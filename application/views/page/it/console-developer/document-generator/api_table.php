@@ -59,7 +59,7 @@
 		    </div>
 		    <div class="panel-footer" style="text-align: right;">
 		    	<button class="btn btn-primary" id ="BtnRun">Run</button>
-		        <button class="btn btn-success" id="btnSave" action = "add" data-id="" disabled>Save</button>
+		        <button class="btn btn-success" id="btnSave" action = "add" data-id="" disabled dt="">Save</button>
 		    </div>
 		</div>
 	</div>
@@ -92,9 +92,12 @@
 <script type="text/javascript">
 	var S_Table_example_emp;
 	var S_Table_example_mhs;
+	var S_Table_example_;
+	var oTable;
 	var App_query = {
 		Loaded : function(){
 			$('.Input').val('');
+			App_query.LoadTable();
 		},
 
 		SetDomParams : function(dt){
@@ -347,34 +350,62 @@
 			return html;
 		},
 
-		RunQuery : function(selector,action="add",ID=""){
+		RunQuery : function(selector,action="add",ID="",DepartmentArr=[]){
 			var data = {};
+			var selectorHTML = selector.html();
 			var c = 0; // for add parameter obj
-			$('.Input').not('div').each(function(){
-		        var field = $(this).attr('name');
-		        var key = $(this).attr('key');
-		        if (key == 'user' ) {
-		        	if (c == 0) {
-		        		data['user'] = [];
-		        		c = 1;
-		        	}
-		        	var temp = [];
-		        	var keyindex = parseInt($(this).closest('.row').attr('keyindex'));
-		        	data['user'][keyindex] = {};
-		        	data['user'][keyindex][field] = $(this).val();
-		        }
-		        else
-		        {
-		        	data[field] = $(this).val();
-		        }
-		        
-		    })
+			if (action != 'delete') {
+				$('.Input').not('div').each(function(){
+			        var field = $(this).attr('name');
+			        var key = $(this).attr('key');
+			        // console.log(field);
+			        if (key == 'user' ) {
+			        	if (c == 0) {
+			        		data['user'] = [];
+			        		c = 1;
+			        	}
+			        	var temp = [];
+			        	var keyindex = parseInt($(this).closest('.row').attr('keyindex'));
+			        	data['user'][keyindex] = {};
+			        	data['user'][keyindex][field] = $(this).val();
+			        }
+			        else
+			        {
+			        	data[field] = $(this).val();
+			        }
+			        
+			    })
+
+			    if ( $('.Input[name="ApiNameTable"]').length ) {
+			    	// validation
+			    	var q = $('.Input[name="Query"]').val();
+			    	var ap = $('.Input[name="ApiNameTable"]').val();
+			    	// console.log(q);
+			    	// console.log(ap);
+			    	if ( q == '' || ap == ''  ) {
+			    		toastr.info('Query & ApiNameTable are required');
+			    		return;
+			    	}
+			    }
+			}
+
 
 			var dataform = {
 			    action : action,
 			    data : data,
 			    ID : ID,
 			};
+
+			// console.log(dataform);
+
+			if (action == 'add' || action == 'edit') {
+				if (DepartmentArr.length == 0) {
+					toastr.info('Please choose least one department');
+					return;
+				}
+				dataform['DepartmentArr'] = DepartmentArr;
+			}
+
 			loading_button2(selector);
 			var url = base_url_js+"it/__request-document-generator/__sqlQueryLanguange";
 			var token = jwt_encode(dataform,'UAP)(*');
@@ -384,18 +415,32 @@
 				var st = response['status'];
 				if (st == 2) {
 					App_query.SetDomParams(response['data']);
+					$('#TBLQuery').empty();
 				}
 				else if(st==0){
 					toastr.error(JSON.stringify(response['callback']));
+					$('#ParamsResult').empty();
+					$('#TBLQuery').empty();
 				}
 				else if(st==1)
 				{
-					// exceute query
-					App_query.SetDomTBLResult(response['data']['query']);
+					if (action != 'run') {
+						toastr.success('Success'); 
+						location.reload();
+					}
+					else
+					{
+						// exceute query
+						if (data['Params']=='') {
+							$('#ParamsResult').empty();
+						}
+						App_query.SetDomTBLResult(response['data']['query']);
+
+					}
 				}
-				end_loading_button2(selector,'Run');				
+				end_loading_button2(selector,selectorHTML);				
 			}).fail(function() {
-				end_loading_button2(selector,'Run');
+				end_loading_button2(selector,selectorHTML);
 			});
 
 		},
@@ -406,13 +451,36 @@
 			if (data.length > 0) {
 				// console.log(data);
 				var arr_header = data[0];
-				var html = '<div class = "well">'+
-								'<div style = "padding:15px;">'+
-									'<label>Query Result</label>'+
+				var valueApiNameTable = '';
+				var dt = $('#btnSave').attr('dt');
+				// console.log(dt);
+				if (dt != '') {
+					var dt_decode = jwt_decode(dt);
+					// console.log(dt_decode);
+					if (dt_decode == undefined) {
+						valueApiNameTable = '';
+					}
+					else
+					{
+						valueApiNameTable = dt_decode['ApiNameTable'];
+					}
+				}
+
+				var html = '<div class = "well">';
+				html  += '<div class = "row" style = "margin-top:5px;">'+
+							'<div class = "col-md-12">'+
+								'<div class = "form-group">'+
+									'<label>API Name Table</label>'+
+									'<input type = "text" class = "form-control Input" name = "ApiNameTable" value = "'+valueApiNameTable+'" />'+
 								'</div>'+
-									'<div class = "row">'+
-										'<div class = "col-md-12">'+
-											'<div class = "table-responsive">';	
+							'</div>'+
+						  '</div>';
+									html  += '<div style = "padding:15px;">'+
+												'<label>Query Result</label>'+
+											'</div>'+
+											'<div class = "row">'+
+													'<div class = "col-md-12">'+
+														'<div class = "table-responsive">';	
 				html += '<table class="table" id = "TBLResultQuery"><thead><tr>';
 				for (key in arr_header){
 					html += '<th>'+key+'</th>';
@@ -438,14 +506,7 @@
 
 				html += '</table>';
 				html += '</div></div></div>';
-				html  += '<div class = "row" style = "margin-top:5px;">'+
-							'<div class = "col-md-12">'+
-								'<div class = "form-group">'+
-									'<label>API Name Table</label>'+
-									'<input type = "text" class = "form-control Input" name = "ApiNameTable" />'+
-								'</div>'+
-							'</div>'+
-						  '</div>';		
+						
 				html += '</div>';
 
 				selector.html(html);
@@ -460,20 +521,220 @@
 			}
 		},
 
+		ShowModalDepartment : function(selector,action='add',ID='',get_data=[]){
+		    var html = '';
+		    html ='<div class = "row">'+
+		            '<div class = "col-md-12">'+
+		                '<table id="example_budget" class="table table-bordered display select" cellspacing="0" width="100%">'+
+		       '<thead>'+
+		          '<tr>'+
+		             '<th>Select &nbsp <input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+		             '<th>Code</th>'+
+		             '<th>Departement</th>'+
+		          '</tr>'+
+		       '</thead>'+
+		  '</table></div></div>';
+
+		    $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Department'+'</h4>');
+		    $('#GlobalModalLarge .modal-body').html(html);
+		    $('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
+		        '<button type="button" id="ModalbtnSaveForm" action = "'+action+'" data-id = "'+ID+'" class="btn btn-success">Save</button>');
+		    $('#GlobalModalLarge').modal({
+		        'show' : true,
+		        'backdrop' : 'static'
+		    });
+		    var url = base_url_js+'api/__getAllDepartementPU';
+		    $.get( url, function( dt ) {
+		        var table = $('#example_budget').DataTable({
+		              "processing": true,
+		              "serverSide": false,
+		              "data" : dt,
+		              'columnDefs': [
+		                  {
+		                     'targets': 0,
+		                     'searchable': false,
+		                     'orderable': false,
+		                     'className': 'dt-body-center',
+		                     'render': function (data, type, full, meta){
+		                         var checked = '';
+		                         // console.log(get_data);
+		                         if (get_data['document_access_department'] != undefined) {
+		                         	var document_access_department = get_data['document_access_department'];
+		                         	for (var i = 0; i < document_access_department.length; i++) {
+		                         		if (document_access_department[i]['Department'] == full.Code) {
+		                         			checked = 'checked';
+		                         			break;
+		                         		}
+		                         	}
+		                         }
+		                         
+		                         return '<input type="checkbox" name="id[]" value="' + full.Code + '" dt = "'+full.Abbr+'" '+checked+'>';
+		                     }
+		                  },
+		                  {
+		                     'targets': 1,
+		                     'render': function (data, type, full, meta){
+		                         return full.Abbr;
+		                     }
+		                  },
+		                  {
+		                     'targets': 2,
+		                     'render': function (data, type, full, meta){
+		                         return full.Name2;
+		                     }
+		                  },
+		              ],
+		              'createdRow': function( row, data, dataIndex ) {
+		                    // console.log(data);
+		              },
+		              // 'order': [[1, 'asc']]
+		        });
+
+		        S_Table_example_ = table;
+		    });
+
+		},
+
+		LoadTable : function(){
+		   var recordTable = $('#TblList').DataTable({
+		       "processing": true,
+		       "serverSide": false,
+		       "ajax":{
+		           url : base_url_js+"it/__request-document-generator/__sqlQueryLanguange", // json datasource
+		           ordering : false,
+		           type: "POST",  // method  , by default get
+		           data : function(token){
+		                 // Read values
+		                  var data = {
+		                         action : 'read',
+		                     };
+		                 // Append to data
+		                 token.token = jwt_encode(data,'UAP)(*');
+		           }
+		        },
+		         'columnDefs': [
+		            {
+		               'targets': 1,
+		               'searchable': false,
+		               'orderable': false,
+		               // 'className': 'dt-body-center',
+		               'render': function (data, type, full, meta){
+		               	   var btnEdit = '<li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[1]+'" data = "'+full[2]+'"><i class="fa fa fa-edit"></i> Edit</a></li>';
+		               	   var btnRemove = '<li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[1]+'"><i class="fa fa fa-remove"></i> Remove</a></li>';
+
+		               	   var btnAction = '<div class="btn-group">' +
+		               	       '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+		               	       '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
+		               	       '  </button>' +
+		               	       '  <ul class="dropdown-menu">' +
+		               	      		btnEdit +
+		               	       // '    <li role="separator" class="divider"></li>' +
+		               	       		btnRemove +
+		               	       '  </ul>' +
+		               	       '</div>';
+
+		                   var ht = btnAction;
+		                   return ht;
+		               }
+		            },
+		            
+		         ],
+		       'createdRow': function( row, data, dataIndex ) {
+		               
+		       },
+		       dom: 'l<"toolbar">frtip',
+		       initComplete: function(){
+		         
+		      }  
+		   });
+		   
+		   oTable = recordTable;
+		},
+
 	};
 
 	$(document).ready(function(e){
 		App_query.Loaded();
 	})
 
+	$(document).off('click', '.btnEdit').on('click', '.btnEdit',function(e) {
+	   var itsme = $(this);
+	   var ID = itsme.attr('data-id');
+	   var data  = jwt_decode(itsme.attr('data'));
+	   var action = 'edit';
+	   $('#btnSave').attr('action',action);
+	   $('#btnSave').attr('data-id',ID);
+	   $('#btnSave').attr('dt',itsme.attr('data'));
+	   // console.log(data);
+	   
+	   	$('.Input').each(function(e){
+	   		var nm = $(this).attr('name');
+	   		for (key in data){
+	   			if (key == nm ) {
+	   				$(this).val(data[key]);
+	   				break;
+	   			}
+	   		}
+	   	})
+
+	   	$('#BtnRun').trigger('click');
+	})
+
+	$(document).off('click', '.btnRemove').on('click', '.btnRemove',function(e) {
+		var itsme = $(this);
+		var action = 'delete';
+		var ID = itsme.attr('data-id');
+		App_query.RunQuery(itsme,action,ID);
+	})
+
 	$(document).off('click', '#BtnRun').on('click', '#BtnRun',function(e) {
 	   var itsme = $(this);
+	   // $('#ParamsResult').empty();
+	   // $('#TBLQuery').empty();
 	   App_query.RunQuery(itsme,'run');
 	})
 
 	$(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
 	   var itsme = $(this);
-	   App_query.RunQuery(itsme,'add');
+	   var action = itsme.attr('action');
+	   var ID = itsme.attr('data-id');
+	   var dt = [];
+	   var get_dt = itsme.attr('dt');
+	   if (get_dt != '') {
+	   		dt = jwt_decode(get_dt);
+	   		if (dt == undefined) {
+	   			dt = [];
+	   		}
+	   }
+	   App_query.ShowModalDepartment(itsme,action,ID,dt);
+	})
+
+	// Handle click on "Select all" control
+	$(document).off('click', '#example-select-all').on('click', '#example-select-all',function(e) {
+	   // Get all rows with search applied
+	   var rows = S_Table_example_.rows({ 'search': 'applied' }).nodes();
+	   // Check/uncheck checkboxes for all rows in the table
+	   $('input[type="checkbox"]', rows).prop('checked', this.checked);
+	});
+
+	$(document).off('click', '#ModalbtnSaveForm').on('click', '#ModalbtnSaveForm',function(e) {
+	   var itsme = $(this);
+	   var action = itsme.attr('action');
+	   var ID = itsme.attr('data-id');
+	   var DepartmentArr = [];
+	   S_Table_example_.$('input[type="checkbox"]:checked').each(function(){
+	     var v = $(this).val();
+	     var n = $(this).attr('dt');
+	     var temp = {
+	       Code : v,
+	       Name : n,
+	     };
+
+	     DepartmentArr.push(temp);
+	   }); // exit each function
+
+	   App_query.RunQuery(itsme,action,ID,DepartmentArr);
+	   
 	})
 
 	$(document).off('click', '.SearchNIPEMP').on('click', '.SearchNIPEMP',function(e) {
