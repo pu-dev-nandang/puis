@@ -6,7 +6,7 @@
 <div id="global-information-dash">
 	<div class="container">
 		<div class="row">
-			<div class="col-sm-3">
+			<div class="col-sm-4">
 				<div class="panel panel-default" id="click-me" data-href="global-informations/students">
 					<div class="panel-body">
 						<div class="row card">
