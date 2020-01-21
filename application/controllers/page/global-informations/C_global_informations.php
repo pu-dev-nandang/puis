@@ -554,9 +554,9 @@ class C_global_informations extends Globalclass {
 	            }
 	            $data['profilePIC'] = $srcImg;
         		$data['detail'] = $isExist;
-        		$splitMPosition = explode(".", $isExist->PositionMain);
+        		/*$splitMPosition = explode(".", $isExist->PositionMain);
     			$data['divisionMain'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitMPosition[0]))->row();
-    			$data['positionMain'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitMPosition[1]))->row();
+    			$data['positionMain'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitMPosition[1]))->row();*/
     			if(!empty($isExist->PositionOther1)){
 	    			$splitOTHPosition1 = explode(".", $isExist->PositionOther1);
 	    			$data['othPositionDiv1'] = $this->General_model->fetchData("db_employees.division",array("ID"=>(!empty($splitOTHPosition1[0]) ? $splitOTHPosition1[0] : null)))->row();
