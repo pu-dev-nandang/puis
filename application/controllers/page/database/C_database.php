@@ -548,6 +548,7 @@ class C_database extends Globalclass {
         }else{$adMessage="Windows active directory server not connected";}
         
     }
+    /*END ADDED BY FEBRI @ NOV 2019*/
 
     private function pingAddress($url=null) {
         if(!empty($url)){
@@ -571,7 +572,6 @@ class C_database extends Globalclass {
         return $status;*/
     }
 
-    /*END ADDED BY FEBRI @ NOV 2019*/
 
 
     // Reset Pasword ====
