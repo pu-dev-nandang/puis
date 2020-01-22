@@ -6,6 +6,7 @@ class C_lpmi extends Lpmi {
     function __construct()
     {
         parent::__construct();
+        $this->load->model('General_model');
     }
 
 
@@ -40,6 +41,62 @@ class C_lpmi extends Lpmi {
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/edom/crudQuestion',$data,true);
         $this->menu_edom($page);
+    }
+
+
+    public function edom_list_result(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/edom/list_result',$data,true);
+        $this->menu_edom($page);
+    }
+
+
+    public function request_edom(){
+        $data = $this->input->post();
+        if($data){
+            $explodeSemester = explode(".", $data['semester']);
+            $semeseterID = (!empty($explodeSemester[0]) ? $explodeSemester[0] : 0);
+            $semeseterYear = (!empty($explodeSemester[1]) ? $explodeSemester[1] : 0);
+            $semeseterOddEvent = (!empty($explodeSemester[2]) ? $explodeSemester[2] : 0);
+            
+            $explodeProdi = explode(".", $data['prodi']);
+            $prodiID = (!empty($explodeProdi[0]) ? $explodeProdi[0] : 0);
+            $prodiCode = (!empty($explodeProdi[1]) ? $explodeProdi[1] : null);
+            
+            $message = "";
+            if((!empty($semeseterID) && !empty($semeseterYear)) && (!empty($prodiID)) ){
+                $tablename = "edomrecap".$semeseterYear;
+                $conditions = array("Prodi_id"=>$prodiID,"Semester_id"=>$semeseterID);
+                $results = $this->General_model->fetchData("db_statistik.".$tablename,$conditions)->result();
+                
+                if(!empty($results)){
+                    header("Content-type: application/vnd-ms-excel");
+                    header("Content-Disposition: attachment; filename=edom-recap-".$semeseterYear."-".(($semeseterOddEvent == 2) ? "Ganjil":"Genap").".xls");
+                    echo '<table border="1"><thead><tr><th>No</th><th>Code</th><th>Course</th><th>Group</th><th>Program Study</th><th>Lecturer</th><th>NIP</th><th>Question</th><th>Total Student</th><th>Rate</th></tr></thead><tbody>';
+                    $no = 1;
+                    foreach ($results as $v) {
+                        echo '<tr height="50px"><td>'.$no.'</td>'.
+                             '<td>'.$v->CourseCode.'</td>'.
+                             '<td>'.$v->CourseNameEng.'</td>'.
+                             '<td>'.$v->ClassGroup.'</td>'.
+                             '<td>'.$v->ProdiNameEng.'</td>'.
+                             '<td>'.$v->Lecturer.'</td>'.
+                             '<td>'.$v->LecturerNIP.'</td>'.
+                             '<td width="60%">'.$v->Question.'</td>'.
+                             '<td>'.$v->TotalStudent.'</td>'.
+                             '<td>'.round($v->Rate,2).'</td></tr>';
+                        $no++;
+                    }
+                    echo '</tbody></table>';
+                    // /$message = "Your request data has been completed.";
+                }else{
+                    $message = "Your request data is unavailable.";
+                    $this->session->set_flashdata("message",$message);
+                    redirect(site_url('lpmi/lecturer-evaluation/download-result'));
+                }
+            }
+            
+        }
     }
 
 
