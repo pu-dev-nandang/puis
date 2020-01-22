@@ -1971,7 +1971,7 @@ class M_api extends CI_Model {
 
 
         if(count($dataIDLast)>0){
-            $dataResult = $this->db->query('SELECT s.GradeValue,s.SemesterID,cd.TotalSKS AS Credit FROM '.$db_ta.'.study_planning s
+            $dataResult = $this->db->query('SELECT s.GradeValue,s.SemesterID,cd.TotalSKS AS Credit, s.Approval FROM '.$db_ta.'.study_planning s
                                                 LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = s.CDID)
                                                 WHERE s.NPM = "'.$NPM.'" AND s.SemesterID <= "'.$smtActID.'" ORDER BY s.SemesterID ASC ')->result_array();
 
@@ -1985,10 +1985,12 @@ class M_api extends CI_Model {
             for ($s=0;$s<count($dataResult);$s++){
 
                 // Menghitung IPK
-                $TotalSKS = $TotalSKS + (int) $dataResult[$s]['Credit'];
-                $gradeV = (int) $dataResult[$s]['Credit'] * (float) $dataResult[$s]['GradeValue'];
+                if($dataResult[$s]['Approval']=='2'){
+                    $TotalSKS = $TotalSKS + (int) $dataResult[$s]['Credit'];
+                    $gradeV = (int) $dataResult[$s]['Credit'] * (float) $dataResult[$s]['GradeValue'];
 
-                $totalGradeValue =$totalGradeValue + $gradeV;
+                    $totalGradeValue =$totalGradeValue + $gradeV;
+                }
 
                 if($dataResult[$s]['SemesterID']==$dataIDLast[0]['ID']){
                     $TotalSKSSemester = $TotalSKSSemester + (int) $dataResult[$s]['Credit'];
