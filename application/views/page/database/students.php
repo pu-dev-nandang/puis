@@ -31,7 +31,7 @@
                                 <div class="col-sm-2">
                                     <div class="form-group">
                                         <label>Class of</label>                             
-                                        <select class="form-control" name="Year">
+                                        <select class="form-control" name="Year" id="classOf">
                                             <option value="">-Choose year-</option>
                                             <?php if(!empty($yearIntake)) { 
                                             foreach ($yearIntake as $y) {
@@ -152,17 +152,17 @@
                                 </div>
                             </div>
                             <div class="row" style="padding-top:22px">
-                                <div class="col-sm-8">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <button class="btn btn-primary btn-filter" type="button"><i class="fa fa-search"></i> Search</button>
                                         <a class="btn btn-default" href="">Clear Filter</a>
                                     </div>
                                 </div>
                                 <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>                    
-                                <div class="col-sm-4 text-right">
+                                <div class="col-sm-6 text-right">
                                     <div class="form-group">
                                         <button type="button" class="btn btn-default" id="btnStdDownloadtoExcel"><i class="fa fa-download margin-right"></i> Export Students Information to Excel</button>
-                                        <!-- <button type="button" class="btn btn-default" id="btnIPSIPKDownloadtoExcel"><i class="fa fa-download margin-right"></i> Export IPS/IPK Students to Excel</button>                                         -->
+                                        <button type="button" class="btn btn-default" id="btnIPSIPKDownloadtoExcel"><i class="fa fa-download margin-right"></i> Export IPS/IPK Students to Excel</button>                                        
                                     </div>
                                 </div>
                                 <?php } ?>  
@@ -373,7 +373,7 @@
             var Year = $("#form-filter").find("select[name=Year]").val();
             if(!Year || Year.length == 0){
                 $("#filter-form .panel").animateCss('shake');
-                toastr.warning('Please fill form filter at least fill the field "Class of"','Warning');
+                toastr.info('Please fill form filter at least fill the field "Class of"','Warning');
             }else{
                 FormSubmitAuto(url, 'POST', [{ name: 'token', value: token },]);
             }
@@ -386,8 +386,8 @@
             var Year = $("#form-filter").find("select[name=Year]").val();
             var ProdiID = $("#form-filter").find("select[name=ProdiID]").val();
             if((!Year && Year.length == 0) || (!ProdiID && ProdiID.length == 0) ){
-                $("#filter-form .panel").animateCss('shake');
-                toastr.warning('Please fill field "Class of" and "Study Program".','Warning');
+                $("#prodiID, #classOf ").animateCss('shake');
+                toastr.info('Please fill field "Class of" and "Study Program".','Warning');
             }else{
                 FormSubmitAuto(url, 'POST', [{ name: 'token', value: token },]);
             }

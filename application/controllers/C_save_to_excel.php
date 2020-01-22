@@ -2421,49 +2421,64 @@ class C_save_to_excel extends CI_Controller
 
 
         /*UPDATED BY FEBRI @ JAN 2020*/
-        $this->load->model(array("global-informations/Globalinformation_model","General_model"));
+       $this->load->model("global-informations/Globalinformation_model");
         $reqdata = $this->input->post();
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
         $param = array();
-        $Tyear = date('Y');
-        
+
+        if(!empty($data_arr['student'])){
+            $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$data_arr['student']."%' ","filter"=>"AND",);    
+            $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$data_arr['student']."%' ","filter"=>"OR",);
+            $param[] = array("field"=>"ath.`EmailPU`","data"=>" like '%".$data_arr['student']."%') ","filter"=>"OR",);
+        }        
         if(!empty($data_arr['Year'])){
             $Tyear = $data_arr['Year'];
             $param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$data_arr['Year']." ","filter"=>"AND",);    
+        }else{
+            $Tyear = date("Y");
         }
         if(!empty($data_arr['ProdiID'])){
             $param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$data_arr['ProdiID']." ","filter"=>"AND",);    
         }
-        
-        $results = $this->Globalinformation_model->fetchStudentsPS(false,$param);
-        $results = $this->General_model->fetchData("")->result();
-        if(!empty($results)){
-            foreach ($results as $v) {
-                echo "<h1>Student {$v->NPM}-{$v->Name} </h1>";
-                $getTranscript = $this->General_model->callStoredProcedure("call db_academic.fetchStudentTranscript(".$v->NPM.")")->result();
-                $v->transcript = $getTranscript;
-                /*if(!empty($getTranscript)){
-                    $dataTranscript = array();
-                    $IPK=0;$IPS=0;$TotalCredit=0;$TotalPoint=0;
-                    $year = 0;$nsemester = 1;
-                    foreach ($getTranscript as $t) {
-                        if($t->TermYear != $year){
-                            echo "<h3>Semester {$nsemester} Term {$t->Term}</h3>";
-                            $nsemester++;
-                        }
-                        echo "<p>Credit :".$t->Credit."</p>";
-                        echo "<p>Grade :".$t->Grade."</p>";
-                        echo "<p>Grade Value :".$t->GradeValue."</p>";
-                        echo "<p>Point :".round($t->Point,2)."</p>";
-                        echo "<hr>";
-                        $year = $t->TermYear;                        
-                    }
-                }*/
+        if(!empty($output['GroupProdiID'])){
+            $param[] = array("field"=>"ath.`ProdiGroupID`","data"=>" =".$output['GroupProdiID']." ","filter"=>"AND",);
+        }
+        if(!empty($data_arr['status'])){
+        $param[] = array("field"=>"ss.`CodeStatus`","data"=>" =".$data_arr['status']." ","filter"=>"AND",);    
+        }
+        if(!empty($data_arr['gender'])){
+            $param[] = array("field"=>"ta.`Gender`","data"=>" ='".$data_arr['gender']."' ","filter"=>"AND",);    
+        }
+        if(!empty($data_arr['religion'])){
+            $param[] = array("field"=>"ag.`ID`","data"=>" =".$data_arr['religion']." ","filter"=>"AND",);    
+        }
+        if(!empty($data_arr['graduation_year'])){
+            $param[] = array("field"=>"ath.`GraduationYear`","data"=>" =".$data_arr['graduation_year']." ","filter"=>"AND",);    
+        }
+        if(!empty($data_arr['graduation_start'])){
+            if(!empty($data_arr['graduation_end'])){
+                $param[] = array("field"=>"(ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($data_arr['graduation_start']))."' ","filter"=>"AND",);    
+                $param[] = array("field"=>"ath.`GraduationDate`","data"=>" <= '".date("Y-m-d",strtotime($data_arr['graduation_end']))."' )","filter"=>"AND",);    
+            }else{
+                $param[] = array("field"=>"ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($data_arr['graduation_start']))."' ","filter"=>"AND",);
+            }
+        }        
+        if(!empty($data_arr['birthdate_start'])){
+            if(!empty($data_arr['birthdate_end'])){
+                $param[] = array("field"=>"(ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);    
+                $param[] = array("field"=>"ta.DateOfBirth","data"=>" <= '".date("Y-m-d",strtotime($data_arr['birthdate_end']))."' )","filter"=>"AND",);    
+            }else{
+                $param[] = array("field"=>"ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);
             }
         }
-        var_dump($results);
-        die();
+
+        if(!empty($data_arr['isapprove'])){
+            if($data_arr['isapprove']){
+                $param[] = array("field"=>"ts.isApproval","data"=>" = 1 ","filter"=>"AND",);
+            }
+        }
+        $results = $this->Globalinformation_model->fetchStudentsPS(false,false,$param);
         /*END UPDATED BY FEBRI @ JAN 2020*/
 
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
@@ -2527,10 +2542,9 @@ class C_save_to_excel extends CI_Controller
         $excel->setActiveSheetIndex(0)->setCellValue('A3', "NIM"); // Set kolom A3 dengan tulisan "NIK"
         $excel->setActiveSheetIndex(0)->setCellValue('B3', "Nama");
         $excel->setActiveSheetIndex(0)->setCellValue('C3', "Program Studi");
-        $excel->setActiveSheetIndex(0)->setCellValue('D3', "SKS IPS");
-        $excel->setActiveSheetIndex(0)->setCellValue('E3', "IPS");
-        $excel->setActiveSheetIndex(0)->setCellValue('F3', "Total SKS");
-        $excel->setActiveSheetIndex(0)->setCellValue('G3', "IPK");
+        $excel->setActiveSheetIndex(0)->setCellValue('D3', "IPS");
+        $excel->setActiveSheetIndex(0)->setCellValue('E3', "Total SKS");
+        $excel->setActiveSheetIndex(0)->setCellValue('F3', "IPK");
 
         // Apply style header yang telah kita buat tadi ke masing-masing kolom header
         $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
@@ -2539,20 +2553,25 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('D3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('F3')->applyFromArray($style_col);
-        $excel->getActiveSheet()->getStyle('G3')->applyFromArray($style_col);
 
         $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
 
-        if(count($data)>0){
-            foreach ($data AS $item){
+        if(!empty($results)){
+            $IPS = 0; $IPK=0; $Credit=0;
+            foreach ($results AS $item){
                 // Buat header tabel nya pada baris ke 3
-                $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $item['NPM']);
-                $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, ucwords(strtolower($item['Name'])));
-                $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, ucwords(strtolower($item['ProdiName'])));
-                $excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow, $item['IPS_TotalCredit']);
-                $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow, $item['IPS']);
-                $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $item['IPK_TotalCredit']);
-                $excel->setActiveSheetIndex(0)->setCellValue('G'.$numrow, $item['IPK']);
+                $getGPA = $this->Globalinformation_model->fetchStudentTranscript($item->NPM);
+                if(!empty($getGPA)){
+                    $IPS = $getGPA['GPA']['IPS'];
+                    $IPK = $getGPA['GPA']['IPK'];
+                    $Credit = $getGPA['GPA']['TotalCredit'];
+                }
+                $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $item->NPM);
+                $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, ucwords(strtolower($item->Name)));
+                $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, ucwords(strtolower($item->ProdiNameEng)));
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow, $IPS);
+                $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow, $Credit);
+                $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $IPK);
 
                 // Apply style header yang telah kita buat tadi ke masing-masing kolom header
                 $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_col_fill);
@@ -2561,7 +2580,6 @@ class C_save_to_excel extends CI_Controller
                 $excel->getActiveSheet()->getStyle('D'.$numrow)->applyFromArray($style_col_fill);
                 $excel->getActiveSheet()->getStyle('E'.$numrow)->applyFromArray($style_col_fill);
                 $excel->getActiveSheet()->getStyle('F'.$numrow)->applyFromArray($style_col_fill);
-                $excel->getActiveSheet()->getStyle('G'.$numrow)->applyFromArray($style_col_fill);
                 $numrow += 1;
             };
         }
@@ -2649,7 +2667,7 @@ class C_save_to_excel extends CI_Controller
                 $param[] = array("field"=>"ts.isApproval","data"=>" = 1 ","filter"=>"AND",);
             }
         }
-        $results = $this->Globalinformation_model->fetchStudentsPS(false,$param);
+        $results = $this->Globalinformation_model->fetchStudentsPS(false,false,$param);
         /*END UPDATED BY FEBRI @ JAN 2020*/
 
 
@@ -2836,7 +2854,7 @@ class C_save_to_excel extends CI_Controller
                 $excel->setActiveSheetIndex(0)->setCellValue('G'.$numrow,$item->Gender);
                 $excel->setActiveSheetIndex(0)->setCellValue('H'.$numrow,$item->religionName);
                 $excel->setActiveSheetIndex(0)->setCellValue('I'.$numrow,$item->PlaceOfBirth);
-                $excel->setActiveSheetIndex(0)->setCellValue('J'.$numrow,$item->DateOfBirth);
+                $excel->setActiveSheetIndex(0)->setCellValue('J'.$numrow,date("d F Y",strtotime($item->DateOfBirth)));
                 $excel->setActiveSheetIndex(0)->setCellValue('K'.$numrow,$item->Address);
                 $excel->setActiveSheetIndex(0)->setCellValue('L'.$numrow,$item->Phone);
                 $excel->setActiveSheetIndex(0)->setCellValue('M'.$numrow,$item->HP);
