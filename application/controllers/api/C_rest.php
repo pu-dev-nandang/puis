@@ -270,6 +270,25 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function getDetailsCourse(){
+
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+
+        if($cekUser){
+
+            $data = $this->m_rest->getDetailsCourse($dataToken['ClassOf'],$dataToken['NPM']);
+            return print_r(json_encode($data));
+
+        } else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+
+    }
+
     public function getListStudentScores(){
         $requestData= $_REQUEST;
 

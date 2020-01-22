@@ -2383,7 +2383,7 @@ class C_rest3 extends CI_Controller {
         elseif ($mode == 'MasaStudiLulusan') {
           $ProdiID = $dataToken['ProdiID'];
           $ex = explode('.', $ProdiID);
-          $ProdiID = $ProdiID[0];
+          $ProdiID = $ex[0];
           $ProdiName = $dataToken['ProdiName'];
           /*  
               Tahun Masuk = ta
@@ -2446,7 +2446,9 @@ class C_rest3 extends CI_Controller {
             $temp[] = $TahunMasuk;
             $JumlahMhsDiterima = 0;
             if ($TahunMasuk >= $YearMin) {
+
               $sql = 'select count(*) as total from ta_'.$TahunMasuk.'.students where ProdiID ='.$ProdiID;
+
               $query =$this->db->query($sql, array())->result_array();
               $JumlahMhsDiterima = $query[0]['total'];
             }
@@ -2719,5 +2721,115 @@ class C_rest3 extends CI_Controller {
         }
     }
 
+
+    public function LoadEmployees_server_side(){
+      $requestData = $_REQUEST;
+      $sqlTotalData = 'select count(*) as total from (
+              select a.NIP,
+                          SPLIT_STR(a.PositionMain, ".", 1) as DivisionID,c.Division as DepartmentName,
+                          SPLIT_STR(a.PositionMain, ".", 2) as PosistionID,d.Position as PositionName
+                          from db_employees.employees as a
+                          left join db_academic.program_study as b on a.ProdiID = b.ID
+                          left join db_employees.division as c on SPLIT_STR(a.PositionMain, ".", 1) = c.ID
+                          left join db_employees.position as d on SPLIT_STR(a.PositionMain, ".", 2) = d.ID
+              where 
+              (
+                a.Name LIKE "'.$requestData['search']['value'].'%" OR
+                a.NIP LIKE "'.$requestData['search']['value'].'%" OR
+                c.Division LIKE "'.$requestData['search']['value'].'%" OR
+                d.Position LIKE "'.$requestData['search']['value'].'%" 
+              )
+          )xx';
+      $queryTotal = $this->db->query($sqlTotalData)->result_array();
+      $totalData = $queryTotal[0]['total'];
+
+      $sql = 'select a.*,b.Name as ProdiName,b.Name as NameProdiEng,
+            SPLIT_STR(a.PositionMain, ".", 1) as DivisionID,c.Division as DepartmentName,
+            SPLIT_STR(a.PositionMain, ".", 2) as PosistionID,d.Position as PositionName
+            from db_employees.employees as a
+            left join db_academic.program_study as b on a.ProdiID = b.ID
+            left join db_employees.division as c on SPLIT_STR(a.PositionMain, ".", 1) = c.ID
+            left join db_employees.position as d on SPLIT_STR(a.PositionMain, ".", 2) = d.ID
+            where 
+            (
+              a.Name LIKE "'.$requestData['search']['value'].'%" OR
+              a.NIP LIKE "'.$requestData['search']['value'].'%" OR
+              c.Division LIKE "'.$requestData['search']['value'].'%" OR
+              d.Position LIKE "'.$requestData['search']['value'].'%" 
+            )
+            ';
+      $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+      $query = $this->db->query($sql)->result_array();
+      $No = $requestData['start'] + 1;
+      $data = array();
+      for ($i=0; $i < count($query); $i++) {
+          $nestedData=array();
+          $row = $query[$i];
+          $nestedData[] = $No;
+          // foreach ($row as $key => $value) {
+          //   $nestedData[] = $value;
+          // }
+          $nestedData[] = $row['NIP'];
+          $nestedData[] = $row['Name'];
+          $nestedData[] = $row['DepartmentName'];
+          $nestedData[] = $row['PositionName'];
+          $tokenRow = $this->jwt->encode($row,"UAP)(*");
+          $nestedData['data'] = $tokenRow;
+          $data[] = $nestedData;
+          $No++;
+      }
+
+      $json_data = array(
+          "draw"            => intval( $requestData['draw'] ),
+          "recordsTotal"    => intval($totalData),
+          "recordsFiltered" => intval($totalData ),
+          "data"            => $data,
+      );
+
+      echo json_encode($json_data);
+
+    }
+
+   
+
+    public function LoadStudents_server_side(){
+      $this->load->model("global-informations/Globalinformation_model");
+      $requestData = $_REQUEST;
+      $param= [];
+      if(!empty($requestData['search']['value']) ) {
+          $search = $requestData['search']['value'];
+          $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$search."%' ","filter"=>"AND",);    
+          $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$search."%' ","filter"=>"OR",);    
+          $param[] = array("field"=>"ps.`NameEng`","data"=>" like '%".$search."%' )","filter"=>"OR",);    
+      }
+      
+      $totalData = $this->Globalinformation_model->fetchTotalDataStudent($param)->Total;
+      $result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$requestData['start'],$requestData['length'],'');
+      $No = (int)$requestData['start'] + 1;
+      $data = array();
+      // print_r($totalData);die();
+      foreach ($result as $key ) {
+         $nestedData = array();
+         $nestedData[] = $No;
+         $No++;
+         $nestedData[] = $key->NPM;
+         $nestedData[] = $key->Name;
+         $nestedData[] = $key->ProdiName;
+         $arr = (array) json_decode(json_encode($key),true);
+         $tokenRow = $this->jwt->encode($arr,"UAP)(*");
+         $nestedData['data'] = $tokenRow;
+         $data[] = $nestedData;
+
+      }
+
+      $json_data = array(
+          "draw"            => intval( $requestData['draw'] ),
+          "recordsTotal"    => intval($totalData ),
+          "recordsFiltered" => intval( $totalData ),
+          "data"            => $data,
+      );
+
+      echo json_encode($json_data);
+    }
 
 }

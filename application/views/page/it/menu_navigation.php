@@ -205,6 +205,12 @@
                             Overwrite Course
                         </a>
                     </li>
+                    <li class="<?= ($this->uri->segment(3)=='timetable') ? "current open" : ""?>">
+                        <a href="<?= base_url('it/academic/timetable') ?>">
+                            <i class="icon-angle-right"></i>
+                            Timetable
+                        </a>
+                    </li>
                 </ul>
             </li>
 

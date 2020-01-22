@@ -13,21 +13,21 @@
     }
 </style>
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="well">
-            <div class="row">
-                <div class="col-md-6">
-                    <button class="btn btn-block btn-default btn-default-primary" id="btnLimitCredit" disabled>Set Limit Credit</button>
-                </div>
-                <div class="col-md-6">
-                    <button class="btn btn-block btn-default btn-default-warning" id="btnDefaultCredit">Set Default Credit</button>
-                </div>
-            </div>
+<div class="row" style="margin-bottom: 10px;">
+    <div class="col-md-12" style="float: right;text-align: right;">
 
+        <div class="btn-group" role="group" aria-label="...">
+            <button type="button" class="btn btn-default btn-default-warning" id="btnLimitCredit" disabled>Set Limit Credit</button>
+            <button type="button" class="btn btn-default btn-default-warning" id="btnDefaultCredit">Set Default Credit</button>
+            <button class="btn btn-default btn-default-warning" id="btnSetExcludeKRSOnline">Set Exclude KRS Online</button>
         </div>
+
     </div>
-    <div class="col-md-8">
+
+</div>
+
+<div class="row">
+    <div class="col-md-12">
         <div class="well">
             <div class="row">
                 <div class="col-md-2">
@@ -388,8 +388,10 @@
                         var dis ='';
                         if(d.LCID!='' && d.LCID!=null){
                             dis = 'disabled'
+                        } else {
+                            $('#selectLC_Students').append('<option value="'+d.NPM+'" '+dis+'>'+d.NPM+' - '+d.Name+'</option>');
                         }
-                        $('#selectLC_Students').append('<option value="'+d.NPM+'" '+dis+'>'+d.NPM+' - '+d.Name+'</option>');
+
                     }
                     $('#selectLC_Students').select2({allowClear: true});
                 }
@@ -559,6 +561,154 @@
 
 
 
+    });
+
+</script>
+
+
+
+<!-- Set Exclude KRS Online -->
+<script>
+
+    $('#btnSetExcludeKRSOnline').click(function () {
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Set Exclude KRS Online</h4>');
+
+        $('#GlobalModal .modal-body').html('<div class="row">' +
+            '    <div class="col-md-12">' +
+            '        <div class="well">' +
+            '            <div class="row">' +
+            '               <div class="col-md-6">' +
+            '                   <div class="form-group">' +
+            '                       <select class="form-control" id="selectLC_Prodi"></select>' +
+            '                   </div>' +
+            '               </div>' +
+            '               <div class="col-md-4">' +
+            '                   <div class="form-group">' +
+            '                           <select class="form-control" id="selectLC_Credit">' +
+            '                               <option value="1">Semester 1</option>' +
+            '                               <option value="2">Semester 2</option>' +
+            '                               <option value="3">Semester 3</option>' +
+            '                               <option value="4">Semester 4</option>' +
+            '                               <option value="5">Semester 5</option>' +
+            '                               <option value="6">Semester 6</option>' +
+            '                               <option value="7">Semester 7</option>' +
+            '                               <option value="8">Semester 8</option>' +
+            '                               <option value="9">Semester 9</option>' +
+            '                               <option value="10">Semester 10</option>' +
+            '                               <option value="11">Semester 11</option>' +
+            '                               <option value="12">Semester 12</option>' +
+            '                               <option value="13">Semester 13</option>' +
+            '                               <option value="14">Semester 14</option>' +
+            '                       </select>' +
+            '                   </div>' +
+            '               </div>' +
+            '               <div class="col-md-2">' +
+            '                   <div class="form-group">' +
+            '                       <button class="btn btn-block btn-success" id="btnSaveExcludeKRSOnline">Add</button>' +
+            '                   </div>' +
+            '               </div>' +
+            '            </div>' +
+            '        </div>' +
+            '    </div>' +
+            '</div>' +
+            '<div class="row">' +
+            '    <div class="col-md-12">' +
+            '        <table class="table table-bordered table-striped table-centre">' +
+            '            <thead><tr>' +
+            '                <th style="width: 1%;">No</th>' +
+            '                <th>Prodi</th>' +
+            '                <th style="width: 7%;">Semester</th>' +
+            '                <th style="width: 7%;"><i class="fa fa-cog"></i></th>' +
+            '            </tr></thead>' +
+            '           <tbody id="listKRSExclude"></tbody>' +
+            '        </table>' +
+            '    </div>' +
+            '</div>');
+
+        loadSelectOptionBaseProdi('#selectLC_Prodi','');
+
+        loadTableKRSExclude();
+
+        $('#btnSaveExcludeKRSOnline').click(function () {
+
+            var selectLC_Prodi = $('#selectLC_Prodi').val();
+            var selectLC_Credit = $('#selectLC_Credit').val();
+
+            if(selectLC_Prodi!='' && selectLC_Prodi!=null){
+
+                var ProdiID = selectLC_Prodi.split('.')[0];
+
+                var data = {
+                    action : 'add_std_krs_exclude',
+                    dataInsert : {
+                        ProdiID : ProdiID,
+                        Semester : selectLC_Credit,
+                        EntredBy : sessionNIP
+                    }
+                };
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__crudLimitCredit';
+                $.post(url,{token:token},function (result) {
+                    if(parseInt(result)>0){
+                        loadTableKRSExclude();
+                        toastr.success('Data saved','Success');
+                    } else {
+                        toastr.warning('Data already exist','Warning');
+                    }
+                });
+
+            }
+
+        });
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
+
+    function loadTableKRSExclude() {
+        var data = {
+            action : 'read_std_krs_exclude'
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudLimitCredit';
+        $.post(url,{token:token},function (jsonResult) {
+            $('#listKRSExclude').empty();
+            if(jsonResult.length>0){
+                var list = '';
+                $.each(jsonResult,function (i,v) {
+                    list = list+'<tr>' +
+                        '<td>'+(i+1)+'</td>' +
+                        '<td style="text-align: left;">'+v.Prodi+'</td>' +
+                        '<td>'+v.Semester+'</td>' +
+                        '<td><button class="btn btn-danger btn-sm btnRemoveExclude" data-id="'+v.ID+'"><i class="fa fa-trash-o"></i></button></td>' +
+                        '</tr>';
+                });
+                $('#listKRSExclude').html(list);
+            } else {
+                $('#listKRSExclude').html('<tr><td colspan="4">-- Data not yet --</td></tr>');
+            }
+
+        });
+    }
+
+    $(document).on('click','.btnRemoveExclude',function () {
+        if(confirm('Are you sure?')){
+            var ID = $(this).attr('data-id');
+            var data = {
+                action : 'remove_std_krs_exclude',
+                ID : ID
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudLimitCredit';
+            $.post(url,{token:token},function (jsonResult) {
+                toastr.success('Data removed','Success');
+                loadTableKRSExclude();
+            });
+        }
     });
 
 </script>

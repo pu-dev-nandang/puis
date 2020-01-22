@@ -10,14 +10,14 @@
                     <select class="form-control input" name = "TA"></select>
                 </div>
                 <div class="form-group">
-                    <label>Tanggal Masuk</label>
+                    <label>Date of Entry</label>
                     <div class="input-group input-append date datetimepicker">
                         <input data-format="yyyy-MM-dd" class="form-control input" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>" name = "Tgl_msk">
                         <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>No SK</label>
+                    <label>SK Number</label>
                     <input type="text" class="form-control input" name = "NoSK">
                 </div>
                 <div class="form-group">
@@ -93,9 +93,9 @@
                                     '<thead>'+
                                         '<tr>'+
                                             '<th>No</th>'+
-                                            '<th>TA Mahasiswa</th>'+
-                                            '<th>Tgl_msk</th>'+
-                                            '<th>NoSK</th>'+
+                                            '<th>Graduate Year</th>'+
+                                            '<th>Date Of Entry</th>'+
+                                            '<th>SK Number</th>'+
                                             '<th>FileUpload</th>'+
                                             '<th>Update At</th>'+
                                             '<th>Update By</th>'+

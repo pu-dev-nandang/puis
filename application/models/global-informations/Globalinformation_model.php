@@ -149,6 +149,7 @@ class Globalinformation_model extends CI_Model{
     }
 
 
+
     public function fetchStudentTranscript($npm){
         if(!empty($npm)){
             $transcriptPS = $this->db->query("call db_academic.fetchStudentTranscript(".$npm.")");
@@ -220,5 +221,37 @@ class Globalinformation_model extends CI_Model{
 
 
     }
+
+    /* Added by Adhi 2020-01-16 */
+    public function fetchTotalDataStudent($param){
+        $where='';
+          if(!empty($param)){
+              $where = 'WHERE ';
+              $counter = 0;
+              foreach ($param as $key => $value) {
+                  if($counter==0){
+                      $where = $where.$value['field']." ".$value['data'];
+                  }
+                  else{
+                      $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                  }
+                  $counter++;
+              }
+          }
+
+          $psquery = 'call db_academic.fetchStudentsTotal("'.$where.'" )';
+          $query = $this->db->query($psquery);
+
+          $value = $query->row();
+
+          mysqli_next_result( $this->db->conn_id );
+          $query->free_result(); 
+
+          return $value;
+    }
+
+
+    /* end Added by Adhi */
+
 
 }

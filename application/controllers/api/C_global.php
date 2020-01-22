@@ -331,28 +331,70 @@ class C_global extends CI_Controller {
         ini_set('max_execution_time', 3600); //300 seconds = 5 minutes
         ini_set('max_execution_time', 0); // for infinite time of execution
 
-        include_once APPPATH.'vendor/autoload.php';
+        // include_once APPPATH.'vendor/autoload.php';
 
-        $phpWord = new \PhpOffice\PhpWord\PhpWord();
-        $section = $phpWord->addSection();
-        $table = $section->addTable();
-        for ($r = 1; $r <= 8; $r++) {
-            $table->addRow();
-            for ($c = 1; $c <= 5; $c++) {
-                $table->addCell(1750)->addText("Row {$r}, Cell {$c}");
-            }
-        }
+        // $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        // $section = $phpWord->addSection();
+        // $table = $section->addTable();
+        // for ($r = 1; $r <= 8; $r++) {
+        //     $table->addRow();
+        //     for ($c = 1; $c <= 5; $c++) {
+        //         $table->addCell(1750)->addText("Row {$r}, Cell {$c}");
+        //     }
+        // }
 
-        $objWriter =  \PhpOffice\PhpWord\IOFactory::createWriter($phpWord);
+        // $objWriter =  \PhpOffice\PhpWord\IOFactory::createWriter($phpWord);
 
-        $fullXml = $objWriter->getWriterPart('Document')->write();
-        $TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('Template3.docx');
-        $TemplateProcessor->setValue('adi',$this->getBodyBlock($fullXml));
+        // $fullXml = $objWriter->getWriterPart('Document')->write();
+        // $TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('Template3.docx');
+        // $TemplateProcessor->setValue('adi',$this->getBodyBlock($fullXml));
 
-        // $TemplateProcessor->setImageValue('areaImages', 'id_emp.png');
-        $TemplateProcessor->setImageValue('areaImages', array('path' => 'id_emp.png', 'width' => 100, 'height' => 100, 'ratio' => false));
+        // // $TemplateProcessor->setImageValue('areaImages', 'id_emp.png');
+        // $TemplateProcessor->setImageValue('areaImages', array('path' => 'id_emp.png', 'width' => 100, 'height' => 100, 'ratio' => false));
 
-        $TemplateProcessor->saveAs('MyWordFile_rev.docx');
+        // $TemplateProcessor->saveAs('MyWordFile_rev.docx');
+
+        // $sql = 'SELECT a.NIP,a.Name,a.PositionMain, SPLIT_STR(a.PositionMain, ".", 1) as DivisionID,a.ProdiID
+        //                 FROM   db_employees.employees as a
+        //                 where (
+        //                         SPLIT_STR(a.PositionMain, ".", 1) != 2 or
+        //                         SPLIT_STR(a.PositionOther1, ".", 1) != 2 or
+        //                         SPLIT_STR(a.PositionOther2, ".", 1) != 2 or
+        //                         SPLIT_STR(a.PositionOther3, ".", 1) != 2
+        //                       )
+        //                and (
+        //                         SPLIT_STR(a.PositionMain, ".", 1) != 12 or
+        //                         SPLIT_STR(a.PositionOther1, ".", 1) != 12 or
+        //                         SPLIT_STR(a.PositionOther2, ".", 1) != 12 or
+        //                         SPLIT_STR(a.PositionOther3, ".", 1) != 12
+        //                ) 
+
+        //                and (
+        //                         SPLIT_STR(a.PositionMain, ".", 1) != 15 or
+        //                         SPLIT_STR(a.PositionOther1, ".", 1) != 15 or
+        //                         SPLIT_STR(a.PositionOther2, ".", 1) != 15 or
+        //                         SPLIT_STR(a.PositionOther3, ".", 1) != 15
+        //                )        
+
+        //                 and a.StatusEmployeeID > 0';
+        // $query =  $this->db->query($sql,array())->result_array();
+        // // print_r($query);die();
+        // for ($i=0; $i < count($query); $i++) {
+        //     $NIP =  $query[$i]['NIP'];
+        //     $Department = ($query[$i]['DivisionID'] == 14) ? 'AC.'.$query[$i]['ProdiID'] : 'NA.'.$query[$i]['DivisionID'];
+        //     $Level = 'User';
+        //     $dataSave = [
+        //      'NIP' => $NIP,
+        //      'Department' => $Department,
+        //      'Level' => $Level,
+        //     ];
+
+        //     $this->db->insert('db_generatordoc.user_access_department',$dataSave);
+        // }
+      
+
+        // echo 'Finish';
+
 
     }
 
