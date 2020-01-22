@@ -66,29 +66,37 @@ class C_lpmi extends Lpmi {
             $message = "";
             if((!empty($semeseterID) && !empty($semeseterYear)) && (!empty($prodiID)) ){
                 $tablename = "edomrecap".$semeseterYear;
-                $conditions = array("Prodi_id"=>$prodiID,"Semester_id"=>$semeseterID);
-                $results = $this->General_model->fetchData("db_statistik.".$tablename,$conditions)->result();
-                
-                if(!empty($results)){
-                    header("Content-type: application/vnd-ms-excel");
-                    header("Content-Disposition: attachment; filename=edom-recap-".$semeseterYear."-".(($semeseterOddEvent == 2) ? "Ganjil":"Genap").".xls");
-                    echo '<table border="1"><thead><tr><th>No</th><th>Code</th><th>Course</th><th>Group</th><th>Program Study</th><th>Lecturer</th><th>NIP</th><th>Question</th><th>Total Student</th><th>Rate</th></tr></thead><tbody>';
-                    $no = 1;
-                    foreach ($results as $v) {
-                        echo '<tr height="50px"><td>'.$no.'</td>'.
-                             '<td>'.$v->CourseCode.'</td>'.
-                             '<td>'.$v->CourseNameEng.'</td>'.
-                             '<td>'.$v->ClassGroup.'</td>'.
-                             '<td>'.$v->ProdiNameEng.'</td>'.
-                             '<td>'.$v->Lecturer.'</td>'.
-                             '<td>'.$v->LecturerNIP.'</td>'.
-                             '<td width="60%">'.$v->Question.'</td>'.
-                             '<td>'.$v->TotalStudent.'</td>'.
-                             '<td>'.round($v->Rate,2).'</td></tr>';
-                        $no++;
+                //chek existing table
+                $isExistTable = $this->General_model->callStoredProcedure("select * from information_schema.`TABLES` where table_schema = 'db_statistik' and table_name = '".$tablename."'")->row();
+                if(!empty($isExistTable)){
+                    $conditions = array("Prodi_id"=>$prodiID,"Semester_id"=>$semeseterID);
+                    $results = $this->General_model->fetchData("db_statistik.".$tablename,$conditions)->result();
+                    
+                    if(!empty($results)){
+                        header("Content-type: application/vnd-ms-excel");
+                        header("Content-Disposition: attachment; filename=edom-recap-".$semeseterYear."-".(($semeseterOddEvent == 2) ? "Ganjil":"Genap").".xls");
+                        echo '<table border="1"><thead><tr><th>No</th><th>Code</th><th>Course</th><th>Group</th><th>Program Study</th><th>Lecturer</th><th>NIP</th><th>Question</th><th>Total Student</th><th>Rate</th></tr></thead><tbody>';
+                        $no = 1;
+                        foreach ($results as $v) {
+                            echo '<tr height="50px"><td>'.$no.'</td>'.
+                                 '<td>'.$v->CourseCode.'</td>'.
+                                 '<td>'.$v->CourseNameEng.'</td>'.
+                                 '<td>'.$v->ClassGroup.'</td>'.
+                                 '<td>'.$v->ProdiNameEng.'</td>'.
+                                 '<td>'.$v->Lecturer.'</td>'.
+                                 '<td>'.$v->LecturerNIP.'</td>'.
+                                 '<td width="60%">'.$v->Question.'</td>'.
+                                 '<td>'.$v->TotalStudent.'</td>'.
+                                 '<td>'.round($v->Rate,2).'</td></tr>';
+                            $no++;
+                        }
+                        echo '</tbody></table>';
+                        // /$message = "Your request data has been completed.";
+                    }else{
+                        $message = "Your request data is unavailable.";
+                        $this->session->set_flashdata("message",$message);
+                        redirect(site_url('lpmi/lecturer-evaluation/download-result'));
                     }
-                    echo '</tbody></table>';
-                    // /$message = "Your request data has been completed.";
                 }else{
                     $message = "Your request data is unavailable.";
                     $this->session->set_flashdata("message",$message);
