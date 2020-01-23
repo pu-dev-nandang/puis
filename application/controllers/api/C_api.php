@@ -10400,7 +10400,7 @@ class C_api extends CI_Controller {
         $data_arr = (array) $this->jwt->decode($token,$key);
 
         $w_ClassOf = ($data_arr['ClassOf']!='') ? ' AND auts.Year = "'.$data_arr['ClassOf'].'" ' : '';
-        $w_StatusKRS = ($data_arr['StatusKRS']!='') ? ' AND stdk.Status = "'.$data_arr['StatusKRS'].'" ' : '';
+        $w_StatusKRS = ($data_arr['StatusKRS']!='' && $data_arr['StatusKRS']!='NOT_EXISTS') ? ' AND stdk.Status = "'.$data_arr['StatusKRS'].'" ' : '';
 
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
@@ -10408,7 +10408,37 @@ class C_api extends CI_Controller {
             $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent,
+        if($data_arr['StatusKRS']=='NOT_EXISTS'){
+
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent,
+                              stdk.Input_At
+                              FROM db_academic.mentor_academic ma
+                              LEFT JOIN db_academic.auth_students auts ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE ( ma.NIP = "'.$data_arr['NIP'].'" 
+                              AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' AND ma.NPM NOT IN
+                            (SELECT auts_1.NPM
+                              FROM db_academic.mentor_academic ma_1
+                              LEFT JOIN db_academic.auth_students auts_1 ON (ma_1.NPM = auts_1.NPM)
+                              LEFT JOIN db_academic.std_krs stdk_1 ON (stdk_1.NPM = auts_1.NPM)
+                              WHERE (stdk_1.SemesterID = "'.$data_arr['SemesterID'].'" AND ma_1.NIP = "'.$data_arr['NIP'].'" 
+                               ) GROUP BY auts_1.NPM) ) '.$dataSearch.'  GROUP BY auts.NPM ORDER BY stdk.Input_At DESC, ma.NPM ASC';
+
+        } else if($data_arr['StatusKRS']=='') {
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent,
+                              stdk.Input_At
+                              FROM db_academic.mentor_academic ma
+                              LEFT JOIN db_academic.auth_students auts ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE (ma.NIP = "'.$data_arr['NIP'].'" 
+                              AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' ) 
+                              '.$dataSearch.'  GROUP BY auts.NPM ORDER BY stdk.Input_At DESC, ma.NPM ASC';
+        } else {
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent,
                               stdk.Input_At
                               FROM db_academic.mentor_academic ma
                               LEFT JOIN db_academic.auth_students auts ON (ma.NPM = auts.NPM)
@@ -10418,6 +10448,9 @@ class C_api extends CI_Controller {
                               WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND ma.NIP = "'.$data_arr['NIP'].'" 
                               AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' ) 
                               '.$dataSearch.'  GROUP BY auts.NPM ORDER BY stdk.Input_At DESC, ma.NPM ASC';
+        }
+
+
 
 
 
