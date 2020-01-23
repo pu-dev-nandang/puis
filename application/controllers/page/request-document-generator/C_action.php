@@ -49,6 +49,23 @@ class C_action extends ServiceDocumentGenerator_Controler {
 	    echo json_encode($rs);
 	}
 
+	public function NeedApproval(){
+		$rs = $this->m_doc->NeedApproval();
+		echo json_encode($rs);
+	}
+
+	public function ApproveByChecklist(){
+		$dataToken = $this->getInputToken();
+		$dataToken = json_decode(json_encode($dataToken),true);
+		for ($i=0; $i < count($dataToken); $i++) { 
+			$dataTokenKey = $dataToken[$i];
+			$this->m_doc->ApproveDocument($dataTokenKey);
+		}
+		$rs = 1;
+		echo json_encode($rs);
+		// print_r($dataToken);die();
+	}
+
 	public function ApproveOrReject(){
 		$dataToken = $this->getInputToken();
 		$dataToken = json_decode(json_encode($dataToken),true);

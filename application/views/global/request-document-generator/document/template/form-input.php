@@ -1163,7 +1163,12 @@
 
     })
 
-    
+    $(document).off('change', '.Input[field="Signature"][name="verify"][key="SET"]').on('change', '.Input[field="Signature"][name="verify"][key="SET"]',function(e) {
+       var v = $(this).find('option:selected').val();
+       $('.Input[field="Signature"][name="verify"][key="SET"] option').filter(function() {
+          //may want to use $.trim in here
+          return $(this).val() == v; 
+       }).prop("selected", true);
+    })
 
-    
 </script>

@@ -1,35 +1,18 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h4 class="panel-title">List</h4>
+        <h4 class="panel-title">List Need Approval</h4>
     </div>
     <div class="panel-body" style="min-height: 100px;" id = "pageTableSurat">
         
     </div>
 </div>
 <script type="text/javascript">
+	var oTable;
 	var App_table = {
 		Loaded : function(){
 			$('#rowChooseDocument').removeClass('hide');
 			loading_page('#pageTableSurat');
-			var firstLoad = setInterval(function () {
-	            var SelectMasterSurat = $('#MasterSurat').val();
-	            if(SelectMasterSurat!='' && SelectMasterSurat!=null ){
-	                /*
-	                    LoadAction
-	                */
-	                App_table.LoadPageDefaultTable();
-	                clearInterval(firstLoad);
-	            }
-	        },1000);
-	        setTimeout(function () {
-	            clearInterval(firstLoad);
-	        },5000);
-		},
-
-		LoadPageDefaultTable : function(){
-			if (typeof msgMasterDocument !== 'undefined') {
-			    $('#pageTableSurat').html('<p style="color:red;">'+msgMasterDocument+'</p>');
-			}
+			App_table.DomListRequestDocument();
 		},
 
 		__opStatus : function(dtselected=''){
@@ -84,7 +67,7 @@
 									'<table class = "table table-striped" id = "TblList" style = "min-width: 650px;">'+
 										'<thead>'+
 											'<tr>'+
-												'<th>Doc & User</th>'+
+												'<th>Doc & User &nbsp <input type="checkbox" name="select_all" value="1" id="TblList-select-all"></th>'+
 												'<th>Date</th>'+
 												'<th>Approval</th>'+
 												'<th>Status</th>'+
@@ -95,7 +78,14 @@
 									'</table>'+			
 								'</div>'+
 							'</div>'+
-						'</div>';		
+						'</div>'+
+						'<div class = "row" style = "margin-top:5px;">'+
+							'<div class = "col-md-12">'+
+								'<div style = "padding: 5px;">'+
+									'<button class="btn btn-block btn-success" id = "ApproveCheckList">Approve</button>'+
+								'</div>'
+							'</div>'+
+						'</div>'			
 						;
 			$('#pageTableSurat').html(html);
 			/* Load Action table */
@@ -108,30 +98,19 @@
 		       "processing": true,
 		       "serverSide": false,
 		       "ajax":{
-		           url : base_url_js+"__request-document-generator/__LoadTablebyUserRequest", // json datasource
+		           url : base_url_js+"__request-document-generator/__NeedApproval", // json datasource
 		           ordering : false,
-		           type: "post",  // method  , by default get
-		           data : function(token){
-		                 // Read values
-		                  var data = {
-		                         opFilteringStatus : $('#opFilteringStatus option:selected').val(),
-		                         opFilteringData : $('#opFilteringData option:selected').val(),
-		                         IDMasterSurat : $('#MasterSurat option:selected').val(),
-
-		                     };
-		                 // Append to data
-		                 token.token = jwt_encode(data,'UAP)(*');
-		           }                                                                     
+		           type: "GET",  // method  , by default get
 		        },
 		         'columnDefs': [
 		         	
 		         	{
 		         	   'targets': 0,
-		         	   // 'searchable': false,
-		         	   // 'orderable': false,
+		         	   'searchable': false,
+		         	   'orderable': false,
 		         	   'className': 'dt-body-center',
 		         	   'render': function (data, type, full, meta){
-		         	       var ht = '<span class="badge">'+full[0]+'</span>'+
+		         	       var ht = '<input type="checkbox" name="id[]" value="' + full[6] + '">'+' <span class="badge">'+full[0]+'</span>'+
 		         	       			'<br><label>'+full[1]+'</label>'+
 		         	       			'<br><span class="label label-primary">'+full[2]+'</span>'
 		         	       			;
@@ -177,16 +156,10 @@
 		               	   var tokenRow = jwt_decode(full[7]);
 		               	   // console.log(tokenRow);
 		               	   var link = base_url_js+'uploads/document-generator/'+tokenRow['Path'];
-		               	   var btnEdit = '';
-		               	   var btnBatal = '';
 		               	   var btnApprove = '';
 		               	   var btnReject = ''; 
 		               	   var stRow = tokenRow['Status'];
 		               	   if (stRow !='Batal' && stRow !='Approve') {
-		               	   	if (tokenRow['Approve1Status'] != 1 && tokenRow['UserNIP'] == sessionNIP ) {
-		               	   			btnEdit = '<li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[6]+'" data = "'+full[7]+'"><i class="fa fa fa-edit"></i> Edit</a></li>';
-		               	   			btnBatal = '<li><a href="javascript:void(0);" class="btnBatal" data-id="'+full[6]+'" data = "'+full[7]+'"><i class="fa fa fa-remove"></i> Batal</a></li>';
-		               	   	}
 		               	   	// for approval 1
 		               	   	if (tokenRow['Approve1Status'] == 0 && tokenRow['Approve1'] == sessionNIP ) {
 		               	   			btnApprove = '<li><a href="javascript:void(0);" class="btnApprove" data-id="'+full[6]+'" data = "'+full[7]+'" approval_number = "1"><i class="fa fa-floppy-o"></i> Approve</a></li>';
@@ -216,10 +189,6 @@
 		               	       '  </button>' +
 		               	       '  <ul class="dropdown-menu">' +
 		               	       		'<li>'+'<a class="btnPreviewTable" href="'+link+'" target="_blank"><i class="fa fa-print"></i> Preview</a>'+'</li>'+
-		               	      		btnEdit +
-		               	       // '    <li role="separator" class="divider"></li>' +
-		               	       		btnBatal +
-		               	       // '    <li role="separator" class="divider"></li>' +
 		               	       		btnApprove+
 		               	       // '    <li role="separator" class="divider"></li>' +
 		               	       		btnReject+
@@ -246,101 +215,16 @@
 		   oTable = recordTable;
 		},
 
-		Status : ['Request','Reject','Approve','Batal'],
+		Status : ['Request'],
 		filtering : [
-			{
-				text : 'All',
-				value : '%',
-			},
 			{
 				text : 'For me',
 				value : '1',
 			},
 		],
 
-		form_edit : function(ID,dt){
-			$('#btnSave').attr('action','edit');
-			$('#btnSave').attr('data-id',ID);
-			$('.Input').each(function(){
-				var nm = $(this).attr('name');
-				$(this).val(dt[nm]);
-			})
-
-			// special for table
-			var InputJson = dt['InputJson'];
-			if (InputJson != null && InputJson != '') {
-				InputJson =  jQuery.parseJSON( InputJson )
-				// for (key in InputJson){
-				// 	$('.Input[field="PARAMS"][name="#'+key+'"] option').filter(function() {
-				// 	   //may want to use $.trim in here
-				// 	   return $(this).val() == InputJson[key]; 
-				// 	}).prop("selected", true);
-				// }
-
-				// console.log(InputJson);
-
-				if (InputJson['TABLE'] !== undefined) {
-					var arr = InputJson['TABLE'];
-					for (var i = 0; i < arr.length; i++) {
-						var arrkey = arr[i];
-						// console.log(arrkey);
-						for(key in arrkey){
-							if (key.substring(0, 1) == '#') {
-								var elClosest = $('.form-group[keyindex="'+i+'"]');
-								if ( elClosest.find('select .Input').length ) {
-									elClosest.find('.Input[field="PARAMS"][name="'+key+'"] option').filter(function() {
-									   //may want to use $.trim in here
-									   return $(this).val() == arrkey[key]; 
-									}).prop("selected", true);
-								}
-								else
-								{
-									elClosest.find('.Input').val(arrkey[key]);
-								}
-							}
-						}
-						
-					}
-				}
-
-
-				// for GET
-				if (InputJson['GET'] !== undefined) {
-					for(key in InputJson['GET']){
-						for (var i = 0; i < InputJson['GET'][key].length; i++) {
-							var get_token = jwt_encode(InputJson['GET'][key][i], "UAP)(*");
-							if (key == 'EMP') {
-								$('.GET[keyindex="'+i+'"]').find('.Input[key="GET"][name="'+key+'"]').val( InputJson['GET'][key][i]['user']['NIP'] );
-								$('.GET[keyindex="'+i+'"]').find('label[for="Name"]').html( InputJson['GET'][key][i]['user']['Name'] );
-							}
-							else
-							{
-								$('.GET[keyindex="'+i+'"]').find('.Input[key="GET"][name="'+key+'"]').val( InputJson['GET'][key][i]['user']['NPM'] );
-								$('.GET[keyindex="'+i+'"]').find('label[for="Name"]').html( InputJson['GET'][key][i]['user']['Name'] );
-							}
-
-							$('.GET[keyindex="'+i+'"]').find('.Input[key="GET"][name="'+key+'"]').attr( 'datatoken',get_token );
-							
-						}
-					}
-				}
-				
-			}
-
-			
-		},
-
-		__GenerateByData_settingTemplate : function(dt){
-			// console.log(dt);
-			// console.log(settingTemplate);
-
-			// for User
-			// settingTemplate.USER['UserNIP'] = dt['UserNIP'];
-			// settingTemplate.USER.push('value.'+dt['UserNIP'])
+		__GenerateByData_settingTemplate : function(dt,settingTemplate){
 			for (var i = 0; i < settingTemplate.USER.length; i++) {
-				// if (settingTemplate.USER[i] == 'NIP.NIP') {
-				// 	settingTemplate.USER[i] = 'NIP.NIP.'+dt['UserNIP'];
-				// }
 				settingTemplate.USER[i] = settingTemplate.USER[i]+'.'+dt['UserNIP'];
 			}
 
@@ -367,21 +251,23 @@
 				if (InputJson['GET'] !== undefined) {
 					 settingTemplate['GET'] = InputJson['GET'];
 				}
-				
+
+				// console.log(settingTemplate['GET']);
 
 			}
+
+			return settingTemplate;
 
 		},
 
 		ApproveOrReject : function(dataID,dt,approval_number,decision,Note=''){
 			if (confirm('Are you sure ?')) {
 				var url = base_url_js+"__request-document-generator/__ApproveOrReject";
-				App_table.__GenerateByData_settingTemplate(dt);
-				// console.log(settingTemplate);
-				// return;
+				var settingTemplate = jQuery.parseJSON(dt['masterDocument'][0]['Config']);
+				settingTemplate = App_table.__GenerateByData_settingTemplate(dt,settingTemplate);
 			    var data = {
 			       settingTemplate : settingTemplate,
-			       ID : $('#MasterSurat option:selected').val(),
+			       ID : dt['ID_document'], // get from data
 			       DepartmentID : dt['DepartmentID'],
 			       dataID : dataID,
 			       decision : decision,
@@ -455,21 +341,58 @@
 			        toastr.error('Connection error,please try again');
 			        
 			    })
+		},
+
+		ApproveByChecklist : function(selector,dt){
+			if (confirm('Are you sure ?')) {
+				var data = [];
+				for (var i = 0; i < dt.length; i++) {
+					var temp = {};
+					var settingTemplate = jQuery.parseJSON(dt[i]['dt']['masterDocument'][0]['Config']);
+					settingTemplate = App_table.__GenerateByData_settingTemplate(dt[i]['dt'],settingTemplate);
+					var ID = dt[i]['dt']['ID_document'];
+					var DepartmentID = dt[i]['dt']['DepartmentID'];
+					var dataID = dt[i]['ID'];
+					var approval_number = dt[i]['approval_number'];
+
+					var temp = {
+						settingTemplate : settingTemplate,
+						ID : ID,
+						DepartmentID : DepartmentID,
+						dataID : dataID,
+						approval_number : approval_number,
+					};
+
+					data.push(temp);
+				}
+				// console.log(data);
+				// return;
+				var url = base_url_js+"__request-document-generator/__ApproveByChecklist";
+				var token =  jwt_encode(data,'UAP)(*');
+				loadingStart();
+			    AjaxSubmitTemplate(url,token).then(function(response){
+			    	if (response == 1) {
+			    		toastr.success('Saved');
+			    	}
+			    	else
+			    	{
+			    	    toastr.error('Something error,please try again');
+			    	}
+			    	oTable.ajax.reload( null, false );
+			    	getNeedApproval();
+			    	loadingEnd(1000);
+				}).fail(function(response){
+			        toastr.error('Connection error,please try again');
+			        oTable.ajax.reload( null, false );
+			        getNeedApproval();
+			        loadingEnd(500);
+			    })
+			}
 		}, 
 	};
 
 	$(document).ready(function(){
 		App_table.Loaded();
-	})
-
-	$(document).off('change', '#opFilteringStatus,#opFilteringData').on('change', '#opFilteringStatus,#opFilteringData',function(e) {
-		oTable.ajax.reload( null, false );
-	})
-
-	$(document).off('click', '.btnEdit').on('click', '.btnEdit',function(e) {
-		var dataID = $(this).attr('data-id');
-		var dataToken = jwt_decode($(this).attr('data'));
-		App_table.form_edit(dataID,dataToken);
 	})
 
 	$(document).off('click', '.btnApprove').on('click', '.btnApprove',function(e) {
@@ -499,11 +422,38 @@
 		App_table.ApproveOrReject(dataID,dataToken,approval_number,'Reject',Note);
 	})
 
-	
-
 	$(document).off('click', '.btnLog').on('click', '.btnLog',function(e) {
 		var dataID = $(this).attr('data-id');
 		var dataToken = jwt_decode($(this).attr('data'));
 		App_table.Logdata(dataID,dataToken);
 	})
+
+	// Handle click on "Select all" control
+	$(document).off('click', '#TblList-select-all').on('click', '#TblList-select-all',function(e) {
+	   // Get all rows with search applied
+	   var rows = oTable.rows({ 'search': 'applied' }).nodes();
+	   // Check/uncheck checkboxes for all rows in the table
+	   $('input[type="checkbox"]', rows).prop('checked', this.checked);
+	});
+
+	$(document).off('click', '#ApproveCheckList').on('click', '#ApproveCheckList',function(e) {
+		var Arr = [];
+		var selector = $(this);
+		oTable.$('input[type="checkbox"]:checked').each(function(){
+		  var tr = $(this).closest('tr');
+		  var approval_number =  tr.find('.btnApprove').attr('approval_number');
+		  var dt = jwt_decode(tr.find('.btnApprove').attr('data'));
+		  var v = $(this).val();
+		  var temp = {
+		  	ID : v,
+		  	approval_number : approval_number,
+		  	dt : dt,
+		  }
+		  Arr.push(temp);
+		}); // exit each function
+
+		App_table.ApproveByChecklist(selector,Arr);
+	})
+
+	
 </script>

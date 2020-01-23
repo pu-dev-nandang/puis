@@ -30,6 +30,9 @@
               <a href="<?php echo base_url('request-document-generator/Template'); ?>">Template</a>
           </li>
         <?php endif ?>
+          <li class="<?php if($this->uri->segment(1)=='request-document-generator' &&  $this->uri->segment(2) == 'NeedApproval' ) { echo 'active'; } ?>">
+              <a href="<?php echo base_url('request-document-generator/NeedApproval'); ?>">Need Approval <span class="badge" id = "CountApproval"></span></a>
+          </li>
     </ul>
     <div style="border-top: 1px solid #cccccc">
         <div class="row" style="margin-top: 15px;">
@@ -48,7 +51,24 @@
     $('#DepartmentIDChoose').removeClass('form-control');
     $('#DepartmentIDChoose').addClass('select2-select-00 full-width-fix');
     $('#DepartmentIDChoose').select2({});
+
+    getNeedApproval();
+
   })
+
+  function getNeedApproval(){
+    var url = base_url_js+"__request-document-generator/__NeedApproval";
+     $.get( url, function(response) {
+       $('#CountApproval').html(response.recordsTotal);
+       // console.log(response);
+     })
+     .done(function() {
+       // alert( "second success" );
+     })
+     .fail(function() {
+       // alert( "error" );
+     })
+  }
 
   function file_validation_generator(ev,TheName = '')
   {

@@ -7,16 +7,22 @@ class M_user extends CI_Model {
 	    parent::__construct();
 	}
 
+	private function __generate_value($value){
+		$ex = explode('.', $value);
+		$rs = $ex[0].'.'.$ex[1];
+		return $rs;
+	}
+
 	public function preview_template($getObjInput){
 		$rs = [];
 		foreach ($getObjInput as $key => $value) {
 			$generate = $this->__generate($value);
+			$value = $this->__generate_value($value);
 			$rs[] = [
 				'field' => $value,
 				'value' => $generate,
 			];
 		}
-
 		return $rs;
 	}
 
@@ -27,7 +33,7 @@ class M_user extends CI_Model {
 		*/
 		switch ($ex[0]) {
 			case 'NIP':
-				$NIP = $this->session->userdata('NIP');
+				$NIP = (array_key_exists(2, $ex)) ? $ex[2] : $this->session->userdata('NIP');
 				$sql = 'select a.*,b.Name as ProdiName,b.Name as NameProdiEng,
 						SPLIT_STR(a.PositionMain, ".", 1) as DivisionID,c.Division as DepartmentName,
 						SPLIT_STR(a.PositionMain, ".", 2) as PosistionID,d.Position as PositionName

@@ -535,9 +535,13 @@
 				var keynumber = el.closest('.GET').attr('keynumber');
 				var keyindex = parseInt(el.closest('.GET').attr('keyindex'));
 				var dt = jwt_decode(el.attr('datatoken'));
-				settingTemplate['GET'][field][keyindex]['user'] = {};
-				settingTemplate['GET'][field][keyindex]['user'] = dt;
+				// console.log(dt);
+				// settingTemplate['GET'][field][keyindex]['user'] = {};
+				// settingTemplate['GET'][field][keyindex]['user'] = dt;
+				settingTemplate['GET'][field][keyindex] = dt;
 			})
+
+			// console.log(settingTemplate['GET']);return;
 
 			var url = base_url_js+"__request-document-generator/__previewbyUserRequest";
 		    var data = {
@@ -578,6 +582,7 @@
 		    	if (response == 1) {
 		    		toastr.success('Saved');
 		    	    $('#MasterSurat').trigger('change');
+		    	    getNeedApproval();
 		    	}
 		    	else
 		    	{
