@@ -11718,7 +11718,7 @@ class C_api extends CI_Controller {
 
 
         $w_ClassOf = ($data_arr['ClassOf']!='') ? ' AND auts.Year = "'.$data_arr['ClassOf'].'" ' : '';
-        $w_StatusKRS = ($data_arr['StatusKRS']!='') ? ' AND stdk.Status = "'.$data_arr['StatusKRS'].'" ' : '';
+        $w_StatusKRS = ($data_arr['StatusKRS']!='' && $data_arr['StatusKRS']!='NOT_EXISTS') ? ' AND stdk.Status = "'.$data_arr['StatusKRS'].'" ' : '';
 
 
         $dataSearch = '';
@@ -11727,8 +11727,40 @@ class C_api extends CI_Controller {
             $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
         }
 
+        if($data_arr['StatusKRS']=='NOT_EXISTS'){
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
+                              ma.NIP AS MentorNIP, stdk.Input_At
+                              FROM  db_academic.auth_students auts
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE (auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' 
+                              AND auts.NPM NOT IN (SELECT auts_1.NPM FROM  db_academic.auth_students auts_1
+                                                  LEFT JOIN db_academic.std_krs stdk_1 ON (stdk_1.NPM = auts_1.NPM)
+                                                  WHERE (stdk_1.SemesterID = "'.$data_arr['SemesterID'].'" AND auts_1.ProdiID = "'.$data_arr['ProdiID'].'"  
+                                                  AND auts_1.StatusStudentID = "'.$data_arr['Status'].'" )
+                                                  GROUP BY auts_1.NPM)
+                              ) '.$dataSearch.' 
+                              GROUP BY auts.NPM ORDER BY auts.NPM ASC';
+
+        } else if($data_arr['StatusKRS']=='') {
+
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
+                              ma.NIP AS MentorNIP, stdk.Input_At
+                              FROM  db_academic.auth_students auts
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE (auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' ) '.$dataSearch.' 
+                              GROUP BY auts.NPM ORDER BY auts.NPM ASC';
+        } else {
+
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
                               ma.NIP AS MentorNIP, stdk.Input_At
                               FROM  db_academic.auth_students auts
                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
@@ -11738,6 +11770,11 @@ class C_api extends CI_Controller {
                               LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
                               WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' ) '.$dataSearch.' 
                               GROUP BY auts.NPM ORDER BY stdk.Input_At ASC, auts.NPM ASC';
+
+        }
+
+
+
 
 
 
