@@ -11676,12 +11676,18 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-        $w_status = ($data_arr['Status']!='') ? ' AND auts.StatusStudentID = "'.$data_arr['Status'].'"' : '';
+
+        $w_ClassOf = ($data_arr['ClassOf']!='') ? ' AND auts.Year = "'.$data_arr['ClassOf'].'" ' : '';
+
+        $w_StatusKRS = ($data_arr['StatusKRS']!='') ? ' AND stdk.Status = "'.$data_arr['StatusKRS'].'" ' : '';
+
+
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
             $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
         }
+
 
         $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
                               ma.NIP AS MentorNIP, stdk.Input_At
@@ -11691,7 +11697,10 @@ class C_api extends CI_Controller {
                               LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
                               LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
                               LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
-                              WHERE ( auts.ProdiID = "'.$data_arr['ProdiID'].'" '.$w_status.' ) '.$dataSearch.' GROUP BY auts.NPM ORDER BY stdk.Input_At ASC, auts.NPM ASC';
+                              WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' ) '.$dataSearch.' 
+                              GROUP BY auts.NPM ORDER BY stdk.Input_At ASC, auts.NPM ASC';
+
+
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -11715,7 +11724,6 @@ class C_api extends CI_Controller {
 
             // Semester
             $Semester = $this->m_api->getSemesterStudentByYear($data_arr['SemesterID'],$row['Year']);
-
 
             // Course
             $dataCourse = $this->db->query('SELECT mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, stdk.Status FROM db_academic.std_krs stdk
