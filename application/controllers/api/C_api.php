@@ -11560,7 +11560,9 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-        $w_status = ($data_arr['Status']!='') ? ' AND auts.StatusStudentID = "'.$data_arr['Status'].'"' : '';
+        $w_ClassOf = ($data_arr['ClassOf']!='') ? ' AND auts.Year = "'.$data_arr['ClassOf'].'" ' : '';
+        $w_StatusKRS = ($data_arr['StatusKRS']!='') ? ' AND stdk.Status = "'.$data_arr['StatusKRS'].'" ' : '';
+
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
@@ -11574,7 +11576,12 @@ class C_api extends CI_Controller {
                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
                               LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
                               LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
-                              WHERE ( ma.NIP = "'.$data_arr['NIP'].'" '.$w_status.' ) '.$dataSearch.'  GROUP BY auts.NPM ORDER BY stdk.Input_At DESC, ma.NPM ASC';
+                              WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND ma.NIP = "'.$data_arr['NIP'].'" 
+                              AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' ) 
+                              '.$dataSearch.'  GROUP BY auts.NPM ORDER BY stdk.Input_At DESC, ma.NPM ASC';
+
+
+
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -11678,7 +11685,6 @@ class C_api extends CI_Controller {
 
 
         $w_ClassOf = ($data_arr['ClassOf']!='') ? ' AND auts.Year = "'.$data_arr['ClassOf'].'" ' : '';
-
         $w_StatusKRS = ($data_arr['StatusKRS']!='') ? ' AND stdk.Status = "'.$data_arr['StatusKRS'].'" ' : '';
 
 
