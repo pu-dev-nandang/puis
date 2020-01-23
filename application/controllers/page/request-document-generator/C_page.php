@@ -15,4 +15,9 @@ class C_page extends ServiceDocumentGenerator_Controler {
 		$page = $this->load->view('global/request-document-generator/index',$this->GLobalVariable,true);
 	    $this->menu_document($page);
 	}
+
+	public function NeedApproval(){
+		$page = $this->load->view('global/request-document-generator/NeedApproval',$this->GLobalVariable,true);
+	    $this->menu_document($page);
+	}
 }

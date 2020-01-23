@@ -369,15 +369,69 @@
 			                            '<h3><u><b>Parameter for Table</b></u></h3>'+
 			                        '</div>';
 			var paramsChoose = dt['API']['paramsChoose'];
-			for (key in paramsChoose){
-				var htmlOP = App_input.SelectAPIOPByParams(dt['API']['paramsChoose'][key],key);
-				html += '<div class = "form-group">'+
-                            '<label>Choose '+key+'</label>'+
-                            htmlOP+
-                        '</div>';
+			var paramsUser = dt['paramsUser'];
+			// console.log(dt);
+			for (var i = 0; i < paramsUser.length; i++) {
+				var arr = paramsUser[i];
+				for (key in arr){
+					if (key == '#NIP') {
+					  var dtRowEmp = dt['API']['selectEmployees'];
+					  var htmlOPEMP = App_input.SelectAPIOPEMP(dtRowEmp,key);
+					  html  += '<div class = "form-group" keyindex = "'+i+'">'+
+					              '<label>Choose Parameter '+params[key]+'</label>'+
+					              htmlOPEMP+
+					          '</div>';
+					}
+					else if(key == '#NPM'){
+						html  += '<div class = "form-group" keyindex = "'+i+'">'+
+						            '<label>Choose Parameter '+key+'</label>'+
+						            '<div class="input-group">'+
+						                '<input type="text" class="form-control Input" readonly field="PARAMS" name="'+key+'" key="TABLE">'+
+						                '<span class="input-group-btn">'+
+						                    '<button class="btn btn-default SearchNPMSTD" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+						                '</span>'+
+						            '</div>'+
+						            '<label for="Name"></label>'+
+						        '</div>';
+					}
+					else
+					{
+						
+						if (key.substring(0, 1) == '#') {
+							var dtRow = dt['API']['paramsChoose'][key];
+							var htmlOP = App_input.SelectAPIOPByParams(dtRow,key);
+							html += '<div class = "form-group" keyindex = "'+i+'">'+
+							            '<label>Choose Parameter '+key+'</label>'+
+							            htmlOP+
+							        '</div>';  
+						}
+						
+					}
+				}
 			}
+
+
+			// console.log(dt);
+			// for (key in paramsChoose){
+			// 	var htmlOP = App_input.SelectAPIOPByParams(dt['API']['paramsChoose'][key],key);
+			// 	html += '<div class = "form-group">'+
+   //                          '<label>Choose '+key+'</label>'+
+   //                          htmlOP+
+   //                      '</div>';
+			// }
 			html  += '</div></div></div>';
 			selector.html(html);
+		},
+
+		SelectAPIOPEMP : function(data,paramsChoose){
+		    var html =  '<select class = "form-control Input" field="PARAMS" name="'+paramsChoose+'" key = "TABLE">';
+		    for (var i = 0; i < data.length; i++) {
+		       html +=  '<option value = "'+data[i].NIP+'">'+data[i].Name+'</option>';
+		    }
+
+		    html  += '</select>';
+
+		    return html;
 		},
 
 		SelectAPIOPByParams : function(data,paramsChoose){
@@ -460,12 +514,19 @@
 			}
 
 			// special for TABLE
+			var data = {};
 			$('.Input[key="TABLE"][field="PARAMS"]').each(function(e){
+				var keyindex = parseInt($(this).closest('.form-group').attr('keyindex'));
+				
 				var nm = $(this).attr('name');
-				nm = nm.replace("#", "");
 				var v = $(this).find('option:selected').val();
-				settingTemplate['TABLE']['paramsUser'][nm] = v;
+				if (v == undefined) {
+				  v = $(this).val();
+				}
+				settingTemplate['TABLE']['paramsUser'][keyindex][nm] = v;
 			})
+
+			// console.log(settingTemplate);return;
 
 			// FOR GET
 			$('.Input[key="GET"]').each(function(e){
@@ -474,9 +535,13 @@
 				var keynumber = el.closest('.GET').attr('keynumber');
 				var keyindex = parseInt(el.closest('.GET').attr('keyindex'));
 				var dt = jwt_decode(el.attr('datatoken'));
-				settingTemplate['GET'][field][keyindex]['user'] = {};
-				settingTemplate['GET'][field][keyindex]['user'] = dt;
+				// console.log(dt);
+				// settingTemplate['GET'][field][keyindex]['user'] = {};
+				// settingTemplate['GET'][field][keyindex]['user'] = dt;
+				settingTemplate['GET'][field][keyindex] = dt;
 			})
+
+			// console.log(settingTemplate['GET']);return;
 
 			var url = base_url_js+"__request-document-generator/__previewbyUserRequest";
 		    var data = {
@@ -497,7 +562,7 @@
 		    	}
 		    	end_loading_button2(selector,'Preview');
 			}).fail(function(response){
-		        toastr.error('Connection error,please try again');
+		        toastr.error('No data result');
 		        end_loading_button2(selector,'Preview');
 		    })
 		},
@@ -517,6 +582,7 @@
 		    	if (response == 1) {
 		    		toastr.success('Saved');
 		    	    $('#MasterSurat').trigger('change');
+		    	    getNeedApproval();
 		    	}
 		    	else
 		    	{

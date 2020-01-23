@@ -10,7 +10,7 @@ class C_it extends It_Controler {
         $this->load->model('m_sendemail');
         $this->data['department'] = parent::__getDepartement(); 
         $this->load->model('m_api');
-        $this->load->model('master/m_master');
+        // $this->load->model('master/m_master');
     }
 
     

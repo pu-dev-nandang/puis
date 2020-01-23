@@ -1195,6 +1195,7 @@ class M_doc extends CI_Model {
     }
 
     private function __preview_templatebyUserRequest($rsGET,$FileTemplate){
+        // print_r($rsGET);die();
         // $FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
         $line = $this->__readDoc($FileTemplate);
         $TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($FileTemplate);
@@ -1278,6 +1279,7 @@ class M_doc extends CI_Model {
                                                 'action' => 'live',
                                             ];
                                             $dataPass = $dataPass + $rsGET[$keyRS]['paramsUser'];
+                                            // print_r($dataPass);die();
                                             $RSQuery = $this->run_set_table($dataPass);
                                             $this->m_table->writeDocument($TemplateProcessor,$rsGET[$keyRS],$RSQuery);
                                             $BoolTbl = true;
@@ -1413,6 +1415,7 @@ class M_doc extends CI_Model {
         // print_r($dataSave);die();
         
         $dataSave['ID_document'] = $ID;
+        $dataSave['DepartmentID'] = $DepartmentID;
         $dataSave['NoSuratOnly'] = $rs['SET']['PolaNoSurat']['NoSuratOnly'];
         $dataSave['NoSuratFull'] = $rs['SET']['PolaNoSurat']['NoSuratStr'];
         $dataSave['UserNIP'] = $this->session->userdata('NIP');
@@ -1443,15 +1446,23 @@ class M_doc extends CI_Model {
         $arr_rs['GET'] = [];
         foreach ($dt as $key => $value) {
             $arr = $dt[$key];
-            for ($i=0; $i < count($arr); $i++) { 
-                if ($key == 'EMP') {
-                    $arr_rs['GET'][$key][] = $arr[$i]['user'];
-                }
-
-                if ($key == 'MHS') {
-                   $arr_rs['GET'][$key][] = $arr[$i]['user'];
-                }
+            if ($key == 'EMP') {
+                $arr_rs['GET'][$key] = $arr;
             }
+
+            if ($key == 'MHS') {
+               $arr_rs['GET'][$key] = $arr;
+            }
+
+            // for ($i=0; $i < count($arr); $i++) { 
+            //     if ($key == 'EMP') {
+            //         $arr_rs['GET'][$key][] = $arr[$i]['user'];
+            //     }
+
+            //     if ($key == 'MHS') {
+            //        $arr_rs['GET'][$key][] = $arr[$i]['user'];
+            //     }
+            // }
         }
 
         $dataSave['InputJson'] = $dataSave['InputJson'] + $arr_rs;
@@ -1462,16 +1473,25 @@ class M_doc extends CI_Model {
 
     private function dataSaveForTable($dataSave,$dt){
         $ID_api = $dt['API']['Choose'];
+        // print_r($dt);die();
         $G_dt = $this->m_master->caribasedprimary('db_generatordoc.api_doc','ID',$ID_api);
         $Params = json_decode($G_dt[0]['Params'],true) ;
         $arr_json = [];
         for ($i=0; $i < count($Params); $i++) { 
             if (substr($Params[$i], 0,1) == '#') {
                 // get data by passing
-                $str = str_replace('#', '', $Params[$i]);
-                $arr_json[$str] = $dt['paramsUser'][$str];  
+                // $str = str_replace('#', '', $Params[$i]);
+                $str = $Params[$i];
+                $arr_json['TABLE'][$i][$str] = $dt['paramsUser'][$i][$str];
+            }
+            elseif (substr($Params[$i], 0,1) == '$') {
+                $str = $Params[$i];
+                $keySess = str_replace('$', '', $Params[$i]);
+                $arr_json['TABLE'][$i][$str] = $this->session->userdata($keySess);
             }
         }
+
+        // print_r($arr_json);die();
 
         $dataSave['InputJson'] = json_encode($arr_json);
         return $dataSave;
@@ -1498,6 +1518,7 @@ class M_doc extends CI_Model {
 
     private function __savebyUserRequest($rsGET,$FileTemplate,$DocumentName,$DefFileName=''){
         // $FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
+        // print_r($rsGET);die();
         $line = $this->__readDoc($FileTemplate);
         $TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($FileTemplate);
         $BoolTbl = false;
@@ -1574,6 +1595,7 @@ class M_doc extends CI_Model {
                             case $this->KeyTABLE:
                                 if ($this->KeyTABLE == $keyRS) {
                                         if (!$BoolTbl) {
+                                            // print_r($rsGET[$keyRS]);die();
                                             $this->load->model('document-generator/m_table');
                                             $dataPass = [
                                                 'ID_api' => $rsGET[$keyRS]['API']['Choose'],
@@ -1640,20 +1662,28 @@ class M_doc extends CI_Model {
         $dataSave['TotApproval'] = count($dt);
         $key;
         $chk = 1; // check status
+        $manually = 1;
         for ($i=0; $i < count($dt); $i++) { 
             $key = $i+1;
             if ($dt[$i]['verify']['valueVerify'] == 1 ) {
                $dataSave['Approve'.$key] = $dt[$i]['NIPEMP'];
                $dataSave['Approve'.$key.'Status'] = 0;
+               if ($manually == 1) {
+                    $manually = 0;
+               }
+               // $dataSave['IsManually'] = 0; // approval system
                $chk = $chk * 0;
             }
             else
             {
                 $dataSave['Approve'.$key] = $dt[$i]['NIPEMP'];
                 $dataSave['Approve'.$key.'Status'] = 1;
+                // $dataSave['IsManually'] = 1; // approval manually
                 $chk = $chk * 1;
             }
         }
+
+        $dataSave['IsManually'] = $manually;
 
         $LeftApproval = 3 - $dataSave['TotApproval'];
         for ($i=0; $i < $LeftApproval ; $i++) { 
@@ -1670,6 +1700,128 @@ class M_doc extends CI_Model {
         }
 
         return $dataSave;   
+    }
+
+    public function NeedApproval(){
+        $NIP = $this->session->userdata('NIP');
+        $AddWhere = '';
+        $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
+        $AddWhere .= $WhereOrAnd.' ( (a.Approve1 = "'.$NIP.'" and a.Approve1Status = 0  ) or (a.Approve2 = "'.$NIP.'" and a.Approve2Status = 0  ) or ( a.Approve3 = "'.$NIP.'"  and a.Approve3Status = 0  )  )';
+
+        $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
+        $AddWhere .= $WhereOrAnd.' a.Status = 1';
+
+        $sql = 'select a.NoSuratFull,b.DocumentName,a.UserNIP,c.Name as NameEMPRequest,a.DateRequest,a.Approve1,a.Approve2,a.Approve3,a.Status,
+                a.Input1,a.Input2,a.Input3,a.Input4,a.Input5,a.Input6,a.Input7,a.Input8,a.Input9,a.Input10,
+                a.Approve1Status,a.Approve1At,a.Approve2Status,a.Approve2At,a.Approve3Status,a.Approve3At,a.TotApproval,
+                d.Name as NameEMPAppr1,e.Name as NameEMPAppr2,f.Name as NameEMPAppr3,a.Path,a.InputJson,a.IsManually,a.ID_document,a.DepartmentID,a.ID
+                from db_generatordoc.document_data as a 
+                left join db_generatordoc.document as b on a.ID_document =  b.ID
+                left join db_employees.employees as c on c.NIP = a.UserNIP
+                left join db_employees.employees as d on d.NIP = a.Approve1
+                left join db_employees.employees as e on e.NIP = a.Approve2
+                left join db_employees.employees as f on f.NIP = a.Approve3
+                join db_generatordoc.document_access_department as g on g.ID_document = b.ID
+                '.$AddWhere.'
+                group by a.ID
+                order by a.ID asc
+                ';
+                // print_r($sql);die();
+        $query = $this->db->query($sql,array())->result_array();
+        $data = array();
+        for ($i=0; $i < count($query); $i++) { 
+            $nestedData = array();
+            $row = $query[$i]; 
+            $nestedData[] = $row['NoSuratFull'];
+            $nestedData[] = $row['DocumentName'];
+            $nestedData[] = $row['UserNIP'].' - '.$row['NameEMPRequest'];
+            $nestedData[] = $this->m_master->getDateIndonesian($row['DateRequest']);
+            $Appr = '';
+
+            if ($row['IsManually'] == 0) {
+                if ($row['Approve1'] != '' && $row['Approve1'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    $style = ($row['Approve1Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
+                    $Appr .= '<li><label>Approval 1 : '.$row['NameEMPAppr1'].'</label> | Status : '.$style.'</li>';
+                }
+
+                if ($row['Approve2'] != '' && $row['Approve2'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    $style = ($row['Approve2Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
+
+                    $Appr .= '<li><label>Approval 2 : '.$row['NameEMPAppr2'].'</label> | Status : '.$style.'</li>';
+                }
+
+                if ($row['Approve3'] != '' && $row['Approve3'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    $style = ($row['Approve3Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
+
+                    $Appr .= '<li><label>Approval 3 : '.$row['NameEMPAppr3'].'</label> | Status : '.$style.'</li>';
+                }
+            }
+            else
+            {
+                $style = '<span style="color:green;"><i class="fa fa-check-circle"></i> Manually Approve</span>';
+                if ($row['Approve1'] != '' && $row['Approve1'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    
+                    $Appr .= '<li><label>Approval 1 : '.$row['NameEMPAppr1'].'</label> | Status : '.$style.'</li>';
+                }
+
+                if ($row['Approve2'] != '' && $row['Approve2'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    $Appr .= '<li><label>Approval 2 : '.$row['NameEMPAppr2'].'</label> | Status : '.$style.'</li>';
+                }
+
+                if ($row['Approve3'] != '' && $row['Approve3'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    $Appr .= '<li><label>Approval 3 : '.$row['NameEMPAppr3'].'</label> | Status : '.$style.'</li>';
+                }
+
+            }
+            
+
+
+            if ($Appr != '') {
+                $Appr .= '</ul>';
+            }
+            $nestedData[] = $Appr;
+            $nestedData[] = ($row['IsManually'] == 0) ? $row['Status'] : 'Manually Approve';
+            // $nestedData[] = $row['Status'] ;
+            $nestedData[] = $row['ID'];
+            
+            $sqlmasterDocument = 'select a.*,b.Name from db_generatordoc.document as a join db_employees.employees as b on a.UpdatedBy = b.NIP
+                    join db_generatordoc.document_access_department as c on c.ID_document = a.ID
+                    where a.ID = '.$row['ID_document'].'
+                    group by a.ID
+            ';
+            $querymasterDocument = $this->db->query($sqlmasterDocument,array())->result_array();
+            $row['masterDocument'] = $querymasterDocument;
+
+            $token = $this->jwt->encode($row,"UAP)(*");
+            $nestedData[] = $token;
+            $data[] = $nestedData;
+        }
+
+        $rs = array(
+            "draw"            => intval( 0 ),
+            "recordsTotal"    => intval(count($query)),
+            "recordsFiltered" => intval( count($query) ),
+            "data"            => $data
+        );
+        return $rs;
     }
 
     public function LoadTablebyUserRequest($dataToken){
@@ -1700,7 +1852,7 @@ class M_doc extends CI_Model {
         $sql = 'select a.NoSuratFull,b.DocumentName,a.UserNIP,c.Name as NameEMPRequest,a.DateRequest,a.Approve1,a.Approve2,a.Approve3,a.Status,
                 a.Input1,a.Input2,a.Input3,a.Input4,a.Input5,a.Input6,a.Input7,a.Input8,a.Input9,a.Input10,
                 a.Approve1Status,a.Approve1At,a.Approve2Status,a.Approve2At,a.Approve3Status,a.Approve3At,a.TotApproval,
-                d.Name as NameEMPAppr1,e.Name as NameEMPAppr2,f.Name as NameEMPAppr3,a.Path,a.InputJson,a.ID
+                d.Name as NameEMPAppr1,e.Name as NameEMPAppr2,f.Name as NameEMPAppr3,a.Path,a.InputJson,a.IsManually,a.ID_document,a.DepartmentID,a.ID
                 from db_generatordoc.document_data as a 
                 left join db_generatordoc.document as b on a.ID_document =  b.ID
                 left join db_employees.employees as c on c.NIP = a.UserNIP
@@ -1712,6 +1864,7 @@ class M_doc extends CI_Model {
                 group by a.ID
                 order by a.ID asc
                 ';
+                // print_r($sql);die();
         $query = $this->db->query($sql,array())->result_array();
         $data = array();
         for ($i=0; $i < count($query); $i++) { 
@@ -1722,37 +1875,69 @@ class M_doc extends CI_Model {
             $nestedData[] = $row['UserNIP'].' - '.$row['NameEMPRequest'];
             $nestedData[] = $this->m_master->getDateIndonesian($row['DateRequest']);
             $Appr = '';
-            if ($row['Approve1'] != '' && $row['Approve1'] != NULL ) {
-                if ($Appr == '') {
-                    $Appr .= '<ul style = "margin-left:-25px;">';
+
+            if ($row['IsManually'] == 0) {
+                if ($row['Approve1'] != '' && $row['Approve1'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    $style = ($row['Approve1Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
+                    $Appr .= '<li><label>Approval 1 : '.$row['NameEMPAppr1'].'</label> | Status : '.$style.'</li>';
                 }
-                $style = ($row['Approve1Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
-                $Appr .= '<li><label>Approval 1 : '.$row['NameEMPAppr1'].'</label> | Status : '.$style.'</li>';
-            }
 
-            if ($row['Approve2'] != '' && $row['Approve2'] != NULL ) {
-                if ($Appr == '') {
-                    $Appr .= '<ul style = "margin-left:-25px;">';
+                if ($row['Approve2'] != '' && $row['Approve2'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    $style = ($row['Approve2Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
+
+                    $Appr .= '<li><label>Approval 2 : '.$row['NameEMPAppr2'].'</label> | Status : '.$style.'</li>';
                 }
-                $style = ($row['Approve2Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
 
-                $Appr .= '<li><label>Approval 2 : '.$row['NameEMPAppr2'].'</label> | Status : '.$style.'</li>';
-            }
+                if ($row['Approve3'] != '' && $row['Approve3'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    $style = ($row['Approve3Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
 
-            if ($row['Approve3'] != '' && $row['Approve3'] != NULL ) {
-                if ($Appr == '') {
-                    $Appr .= '<ul style = "margin-left:-25px;">';
+                    $Appr .= '<li><label>Approval 3 : '.$row['NameEMPAppr3'].'</label> | Status : '.$style.'</li>';
                 }
-                $style = ($row['Approve3Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
-
-                $Appr .= '<li><label>Approval 3 : '.$row['NameEMPAppr3'].'</label> | Status : '.$style.'</li>';
             }
+            else
+            {
+                $style = '<span style="color:green;"><i class="fa fa-check-circle"></i> Manually Approve</span>';
+                if ($row['Approve1'] != '' && $row['Approve1'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    
+                    $Appr .= '<li><label>Approval 1 : '.$row['NameEMPAppr1'].'</label> | Status : '.$style.'</li>';
+                }
+
+                if ($row['Approve2'] != '' && $row['Approve2'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    $Appr .= '<li><label>Approval 2 : '.$row['NameEMPAppr2'].'</label> | Status : '.$style.'</li>';
+                }
+
+                if ($row['Approve3'] != '' && $row['Approve3'] != NULL ) {
+                    if ($Appr == '') {
+                        $Appr .= '<ul style = "margin-left:-25px;">';
+                    }
+                    $Appr .= '<li><label>Approval 3 : '.$row['NameEMPAppr3'].'</label> | Status : '.$style.'</li>';
+                }
+
+            }
+            
+
 
             if ($Appr != '') {
                 $Appr .= '</ul>';
             }
             $nestedData[] = $Appr;
-            $nestedData[] = $row['Status'];
+            $nestedData[] = ($row['IsManually'] == 0) ? $row['Status'] : 'Manually Approve';
+            // $nestedData[] = $row['Status'] ;
             $nestedData[] = $row['ID'];
             $token = $this->jwt->encode($row,"UAP)(*");
             $nestedData[] = $token;
@@ -1885,6 +2070,7 @@ class M_doc extends CI_Model {
             $dataSave = $this->dataSaveForGET($dataSave,$rs['GET']);
         }
 
+        $dataSave['DepartmentID'] = $DepartmentID;
         $dataSave['UpdatedBy'] = $this->session->userdata('NIP');
         $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
         $dataSave = $this->__saveApproval($dataSave,$rs['SET']['Signature']);
@@ -1904,6 +2090,7 @@ class M_doc extends CI_Model {
         $this->load->model('document-generator/m_set');
         $this->load->model('document-generator/m_user');
         $this->load->model('document-generator/m_grab');
+        $this->load->model('document-generator/m_get');
         $rs = [];
         $ID = $dataToken['ID'];
         $G_dt = $this->m_master->caribasedprimary('db_generatordoc.document','ID',$ID);
@@ -1913,6 +2100,7 @@ class M_doc extends CI_Model {
         $line = $this->__readDoc($FileTemplate);
         $Filtering = [];
         $Input = $dataToken['settingTemplate'];
+        // print_r($dataToken);die();
         $DepartmentID = $dataToken['DepartmentID'];
         $dataID = $dataToken['dataID'];
         $approval_number =  $dataToken['approval_number'];
@@ -1992,12 +2180,25 @@ class M_doc extends CI_Model {
                             break;
                         case $this->KeyTABLE:
                             if (!in_array($ex[0], $Filtering)){
-                                
+                                // print_r($Input['TABLE']);die();
+                                $rs[$this->KeyTABLE] = $Input['TABLE'];
                             }
                             else
                             {
                                 continue;
                             }
+                            break;
+                        case $this->KeyGET:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyGET] = $this->m_get->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            
                             break;
                     }
 
@@ -2005,7 +2206,6 @@ class M_doc extends CI_Model {
                 }
             }
         }
-
 
         $dataSave['UpdatedBy'] = $this->session->userdata('NIP');
         $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
@@ -2040,7 +2240,7 @@ class M_doc extends CI_Model {
         // $FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
         $line = $this->__readDoc($FileTemplate);
         $TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($FileTemplate);
-
+        $BoolTbl = false;
         foreach ($line as $v) {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 for ($z=0; $z < count($matches[1]); $z++) { 
@@ -2102,8 +2302,40 @@ class M_doc extends CI_Model {
                                     
                                 }
                                 break;
+                            case $this->KeyGET:
+                                if ($this->KeyGET == $keyRS) {
+                                    $setStr = trim(ucwords($ex[0]));
+                                    $obj = $rsGET[$keyRS];
+                                    $arrKomponen = $matches[1];
+
+                                    $this->__SETWriteGET($TemplateProcessor,$arrKomponen,$obj);
+                                }
+                                break;
                             case $this->KeyTABLE:
-                                
+                                if ($this->KeyTABLE == $keyRS) {
+                                        if (!$BoolTbl) {
+                                            $this->load->model('document-generator/m_table');
+                                            $dataPass = [
+                                                'ID_api' => $rsGET[$keyRS]['API']['Choose'],
+                                                'action' => 'live',
+                                            ];
+                                            $dataPass = $dataPass + $rsGET[$keyRS]['paramsUser'];
+                                          
+                                            // get session from user request
+                                            $dtArrSess = [];
+                                            $dtUser = $rsGET['USER'];
+                                            // print_r($dtUser);die();
+                                            for ($z=0; $z < count($dtUser); $z++) {
+                                                $field = $dtUser[$z]['field'];
+                                                $ex_field = explode('.', $field);
+                                                $dtArrSess[$ex_field[1]] = $dtUser[$z]['value'];
+                                            }
+                                            $RSQuery = $this->run_set_table($dataPass,$dtArrSess);
+                                            $this->m_table->writeDocument($TemplateProcessor,$rsGET[$keyRS],$RSQuery);
+                                            $BoolTbl = true;
+                                        }
+                                        
+                                }
                                 break;
                         }
                     }
@@ -2313,30 +2545,46 @@ class M_doc extends CI_Model {
         
     }
 
-    public function run_set_table($dataToken){
+    public function run_set_table($dataToken,$dtArrSess=[]){
         $ID_api = $dataToken['ID_api'];
         $G_dt = $this->m_master->caribasedprimary('db_generatordoc.api_doc','ID',$ID_api);
         $Params = json_decode($G_dt[0]['Params'],true) ;
         $querySql = $G_dt[0]['Query'];
         $VarPassing = [];
+        // print_r($dataToken);die();
         for ($i=0; $i < count($Params); $i++) { 
             if (substr($Params[$i], 0,1) == '#') {
                 // get data by passing
-                $str = str_replace('#', '', $Params[$i]);
-                $VarPassing[] = $dataToken[$str];
+                // $str = str_replace('#', '', $Params[$i]);
+                $str = $Params[$i];
+                $VarPassing[] = $dataToken[$i][$str];
             }
             else if (substr($Params[$i], 0,1) == '$') {
-                $str = str_replace('$', '', $Params[$i]);
+                $keySess = str_replace('$', '', $Params[$i]);
+                $str = $Params[$i];
                 if ($dataToken['action'] == 'sample') {
-                    $VarPassing[] = $dataToken[$str];
+                    $VarPassing[] = $dataToken[$i][$str];
                 }
                 else
                 {
-                    $VarPassing[] = $this->session->userdata($str);
+                    if(!empty($dtArrSess)) 
+                    {
+                        foreach ($dtArrSess as $field_dt => $value_dt) {
+                            if ($field_dt == $keySess) {
+                                $VarPassing[] = $value_dt;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        $VarPassing[] = $this->session->userdata($keySess);
+                    }
+                    
                 }
             }
         }
-        
+      
         $query = $this->db->query($querySql,$VarPassing)->result_array();
         if (count($query) > 0) {
             return [
@@ -2431,6 +2679,7 @@ class M_doc extends CI_Model {
             $nestedData[] = '';
             $nestedData[] = $row['ID'];
             $row['document_access_department'] = $this->m_master->caribasedprimary('db_generatordoc.document_access_department','ID_document',$row['ID']);
+            
             $token = $this->jwt->encode($row,"UAP)(*");
             $nestedData[] = $token;
             $data[] = $nestedData;

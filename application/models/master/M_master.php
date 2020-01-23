@@ -3897,5 +3897,17 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
     }
 
+    public function QueryDepartmentJoin($IDJoin,$aliasTable = 'qdj'){
+      $sql = ' left join (
+            select * from (
+            select CONCAT("AC.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Code as Abbr from db_academic.program_study
+            UNION
+            select CONCAT("NA.",ID) as ID, Division as NameDepartment,Description as NameDepartmentIND,Abbreviation as Abbr from db_employees.division  
+            UNION
+            select CONCAT("FT.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Abbr from db_academic.faculty 
+        )'.$aliasTable.')'.$aliasTable.' on '.$IDJoin.'='.$aliasTable.'.ID';
+      return $sql;
+    }
+
 
 }
