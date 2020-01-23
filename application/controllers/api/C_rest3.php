@@ -1175,17 +1175,22 @@ class C_rest3 extends CI_Controller {
           $P = $dataToken['ProdiID'];
           $P = explode('.', $P);
           $ProdiID = $P[0];
-          $sql = 'select a.ID_PKM,b.Name as NamaDosen,"" as RoadMap,a.Judul_PKM,a.ID_thn_laks 
+          $sql = 'select a.ID_PKM,b.Name as NamaDosen,"" as RoadMap,a.Judul_PKM,a.ID_thn_laks, 
+                      (select COUNT(*) from db_research.list_anggota_pkm as x
+                        join db_research.master_anggota_pkm as y on x.ID_anggota = y.ID
+                        where x.ID_PKM = a.ID_PKM and y.Type_anggota = "MHS") AS totalstudent 
                   from db_research.pengabdian_masyarakat as a
                   join db_employees.employees as b on a.NIP = b.NIP
                   #join db_research.list_anggota_pkm as c on c.ID_PKM = a.ID_PKM
                   #join db_research.master_anggota_pkm as d on d.ID = c.ID_anggota
-                  where b.ProdiID = '.$ProdiID.'
+                  where b.ProdiID = 4
                   group by a.NIP, a.ID_PKM
                  ';
           $query = $this->db->query($sql,array())->result_array();
           $data = [];
           for ($i=0; $i < count($query); $i++) { 
+            if (!empty($query[$i]['totalstudent'])){
+            
             $nestedData = [];
             $row = $query[$i];
             $nestedData[] = $i+1;
@@ -1208,6 +1213,7 @@ class C_rest3 extends CI_Controller {
             $nestedData[] = $row['Judul_PKM'];
             $nestedData[] = $row['ID_thn_laks'];
             $data[] = $nestedData;
+            }
           }
           $rs = array(
               "draw"            => intval( 0 ),
@@ -1234,18 +1240,23 @@ class C_rest3 extends CI_Controller {
           $P = $dataToken['ProdiID'];
           $P = explode('.', $P);
           $ProdiID = $P[0];
-          $sql = 'select a.ID_litabmas, b.Name as NamaDosen,"" as RoadMap,a.Judul_litabmas,a.ID_thn_laks 
+          $sql = 'select a.ID_litabmas, b.Name as NamaDosen,"" as RoadMap,a.Judul_litabmas,a.ID_thn_laks ,
+                        (select COUNT(*) from db_research.list_anggota_penelitian as x
+                        join db_research.master_anggota_penelitian as y on x.ID_anggota = y.ID
+                        where x.ID_Litabmas = a.ID_litabmas and y.Type_anggota = "MHS") AS totalstudent
                   from db_research.litabmas as a
                   join db_employees.employees as b on a.NIP = b.NIP
+                 
                   #join db_research.litabmas_list_mahasiswa as c on c.ID_litabmas = a.ID_litabmas
                   #join db_research.anggota_panitia_mahasiswa as d on d.ID_ang_mahasiswa = c.ID_ang_mahasiswa
 
-                  where b.ProdiID = '.$ProdiID.'
-                  group by a.NIP, a.ID_litabmas
+                  where b.ProdiID = '.$ProdiID.' 
+                  group by a.NIP, a.ID_litabmas;
                  ';
           $query = $this->db->query($sql,array())->result_array();
           $data = [];
           for ($i=0; $i < count($query); $i++) { 
+            if (!empty($query[$i]['totalstudent'])){
             $nestedData = [];
             $row = $query[$i];
             $nestedData[] = $i+1;
@@ -1270,6 +1281,7 @@ class C_rest3 extends CI_Controller {
             $nestedData[] = $row['ID_thn_laks'];
             $data[] = $nestedData;
           }
+        }
           $rs = array(
               "draw"            => intval( 0 ),
               "recordsTotal"    => intval(count($query)),
