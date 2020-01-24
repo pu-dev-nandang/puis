@@ -709,6 +709,9 @@ class M_doc extends CI_Model {
                 $setValue = 'SET.Signature.Position'.'#'.$keyApproval;
                 $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
 
+                $setValue = 'SET.Signature.NIP'.'#'.$keyApproval;
+                $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+
         		// if (array_key_exists(2, $arrKomponen)) {
         		// 	$setValue = $arrKomponen[2];
         		// 	$TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
