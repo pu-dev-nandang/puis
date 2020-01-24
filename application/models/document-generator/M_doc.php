@@ -187,6 +187,7 @@ class M_doc extends CI_Model {
     	        				$callback_data = $this->m_set->preview_template($getObjInput);
     	        				// print_r($callback_data);
     	        				$rs[$this->KeySET] = $callback_data;
+
     	        			}
     	        			else
     	        			{
@@ -703,17 +704,23 @@ class M_doc extends CI_Model {
     			}
     		}
 
-    		// write name di arrKomponen key ke 2
-    		if (array_key_exists(2, $arrKomponen)) {
-    			$setValue = $arrKomponen[2];
-    			$TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
-    		}
+    		// write name
+                //SET.Signature.Position
+                $setValue = 'SET.Signature.Position'.'#'.$keyApproval;
+                $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
 
-    		// write name di arrKomponen key ke 3
-    		if (array_key_exists(3, $arrKomponen)) {
-    			$setValue = $arrKomponen[3];
-    			$TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
-    		}
+        		// if (array_key_exists(2, $arrKomponen)) {
+        		// 	$setValue = $arrKomponen[2];
+        		// 	$TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+        		// }
+
+                // write NIP
+                $setValue = 'Signature.NIP'.'#'.$keyApproval;
+                $TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
+        		// if (array_key_exists(3, $arrKomponen)) {
+        		// 	$setValue = $arrKomponen[3];
+        		// 	$TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
+        		// }
     		
     	}
     	
