@@ -25,7 +25,7 @@
 						</div>
 						<div class="form-group">
 							<label>Additional Info</label>
-							<textarea name="Address" class="form-control" placeholder="Contact number/mail/fax"><?=(!empty($detail) ? $detail->AdditionlInfo : null)?></textarea>
+							<textarea class="form-control" name="AdditionalInfo" placeholder="Contact number/mail/fax"><?=(!empty($detail) ? $detail->AdditionalInfo : null)?></textarea>
 							<small class="text-danger text-message"></small>
 						</div>
 						<div class="row">
@@ -41,10 +41,10 @@
 							<div class="col-sm-2">
 								<div class="form-group">
 									<label>Is Active</label>
-									<select class="form-control required" required name="Category" >
+									<select class="form-control required" required name="IsActive" >
 										<option value="">Choose One</option>
-										<option value="1" <?=(!empty($detail) ? (($detail->isActive == 1) ? 'selected':'') : '')?> >Yes</option>
-										<option value="0" <?=(!empty($detail) ? (($detail->isActive == 0) ? 'selected':'') : '')?> >No</option>
+										<option value="1" <?=(!empty($detail) ? (($detail->IsActive == 1) ? 'selected':'') : '')?> >Yes</option>
+										<option value="0" <?=(!empty($detail) ? (($detail->IsActive == 0) ? 'selected':'') : '')?> >No</option>
 									</select>
 									<small class="text-danger text-message"></small>
 								</div>	
@@ -66,6 +66,31 @@
 		$(".btn-back").click(function(){
 			loading_modal_show();
 			location.reload(true);
+		});
+		$formcompany = $("#form-company");
+		$formcompany.on("click",".btn-save",function(){
+			var error = false;
+			var itsme = $(this);
+			var itsform = itsme.parent().parent();
+		 	itsform.find(".required").each(function(){
+			  	var value = $(this).val();
+			  	if($.trim(value) == ''){
+			  		$(this).addClass("error");
+			  		$(this).parent().find(".text-message").text("Please fill this field");
+			  		error = false;
+			  	}else{
+			  		error = true;
+			  		$(this).removeClass("error");
+			  		$(this).parent().find(".text-message").text("");
+			  	}
+		  	});
+		 	
+		 	var totalError = itsform.find(".error").length;
+		  	if(error && totalError == 0 ){
+		  		$formcompany[0].submit();
+		  	}else{
+		  		alert("Please fill out the field.");
+		  	}
 		});
 	});
 </script>

@@ -60,4 +60,16 @@ class M_akademik extends CI_Model {
     }
 
 
+    /*ADDED BY FEBRI @ JAN 2020*/
+    public function getStdInsurance($data){
+        $this->db->select("a.*,b.Name as InsuranceName,b.Address as InsuranceAddress");
+        $this->db->from("db_academic.std_insurance a");
+        $this->db->join("db_employees.master_company b","b.ID = a.InsuranceID","left");
+        $this->db->where($data);
+        $query = $this->db->get();
+        return $query;
+    }
+    /*END ADDED BY FEBRI @ JAN 2020*/
+
+
 }

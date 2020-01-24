@@ -1,3 +1,12 @@
+<?php $message = $this->session->flashdata('message');
+	if(!empty($message)){ ?>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		toastr.warning("<?= $this->session->flashdata('message');?>",'Info!');
+	});
+	</script>
+<?php } ?>
+
 <div id="master-company">
 	<div class="row">
 		<div class="col-sm-12">
@@ -11,36 +20,133 @@
 					</h4>
 				</div>
 				<div class="panel-body">
-					<div id="fetch-company"><center><i class="fa fa-spinner fa-spin"></i> processing..</center></div>
+					<div id="fetch-data-tables">
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="table-responsives">
+									<table class="table table-bordered" id="table-list-data">
+										<thead>
+											<tr>
+												<th width="2%">No</th>
+												<th>Company Name</th>
+												<th>Address</th>
+												<th>Category Company</th>
+												<th>Status</th>
+												<th width="5%"></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr><td colspan="6">Empty result</td></tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
 	<script type="text/javascript">
-		function fetchData(){
-			$.ajax({
-			    type : 'POST',
-			    url : base_url_js+"human-resources/master_insurance_company/fetch",
-			    data: "Category='insurance'",
-			    dataType : 'html',
-			    beforeSend :function(){loading_modal_show()},
-	            error : function(jqXHR){
-	            	loading_modal_hide();
-	            	$("body #modalGlobal .modal-body").html(jqXHR.responseText);
-		      	  	$("body #modalGlobal").modal("show");
-			    },success : function(response){
-	            	loading_modal_hide();
-			    	$("body #fetch-company").html(response);
-			    }
-			});
-		}
+		
+		function fetchingDataInsurace() {
+	        //loading_modal_show();
+	        var data = {
+              Category : "insurance",
+          	};
+          	var token = jwt_encode(data,'UAP)(*');
+
+	        var dataTable = $('#fetch-data-tables #table-list-data').DataTable( {
+	            "destroy": true,
+	            "retrieve":true,
+	            "processing": true,
+	            "serverSide": true,
+	            "iDisplayLength" : 10,
+	            "ordering" : false,
+	            "responsive": true,
+	            "language": {
+	                "searchPlaceholder": "NIM, Name, Study Program"
+	            },
+	            "lengthMenu": [[10, 25, 50], [10, 25, 50]],
+	            "ajax":{
+	                url : base_url_js+'human-resources/master_insurance_company/fetch', // json datasource
+	                ordering : false,
+	                data : {token:token},
+	                type: "post",  // method  , by default get
+	                error: function(jqXHR){  // error handling
+	                    //loading_modal_hide();
+	                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+	                        '<h4 class="modal-title">Error Fetch Student Data</h4>');
+	                    $('#GlobalModal .modal-body').html(jqXHR.responseText);
+	                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+	                    $('#GlobalModal').modal({
+	                        'show' : true,
+	                        'backdrop' : 'static'
+	                    });
+	                }
+	            },
+	            "initComplete": function(settings, json) {
+	                //loading_modal_hide();
+	            },
+	            "columns": [
+	            	{
+		                "data": "no",
+		            },{
+		                "data": "Name",
+		            },
+		            { "data": "Address",
+		              "render": function (data, type, row) {
+	                    var trimAdditionalInfo = $.trim("AdditionalInfo");
+	                    return "<p>"+data+"</p>"+((trimAdditionalInfo.length > 0) ? "<p>"+row.AdditionalInfo+"</p>":"");
+	                  }
+		          	},
+		            { "data": "Category",
+		            },
+		            { "data": "IsActive",
+		              "render": function (data, type, row) {
+	                    return "<span>"+((row.IsActive == 1) ? "Active":"Non Active")+"</span>";
+	                  }
+	            	},
+		            { "data": "ID",
+		              "render": function (data, type, row) {
+	                    return '<div class="btn-group"><button class="btn btn-xs btn-warning btn-edit" type="button" title="Edit" data-id="'+data+'"><i class="fa fa-edit"></i></button></div>';
+	                  }	
+	            	},
+		            
+		        ],
+	        });
+	    }
+
 		$(document).ready(function(){
-			fetchData();
+			fetchingDataInsurace();
 			$(".btn-add-record").click(function(){
 				$.ajax({
 				    type : 'POST',
 				    url : base_url_js+"human-resources/master_insurance_company/form",
+				    dataType : 'html',
+				    beforeSend :function(){loading_modal_show()},
+		            error : function(jqXHR){
+		            	loading_modal_hide();
+		            	$("body #modalGlobal .modal-body").html(jqXHR.responseText);
+			      	  	$("body #modalGlobal").modal("show");
+				    },success : function(response){
+		            	loading_modal_hide();
+				    	$("#master-company").html(response);
+				    }
+				});
+			});
+
+			$("#master-company #table-list-data").on("click","tbody .btn-edit",function(){
+				var ID = $(this).data("id");
+				var data = {
+	              ID : ID,
+	          	};
+	          	var token = jwt_encode(data,'UAP)(*');
+				$.ajax({
+				    type : 'POST',
+				    url : base_url_js+"human-resources/master_insurance_company/form",
+				    data : {token:token},
 				    dataType : 'html',
 				    beforeSend :function(){loading_modal_show()},
 		            error : function(jqXHR){

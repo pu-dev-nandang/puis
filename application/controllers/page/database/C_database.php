@@ -7,7 +7,7 @@ class C_database extends Globalclass {
     {
         parent::__construct();
 //        $this->session->set_userdata('departement_nav', 'academic');
-        $this->load->model(array('m_sendemail','database/m_database','General_model'));
+        $this->load->model(array('m_sendemail','database/m_database','General_model','akademik/M_akademik'));
         $this->load->library('JWT');
     }
 
@@ -405,12 +405,28 @@ class C_database extends Globalclass {
             $conditions = array("NPM"=>$data_arr['NPM']);
             $isExist = $this->General_model->fetchData("ta_".$data_arr['TA'].".students",$conditions)->row();
             if(!empty($isExist)){
+                $isExist->Insurance = $this->M_akademik->getStdInsurance(array("a.NPM"=>$data_arr['NPM']))->row();
                 $data['NPM'] = $data_arr['NPM'];
                 $data['TA'] = $data_arr['TA'];
+                if(!empty($isExist)){
+                    if(!empty($isExist->InsuranceID)){
+                        $getInsurance = $this->General_model->fetchData("db_academic.std_insurance", array("NPM"=>$isExist->NPM))->row();
+                        if(!empty($getInsurance)){
+                            $detailInsurance = $this->General_model->fetchData("db_employees.master_company",array("InsuranceID"=>$getInsurance->InsuranceID))->row();
+                            $getInsurance->CompanyName = $detailInsurance->Name; 
+                            $isExist->Insurance = $getInsurance; 
+                        }                        
+                    }
+                }
                 $data['detail_ori'] = $isExist;
                 $data['detail_auth_ori'] = $this->General_model->fetchData("db_academic.auth_students",array("NPM"=>$data_arr['NPM']))->row();
                 $conditions['isApproval'] = 1;
                 $data['detail_req'] = $this->General_model->fetchData("db_academic.tmp_students",$conditions)->row();
+                if(!empty($data['detail_req'])){
+                    if(!empty($data['detail_req']->InsuranceID)){
+                        $data['detail_req']->Insurance = $this->General_model->fetchData("db_employees.master_company",array("ID"=>$data['detail_req']->InsuranceID))->row();
+                    }
+                }
             }
         }
         $this->load->view('page/database/admisi/requestMerging',$data);
@@ -419,6 +435,7 @@ class C_database extends Globalclass {
     public function students_req_approval(){
         $data = $this->input->post();
         $myName = $this->session->userdata('Name');
+        $myNIP = $this->session->userdata('NIP');
         $json = array();
         if($data){
             $key = "UAP)(*";
@@ -446,7 +463,6 @@ class C_database extends Globalclass {
                     unset($getTempStudentReq->edited);
                     unset($getTempStudentReq->editedby);
                     unset($getTempStudentReq->ID);
-                    unset($getTempStudentReq->NPM);
                     unset($getTempStudentReq->Name);
 
                     $KTPNumber = $getTempStudentReq->KTPNumber;
@@ -454,6 +470,29 @@ class C_database extends Globalclass {
                     unset($getTempStudentReq->KTPNumber);
                     unset($getTempStudentReq->Access_Card_Number);
                     unset($getTempStudentReq->approvedBy);
+
+                    //HEALTY INSURANCE 
+                    $dataInsurance = array();
+                    $dataInsurance['InsuranceID'] = ($getTempStudentReq->InsuranceID != 'OTH') ? $getTempStudentReq->InsuranceID:null;
+                    $dataInsurance['InsuranceOTH'] = $getTempStudentReq->InsuranceOTH;
+                    $dataInsurance['InsurancePolicy'] = $getTempStudentReq->InsurancePolicy;
+                    $dataInsurance['EffectiveStart'] = $getTempStudentReq->EffectiveStart;
+                    $dataInsurance['EffectiveEnd'] = $getTempStudentReq->EffectiveEnd;
+                    //clone card 
+                    $cardName = $getTempStudentReq->Card;
+                    $clonepath = "./uploads/students/insurance_card/";
+                    $cloneNewFile = str_replace("REQ", "APPV", $getTempStudentReq->Card);
+                    $cloneCard = copy($clonepath.$cardName, $clonepath.$cloneNewFile);
+                    $dataInsurance['Card'] = $cloneNewFile;
+                    $dataInsurance['NPM'] = $getTempStudentReq->NPM;
+                    unset($getTempStudentReq->InsuranceID);
+                    unset($getTempStudentReq->InsuranceOTH);
+                    unset($getTempStudentReq->InsurancePolicy);
+                    unset($getTempStudentReq->EffectiveStart);
+                    unset($getTempStudentReq->EffectiveEnd);
+                    unset($getTempStudentReq->NPM);
+                    unset($getTempStudentReq->Card);
+                    //END HEALTY INSURANCE 
 
                     $updateTA = $this->General_model->updateData("ta_".$data_arr['TA'].".students",$getTempStudentReq,$conditions);
                     if($updateTA){
@@ -472,8 +511,23 @@ class C_database extends Globalclass {
                         $updateTempStd = $this->General_model->updateData("db_academic.tmp_students",$dataAppv,$conditions);
                         //update to table auth student on dbaccademic
                         $updateAuthStd = $this->General_model->updateData("db_academic.auth_students",array("KTPNumber"=>$KTPNumber,"Access_Card_Number"=>$Access_Card_Number),$conditions);
+                        //insert new company insurance
+                        if(!empty($dataInsurance['InsuranceOTH']) && empty($dataInsurance['InsuranceID'])){
+                            $insertInsurance = $this->General_model->insertData("db_employees.master_company",array("Name"=>$dataInsurance['InsuranceOTH'],"IsActive"=>0,"Category"=>"insurance","createdby"=>$myNIP));
+                        }
+                        //update Insurance
+                        $isExistInsurance = $this->General_model->fetchData("db_academic.std_insurance",$conditions)->row();
+                        if(!empty($isExistInsurance)){
+                            unlink($clonepath.$cardName);
+                            $dataInsurance['editedby'] = $myName;
+                            $saveInsurance = $this->General_model->updateData("db_academic.std_insurance",$dataInsurance,$conditions);
+                        }else{
+                            $dataInsurance['createdby'] = $myName;
+                            $saveInsurance = $this->General_model->insertData("db_academic.std_insurance",$dataInsurance);
+                        }
+
                         $adMessage = "";
-                        if($updateTempStd && $updateAuthStd){
+                        if($updateTempStd && $updateAuthStd && $saveInsurance){
                             if(!empty($Access_Card_Number)){
                                 if($Access_Card_Number != $isExistAuth->Access_Card_Number){ //check if different number of card
                                     if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id'){
@@ -499,10 +553,9 @@ class C_database extends Globalclass {
                                         }else{$adMessage="Windows active directory server not connected";}
                                     }
                                 }
-                            }
-                            
+                            }                            
                         }
-                        $message = (($updateTempStd && $updateAuthStd) ? "Successfully":"Failed")." saved.".(!empty($adMessage) ? ' <b>'.$adMessage.'</b>':'');
+                        $message = (($updateTempStd && $updateAuthStd && $saveInsurance) ? "Successfully":"Failed")." saved.".(!empty($adMessage) ? ' <b>'.$adMessage.'</b>':'');
                         $isfinish = $updateTempStd;
                     }else{
                         $message = "Failed saved data. Try again.";

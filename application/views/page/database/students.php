@@ -1077,6 +1077,7 @@
                 beforeSend : function(){
                     loading_modal_show();
                 },error : function(jqXHR){
+                    loading_modal_hide();
                     console.log("Error info:\n"+jqXHR.responseText);
                     $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
                     $("body #GlobalModal .modal-body").html(jqXHR.responseText);
