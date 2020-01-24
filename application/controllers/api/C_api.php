@@ -1626,6 +1626,16 @@ class C_api extends CI_Controller {
                     ->result_array();
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='readMentorProdi'){
+
+                $ProdiID = $data_arr['ProdiID'];
+                $data = $this->db->select('NIP,Name')->order_by('NIP', 'ASC')->get_where('db_employees.employees',array(
+                    'ProdiID' => $ProdiID,
+                        'StatusLecturerID' => '3'
+                    ))->result_array();
+
+                return print_r(json_encode($data));
+            }
         }
     }
 
@@ -10558,6 +10568,7 @@ class C_api extends CI_Controller {
 
         $w_ClassOf = ($data_arr['ClassOf']!='') ? ' AND auts.Year = "'.$data_arr['ClassOf'].'" ' : '';
         $w_StatusKRS = ($data_arr['StatusKRS']!='' && $data_arr['StatusKRS']!='NOT_EXISTS') ? ' AND stdk.Status = "'.$data_arr['StatusKRS'].'" ' : '';
+        $w_Mentor = ($data_arr['MentorNIP']!='') ? ' AND ma.NIP = "'.$data_arr['MentorNIP'].'" ' : '';
 
 
         $dataSearch = '';
@@ -10576,7 +10587,7 @@ class C_api extends CI_Controller {
                               LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
                               LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
                               LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
-                              WHERE (auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' 
+                              WHERE (auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.$w_Mentor.' 
                               AND auts.NPM NOT IN (SELECT auts_1.NPM FROM  db_academic.auth_students auts_1
                                                   LEFT JOIN db_academic.std_krs stdk_1 ON (stdk_1.NPM = auts_1.NPM)
                                                   WHERE (stdk_1.SemesterID = "'.$data_arr['SemesterID'].'" AND auts_1.ProdiID = "'.$data_arr['ProdiID'].'"  
@@ -10595,7 +10606,7 @@ class C_api extends CI_Controller {
                               LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
                               LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
                               LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
-                              WHERE (auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' ) '.$dataSearch.' 
+                              WHERE (auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.$w_Mentor.' ) '.$dataSearch.' 
                               GROUP BY auts.NPM ORDER BY auts.NPM ASC';
         } else {
 
@@ -10607,7 +10618,8 @@ class C_api extends CI_Controller {
                               LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
                               LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
                               LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
-                              WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' ) '.$dataSearch.' 
+                              WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND auts.ProdiID = "'.$data_arr['ProdiID'].'"  
+                              AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.$w_Mentor.' ) '.$dataSearch.' 
                               GROUP BY auts.NPM ORDER BY stdk.Input_At ASC, auts.NPM ASC';
 
         }
