@@ -43,7 +43,7 @@
     function loadTime() {
         setInterval(function () {
             var dt = moment().format('dddd, DD MMM YYYY HH:mm:ss');
-            console.log(dt);
+            // console.log(dt);
             $('#tdNow').html(dt);
         },1000);
     }

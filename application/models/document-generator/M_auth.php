@@ -14,11 +14,11 @@ class M_auth extends CI_Model {
         $sql = 'select qdj.*,a.Level from  db_generatordoc.user_access_department as a 
                 left join  (
                     select * from (
-                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Code as Abbr from db_academic.program_study
+                    select CONCAT("AC.",ID) as ID, CONCAT("Study ",NameEng)  as NameDepartment,Name as NameDepartmentIND,Code as Abbr from db_academic.program_study
                     UNION
                     select CONCAT("NA.",ID) as ID, Division as NameDepartment,Description as NameDepartmentIND,Abbreviation as Abbr from db_employees.division  
                     UNION
-                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Abbr from db_academic.faculty 
+                    select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartment,Name as NameDepartmentIND,Abbr from db_academic.faculty 
                     ) qdj
                 ) qdj on qdj.ID = a.Department
                 where a.NIP = "'.$this->session->userdata('NIP').'"   

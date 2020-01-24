@@ -344,50 +344,53 @@
 		},
 
 		ApproveByChecklist : function(selector,dt){
-			if (confirm('Are you sure ?')) {
-				var data = [];
-				for (var i = 0; i < dt.length; i++) {
-					var temp = {};
-					var settingTemplate = jQuery.parseJSON(dt[i]['dt']['masterDocument'][0]['Config']);
-					settingTemplate = App_table.__GenerateByData_settingTemplate(dt[i]['dt'],settingTemplate);
-					var ID = dt[i]['dt']['ID_document'];
-					var DepartmentID = dt[i]['dt']['DepartmentID'];
-					var dataID = dt[i]['ID'];
-					var approval_number = dt[i]['approval_number'];
+			if (dt.length > 0) {
+				if (confirm('Are you sure ?')) {
+					var data = [];
+					for (var i = 0; i < dt.length; i++) {
+						var temp = {};
+						var settingTemplate = jQuery.parseJSON(dt[i]['dt']['masterDocument'][0]['Config']);
+						settingTemplate = App_table.__GenerateByData_settingTemplate(dt[i]['dt'],settingTemplate);
+						var ID = dt[i]['dt']['ID_document'];
+						var DepartmentID = dt[i]['dt']['DepartmentID'];
+						var dataID = dt[i]['ID'];
+						var approval_number = dt[i]['approval_number'];
 
-					var temp = {
-						settingTemplate : settingTemplate,
-						ID : ID,
-						DepartmentID : DepartmentID,
-						dataID : dataID,
-						approval_number : approval_number,
-					};
+						var temp = {
+							settingTemplate : settingTemplate,
+							ID : ID,
+							DepartmentID : DepartmentID,
+							dataID : dataID,
+							approval_number : approval_number,
+						};
 
-					data.push(temp);
+						data.push(temp);
+					}
+					// console.log(data);
+					// return;
+					var url = base_url_js+"__request-document-generator/__ApproveByChecklist";
+					var token =  jwt_encode(data,'UAP)(*');
+					loadingStart();
+				    AjaxSubmitTemplate(url,token).then(function(response){
+				    	if (response == 1) {
+				    		toastr.success('Saved');
+				    	}
+				    	else
+				    	{
+				    	    toastr.error('Something error,please try again');
+				    	}
+				    	oTable.ajax.reload( null, false );
+				    	getNeedApproval();
+				    	loadingEnd(1000);
+					}).fail(function(response){
+				        toastr.error('Connection error,please try again');
+				        oTable.ajax.reload( null, false );
+				        getNeedApproval();
+				        loadingEnd(500);
+				    })
 				}
-				// console.log(data);
-				// return;
-				var url = base_url_js+"__request-document-generator/__ApproveByChecklist";
-				var token =  jwt_encode(data,'UAP)(*');
-				loadingStart();
-			    AjaxSubmitTemplate(url,token).then(function(response){
-			    	if (response == 1) {
-			    		toastr.success('Saved');
-			    	}
-			    	else
-			    	{
-			    	    toastr.error('Something error,please try again');
-			    	}
-			    	oTable.ajax.reload( null, false );
-			    	getNeedApproval();
-			    	loadingEnd(1000);
-				}).fail(function(response){
-			        toastr.error('Connection error,please try again');
-			        oTable.ajax.reload( null, false );
-			        getNeedApproval();
-			        loadingEnd(500);
-			    })
 			}
+			
 		}, 
 	};
 
