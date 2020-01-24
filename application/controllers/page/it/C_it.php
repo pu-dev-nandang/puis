@@ -446,7 +446,7 @@ class C_it extends It_Controler {
         $explode = explode("#", $data_arr['Semester']);
         $idSemester = $explode[0];
         $semesterYear = $explode[1];
-        $execute = $this->General_model->callStoredProcedure("call db_academic.fetchGenerateEdom(".$idSemester.",".$semesterYear.",1)");
+        $execute = $this->General_model->callStoredProcedure("call db_academic.fetchGenerateEdom(".$idSemester.",".$semesterYear.")");
         //var_dump($execute);
         $insertLastUpdate = $this->General_model->insertData("db_statistik.lastupdated",array("TableName"=>"edomRecap".$semesterYear,"LastUpdated"=>date("Y-m-d H:i:s")));
       }
