@@ -27,7 +27,8 @@
     </ul>
 
     <ul class="crumb-buttons">
-        <li><a href="javascript:void(0);" title=""><span style="color:#607D8B;" id="tdNow"></span></a></li>
+        <li><a href="javascript:void(0);" title="">
+                <span style="color:#607D8B;" id="tdNow"></span></a></li>
         <li><a href="javascript:void(0);" title="">Department :
                 <span style="color:#ff1100;" id = "wrDepartment"><?php echo ucwords(strtolower(str_replace('-',' ',$departement))); ?>
                 </span><span></span></a></li>
@@ -41,9 +42,11 @@
     });
 
     function loadTime() {
+        var phpNowDate = '<?= date("Y-m-d H:i:s"); ?>';
+        var no = 0;
         setInterval(function () {
-            var dt = moment().format('dddd, DD MMM YYYY HH:mm:ss');
-            // console.log(dt);
+            var dt = moment(phpNowDate).add(no, 'second').format('ddd DD MMM YYYY HH:mm:ss');
+            no++;
             $('#tdNow').html(dt);
         },1000);
     }
