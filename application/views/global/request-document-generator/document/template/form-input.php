@@ -15,9 +15,31 @@
     </div>
     <div class="panel-body" style="min-height: 100px;">
         <div class="well">
-            <div class="form-group">
-                <label>Upload Template</label>
-                <input type="file" name = "PathTemplate" id = "UploadFile">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                    <label>Upload Template</label>
+                    <input type="file" name = "PathTemplate" id = "UploadFile">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>Sample Template 1</label>
+                  <ul style="margin-left: -20px;">
+                    <li><a href="<?php echo base_url().'uploads/document-generator/template/Template_Surat_GET_EMP.docx' ?>">Template Surat GET EMP</a> </li>
+                    <li><a href="<?php echo base_url().'uploads/document-generator/template/Template_Surat_GET_MHS.docx' ?>">Template Surat GET MHS</a> </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>Sample Template 2</label>
+                  <ul style="margin-left: -20px;">
+                    <li><a href="<?php echo base_url().'uploads/document-generator/template/Template_Surat_Tugas.docx' ?>">Template Surat Tugas</a> </li>
+                    <li><a href="<?php echo base_url().'uploads/document-generator/template/Template_Surat_Tugas_mengajar.docx' ?>">Template Surat Tugas mengajar</a> </li>
+                  </ul>
+                </div>
+              </div>
             </div>
         </div>
         <div class="row">
