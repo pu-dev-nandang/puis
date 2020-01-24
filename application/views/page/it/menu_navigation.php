@@ -255,6 +255,14 @@
                     Console Developer
                 </a>
             </li>
+            <!-- ADDED BY FEBRI @ JAN 2020 -->
+            <li class="<?php if($this->uri->segment(2)=='generate-edom'){echo"current";}?>">
+                <a href="<?php echo base_url('it/generate-edom');?>">
+                    <i class="fa fa-tasks"></i>
+                    Generate EDOM
+                </a>
+            </li>
+            <!-- END ADDED BY FEBRI @ JAN 2020 -->
 
         </ul>
 

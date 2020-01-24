@@ -198,6 +198,9 @@
 </div>
 
 
+<div id="student-detail"></div>
+
+
 
 <script type="text/javascript">
 	function fetchingData(sorted='') {
@@ -300,7 +303,8 @@
 	            	$("body #modalGlobal .modal-body").html(jqXHR.responseText);
 		      	  	$("body #modalGlobal").modal("show");
 			    },success : function(response){
-			    	$("#student-list").html(response);
+			    	$("#student-list").addClass("hidden");
+			    	$("#student-detail").html(response);
 			    }
 			});
     	});
