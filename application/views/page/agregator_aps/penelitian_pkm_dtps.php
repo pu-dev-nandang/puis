@@ -43,6 +43,7 @@
 
     function LoadTableData(filterProdi)
     {
+        // console.log('asd');
         var P = filterProdi.split('.');
         var ProdiID = P[0];
         var data = {
@@ -135,7 +136,7 @@
         var v = parseInt($(this).html());
         if (v > 0) {
             var dt = $(this).attr('data');
-            // dt = jwt_decode(dt);
+            dt = jwt_decode(dt);
             var html =  '<div class = "row">'+
                             '<div class = "col-md-12">'+
                                 '<table class = "table">'+
@@ -149,6 +150,7 @@
                                     '</thead>'+
                                     '<tbody>';
                     if (dt.length > 0) {
+                        //console.log(dt)
                         for (var i = 0; i < dt.length; i++) {
                             var Judul = (dt[i]["Judul_litabmas"] !== undefined) ? dt[i]["Judul_litabmas"] : dt[i]["Judul_PKM"];
                             var dataAnggota = dt[i]["dataAnggota"];
