@@ -116,7 +116,7 @@
 				    }
 				});
 		  	}else{
-		  		alert("Please fill out the field.");
+		  		alert("Please fill out the field");
 		  	}
 		});
 
