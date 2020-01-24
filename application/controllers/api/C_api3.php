@@ -5348,6 +5348,17 @@ class C_api3 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='insertLogLecturer'){
+
+            $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['IPLocal2'] = $this->input->ip_address();
+            $dataForm['IPLocal'] = $hostname;
+            $dataForm['AccessedOn'] = $this->m_rest->getDateTimeNow();
+            $this->db->insert('db_employees.log_lecturers',$dataForm);
+            return print_r(1);
+
+        }
     }
 
     public function crudFileFinalProject(){
