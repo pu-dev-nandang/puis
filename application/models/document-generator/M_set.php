@@ -57,7 +57,14 @@ class M_set extends CI_Model {
 		if (count($exEntity) > 0 ) {
 			switch ($exEntity[0]) {
 				case 'NIP':
-					
+					$sql = 'select NIP as ID,Name as Value from db_employees.employees where StatusEmployeeID != -1';
+					$query = $this->db->query($sql,array())->result_array();
+					$rs['Choose'] = $exEntity[0];
+					$rs['select'] = $query;
+					$rs['user'] = '';
+					$rs['verify'] = '';
+					$rs['cap'] = '';
+					$rs['number'] = $exEntity[1];
 					break;
 				case 'Position':
 					$sql = 'select ID,Position as Value from db_employees.position where ID in(1,2,3,4,5,6,10,11,12)';
@@ -266,6 +273,56 @@ class M_set extends CI_Model {
 								$rs['Signature'][$i]['number'] = $obj[$i]['number'];
 								break;
 							
+							case 'NIP':
+								$sql = "select * from db_employees.employees
+								        where NIP = '".$user."'
+								        limit 1
+								        ";
+								$query=$this->db->query($sql, array())->result_array();
+								
+								$value = '';
+								if (count($query) == 0 && !isset($query) ) {
+									echo "Position User not exist";
+									die();
+								}
+								else
+								{
+									$TitleBehind = ($query[0]['TitleBehind'] == '' || $query[0]['TitleBehind'] == null ) ? '' : ', '.$query[0]['TitleBehind'];
+									$value = $query[0]['TitleAhead'].' '.$query[0]['Name'].$TitleBehind;
+									$rs['Signature'][$i]['NameEMP'] = $value;
+									$NIP = $query[0]['NIP'];
+									$rs['Signature'][$i]['NIPEMP'] = $NIP;
+								}
+
+								// verify
+								$img = '';
+								
+								$valueVerify = $verify;
+								if ($verify == 1) {
+									$img = './uploads/signature/'.$query[0]['Signatures'];
+									
+								}
+
+								$rs['Signature'][$i]['verify'] = [
+									'valueVerify' => $valueVerify,
+									'img' => $img,
+								];
+								
+								// cap
+								$img = '';
+								$valueCap = $cap;
+								if ($cap == 1) {
+									$img = './images/cap.png';
+									// $img = './uploads/signature/'.$query[0]['NIP'].'_cap.png';
+								}
+
+								$rs['Signature'][$i]['cap'] = [
+									'valueCap' => $valueCap,
+									'img' => $img,
+								];
+								$rs['Signature'][$i]['number'] = $obj[$i]['number'];
+								break;	
+
 							default:
 								# code...
 								break;
