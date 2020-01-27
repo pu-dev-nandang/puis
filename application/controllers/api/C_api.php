@@ -4172,7 +4172,6 @@ class C_api extends CI_Controller {
                 WHERE ea.NIP = "'.$NIP.'" AND m.Type = "1" AND ea.Active = "1" AND ea.LinkFiles IS NOT NULL '.$dataSearch;
 
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
-                
                 $query = $this->db->query($sql)->result_array();
                 $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
@@ -4184,7 +4183,9 @@ class C_api extends CI_Controller {
                     $nestedData=array();
                     $row = $query[$i];
 
-                    $btnAction = '<button type="button" class="btn btn-sm btn-primary btn-circle btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'.$row['LinkFiles'].'"><i class="fa fa-eye"></i></button> <button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'"><i class="fa fa-trash"></i></button> <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'.$row['NameFiles'].'" idtypex="'.$row['TypeFiles'].'" idfiles="'.$row['ID'].'" linkfileother="'.$row['LinkFiles'].'" namedoc ="'.$row['No_Document'].'"><i class="fa fa-edit"></i></button> ';
+                    $btnAction = '<button type="button" class="btn btn-sm btn-primary btn-circle btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'.$row['LinkFiles'].'"><i class="fa fa-eye"></i></button> 
+                        <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'.$row['NameFiles'].'" idtypex="'.$row['TypeFiles'].'" idfiles="'.$row['ID'].'" linkfileother="'.$row['LinkFiles'].'" namedoc ="'.$row['No_Document'].'"><i class="fa fa-edit"></i></button> 
+                        <button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'"><i class="fa fa-trash"></i></button> ';
 
                     if ($row['No_Document'] == null){
                          $nodoc = '<center> - </center>';
@@ -4212,7 +4213,6 @@ class C_api extends CI_Controller {
 
                     $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
                     $nestedData[] = '<div style="text-align:left;">'.$row['NameFiles'].' </div>';
-                    $nestedData[] = '<div style="text-align:left;">'.$data_otherfiles.' </div>';
                     $nestedData[] = '<div style="text-align:left;">'.$nodoc.' </div>';
                     $nestedData[] = '<div style="text-align:center;">'.$datadate.' </div>';
                     $nestedData[] = '<div style="text-align:left;">'.$datadesc.' </div>';
@@ -4321,11 +4321,10 @@ class C_api extends CI_Controller {
                 $dataSearch = '';
                 if( !empty($requestData['search']['value']) ) {
                     $search = $requestData['search']['value'];
-                    $dataSearch = 'WHERE Name_other_files LIKE "%'.$search.'%" ORDER BY ID DESC';
+                    $dataSearch = 'WHERE TypeFiles LIKE "%'.$search.'%" OR NameFiles LIKE "%'.$search.'%" ORDER BY ID DESC';
                 }
 
-                $queryDefault = 'SELECT * FROM db_employees.master_other_files '.$dataSearch;
-
+                $queryDefault = 'SELECT * FROM db_employees.master_files '.$dataSearch;
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
                 
                 $query = $this->db->query($sql)->result_array();
@@ -4339,10 +4338,16 @@ class C_api extends CI_Controller {
                     $nestedData=array();
                     $row = $query[$i];
 
-                    $btnAction = '<button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'" typedata="other"><i class="fa fa-trash"></i></button> ';                 
+                    if($row['ID'] == "13") {
+                        $btnAction = '<button class="btn btn-sm btn-circle btn-danger" data-toggle="tooltip" data-placement="top" title="Delete File" disabled><i class="fa fa-trash"></i></button> ';  
+                    } 
+                    else {
+                        $btnAction = '<button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'" TypeFiles="'.$row['ID'].'" typedata="otherfile"><i class="fa fa-trash"></i></button> ';  
+                    }
 
                     $nestedData[] = '<div style="text-align:center; color: #000000;">'.$no.'</div>';
-                    $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['Name_other_files'].'</div>';
+                    $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['TypeFiles'].'</div>';
+                    $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['NameFiles'].'</div>';
                     $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
                     $data[] = $nestedData;
                     $no++;
@@ -4359,7 +4364,9 @@ class C_api extends CI_Controller {
 
             else if($data_arr['action']=='get_katotherfiles') {
 
-                $data = $this->db->query('SELECT ID, Name_other_files FROM db_employees.master_other_files ')->result_array();
+                $data = $this->db->query('SELECT ID, NameFiles
+                        FROM db_employees.master_files
+                        WHERE TYPE = "1" ')->result_array();
                 return print_r(json_encode($data));
 
             }
@@ -4387,7 +4394,9 @@ class C_api extends CI_Controller {
                 // echo json_encode($details);
             }
             else if($data_arr['action']=='deleteother_master') {
+                
                 $id_otherfile = $data_arr['id_otherfile'];
+                $TypeFiles = $data_arr['TypeFiles'];
                 $typedata = $data_arr['typedata'];
 
                 if($typedata == "university") {
@@ -4401,9 +4410,17 @@ class C_api extends CI_Controller {
                     $this->db->reset_query();
                 }
                 else {
-                    $this->db->where('ID',$id_otherfile);
-                    $this->db->delete('db_employees.master_other_files');
-                    $this->db->reset_query();
+                    
+                    $dataAttdS = $this->db->query('SELECT * FROM db_employees.files WHERE TypeFiles = "'.$TypeFiles.'" ')->result_array();
+                    
+                    if(count($dataAttdS)>0){
+                        return print_r(0);
+                    } 
+                    else {
+                        $this->db->where('ID',$id_otherfile);
+                        $this->db->delete('db_employees.master_files');
+                        $this->db->reset_query();
+                    }
                 }
                 return print_r(1);
             }
@@ -6706,14 +6723,14 @@ class C_api extends CI_Controller {
                 $NoDocument = strtoupper($formInsert['NoDocument']);
                 $DateDocument = $formInsert['DateDocument'];
                 $type = $formInsert['type'];
-                $kat_otherfiles = $formInsert['kat_otherfiles'];
+                //$kat_otherfiles = $formInsert['kat_otherfiles'];
                 $DescriptionFile = $formInsert['DescriptionFile'];
                 $fileName = $formInsert['fileName'];
                 $Get_MasterFiles = $this->m_master->MasterfileStatus($type);
                 $dataSave = array(
                     'NIP' => $NIP,
                     'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                    'ID_OtherFiles' => $kat_otherfiles,
+                    //'ID_OtherFiles' => $kat_otherfiles,
                     'No_Document' => $NoDocument,
                     'Date_Files' => $DateDocument,
                     'Description_Files' => $DescriptionFile,
@@ -6847,24 +6864,26 @@ class C_api extends CI_Controller {
 
         else if($data_arr['action']=='update_mster_katother'){
 
-            $master_name_katother = ucwords($data_arr['master_name_katother']);
-            $dataAttdS = $this->db->query('SELECT * FROM db_employees.master_other_files
-                                          WHERE Name_other_files = "'.$master_name_katother.'" ')->result_array();
+            $type_otherfiles = ucwords($data_arr['type_otherfiles']);
+            $name_katother = ucwords($data_arr['name_katother']);
+            
+            $dataAttdS = $this->db->query('SELECT * FROM db_employees.master_files
+                                          WHERE TypeFiles = "'.$type_otherfiles.'" OR NameFiles = "'.$name_katother.'" ')->result_array();
 
             if(count($dataAttdS)>0){
                 return print_r(0);
             } 
             else {
                 $dataSave = array(
-                    'Name_other_files' => $master_name_katother,
+                    'TypeFiles' => $type_otherfiles,
+                    'NameFiles' => $name_katother,
                     'UserCreate' => $IDuser
                 );
-                $this->db->insert('db_employees.master_other_files',$dataSave);
+                $this->db->insert('db_employees.master_files',$dataSave);
                 return print_r(1);
             }
         }
 
-        
         else if($data_arr['action']=='readmastermajor'){
 
             $requestData= $_REQUEST;
