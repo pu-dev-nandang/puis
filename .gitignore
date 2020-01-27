@@ -61,6 +61,6 @@ document/*
 **/images/Testimonials/
 
 #Ignores Add Templates Surat Generator
-#**/uploads/document-generator/
-#***/uploads/document-generator/template/
+**/uploads/document-generator/
+***/uploads/document-generator/template/
 ****/uploads/document-generator/template/temp/
