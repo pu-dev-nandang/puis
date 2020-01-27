@@ -1223,11 +1223,21 @@ class C_api extends CI_Controller {
             $data = $this->m_api->__getItemKuriklum($data_arr['table']);
             return print_r(json_encode($data));
         }
-        else if($data_arr['action']='getDateKRSOnline'){
+        else if($data_arr['action']=='getDateKRSOnline'){
 
             $data = $this->checkDateKRSOnlineToEditTimetable($data_arr['SemesterID']);
 
             return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='updateStatusEditTimeTable'){
+
+            //updateStatusEditTimeTable
+
+            $this->db->set('EditTimeTable', $data_arr['EditTimeTable']);
+            $this->db->where('SemesterID', $data_arr['SemesterID']);
+            $this->db->update('db_academic.academic_years');
+            return print_r(1);
 
         }
     }
