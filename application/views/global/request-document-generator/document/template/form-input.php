@@ -1128,9 +1128,18 @@
         set_GET : function(attrname,attrva,attrkey,attrfield,el){
             var keynumber = el.closest('.GET').attr('keynumber');
             var keyindex = parseInt(el.closest('.GET').attr('keyindex'));
-            var dt = jwt_decode(el.attr('datatoken'));
-            settingTemplate[attrkey][attrname][keyindex]['user'] = {};
-            settingTemplate[attrkey][attrname][keyindex]['user'] = dt;
+           
+            if ($(this).val() != '') {
+               var dt = jwt_decode(el.attr('datatoken'));
+               settingTemplate[attrkey][attrname][keyindex]['user'] = {};
+               settingTemplate[attrkey][attrname][keyindex]['user'] = dt;
+            }
+            else
+            {
+              settingTemplate[attrkey][attrname][keyindex]['user'] = {};
+              settingTemplate[attrkey][attrname][keyindex]['number'] = keynumber;
+            }
+            
         },
 
 

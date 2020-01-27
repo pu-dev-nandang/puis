@@ -1239,17 +1239,33 @@ class M_doc extends CI_Model {
                 }
             }
 
-            // write name di arrKomponen key ke 2
-            if (array_key_exists(2, $arrKomponen)) {
-                $setValue = $arrKomponen[2];
-                $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
-            }
+            
+            // write name
+                for ($j=0; $j < count($arrKomponen); $j++) {
+                    $str = $arrKomponen[$j];
+                    $setValue = 'SET.Signature.Position'.'#'.$keyApproval;
+                    if (strpos($str, $setValue) !== false) {
+                        // $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+                        $TemplateProcessor->setValue($str,$arrValue[$i]['NameEMP']);
+                        break;
+                    }
+                    
+                    $setValue = 'SET.Signature.NIP'.'#'.$keyApproval;
+                    if (strpos($str, $setValue) !== false) {
+                        // $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+                        $TemplateProcessor->setValue($str,$arrValue[$i]['NameEMP']);
+                        break;
+                    }
+                   
+                }
 
-            // write name di arrKomponen key ke 3
-            if (array_key_exists(3, $arrKomponen)) {
-                $setValue = $arrKomponen[3];
+                // write NIP
+                $setValue = 'Signature.NIP'.'#'.$keyApproval;
                 $TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
-            }
+                // if (array_key_exists(3, $arrKomponen)) {
+                //  $setValue = $arrKomponen[3];
+                //  $TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
+                // }
             
         }
         
@@ -2679,53 +2695,70 @@ class M_doc extends CI_Model {
     }
 
     private function __SETWriteGET($TemplateProcessor,$arrKomponen,$obj){
-        // print_r($arrKomponen);
+         // print_r($arrKomponen);die();
         // print_r($obj);die();
         for ($z=0; $z < count($arrKomponen); $z++) { 
             $komponen = $arrKomponen[$z];
+            // print_r($komponen);
             $ex = explode('.', $komponen);
-            // print_r($ex);die();
-            // get Type
-            $keyType = $ex[1];
+            // print_r($ex);
+            if ($ex[0] == 'GET') {
+                // get Type
+                $keyType = $ex[1];
 
-            // get key field
-            $get_keyField = $ex[2];
-            // get numbering by #
-            $keyFieldArr = explode('#', $get_keyField);
-            $keyField =  $keyFieldArr[0];
-            $keyNumber = $keyFieldArr[1];
+                // get key field
+                $get_keyField = $ex[2];
+                // get numbering by #
+                $keyFieldArr = explode('#', $get_keyField);
+                $keyField =  $keyFieldArr[0];
+                $keyNumber = $keyFieldArr[1];
 
-            foreach ($obj as $key => $v) {
-               switch ($key) {
-                   case 'EMP':
-                   case 'MHS':
-                       if ($keyType == $key) {
-                           $arr_dt = $obj[$key];
-                           for ($i=0; $i < count($arr_dt); $i++) {
-                                $number = $arr_dt[$i]['number'];
-                                if ($arr_dt[$i]['Choose'] == $keyField && $number == $keyNumber) {
-                                    $arr_get_value = $arr_dt[$i]['user'];
-                                    $TemplateProcessor->setValue($komponen,$arr_get_value[$keyField]);
-                                    foreach ($arr_get_value as $col => $value) {
-                                        $setValue = $keyType.'.'.$col.'#'.$keyNumber;
-                                        $TemplateProcessor->setValue($setValue,$value);
-                                    }
-                                } 
-                               
+                foreach ($obj as $key => $v) {
+                   switch ($key) {
+                       case 'EMP':
+                       case 'MHS':
+                           if ($keyType == $key) {
+                               $arr_dt = $obj[$key];
+                               for ($i=0; $i < count($arr_dt); $i++) {
+                                    $number = $arr_dt[$i]['number'];
+                                    if ($arr_dt[$i]['Choose'] == $keyField && $number == $keyNumber) {
+                                        $arr_get_value = $arr_dt[$i]['user'];
+                                        if(!empty($arr_get_value)) {
+                                            $TemplateProcessor->setValue($komponen,$arr_get_value[$keyField]);
+                                            foreach ($arr_get_value as $col => $value) {
+                                                $setValue = $keyType.'.'.$col.'#'.$keyNumber;
+                                                $TemplateProcessor->setValue($setValue,$value);
+                                            }
+                                        }
+                                        else
+                                        {
+
+                                            $setValue ='GET.'.$keyType.'.'.'NIP'.'#'.$keyNumber;
+                                            $TemplateProcessor->setValue($setValue,'');
+
+                                            $setValue = $keyType.'.'.'Name'.'#'.$keyNumber;
+                                            $TemplateProcessor->setValue($setValue,'');
+                                            // print_r($arrKomponen);die();
+                                        }
+                                        
+                                    } 
+                                   
+                               }
                            }
-                       }
-                       
-                       break;
-                   default:
-                       # code...
-                       break;
-               }
+                           
+                           break;
+                       default:
+                           # code...
+                           break;
+                   }
+                }
             }
+            
 
         }
         
 
-        // die();
+         // die();
 
     }
 
