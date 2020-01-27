@@ -18,7 +18,7 @@
 	<div class="row">
 		<div class="col-sm-12">
 			<div class="act" style="margin-bottom:15px">
-				<button class="btn btn-sm btn-warning" type="button" onClick="window.location.reload();" >
+				<button class="btn btn-sm btn-warning go-back" type="button" >
 					<i class="fa fa-chevron-left"></i> Back to list
 				</button>
 			</div>
@@ -260,3 +260,12 @@
 		</div>
 	</div>
 </div>	
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("body #detail-user .go-back").click(function(){
+			$("#student-list").removeClass("hidden");
+	    	$("#student-detail").empty();
+		});
+	});
+</script>

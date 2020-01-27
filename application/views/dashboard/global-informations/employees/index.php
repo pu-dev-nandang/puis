@@ -190,6 +190,8 @@
 	</div>
 </div>
 
+<div id="employee-detail"></div>
+
 
 
 <script type="text/javascript">
@@ -269,7 +271,8 @@
 	            	$("body #modalGlobal .modal-body").html(jqXHR.responseText);
 		      	  	$("body #modalGlobal").modal("show");
 			    },success : function(response){
-			    	$("#employee-list").html(response);
+			    	$("#employee-list").addClass("hidden");
+			    	$("#employee-detail").html(response);
 			    }
 			});
     	});

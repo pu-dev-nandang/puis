@@ -73,22 +73,6 @@
 		 	var totalError = itsform.find(".error").length;
 		  	if(error && totalError == 0 ){
 		  		$("#form-edom-results")[0].submit();
-		  		/*var filtering = itsform.serialize();
-	        	var token = jwt_encode({Filter : filtering},'UAP)(*');
-		  		$.ajax({
-				    type : 'POST',
-				    url : base_url_js+"lpmi/lecturer-evaluation/request-edom",
-				    data : {token:token},
-				    dataType : 'html',
-				    beforeSend :function(){$('#ajax-loader').show();},
-		            error : function(jqXHR){
-		            	$('#ajax-loader').hide(); 
-		            	$("body #modalGlobal .modal-body").html(jqXHR.responseText);
-			      	  	$("body #modalGlobal").modal("show");
-				    },success : function(response){
-				    	$("#student-list").html(response);
-				    }
-				});*/
 		  	}else{
 		  		alert("Please fill out the field.");
 		  	}

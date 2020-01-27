@@ -49,5 +49,19 @@ class General_model extends CI_Model{
 		$query = $this->db->query($psquery);
 		return $query;
 	}
+	
+	public function callStoredProcedureWNoLimit($psquery){
+		ini_set('max_execution_time', '0');
+		$query = $this->db->query($psquery);
+
+		$value = $query->row();
+
+		//limit execute time
+        /*mysqli_next_result( $this->db->conn_id );
+        $query->free_result();*/ 
+        //end limit execute time
+		return $value;
+	}
+
 
 }

@@ -431,4 +431,38 @@ class C_it extends It_Controler {
       } 
     }
 
+
+
+    /*ADDED BY FEBRI @ JAN 2020*/
+    public function generateEdom(){
+      $department = parent::__getDepartement();
+      $this->load->model('General_model');
+      $data['semester'] = $this->General_model->fetchData("db_academic.semester",array(),"ID","ASC")->result();
+      $data['edoms'] = $this->General_model->fetchData("db_statistik.lastupdated","TableName like 'edom%' ","LastUpdated","Desc")->result();
+      $content = $this->load->view('page/'.$department.'/generate-edom/index',$data,true);
+      $this->temp($content);
+    }
+
+
+    public function generateRequestEdom(){
+      ini_set('max_execution_time', '0');
+      $this->load->model('General_model');
+      $data = $this->input->post();
+      $json = array();
+      if($data){
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($data['token'],$key);        
+        $explode = explode("#", $data_arr['Semester']);
+        $idSemester = $explode[0];
+        $semesterYear = $explode[1];
+        $execute = $this->General_model->callStoredProcedure("call db_academic.fetchGenerateEdom(".$idSemester.",".$semesterYear.")");
+        //var_dump($execute);
+        $insertLastUpdate = $this->General_model->insertData("db_statistik.lastupdated",array("TableName"=>"edomRecap".$semesterYear,"LastUpdated"=>date("Y-m-d H:i:s")));
+      }
+
+      echo json_encode($json);
+    }
+    /*END ADDED BY FEBRI @ JAN 2020*/
+
+
 }

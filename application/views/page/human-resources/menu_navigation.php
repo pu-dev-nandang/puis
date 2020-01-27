@@ -46,6 +46,15 @@
                 </a>
             </li>
 
+            <!-- ADDED BY FEBRI @ JAN 2020 -->
+            <li class="<?php if($this->uri->segment(2)=='master_insurance_company'){echo"current";}?>">
+                <a href="<?php echo base_url('human-resources/master_insurance_company');?>" title="Master Insurance Company">
+                    <i class="fa fa-medkit"></i>
+                    Insurance Company
+                </a>
+            </li>
+            <!-- END ADDED BY FEBRI @ JAN 2020 -->
+
 
         </ul>
 

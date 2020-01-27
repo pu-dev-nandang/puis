@@ -194,6 +194,8 @@
 	</div>
 </div>
 
+<div id="lecturer-detail"></div>
+
 
 
 <script type="text/javascript">
@@ -272,7 +274,8 @@
 	            	$("body #modalGlobal .modal-body").html(jqXHR.responseText);
 		      	  	$("body #modalGlobal").modal("show");
 			    },success : function(response){
-			    	$("#lecturer-list").html(response);
+			    	$("#lecturer-list").addClass("hidden");
+			    	$("#lecturer-detail").html(response);
 			    }
 			});
     	});
