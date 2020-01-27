@@ -15,17 +15,37 @@ class M_table extends CI_Model {
 	    // $this->load->model('master/m_master');
 	}
 
-	public function __generate($Props){
-		$sql = 'select * from db_generatordoc.api_doc where Active = 1 order by ID';
-		$query = $this->db->query($sql,array())->result_array();
-
+	public function __SemesterID(){ // #SemesterID
 		$sqlSMT = 'select ID,Name as Value,Status as Selected from db_academic.semester order by ID DESC';
 		$querySQLSMT = $this->db->query($sqlSMT,array())->result_array();
+		return $querySQLSMT;
+	}
+
+	public function __NIP(){
+		return array();
+	}
+
+	public function __NPM(){
+		return array();
+	}
+
+	public function __generate($Props){
+		$DepartmentID = $this->session->userdata('DepartmentIDDocument');
+		$sql = 'select a.* from db_generatordoc.api_doc  as a
+				join db_generatordoc.api_doc_department as b on b.ID_api_doc = a.ID
+				where a.Active = 1 
+				and b.Department = "'.$DepartmentID.'"
+				group by a.ID
+				order by ID';
+		$query = $this->db->query($sql,array())->result_array();
+
+		$querySQLSMT = $this->__SemesterID();
 		$sqlEmployeesSample = 'SELECT em.NIP, em.Name
 		                            FROM db_employees.employees em 
 		                            LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
 		                            LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
 		                            where StatusEmployeeID not in (-1,-2,4,6)
+		                            order by em.Name asc
 		                            ';
 		$querySQLEmployees = $this->db->query($sqlEmployeesSample,array())->result_array();
 
@@ -35,6 +55,8 @@ class M_table extends CI_Model {
 			'Choose' => '',
 			'paramsChoose' => [
 				'#SemesterID' => $querySQLSMT,
+				'#NIP' => $this->__NIP(),
+				'#NPM' => $this->__NPM(),
 			],
 			'selectEmployees' => $querySQLEmployees,
 			// 'MapTable' => [] => by JS

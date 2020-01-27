@@ -169,8 +169,25 @@ class M_prodi extends CI_Model {
         $PositionMain = $this->session->userdata('PositionMain');
         $DivisionID = $PositionMain['IDDivision'];
         $IDPosition = $PositionMain['IDPosition'];
+
+        // Position Other 1
+        $PositionOther1 = $this->session->userdata('PositionOther1');
+        $DivisionIDOther1 = $PositionOther1['IDDivisionOther1'];
+        $IDPositionOther1 = $PositionOther1['IDPositionOther1'];
+
+        // Position Other 2
+        $PositionOther2 = $this->session->userdata('PositionOther2');
+        $DivisionIDOther2 = $PositionOther2['IDDivisionOther2'];
+        $IDPositionOther2 = $PositionOther2['IDPositionOther2'];
+
+
+        // Position Other 3
+        $PositionOther3 = $this->session->userdata('PositionOther3');
+        $DivisionIDOther3 = $PositionOther3['IDDivisionOther3'];
+        $IDPositionOther3 = $PositionOther3['IDPositionOther3'];
+
         // get prodi
-        $GetProdi = ($DivisionID == 12 || $IDPosition < 5) ?  $this->m_master->caribasedprimary('db_academic.program_study','Status',1):array();
+        $GetProdi = (  ($DivisionID == 12  || $DivisionIDOther1 == 12 || $DivisionIDOther2 == 12 || $DivisionIDOther3 == 12  ) || ($IDPosition < 5  || $IDPositionOther1 < 5 || $IDPositionOther2 < 5 || $IDPositionOther3 < 5 )  ) ?  $this->m_master->caribasedprimary('db_academic.program_study','Status',1):array();
 
         // check Prodi
         $NIP = $this->session->userdata('NIP');
@@ -180,7 +197,7 @@ class M_prodi extends CI_Model {
         if (count($a_ID) > 0) {
             $GetProdi = $a_ID;
         }
-        elseif ($IDPosition == 5) { // for dekan
+        elseif ($IDPosition == 5 || $IDPositionOther1 == 5 || $IDPositionOther2 == 5 || $IDPositionOther3 == 5 ) { // for dekan
             $Fculty = $this->m_master->caribasedprimary('db_academic.faculty','NIP',$this->session->userdata('NIP') );
             if (count($Fculty ) > 0) {
                 // cek prody faculty
@@ -200,14 +217,14 @@ class M_prodi extends CI_Model {
             // if ($DivisionID != 12 && $IDPosition > 6) {
             //    redirect(base_url().'page404');die();
             // }
-            if ($DivisionID == 14 &&  $IDPosition == 7) {
+            if ( ($DivisionID == 14 || $DivisionIDOther1 == 14 || $DivisionIDOther2 == 14 || $DivisionIDOther3 == 14 ) &&  ($IDPosition == 7  || $IDPositionOther1 == 7 || $IDPositionOther2 == 7 || $IDPositionOther3 == 7 )  ) {
                 $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
                 $ProdiID = $G_emp[0]['ProdiID'];
                 $GetProdi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
             }
             else
             {
-                if ($DivisionID == 12 || $IDPosition < 5) {
+                if (  ($DivisionID == 12 || $DivisionIDOther1 == 12 || $DivisionIDOther2 == 12 || $DivisionIDOther3 == 12  ) || ($IDPosition < 5 ||  $IDPositionOther1 < 5 || $IDPositionOther2 < 5 || $IDPositionOther3 < 5  )  ) {
                    $GetProdi= $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
                 }
                 else

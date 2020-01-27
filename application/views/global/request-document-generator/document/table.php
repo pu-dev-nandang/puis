@@ -9,6 +9,7 @@
 <script type="text/javascript">
 	var App_table = {
 		Loaded : function(){
+			$('#rowChooseDocument').removeClass('hide');
 			loading_page('#pageTableSurat');
 			var firstLoad = setInterval(function () {
 	            var SelectMasterSurat = $('#MasterSurat').val();
@@ -161,7 +162,7 @@
 		               'targets': 2,
 		               // 'searchable': false,
 		               // 'orderable': false,
-		               'className': 'dt-body-center',
+		               // 'className': 'dt-body-center',
 		               'render': function (data, type, full, meta){
 		                   var ht = full[4];
 		                   return ht;
@@ -266,47 +267,146 @@
 			})
 
 			// special for table
-			// console.log(dt);
 			var InputJson = dt['InputJson'];
 			if (InputJson != null && InputJson != '') {
 				InputJson =  jQuery.parseJSON( InputJson )
-				for (key in InputJson){
-					$('.Input[field="PARAMS"][name="#'+key+'"] option').filter(function() {
-					   //may want to use $.trim in here
-					   return $(this).val() == InputJson[key]; 
-					}).prop("selected", true);
+				// for (key in InputJson){
+				// 	$('.Input[field="PARAMS"][name="#'+key+'"] option').filter(function() {
+				// 	   //may want to use $.trim in here
+				// 	   return $(this).val() == InputJson[key]; 
+				// 	}).prop("selected", true);
+				// }
+
+				// console.log(InputJson);
+
+				if (InputJson['TABLE'] !== undefined) {
+					var arr = InputJson['TABLE'];
+					for (var i = 0; i < arr.length; i++) {
+						var arrkey = arr[i];
+						// console.log(arrkey);
+						for(key in arrkey){
+							if (key.substring(0, 1) == '#') {
+								var elClosest = $('.form-group[keyindex="'+i+'"]');
+								if ( elClosest.find('select .Input').length ) {
+									elClosest.find('.Input[field="PARAMS"][name="'+key+'"] option').filter(function() {
+									   //may want to use $.trim in here
+									   return $(this).val() == arrkey[key]; 
+									}).prop("selected", true);
+								}
+								else
+								{
+									elClosest.find('.Input').val(arrkey[key]);
+								}
+							}
+						}
+						
+					}
+				}
+
+
+				// for GET
+				if (InputJson['GET'] !== undefined) {
+					for(key in InputJson['GET']){
+						for (var i = 0; i < InputJson['GET'][key].length; i++) {
+							var get_token = jwt_encode(InputJson['GET'][key][i], "UAP)(*");
+							if (key == 'EMP') {
+								$('.GET[keyindex="'+i+'"]').find('.Input[key="GET"][name="'+key+'"]').val( InputJson['GET'][key][i]['user']['NIP'] );
+								$('.GET[keyindex="'+i+'"]').find('label[for="Name"]').html( InputJson['GET'][key][i]['user']['Name'] );
+							}
+							else
+							{
+								$('.GET[keyindex="'+i+'"]').find('.Input[key="GET"][name="'+key+'"]').val( InputJson['GET'][key][i]['user']['NPM'] );
+								$('.GET[keyindex="'+i+'"]').find('label[for="Name"]').html( InputJson['GET'][key][i]['user']['Name'] );
+							}
+
+							$('.GET[keyindex="'+i+'"]').find('.Input[key="GET"][name="'+key+'"]').attr( 'datatoken',get_token );
+							
+						}
+					}
 				}
 				
 			}
+
+			
+		},
+
+		__GenerateByData_settingTemplate : function(dt){
+			// console.log(dt);
+			// console.log(settingTemplate);
+
+			// for User
+			// settingTemplate.USER['UserNIP'] = dt['UserNIP'];
+			// settingTemplate.USER.push('value.'+dt['UserNIP'])
+			for (var i = 0; i < settingTemplate.USER.length; i++) {
+				// if (settingTemplate.USER[i] == 'NIP.NIP') {
+				// 	settingTemplate.USER[i] = 'NIP.NIP.'+dt['UserNIP'];
+				// }
+				settingTemplate.USER[i] = settingTemplate.USER[i]+'.'+dt['UserNIP'];
+			}
+
+			// for input
+			for (var i = 0; i < settingTemplate.INPUT.length; i++) {
+				for (key in dt){
+					if (key == settingTemplate.INPUT[i].mapping) {
+						settingTemplate.INPUT[i].value = dt[key];
+						break;
+					}
+				}
+			}
+
+			var InputJson = dt['InputJson'];
+			
+			InputJson =  jQuery.parseJSON( InputJson )
+			if (InputJson != null && InputJson != '') {
+				// for table
+				if (InputJson['TABLE'] !== undefined) {
+					 settingTemplate['TABLE']['paramsUser'] = InputJson['TABLE'];
+				}
+
+				// for GET
+				if (InputJson['GET'] !== undefined) {
+					 settingTemplate['GET'] = InputJson['GET'];
+				}
+				
+
+			}
+
 		},
 
 		ApproveOrReject : function(dataID,dt,approval_number,decision,Note=''){
-			var url = base_url_js+"__request-document-generator/__ApproveOrReject";
-		    var data = {
-		       settingTemplate : settingTemplate,
-		       ID : $('#MasterSurat option:selected').val(),
-		       DepartmentID : DepartmentID,
-		       dataID : dataID,
-		       decision : decision,
-		       approval_number : approval_number,
-		       Note : Note,
-		    }
-		    var token =  jwt_encode(data,'UAP)(*');
-		    loadingStart();
-		    AjaxSubmitTemplate(url,token).then(function(response){
-		    	if (response == 1) {
-		    		toastr.success('Saved');
-		    		oTable.ajax.reload( null, false );
-		    	}
-		    	else
-		    	{
-		    	    toastr.error('Something error,please try again');
-		    	}
-		    	loadingEnd(1000);
-			}).fail(function(response){
-		        toastr.error('Connection error,please try again');
-		        loadingEnd(500);
-		    })
+			if (confirm('Are you sure ?')) {
+				var url = base_url_js+"__request-document-generator/__ApproveOrReject";
+				App_table.__GenerateByData_settingTemplate(dt);
+				// console.log(settingTemplate);
+				// return;
+			    var data = {
+			       settingTemplate : settingTemplate,
+			       ID : $('#MasterSurat option:selected').val(),
+			       DepartmentID : dt['DepartmentID'],
+			       dataID : dataID,
+			       decision : decision,
+			       approval_number : approval_number,
+			       Note : Note,
+			    }
+			    var token =  jwt_encode(data,'UAP)(*');
+			    loadingStart();
+			    AjaxSubmitTemplate(url,token).then(function(response){
+			    	if (response == 1) {
+			    		toastr.success('Saved');
+			    		oTable.ajax.reload( null, false );
+			    		getNeedApproval();
+			    	}
+			    	else
+			    	{
+			    	    toastr.error('Something error,please try again');
+			    	}
+			    	loadingEnd(1000);
+				}).fail(function(response){
+			        toastr.error('Connection error,please try again');
+			        loadingEnd(500);
+			    })
+			}
+			
 		},
 
 		Logdata : function(ID,dt){

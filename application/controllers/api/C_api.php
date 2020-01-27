@@ -357,8 +357,7 @@ class C_api extends CI_Controller {
     public function getEmployees()
     {
         $requestData= $_REQUEST;
-        // print_r($requestData);
-
+        
         $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE PositionMain not like "%14%"')->result_array();
 
         if( !empty($requestData['search']['value']) ) {
@@ -403,7 +402,6 @@ class C_api extends CI_Controller {
             }
 
             $nestedData[] = $row["NIP"];
-            // $nestedData[] = $row["NIDN"];
             $nestedData[] = '<div style="text-align: center;"><img src="http://siak.podomorouniversity.ac.id/includes/foto/'.$row["Photo"].'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
             $nestedData[] = '<a href="'.base_url('database/lecturer-details/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>';
             $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
@@ -1424,19 +1422,56 @@ class C_api extends CI_Controller {
             $this->db->insert('db_academic.'.$data_arr['table'],$insert);
             $insert_id = $this->db->insert_id();
             return print_r($insert_id);
-        } else if($data_arr['action']=='edit'){
+        }
+        else if($data_arr['action']=='edit'){
             $dataupdate = (array) $data_arr['data_insert'];
             $this->db->where('ID', $data_arr['ID']);
             $this->db->update('db_academic.'.$data_arr['table'],$dataupdate);
             return print_r(1);
-        } else if($data_arr['action']=='delete'){
+        }
+        else if($data_arr['action']=='delete'){
             $this->db->where('ID', $data_arr['ID']);
             $this->db->delete('db_academic.'.$data_arr['table']);
             return print_r(1);
-        } else if($data_arr['action']=='read'){
+        }
+        else if($data_arr['action']=='read'){
             $data = $this->m_api->__getItemKuriklum($data_arr['table']);
             return print_r(json_encode($data));
         }
+        else if($data_arr['action']='getDateKRSOnline'){
+
+            $data = $this->checkDateKRSOnlineToEditTimetable($data_arr['SemesterID']);
+
+            return print_r(json_encode($data));
+
+        }
+    }
+
+    private function checkDateKRSOnlineToEditTimetable($SemesterID){
+
+
+        $data = $this->db->query('SELECT ay.krsStart, ay.krsEnd, ay.EditTimeTable, s.Status 
+                                            FROM db_academic.academic_years ay 
+                                            LEFT JOIN db_academic.semester s ON (s.ID = ay.SemesterID)  
+                                            WHERE s.ID = "'.$SemesterID.'" ')->result_array();
+
+        if($data[0]['EditTimeTable']=='0'){
+            $dateNow = date('Y-m-d');
+            $data[0]['D'] = $dateNow;
+            if($data[0]['krsStart']<=$dateNow && $data[0]['krsEnd']>=$dateNow){
+                $data[0]['EditTimeTable'] = '0';
+            } else {
+                if($data[0]['Status']==1){
+                    $data[0]['EditTimeTable'] = '1';
+                } else {
+                    $data[0]['EditTimeTable'] = '0';
+                }
+
+            }
+        }
+
+        return $data;
+
     }
 
     public function crudDetailMK(){
@@ -1804,6 +1839,16 @@ class C_api extends CI_Controller {
             if($data_arr['action']=='readProdiGroup'){
                 $data = $this->db->order_by('Code','ASC')->get_where('db_academic.prodi_group',array('ProdiID'=>$data_arr['ProdiID']))
                     ->result_array();
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='readMentorProdi'){
+
+                $ProdiID = $data_arr['ProdiID'];
+                $data = $this->db->select('NIP,Name')->order_by('NIP', 'ASC')->get_where('db_employees.employees',array(
+                    'ProdiID' => $ProdiID,
+                        'StatusLecturerID' => '3'
+                    ))->result_array();
+
                 return print_r(json_encode($data));
             }
         }
@@ -2293,10 +2338,15 @@ class C_api extends CI_Controller {
                 $dataApprove = $this->m_api->__getStudentByScheduleIDApproved($SemesterID,$ScheduleID);
                 $dataPlan = $this->m_api->__getStudentByScheduleIDInStudyPlanning($SemesterID,$ScheduleID);
 
+                $dataKRS = $this->checkDateKRSOnlineToEditTimetable($SemesterID);
+
                 $result = array(
                     'Approve' => $dataApprove,
-                    'Plan' => $dataPlan
+                    'Plan' => $dataPlan,
+                    'KRS' => $dataKRS
                 );
+
+
 
                 return print_r(json_encode($result));
 
@@ -2789,6 +2839,123 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align: center;">'.$row["NameModule"].'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["Description"].'</div>';
             $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewgroupmodule" versionid="'.$row["IDModule"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i></button> <button class="btn btn-sm btn-circle btn-danger btndeletegroup" data-toggle="tooltip" versionid="'.$row["IDModule"].'" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button> <button class="btn btn-sm btn-success btn-circle btneditgroupmodule" data-toggle="tooltip" groupid="'.$row["IDModule"].'" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button> </div>';
+            $no++;
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
+    public function rektorat_listacademicfile(){  //menu rektorat academic files
+        $typefile = $this->input->get('type');
+        $otherfile = $this->input->get('other');
+
+        $requestData= $_REQUEST;
+        
+        if ($typefile == "0" && $otherfile == "0") {
+
+            $totalData = $this->db->query('SELECT f.*, mf.TypeFiles AS M_TypeFiles,  p.Name_other_files, xx.Name, ab.Name AS NamaCreate
+                                            FROM db_employees.files f
+                                            LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
+                                            LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
+                                            LEFT JOIN db_employees.employees AS xx ON (f.NIP = xx.NIP)
+                                            LEFT JOIN db_employees.employees AS ab ON (f.UserCreate = ab.NIP)
+                                            WHERE f.LinkFiles IS NOT NULL')->result_array();
+
+            if( !empty($requestData['search']['value']) ) {
+                $sql = 'SELECT f.*, mf.TypeFiles AS M_TypeFiles, p.Name_other_files, xx.Name, ab.Name AS NamaCreate
+                        FROM db_employees.files f
+                        LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
+                        LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
+                        LEFT JOIN db_employees.employees AS xx ON (f.NIP = xx.NIP)
+                        LEFT JOIN db_employees.employees AS ab ON (f.UserCreate = ab.NIP)
+                        WHERE f.LinkFiles IS NOT NULL AND (';
+                $sql.= 'xx.Name LIKE "'.$requestData['search']['value'].'%" ';
+                $sql.= ' OR f.NIP LIKE "%'.$requestData['search']['value'].'%" ';
+                $sql.= ') ORDER BY f.ID DESC';
+            }
+            else {
+                $sql = 'SELECT f.*, mf.TypeFiles AS M_TypeFiles,  p.Name_other_files, xx.Name, ab.Name AS NamaCreate
+                        FROM db_employees.files f
+                        LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
+                        LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
+                        LEFT JOIN db_employees.employees AS xx ON (f.NIP = xx.NIP)
+                        LEFT JOIN db_employees.employees AS ab ON (f.UserCreate = ab.NIP)
+                        WHERE f.LinkFiles IS NOT NULL ';
+                $sql.= 'ORDER BY f.ID DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            }
+        } 
+
+        else {
+
+                $whereType = ($typefile!='') ? 'AND f.TypeFiles = "'.$typefile.'" ' : '';
+                $whereOtherFile = ($otherfile!='') ? 'AND f.ID_OtherFiles = "'.$otherfile.'" ' : ''; 
+                $uniowhere = $whereType.''.$whereOtherFile;
+
+                $totalData = $this->db->query('SELECT f.*, mf.TypeFiles AS M_TypeFiles,  p.Name_other_files, xx.Name, ab.Name AS NamaCreate
+                                            FROM db_employees.files f
+                                            LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
+                                            LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
+                                            LEFT JOIN db_employees.employees AS xx ON (f.NIP = xx.NIP)
+                                            LEFT JOIN db_employees.employees AS ab ON (f.UserCreate = ab.NIP)
+                                            WHERE f.LinkFiles IS NOT NULL '.$uniowhere)->result_array();
+
+                if( !empty($requestData['search']['value']) ) {
+                    $sql = 'SELECT f.*, mf.TypeFiles AS M_TypeFiles, p.Name_other_files, xx.Name, ab.Name AS NamaCreate
+                            FROM db_employees.files f
+                            LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
+                            LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
+                            LEFT JOIN db_employees.employees AS xx ON (f.NIP = xx.NIP)
+                            LEFT JOIN db_employees.employees AS ab ON (f.UserCreate = ab.NIP)
+                            WHERE f.LinkFiles IS NOT NULL '.$uniowhere;
+                    $sql.= 'AND (xx.Name LIKE "'.$requestData['search']['value'].'%" ';
+                    $sql.= ' OR f.NIP LIKE "%'.$requestData['search']['value'].'%" ';
+                    $sql.= ') ORDER BY f.ID DESC';
+
+                }
+                else {
+                    $sql = 'SELECT f.*, mf.TypeFiles AS M_TypeFiles,  p.Name_other_files, xx.Name, ab.Name AS NamaCreate
+                            FROM db_employees.files f
+                            LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
+                            LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
+                            LEFT JOIN db_employees.employees AS xx ON (f.NIP = xx.NIP)
+                            LEFT JOIN db_employees.employees AS ab ON (f.UserCreate = ab.NIP)
+                            WHERE f.LinkFiles IS NOT NULL '.$uniowhere;
+                    $sql.= 'ORDER BY f.ID DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+                }
+        }
+        
+        $query = $this->db->query($sql)->result_array();
+        $no = $requestData['start']+1;
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $date_upload = date('d M Y H:i',strtotime($row['DateCreate']));
+            if($row["ID_OtherFiles"] == null) {
+                $id_other = "-";
+            } 
+            else {
+                $id_other = $row["Name_other_files"];
+            }
+            
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="text-align: left;">'.$row["NIP"].' - '.$row["Name"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["M_TypeFiles"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["Name_other_files"].'</div>';
+            $nestedData[] = '<div style="text-align: left;">'.$row["Description_Files"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["NamaCreate"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$date_upload.'</div>';
+            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-primary btn-round btnviewlistsrata" filesub="'.$row["LinkFiles"].'" data-toggle="tooltip" data-placement="top" title="Preview"><i class="fa fa-eye"></i> Preview</button></div>';
+            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-primary btn-round btnviewgroupmodule" file_id="'.$row["ID"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i> Details</button></div>';
             $no++;
             $data[] = $nestedData;
         }
@@ -4267,13 +4434,13 @@ class C_api extends CI_Controller {
                     OR m.NameFiles LIKE "%'.$search.'%" ORDER BY ID DESC';
                 }
 
-                $queryDefault = 'SELECT ea.*, m.NameFiles
+                $queryDefault = 'SELECT ea.*, m.NameFiles, p.Name_other_files
                 FROM db_employees.files AS ea
                 LEFT JOIN db_employees.master_files AS m ON (ea.TypeFiles = m.ID) 
+                LEFT JOIN db_employees.master_other_files AS p ON (ea.ID_OtherFiles = p.ID)
                 WHERE ea.NIP = "'.$NIP.'" AND m.Type = "1" AND ea.Active = "1" AND ea.LinkFiles IS NOT NULL '.$dataSearch;
 
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
-                
                 $query = $this->db->query($sql)->result_array();
                 $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
@@ -4285,7 +4452,9 @@ class C_api extends CI_Controller {
                     $nestedData=array();
                     $row = $query[$i];
 
-                    $btnAction = '<button type="button" class="btn btn-sm btn-primary btn-circle btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'.$row['LinkFiles'].'"><i class="fa fa-eye"></i></button> <button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'"><i class="fa fa-trash"></i></button> <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'.$row['NameFiles'].'" idtypex="'.$row['TypeFiles'].'" idfiles="'.$row['ID'].'" linkfileother="'.$row['LinkFiles'].'" namedoc ="'.$row['No_Document'].'"><i class="fa fa-edit"></i></button> ';
+                    $btnAction = '<button type="button" class="btn btn-sm btn-primary btn-circle btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'.$row['LinkFiles'].'"><i class="fa fa-eye"></i></button> 
+                        <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'.$row['NameFiles'].'" idtypex="'.$row['TypeFiles'].'" idfiles="'.$row['ID'].'" linkfileother="'.$row['LinkFiles'].'" namedoc ="'.$row['No_Document'].'"><i class="fa fa-edit"></i></button> 
+                        <button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'"><i class="fa fa-trash"></i></button> ';
 
                     if ($row['No_Document'] == null){
                          $nodoc = '<center> - </center>';
@@ -4303,7 +4472,13 @@ class C_api extends CI_Controller {
                          $datadesc = '<center> - </center>';
                     } else {
                          $datadesc = $row['Description_Files'];
-                    }                                      
+                    }       
+
+                    if ($row['Name_other_files'] == null){
+                         $data_otherfiles = '<center> - </center>';
+                    } else {
+                         $data_otherfiles = $row['Name_other_files'];
+                    }                                       
 
                     $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
                     $nestedData[] = '<div style="text-align:left;">'.$row['NameFiles'].' </div>';
@@ -4415,11 +4590,10 @@ class C_api extends CI_Controller {
                 $dataSearch = '';
                 if( !empty($requestData['search']['value']) ) {
                     $search = $requestData['search']['value'];
-                    $dataSearch = 'WHERE Name_other_files LIKE "%'.$search.'%" ORDER BY ID DESC';
+                    $dataSearch = 'WHERE TypeFiles LIKE "%'.$search.'%" OR NameFiles LIKE "%'.$search.'%" ORDER BY ID DESC';
                 }
 
-                $queryDefault = 'SELECT * FROM db_employees.master_other_files '.$dataSearch;
-
+                $queryDefault = 'SELECT * FROM db_employees.master_files '.$dataSearch;
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
                 
                 $query = $this->db->query($sql)->result_array();
@@ -4433,10 +4607,16 @@ class C_api extends CI_Controller {
                     $nestedData=array();
                     $row = $query[$i];
 
-                    $btnAction = '<button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'" typedata="other"><i class="fa fa-trash"></i></button> ';                 
+                    if($row['ID'] == "13") {
+                        $btnAction = '<button class="btn btn-sm btn-circle btn-danger" data-toggle="tooltip" data-placement="top" title="Delete File" disabled><i class="fa fa-trash"></i></button> ';  
+                    } 
+                    else {
+                        $btnAction = '<button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'" TypeFiles="'.$row['ID'].'" typedata="otherfile"><i class="fa fa-trash"></i></button> ';  
+                    }
 
                     $nestedData[] = '<div style="text-align:center; color: #000000;">'.$no.'</div>';
-                    $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['Name_other_files'].'</div>';
+                    $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['TypeFiles'].'</div>';
+                    $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['NameFiles'].'</div>';
                     $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
                     $data[] = $nestedData;
                     $no++;
@@ -4453,13 +4633,39 @@ class C_api extends CI_Controller {
 
             else if($data_arr['action']=='get_katotherfiles') {
 
-                $data = $this->db->query('SELECT ID, Name_other_files FROM db_employees.master_other_files ')->result_array();
+                $data = $this->db->query('SELECT ID, NameFiles
+                        FROM db_employees.master_files
+                        WHERE TYPE = "1" ')->result_array();
                 return print_r(json_encode($data));
 
             }
 
+            else if($data_arr['action']=='get_typefiles_rektorat') {
+
+                $data = $this->db->query('SELECT ID, NameFiles FROM db_employees.master_files WHERE ID <= 13')->result_array();
+                return print_r(json_encode($data));
+            }
+
+            else if($data_arr['action']=='get_detailfiles_rektorat') {
+
+                $id_files = $this->input->get('s');
+
+                $data = $this->db->query('SELECT f.*, mf.TypeFiles AS M_TypeFiles,  p.Name_other_files, xx.Name, xy.Name_University, aa.Name_MajorProgramstudy, ab.Name_MajorProgramstudy AS NamaProgramStudy
+                                         FROM db_employees.files f
+                                         LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
+                                         LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
+                                         LEFT JOIN db_employees.employees AS xx ON (f.NIP = xx.NIP)
+                                         LEFT JOIN db_research.university AS xy ON (f.NameUniversity = xy.ID)
+                                         LEFT JOIN db_employees.major_programstudy_employees AS aa ON (f.Major = aa.ID) 
+                                         LEFT JOIN db_employees.major_programstudy_employees AS ab ON(f.ProgramStudy = ab.ID)
+                                         WHERE f.ID = "'.$id_files.'" ')->result_array();
+                return print_r(json_encode($data));
+                // echo json_encode($details);
+            }
             else if($data_arr['action']=='deleteother_master') {
+                
                 $id_otherfile = $data_arr['id_otherfile'];
+                $TypeFiles = $data_arr['TypeFiles'];
                 $typedata = $data_arr['typedata'];
 
                 if($typedata == "university") {
@@ -4473,9 +4679,17 @@ class C_api extends CI_Controller {
                     $this->db->reset_query();
                 }
                 else {
-                    $this->db->where('ID',$id_otherfile);
-                    $this->db->delete('db_employees.master_other_files');
-                    $this->db->reset_query();
+                    
+                    $dataAttdS = $this->db->query('SELECT * FROM db_employees.files WHERE TypeFiles = "'.$TypeFiles.'" ')->result_array();
+                    
+                    if(count($dataAttdS)>0){
+                        return print_r(0);
+                    } 
+                    else {
+                        $this->db->where('ID',$id_otherfile);
+                        $this->db->delete('db_employees.master_files');
+                        $this->db->reset_query();
+                    }
                 }
                 return print_r(1);
             }
@@ -6572,6 +6786,8 @@ class C_api extends CI_Controller {
             $formInsert = (array) $data_arr['formInsert'];
 
             $NIP = $formInsert['formNIP'];
+            $type_files = $formInsert['type_files'];
+            $kat_otherfiles = $formInsert['kat_otherfiles'];
             $NoDocument = strtoupper($formInsert['NoDocument']);
             $DescriptionFile = $formInsert['DescriptionFile'];
             $DateDocument = $formInsert['DateDocument'];
@@ -6579,8 +6795,16 @@ class C_api extends CI_Controller {
             $idlinkfiles = $formInsert['idlinkfiles'];
             $linkotherfile = $formInsert['linkotherfile'];
 
+            if($kat_otherfiles == "0") {
+                $id_kat_otherfile = NULL;
+            } else {
+                $id_kat_otherfile = $kat_otherfiles;
+            }
+
             $dataUpdate = array(
                 'No_Document' => $NoDocument,
+                'TypeFiles' => $type_files,
+                'ID_OtherFiles' => $id_kat_otherfile,
                 'Date_Files' => $DateDocument,
                 'Description_Files' => $DescriptionFile,
                 'LinkFiles' => $linkotherfile
@@ -6768,14 +6992,14 @@ class C_api extends CI_Controller {
                 $NoDocument = strtoupper($formInsert['NoDocument']);
                 $DateDocument = $formInsert['DateDocument'];
                 $type = $formInsert['type'];
-                $kat_otherfiles = $formInsert['kat_otherfiles'];
+                //$kat_otherfiles = $formInsert['kat_otherfiles'];
                 $DescriptionFile = $formInsert['DescriptionFile'];
                 $fileName = $formInsert['fileName'];
                 $Get_MasterFiles = $this->m_master->MasterfileStatus($type);
                 $dataSave = array(
                     'NIP' => $NIP,
                     'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                    'ID_OtherFiles' => $kat_otherfiles,
+                    //'ID_OtherFiles' => $kat_otherfiles,
                     'No_Document' => $NoDocument,
                     'Date_Files' => $DateDocument,
                     'Description_Files' => $DescriptionFile,
@@ -6909,24 +7133,26 @@ class C_api extends CI_Controller {
 
         else if($data_arr['action']=='update_mster_katother'){
 
-            $master_name_katother = ucwords($data_arr['master_name_katother']);
-            $dataAttdS = $this->db->query('SELECT * FROM db_employees.master_other_files
-                                          WHERE Name_other_files = "'.$master_name_katother.'" ')->result_array();
+            $type_otherfiles = ucwords($data_arr['type_otherfiles']);
+            $name_katother = ucwords($data_arr['name_katother']);
+            
+            $dataAttdS = $this->db->query('SELECT * FROM db_employees.master_files
+                                          WHERE TypeFiles = "'.$type_otherfiles.'" OR NameFiles = "'.$name_katother.'" ')->result_array();
 
             if(count($dataAttdS)>0){
                 return print_r(0);
             } 
             else {
                 $dataSave = array(
-                    'Name_other_files' => $master_name_katother,
+                    'TypeFiles' => $type_otherfiles,
+                    'NameFiles' => $name_katother,
                     'UserCreate' => $IDuser
                 );
-                $this->db->insert('db_employees.master_other_files',$dataSave);
+                $this->db->insert('db_employees.master_files',$dataSave);
                 return print_r(1);
             }
         }
 
-        
         else if($data_arr['action']=='readmastermajor'){
 
             $requestData= $_REQUEST;
@@ -7961,7 +8187,7 @@ class C_api extends CI_Controller {
             if($data_arr['action']=='getStudents'){
 
                 $dataStd = $this->db->query('SELECT s.NPM,s.Name, lc.ID AS LCID FROM '.$data_arr['DB_Student'].'.students s
-                                                      LEFT JOIN db_academic.limit_credit lc ON (s.NPM=lc.NPM)
+                                                      LEFT JOIN db_academic.limit_credit lc ON (s.NPM=lc.NPM AND lc.SemesterID = "'.$data_arr['SemesterID'].'")
                                                       WHERE s.ProdiID = "'.$data_arr['ProdiID'].'"
                                                       ORDER BY s.NPM ASC')->result_array();
 
@@ -7987,6 +8213,33 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='addLC'){
                 $dataInsert = (array) $data_arr['dataInsert'];
                 $this->db->insert('db_academic.limit_credit', $dataInsert);
+                return print_r(1);
+            }
+            else if($data_arr['action']=='add_std_krs_exclude'){
+                $dataInsert = (array) $data_arr['dataInsert'];
+
+                $ProdiID = $dataInsert['ProdiID'];
+                $Semester = $dataInsert['Semester'];
+
+                $dataCk = $this->db->get_where('db_academic.std_krs_exclude',array('ProdiID' => $ProdiID, 'Semester' => $Semester))->result_array();
+
+                $result = 0;
+                if(count($dataCk)<=0){
+                    $this->db->insert('db_academic.std_krs_exclude',$dataInsert);
+                    $result = 1;
+                }
+
+                return print_r($result);
+
+            }
+            else if($data_arr['action']=='read_std_krs_exclude'){
+                $result = $this->db->query('SELECT st.*, ps.NameEng AS Prodi FROM db_academic.std_krs_exclude st 
+                                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = st.ProdiID)')->result_array();
+                return print_r(json_encode($result));
+            }
+            else if($data_arr['action']=='remove_std_krs_exclude'){
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->delete('db_academic.std_krs_exclude');
                 return print_r(1);
             }
         }
@@ -11338,21 +11591,61 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-        $w_status = ($data_arr['Status']!='') ? ' AND auts.StatusStudentID = "'.$data_arr['Status'].'"' : '';
+        $w_ClassOf = ($data_arr['ClassOf']!='') ? ' AND auts.Year = "'.$data_arr['ClassOf'].'" ' : '';
+        $w_StatusKRS = ($data_arr['StatusKRS']!='' && $data_arr['StatusKRS']!='NOT_EXISTS') ? ' AND stdk.Status = "'.$data_arr['StatusKRS'].'" ' : '';
+
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
             $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent,
+        if($data_arr['StatusKRS']=='NOT_EXISTS'){
+
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent,
                               stdk.Input_At
                               FROM db_academic.mentor_academic ma
                               LEFT JOIN db_academic.auth_students auts ON (ma.NPM = auts.NPM)
                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
                               LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
                               LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
-                              WHERE ( ma.NIP = "'.$data_arr['NIP'].'" '.$w_status.' ) '.$dataSearch.'  GROUP BY auts.NPM ORDER BY stdk.Input_At DESC, ma.NPM ASC';
+                              WHERE ( ma.NIP = "'.$data_arr['NIP'].'" 
+                              AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' AND ma.NPM NOT IN
+                            (SELECT auts_1.NPM
+                              FROM db_academic.mentor_academic ma_1
+                              LEFT JOIN db_academic.auth_students auts_1 ON (ma_1.NPM = auts_1.NPM)
+                              LEFT JOIN db_academic.std_krs stdk_1 ON (stdk_1.NPM = auts_1.NPM)
+                              WHERE (stdk_1.SemesterID = "'.$data_arr['SemesterID'].'" AND ma_1.NIP = "'.$data_arr['NIP'].'" 
+                               ) GROUP BY auts_1.NPM) ) '.$dataSearch.'  GROUP BY auts.NPM ORDER BY stdk.Input_At DESC, ma.NPM ASC';
+
+        } else if($data_arr['StatusKRS']=='') {
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent,
+                              stdk.Input_At
+                              FROM db_academic.mentor_academic ma
+                              LEFT JOIN db_academic.auth_students auts ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE (ma.NIP = "'.$data_arr['NIP'].'" 
+                              AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' ) 
+                              '.$dataSearch.'  GROUP BY auts.NPM ORDER BY stdk.Input_At DESC, ma.NPM ASC';
+        } else {
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent,
+                              stdk.Input_At
+                              FROM db_academic.mentor_academic ma
+                              LEFT JOIN db_academic.auth_students auts ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND ma.NIP = "'.$data_arr['NIP'].'" 
+                              AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.' ) 
+                              '.$dataSearch.'  GROUP BY auts.NPM ORDER BY stdk.Input_At DESC, ma.NPM ASC';
+        }
+
+
+
+
+
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -11454,14 +11747,21 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-        $w_status = ($data_arr['Status']!='') ? ' AND auts.StatusStudentID = "'.$data_arr['Status'].'"' : '';
+
+        $w_ClassOf = ($data_arr['ClassOf']!='') ? ' AND auts.Year = "'.$data_arr['ClassOf'].'" ' : '';
+        $w_StatusKRS = ($data_arr['StatusKRS']!='' && $data_arr['StatusKRS']!='NOT_EXISTS') ? ' AND stdk.Status = "'.$data_arr['StatusKRS'].'" ' : '';
+        $w_Mentor = ($data_arr['MentorNIP']!='') ? ' AND ma.NIP = "'.$data_arr['MentorNIP'].'" ' : '';
+
+
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
             $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
+        if($data_arr['StatusKRS']=='NOT_EXISTS'){
+
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
                               ma.NIP AS MentorNIP, stdk.Input_At
                               FROM  db_academic.auth_students auts
                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
@@ -11469,7 +11769,47 @@ class C_api extends CI_Controller {
                               LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
                               LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
                               LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
-                              WHERE ( auts.ProdiID = "'.$data_arr['ProdiID'].'" '.$w_status.' ) '.$dataSearch.' GROUP BY auts.NPM ORDER BY stdk.Input_At ASC, auts.NPM ASC';
+                              WHERE (auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.$w_Mentor.' 
+                              AND auts.NPM NOT IN (SELECT auts_1.NPM FROM  db_academic.auth_students auts_1
+                                                  LEFT JOIN db_academic.std_krs stdk_1 ON (stdk_1.NPM = auts_1.NPM)
+                                                  WHERE (stdk_1.SemesterID = "'.$data_arr['SemesterID'].'" AND auts_1.ProdiID = "'.$data_arr['ProdiID'].'"  
+                                                  AND auts_1.StatusStudentID = "'.$data_arr['Status'].'" )
+                                                  GROUP BY auts_1.NPM)
+                              ) '.$dataSearch.' 
+                              GROUP BY auts.NPM ORDER BY auts.NPM ASC';
+
+        } else if($data_arr['StatusKRS']=='') {
+
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
+                              ma.NIP AS MentorNIP, stdk.Input_At
+                              FROM  db_academic.auth_students auts
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE (auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.$w_Mentor.' ) '.$dataSearch.' 
+                              GROUP BY auts.NPM ORDER BY auts.NPM ASC';
+        } else {
+
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
+                              ma.NIP AS MentorNIP, stdk.Input_At
+                              FROM  db_academic.auth_students auts
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND auts.ProdiID = "'.$data_arr['ProdiID'].'"  
+                              AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.$w_Mentor.' ) '.$dataSearch.' 
+                              GROUP BY auts.NPM ORDER BY stdk.Input_At ASC, auts.NPM ASC';
+
+        }
+
+
+
+
+
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -11493,7 +11833,6 @@ class C_api extends CI_Controller {
 
             // Semester
             $Semester = $this->m_api->getSemesterStudentByYear($data_arr['SemesterID'],$row['Year']);
-
 
             // Course
             $dataCourse = $this->db->query('SELECT mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, stdk.Status FROM db_academic.std_krs stdk

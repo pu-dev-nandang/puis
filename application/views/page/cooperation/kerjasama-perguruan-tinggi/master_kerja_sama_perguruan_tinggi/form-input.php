@@ -356,7 +356,7 @@
 	    	   var fsize = f.size||f.fileSize;
 	    	   // console.log(fsize);
 
-	    	   if(fsize > 2000000) // 2mb
+	    	   if(fsize > 5000000) // 5mb
 	    	   {
 	    	    msgStr += 'Upload File '+TheName +  ' Image File Size is very big<br>';
 	    	    //toastr.error("Image File Size is very big", 'Failed!!');

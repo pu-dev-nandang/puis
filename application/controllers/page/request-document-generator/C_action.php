@@ -19,6 +19,7 @@ class C_action extends ServiceDocumentGenerator_Controler {
 	public function previewbyUserRequest(){
 		$dataToken = $this->getInputToken();
 		$dataToken = json_decode(json_encode($dataToken),true);
+		// print_r($dataToken);die();
 		$rs = $this->m_doc->previewbyUserRequest($dataToken);
 		echo json_encode($rs);
 	}
@@ -46,6 +47,23 @@ class C_action extends ServiceDocumentGenerator_Controler {
 	    $dataToken = $this->getInputToken();
 	    $rs = $this->m_doc->LoadTablebyUserRequest($dataToken);
 	    echo json_encode($rs);
+	}
+
+	public function NeedApproval(){
+		$rs = $this->m_doc->NeedApproval();
+		echo json_encode($rs);
+	}
+
+	public function ApproveByChecklist(){
+		$dataToken = $this->getInputToken();
+		$dataToken = json_decode(json_encode($dataToken),true);
+		for ($i=0; $i < count($dataToken); $i++) { 
+			$dataTokenKey = $dataToken[$i];
+			$this->m_doc->ApproveDocument($dataTokenKey);
+		}
+		$rs = 1;
+		echo json_encode($rs);
+		// print_r($dataToken);die();
 	}
 
 	public function ApproveOrReject(){
@@ -91,5 +109,11 @@ class C_action extends ServiceDocumentGenerator_Controler {
 				';
 		$query = $this->db->query($sql,array())->result_array();
 		echo json_encode($query);
+	}
+
+	public function LoadSessionDepartment(){
+		$dataToken = $this->getInputToken();
+		$this->__setDepartmentSession($dataToken['DepartmentIDChoose']);
+		echo json_encode(1);
 	}
 }

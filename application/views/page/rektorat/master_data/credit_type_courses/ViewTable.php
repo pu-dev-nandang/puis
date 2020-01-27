@@ -3,7 +3,7 @@
 		<tr>
 			<th>No</th>
 			<th>Nama Type</th>
-			<th>SKS/Menit</th>
+			<th>Credit / Minutes</th>
 			<th>Updated_at</th>
 			<th>Updated_by</th>
 			<?php if (isset($action)): ?>
@@ -57,9 +57,9 @@
 	                      	           '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
 	                      	           '  </button>' +
 	                      	           '  <ul class="dropdown-menu">' +
-	                      	           '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[7]+'" data = "'+full[6]+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
+	                      	           '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[6]+'" data = "'+full[5]+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
 	                      	           '    <li role="separator" class="divider"></li>' +
-	                      	           '    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[7]+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
+	                      	           '    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[6]+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
 	                      	           '  </ul>' +
 	                      	           '</div>';
 	                      	       return btnAction;
@@ -102,12 +102,14 @@
 		$(document).off('click', '.btnEdit').on('click', '.btnEdit',function(e) {
 		    var ID = $(this).attr('data-id');
 		    var Token = $(this).attr('data');
+		    // console.log(Token);return;
 		    var data = jwt_decode(Token);
 		    for(var key in data) {
 		       	$('.input[name="'+key+'"]').val(data[key]);
 	        }
 		    $('#btnSave').attr('action','edit');
 		    $('#btnSave').attr('data-id',ID);
+		    $('#btnSave').prop('disabled',false);
 		})
 	<?php endif ?>
 	<?php endif ?>

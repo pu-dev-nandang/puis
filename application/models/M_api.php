@@ -908,9 +908,11 @@ class M_api extends CI_Model {
 
      public function views_editotfiles($NIP,$IDfiles) {
 
-        $sql = "SELECT *
-                FROM db_employees.files
-                WHERE NIP= '".$NIP."' AND ID= '".$IDfiles."' AND Active = '1' ";
+        $sql = "SELECT a.*, b.TypeFiles AS NameFiles, c.Name_other_files
+                FROM db_employees.files AS a
+                LEFT JOIN db_employees.master_files AS b ON (a.TypeFiles = b.ID)
+                LEFT JOIN db_employees.master_other_files AS c ON (a.ID_OtherFiles = c.ID)
+                WHERE a.NIP= '".$NIP."' AND a.ID= '".$IDfiles."' AND a.Active = '1' ";
 
         $query=$this->db->query($sql, array());
         return $query->result_array();
@@ -1971,7 +1973,7 @@ class M_api extends CI_Model {
 
 
         if(count($dataIDLast)>0){
-            $dataResult = $this->db->query('SELECT s.GradeValue,s.SemesterID,cd.TotalSKS AS Credit FROM '.$db_ta.'.study_planning s
+            $dataResult = $this->db->query('SELECT s.GradeValue,s.SemesterID,cd.TotalSKS AS Credit, s.Approval FROM '.$db_ta.'.study_planning s
                                                 LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = s.CDID)
                                                 WHERE s.NPM = "'.$NPM.'" AND s.SemesterID <= "'.$smtActID.'" ORDER BY s.SemesterID ASC ')->result_array();
 
@@ -1985,10 +1987,12 @@ class M_api extends CI_Model {
             for ($s=0;$s<count($dataResult);$s++){
 
                 // Menghitung IPK
-                $TotalSKS = $TotalSKS + (int) $dataResult[$s]['Credit'];
-                $gradeV = (int) $dataResult[$s]['Credit'] * (float) $dataResult[$s]['GradeValue'];
+                if($dataResult[$s]['Approval']=='2'){
+                    $TotalSKS = $TotalSKS + (int) $dataResult[$s]['Credit'];
+                    $gradeV = (int) $dataResult[$s]['Credit'] * (float) $dataResult[$s]['GradeValue'];
 
-                $totalGradeValue =$totalGradeValue + $gradeV;
+                    $totalGradeValue =$totalGradeValue + $gradeV;
+                }
 
                 if($dataResult[$s]['SemesterID']==$dataIDLast[0]['ID']){
                     $TotalSKSSemester = $TotalSKSSemester + (int) $dataResult[$s]['Credit'];
@@ -2040,6 +2044,7 @@ class M_api extends CI_Model {
                 } else {
 
                     $pembulatanIPS = round($LastIPS,2);
+                    $pembulatanIPS = str_replace(',', '.', $pembulatanIPS);
 
                     $dataMakCredit = $this->db->query('SELECT Credit FROM db_academic.range_credits WHERE
                                                       IPSStart <= '.$pembulatanIPS.'

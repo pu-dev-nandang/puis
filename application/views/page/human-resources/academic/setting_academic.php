@@ -95,11 +95,11 @@
         <div class="col-md-6">
             <div class="widget box">
                 <div class="widget-header">
-                    <h4 class=""><i class="icon-reorder"></i> Kategory Other Files</h4>
+                    <h4 class=""><i class="icon-reorder"></i> Category Files</h4>
                     <div class="toolbar no-padding">
                         <div class="">
                             <span class="btn btn-xs btn-primary add_kat_otherfiles">
-                                <i class="icon-plus"></i> Add Kategori Other File
+                                <i class="icon-plus"></i> Add Category File
                             </span>
                         </div>
                     </div>
@@ -194,14 +194,18 @@
 
 
     $(document).on('click','.btnSubmitKatOtherFiles', function () {
-        var master_name_katother = $('#master_kat_otherfiles').val();
+        var type_otherfiles = $('#master_kat_otherfiles').val();
+        var name_katother = $('#name_kat_otherfiles').val();
 
-            if(master_name_katother!='' && master_name_katother!=null){
+            if(type_otherfiles!='' && type_otherfiles!=null
+                && name_katother!='' && name_katother!=null
+                ){
                 loading_button('.btnSubmitKatOtherFiles');
 
                 var data = {
                     action : 'update_mster_katother',
-                    master_name_katother : master_name_katother
+                    type_otherfiles : type_otherfiles,
+                    name_katother : name_katother
                 };
 
                 var token = jwt_encode(data,'UAP)(*');
@@ -282,11 +286,15 @@
     $(document).on('click','.add_kat_otherfiles', function () {
         var body = '<div class="row">' +
             '         <div class="col-md-12">' +
-            '           <h4><b> ADD CATEGORY OTHER FILES</b></h4>' +
+            '           <h4><b> ADD CATEGORY FILES</b></h4>' +
             '           <div class="well">' +
             '               <div class="form-group">' +
-            '                   <label>Name Category Other File</label>'+
+            '                   <label>Category File</label>'+
             '                   <input class="form-control" id="master_kat_otherfiles">' +
+            '               </div>' +
+             '               <div class="form-group">' +
+            '                   <label>Name File</label>'+
+            '                   <input class="form-control" id="name_kat_otherfiles">' +
             '               </div>' +
             '           </div>' +
             '           <div class="btn-group pull-right">   '+ 
@@ -376,8 +384,9 @@
         $('#tablekatotherfile').html('<table class="table table-bordered table-striped" id="tableDataKatOtherFile">     '+
             '                    <thead>                                                                                '+
             '                    <tr style="background: #20485A;color: #FFFFFF;">                                       '+
-            '                        <th style="width: 5%;text-align: center;">No</th>                                  '+
-            '                        <th style="width: 25%; text-align: center;">Name Kategori Other Files</th>         '+
+            '                        <th style="width: 5%; text-align: center;">No</th>                                  '+
+            '                        <th style="width: 25%; text-align: center;">Category File</th>         '+
+             '                       <th style="width: 25%; text-align: center;">Name File</th>         '+
             '                        <th style="text-align: center;width: 8%;">Action</th>                              '+
             '                    </tr>                                                                                  '+
             '                    </thead>                                                                               '+
@@ -409,23 +418,34 @@
         if (window.confirm('Are you sure to delete file ?')) {
            
             var id_otherfile = $(this).attr('Idotherfile');
+            var TypeFiles = $(this).attr('TypeFiles');
             var typedata = $(this).attr('typedata');
-
+            
             var data = {
                 action : 'deleteother_master',
                 id_otherfile : id_otherfile,
+                TypeFiles : TypeFiles, 
                 typedata : typedata
             };
 
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+"api/__reviewotherfile";
             $.post(url,{token:token},function (result) {
-                toastr.success('Success Delete File!','Success'); 
-                setTimeout(function () {
-                    $('.menuDetails[data-page="otherfiles"]').trigger('click');
-                   window.location.href = '';
-                },1000);
+                
+                if(result==0 || result=='0') { 
+                    toastr.error('Soory, The files category is still used in data upload files and cannot be deleted!','Error');
+                } 
+                else {
+                    toastr.success('Success Delete Data!','Success');
+                    loadtable_kat_otherfile();
+                    setTimeout(function () {
+                        $('.btnSubmitKatOtherFiles').html('Save').prop('disabled',false);
+                         window.location.href = '';
+                    },500);
+                }
             });
         }
     });
 </script>
+
+

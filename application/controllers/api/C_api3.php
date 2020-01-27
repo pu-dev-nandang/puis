@@ -5337,6 +5337,28 @@ class C_api3 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='insertLogStudent'){
+
+            $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['IPLocal2'] = $this->input->ip_address();
+            $dataForm['IPLocal'] = $hostname;
+            $dataForm['AccessedOn'] = $this->m_rest->getDateTimeNow();
+            $this->db->insert('db_academic.log_student',$dataForm);
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='insertLogLecturer'){
+
+            $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['IPLocal2'] = $this->input->ip_address();
+            $dataForm['IPLocal'] = $hostname;
+            $dataForm['AccessedOn'] = $this->m_rest->getDateTimeNow();
+            $this->db->insert('db_employees.log_lecturers',$dataForm);
+            return print_r(1);
+
+        }
     }
 
     public function crudFileFinalProject(){
@@ -5569,22 +5591,28 @@ class C_api3 extends CI_Controller {
 
 
             $LoginAsLecturer = ($row['LoginAsLec']!='' && $row['LoginAsLec']!=null)
-                ? $row['LoginAsLec'] : '';
+                ? '<span class="label label-danger">Remote Lecturer</span><div style="color: #3f51b5;margin-top: 10px;">'.$row['LoginAsLec'].'</div>' : '';
             $LoginAsStudent = ($row['LoginAsStd']!='' && $row['LoginAsStd']!=null)
-                ? ucwords(strtolower($row['LoginAsStd'])) : '';
+                ? '<span class="label label-primary">Remote Student</span><div style="color: #3f51b5;margin-top: 10px;">'.$row['LoginAsStd'].'</div>' : '';
 
             $urlExp = explode('/',$row['URL']);
 
             $viewLink = '';
             $im = 2;
+            $tokenText = '';
             if(count($urlExp)>$im){
                 for($i2=0;$i2<count($urlExp);$i2++){
                     if($i2>$im){
                         $lg = strlen($urlExp[$i2]);
                         $vl = ($lg<=55) ? $urlExp[$i2] : '';
 
-                        $de = ($i2!=$im && $i2!=count($urlExp)) ? '<i class="fa fa-angle-right"></i>' : '';
+                        $de = ($i2!=$im && $i2!=count($urlExp) && $vl!='') ? '<i class="fa fa-angle-right"></i>' : '';
                         $viewLink = $viewLink.' '.$de.' <b>'.$vl.'</b>';
+
+
+                        if($lg>55){
+                            $tokenText = '<div style="margin-top: 15px;">Token : <textarea class="form-control" rows="3" style="color: #333333;" readonly>'.$urlExp[$i2].'</textarea></div>';
+                        }
                     }
 
                 }
@@ -5593,17 +5621,212 @@ class C_api3 extends CI_Controller {
             }
 
             $nestedData[] = '<div>'.$no.'</div>';
-            $nestedData[] = '<div>'.$row['Name'].'</div>';
-            if($dataWhere==''){
+
+            if(!isset($u)) {
+                $IPPublic = ($row['IPPublic'] != '' && $row['IPPublic'] != null) ? 'Public : ' . $row['IPPublic'] . '<br/>' : '';
+                $IPLocal = ($row['IPLocal'] != '' && $row['IPLocal'] != null) ? 'Local 1 : ' . $row['IPLocal'] . '<br/>' : '';
+                $IPLocal2 = ($row['IPLocal2'] != '' && $row['IPLocal2'] != null) ? 'Local 2 : ' . $row['IPLocal2'] : '';
+                $dataIP = '<div>' . $IPPublic . '' . $IPLocal . '' . $IPLocal2 . '</div>';
+
+                $nestedData[] = '<div style="text-align: left;"><b>' . $row['Name'] . '</b>' . $dataIP . '</div>';
+
+            }
+            $nestedData[] = '<div style="text-align: left;">'.$LoginAsLecturer.$LoginAsStudent.'<div style="color: #FF5722;">'.date('d M Y H:i:s',strtotime($row['AccessedOn'])).'</div></div>';
+            $nestedData[] = '<div style="text-align: left;">'.$viewLink.$tokenText.'</div>';
+
+            $data[] = $nestedData;
+            $no++;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data,
+            "dataQuery"            => $query
+        );
+        echo json_encode($json_data);
+
+    }
+
+    public function getDataLogLecturer(){
+
+        $requestData= $_REQUEST;
+
+        $u = $this->input->get('u');
+
+        $dataWhere = ($u!='' && $u!=null && isset($u)) ? 'WHERE lem.NIP = "'.$u.'" ' : '';
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+
+            $fillSrc = 'lem.URL LIKE "%'.$search.'%" OR
+                                 em.Name LIKE "%'.$search.'%" OR
+                                 em.NIP LIKE "%'.$search.'%"';
+
+            $dataSearch = ($u!='' && $u!=null && isset($u))
+                ?  ' AND ( '.$fillSrc.' )'
+                : ' WHERE '.$fillSrc;
+        }
+
+        $queryDefault = 'SELECT lem.ID, em.Name, lem.AccessedOn,                            
+                            lem.IPPublic, lem.IPLocal, lem.IPLocal2, lem.URL
+                            FROM db_employees.log_lecturers lem
+                            LEFT JOIN db_employees.employees em ON (em.NIP = lem.NIP)
+                            '.$dataWhere.' '.$dataSearch.' ORDER BY lem.ID DESC';
+
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+
+            $nestedData = array();
+            $row = $query[$i];
+
+            $urlExp = explode('/',$row['URL']);
+
+            $viewLink = '';
+            $im = 2;
+            $tokenText = '';
+            if(count($urlExp)>$im){
+                for($i2=0;$i2<count($urlExp);$i2++){
+                    if($i2>$im){
+                        $lg = strlen($urlExp[$i2]);
+                        $vl = ($lg<=55) ? $urlExp[$i2] : '';
+
+                        $de = ($i2!=$im && $i2!=count($urlExp) && $vl!='') ? '<i class="fa fa-angle-right"></i>' : '';
+                        $viewLink = $viewLink.' '.$de.' <b>'.$vl.'</b>';
+
+
+                        if($lg>55 && !isset($u)){
+                            $tokenText = '<div style="margin-top: 15px;">Token : <textarea class="form-control" rows="3" style="color: #333333;" readonly>'.$urlExp[$i2].'</textarea></div>';
+                        }
+                    }
+
+                }
+            } else {
+                $viewLink = $urlExp[$im];
+            }
+
+            $nestedData[] = '<div>'.$no.'</div>';
+
+
+            if(!isset($u)){
                 $IPPublic = ($row['IPPublic']!='' && $row['IPPublic']!=null) ? 'Public : '.$row['IPPublic'].'<br/>' : '';
                 $IPLocal = ($row['IPLocal']!='' && $row['IPLocal']!=null) ? 'Local 1 : '.$row['IPLocal'].'<br/>' : '';
                 $IPLocal2 = ($row['IPLocal2']!='' && $row['IPLocal2']!=null) ? 'Local 2 : '.$row['IPLocal2'] : '';
-                $nestedData[] = '<div>'.$IPPublic.''.$IPLocal.''.$IPLocal2.'</div>';
+                $dataIP = '<div>'.$IPPublic.''.$IPLocal.''.$IPLocal2.'</div>';
+
+                $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b>'.$dataIP.'</div>';
             }
-            $nestedData[] = '<div>'.date('d M Y H:i:s',strtotime($row['AccessedOn'])).'</div>';
-            $nestedData[] = '<div>'.$LoginAsLecturer.'</div>';
-            $nestedData[] = '<div>'.$LoginAsStudent.'</div>';
-            $nestedData[] = '<div>'.$viewLink.'</div>';
+
+            $nestedData[] = '<div style="text-align: left;">'.'<div style="color: #FF5722;">'.date('d M Y H:i:s',strtotime($row['AccessedOn'])).'</div></div>';
+            $nestedData[] = '<div style="text-align: left;">'.$viewLink.$tokenText.'</div>';
+
+            $data[] = $nestedData;
+            $no++;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data,
+            "dataQuery"            => $query
+        );
+        echo json_encode($json_data);
+
+    }
+
+    public function getDataLogStudent(){
+
+        $requestData= $_REQUEST;
+
+        $u = $this->input->get('u');
+
+        $dataWhere = ($u!='' && $u!=null && isset($u)) ? 'WHERE lem.NPM = "'.$u.'" ' : '';
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+
+            $fillSrc = 'lem.URL LIKE "%'.$search.'%" OR
+                                 em.Name LIKE "%'.$search.'%" OR
+                                 em.NPM LIKE "%'.$search.'%"';
+
+            $dataSearch = ($u!='' && $u!=null && isset($u))
+                ?  ' AND ( '.$fillSrc.' )'
+                : ' WHERE '.$fillSrc;
+        }
+
+        $queryDefault = 'SELECT lem.ID, em.Name, lem.AccessedOn,                            
+                            lem.IPPublic, lem.IPLocal, lem.IPLocal2, lem.URL
+                            FROM db_academic.log_student lem
+                            LEFT JOIN db_academic.auth_students em ON (em.NPM = lem.NPM)
+                            '.$dataWhere.' '.$dataSearch.' ORDER BY lem.ID DESC';
+
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+
+            $nestedData = array();
+            $row = $query[$i];
+
+            $urlExp = explode('/',$row['URL']);
+
+            $viewLink = '';
+            $im = 2;
+            $tokenText = '';
+            if(count($urlExp)>$im){
+                for($i2=0;$i2<count($urlExp);$i2++){
+                    if($i2>$im){
+                        $lg = strlen($urlExp[$i2]);
+                        $vl = ($lg<=55) ? $urlExp[$i2] : '';
+
+                        $de = ($i2!=$im && $i2!=count($urlExp) && $vl!='') ? '<i class="fa fa-angle-right"></i>' : '';
+                        $viewLink = $viewLink.' '.$de.' <b>'.$vl.'</b>';
+
+
+                        if($lg>55 && !isset($u)){
+                            $tokenText = '<div style="margin-top: 15px;">Token : <textarea class="form-control" rows="3" style="color: #333333;" readonly>'.$urlExp[$i2].'</textarea></div>';
+                        }
+                    }
+
+                }
+            } else {
+                $viewLink = $urlExp[$im];
+            }
+
+            $nestedData[] = '<div>'.$no.'</div>';
+
+
+            if(!isset($u)){
+                $IPPublic = ($row['IPPublic']!='' && $row['IPPublic']!=null) ? 'Public : '.$row['IPPublic'].'<br/>' : '';
+                $IPLocal = ($row['IPLocal']!='' && $row['IPLocal']!=null) ? 'Local 1 : '.$row['IPLocal'].'<br/>' : '';
+                $IPLocal2 = ($row['IPLocal2']!='' && $row['IPLocal2']!=null) ? 'Local 2 : '.$row['IPLocal2'] : '';
+                $dataIP = '<div>'.$IPPublic.''.$IPLocal.''.$IPLocal2.'</div>';
+
+                $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b>'.$dataIP.'</div>';
+            }
+
+            $nestedData[] = '<div style="text-align: left;">'.'<div style="color: #FF5722;">'.date('d M Y H:i:s',strtotime($row['AccessedOn'])).'</div></div>';
+            $nestedData[] = '<div style="text-align: left;">'.$viewLink.$tokenText.'</div>';
 
             $data[] = $nestedData;
             $no++;
@@ -6319,6 +6542,9 @@ class C_api3 extends CI_Controller {
 
             return print_r(1);
 
+        }
+        else if($data_arr['action']=='getStudentReportService'){
+            $dataOpen = $this->db->query()->result_array();
         }
         else if($data_arr['action']=='readStudentReport'){
             $NPM = $data_arr['NPM'];

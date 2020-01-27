@@ -16,7 +16,6 @@
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(1)=='requestdocument'){echo"current";}?>">
-
                 <a href="<?php echo base_url('rectorat/requestdocument');?>">
                     <i class="fa fa-files-o"></i> Request Document
                 </a>
@@ -26,6 +25,11 @@
                     <i class="fa fa-book"></i> Surat Mengajar
                 </a>
             </li>
+            <li class="<?php if($this->uri->segment(1)=='rectorat' && $this->uri->segment(2)=='file_academic_employee'){echo"current";}?>">
+                <a href="<?php echo base_url('rectorat/file_academic_employee');?>">
+                    <i class="fa fa-file-pdf-o"></i> File Academic Employee
+                </a>
+            </li>
             <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; ?>
             <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='rectorat' && $this->uri->segment(2)=='document-generator'){echo"current";}?>">
                 <a href="<?php echo base_url('rectorat/document-generator');?>">
@@ -33,6 +37,7 @@
                 </a>
             </li>
             
+
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">

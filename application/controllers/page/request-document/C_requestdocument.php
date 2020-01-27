@@ -32,6 +32,13 @@ class C_requestdocument extends Globalclass {
         $this->menu_request($page);
     }
 
+    public function list_academic_employee() 
+    {
+        $page = $this->load->view('page/'.$this->data['department'].'/list_academic_otherfiles','',true);
+        $this->menu_request($page);
+
+    }
+
     public function list_requestsuratmengajar()
     {
         $page = $this->load->view('page/'.$this->data['department'].'/list_requestsuratmengajar','',true);
