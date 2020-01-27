@@ -76,7 +76,7 @@
                         '                <button id="btnSubmitEditTB" class="btn btn-default btn-sm">Submit</button>' +
                         '            </div>';
 
-                    $('#viewDateKRS').html(Start+' - '+End+ck);
+                    $('#viewDateKRS').html('KRS Online : <b>'+Start+' - '+End+'</b>'+ck);
 
 
 
