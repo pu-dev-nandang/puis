@@ -4229,7 +4229,7 @@ class C_api2 extends CI_Controller {
         $data_arr = $this->getInputToken();
 
         if($data_arr['action']=='getNonAcademic'){
-            $data = $this->db->get_where('db_employees.master_files',array('Type' => 1))->result_array();
+            $data = $this->db->get_where('db_employees.master_files',array('ID' => 13))->result_array();
 
             return print_r(json_encode($data));
         }
@@ -4268,7 +4268,7 @@ class C_api2 extends CI_Controller {
                                         LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
                                         LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
                                         WHERE f.NIP = "'.$NIP.'" AND f.Active = 1 ORDER BY mf.ID ASC')->result_array();
-
+            //print_r($dataF); exit();
             return print_r(json_encode($dataF));
         }
         else if($data_arr['action']=='removeDoc'){

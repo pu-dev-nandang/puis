@@ -1333,7 +1333,7 @@ function uploadfile_transcripts3(fileName_Transcript) {
         var NoDocument = $('#NoDocument').val();
         var DescriptionFile = $('#DescriptionFile').val();
         var DateDocument = $('#DateDocument').val();
-        var kat_otherfiles = $("#JenisFiles option:selected").attr("id")
+        //var kat_otherfiles = $("#JenisFiles option:selected").attr("id")
         var type = $("#typefiles option:selected").text();
         var min=100; 
         var max=999;  
@@ -1359,7 +1359,7 @@ function uploadfile_transcripts3(fileName_Transcript) {
                             NoDocument : NoDocument,
                             DateDocument : DateDocument,
                             type : type,
-                            kat_otherfiles : kat_otherfiles,
+                            //kat_otherfiles : kat_otherfiles,
                             DescriptionFile : DescriptionFile,
                             fileName : fileName }
                     };

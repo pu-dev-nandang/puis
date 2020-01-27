@@ -125,7 +125,7 @@
                             var tgl_ijazah = moment(response[i]['DateIjazah']).format('DD MMM YYYY');
                         }
                         
-                        if(response[i]['Name_University'] == null || response[i]['NoIjazah'] == null) {
+                        if(response[i]['NameUniversity'] == null) {
 
                             var nama_univ = "-";
                             var no_ijazah = "-";
@@ -136,7 +136,7 @@
                             var data_semester = "-";
 
                         } else {
-                            var nama_univ = response[i]['Name_University'];
+                            var nama_univ = response[i]['NameUniversity'];
                             var no_ijazah = response[i]['NoIjazah'];
                             var name_major = response[i]['Name_MajorProgramstudy'];
                             var name_program = response[i]['NamaProgramStudy'];
