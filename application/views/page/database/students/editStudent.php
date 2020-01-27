@@ -143,6 +143,21 @@
                             <input class="form-control formBiodata" id="formAcc" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')" maxlength="10">
                         </td>
                     </tr>
+                    <tr>
+                        <th>Religion</th>
+                        <th>:</th>
+                        <td>
+                            <select class="form-control" id="formReligion">
+                                <option value="">Choose One</option>
+                                <?php if(!empty($Religion)){
+                                foreach ($Religion as $r) {
+                                    echo "<option value='".$r->ID."'>".$r->Nama."</option>";
+                                 } ?>
+                                <?php } ?>
+                            </select>
+                        </td>
+                    </tr>
+
                 </table>
             </div>
         </div>
@@ -471,6 +486,7 @@
             }
 
             var formNationality = $('#formNationality option:selected').val();
+            var formReligion = $('#formReligion option:selected').val();
 
             var data = {
                 action : 'updateBiodataStudent',
@@ -500,6 +516,7 @@
                 },
                 dataTAStd : {
                     NationalityID : formNationality,
+                    ReligionID : formReligion,
                 }
             };
 
@@ -554,6 +571,7 @@
                 $('#formAddress').val(d.Address);
                 $('#formJacket').val(d.Jacket);
                 $('#formAcc').val(d.Access_Card_Number);
+                $('#formReligion').val(d.ReligionID);
 
                 //---data parent --
                 $('#formNameFather').val(d.Father);
