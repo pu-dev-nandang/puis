@@ -367,6 +367,7 @@ class C_database extends Globalclass {
         $data['Name'] = $Name;
         // load Nationality
         $data['Arr_nationality'] = json_encode($this->m_master->caribasedprimary('db_admission.country','ctr_active',1));
+        $data['Religion'] = $this->General_model->fetchData("`db_admission`.`agama`",array())->result();
         $content = $this->load->view('page/database/students/editStudent',$data,true);
         $this->temp($content);
     }
@@ -417,6 +418,10 @@ class C_database extends Globalclass {
                             $isExist->Insurance = $getInsurance; 
                         }                        
                     }
+                    if(!empty($isExist->ReligionID)){
+                        $religion = $this->General_model->fetchData("db_admission.agama",array("ID"=>$isExist->ReligionID))->row();
+                        $isExist->Religion = (!empty($religion) ? $religion->Nama : '-');
+                    }
                 }
                 $data['detail_ori'] = $isExist;
                 $data['detail_auth_ori'] = $this->General_model->fetchData("db_academic.auth_students",array("NPM"=>$data_arr['NPM']))->row();
@@ -425,6 +430,10 @@ class C_database extends Globalclass {
                 if(!empty($data['detail_req'])){
                     if(!empty($data['detail_req']->InsuranceID)){
                         $data['detail_req']->Insurance = $this->General_model->fetchData("db_employees.master_company",array("ID"=>$data['detail_req']->InsuranceID))->row();
+                    }
+                    if(!empty($data['detail_req']->ReligionID)){
+                        $religion = $this->General_model->fetchData("db_admission.agama",array("ID"=>$data['detail_req']->ReligionID))->row();
+                        $data['detail_req']->Religion = (!empty($religion) ? $religion->Nama : '-');
                     }
                 }
             }

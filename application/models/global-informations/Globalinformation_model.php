@@ -218,9 +218,46 @@ class Globalinformation_model extends CI_Model{
             return $json;
         }
         return false;
-
-
     }
+
+
+    public function fetchSubjectType($count=false,$param='',$start='',$limit='',$order=''){
+        $where='';
+        if(!empty($param)){
+            $where = 'WHERE ';
+            $counter = 0;
+            foreach ($param as $key => $value) {
+                if($counter==0){
+                    $where = $where.$value['field']." ".$value['data'];
+                }
+                else{
+                    $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                }
+                $counter++;
+            }
+        }
+
+        $lims="";
+        if($start!="" || $limit!=""){
+            $lims = " LIMIT {$start},{$limit}"; 
+        }
+
+        if($count){
+            $select = "count(*) as Total";
+        }else{
+            $select = "*";
+        }
+        $sorted = " order by ".(!empty($order) ? $order : 'a.ID DESC');
+        
+        $string = "SELECT {$select}
+                   FROM db_mail_blast.subject_type as a
+                   {$where} {$sorted} {$lims} ";
+        
+        $value  = $this->db->query($string);
+        var_dump($this->db->last_query());
+        return $value;
+    }
+
 
     /* Added by Adhi 2020-01-16 */
     public function fetchTotalDataStudent($param){

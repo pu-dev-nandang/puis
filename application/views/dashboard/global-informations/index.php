@@ -21,6 +21,22 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="col-sm-4">
+				<div class="panel panel-default" id="click-me" data-href="global-informations/message-blast">
+					<div class="panel-body">
+						<div class="row card">
+							<div class="col-sm-3">
+								<p class="icon"><i class="fa fa-envelope"></i></p>
+							</div>
+							<div class="col-sm-9 col-md-9">
+								<p class="title">Message Blast</p>
+								<p class="desc">Service that allows you to easily send messages to multiple email utilizing an automated messaging system.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 			
 			
 

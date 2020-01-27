@@ -11010,6 +11010,8 @@ class C_api extends CI_Controller {
                 // dataTAStd
                 $dataTAStd = json_decode(json_encode($data_arr['dataTAStd']),true);
                 $dataUpdate->NationalityID = $dataTAStd['NationalityID'];
+                $dataUpdate->ReligionID = $dataTAStd['ReligionID'];
+
                 
                 $this->db->where('NPM', $NPM);
                 $this->db->update($DB_Student.'.students',$dataUpdate);

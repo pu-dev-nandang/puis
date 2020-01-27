@@ -46,11 +46,13 @@
                       <tr>
                         <th colspan="2">Address</th>
                         <th>Phone</th>
+                        <th>Religion</th>
                         <th colspan="2">Mobile Phone</th>
                       </tr>
                       <tr>
                         <td colspan="2"><p class="address"><?=$detail_ori->Address?></p> </td>
                         <td><p class="phone"><?=$detail_ori->Phone?></p></td>
+                        <td><p class="religion"><?=$detail_ori->Religion?></p></td>
                         <td colspan="2"><p class="hp"><?=$detail_ori->HP?></p></td>
                       </tr>
                     </tbody>
@@ -159,11 +161,13 @@
                       <tr>
                         <th colspan="2">Address</th>
                         <th>Phone</th>
-                        <th colspan="2">Mobile Phone</th>
+                        <th>Religion</th>
+                        <th>Mobile Phone</th>
                       </tr>
                       <tr>
                         <td colspan="2"><p class="address <?=($detail_req->Address != $detail_ori->Address) ? 'different':'' ?>"><?=$detail_req->Address?></p></td>
                         <td><p class="phone <?=($detail_req->Phone != $detail_ori->Phone) ? 'different':'' ?>"><?=$detail_req->Phone?></p></td>
+                        <td><p class="religion <?=($detail_req->Religion != $detail_ori->Religion) ? 'different':'' ?>"><?=$detail_req->Religion?></p></td>
                         <td colspan="2"><p class="hp <?=($detail_req->HP != $detail_ori->HP) ? 'different':'' ?>"><?=$detail_req->HP?></p></td>
                       </tr>
                     </tbody>

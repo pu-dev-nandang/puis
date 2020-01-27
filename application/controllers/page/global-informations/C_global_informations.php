@@ -614,6 +614,87 @@ class C_global_informations extends Globalclass {
         $page = $this->load->view('dashboard/global-informations/message-blast/subject-type/index',$data,true);
         $this->blast_global_informations($page);
     }
+
+
+    public function subjectTypeFetch(){
+        $reqdata = $this->input->post();
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $param = array();$orderBy=" NPM DESC ";
+            if(!empty($data_arr['Filter'])){            
+                $parse = parse_str($data_arr['Filter'],$output);
+                if(!empty($output['student'])){
+                    $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$output['student']."%' ","filter"=>"AND",);    
+                    $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$output['student']."%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"ath.`EmailPU`","data"=>" like '%".$output['student']."%') ","filter"=>"OR",);
+                }                  
+            }
+
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+
+                $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$search."%' ","filter"=>"AND",);    
+                $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$search."%' ","filter"=>"OR",);    
+                $param[] = array("field"=>"ps.`NameEng`","data"=>" like '%".$search."%' )","filter"=>"OR",);    
+            }            
+
+            $data = array();
+            $totalData = $this->Globalinformation_model->fetchSubjectType(true,false,$param);
+            $TotalDataRS = (!empty($totalData) ? $totalData->Total : 0);
+            $result = $this->Globalinformation_model->fetchSubjectType(false,false,$param,(!empty($reqdata['start']) ? $reqdata['start']:0),(!empty($reqdata['length']) ? $reqdata['length'] : 0),$orderBy);
+            var_dump($result);die();
+            $json_data = array(
+                "draw"            => intval( $reqdata['draw'] ),
+                "recordsTotal"    => intval($TotalDataRS),
+                "recordsFiltered" => intval($TotalDataRS),
+                "data"            => (!empty($result) ? $result : null)
+            );
+
+        }else{$json_data=null;}
+
+        $response = $json_data;
+        echo json_encode($response);
+    }
+
+
+    public function subjectTypeForm(){
+        $data = $this->input->post();
+        if($data){
+            $data['detail'] = $this->General_model->fetchData("db_mail_blast",array("ID"=>$data['ID']))->row();
+        }
+        $this->load->view('dashboard/global-informations/message-blast/subject-type/form',$data,false);
+    }
+
+
+    public function subjectTypeSave(){
+        $data = $this->input->post();
+        $mynip = $this->session->userdata('NIP');
+        if($data){
+            $message = "";
+            unset($data['files']);
+            if(!empty($data['ID'])){
+                $conditions = array("ID"=>$data['ID']);
+                $isExist = $this->General_model->fetchData("db_mail_blast.subject_type",$conditions)->row();
+                if(!empty($isExist)){
+                    $data['editedby'] = $mynip;
+                    $update = $this->General_model->updateData("db_mail_blast.subject_type",$data,$conditions);
+                    $message = (($update) ? "Successfully":"Failed")." updated.";
+                }else{
+                    $message = "Data is not founded. Try again";
+                }
+
+            }else{
+                $data['createdby'] = $mynip;
+                $insert = $this->General_model->insertData("db_mail_blast.subject_type",$data);
+                $message = (($insert) ? "Successfully":"Failed")." saved.";
+            }
+
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('global-informations/subject-type')); 
+
+        }else{show_404();}
+    }
 /*END SUBJECT TYPE*/
 
 }
