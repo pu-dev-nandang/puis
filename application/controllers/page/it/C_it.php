@@ -105,11 +105,33 @@ class C_it extends It_Controler {
         $this->load->view('page/'.$department.'/version/'.$data_arr['page'], $data_arr);
     }
 
+    public function menu_user_activity($page){
+        $department = parent::__getDepartement();
+        $data['NIP']= $this->session->userdata('NIP');
+        $data['page']= $page;
+        $content = $this->load->view('page/'.$department.'/user-activity/menu_user_activity',$data,true);
+        $this->temp($content);
+    }
+
     public function user_activity(){
         $department = parent::__getDepartement();
         $data['NIP']= $this->session->userdata('NIP');
-        $content = $this->load->view('page/'.$department.'/user-activity/user_activity',$data,true);
-        $this->temp($content);
+        $page = $this->load->view('page/'.$department.'/user-activity/user_activity',$data,true);
+        $this->menu_user_activity($page);
+    }
+
+    public function user_activity_student(){
+        $department = parent::__getDepartement();
+        $data['NIP']= $this->session->userdata('NIP');
+        $page = $this->load->view('page/'.$department.'/user-activity/user_activity_student',$data,true);
+        $this->menu_user_activity($page);
+    }
+
+    public function user_activity_lecturer(){
+        $department = parent::__getDepartement();
+        $data['NIP']= $this->session->userdata('NIP');
+        $page = $this->load->view('page/'.$department.'/user-activity/user_activity_lecturer',$data,true);
+        $this->menu_user_activity($page);
     }
 
     public function seleksi_mahasiswa_asing(){
