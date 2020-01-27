@@ -166,7 +166,7 @@
             var dataTable = $('#tableListStd').DataTable( {
                 "processing": true,
                 "serverSide": true,
-                "iDisplayLength" : 10,
+                "iDisplayLength" : 25,
                 "ordering" : false,
                 "language": {
                     "searchPlaceholder": "NIM , Name Student"
