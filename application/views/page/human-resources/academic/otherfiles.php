@@ -9,7 +9,8 @@
                                 <div class="row"> 
                                     <div class="col-xs-5">
                                         <div class="form-group">
-                                        <label class="control-label">Category File </label>
+                                        <label style="display: block"> Category File   <a href="javascript:void(0);" class="add_kat_otherfiles" style="text-align: right; float:right;"><span class="label label-pill" style="color: blue"><span class="fa fa-plus-circle"></span> Category File </span></a> </label>
+                                        <!-- <label class="control-label">Category File </label> -->
                                         <div>
                                             <select class="form-control" id="typefiles">
                                                 <?php for ($i=0; $i < count($G_TypeFiles); $i++): ?>
@@ -75,7 +76,7 @@
  </div>
 
 <script>
-    $(document).ready(function () {
+$(document).ready(function () {
     $('.frmdatepicker').datepicker({
       dateFormat : 'yy-mm-dd',
       changeMonth : true,
@@ -116,6 +117,37 @@ $('#typefiles').change(function (event) {
 
     }
 });
+
+
+    $(document).on('click','.btnMasterOtherfile', function () {
+        $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Master University </h4>');
+
+        var body = '<div class="row table-responsive">' +
+            '    <div class="col-md-5">' +
+            '        <div class="well">' +
+            '            <div class="form-group">' +
+            '                <input class="form-control" id="master_nameuniv" placeholder="Name University...">' +
+            '            </div>' +
+            '            <div style="text-align:right;">' +
+            '                <button class="btn btn-success btn-round" id="btnSaveLembaga"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
+            '            </div>' +
+            '        </div>' +
+            '    </div>' +
+            '    ' +
+            '    <div id="viewData23" class="col-md-7">' +
+            '    </div>' +
+            '</div>';
+        $('#GlobalModalLarge .modal-body').html(body);
+
+        $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
+        $('#GlobalModalLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+        //loadDataUniversity();
+    });
+
 
 </script>
 
@@ -174,6 +206,33 @@ $('#typefiles').change(function (event) {
 
 </script>
 <script>
+
+    $(document).on('click','.add_kat_otherfiles', function () {
+        var body = '<div class="row">' +
+            '         <div class="col-md-12">' +
+            '           <h4><b> ADD CATEGORY FILES</b></h4>' +
+            '           <div class="well">' +
+            '               <div class="form-group">' +
+            '                   <label>Category File</label>'+
+            '                   <input class="form-control" id="master_kat_otherfiles">' +
+            '               </div>' +
+             '               <div class="form-group">' +
+            '                   <label>Name File</label>'+
+            '                   <input class="form-control" id="name_kat_otherfiles">' +
+            '               </div>' +
+            '           </div>' +
+            '           <div class="btn-group pull-right">   '+ 
+            '                <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i>Cancel</button> '+ 
+            '                <button type="button" class="btn btn-success btn-round btnSubmitKatOtherFiles"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button> '+
+            '           </div>  '+ 
+            '        </div> ' +
+            '     </div>';
+        $('#NotificationModal .modal-body').html(body);
+        $('#NotificationModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
 
     $(document).on('change','#e_typefiles', function () {
         var filterKategoriJenis = $('#e_typefiles option:selected').attr('id');
@@ -385,6 +444,48 @@ $('#typefiles').change(function (event) {
 </script>
 
 <script>
+
+$(document).on('click','.btnSubmitKatOtherFiles', function () {
+        var type_otherfiles = $('#master_kat_otherfiles').val();
+        var name_katother = $('#name_kat_otherfiles').val();
+
+            if(type_otherfiles!='' && type_otherfiles!=null
+                && name_katother!='' && name_katother!=null
+                ){
+                loading_button('.btnSubmitKatOtherFiles');
+
+                var data = {
+                    action : 'update_mster_katother',
+                    type_otherfiles : type_otherfiles,
+                    name_katother : name_katother
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__loadMstruniversity';
+
+                $.post(url,{token:token},function (jsonResult) {
+
+                    if(jsonResult==0 || jsonResult=='0') { 
+                        toastr.error('Sorry, Name Category Other File Already!','Error');
+                        $('.btnSubmitKatOtherFiles').html('Save').prop('disabled',false);
+
+                    } else {
+
+                        toastr.success('Data saved','Success');
+                        $('#NotificationModal').modal('hide');
+
+                        setTimeout(function () {
+                            $('.btnSubmitKatOtherFiles').html('Save').prop('disabled',false);
+                            window.location.href = '';
+
+                        },500);
+                    }
+                });
+
+            } else {
+                toastr.warning('All form is required','Warning');
+            }
+    });
    
 $('#btnSaveEditFiles').click(function () {  
         var NIP = $('#formNIP').val();
