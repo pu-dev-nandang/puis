@@ -11494,7 +11494,7 @@ class C_api extends CI_Controller {
                                                                 LEFT JOIN db_academic.std_krs stdk_1 ON (stdk_1.NPM = auts_1.NPM)
                                                                 WHERE stdk_1.SemesterID = "'.$data_arr['SemesterID'].'" GROUP BY auts_1.NPM )
                                           ) '.$dataSearch.'
-                                          ORDER BY NPM ASC';
+                                          GROUP BY auts.NPM ORDER BY auts.NPM ASC';
 
         } else if($data_arr['StatusKRS']=='') {
             $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiID, auts.ProdiGroupID, em.Name AS MentorName, em.NIP AS MentorNIP
@@ -11502,7 +11502,7 @@ class C_api extends CI_Controller {
                                           LEFT JOIN db_academic.mentor_academic mac ON (mac.NPM = auts.NPM)
                                           LEFT JOIN db_employees.employees em ON (em.NIP = mac.NIP)
                                           WHERE ( auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.' ) '.$dataSearch.'
-                                          ORDER BY NPM ASC';
+                                          GROUP BY auts.NPM ORDER BY auts.NPM ASC';
         } else {
 
             $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiID, auts.ProdiGroupID, em.Name AS MentorName, em.NIP AS MentorNIP
@@ -11512,7 +11512,7 @@ class C_api extends CI_Controller {
                                           LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
                                           WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.$w_StatusKRS.' ) 
                                           '.$dataSearch.'
-                                          ORDER BY NPM ASC';
+                                          ORDER BY auts.NPM ASC';
 
         }
 
