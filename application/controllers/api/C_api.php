@@ -10289,6 +10289,8 @@ class C_api extends CI_Controller {
 
         $w_year = ($data_arr['Year']!='') ? ' AND auts.Year = "'.$data_arr['Year'].'" ' : '' ;
         $w_prodi = ($data_arr['ProdiID']!='') ? ' AND auts.ProdiID = "'.$data_arr['ProdiID'].'" ' : '' ;
+        $w_StatusKRS = ($data_arr['StatusKRS']!='' && $data_arr['StatusKRS']!='NOT_EXISTS')
+            ? ' AND stdk.Status = "'.$data_arr['StatusKRS'].'" ' : '';
 
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
@@ -10298,12 +10300,41 @@ class C_api extends CI_Controller {
                                     OR auts.Name '.$wl.')';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiID, auts.ProdiGroupID, em.Name AS MentorName, em.NIP AS MentorNIP
+        if($data_arr['StatusKRS']=='NOT_EXISTS'){
+
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiID, auts.ProdiGroupID, em.Name AS MentorName, em.NIP AS MentorNIP
+                                          FROM db_academic.auth_students auts
+                                          LEFT JOIN db_academic.mentor_academic mac ON (mac.NPM = auts.NPM)
+                                          LEFT JOIN db_employees.employees em ON (em.NIP = mac.NIP)
+                                          LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                                          WHERE ( auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.' 
+                                          AND auts.NPM NOT IN (SELECT auts_1.NPM FROM  db_academic.auth_students auts_1 
+                                                                LEFT JOIN db_academic.std_krs stdk_1 ON (stdk_1.NPM = auts_1.NPM)
+                                                                WHERE stdk_1.SemesterID = "'.$data_arr['SemesterID'].'" GROUP BY auts_1.NPM )
+                                          ) '.$dataSearch.'
+                                          ORDER BY NPM ASC';
+
+        } else if($data_arr['StatusKRS']=='') {
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiID, auts.ProdiGroupID, em.Name AS MentorName, em.NIP AS MentorNIP
                                           FROM db_academic.auth_students auts
                                           LEFT JOIN db_academic.mentor_academic mac ON (mac.NPM = auts.NPM)
                                           LEFT JOIN db_employees.employees em ON (em.NIP = mac.NIP)
                                           WHERE ( auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.' ) '.$dataSearch.'
                                           ORDER BY NPM ASC';
+        } else {
+
+            $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiID, auts.ProdiGroupID, em.Name AS MentorName, em.NIP AS MentorNIP
+                                          FROM db_academic.auth_students auts
+                                          LEFT JOIN db_academic.mentor_academic mac ON (mac.NPM = auts.NPM)
+                                          LEFT JOIN db_employees.employees em ON (em.NIP = mac.NIP)
+                                          LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                                          WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.$w_StatusKRS.' ) 
+                                          '.$dataSearch.'
+                                          ORDER BY NPM ASC';
+
+        }
+
+
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 

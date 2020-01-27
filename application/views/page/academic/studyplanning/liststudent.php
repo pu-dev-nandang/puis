@@ -30,22 +30,41 @@
     <div class="col-md-12">
         <div class="well">
             <div class="row">
-                <div class="col-md-2">
+                <div class="col-md-2 hide">
                     <select class="form-control filterSP" id="filterProgramCampus"></select>
                 </div>
                 <div class="col-md-3">
+                    <label>Semester</label>
                     <select class="form-control filterSP" id="filterSemester"></select>
                 </div>
                 <div class="col-md-3">
+                    <label>Curriculum</label>
                     <select class="form-control filterSP" id="filterCurriculum">
                         <option value="">--- All Curriculum ---</option>
                         <option disabled>-----------------------------</option>
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label>Programme Study</label>
                     <select class="form-control filterSP" id="filterBaseProdi">
                         <option value="">-- All Programme Study --</option>
                         <option disabled>-----------------------------</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Status KRS</label>
+                    <select class="form-control filterSP" id="filterStatusKRS">
+                        <option value="">--- All Status ---</option>
+                        <option disabled="">-----------------------</option>
+                        <option value="NOT_EXISTS" style="color:#ff9800;">Not Yet Input KRS</option>
+                        <option disabled="">-----------------------</option>
+                        <option value="0">Not Yet Sent KRS</option>
+                        <option value="1">Waiting Approval Mentor</option>
+                        <option value="2">Waiting Approval Kaprodi</option>
+                        <option value="3" style="color:green;">Approved By Mentor &amp; Kaprodi</option>
+                        <option disabled="">-----------------------</option>
+                        <option value="-2" style="color:red;">Rejected By Mentor</option>
+                        <option value="-3" style="color:red;">Rejected By Kaprodi</option>
                     </select>
                 </div>
             </div>
@@ -129,12 +148,16 @@
             var filterCurriculum = $('#filterCurriculum').val();
             var Year = (filterCurriculum!='' && filterCurriculum!=null) ? filterCurriculum.split('.')[1] : '';
 
+            var filterStatusKRS = $('#filterStatusKRS').val();
+            var StatusKRS = (filterStatusKRS!='' && filterStatusKRS!=null) ? filterStatusKRS : '';
+
             var exSemester = filterSemester.split('.');
             var data = {
                 ProgramID : filterProgramCampus,
                 SemesterID : exSemester[0],
                 Year : Year,
-                ProdiID : ProdiID
+                ProdiID : ProdiID,
+                StatusKRS : StatusKRS
             };
 
             var token = jwt_encode(data,'UAP)(*');
@@ -165,117 +188,6 @@
 
     }
 
-    function getStudents2() {
-
-        var ProgramID = $('#filterProgramCampus').val();
-        // var ProdiID = $('#filterBaseProdi').val().split('.')[0];
-        var filterBaseProdi = $('#filterBaseProdi').val();
-        var filterSemesterSchedule = $('#filterSemesterSchedule').val();
-        var ClassOf = (filterSemesterSchedule != '' && filterSemesterSchedule != null) ? filterSemesterSchedule.split('|')[1].split('.')[1] : '';
-
-        if (ProgramID != null && filterBaseProdi != null && filterSemesterSchedule != null && ClassOf != "") {
-            var ProdiID = filterBaseProdi.split('.')[0];
-
-            var data = {
-                action: 'read',
-                dataWhere: {
-                    ProgramID: ProgramID,
-                    ProdiID: ProdiID,
-                    ClassOf: ClassOf
-                }
-            };
-
-            $('#divPage').html('<div class="table-responsive"><table class="table table-striped table-bordered" id="tableDataStudents">' +
-                '            <thead style="background: #007475;color: #ffffff;">' +
-                '            <tr>' +
-                '                <th rowspan="2" style="width: 1%;">No</th>' +
-                '                <th rowspan="2" style="width: 7%;">NPM</th>' +
-                '                <th rowspan="2">Student</th>' +
-                '                <th rowspan="2" style="width: 15%;">Mentor</th>' +
-                '                <th colspan="2" style="width: 10%;">Payment</th>' +
-                '                <th rowspan="2" style="width: 10%;">Last IPS</th>' +
-                '                <th rowspan="2" style="width: 10%;">IPK</th>' +
-                '                <th rowspan="2" style="width: 5%;">Credit Taken</th>' +
-                '                <th rowspan="2" style="width: 5%;">Max Credit</th>' +
-                '            </tr>' +
-                '            <tr>' +
-                '               <th style="width: 10%;">BPP</th>' +
-                '               <th style="width: 10%;">Credit</th>' +
-                '            </tr>' +
-                '            </thead>' +
-                '            <tbody id="dataStudents"></tbody>' +
-                '        </table></div>');
-
-            var token = jwt_encode(data, 'UAP)(*');
-
-            var url = base_url_js+'api/__crudStudyPlanning';
-            $.post(url, {token: token}, function (jsonResult) {
-
-                // console.log(jsonResult);
-
-                var tr = $('#dataStudents');
-                var no = 1;
-                for (var i = 0; i < jsonResult.length; i++) {
-
-                    var CreditUnit = 0;
-                    var StudyPlanning = jsonResult[i].StudyPlanning;
-                    for (var c = 0; c < StudyPlanning.length; c++) {
-                        var stp = StudyPlanning[c];
-                        CreditUnit = CreditUnit + parseInt(stp.TotalSKS);
-                    }
-
-                    var Student = jsonResult[i].Student;
-
-                    var sendMailStd = (Student.EmailPU!=null && Student.EmailPU!='') ? '<br/><a style="color: #03a9f4;" href="javascript:void(0);" class="sendEmail" data-email="'+Student.EmailPU+'"><i class="fa fa-envelope-o" aria-hidden="true"></i> Send Email</a>' : '';
-
-                    tr.append('<tr>' +
-                        '<td>' + no + '</td>' +
-                        '<td>' + Student.NPM + '</td>' +
-                        '<td style="text-align: left;">' +
-                        '   <b>' +
-                        '       <a href="javascript:void(0)" class="detailStudyPlan" data-npm="' + Student.NPM + '" data-ta="' + Student.ClassOf + '">' + Student.Name + '</a></b>' + sendMailStd +
-                        '</td>' +
-                        '<td id="mentorData'+no+'" style="text-align: left;">-</td>' +
-                        '<td id="bpp'+no+'">-</td>' +
-                        '<td id="credit'+no+'">-</td>' +
-                        '<td>' +parseFloat(Student.DetailSemester.LastIPS).toFixed(2)+ '</td>' +
-                        '<td>' + parseFloat(Student.DetailSemester.IPK).toFixed(2) + '</td>' +
-                        '<td>' + CreditUnit + '</td>' +
-                        '<td>' + Student.DetailSemester.MaxCredit.Credit + '</td>' +
-                        '</tr>');
-
-                    if(Student.DetailPayment.length>0){
-                        for(var p=0;p<Student.DetailPayment.length;p++){
-                            var dt = Student.DetailPayment[p];
-                            if(dt.PTID=='2'){
-                                $('#bpp'+no).html('<i class="fa fa-check-circle" style="color: green;"></i>');
-                            }
-                            if(dt.PTID=='3'){
-                                $('#credit'+no).html('<i class="fa fa-check-circle" style="color: green;"></i>');
-                            }
-                        }
-                    }
-
-                    if(Student.DetailMentor.length>0){
-                        var dataMentor = Student.DetailMentor[0];
-                        // var spDsn = dataMentor.Mentor.split(' ');
-                        // var dsn = (spDsn.length>2) ? spDsn[0]+' '+spDsn[1] : dataMentor.Mentor;
-                        var dsn = (dataMentor.Mentor!='' && dataMentor.Mentor!=null) ? dataMentor.Mentor : '-';
-                        var divMentor = dsn+'<br/><i>'+dataMentor.NIP+'</i>';
-                        $('#mentorData'+no).html(divMentor);
-                    }
-
-                    no++;
-                }
-
-                $('#tableDataStudents').DataTable({
-                    'pageLength': 25
-                });
-            });
-
-        }
-
-    }
 </script>
 
 
