@@ -535,10 +535,16 @@
 				var keynumber = el.closest('.GET').attr('keynumber');
 				var keyindex = parseInt(el.closest('.GET').attr('keyindex'));
 				var dt = jwt_decode(el.attr('datatoken'));
-				// console.log(dt);
-				// settingTemplate['GET'][field][keyindex]['user'] = {};
-				// settingTemplate['GET'][field][keyindex]['user'] = dt;
-				settingTemplate['GET'][field][keyindex] = dt;
+				
+				if (dt['number'] !== undefined) {
+					settingTemplate['GET'][field][keyindex] = dt;
+				}
+				else
+				{
+					settingTemplate['GET'][field][keyindex]['user'] = {};
+					settingTemplate['GET'][field][keyindex]['user'] = dt;
+					settingTemplate['GET'][field][keyindex]['number'] = keynumber;
+				}
 			})
 
 			// console.log(settingTemplate['GET']);return;
