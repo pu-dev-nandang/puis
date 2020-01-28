@@ -1,6 +1,15 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h4 class="panel-title">List</h4>
+      <div class="row">
+        <div class="col-sm-6">
+          <h4 class="panel-title">List</h4>
+        </div>
+        <div class="col-sm-6">
+            <div class="pull-right">
+              <a href="<?php echo base_url().'request-document-generator/Template/CategorySrt' ?>" class = "btn btn-sm btn-primary" >Category Document</a>
+            </div>
+        </div>
+      </div>
     </div>
     <div class="panel-body" style="min-height: 100px;">
         <div class="row">

@@ -34,9 +34,26 @@ class M_set extends CI_Model {
 		return $rs;
 	}
 
+	// public function PolaNoSurat($params){
+	// 	// example :  041/UAP/R/SKU/X/2019
+	// 	$ex = explode('.', $params);
+	// 	if (count($ex) > 0 && count($ex) == 1 ) {
+	// 		return array(
+	// 			'value' => 'method_default',
+	// 			'setting' => array(
+	// 				'prefix' => '',
+	// 			),
+	// 			'sample' => '041/UAP/R/SKU/X/2019',
+	// 		);
+	// 	}
+
+	// }
+
 	public function PolaNoSurat($params){
 		// example :  041/UAP/R/SKU/X/2019
 		$ex = explode('.', $params);
+		$sql = 'select * from db_generatordoc.category_document where Active = 1';
+		$query = $this->db->query($sql,array())->result_array();
 		if (count($ex) > 0 && count($ex) == 1 ) {
 			return array(
 				'value' => 'method_default',
@@ -44,6 +61,7 @@ class M_set extends CI_Model {
 					'prefix' => '',
 				),
 				'sample' => '041/UAP/R/SKU/X/2019',
+				'choose' => $query,
 			);
 		}
 
@@ -601,18 +619,34 @@ class M_set extends CI_Model {
 	private function __getValuePolaNoSurat($method,$setting,$ID_document){
 		switch ($method) {
 			case 'method_default':
-				// No Surat
-				$Year = date('Y');
-				$sql = 'select NoSuratOnly from db_generatordoc.document_data where ID_document = ?
-						and Year(DateRequest) = "'.$Year.'"
-						order by ID desc limit 1';
-				$query = $this->db->query($sql,array($ID_document))->result_array();
-
+				// get Category document first
 				$NoSuratOnly = 1;
-				$maxCharacter = 3;
-				if (count($query) > 0 ) {
-					$NoSuratOnly =(int)$query[0]['NoSuratOnly']+1;
+				$G_dt = $this->m_master->caribasedprimary('db_generatordoc.document','ID',$ID_document);
+				// prefix
+				$prefix = $setting['prefix'];
+				$Year = date('Y');
+				if (count($G_dt) > 0) {
+					$ID_category_document = $G_dt[0]['ID_category_document'];
+					$sql = 'select a.NoSuratOnly from db_generatordoc.document_data as a 
+							join db_generatordoc.document as b on a.ID_document = b.ID
+							join db_generatordoc.category_document as c on b.ID_category_document = c.ID
+							where c.ID = ?
+							and Year(a.DateRequest) = "'.$Year.'"
+							order by a.ID desc limit 1';
+					$query = $this->db->query($sql,array($ID_category_document))->result_array();
+					if (count($query) > 0 ) {
+						$NoSuratOnly =(int)$query[0]['NoSuratOnly']+1;
+					}
+
+					// prefix ambil dari category
+					$G_dt_category = $this->m_master->caribasedprimary('db_generatordoc.category_document','ID',$ID_category_document);
+					$Config = json_decode($G_dt_category[0]['Config'],true) ;
+					$prefix = $Config['SET']['PolaNoSurat']['setting']['prefix'];
 				}
+
+
+				// No Surat
+				$maxCharacter = 3;
 
 				$len = strlen($NoSuratOnly);
 				$NoSuratStr = (string) $NoSuratOnly;
@@ -620,8 +654,7 @@ class M_set extends CI_Model {
 					$NoSuratStr = '0'.$NoSuratStr;
 				}
 
-				// prefix
-				$prefix = $setting['prefix'];
+
 
 				// Bulan & Tahun
 				$Month = date('m');
