@@ -4618,7 +4618,6 @@ class C_api extends CI_Controller {
                     }
 
                     $nestedData[] = '<div style="text-align:center; color: #000000;">'.$no.'</div>';
-                    $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['TypeFiles'].'</div>';
                     $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['NameFiles'].'</div>';
                     $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
                     $data[] = $nestedData;
