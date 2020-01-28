@@ -9,13 +9,13 @@
                                 <div class="row"> 
                                     <div class="col-xs-5">
                                         <div class="form-group">
-                                        <label style="display: block"> Category File   <a href="javascript:void(0);" class="add_kat_otherfiles" style="text-align: right; float:right;"><span class="label label-pill" style="color: blue"><span class="fa fa-plus-circle"></span> Category File </span></a> </label>
-                                        <!-- <label class="control-label">Category File </label> -->
+                                        <label style="display: block"> Category Other File   <a href="javascript:void(0);" class="add_kat_otherfiles" style="text-align: right; float:right;"><span class="label label-pill" style="color: blue"><span class="fa fa-plus-circle"></span> Category File </span></a> </label>
+                                        
                                         <div>
                                             <select class="form-control" id="typefiles">
                                                 <?php for ($i=0; $i < count($G_TypeFiles); $i++): ?>
-                                                    <?php if ($G_TypeFiles[$i]['Type'] == 1): ?>
-                                                     <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['TypeFiles'] ?></option>  
+                                                    <?php if ($G_TypeFiles[$i]['Type'] == 1 ): ?>
+                                                     <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['NameFiles'] ?></option>  
                                                     <?php endif ?>
                                                 <?php endfor ?>
                                             </select>
@@ -87,36 +87,11 @@ $(document).ready(function () {
     });
 });
 
-$('#fileOther').change(function (event) {
+    $('#fileOther').change(function (event) {
         $('#element1').empty();
         var file = URL.createObjectURL(event.target.files[0]);
         $('#element1').append('<br/><iframe src="' + file + '" style="width:250px; height:100;" frameborder="0"></iframe>' );
     });
-
-
-$('#typefiles').change(function (event) {
-    
-    var filterKategoriJenis = $('#typefiles option:selected').attr('id');
-    $("#JenisFiles").empty();
-
-    if(filterKategoriJenis == "13") {
-
-        var url = base_url_js+'api/__reviewotherfile';
-        var token = jwt_encode({action : 'get_katotherfiles'},'UAP)(*');
-
-        $.post(url,{token:token},function (jsonResult) {
-            $('#JenisFiles').append('<option id="0" disabled selected>Pilih Kategori Other Files</option>');
-                for(var i=0;i<jsonResult.length;i++){
-                        $('#JenisFiles').append('<option id="'+jsonResult[i].ID+'"> '+jsonResult[i].Name_other_files+' </option>');
-                }
-        });
-    } 
-    else {
-
-        $("#JenisFiles").empty();
-
-    }
-});
 
 
     $(document).on('click','.btnMasterOtherfile', function () {
@@ -145,9 +120,7 @@ $('#typefiles').change(function (event) {
             'show' : true,
             'backdrop' : 'static'
         });
-        //loadDataUniversity();
     });
-
 
 </script>
 
@@ -213,11 +186,7 @@ $('#typefiles').change(function (event) {
             '           <h4><b> ADD CATEGORY FILES</b></h4>' +
             '           <div class="well">' +
             '               <div class="form-group">' +
-            '                   <label>Category File</label>'+
-            '                   <input class="form-control" id="master_kat_otherfiles">' +
-            '               </div>' +
-             '               <div class="form-group">' +
-            '                   <label>Name File</label>'+
+            '                   <label>Name Category Other File</label>'+
             '                   <input class="form-control" id="name_kat_otherfiles">' +
             '               </div>' +
             '           </div>' +
@@ -368,7 +337,7 @@ $('#typefiles').change(function (event) {
                         '                        <option id="'+response[i]['TypeFiles']+'" disabled selected>'+response[i]['NameFiles']+'</option>'+
                         '                        <?php for ($i=0; $i < count($G_TypeFiles); $i++): ?>       '+
                         '                            <?php if ($G_TypeFiles[$i]['Type'] == 1): ?>           '+
-                        '                             <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['TypeFiles'] ?></option>   '+ 
+                        '                               <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['TypeFiles'] ?></option>   '+ 
                         '                            <?php endif ?>                                         '+
                         '                        <?php endfor ?>                                            '+
                         '                    </select>                                                      '+
@@ -420,7 +389,7 @@ $('#typefiles').change(function (event) {
                         '    <div><input type="hidden" class="form-control" value="'+linkfileother+'" id="linkotherfile">   </div>       '+
                         '    <div><input type="hidden" class="form-control" value="'+idfiles+'" id="idlinkfiles">           </div>       '+
 
-                              '         <div class="btn-group">   '+ 
+                        '         <div class="btn-group">   '+ 
                         '                <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i>Cancel</button> '+ 
                         '                <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="glyphicon glyphicon-floppy-disk"></i> Save</button> '+ 
                         '               </div>  '+ 
@@ -446,17 +415,13 @@ $('#typefiles').change(function (event) {
 <script>
 
 $(document).on('click','.btnSubmitKatOtherFiles', function () {
-        var type_otherfiles = $('#master_kat_otherfiles').val();
         var name_katother = $('#name_kat_otherfiles').val();
 
-            if(type_otherfiles!='' && type_otherfiles!=null
-                && name_katother!='' && name_katother!=null
-                ){
+            if(name_katother!='' && name_katother!=null){
                 loading_button('.btnSubmitKatOtherFiles');
 
                 var data = {
                     action : 'update_mster_katother',
-                    type_otherfiles : type_otherfiles,
                     name_katother : name_katother
                 };
 
@@ -477,6 +442,7 @@ $(document).on('click','.btnSubmitKatOtherFiles', function () {
                         setTimeout(function () {
                             $('.btnSubmitKatOtherFiles').html('Save').prop('disabled',false);
                             window.location.href = '';
+                            $('.menuDetails[data-page="otherfiles"]').trigger('click');
 
                         },500);
                     }

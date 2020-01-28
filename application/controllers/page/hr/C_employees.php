@@ -68,7 +68,10 @@ class C_employees extends HR_Controler {
     public function loadpageacademicDetails(){
         $department = parent::__getDepartement();
         $data_arr = $this->getInputToken();
-        $G_TypeFiles = $this->m_master->showData_array('db_employees.master_files');
+        //$G_TypeFiles = $this->m_master->showData_array('db_employees.master_files'); 
+        $sql = 'SELECT * FROM db_employees.master_files WHERE Type = 1 AND ID NOT IN ("13")';
+        $G_TypeFiles =$this->db->query($sql, array())->result_array();
+    
         $data_arr['G_TypeFiles'] =  $G_TypeFiles;
         $this->load->view('page/'.$department.'/academic/'.$data_arr['page'], $data_arr);
     }
