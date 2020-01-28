@@ -5563,6 +5563,17 @@ class C_api3 extends CI_Controller {
                 : ' WHERE '.$fillSrc;
         }
 
+        // query total 
+        $sqlTotal = 'select count(*) as total from (
+                SELECT lem.ID
+                                            FROM db_employees.log_employees lem
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = lem.NIP)
+                                            LEFT JOIN db_employees.employees em2 ON (em2.NIP = lem.UserID)
+                                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM =  lem.UserID)
+                                            '.$dataWhere.' '.$dataSearch.'
+            ) cc';
+        $queryTotal = $this->db->query($sqlTotal,array())->result_array()[0]['total'];
+
         $queryDefault = 'SELECT lem.ID, em.Name, lem.AccessedOn,
                             (CASE WHEN lem.NIP = lem.UserID THEN 0 ELSE lem.UserID END ) AS LoginAs,
                             (CASE WHEN em2.Name = em.Name THEN NULL ELSE em2.Name END) AS LoginAsLec,
@@ -5578,7 +5589,7 @@ class C_api3 extends CI_Controller {
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        // $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
         $no = $requestData['start'] + 1;
         $data = array();
@@ -5641,8 +5652,8 @@ class C_api3 extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefaultRow)),
-            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "recordsTotal"    => intval($queryTotal),
+            "recordsFiltered" => intval( $queryTotal ),
             "data"            => $data,
             "dataQuery"            => $query
         );
