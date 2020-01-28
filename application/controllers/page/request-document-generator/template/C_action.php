@@ -72,5 +72,55 @@ class C_action extends ServiceDocumentGenerator_Controler {
         $rs = $this->m_doc->run_set_table($dataToken);
         echo json_encode($rs);
     }
+
+    public function LoadTableCategorySrt(){
+        $dataToken = $this->getInputToken();
+        $dataToken = json_decode(json_encode($dataToken),true);
+        $rs = $this->m_doc->LoadTableCategorySrt($dataToken);
+        echo json_encode($rs);
+    }
+
+    public function submit_CategorySrt(){
+        $rs = ['status' => 0,'msg' => ''];
+        $dataToken = $this->getInputToken();
+        $dataToken = json_decode(json_encode($dataToken),true);
+        $action = $dataToken['action'];
+        switch ($action) {
+            case 'add':
+                $data = $dataToken['data'];
+                $data['Config'] = json_encode($data['Config']);
+                $data['Department'] = $this->session->userdata('DepartmentIDDocument');
+                $data['UpdatedBy'] = $this->session->userdata('NIP');
+                $data['UpdatedAt'] = date('Y-m-d H:i:s');
+                $this->db->insert('db_generatordoc.category_document',$data);
+                $rs['status'] = 1;
+                break;
+            case 'delete':
+                $ID = $dataToken['ID'];
+                $data['Active'] = 0;
+                $data['UpdatedBy'] = $this->session->userdata('NIP');
+                $data['UpdatedAt'] = date('Y-m-d H:i:s');
+                $this->db->where('ID',$ID);
+                $this->db->update('db_generatordoc.category_document',$data);
+                $rs['status'] = 1;
+                break;
+            case 'edit':
+                $ID = $dataToken['ID'];
+                $data = $dataToken['data'];
+                $data['Config'] = json_encode($data['Config']);
+                $data['Department'] = $this->session->userdata('DepartmentIDDocument');
+                $data['UpdatedBy'] = $this->session->userdata('NIP');
+                $data['UpdatedAt'] = date('Y-m-d H:i:s');
+                $this->db->where('ID',$ID);
+                $this->db->update('db_generatordoc.category_document',$data);
+                $rs['status'] = 1;
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        echo json_encode($rs);
+    }
     
 }

@@ -18,4 +18,9 @@ class C_page extends ServiceDocumentGenerator_Controler {
 		$page = $this->load->view('global/request-document-generator/index',$this->GLobalVariable,true);
 	    $this->menu_document($page);
 	}
+
+	public function category_srt(){
+		$page = $this->load->view('global/request-document-generator/document/template/category_srt',$this->GLobalVariable,true);
+	    $this->menu_document($page);
+	}
 }

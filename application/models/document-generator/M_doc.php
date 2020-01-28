@@ -802,6 +802,7 @@ class M_doc extends CI_Model {
     		'UpdatedBy' => $this->session->userdata('NIP'),
     		'UpdatedAt' => date('Y-m-d H:i:s'),
             'DepartmentCreated' => $this->session->userdata('DepartmentIDDocument'),
+            'ID_category_document' => $Input['ID_category_document'],
     	];
     	$this->db->insert('db_generatordoc.document',$dataSave);
         $ID_document = $this->db->insert_id();
@@ -2805,6 +2806,48 @@ class M_doc extends CI_Model {
         return $rs;
     }
 
-    
+    public function LoadTableCategorySrt($dataToken=[]){
+        $this->load->model('ticketing/m_general');
+        $rs = [];
+        $AddWhere = '';
+        $DepartmentID = $this->session->userdata('DepartmentIDDocument');
+        if (!empty($dataToken)) {
+            if (array_key_exists('Active', $dataToken)) {
+                $Active = $dataToken['Active'];
+                $AddWhere .= ' where a.Active = "'.$Active.'"';
+            }
+        }
+
+        $sql = 'select a.*,qdx.NameDepartment,b.Name as NameUpdated
+                from db_generatordoc.category_document as a 
+                '.$this->m_general->QueryDepartmentJoin('a.Department','qdx').'
+                join db_employees.employees as b on a.UpdatedBy = b.NIP
+                '.$AddWhere.'
+                order by ID desc
+                ';
+        $query = $this->db->query($sql,array())->result_array();
+        $data = array();
+        for ($i=0; $i < count($query); $i++) {
+            $nestedData = array();
+            $row = $query[$i]; 
+            $nestedData[] = $row['NameCategorySrt'];
+            $nestedData[] = $row['DescSrt'];
+            $nestedData[] = $row['NameDepartment'];
+            $nestedData[] = $row['UpdatedBy'];
+            $nestedData[] = $row['NameUpdated'];
+            $nestedData[] = $row['UpdatedAt'];
+            $nestedData[] = $row['ID'];
+            $token = $this->jwt->encode($row,"UAP)(*");
+            $nestedData[] = $token;
+            $data[] = $nestedData;
+        }
+        $rs = array(
+            "draw"            => intval( 0 ),
+            "recordsTotal"    => intval(count($query)),
+            "recordsFiltered" => intval( count($query) ),
+            "data"            => $data
+        );
+        return $rs;
+    }
   
 }
