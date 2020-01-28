@@ -4440,17 +4440,16 @@ class C_api extends CI_Controller {
                 $dataSearch = '';
                 if( !empty($requestData['search']['value']) ) {
                     $search = $requestData['search']['value'];
-                    $dataSearch = 'AND ea.NameFiles LIKE "%'.$search.'%"
-                    OR m.NameFiles LIKE "%'.$search.'%" ORDER BY ID DESC';
+                    $dataSearch = 'AND m.NameFiles LIKE "%'.$search.'%" ORDER BY ID DESC';
                 }
 
-                $queryDefault = 'SELECT ea.*, m.NameFiles, p.Name_other_files
+                $queryDefault = 'SELECT ea.*, m.NameFiles
                 FROM db_employees.files AS ea
                 LEFT JOIN db_employees.master_files AS m ON (ea.TypeFiles = m.ID) 
-                LEFT JOIN db_employees.master_other_files AS p ON (ea.ID_OtherFiles = p.ID)
-                WHERE ea.NIP = "'.$NIP.'" AND m.Type = "1" AND ea.Active = "1" AND ea.LinkFiles IS NOT NULL '.$dataSearch;
+                WHERE ea.NIP = "'.$NIP.'" AND m.Type = "1" AND ea.LinkFiles IS NOT NULL '.$dataSearch;
 
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
                 $query = $this->db->query($sql)->result_array();
                 $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
@@ -4483,12 +4482,6 @@ class C_api extends CI_Controller {
                     } else {
                          $datadesc = $row['Description_Files'];
                     }       
-
-                    if ($row['Name_other_files'] == null){
-                         $data_otherfiles = '<center> - </center>';
-                    } else {
-                         $data_otherfiles = $row['Name_other_files'];
-                    }                                       
 
                     $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
                     $nestedData[] = '<div style="text-align:left;">'.$row['NameFiles'].' </div>';
@@ -4645,7 +4638,7 @@ class C_api extends CI_Controller {
 
                 $data = $this->db->query('SELECT ID, NameFiles
                         FROM db_employees.master_files
-                        WHERE TYPE = "1" ')->result_array();
+                        WHERE Type = "1" ')->result_array();
                 return print_r(json_encode($data));
 
             }
@@ -7103,7 +7096,6 @@ class C_api extends CI_Controller {
         }
         else if($data_arr['action']=='update_mstruniv'){
 
-            //$master_codeuniv = $data_arr['master_codeuniv'];
             $master_nameuniv = ucwords($data_arr['master_nameuniv']);
 
             $dataAttdS = $this->db->query('SELECT * FROM db_research.university
@@ -7143,20 +7135,17 @@ class C_api extends CI_Controller {
 
         else if($data_arr['action']=='update_mster_katother'){
 
-            $type_otherfiles = ucwords($data_arr['type_otherfiles']);
             $name_katother = ucwords($data_arr['name_katother']);
             
             $dataAttdS = $this->db->query('SELECT * FROM db_employees.master_files
-                                          WHERE TypeFiles = "'.$type_otherfiles.'" OR NameFiles = "'.$name_katother.'" ')->result_array();
+                                          WHERE NameFiles = "'.$name_katother.'" ')->result_array();
 
             if(count($dataAttdS)>0){
                 return print_r(0);
             } 
             else {
                 $dataSave = array(
-                    'TypeFiles' => $type_otherfiles,
-                    'NameFiles' => $name_katother,
-                    'UserCreate' => $IDuser
+                    'NameFiles' => $name_katother
                 );
                 $this->db->insert('db_employees.master_files',$dataSave);
                 return print_r(1);
