@@ -5677,11 +5677,15 @@ class C_api3 extends CI_Controller {
                             LEFT JOIN db_employees.employees em ON (em.NIP = lem.NIP)
                             '.$dataWhere.' '.$dataSearch.' ORDER BY lem.ID DESC';
 
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT lem.ID FROM db_employees.log_lecturers lem
+                            LEFT JOIN db_employees.employees em ON (em.NIP = lem.NIP)
+                            '.$dataWhere.' '.$dataSearch.' ORDER BY lem.ID DESC) xx';
+
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
         $no = $requestData['start'] + 1;
         $data = array();
@@ -5738,8 +5742,8 @@ class C_api3 extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefaultRow)),
-            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval( $queryDefaultRow),
             "data"            => $data,
             "dataQuery"            => $query
         );
@@ -5774,11 +5778,15 @@ class C_api3 extends CI_Controller {
                             LEFT JOIN db_academic.auth_students em ON (em.NPM = lem.NPM)
                             '.$dataWhere.' '.$dataSearch.' ORDER BY lem.ID DESC';
 
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT lem.ID FROM db_academic.log_student lem
+                            LEFT JOIN db_academic.auth_students em ON (em.NPM = lem.NPM)
+                            '.$dataWhere.' '.$dataSearch.') xx ';
+
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
         $no = $requestData['start'] + 1;
         $data = array();
@@ -5835,10 +5843,10 @@ class C_api3 extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefaultRow)),
-            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval($queryDefaultRow),
             "data"            => $data,
-            "dataQuery"            => $query
+            "dataQuery"       => $query
         );
         echo json_encode($json_data);
 
