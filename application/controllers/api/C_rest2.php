@@ -4496,7 +4496,15 @@ class C_rest2 extends CI_Controller {
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        // $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $queryDefaultRow = $this->db->query(
+                'select count(*) as total from (
+                        SELECT 1
+                        FROM db_notifikasi.logging_user lu
+                        LEFT JOIN db_notifikasi.logging l ON (l.ID = lu.IDLogging)
+                        WHERE lu.UserID = "'.$NIP.'" '.$dataSearch.'
+                    ) ss'
+        )->result_array()[0]['total'];
 
         $no = $requestData['start'] + 1;
         $data = array();
@@ -4540,8 +4548,10 @@ class C_rest2 extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefaultRow)),
-            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            // "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsTotal"    => intval($queryDefaultRow),
+            // "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "recordsFiltered" => intval($queryDefaultRow),
             "data"            => $data
         );
 
