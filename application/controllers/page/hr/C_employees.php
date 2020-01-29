@@ -48,6 +48,14 @@ class C_employees extends HR_Controler {
         $this->tab_menu($page);
     }
 
+
+    public function preferences()
+    {
+        $department = parent::__getDepartement();
+        $page = $this->load->view('page/'.$department.'/employees/preferences','',true);
+        $this->tab_menu($page);
+    }
+
     //add bismar
     public function employees_files(){
         $department = parent::__getDepartement();

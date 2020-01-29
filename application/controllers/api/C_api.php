@@ -11085,10 +11085,22 @@ class C_api extends CI_Controller {
                                       GROUP BY s.ID
                                       ORDER BY d.ID,sd.StartSessions, sd.EndSessions, s.ClassGroup ASC ';
 
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ( SELECT s.ID FROM db_academic.schedule s
+                                      LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
+                                      LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                      LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                      LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                      LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                      WHERE ( s.ProgramsCampusID = "'.$data_arr['ProgramCampusID'].'"
+                                      AND s.SemesterID = "'.$data_arr['SemesterID'].'" '.$whereProdi.' '.$whereDay.' '.$whereCombinedClasses.' )
+                                       '.$dataSearch.'
+                                      GROUP BY s.ID) xx ';
+
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
         $no = $requestData['start'] + 1;
         $data = array();
@@ -11233,8 +11245,8 @@ class C_api extends CI_Controller {
         }
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefaultRow)),
-            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval( $queryDefaultRow) ,
             "data"            => $data
         );
 
@@ -11516,7 +11528,7 @@ class C_api extends CI_Controller {
                                           LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
                                           WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.$w_StatusKRS.' ) 
                                           '.$dataSearch.'
-                                          ORDER BY auts.NPM ASC';
+                                          GROUP BY auts.NPM ORDER BY auts.NPM ASC';
 
         }
 
@@ -11823,7 +11835,23 @@ class C_api extends CI_Controller {
                               ) '.$dataSearch.' 
                               GROUP BY auts.NPM ORDER BY auts.NPM ASC';
 
-        } else if($data_arr['StatusKRS']=='') {
+            $queryDefaultTotal = 'SELECT COUNT(*) Total FROM (SELECT auts.NPM FROM  db_academic.auth_students auts
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE (auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.$w_Mentor.' 
+                              AND auts.NPM NOT IN (SELECT auts_1.NPM FROM  db_academic.auth_students auts_1
+                                                  LEFT JOIN db_academic.std_krs stdk_1 ON (stdk_1.NPM = auts_1.NPM)
+                                                  WHERE (stdk_1.SemesterID = "'.$data_arr['SemesterID'].'" AND auts_1.ProdiID = "'.$data_arr['ProdiID'].'"  
+                                                  AND auts_1.StatusStudentID = "'.$data_arr['Status'].'" )
+                                                  GROUP BY auts_1.NPM)
+                              ) '.$dataSearch.' 
+                              GROUP BY auts.NPM) xx';
+
+        }
+        else if($data_arr['StatusKRS']=='') {
 
             $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
                               ma.NIP AS MentorNIP, stdk.Input_At
@@ -11835,7 +11863,18 @@ class C_api extends CI_Controller {
                               LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
                               WHERE (auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.$w_Mentor.' ) '.$dataSearch.' 
                               GROUP BY auts.NPM ORDER BY auts.NPM ASC';
-        } else {
+
+            $queryDefaultTotal = 'SELECT COUNT(*) Total FROM (SELECT auts.NPM FROM  db_academic.auth_students auts
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE (auts.ProdiID = "'.$data_arr['ProdiID'].'"  AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.$w_Mentor.' ) '.$dataSearch.' 
+                              GROUP BY auts.NPM) xx';
+
+        }
+        else {
 
             $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
                               ma.NIP AS MentorNIP, stdk.Input_At
@@ -11849,17 +11888,22 @@ class C_api extends CI_Controller {
                               AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.$w_Mentor.' ) '.$dataSearch.' 
                               GROUP BY auts.NPM ORDER BY stdk.Input_At ASC, auts.NPM ASC';
 
+            $queryDefaultTotal = 'SELECT COUNT(*) Total FROM (SELECT auts.NPM FROM  db_academic.auth_students auts
+                              LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
+                              LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
+                              LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
+                              LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE (stdk.SemesterID = "'.$data_arr['SemesterID'].'" AND auts.ProdiID = "'.$data_arr['ProdiID'].'"  
+                              AND auts.StatusStudentID = "'.$data_arr['Status'].'" '.$w_ClassOf.$w_StatusKRS.$w_Mentor.' ) '.$dataSearch.' 
+                              GROUP BY auts.NPM) xx';
+
         }
-
-
-
-
-
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
         $no = $requestData['start']+1;
         $data = array();
@@ -11944,8 +11988,8 @@ class C_api extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefaultRow)),
-            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval( $queryDefaultRow) ,
             "data"            => $data
         );
         echo json_encode($json_data);

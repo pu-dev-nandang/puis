@@ -1,43 +1,24 @@
 
-<?php
 
-$btnFilesEmp = ($this->uri->segment(3)=='files') ? 'btn-primary' : 'btn-default btn-default-primary';
-$btnInputEmp = ($this->uri->segment(3)=='input-employees') ? 'btn-primary' : 'btn-default btn-default-primary';
-$btnListEmp = ($this->uri->segment(2)=='employees' && $this->uri->segment(3)=='') ? 'btn-primary' : 'btn-default btn-default-primary';
+<div class="tabbable tabbable-custom tabbable-full-width">
+    <ul class="nav nav-tabs">
+        <li class="<?= ($this->uri->segment(2)=='employees' && $this->uri->segment(3)=='') ? 'active' : ''; ?>">
+            <a href="<?= base_url('human-resources/employees'); ?>">List Employees</a>
+        </li>
+        <li class="<?php if($this->uri->segment(3) == 'input-employees') { echo 'active'; } ?>">
+            <a href="<?= base_url('human-resources/employees/input-employees'); ?>">Add Employees</a>
+        </li>
+        <li class="<?php if($this->uri->segment(3) == 'preferences') { echo 'active'; } ?>">
+            <a href="<?= base_url('human-resources/employees/preferences'); ?>">Preferences</a>
+        </li>
+    </ul>
+    <div style="border-top: 1px solid #cccccc">
 
-?>
+        <div class="row">
+            <div class="col-md-12" style="margin-top: 30px;">
+                <?php echo $page; ?>
+            </div>
+        </div>
 
-<div class="row">
-    <div class="col-md-12" style="text-align: right;">
-
-        <a href="<?php echo base_url('human-resources/employees'); ?>" class="btn btn-default <?php echo $btnListEmp; ?>">List Employees</a> |
-        <a href="<?php echo base_url('human-resources/employees/input-employees'); ?>" class="btn <?php echo $btnInputEmp; ?>">Add Employees</a> |
-        <!--<a href="<?php //echo base_url('human-resources/employees/files'); ?>" class="btn btn-default <?php //echo $btnFilesEmp; ?>">Files Employees</a> -->
-        <hr/>
     </div>
 </div>
-
-<div class="row">
-    <div class="col-md-12">
-        <?php echo $page; ?>
-    </div>
-</div>
-
-<!--<div class="row">-->
-<!--    <div class="col-md-12">-->
-<!--        <div class="tabbable tabbable-custom tabbable-full-width">-->
-<!--            <ul class="nav nav-tabs">-->
-<!--                <li class="active"><a href="#tab_mata_kuliah" data-toggle="tab">Employees</a></li>-->
-<!--                <li><a href="#tab_mata_kuliah" data-toggle="tab">Dosen</a></li>-->
-<!--            </ul>-->
-<!--            <div class="tab-content row">-->
-                <!--=== Overview ===-->
-<!--                <div class="tab-pane active" id="tab_mata_kuliah">-->
-<!---->
-<!--                    --><?php //echo $page; ?>
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-
