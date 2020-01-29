@@ -30,7 +30,7 @@
 							<form id="form-submit-mail" action="" method="post" autocomplete="off">
 								<div class="form-group">
 									<label>From</label>
-									<input type="text" name="from" value="it.support@podomorouniversity.ac.id" readonly class="form-control readonly required" required>
+									<input type="text" name="mail_from" value="it.support@podomorouniversity.ac.id" readonly class="form-control readonly required" required>
 									<small class="text-danger text-message"></small>
 								</div>
 								<div class="form-group">
@@ -67,19 +67,23 @@
 								</div>
 								<div class="form-group">
 									<label>Type of Subject</label>
-									<select class="form-control" name="typeSubject">
-										<option value="">-Choose one-</option>										
+									<select class="form-control" name="typeSubject" id="subjectType">
+										<option value="">-Choose one-</option>	
+										<?php if(!empty($subject)){
+										foreach ($subject as $s) {
+											echo "<option value='".$s->ID."'>".$s->subject."</option>";
+										} } ?>
 									</select>
 									<small class="text-danger text-message"></small>
 								</div>
 								<div class="form-group">
 									<label>Subject</label>
-									<input type="text" name="subject" class="form-control required" required>
+									<input type="text" name="subject" class="form-control required subject-field" required>
 									<small class="text-danger text-message"></small>
 								</div>
 								<div class="form-group">
 									<label>Message</label>
-									<textarea class="form-control required" required name="message" id="message-blst"></textarea>
+									<textarea class="form-control required subject-field" required name="message" id="message-blst"></textarea>
 									<small class="text-danger text-message"></small>
 								</div>
 								<div class="form-group">
@@ -139,6 +143,7 @@
               }
             }
     	});
+		
 
 		$("#form-submit-mail").on("click",".find-participants",function(){
 			var itsme = $(this);
@@ -196,14 +201,7 @@
 					}
 				});
 
-				console.log(participantMail);
-
-				/*#please do some checking data in list mail by class name (mail)
-				#if(has class email){
-				#alert cannot add this data
-				#}else{*/
 				appendEmailTOReceiver(belongsto,participantMail);
-				/*#}*/
 
 			}
 		});
@@ -221,8 +219,8 @@
 					var isExist = $("body #message-blast #form-submit-mail .box-mail."+destination+" .list-mail > .bg-mail").hasClass('mail-'+destination+'-'+value.email+'');
 					if(!isExist){
 						storedData += '<div class="bg-mail mail-'+destination+'-'+value.email+'">'+
-								      '<input type="hidden" value="'+value.name+'" name="name[]">' +
-									  '<input type="hidden" value="'+value.email+'" name="email[]">'+
+								      '<input type="hidden" class="name" value="'+value.name+'" name="main_'+destination+'_to_name[]">' +
+									  '<input type="hidden" class="mail" value="'+value.email+'" name="mail_'+destination+'_to[]">'+
 									  '<span class="mail mail-'+key+'" title="'+value.name+'" >'+value.email+'</span> <span class="remove-mail"><i class="fa fa-times"></i></span></div>';
 					}
 				});
@@ -247,5 +245,52 @@
 				$(location).attr("href","<?=site_url('global-informations/message-blast')?>");
 			}
 		});
+
+		$("#subjectType").change(function(){
+			var ID = $(this).val();
+			if($.trim(ID).length > 0){
+				var data = {
+	          		ID : ID
+	          	};
+	          	var token = jwt_encode(data,'UAP)(*');
+				$.ajax({
+				    type : 'POST',
+				    url : base_url_js+"global-informations/subject-type/getSubjectTypeID",
+				    data : {token:token},
+				    dataType : 'json',
+				    beforeSend :function(){},
+				    error : function(jqXHR){
+		            	$('body #GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+	                        '<h4 class="modal-title">Error Fetch Student Data</h4>');
+	                    $('body #GlobalModal .modal-body').html(jqXHR.responseText);
+	                    $('body #GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+	                    $('body #GlobalModal').modal({
+	                        'show' : true,
+	                        'backdrop' : 'static'
+	                    });
+				    },success : function(response){
+				    	if(!jQuery.isEmptyObject(response)){
+				    		$("#form-submit-mail input[name=subject]").val(response.subject);
+				    		var receiver = $("#form-submit-mail .box-mail.receiver .list-mail .bg-mail").length;
+				    		var dearDestination = "Dear ";
+				    		if(receiver > 0 ){
+				    			if(receiver == 1){
+				    				var nameReceiver = $("#form-submit-mail .box-mail.receiver .list-mail .bg-mail:first > .name").val();
+				    				dearDestination += nameReceiver+",";
+				    			}else{
+				    				dearDestination += "All,";
+				    			}
+				    		}else{dearDestination="Dear,"}
+				    		var message = "<h5>"+dearDestination+"</h5>"+response.template;
+				    		$('#message-blst').summernote("code",message);
+				    	}
+				    }
+				});
+			}else{
+				$("#form-submit-mail .subject-field").val("");
+				$('#message-blst').summernote("code","");
+			}
+		});
+
 	});
 </script>

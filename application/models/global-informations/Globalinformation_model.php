@@ -254,7 +254,7 @@ class Globalinformation_model extends CI_Model{
                    {$where} {$sorted} {$lims} ";
         
         $value  = $this->db->query($string);
-        var_dump($this->db->last_query());
+        //var_dump($this->db->last_query());
         return $value;
     }
 

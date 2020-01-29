@@ -154,6 +154,27 @@
 										</div>
 									</div>
 									<div class="col-sm-6">
+										<div class="ctn insurance">
+											<div class="heading">
+												<h4><i class="fa fa-medkit"></i> Health Insurance</h4>
+											</div>
+											<div class="content">
+												<div class="row">
+													<label class="col-sm-4">Insurance Company</label>
+													<p class="col-sm-8"><?=(!empty($detail->InsuranceName) ? $detail->InsuranceName : '-')?></p>
+												</div>
+												<div class="row">
+													<label class="col-sm-4">Insurance Policy Number</label>
+													<p class="col-sm-8"><?=(!empty($detail->InsurancePolicy) ? $detail->InsurancePolicy : '-')?></p>
+												</div>
+												<div class="row">
+													<label class="col-sm-4">Effective from</label>
+													<p class="col-sm-8"><?=((!empty($detail->InsuranceEffectiveStart) && !empty($detail->InsuranceEffectiveEnd)) ? date("d M Y",strtotime($detail->InsuranceEffectiveStart))." <label>until</label> ".date("d M Y",strtotime($detail->InsuranceEffectiveEnd)) : '-')?></p>
+												</div>
+
+
+											</div>
+										</div>
 										<div class="ctn academic">
 											<div class="heading">
 												<h4><i class="fa fa-bookmark"></i> Academic</h4>

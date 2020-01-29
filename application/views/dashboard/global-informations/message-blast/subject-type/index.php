@@ -13,7 +13,7 @@
 				<i class="fa fa-chevron-left"></i> Bact to message
 			</a>
 		</div>
-		<div class="col-sm-12">
+		<!-- <div class="col-sm-12">
 			<div class="panel panel-default"  style="margin-top:10px">
 				<div class="panel-heading">
 					<h4 class="panel-title">
@@ -41,14 +41,14 @@
 							</div>
 							<div class="col-sm-2" style="line-height:75px">
 								<div class="form-group">
-									<button class="btn btn-sm btn-primary" type="button"><i class="fa fa-search"></i> Search</button>
+									<button class="btn btn-sm btn-primary btn-filter" type="button"><i class="fa fa-search"></i> Search</button>
 								</div>
 							</div>
 						</div>
 					</form>
 				</div>
 			</div>
-		</div>
+		</div> -->
 		<div class="col-sm-12">
 			<div class="panel panel-default"  style="margin-top:10px">
 				<div class="panel-heading">
@@ -60,14 +60,14 @@
 					</h4>
 				</div>
 				<div class="panel-body">					
-					<div class="fetch-data-tables">
+					<div id="fetch-data-tables">
 						<table class="table table-bordered" id="table-list-data">
 							<thead>
 								<tr>
-									<th width="2%">No</th>
+									<th width="2%">Code</th>
 									<th>Subject</th>
 									<th>Status</th>
-									<th colspan="3"></th>
+									<th width="5%"></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -89,7 +89,7 @@
         var filtering = $("#form-filter").serialize();
         var token = jwt_encode({Filter : filtering},'UAP)(*');
 
-        var dataTable = $('body #fetch-data-tables #table-list-data').DataTable( {
+        var dataTable = $('#fetch-data-tables #table-list-data').DataTable( {
             "destroy": true,
             "retrieve":true,
             "processing": true,
@@ -120,20 +120,30 @@
             },
             "initComplete": function(settings, json) {
                 //loading_modal_hide();
-                console.log(json);
             },
             "columns": [
-            	{
-	                "data": "Subject",
-	            },
-	            { "data": "IsActive",
-	              "render": function (data, type, row, meta) {
-	              	return "<p>"+((data == 1) ? "Active":"Non Active")+"</p>";
-	              }
-	          	},
 	          	{
 	                "data": "ID",
+	                "render": function (data, type, row) {
+	                	return "<label>ST00"+data+"</label>";
+	                }
 	            },
+            	{
+	                "data": "subject",
+	            },
+	            { 
+	            	"data": "IsActive",
+	            	"render": function(data, type, row){
+	            		return "<label>"+((data==1)?"Active":"Non Active")+"</label>";
+	            	}
+	          	},
+	            {
+	                "data": "ID",
+	                "render": function (data, type, row) {
+	                	return '<button type="button" class="btn btn-sm btn-warning btn-update" data-id="'+data+'"><i class="fa fa-edit"></i></button>';
+	                }
+	            },
+
 	        ],
         });
     }
@@ -143,6 +153,41 @@
 			$.ajax({
 			    type : 'POST',
 			    url : base_url_js+"global-informations/subject-type/form",
+			    dataType : 'html',
+			    beforeSend :function(){
+			    	loading_modal_show();
+			    },error : function(jqXHR){
+	            	loading_modal_hide();
+                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                        '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                    $('#GlobalModal .modal-body').html(jqXHR.responseText);
+                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                    $('#GlobalModal').modal({
+                        'show' : true,
+                        'backdrop' : 'static'
+                    });
+			    },success : function(response){
+	            	loading_modal_hide();
+					$("body #global-informations #subject-type").html(response);
+			    }
+			});
+		});
+
+		$("#form-filter .btn-filter").click(function(){
+			$('#fetch-data-tables #table-list-data').DataTable().destroy();
+			fetchingSubject();
+		});
+
+		$("body #subject-type #table-list-data").on("click",".btn-update",function(){
+			var ID = $(this).data("id");
+			var data = {
+              ID : ID,
+          	};
+          	var token = jwt_encode(data,'UAP)(*');
+			$.ajax({
+			    type : 'POST',
+			    url : base_url_js+"global-informations/subject-type/form",
+			    data : {token:token},
 			    dataType : 'html',
 			    beforeSend :function(){
 			    	loading_modal_show();
