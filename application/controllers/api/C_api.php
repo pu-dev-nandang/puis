@@ -4667,22 +4667,38 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='deleteother_master') {
                 
                 $id_otherfile = $data_arr['id_otherfile'];
-                $TypeFiles = $data_arr['TypeFiles'];
+                //$TypeFiles = $data_arr['TypeFiles'];
                 $typedata = $data_arr['typedata'];
 
                 if($typedata == "university") {
-                    $this->db->where('ID',$id_otherfile);
-                    $this->db->delete('db_research.university');
-                    $this->db->reset_query();
+
+                    $dataAttUniv = $this->db->query('SELECT * FROM db_employees.files WHERE NameUniversity = "'.$id_otherfile.'" ')->result_array();
+                    
+                    if(count($dataAttUniv)>0) {
+                        return print_r(0);
+                    } 
+                    else {
+                        $this->db->where('ID',$id_otherfile);
+                        $this->db->delete('db_research.university');
+                        $this->db->reset_query();
+                    }
                 } 
-                else if($typedata == "major"){
-                    $this->db->where('ID',$id_otherfile);
-                    $this->db->delete('db_employees.major_programstudy_employees');
-                    $this->db->reset_query();
+                else if($typedata == "major") {
+
+                    $dataAttMajor = $this->db->query('SELECT * FROM db_employees.files WHERE Major = "'.$id_otherfile.'" OR ProgramStudy = "'.$id_otherfile.'" ')->result_array();
+                    
+                    if(count($dataAttMajor)>0){
+                        return print_r(0);
+                    } 
+                    else {
+                        $this->db->where('ID',$id_otherfile);
+                        $this->db->delete('db_employees.major_programstudy_employees');
+                        $this->db->reset_query();
+                    }
                 }
                 else {
                     
-                    $dataAttdS = $this->db->query('SELECT * FROM db_employees.files WHERE TypeFiles = "'.$TypeFiles.'" ')->result_array();
+                    $dataAttdS = $this->db->query('SELECT * FROM db_employees.files WHERE TypeFiles = "'.$id_otherfile.'" ')->result_array();
                     
                     if(count($dataAttdS)>0){
                         return print_r(0);

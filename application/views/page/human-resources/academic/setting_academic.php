@@ -432,6 +432,7 @@
                     toastr.success('Success Delete Data!','Success');
                     loadtable_kat_otherfile();
                     setTimeout(function () {
+                        
                         $('.btnSubmitKatOtherFiles').html('Save').prop('disabled',false);
                          window.location.href = '';
                     },500);
