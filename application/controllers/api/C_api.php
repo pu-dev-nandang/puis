@@ -4637,7 +4637,7 @@ class C_api extends CI_Controller {
 
                 $data = $this->db->query('SELECT ID, NameFiles
                         FROM db_employees.master_files
-                        WHERE Type = "1" ')->result_array();
+                        WHERE Type = "1" AND ID NOT IN ("13") ')->result_array();
                 return print_r(json_encode($data));
 
             }
