@@ -4,15 +4,15 @@
 	#biodata .left > .info > .status > span{width: 100% }
 	#biodata .right > .info{margin-bottom: 30px;}
 	#biodata .right > .info > h2.name{margin-top: 0px}
-	#biodata .right .ctn{margin-bottom: 20px}
+	#biodata .right .ctn{margin-bottom: 30px}
 	#biodata .right .ctn > .heading{
 		background: #555555;
 	    padding: 2px 10px;
-	    color: #fff;
-	    margin: 15px auto;
+	    color: #fff;	    
 	    border-radius: 0px 10px;
 	}
 	#biodata .right .ctn > .content > .child:first-child{border-bottom: 1px solid #eee;margin-bottom: 10px}
+	#biodata .right .ctn > .content{padding: 20px 20px;border:1px solid #555555;margin-top: -10px;border-radius: 0px 0px 10px 10px}
 </style>
 <div id="detail-user">
 	<div class="row">
