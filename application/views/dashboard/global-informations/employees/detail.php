@@ -8,11 +8,11 @@
 	#biodata .right .ctn > .heading{
 		background: #555555;
 	    padding: 2px 10px;
-	    color: #fff;
-	    margin: 15px auto;
+	    color: #fff;	    
 	    border-radius: 0px 10px;
 	}
 	#biodata .right .ctn > .content > .child:first-child{border-bottom: 1px solid #eee;margin-bottom: 10px}
+	#biodata .right .ctn > .content{padding: 20px 20px;border:1px solid #555555;margin-top: -10px;border-radius: 0px 0px 10px 10px}
 </style>
 <div id="detail-user">
 	<div class="row">
@@ -48,7 +48,7 @@
 									<div class="col-sm-6">
 										<div class="ctn historical">
 											<div class="heading">
-												<h4><i class="fa fa-user"></i> Personal details</h4>
+												<h4><i class="fa fa-user"></i> Personal Details</h4>
 											</div>
 											<div class="content">
 												<div class="row">
@@ -56,7 +56,7 @@
 													<p class="col-sm-9"><?=$detail->Name?></p>
 												</div>
 												<div class="row">
-													<label class="col-sm-3">Level of Education</label>
+													<label class="col-sm-3">Last Education Level</label>
 													<p class="col-sm-9"><?=$detail->EmpLevelEduName."-".$detail->EmpLevelDesc?></p>
 												</div>												
 												<div class="row">
