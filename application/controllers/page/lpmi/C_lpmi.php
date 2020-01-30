@@ -46,6 +46,7 @@ class C_lpmi extends Lpmi {
 
     public function edom_list_result(){
         $data['department'] = parent::__getDepartement();
+        $data['semester'] = $this->General_model->fetchData("db_academic.semester",array(),"ID","ASC")->result();
         $page = $this->load->view('page/'.$data['department'].'/edom/list_result',$data,true);
         $this->menu_edom($page);
     }
@@ -58,14 +59,15 @@ class C_lpmi extends Lpmi {
             $semeseterID = (!empty($explodeSemester[0]) ? $explodeSemester[0] : 0);
             $semeseterYear = (!empty($explodeSemester[1]) ? $explodeSemester[1] : 0);
             $semeseterOddEvent = (!empty($explodeSemester[2]) ? $explodeSemester[2] : 0);
+            $semesterType = ($semeseterOddEvent==2)? "genap":"ganjil";
             
             $explodeProdi = explode(".", $data['prodi']);
             $prodiID = (!empty($explodeProdi[0]) ? $explodeProdi[0] : 0);
             $prodiCode = (!empty($explodeProdi[1]) ? $explodeProdi[1] : null);
-            
+
             $message = "";
-            if((!empty($semeseterID) && !empty($semeseterYear)) && (!empty($prodiID)) ){
-                $tablename = "edomrecap".$semeseterYear;
+            if((!empty($semeseterID) && !empty($data['intake'])) && (!empty($prodiID)) ){
+                $tablename = "edomrecap_".$prodiCode."_".$semeseterYear."_".$semesterType."_".$semeseterYear;
                 //chek existing table
                 $isExistTable = $this->General_model->callStoredProcedure("select * from information_schema.`TABLES` where table_schema = 'db_statistik' and table_name = '".$tablename."'")->row();
                 if(!empty($isExistTable)){
@@ -98,7 +100,7 @@ class C_lpmi extends Lpmi {
                         redirect(site_url('lpmi/lecturer-evaluation/download-result'));
                     }
                 }else{
-                    $message = "Your request data is unavailable.";
+                    $message = "Your request data is unavailable. Database is unavailable.";
                     $this->session->set_flashdata("message",$message);
                     redirect(site_url('lpmi/lecturer-evaluation/download-result'));
                 }

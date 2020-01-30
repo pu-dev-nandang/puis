@@ -32,7 +32,10 @@
                     <tbody>                      
                       <tr>
                         <td>
-                          <img class="im-pp" style="width:100%" src="<?=base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)?>" alt="<?=$detail_ori->Name?>">
+                        <?php $url_image = 'uploads/students/ta_'.$TA.'/'.$detail_ori->Photo;
+                            $srcImg = (file_exists($url_image)) ? base_url('/uploads/students/ta_'.$TA.'/'.$row['Photo'])
+                                    : base_url('images/icon/userfalse.png') ; ?>
+                          <img class="im-pp" style="width:100%" src="<?=$srcImg?>" alt="<?=$detail_ori->Name?>">
                         </td>
                         <td><p class="npm"><?=$detail_ori->NPM?></p>
                             <p class="name"><?=$detail_ori->Name?></p>
@@ -142,10 +145,18 @@
                     <tbody>
                       <tr>
                         <td>
-                          <?php if(!empty($detail_req->Photo)){ ?>
-                          <img class="im-pp" style="width:100%" src="<?=base_url().'/uploads/students/ta_'.$TA.'/'.$detail_req->Photo?>" alt="<?=$detail_req->Name?>">
-                          <?php }else{ ?>
-                          <img class="im-pp" style="width:100%" src="<?=base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)?>" alt="<?=$detail_ori->Name?>">
+                          <?php if(!empty($detail_req->Photo)){ 
+                            $url_image = 'uploads/students/ta_'.$TA.'/'.$detail_req->Photo;
+                            $srcImg = (file_exists($url_image)) ? base_url('/uploads/students/ta_'.$TA.'/'.$row['Photo'])
+                                    : base_url('images/icon/userfalse.png') ;
+                          ?>
+                          <img class="im-pp" style="width:100%" src="<?=$srcImg?>" alt="<?=$detail_req->Name?>">
+                          <?php }else{ 
+                            $url_image = 'uploads/students/ta_'.$TA.'/'.$detail_ori->Photo;
+                            $srcImg = (file_exists($url_image)) ? base_url('/uploads/students/ta_'.$TA.'/'.$row['Photo'])
+                                    : base_url('images/icon/userfalse.png') ;
+                          ?>
+                          <img class="im-pp" style="width:100%" src="<?=$srcImg?>" alt="<?=$detail_ori->Name?>">
                           <?php } ?>
                         </td>
                         <td><p class="npm"><?=$detail_req->NPM?></p>
@@ -184,8 +195,9 @@
                       <tr>
                         <td><img class="im-card" style="width:100%" src="<?=base_url('/uploads/students/insurance_card/'.(!empty($detail_req->Card) ? $detail_req->Card : $detail_ori->Insurance->Card))?>" ></td>
                         <td><?=(!empty($detail_req->InsuranceOTH) ? $detail_req->InsuranceOTH : (!empty($detail_req->Insurance) ? $detail_req->Insurance->Name : $detail_req->InsuranceID ) )?></td>
-                        <td><p class="insurance-policy <?=($detail_req->InsurancePolicy != $detail_ori->Insurance->InsurancePolicy) ? 'different':''?>"><?=$detail_req->InsurancePolicy?></p></td>
-                        <td colspan="3"><p class="effective-from"><span class="valid-start <?=($detail_req->EffectiveStart != $detail_ori->Insurance->EffectiveStart) ? 'different':''?> "><?=date("d M Y",strtotime($detail_req->EffectiveStart))?></span> until <span class="valid-end  <?=($detail_req->EffectiveEnd != $detail_ori->Insurance->EffectiveEnd) ? 'different':''?>"><?=date("d M Y",strtotime($detail_req->EffectiveEnd))?></span></p></td>
+                        <td><p class="insurance-policy <?=(!empty($detail_ori->Insurance) ? ($detail_req->InsurancePolicy != $detail_ori->Insurance->InsurancePolicy) ? 'different':'' : 'different') ?>"><?=$detail_req->InsurancePolicy?></p></td>
+                        <td colspan="3"><p class="effective-from"><span class="valid-start <?=(!empty($detail_ori->Insurance) ? (($detail_req->EffectiveStart != $detail_ori->Insurance->EffectiveStart) ? 'different':'') : 'different') ?> "><?=date("d M Y",strtotime($detail_req->EffectiveStart))?></span> until 
+                                                                  <span class="valid-end  <?=(!empty($detail_ori->Insurance) ? (($detail_req->EffectiveEnd != $detail_ori->Insurance->EffectiveEnd) ? 'different':'') : 'different') ?>"><?=date("d M Y",strtotime($detail_req->EffectiveEnd))?></span></p></td>
                       </tr>
                     </tbody>
                     <thead>
