@@ -17,7 +17,7 @@
 				<div class="panel-body">
 					<form id="form-edom-results" action="<?=site_url('lpmi/lecturer-evaluation/request-edom')?>" method="post">
 						<div class="row">
-							<div class="col-sm-6">
+							<div class="col-sm-4">
 								<div class="form-group">
 									<label>Study Program</label>
 									<select class="form-control required" required id="filterProdi" name="prodi">
@@ -27,7 +27,25 @@
 								</div>
 							</div>
 							
-							<div class="col-sm-6">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<label>Year Intake</label>
+									<select class="form-control required" required name="intake">
+										<option value="">Choose one</option>
+										<?php if(!empty($semester)){ $intake ="";
+										foreach ($semester as $s) {	
+											if($s->Year != $intake){	
+												echo "<option value='".$s->Year."'>".$s->Year."</option>";
+											}
+											$intake = $s->Year;
+										} } ?>
+									</select>
+									<small class="text-danger text-message"></small>
+								</div>
+							</div>
+
+
+							<div class="col-sm-4">
 								<div class="form-group">
 									<label>Semester</label>
 									<select class="form-control required" required id="filterSemester" name="semester">
