@@ -19,13 +19,32 @@
 								<div class="panel-body">
 									<form id="form-generate" action="<?=site_url('it/generate-edom/request')?>" method="post" autocomplete="off">
 										<div class="form-group">
-											<label>Semester</label>
-											<select class="form-control required" required name="semester">
+											<label>Study Program</label>
+											<select class="form-control required" required name="prody" id="filterProdi">
+												<option value="">Choose one</option>
+											</select>
+											<small class="text-danger text-message"></small>
+										</div>
+
+										<div class="form-group">
+											<label>Year Intake</label>
+											<select class="form-control required" required name="intake">
 												<option value="">Choose one</option>
 												<?php if(!empty($semester)){ 
-												foreach ($semester as $s) {
-													echo '<option value="'.$s->ID.'#'.$s->Year.'">'.$s->Name.'</option>';
+												foreach ($semester as $i) {
+													if($i->Year != $intake){
+														echo '<option value="'.$i->Year.'">'.$i->Year.'</option>';
+													}
+													$intake = $i->Year;
 												} } ?>
+											</select>
+											<small class="text-danger text-message"></small>
+										</div>
+
+										<div class="form-group">
+											<label>Semester</label>
+											<select class="form-control required" required name="semester" id="filterSemester">
+												<option value="">Choose one</option>
 											</select>
 											<small class="text-danger text-message"></small>
 										</div>
@@ -57,7 +76,7 @@
 												<tr>
 													<td><?=$no++?></td>
 													<td><?=$e->TableName?></td>
-													<td><?=$e->LastUpdated?></td>
+													<td><?=date("d M Y H:i:s",strtotime($e->LastUpdated))?></td>
 												</tr>
 												<?php } }else{echo "<tr><td colspan='3'>Empty Results</td></tr>";} ?>
 											</tbody>
@@ -75,6 +94,8 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
+		loSelectOptionSemester('#filterSemester','');
+		loadSelectOptionBaseProdi('#filterProdi','');
 		$("#form-generate").on("click",".btn-request",function(){
 			var error = false;
 			var itsme = $(this);
@@ -95,9 +116,13 @@
 		 	var totalError = itsform.find(".error").length;
 		  	if(error && totalError == 0 ){
 		  		var itsme = $(this);
+	    		var Prody = itsform.find("select[name=prody]").val();
+	    		var Intake = itsform.find("select[name=intake]").val();
 	    		var Semester = itsform.find("select[name=semester]").val();
 				var data = {
 	              Semester : Semester,
+	              Prody : Prody,
+	              Intake : Intake,
 	          	};
 	          	var token = jwt_encode(data,'UAP)(*');
 	          	$.ajax({
@@ -105,14 +130,17 @@
 				    url : itsform.attr("action"),
 				    data : {token:token},
 				    dataType : 'json',
-				    beforeSend :function(){loading_modal_show();},
+				    beforeSend :function(){
+				    	loading_modal_show();
+				    	$("body #NotificationModal .modal-body").html('<div class="generate-request-load text-center"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i> <br> wait for a secoond, we are generating your data.<h4>Please dont close this windows..!!</h4></div>');
+				    },
 		            error : function(jqXHR){
 		            	loading_modal_hide();
 		            	$("body #modalGlobal .modal-body").html(jqXHR.responseText);
 			      	  	$("body #modalGlobal").modal("show");
 				    },success : function(response){
 				    	loading_modal_hide();
-				    	location.reload();
+				    	$(location).attr('href', base_url_js+"it/generate-edom");
 				    }
 				});
 		  	}else{

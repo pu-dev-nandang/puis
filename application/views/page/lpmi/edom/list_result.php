@@ -19,15 +19,6 @@
 						<div class="row">
 							<div class="col-sm-6">
 								<div class="form-group">
-									<label>Semester</label>
-									<select class="form-control required" required id="filterSemester" name="semester">
-										<option value="">Choose one</option>
-									</select>
-									<small class="text-danger text-message"></small>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group">
 									<label>Study Program</label>
 									<select class="form-control required" required id="filterProdi" name="prodi">
 										<option value="">Choose one</option>
@@ -35,6 +26,17 @@
 									<small class="text-danger text-message"></small>
 								</div>
 							</div>
+							
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label>Semester</label>
+									<select class="form-control required" required id="filterSemester" name="semester">
+										<option value="">Choose one</option>
+									</select>
+									<small class="text-danger text-message"></small>
+								</div>
+							</div>
+							
 						</div>
 						<div class="row">
 							<div class="col-sm-12 text-center">

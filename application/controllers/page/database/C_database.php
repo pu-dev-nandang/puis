@@ -592,33 +592,92 @@ class C_database extends Globalclass {
     }
 
 
-    public function testAD(){
-        $urlAD = URLAD.'__api/Create';
-        echo "URL:".$urlAD;
-        $adMessage = "";
-        $data_arr['NPM'] = 11140005;
-        $Access_Card_Number = 111111;
-        $is_url_exist = $this->m_master->is_url_exist($urlAD);
-        
-        if ($is_url_exist) {
-            //update to AD
-            $data_arr1 = [
-                'pager' => $Access_Card_Number ,
-            ];
-            $dataAD = array(
-                'auth' => 's3Cr3T-G4N',
-                'Type' => 'Student',
-                'UserID' => $data_arr['NPM'],
-                'data_arr' => $data_arr1,
-            );
+    public function saveStudentHealtInfo(){
+        $data = $this->input->post();
+        $myName = $this->session->userdata('Name');
+        $myNIP = $this->session->userdata('NIP');
+        if($data){
+            $conditions = array("NPM"=>$data['NPM']);
+            $isExist = $this->General_model->fetchData("db_academic.auth_students",$conditions)->row();
+            if(!empty($isExist)){
+                $data['EffectiveStart'] = date("Y-m-d",strtotime($data['EffectiveStart']));
+                $data['EffectiveEnd'] = date("Y-m-d",strtotime($data['EffectiveEnd']));
+                
+                $uri = "ta_".$isExist->Year."/".$isExist->NPM."/".preg_replace('/\s+/', '-', $isExist->Name)."#stdHI";
+                $message = "";
+                if(!empty($_FILES['insuranceCard']['name'])){
+                    $ispic = false;
+                    $file_name = $_FILES['insuranceCard']['name'];
+                    $file_size =$_FILES['insuranceCard']['size'];
+                    $file_tmp =$_FILES['insuranceCard']['tmp_name'];
+                    $file_type=$_FILES['insuranceCard']['type'];
+                    if($file_type == "image/jpeg" || $file_type == "image/png"){
+                        $ispic = true;
+                    }else {
+                        $ispic = false;
+                        $err_msg     .= "Extention image '".$file_name."' doesn't allowed.";
+                    }
+                    if($file_size > 2097152){ //2Mb
+                        $err_msg     .= "Size of image '".$file_name."'s too large from 2Mb.";
+                    }else { $ispic = true; }
 
-            $url = URLAD.'__api/Edit';
-            $token = $this->jwt->encode($dataAD,"UAP)(*");
-            $update = $this->m_master->apiservertoserver_Response($url,$token,true);
-            $adMessage = $update; 
-        }else{$adMessage="Windows active directory server not connected";}
-        
+                    $newFilename = 'insurance-card-'.$data['NPM']."-REQ-".date('Y-m-d').".jpg";
+
+                    //create folder for an album 
+                    if($_SERVER['SERVER_NAME']=='studentpu.podomorouniversity.ac.id'){
+                        $pathInPieces = explode('/', $_SERVER['DOCUMENT_ROOT']);
+                        $t = count($pathInPieces) - 1;
+                        $newPath = "";
+                        for ($i=0; $i < $t; $i++) { 
+                            $newPath .= $pathInPieces[$i]."/";
+                        }
+                        $folderPCAM = $newPath.'pcam/';
+                    }else{
+                        $folderPCAM = $_SERVER['DOCUMENT_ROOT'].'/puis/';
+                    }
+
+                    //create folder for an album 
+                    $pathFile = $folderPCAM.".//uploads//students//insurance_card";
+                    //$folderName = APPPATH."../".$pathFile;
+                    if(!file_exists($pathFile)){
+                        mkdir($pathFile,0777);
+                        $error403 = "<html><head><title>403 Forbidden</title></head><body><p>Directory access is forbidden.</p></body></html>";
+                        file_put_contents($pathFile."/index.html", $error403);
+                    }
+                    
+                    $moveimage = move_uploaded_file($file_tmp,$pathFile."//".$newFilename);
+                    if($moveimage) {$data['Card'] = $newFilename;}
+                    $message .= ((!$moveimage) ? "<b>Failed upload image.</b> ":"");
+                }
+
+                //check insurance other
+                if(!empty($data['InsuranceOTH'])){
+                    $isSameCompany = $this->General_model->fetchData("db_employees.master_company",array("Name"=>$data['InsuranceOTH']))->row();
+                    if(empty($isSameCompany)){
+                        $insertInsurance = $this->General_model->insertData("db_employees.master_company",array("Name"=>$data['InsuranceOTH'],"IsActive"=>1,"Category"=>"insurance","createdby"=>$myNIP));
+                        $data['InsuranceID'] = $this->db->insert_id();
+                    }
+                }
+
+                $isExistInsurance = $this->General_model->fetchData("db_academic.std_insurance",$conditions)->row();
+                if(!empty($isExistInsurance)){
+                    //if(!empty($_FILES['insuranceCard']['name'])){ unlink("./uploads/students/insurance_card/".$isExistInsurance->Card); }
+                    $data['editedby'] = $myName;
+                    $saveInsurance = $this->General_model->updateData("db_academic.std_insurance",$data,$conditions);
+                }else{
+                    $data['createdby'] = $myName;
+                    $saveInsurance = $this->General_model->insertData("db_academic.std_insurance",$data);
+                }
+                $message = (($saveInsurance) ? "Successfully":"Failed")." saved.";
+            }else{
+                $message = "Student does not founded.";
+                $uri = "404-Not-found";
+            }
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('database/students/edit-students/'.$uri));
+        }
     }
+
     /*END ADDED BY FEBRI @ NOV 2019*/
 
     private function pingAddress($url=null) {

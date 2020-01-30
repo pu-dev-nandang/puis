@@ -11,6 +11,7 @@
 	#table-list-data .detail-user > p{margin:0px;font-weight: bold;color: #4d7496}
 	#table-list-data .detail-user > p.name{text-transform: uppercase;}
 	#table-list-data .detail-user > p.email{font-weight: 100;color: #000}
+	#table-list-data .bday{text-align: center;background: #1ca7dc;color: #fff;padding: 2px}
 </style>
 <div id="employee-list">
 	<div class="row">
@@ -126,6 +127,19 @@
 								<a class="btn btn-default" href="">Clear Filter</a>
 							</div>
 						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="list-emp-bday hidden">
+			<div class="col-sm-3">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title"><i class="fa fa-birthday-cake"></i> Happy Birthdays</h4>
+					</div>
+					<div class="panel-body" style="overflow:auto;max-height:150px">
+						<div class="list-bday">..</div>
 					</div>
 				</div>
 			</div>
@@ -246,8 +260,44 @@
 	    return indexed_array;
 	}
 
+	
+
+	function checkImg(src) {
+	  return $("<img>").attr('src', src);
+	}
+
+	function listBday() {
+		$.ajax({
+		    type : 'GET',
+		    url : base_url_js+"global-informations/employeesBDay",
+		    dataType : 'json',
+            error : function(jqXHR){
+            	$("body #modalGlobal .modal-body").html(jqXHR.responseText);
+	      	  	$("body #modalGlobal").modal("show");
+		    },success : function(response){
+		    	if(response.length > 0){
+		    		$("body #employee-list .list-emp-bday").prev().toggleClass("col-sm-12 col-sm-9");
+		    		var listBday = "<ul class='nav birthdays'>";
+		    		$.each(response, function(k, v) {
+					    listBday += "<li>";
+		    			/*var photo = "";
+		    			var photoURI = base_url_js+"uploads/employees/"+v.Photo;		    			
+		    			listBday+="<img class='pic pic-"+v.NIP+"' src='"+photoURI+"'>";*/
+					    listBday += "<p>"+v.NIP+"-"+v.Name+" ("+v.DivisionMain+")</p></li>";
+					});
+					listBday += "</ul>";
+		    		$("body #employee-list .list-emp-bday .list-bday").html(listBday);
+		    		$("body #employee-list .list-emp-bday").removeClass("hidden");
+		    	}
+		    }
+		});
+	}
+
+	
+
     $(document).ready(function(){
     	fetchingData();
+    	listBday();
     	$("#form-filter .btn-filter").click(function(){
     		$('#fetch-data-tables .table').DataTable().destroy();
     		fetchingData();
@@ -279,15 +329,16 @@
 
     	$("#form-filter select[name=division]").change(function(){
     		var value = $(this).val();
-    		if($.trim(value) != ''){
+    		if($.trim(value) > 0){
     			$("#form-filter select[name=position]").prop("disabled",false);
     		}
     	});
     	$("#form-filter select[name=position]").change(function(){
     		var division = $("#form-filter select[name=division]").val();
-    		if($.trim(division) == ''){
-    			division.addClass("required");
+    		if($.trim(division).length == 0){
     			alert("Please fill up field Division");
+    			$(this).val("");
+    			$(this).prop("disabled",true);
     		}
     	});
     	$('#form-filter').on('keyup keypress', function(e) {

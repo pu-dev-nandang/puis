@@ -447,11 +447,6 @@ class C_global_informations extends Globalclass {
     	
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
-    		/*if(!empty($v->PositionMain)){
-    			$splitPosition = explode(".", $v->PositionMain);
-    			$division = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitPosition[0]))->row();
-    			$position = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitPosition[1]))->row();
-    		}*/
     		$url_image = './uploads/employees/'.$v->Photo;
     		$srcImg =  base_url('images/icon/userfalse.png');
             if($v->Photo != '' && $v->Photo != null){
@@ -467,7 +462,7 @@ class C_global_informations extends Globalclass {
     		$nestedData = array();    		
     		$nestedData[] = ($no++);
     		$nestedData[] = $empBox;
-    		$nestedData[] = (!empty($v->PlaceOfBirth) ?$v->PlaceOfBirth.', ':'' ).date("d F Y",strtotime($v->DateOfBirth));
+    		$nestedData[] = (!empty($v->PlaceOfBirth) ?$v->PlaceOfBirth.', ':'' ).date("d F Y",strtotime($v->DateOfBirth)).(!empty($v->isMyBirthday) ? "<p class='bday'>It's My Birthday</p>" : "");
     		$nestedData[] = "<center>".$v->EmpReligion.'</center>';
     		$nestedData[] = "<center>".(!empty($v->Gender) ? (($v->Gender == "L") ? "Male":"Female") : "").'</center>';
     		$nestedData[] = $v->EmpLevelEduName;
@@ -525,6 +520,16 @@ class C_global_informations extends Globalclass {
         	}
         	$this->load->view('dashboard/global-informations/employees/detail',$data);
         }else{show_404();}
+    }
+
+
+    public function getEmployeesBDay(){
+        $json = array();
+        $param[] = array("field"=>'DATE_FORMAT(em.DateOfBirth,"%m-%d") = DATE_FORMAT(now(),"%m-%d")',"data"=>" ","filter"=>"AND",);    
+        $param[] = array("field"=>"es.Type","data"=>" = 'emp' ","filter"=>"AND",);    
+        $result = $this->Globalinformation_model->fetchEmployee(false,$param)->result();
+        $json = (!empty($result) ? $result : 0);
+        echo json_encode($json);
     }
     
 /*END EMPLOYEE*/

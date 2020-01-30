@@ -474,12 +474,14 @@ class C_it extends It_Controler {
       if($data){
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($data['token'],$key);        
-        $explode = explode("#", $data_arr['Semester']);
-        $idSemester = $explode[0];
-        $semesterYear = $explode[1];
-        $execute = $this->General_model->callStoredProcedure("call db_academic.fetchGenerateEdom(".$idSemester.",".$semesterYear.")");
-        //var_dump($execute);
-        $insertLastUpdate = $this->General_model->insertData("db_statistik.lastupdated",array("TableName"=>"edomRecap".$semesterYear,"LastUpdated"=>date("Y-m-d H:i:s")));
+        $getprody = $this->General_model->fetchData("db_academic.program_study",array("ID"=>$data_arr['Prody']))->row();
+        $prodyName = (!empty($getprody) ? preg_replace('/\s+/', '_', $getprody->Code) : "PID_".$data_arr['Prody']);
+        $getSemester = $this->General_model->fetchData("db_academic.semester",array("ID"=>$data_arr['Semester']))->row();
+        $semesterName = (!empty($getSemester) ? $getSemester->Year."_".(($getSemester->Code == 2) ? "genap":"ganjil") : "SID".$data_arr['Semester']);
+        $execute = $this->General_model->callStoredProcedure("call db_academic.fetchGenerateEdom(".$data_arr['Semester'].",".$data_arr['Intake'].",".$data_arr['Prody'].",'".$prodyName."_".$semesterName."')");        
+        $insertLastUpdate = $this->General_model->insertData("db_statistik.lastupdated",array("TableName"=>strtolower("edomRecap_".$prodyName."_".$semesterName."_".$data_arr['Intake']),
+                                                                                              "LastUpdated"=>date("Y-m-d H:i:s")
+                                                                                              ));
       }
 
       echo json_encode($json);
