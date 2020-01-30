@@ -22,7 +22,7 @@
 				</div>
 			</div>
 
-			<div class="col-sm-4">
+			<!-- <div class="col-sm-4">
 				<div class="panel panel-default" id="click-me" data-href="global-informations/message-blast">
 					<div class="panel-body">
 						<div class="row card">
@@ -36,7 +36,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 			
 			
 

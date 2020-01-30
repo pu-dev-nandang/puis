@@ -17,19 +17,22 @@
 					<input type="hidden" name="ID" value="<?=(!empty($detail) ? $detail->ID : null)?>">
 						<div class="form-group">
 							<label>Subject</label>
-							<input type="text" name="subject" class="form-control required" required value="<?=(!empty($detail) ? $detail->Subject : null)?>" placeholder="Subject message">
+							<input type="text" name="subject" class="form-control required" required value="<?=(!empty($detail) ? $detail->subject : null)?>" placeholder="Subject message">
 						</div>
 						<div class="form-group">
 							<label>Message</label>
 							<textarea class="form-control required" required name="template" id="template-message"><?=!empty($detail) ? $detail->template : null?></textarea>
 						</div>
-						<div class="form-group">
-							<label>Active</label>
+						<div class="row form-group">
+							<label class="col-sm-1">Active</label>
+							<div class="col-sm-2">
+								
 							<select class="form-control required" required name="IsActive">
 								<option value="">Choose One</option>
-								<option value="1" <?=(!empty($detail) ? (($detail==1) ? 'selected':'') : '')?> >Yes</option>
-								<option value="0" <?=(!empty($detail) ? (($detail==0) ? 'selected':'') : '')?> >No</option>
+								<option value="1" <?=(!empty($detail) ? (($detail->IsActive==1) ? 'selected':'') : '')?> >Yes</option>
+								<option value="0" <?=(!empty($detail) ? (($detail->IsActive==0) ? 'selected':'') : '')?> >No</option>
 							</select>
+							</div>
 						</div>
 						<div class="btn-group">
 							<button class="btn btn-sm btn-primary btn-save" type="button">Save changes</button>

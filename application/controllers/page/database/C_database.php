@@ -368,6 +368,7 @@ class C_database extends Globalclass {
         // load Nationality
         $data['Arr_nationality'] = json_encode($this->m_master->caribasedprimary('db_admission.country','ctr_active',1));
         $data['Religion'] = $this->General_model->fetchData("`db_admission`.`agama`",array())->result();
+        $data['companyInsurance'] = $this->General_model->fetchData("db_employees.master_company",array("Category"=>"insurance","IsActive"=>1),"Name","ASC")->result();
         $content = $this->load->view('page/database/students/editStudent',$data,true);
         $this->temp($content);
     }
@@ -487,12 +488,16 @@ class C_database extends Globalclass {
                     $dataInsurance['InsurancePolicy'] = $getTempStudentReq->InsurancePolicy;
                     $dataInsurance['EffectiveStart'] = $getTempStudentReq->EffectiveStart;
                     $dataInsurance['EffectiveEnd'] = $getTempStudentReq->EffectiveEnd;
-                    //clone card 
-                    $cardName = $getTempStudentReq->Card;
-                    $clonepath = "./uploads/students/insurance_card/";
-                    $cloneNewFile = str_replace("REQ", "APPV", $getTempStudentReq->Card);
-                    $cloneCard = copy($clonepath.$cardName, $clonepath.$cloneNewFile);
-                    $dataInsurance['Card'] = $cloneNewFile;
+                    //clone card
+                    if(!empty($getTempStudentReq->Card)){
+                        $cardName = $getTempStudentReq->Card;
+                        $clonepath = "./uploads/students/insurance_card/";
+                        $cloneNewFile = str_replace("REQ", "APPV", $getTempStudentReq->Card);
+                        $cloneCard = copy($clonepath.$cardName, $clonepath.$cloneNewFile);
+                        unlink($clonepath.$cardName);
+                        $dataInsurance['Card'] = $cloneNewFile;
+                    }
+                    //end clone
                     $dataInsurance['NPM'] = $getTempStudentReq->NPM;
                     unset($getTempStudentReq->InsuranceID);
                     unset($getTempStudentReq->InsuranceOTH);
@@ -522,12 +527,16 @@ class C_database extends Globalclass {
                         $updateAuthStd = $this->General_model->updateData("db_academic.auth_students",array("KTPNumber"=>$KTPNumber,"Access_Card_Number"=>$Access_Card_Number),$conditions);
                         //insert new company insurance
                         if(!empty($dataInsurance['InsuranceOTH']) && empty($dataInsurance['InsuranceID'])){
-                            $insertInsurance = $this->General_model->insertData("db_employees.master_company",array("Name"=>$dataInsurance['InsuranceOTH'],"IsActive"=>0,"Category"=>"insurance","createdby"=>$myNIP));
+                            $isSameCompany = $this->General_model->fetchData("db_employees.master_company",array("Name"=>$dataInsurance['InsuranceOTH']))->row();
+                            if(empty($isSameCompany)){
+                                $insertInsurance = $this->General_model->insertData("db_employees.master_company",array("Name"=>$dataInsurance['InsuranceOTH'],"IsActive"=>1,"Category"=>"insurance","createdby"=>$myNIP));
+                                $dataInsurance['InsuranceID'] = $this->db->insert_id();
+                            }
                         }
                         //update Insurance
                         $isExistInsurance = $this->General_model->fetchData("db_academic.std_insurance",$conditions)->row();
                         if(!empty($isExistInsurance)){
-                            unlink($clonepath.$cardName);
+                            //if(!empty($getTempStudentReq->Card)){ unlink($clonepath.$cardName); }
                             $dataInsurance['editedby'] = $myName;
                             $saveInsurance = $this->General_model->updateData("db_academic.std_insurance",$dataInsurance,$conditions);
                         }else{

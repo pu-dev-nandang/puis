@@ -540,6 +540,7 @@ class C_global_informations extends Globalclass {
 
     public function messageBlastForm(){
     	$data['title'] = "Create New Message Blast";
+        $data['subject'] = $this->General_model->fetchData("db_mail_blast.subject_type",array("IsActive"=>1))->result();
     	$page = $this->load->view('dashboard/global-informations/message-blast/form',$data,true);
         $this->blast_global_informations($page);    	
     }
@@ -621,29 +622,26 @@ class C_global_informations extends Globalclass {
         if($reqdata){
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
-            $param = array();$orderBy=" NPM DESC ";
+            $param = array();
             if(!empty($data_arr['Filter'])){            
                 $parse = parse_str($data_arr['Filter'],$output);
-                if(!empty($output['student'])){
-                    $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$output['student']."%' ","filter"=>"AND",);    
-                    $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$output['student']."%' ","filter"=>"OR",);
-                    $param[] = array("field"=>"ath.`EmailPU`","data"=>" like '%".$output['student']."%') ","filter"=>"OR",);
-                }                  
+                if(!empty($output['subject'])){
+                    $param[] = array("field"=>"subject","data"=>" like '%".$output['subject']."%' ","filter"=>"AND",);
+                }    
+                if(!empty($output['status'])){
+                    $param[] = array("field"=>"IsActive","data"=>" =".$output['status']." ","filter"=>"AND",);
+                }
             }
 
             if(!empty($reqdata['search']['value']) ) {
                 $search = $reqdata['search']['value'];
-
-                $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$search."%' ","filter"=>"AND",);    
-                $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$search."%' ","filter"=>"OR",);    
-                $param[] = array("field"=>"ps.`NameEng`","data"=>" like '%".$search."%' )","filter"=>"OR",);    
+                $param[] = array("field"=>"subject","data"=>" like '%".$search."%' ","filter"=>"AND");
             }            
-
+            
             $data = array();
-            $totalData = $this->Globalinformation_model->fetchSubjectType(true,false,$param);
+            $totalData = $this->Globalinformation_model->fetchSubjectType(true,$param)->row();
             $TotalDataRS = (!empty($totalData) ? $totalData->Total : 0);
-            $result = $this->Globalinformation_model->fetchSubjectType(false,false,$param,(!empty($reqdata['start']) ? $reqdata['start']:0),(!empty($reqdata['length']) ? $reqdata['length'] : 0),$orderBy);
-            var_dump($result);die();
+            $result = $this->Globalinformation_model->fetchSubjectType(false,$param,(!empty($reqdata['start']) ? $reqdata['start']:0),(!empty($reqdata['length']) ? $reqdata['length'] : 0))->result();
             $json_data = array(
                 "draw"            => intval( $reqdata['draw'] ),
                 "recordsTotal"    => intval($TotalDataRS),
@@ -661,7 +659,11 @@ class C_global_informations extends Globalclass {
     public function subjectTypeForm(){
         $data = $this->input->post();
         if($data){
-            $data['detail'] = $this->General_model->fetchData("db_mail_blast",array("ID"=>$data['ID']))->row();
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            if(!empty($data_arr['ID'])){
+                $data['detail'] = $this->General_model->fetchData("db_mail_blast.subject_type",array("ID"=>$data_arr['ID']))->row();                
+            }
         }
         $this->load->view('dashboard/global-informations/message-blast/subject-type/form',$data,false);
     }
@@ -694,6 +696,23 @@ class C_global_informations extends Globalclass {
             redirect(site_url('global-informations/subject-type')); 
 
         }else{show_404();}
+    }
+
+
+    public function getSubjectTypeID(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            
+            $isExist = $this->General_model->fetchData("db_mail_blast.subject_type",array("ID"=>$data_arr['ID']))->row();
+            if(!empty($isExist)){
+                $json = $isExist;
+            }
+        }
+
+        echo json_encode($json);
     }
 /*END SUBJECT TYPE*/
 
