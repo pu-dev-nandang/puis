@@ -212,8 +212,8 @@
 			}
 			else
 			{
-				// bool = false;
-				bool = true;
+				bool = false;
+				// bool = true;
 			}
 			
 			if (!bool) {
