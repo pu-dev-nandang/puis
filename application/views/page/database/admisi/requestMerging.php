@@ -33,7 +33,7 @@
                       <tr>
                         <td>
                         <?php $url_image = 'uploads/students/ta_'.$TA.'/'.$detail_ori->Photo;
-                            $srcImg = (file_exists($url_image)) ? base_url('/uploads/students/ta_'.$TA.'/'.$row['Photo'])
+                            $srcImg = (file_exists($url_image)) ? base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)
                                     : base_url('images/icon/userfalse.png') ; ?>
                           <img class="im-pp" style="width:100%" src="<?=$srcImg?>" alt="<?=$detail_ori->Name?>">
                         </td>
@@ -147,13 +147,13 @@
                         <td>
                           <?php if(!empty($detail_req->Photo)){ 
                             $url_image = 'uploads/students/ta_'.$TA.'/'.$detail_req->Photo;
-                            $srcImg = (file_exists($url_image)) ? base_url('/uploads/students/ta_'.$TA.'/'.$row['Photo'])
+                            $srcImg = (file_exists($url_image)) ? base_url('/uploads/students/ta_'.$TA.'/'.$detail_req->Photo)
                                     : base_url('images/icon/userfalse.png') ;
                           ?>
                           <img class="im-pp" style="width:100%" src="<?=$srcImg?>" alt="<?=$detail_req->Name?>">
                           <?php }else{ 
                             $url_image = 'uploads/students/ta_'.$TA.'/'.$detail_ori->Photo;
-                            $srcImg = (file_exists($url_image)) ? base_url('/uploads/students/ta_'.$TA.'/'.$row['Photo'])
+                            $srcImg = (file_exists($url_image)) ? base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)
                                     : base_url('images/icon/userfalse.png') ;
                           ?>
                           <img class="im-pp" style="width:100%" src="<?=$srcImg?>" alt="<?=$detail_ori->Name?>">
