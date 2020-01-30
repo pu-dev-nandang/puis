@@ -82,7 +82,7 @@
         <!-- /Sidebar Toggler -->
 
         <!-- Top Left Menu -->
-        <ul class="nav navbar-nav navbar-left hidden-xs hidden-sm">
+        <ul class="nav navbar-nav navbar-left">
             <li class="<?php if($this->uri->segment(1)=='dashboard'){echo 'current';} ?>">
                 <a href="<?php echo base_url('dashboard'); ?>">
                     <i class="icon-home"></i>
