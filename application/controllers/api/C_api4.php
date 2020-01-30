@@ -107,4 +107,21 @@ class C_api4 extends CI_Controller {
 
     }
 
+  /*ADDED BY FEBRI @ JAN 2020*/
+    public function getStdInsurance(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist = $this->m_api->getStdInsurance(array("a.NPM"=>$data_arr['NPM']))->row();
+            if(!empty($isExist)){
+                $json = $isExist;
+            }
+        }
+
+        echo json_encode($json);
+    }
+    /*END ADDED BY FEBRI @ JAN 2020*/
+
 }
