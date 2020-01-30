@@ -160,13 +160,6 @@
 
                         loading_button('#btnSubmitResponse');
 
-                        // $('#GlobalModal').modal({
-                        //     'show' : true,
-                        //     'backdrop' : 'static'
-                        // });
-
-                        // loading_modal_show();
-
                         var data = {
                             action : 'studentReportInsertRespinse',
                             dataForm : {

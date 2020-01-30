@@ -6552,7 +6552,18 @@ class C_api3 extends CI_Controller {
 
         }
         else if($data_arr['action']=='getStudentReportService'){
-            $dataOpen = $this->db->query()->result_array();
+
+            // 0 = Open, 1 = On Process, 2 = Close
+
+            $dataOpen = $this->db->query('SELECT COUNT(*) AS Total FROM db_ticketing.ss_report WHERE Status = "0" ')->result_array();
+            $dataProgress = $this->db->query('SELECT COUNT(*) AS Total FROM db_ticketing.ss_report WHERE Status = "1" ')->result_array();
+
+            $result = array(
+                'Open' => $dataOpen[0]['Total'],
+                'Progress' => $dataProgress[0]['Total']
+            );
+
+            return print_r(json_encode($result));
         }
         else if($data_arr['action']=='readStudentReport'){
             $NPM = $data_arr['NPM'];
