@@ -474,12 +474,6 @@ class C_it extends It_Controler {
       if($data){
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($data['token'],$key);        
-        
-        /*$getprody = $this->General_model->fetchData("db_academic.program_study",array("ID"=>$data_arr['Prody']))->row();
-        $prodyName = (!empty($getprody) ? preg_replace('/\s+/', '_', $getprody->Code) : "PID_".$data_arr['Prody']);
-        
-        $getSemester = $this->General_model->fetchData("db_academic.semester",array("ID"=>$data_arr['Semester']))->row();
-        $semesterName = (!empty($getSemester) ? $getSemester->Year."_".(($getSemester->Code == 2) ? "genap":"ganjil") : "SID".$data_arr['Semester']);*/
         $explodePrody = explode(".", $data_arr['Prody']);
         $prodyID = $explodePrody[0];
         $prodyCode = $explodePrody[1];
