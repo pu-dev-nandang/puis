@@ -76,11 +76,12 @@ class C_lpmi extends Lpmi {
                     
                     if(!empty($results)){
                         header("Content-type: application/vnd-ms-excel");
-                        header("Content-Disposition: attachment; filename=edom-recap-".$semeseterYear."-".(($semeseterOddEvent == 2) ? "Ganjil":"Genap").".xls");
-                        echo '<table border="1"><thead><tr><th>No</th><th>Code</th><th>Course</th><th>Group</th><th>Program Study</th><th>Lecturer</th><th>NIP</th><th>Question</th><th>Total Student</th><th>Rate</th></tr></thead><tbody>';
+                        header("Content-Disposition: attachment; filename=edom-recap-".$prodiCode."-".$semeseterYear."-".$semesterType.".xls");
+                        echo '<table border="1"><thead><tr><th>No</th><th>Intake</th><th>Code</th><th>Course</th><th>Group</th><th>Program Study</th><th>Lecturer</th><th>NIP</th><th>Question</th><th>Total Student</th><th>Rate</th></tr></thead><tbody>';
                         $no = 1;
                         foreach ($results as $v) {
                             echo '<tr height="50px"><td>'.$no.'</td>'.
+                                 '<td>'.$v->Intake.'</td>'.
                                  '<td>'.$v->CourseCode.'</td>'.
                                  '<td>'.$v->CourseNameEng.'</td>'.
                                  '<td>'.$v->ClassGroup.'</td>'.
