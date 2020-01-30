@@ -265,7 +265,7 @@
                     '</tr>'+
                  '</thead>'+
                  '<tbody></tbody>'+
-            '</table></div></div></div>';
+                  '</table></div></div></div>';
 
               $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Employees'+'</h4>');
               $('#GlobalModalLarge .modal-body').html(html);
@@ -348,7 +348,7 @@
                     '</tr>'+
                  '</thead>'+
                  '<tbody></tbody>'+
-            '</table></div></div></div>';
+                  '</table></div></div></div>';
 
               $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Students'+'</h4>');
               $('#GlobalModalLarge .modal-body').html(html);
@@ -428,28 +428,48 @@
             }   
         },
 
+        // Dom_PolaNoSurat : function(data){
+        //     var html = '<div class = "thumbnail" style = "margin-top:5px;">'+
+        //                     '<div class = "row">'+
+        //                         '<div class = "col-md-12">'+
+        //                             '<div style = "padding:15px;">'+
+        //                                 '<h3><u><b>Pola Nomor Surat</b></u></h3>'+
+        //                             '</div>'+
+        //                             '<p style ="color : red;">Sample : 041/UAP/R/SKU/X/2019</p>'+
+        //                             '<p>'+
+        //                                 'Keterangan : <br/>'+
+        //                                 '* 041 : Increment, 3 character <br/>'+    
+        //                                 '* UAP : Prefix <br/>'+    
+        //                                 '* R : Prefix <br/>'+    
+        //                                 '* SKU : Prefix <br/>'+    
+        //                                 '* X : Bulan Romawi <br/>'+    
+        //                                 '* 2019 : Tahun <br/>'+
+        //                                 '* / : delimiter <br/>'+
+        //                             '</p>'+
+        //                             '<br/>'+
+        //                             '<div class = "form-group">'+
+        //                                 '<label>Prefix</label>'+
+        //                                 '<input type = "text" class="form-control Input" value = "UAP/R/SKU"  field="PolaNoSurat" name = "prefix" key ="SET" />'+
+        //                             '</div>'+
+        //                         '</div>'+
+        //                     '</div>'+
+        //                 '</div>';
+        //     $('#Page_SET').append(html);       
+                                            
+        // },
+
         Dom_PolaNoSurat : function(data){
+            // console.log(data);
+            var OPCategoryDocument =  App_form_input.OPCategoryDocument(data['choose']);
             var html = '<div class = "thumbnail" style = "margin-top:5px;">'+
                             '<div class = "row">'+
                                 '<div class = "col-md-12">'+
                                     '<div style = "padding:15px;">'+
                                         '<h3><u><b>Pola Nomor Surat</b></u></h3>'+
                                     '</div>'+
-                                    '<p style ="color : red;">Sample : 041/UAP/R/SKU/X/2019</p>'+
-                                    '<p>'+
-                                        'Keterangan : <br/>'+
-                                        '* 041 : Increment, 3 character <br/>'+    
-                                        '* UAP : Prefix <br/>'+    
-                                        '* R : Prefix <br/>'+    
-                                        '* SKU : Prefix <br/>'+    
-                                        '* X : Bulan Romawi <br/>'+    
-                                        '* 2019 : Tahun <br/>'+
-                                        '* / : delimiter <br/>'+
-                                    '</p>'+
-                                    '<br/>'+
                                     '<div class = "form-group">'+
-                                        '<label>Prefix</label>'+
-                                        '<input type = "text" class="form-control Input" value = "UAP/R/SKU"  field="PolaNoSurat" name = "prefix" key ="SET" />'+
+                                        '<label>Category Document</label>'+
+                                        OPCategoryDocument+
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
@@ -457,6 +477,20 @@
             $('#Page_SET').append(html);       
                                             
         },
+
+        OPCategoryDocument : function(dt,selectedOP=''){
+          var html = '<select class = "form-control Input" field = "PolaNoSurat" name = "ID_category_document" key="SET">';
+          for (var i = 0; i < dt.length; i++) {
+            var selected = (dt[i].ID == selectedOP) ? 'selected' : '';
+            var token_config = jwt_encode(dt[i].Config, "UAP)(*");
+            html += '<option value = "'+dt[i].ID+'" token_config ="'+token_config+'"  '+selected+' >'+dt[i].NameCategorySrt+'</option>';
+          }
+
+          html  += '</select>';
+          return html;
+        },
+
+
 
         Dom_Signature : function(data){
             var html = '<div class = "thumbnail" style = "margin-top:5px;">';
@@ -975,6 +1009,7 @@
                     DocumentName : $('.Input[name="DocumentName"]').val() ,
                     DocumentAlias : $('.Input[name="DocumentAlias"]').val() ,
                     DepartmentArr : DepartmentArr,
+                    ID_category_document : $('.Input[name="ID_category_document"] option:selected').val(),
                 };
                 
                 var token = jwt_encode(data,'UAP)(*');
@@ -1078,8 +1113,13 @@
         // -- //
 
         set_SET : function(attrname,attrva,attrkey,attrfield,el){
-            if (attrname == 'prefix') {
-               settingTemplate[attrkey]['PolaNoSurat']['setting']['prefix'] = attrva;
+
+            // if (attrname == 'prefix') {
+            //    settingTemplate[attrkey]['PolaNoSurat']['setting']['prefix'] = attrva;
+            // }
+            if (attrname == 'ID_category_document') {
+                var token_config = jQuery.parseJSON(jwt_decode(el.find('option:selected').attr('token_config')));
+                settingTemplate[attrkey]['PolaNoSurat'] = token_config['SET']['PolaNoSurat'];
             }
             else if(attrname == 'user'){
                 var keyindex = parseInt(el.closest('.Approval').attr('keyindex'));
@@ -1128,9 +1168,18 @@
         set_GET : function(attrname,attrva,attrkey,attrfield,el){
             var keynumber = el.closest('.GET').attr('keynumber');
             var keyindex = parseInt(el.closest('.GET').attr('keyindex'));
-            var dt = jwt_decode(el.attr('datatoken'));
-            settingTemplate[attrkey][attrname][keyindex]['user'] = {};
-            settingTemplate[attrkey][attrname][keyindex]['user'] = dt;
+           
+            if ($(this).val() != '') {
+               var dt = jwt_decode(el.attr('datatoken'));
+               settingTemplate[attrkey][attrname][keyindex]['user'] = {};
+               settingTemplate[attrkey][attrname][keyindex]['user'] = dt;
+            }
+            else
+            {
+              settingTemplate[attrkey][attrname][keyindex]['user'] = {};
+              settingTemplate[attrkey][attrname][keyindex]['number'] = keynumber;
+            }
+            
         },
 
 

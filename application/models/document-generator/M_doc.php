@@ -163,6 +163,37 @@ class M_doc extends CI_Model {
 		$this->GRAB = $this->m_grab->__generate($GRAB);
     }
 
+    private function __TagStrSignature($line){
+
+        $str = 'SET.Signature.Position';
+        //$bool = false; 
+        $ArrRS = [];
+        foreach ($line as $v) {
+            if(preg_match_all('/{+(.*?)}/', $v, $matches)){
+                // print_r($matches);
+                for ($i=0; $i < count($matches); $i++) { 
+                    $arr = $matches[$i];
+                    // print_r($arr);
+                    for ($j=0; $j < count($arr); $j++) { 
+                        if (strpos($arr[$j], $str) !== false) {
+                            $strRS = $arr[$j];
+                            $strRS = str_replace("{","",$strRS);
+                            $strRS = str_replace("}","",$strRS);
+                            if (!in_array($strRS, $ArrRS)){
+                                $ArrRS[] = $strRS;
+                            }    
+                        }
+                    }
+                    
+                }
+                
+            }
+        }
+        
+        $rs = $ArrRS;
+        return $rs;
+    }
+
     public function preview_template($Input){
     	$this->load->model('document-generator/m_set');
     	$this->load->model('document-generator/m_user');
@@ -179,15 +210,41 @@ class M_doc extends CI_Model {
     	        $ex = explode('.', $str);
     	        if (count($ex) > 0) {
     	        	switch ($ex[0]) {
+                        case $this->KeyUSER:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyUSER] = $this->m_user->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            break;
+                        case $this->KeyGET:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyGET] = $this->m_get->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            
+                            break;
     	        		case $this->KeySET:
-    	        			
     	        			if (!in_array($ex[0], $Filtering)){
-    	        				$NameObj = $ex[0];
-    	        				$getObjInput = $this->__getObjInput($Input,$NameObj);
-    	        				$callback_data = $this->m_set->preview_template($getObjInput);
-    	        				// print_r($callback_data);
+    	        				$NameObj = $ex[0]; // SET
+    	        				$getObjInput = $this->__getObjInput($Input,$NameObj); // array key pola surat dan signature
+
+                                $TagStrSignature = $this->__TagStrSignature($line); // cek approval by USER or GET
+                                if (count($TagStrSignature > 0)) {
+                                    $TagStrSignature[] = $Input['GET']; // last key for get
+                                }
+
+    	        				$callback_data = $this->m_set->preview_template($getObjInput,'','',$TagStrSignature);
     	        				$rs[$this->KeySET] = $callback_data;
-
     	        			}
     	        			else
     	        			{
@@ -195,17 +252,7 @@ class M_doc extends CI_Model {
     	        			}
 
     	        			break;
-    	        		case $this->KeyUSER:
-    	        			if (!in_array($ex[0], $Filtering)){
-    	        				$NameObj = $ex[0];
-    	        				$getObjInput = $this->__getObjInput($Input,$NameObj);
-    	        				$rs[$this->KeyUSER] = $this->m_user->preview_template($getObjInput);
-    	        			}
-    	        			else
-    	        			{
-    	        				continue;
-    	        			}
-    	        			break;
+    	        		
     	        		case $this->KeyINPUT:
     	        			if (!in_array($ex[0], $Filtering)){
     	        				$NameObj = $ex[0];
@@ -227,7 +274,6 @@ class M_doc extends CI_Model {
     	        			{
     	        				continue;
     	        			}
-    	        			
     	        			break;
     	        		case $this->KeyTABLE:
     	        			if (!in_array($ex[0], $Filtering)){
@@ -240,25 +286,14 @@ class M_doc extends CI_Model {
     	        				continue;
     	        			}
     	        			break;
-                        case $this->KeyGET:
-                            if (!in_array($ex[0], $Filtering)){
-                                $NameObj = $ex[0];
-                                $getObjInput = $this->__getObjInput($Input,$NameObj);
-                                $rs[$this->KeyGET] = $this->m_get->preview_template($getObjInput);
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                            
-                            break;
+                        
     	        	}
 
     	        	$Filtering[] = $ex[0];
     	        }
     	    }
     	}
-
+        // die();
     	return $this->__preview_template($rs,$FileTemplate);
     }
 
@@ -294,7 +329,6 @@ class M_doc extends CI_Model {
 		    		    				$arrKomponen = $matches[1];
 		    		    				$arrValue = $rsGET[$keyRS][$setStr];
 		    		    				$this->__SETWriteSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue);
-		    		    				
 		    		    			}
 		    		    		}
 	    		    			break;
@@ -705,17 +739,23 @@ class M_doc extends CI_Model {
     		}
 
     		// write name
-                //SET.Signature.Position
-                $setValue = 'SET.Signature.Position'.'#'.$keyApproval;
-                $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
-
-                $setValue = 'SET.Signature.NIP'.'#'.$keyApproval;
-                $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
-
-        		// if (array_key_exists(2, $arrKomponen)) {
-        		// 	$setValue = $arrKomponen[2];
-        		// 	$TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
-        		// }
+                for ($j=0; $j < count($arrKomponen); $j++) {
+                    $str = $arrKomponen[$j];
+                    $setValue = 'SET.Signature.Position'.'#'.$keyApproval;
+                    if (strpos($str, $setValue) !== false) {
+                        // $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+                        $TemplateProcessor->setValue($str,$arrValue[$i]['NameEMP']);
+                        break;
+                    }
+                    
+                    $setValue = 'SET.Signature.NIP'.'#'.$keyApproval;
+                    if (strpos($str, $setValue) !== false) {
+                        // $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+                        $TemplateProcessor->setValue($str,$arrValue[$i]['NameEMP']);
+                        break;
+                    }
+                   
+                }
 
                 // write NIP
                 $setValue = 'Signature.NIP'.'#'.$keyApproval;
@@ -762,6 +802,7 @@ class M_doc extends CI_Model {
     		'UpdatedBy' => $this->session->userdata('NIP'),
     		'UpdatedAt' => date('Y-m-d H:i:s'),
             'DepartmentCreated' => $this->session->userdata('DepartmentIDDocument'),
+            'ID_category_document' => $Input['ID_category_document'],
     	];
     	$this->db->insert('db_generatordoc.document',$dataSave);
         $ID_document = $this->db->insert_id();
@@ -874,8 +915,13 @@ class M_doc extends CI_Model {
     	        			if (!in_array($ex[0], $Filtering)){
     	        				$NameObj = $ex[0];
     	        				$getObjInput = $this->__getObjInput($Input,$NameObj);
-    	        				$callback_data = $this->m_set->preview_template($getObjInput);
-    	        				// print_r($callback_data);
+
+                                $TagStrSignature = $this->__TagStrSignature($line); // cek approval by USER or GET
+                                if (count($TagStrSignature > 0)) {
+                                    $TagStrSignature[] = $Input['GET']; // last key for get
+                                }
+
+    	        				$callback_data = $this->m_set->preview_template($getObjInput,'','',$TagStrSignature);
     	        				$rs[$this->KeySET] = $callback_data;
     	        			}
     	        			else
@@ -989,7 +1035,13 @@ class M_doc extends CI_Model {
                             if (!in_array($ex[0], $Filtering)){
                                 $NameObj = $ex[0];
                                 $getObjInput = $this->__getObjInput($Input,$NameObj);
-                                $callback_data = $this->m_set->preview_template($getObjInput,$ID,$DepartmentID);
+
+                                $TagStrSignature = $this->__TagStrSignature($line); // cek approval by USER or GET
+                                if (count($TagStrSignature > 0)) {
+                                    $TagStrSignature[] = $Input['GET']; // last key for get
+                                }
+
+                                $callback_data = $this->m_set->preview_template($getObjInput,$ID,$DepartmentID,$TagStrSignature);
                                 // print_r($callback_data);
                                 $rs[$this->KeySET] = $callback_data;
                             }
@@ -1188,17 +1240,33 @@ class M_doc extends CI_Model {
                 }
             }
 
-            // write name di arrKomponen key ke 2
-            if (array_key_exists(2, $arrKomponen)) {
-                $setValue = $arrKomponen[2];
-                $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
-            }
+            
+            // write name
+                for ($j=0; $j < count($arrKomponen); $j++) {
+                    $str = $arrKomponen[$j];
+                    $setValue = 'SET.Signature.Position'.'#'.$keyApproval;
+                    if (strpos($str, $setValue) !== false) {
+                        // $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+                        $TemplateProcessor->setValue($str,$arrValue[$i]['NameEMP']);
+                        break;
+                    }
+                    
+                    $setValue = 'SET.Signature.NIP'.'#'.$keyApproval;
+                    if (strpos($str, $setValue) !== false) {
+                        // $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+                        $TemplateProcessor->setValue($str,$arrValue[$i]['NameEMP']);
+                        break;
+                    }
+                   
+                }
 
-            // write name di arrKomponen key ke 3
-            if (array_key_exists(3, $arrKomponen)) {
-                $setValue = $arrKomponen[3];
+                // write NIP
+                $setValue = 'Signature.NIP'.'#'.$keyApproval;
                 $TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
-            }
+                // if (array_key_exists(3, $arrKomponen)) {
+                //  $setValue = $arrKomponen[3];
+                //  $TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
+                // }
             
         }
         
@@ -1342,7 +1410,13 @@ class M_doc extends CI_Model {
                             if (!in_array($ex[0], $Filtering)){
                                 $NameObj = $ex[0];
                                 $getObjInput = $this->__getObjInput($Input,$NameObj);
-                                $callback_data = $this->m_set->preview_template($getObjInput,$ID,$DepartmentID);
+
+                                $TagStrSignature = $this->__TagStrSignature($line); // cek approval by USER or GET
+                                if (count($TagStrSignature > 0)) {
+                                    $TagStrSignature[] = $Input['GET']; // last key for get
+                                }
+
+                                $callback_data = $this->m_set->preview_template($getObjInput,$ID,$DepartmentID,$TagStrSignature);
                                 // print_r($callback_data);
                                 $rs[$this->KeySET] = $callback_data;
                             }
@@ -1993,7 +2067,13 @@ class M_doc extends CI_Model {
                             if (!in_array($ex[0], $Filtering)){
                                 $NameObj = $ex[0];
                                 $getObjInput = $this->__getObjInput($Input,$NameObj);
-                                $callback_data = $this->m_set->preview_template($getObjInput,$ID,$DepartmentID);
+
+                                $TagStrSignature = $this->__TagStrSignature($line); // cek approval by USER or GET
+                                if (count($TagStrSignature > 0)) {
+                                    $TagStrSignature[] = $Input['GET']; // last key for get
+                                }
+
+                                $callback_data = $this->m_set->preview_template($getObjInput,$ID,$DepartmentID,$TagStrSignature);
                                 $rs[$this->KeySET] = $callback_data;
 
                                 $rs['SET']['PolaNoSurat']['NoSuratOnly'] = $G_dt[0]['NoSuratOnly'];
@@ -2126,7 +2206,13 @@ class M_doc extends CI_Model {
                             if (!in_array($ex[0], $Filtering)){
                                 $NameObj = $ex[0];
                                 $getObjInput = $this->__getObjInput($Input,$NameObj);
-                                $callback_data = $this->m_set->preview_template($getObjInput,$ID,$DepartmentID);
+
+                                $TagStrSignature = $this->__TagStrSignature($line); // cek approval by USER or GET
+                                if (count($TagStrSignature > 0)) {
+                                    $TagStrSignature[] = $Input['GET']; // last key for get
+                                }
+
+                                $callback_data = $this->m_set->preview_template($getObjInput,$ID,$DepartmentID,$TagStrSignature);
                                 $rs[$this->KeySET] = $callback_data;
                                 $rs['SET']['PolaNoSurat']['NoSuratOnly'] = $G_dt[0]['NoSuratOnly'];
                                 $rs['SET']['PolaNoSurat']['NoSuratStr'] = $G_dt[0]['NoSuratFull'];
@@ -2610,53 +2696,70 @@ class M_doc extends CI_Model {
     }
 
     private function __SETWriteGET($TemplateProcessor,$arrKomponen,$obj){
-        // print_r($arrKomponen);
+         // print_r($arrKomponen);die();
         // print_r($obj);die();
         for ($z=0; $z < count($arrKomponen); $z++) { 
             $komponen = $arrKomponen[$z];
+            // print_r($komponen);
             $ex = explode('.', $komponen);
-            // print_r($ex);die();
-            // get Type
-            $keyType = $ex[1];
+            // print_r($ex);
+            if ($ex[0] == 'GET') {
+                // get Type
+                $keyType = $ex[1];
 
-            // get key field
-            $get_keyField = $ex[2];
-            // get numbering by #
-            $keyFieldArr = explode('#', $get_keyField);
-            $keyField =  $keyFieldArr[0];
-            $keyNumber = $keyFieldArr[1];
+                // get key field
+                $get_keyField = $ex[2];
+                // get numbering by #
+                $keyFieldArr = explode('#', $get_keyField);
+                $keyField =  $keyFieldArr[0];
+                $keyNumber = $keyFieldArr[1];
 
-            foreach ($obj as $key => $v) {
-               switch ($key) {
-                   case 'EMP':
-                   case 'MHS':
-                       if ($keyType == $key) {
-                           $arr_dt = $obj[$key];
-                           for ($i=0; $i < count($arr_dt); $i++) {
-                                $number = $arr_dt[$i]['number'];
-                                if ($arr_dt[$i]['Choose'] == $keyField && $number == $keyNumber) {
-                                    $arr_get_value = $arr_dt[$i]['user'];
-                                    $TemplateProcessor->setValue($komponen,$arr_get_value[$keyField]);
-                                    foreach ($arr_get_value as $col => $value) {
-                                        $setValue = $keyType.'.'.$col.'#'.$keyNumber;
-                                        $TemplateProcessor->setValue($setValue,$value);
-                                    }
-                                } 
-                               
+                foreach ($obj as $key => $v) {
+                   switch ($key) {
+                       case 'EMP':
+                       case 'MHS':
+                           if ($keyType == $key) {
+                               $arr_dt = $obj[$key];
+                               for ($i=0; $i < count($arr_dt); $i++) {
+                                    $number = $arr_dt[$i]['number'];
+                                    if ($arr_dt[$i]['Choose'] == $keyField && $number == $keyNumber) {
+                                        $arr_get_value = $arr_dt[$i]['user'];
+                                        if(!empty($arr_get_value)) {
+                                            $TemplateProcessor->setValue($komponen,$arr_get_value[$keyField]);
+                                            foreach ($arr_get_value as $col => $value) {
+                                                $setValue = $keyType.'.'.$col.'#'.$keyNumber;
+                                                $TemplateProcessor->setValue($setValue,$value);
+                                            }
+                                        }
+                                        else
+                                        {
+
+                                            $setValue ='GET.'.$keyType.'.'.'NIP'.'#'.$keyNumber;
+                                            $TemplateProcessor->setValue($setValue,'');
+
+                                            $setValue = $keyType.'.'.'Name'.'#'.$keyNumber;
+                                            $TemplateProcessor->setValue($setValue,'');
+                                            // print_r($arrKomponen);die();
+                                        }
+                                        
+                                    } 
+                                   
+                               }
                            }
-                       }
-                       
-                       break;
-                   default:
-                       # code...
-                       break;
-               }
+                           
+                           break;
+                       default:
+                           # code...
+                           break;
+                   }
+                }
             }
+            
 
         }
         
 
-        // die();
+         // die();
 
     }
 
@@ -2703,6 +2806,48 @@ class M_doc extends CI_Model {
         return $rs;
     }
 
-    
+    public function LoadTableCategorySrt($dataToken=[]){
+        $this->load->model('ticketing/m_general');
+        $rs = [];
+        $AddWhere = '';
+        $DepartmentID = $this->session->userdata('DepartmentIDDocument');
+        if (!empty($dataToken)) {
+            if (array_key_exists('Active', $dataToken)) {
+                $Active = $dataToken['Active'];
+                $AddWhere .= ' where a.Active = "'.$Active.'"';
+            }
+        }
+
+        $sql = 'select a.*,qdx.NameDepartment,b.Name as NameUpdated
+                from db_generatordoc.category_document as a 
+                '.$this->m_general->QueryDepartmentJoin('a.Department','qdx').'
+                join db_employees.employees as b on a.UpdatedBy = b.NIP
+                '.$AddWhere.'
+                order by ID desc
+                ';
+        $query = $this->db->query($sql,array())->result_array();
+        $data = array();
+        for ($i=0; $i < count($query); $i++) {
+            $nestedData = array();
+            $row = $query[$i]; 
+            $nestedData[] = $row['NameCategorySrt'];
+            $nestedData[] = $row['DescSrt'];
+            $nestedData[] = $row['NameDepartment'];
+            $nestedData[] = $row['UpdatedBy'];
+            $nestedData[] = $row['NameUpdated'];
+            $nestedData[] = $row['UpdatedAt'];
+            $nestedData[] = $row['ID'];
+            $token = $this->jwt->encode($row,"UAP)(*");
+            $nestedData[] = $token;
+            $data[] = $nestedData;
+        }
+        $rs = array(
+            "draw"            => intval( 0 ),
+            "recordsTotal"    => intval(count($query)),
+            "recordsFiltered" => intval( count($query) ),
+            "data"            => $data
+        );
+        return $rs;
+    }
   
 }

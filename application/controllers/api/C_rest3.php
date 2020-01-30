@@ -2816,7 +2816,7 @@ class C_rest3 extends CI_Controller {
       }
       
       $totalData = $this->Globalinformation_model->fetchTotalDataStudent($param)->Total;
-      $result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$requestData['start'],$requestData['length'],'');
+      $result = $this->Globalinformation_model->fetchStudentsPS(false,false,$param,$requestData['start'],$requestData['length'],'');
       $No = (int)$requestData['start'] + 1;
       $data = array();
       // print_r($totalData);die();

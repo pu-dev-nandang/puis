@@ -1,5 +1,3 @@
-
-<?php //print_r($G_data);die(); ?>
 <?php if (count($G_data) == 0): ?>
 	<div class="thumbnail" style="color: red; padding: 20px;">No Result Data</div>
 <?php else: ?>

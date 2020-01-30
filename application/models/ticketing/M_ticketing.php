@@ -941,7 +941,8 @@ class M_ticketing extends CI_Model {
                         where a.TicketStatus = 1
                         '.$Addwhere.'
                         and (
-                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                             b.Name LIKE "'.$requestData['search']['value'].'%" or
+                             a.NoTicket LIKE "'.$requestData['search']['value'].'%"
                         )
                         and (select count(*) as total from db_ticketing.received where TicketID = a.ID) = 1
                         ';
@@ -957,7 +958,8 @@ class M_ticketing extends CI_Model {
                         where a.TicketStatus = 1
                         '.$Addwhere.'
                         and (
-                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                             b.Name LIKE "'.$requestData['search']['value'].'%" or
+                             a.NoTicket LIKE "'.$requestData['search']['value'].'%"
                         )
                         and (select count(*) as total from db_ticketing.received where TicketID = a.ID) = 1
                     )xx';
@@ -1007,7 +1009,8 @@ class M_ticketing extends CI_Model {
                         where a.TicketStatus = 2
                         '.$Addwhere.'
                         and (
-                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                             b.Name LIKE "'.$requestData['search']['value'].'%" or
+                             a.NoTicket LIKE "'.$requestData['search']['value'].'%"
                         )
                         ';
                 $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
@@ -1023,7 +1026,8 @@ class M_ticketing extends CI_Model {
                         where a.TicketStatus = 2
                         '.$Addwhere.'
                         and (
-                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                             b.Name LIKE "'.$requestData['search']['value'].'%" or 
+                             a.NoTicket LIKE "'.$requestData['search']['value'].'%"
                         )
                     )xx';
                 break;
@@ -1079,7 +1083,8 @@ class M_ticketing extends CI_Model {
                         where a.TicketStatus = '.$TicketStatus.'
                         '.$Addwhere.'
                         and (
-                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                             b.Name LIKE "'.$requestData['search']['value'].'%" or 
+                             a.NoTicket LIKE "'.$requestData['search']['value'].'%"
                         )
                         ';
                 // print_r($sql);die();
@@ -1094,7 +1099,8 @@ class M_ticketing extends CI_Model {
                         where a.TicketStatus = '.$TicketStatus.'
                         '.$Addwhere.'
                         and (
-                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                             b.Name LIKE "'.$requestData['search']['value'].'%" or 
+                             a.NoTicket LIKE "'.$requestData['search']['value'].'%"
                         )
                     )xx';
                 break;

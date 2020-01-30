@@ -194,17 +194,15 @@
 
 
     $(document).on('click','.btnSubmitKatOtherFiles', function () {
-        var type_otherfiles = $('#master_kat_otherfiles').val();
+        
         var name_katother = $('#name_kat_otherfiles').val();
 
-            if(type_otherfiles!='' && type_otherfiles!=null
-                && name_katother!='' && name_katother!=null
+            if(name_katother!='' && name_katother!=null
                 ){
                 loading_button('.btnSubmitKatOtherFiles');
 
                 var data = {
                     action : 'update_mster_katother',
-                    type_otherfiles : type_otherfiles,
                     name_katother : name_katother
                 };
 
@@ -288,12 +286,8 @@
             '         <div class="col-md-12">' +
             '           <h4><b> ADD CATEGORY FILES</b></h4>' +
             '           <div class="well">' +
-            '               <div class="form-group">' +
-            '                   <label>Category File</label>'+
-            '                   <input class="form-control" id="master_kat_otherfiles">' +
-            '               </div>' +
              '               <div class="form-group">' +
-            '                   <label>Name File</label>'+
+            '                   <label>Name Category Other File</label>'+
             '                   <input class="form-control" id="name_kat_otherfiles">' +
             '               </div>' +
             '           </div>' +
@@ -384,9 +378,8 @@
         $('#tablekatotherfile').html('<table class="table table-bordered table-striped" id="tableDataKatOtherFile">     '+
             '                    <thead>                                                                                '+
             '                    <tr style="background: #20485A;color: #FFFFFF;">                                       '+
-            '                        <th style="width: 5%; text-align: center;">No</th>                                  '+
-            '                        <th style="width: 25%; text-align: center;">Category File</th>         '+
-             '                       <th style="width: 25%; text-align: center;">Name File</th>         '+
+            '                        <th style="width: 5%; text-align: center;">No</th>                                 '+
+            '                        <th style="width: 25%; text-align: center;">Name Category File</th>                '+
             '                        <th style="text-align: center;width: 8%;">Action</th>                              '+
             '                    </tr>                                                                                  '+
             '                    </thead>                                                                               '+
@@ -439,6 +432,7 @@
                     toastr.success('Success Delete Data!','Success');
                     loadtable_kat_otherfile();
                     setTimeout(function () {
+                        
                         $('.btnSubmitKatOtherFiles').html('Save').prop('disabled',false);
                          window.location.href = '';
                     },500);

@@ -502,6 +502,7 @@
 		},
 
 		SubmitPreviewPDF : function(selector){
+			// console.log('asd');return;
 			// console.log(settingTemplate.INPUT);
 			for (var i = 0; i < settingTemplate.INPUT.length; i++) {
 				$('.Input').each(function(e){
@@ -534,14 +535,30 @@
 				var el = $(this);
 				var keynumber = el.closest('.GET').attr('keynumber');
 				var keyindex = parseInt(el.closest('.GET').attr('keyindex'));
-				var dt = jwt_decode(el.attr('datatoken'));
-				// console.log(dt);
-				// settingTemplate['GET'][field][keyindex]['user'] = {};
-				// settingTemplate['GET'][field][keyindex]['user'] = dt;
-				settingTemplate['GET'][field][keyindex] = dt;
+				if ($(this).val() != '') {
+					var dt = jwt_decode(el.attr('datatoken'));
+					
+					if (dt['number'] !== undefined) {
+						settingTemplate['GET'][field][keyindex] = dt;
+					}
+					else
+					{
+						settingTemplate['GET'][field][keyindex]['user'] = {};
+						settingTemplate['GET'][field][keyindex]['user'] = dt;
+						settingTemplate['GET'][field][keyindex]['number'] = keynumber;
+					}
+				}
+				else
+				{
+					// delete settingTemplate['GET'][field][keyindex];
+					settingTemplate['GET'][field][keyindex]['user'] = {};
+					settingTemplate['GET'][field][keyindex]['number'] = keynumber;
+				}
+				
 			})
 
-			// console.log(settingTemplate['GET']);return;
+			// console.log(settingTemplate['GET']);
+			// console.log(settingTemplate['GET']['EMP'].length)
 
 			var url = base_url_js+"__request-document-generator/__previewbyUserRequest";
 		    var data = {
