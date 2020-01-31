@@ -67,7 +67,7 @@ class C_lpmi extends Lpmi {
 
             $message = "";
             if((!empty($semeseterID) && !empty($data['intake'])) && (!empty($prodiID)) ){
-                $tablename = "edomrecap_".$prodiCode."_".$semeseterYear."_".$semesterType."_".$semeseterYear;
+                $tablename = "edomRecap_".$prodiCode."_".$semeseterYear."_".$semesterType."_".$semeseterYear;
                 //chek existing table
                 $isExistTable = $this->General_model->callStoredProcedure("select * from information_schema.`TABLES` where table_schema = 'db_statistik' and table_name = '".$tablename."'")->row();
                 if(!empty($isExistTable)){
