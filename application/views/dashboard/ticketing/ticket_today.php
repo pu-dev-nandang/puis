@@ -212,6 +212,11 @@ var App_ticket_ticket_today = {
         for(key in arr){
            switch(key)
            {
+            case  "CategoryID" :
+                    if (arr[key] == '-') {
+                        toatString += 'Please choose Category' + "<br>";
+                    }
+                  break;
             case  "Title" :
                   result = Validation_required(arr[key],key);
                   if (result['status'] == 0) {

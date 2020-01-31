@@ -25,7 +25,7 @@ class M_setting extends CI_Model {
                 from db_ticketing.category as a '.$this->m_general->QueryDepartmentJoin('a.DepartmentID').'
                 left join db_employees.employees as c on a.UpdatedBy = c.NIP
                 where  a.Active = 1  '.$AddWhere.'
-                order by a.ID desc
+                order by a.DepartmentID desc,a.ID desc
         ';
         $query = $this->db->query($sql,array())->result_array();
 

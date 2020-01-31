@@ -126,13 +126,19 @@
         var token = jwt_encode(dataform,'UAP)(*');
         AjaxLoadRestTicketing(url,token).then(function(response){
              selector.empty();
+             
              var dataresponse = response.data;
              if (dataresponse.length>0) {
                 for (var i = 0; i < dataresponse.length; i++) {
-                   var selected = (CategorySelected == dataresponse[i][3]) ? 'selected' : '';
-                   if (selected == '') {
-                    selected = (i==0) ? 'selected' : '';
+                   if (i == 0) { // add empty option value
+                    selector.append(
+                         '<option value = "-" '+'selected'+' department = "">'+'--Choose Category--'+'</option>'
+                     );
                    }
+                   var selected = (CategorySelected == dataresponse[i][3]) ? 'selected' : '';
+                   // if (selected == '') {
+                   //  selected = (i==0) ? 'selected' : '';
+                   // }
                    selector.append(
                         '<option value = "'+dataresponse[i][3]+'" '+selected+' department = "'+dataresponse[i][7]+'" >'+dataresponse[i][7]+' - '+dataresponse[i][1]+'</option>'
                     );
