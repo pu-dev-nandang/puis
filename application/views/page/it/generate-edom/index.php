@@ -132,7 +132,7 @@
 				    dataType : 'json',
 				    beforeSend :function(){
 				    	loading_modal_show();
-				    	$("body #NotificationModal .modal-body").html('<div class="generate-request-load text-center"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i> <br> wait for a secoond, we are generating your data.<h4>Please dont close this windows..!!</h4></div>');
+				    	$("body #NotificationModal .modal-body").html('<div class="generate-request-load text-center"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i> <br> wait for a second, we are generating your data.<h4>Please dont close this windows..!!</h4></div>');
 				    },
 		            error : function(jqXHR){
 		            	loading_modal_hide();
