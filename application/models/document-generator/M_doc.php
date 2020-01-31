@@ -1915,7 +1915,7 @@ class M_doc extends CI_Model {
         $opFilteringStatus = $dataToken['opFilteringStatus'];
         $opFilteringData = $dataToken['opFilteringData'];
         $IDMasterSurat = $dataToken['IDMasterSurat'];
-        if ($opFilteringStatus != '') {
+        if ($opFilteringStatus != '' && $opFilteringStatus != 'All') {
            $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
            $AddWhere .= $WhereOrAnd.'a.Status = "'.$opFilteringStatus.'"';
         }
@@ -1923,6 +1923,16 @@ class M_doc extends CI_Model {
         if ($opFilteringData == 1) { // for me
             $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
             $AddWhere .= $WhereOrAnd.' (a.UserNIP = "'.$NIP.'" or a.Approve1 = "'.$NIP.'" or a.Approve2 = "'.$NIP.'" or a.Approve3 = "'.$NIP.'"  )';
+        }
+
+        if ($opFilteringData == 2) { // My Document
+            $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
+            $AddWhere .= $WhereOrAnd.' (a.UserNIP = "'.$NIP.'" )';
+        }
+
+        if ($opFilteringData == 3 || $opFilteringData == 4) { // My Approved or Rejected
+            $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
+            $AddWhere .= $WhereOrAnd.' (a.Approve1 = "'.$NIP.'" or a.Approve2 = "'.$NIP.'" or a.Approve3 = "'.$NIP.'")';
         }
 
         if ($IDMasterSurat != '') {
