@@ -3271,16 +3271,20 @@ class C_save_to_excel extends CI_Controller
             $excel3->setCellValue('H'.$a, $Beasiswa.$Discount);
 
             // cicilan start array key 8 yaitu I
-            $keyI = 8;
+            $keyI = 10; // col tgl bayar
             $TotalBayar = 0;
             $TotalAll = 0;
+            $keyTagihan = 8;
             for ($j=0; $j < count($output); $j++) {
                $tt = '';
                $byr = '';
-               $as = $keyI + 1;
+               $as = $keyI + 1; // col jml bayar
+               $keyDeadline = $keyTagihan + 1;
+               $DeadlineBYR = date('d M Y', strtotime($output[$j]['Deadline']));
+               $TagihanBYR = $output[$j]['Invoice'];
                if ($output[$j]['Status'] == 1) {
                    $tt = date('d M Y', strtotime($output[$j]['DatePayment']));
-                   $byr = "Rp. ".number_format($output[$j]['Invoice'],2,',','.');
+                   $byr = $output[$j]['Invoice'];
                    $TotalBayar = $TotalBayar + $output[$j]['Invoice'];
                }
                $TotalAll = $TotalAll + $output[$j]['Invoice'];
@@ -3294,39 +3298,70 @@ class C_save_to_excel extends CI_Controller
                    $huruf = $this->m_master->HurufColExcelNumber($keyI);
                    // print_r($huruf);die();
                    $excel3->setCellValue($huruf.$a, $tt);
+                   $excel3->getStyle($huruf.$a)->applyFromArray($style_row);
                }
                else
                {
                 $excel3->setCellValue($keyM[$keyI].$a, $tt);
+                $excel3->getStyle($keyM[$keyI].$a)->applyFromArray($style_row);
                }
 
+               $hurufDeadline = $this->m_master->HurufColExcelNumber($keyDeadline);
+               $excel3->setCellValue($hurufDeadline.$a, $DeadlineBYR);
+               $excel3->getStyle($hurufDeadline.$a)->applyFromArray($style_row);
+               
+               $hurufTagihan = $this->m_master->HurufColExcelNumber($keyTagihan);
+               $excel3->setCellValue($hurufTagihan.$a, $TagihanBYR);
+               $excel3->getStyle($hurufTagihan.$a)->applyFromArray($style_row);
+               $keyTagihan = $keyTagihan + 4;
+
+
                if ($as > 25) {
-                   $huruf = $this->m_master->HurufColExcelNumber($keyI);
+                   $huruf = $this->m_master->HurufColExcelNumber($as);
                    $excel3->setCellValue($huruf.$a, $byr);
+                   $excel3->getStyle($huruf.$a)->applyFromArray($style_row);
                }
                else
                {
                  $excel3->setCellValue($keyM[$as].$a, $byr);
+                 $excel3->getStyle($keyM[$as].$a)->applyFromArray($style_row);
                }
-               $keyI = $keyI + 2;
+               $keyI = $keyI + 4;
             }
 
-            $ss = 7 - count($output);
+            $ss = 8 - count($output); // 8 max cicilan 8
             for ($j=0; $j < $ss; $j++) {
                $as = $keyI + 1;
-               $excel3->setCellValue($keyM[$keyI].$a, "");
-               $excel3->setCellValue($keyM[$as].$a, "");
-               $keyI = $keyI + 2;
+               $keyDeadline = $keyTagihan + 1;
+
+               $hurufCol = $this->m_master->HurufColExcelNumber($keyI);
+               $excel3->setCellValue($hurufCol.$a, "");
+               $excel3->getStyle($hurufCol.$a)->applyFromArray($style_row);
+
+               $hurufCol = $this->m_master->HurufColExcelNumber($as);
+               $excel3->setCellValue($hurufCol.$a, "");
+               $excel3->getStyle($hurufCol.$a)->applyFromArray($style_row);
+
+               $hurufCol = $this->m_master->HurufColExcelNumber($keyTagihan);
+               $excel3->setCellValue($hurufCol.$a, "");
+               $excel3->getStyle($hurufCol.$a)->applyFromArray($style_row);
+
+               $hurufCol = $this->m_master->HurufColExcelNumber($keyDeadline);
+               $excel3->setCellValue($hurufCol.$a, "");
+               $excel3->getStyle($hurufCol.$a)->applyFromArray($style_row);
+
+               $keyI = $keyI + 4;
+               $keyTagihan = $keyTagihan + 4;
             }
             $SisaTagihan = $TotalAll - $TotalBayar;
             $SumTotalTagihan = $SumTotalTagihan + $TotalAll;
             $SumTotalPembayaran = $SumTotalPembayaran + $TotalBayar;
             $SumTotalSisaTagihan = $SumTotalSisaTagihan + $SisaTagihan;
-            $excel3->setCellValue('W'.$a, "Rp. ".number_format($TotalAll,2,',','.'));
-            $excel3->setCellValue('X'.$a, "Rp. ".number_format($TotalBayar,2,',','.'));
-            $excel3->setCellValue('Y'.$a, "Rp. ".number_format($SisaTagihan,2,',','.'));
-            $excel3->setCellValue('Z'.$a, ($SisaTagihan > 0) ? "Belum lunas" : "Lunas" );
-            $excel3->setCellValue('AA'.$a, $getData[$i]['Event']);
+            $excel3->setCellValue('AO'.$a, $TotalAll);
+            $excel3->setCellValue('AP'.$a, $TotalBayar);
+            $excel3->setCellValue('AQ'.$a, $SisaTagihan);
+            $excel3->setCellValue('AR'.$a, ($SisaTagihan > 0) ? "Belum lunas" : "Lunas" );
+            $excel3->setCellValue('AS'.$a, $getData[$i]['Event']);
 
             // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
             $excel3->getStyle('A'.$a)->applyFromArray($style_row);
@@ -3357,15 +3392,21 @@ class C_save_to_excel extends CI_Controller
             $excel3->getStyle('X'.$a)->applyFromArray($style_row);
             $excel3->getStyle('Y'.$a)->applyFromArray($style_row);
             $excel3->getStyle('Z'.$a)->applyFromArray($style_row);
-            $excel3->getStyle('AA'.$a)->applyFromArray($style_row);
+            // $excel3->getStyle('AA'.$a)->applyFromArray($style_row);
+
+            $excel3->getStyle('AO'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('AP'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('AQ'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('AR'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('AS'.$a)->applyFromArray($style_row);
             $a = $a + 1;
         }
 
-        $excel3->setCellValue('W'.$a, "Rp. ".number_format($SumTotalTagihan,2,',','.'));
-        $excel3->setCellValue('X'.$a, "Rp. ".number_format($SumTotalPembayaran,2,',','.'));
-        $excel3->setCellValue('Y'.$a, "Rp. ".number_format($SumTotalSisaTagihan,2,',','.'));
+        $excel3->setCellValue('AO'.$a, $SumTotalTagihan);
+        $excel3->setCellValue('AP'.$a, $SumTotalPembayaran);
+        $excel3->setCellValue('AQ'.$a, $SumTotalSisaTagihan);
 
-        foreach(range('A','Z') as $columnID) {
+        foreach(range('A','AZ') as $columnID) {
             $excel2->getActiveSheet()->getColumnDimension($columnID)
                 ->setAutoSize(true);
         }
