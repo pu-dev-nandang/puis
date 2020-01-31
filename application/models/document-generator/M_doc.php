@@ -1930,7 +1930,7 @@ class M_doc extends CI_Model {
             $AddWhere .= $WhereOrAnd.' (a.UserNIP = "'.$NIP.'" )';
         }
 
-        if ($opFilteringData == 3 || $opFilteringData == 4) { // My Document
+        if ($opFilteringData == 3 || $opFilteringData == 4) { // My Approved or Rejected
             $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
             $AddWhere .= $WhereOrAnd.' (a.Approve1 = "'.$NIP.'" or a.Approve2 = "'.$NIP.'" or a.Approve3 = "'.$NIP.'")';
         }
