@@ -1957,6 +1957,7 @@ class M_doc extends CI_Model {
                 '.$AddWhere.'
                 group by a.ID
                 order by a.ID asc
+                Limit 500
                 ';
                 // print_r($sql);die();
         $query = $this->db->query($sql,array())->result_array();
