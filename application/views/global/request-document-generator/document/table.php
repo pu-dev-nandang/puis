@@ -246,7 +246,7 @@
 		   oTable = recordTable;
 		},
 
-		Status : ['Request','Reject','Approve','Batal'],
+		Status : ['Request','Reject','Approve','Batal','All'],
 		filtering : [
 			{
 				text : 'All',
@@ -255,6 +255,18 @@
 			{
 				text : 'For me',
 				value : '1',
+			},
+			{
+				text : 'My Document',
+				value : '2',
+			},
+			{
+				text : 'My Approved',
+				value : '3',
+			},
+			{
+				text : 'My Rejected',
+				value : '-1',
 			},
 		],
 
@@ -463,6 +475,26 @@
 	})
 
 	$(document).off('change', '#opFilteringStatus,#opFilteringData').on('change', '#opFilteringStatus,#opFilteringData',function(e) {
+		var v = $(this).find('option:selected').val();
+		if (v == 3) {
+			$("#opFilteringStatus option").filter(function() {
+			   //may want to use $.trim in here
+			   return $(this).val() == 'Approve'; 
+			}).prop("selected", true);
+		}
+		if (v == -1) {
+			$("#opFilteringStatus option").filter(function() {
+			   //may want to use $.trim in here
+			   return $(this).val() == 'Reject'; 
+			}).prop("selected", true);
+		}
+
+		if (v == 2) {
+			$("#opFilteringStatus option").filter(function() {
+			   //may want to use $.trim in here
+			   return $(this).val() == 'All'; 
+			}).prop("selected", true);
+		}
 		oTable.ajax.reload( null, false );
 	})
 
