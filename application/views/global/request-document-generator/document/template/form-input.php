@@ -1169,7 +1169,7 @@
             var keynumber = el.closest('.GET').attr('keynumber');
             var keyindex = parseInt(el.closest('.GET').attr('keyindex'));
            
-            if ($(this).val() != '') {
+            if (el.val() != '') {
                var dt = jwt_decode(el.attr('datatoken'));
                settingTemplate[attrkey][attrname][keyindex]['user'] = {};
                settingTemplate[attrkey][attrname][keyindex]['user'] = dt;
