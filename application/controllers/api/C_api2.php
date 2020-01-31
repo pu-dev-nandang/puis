@@ -4267,8 +4267,8 @@ class C_api2 extends CI_Controller {
                                         FROM db_employees.files f
                                         LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
                                         LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
-                                        WHERE f.NIP = "'.$NIP.'" AND f.Active = 1 ORDER BY mf.ID ASC')->result_array();
-            //print_r($dataF); exit();
+                                        WHERE f.NIP = "'.$NIP.'" AND f.Active = 1 AND LinkFiles IS NOT NULL ORDER BY mf.ID ASC')->result_array();
+           
             return print_r(json_encode($dataF));
         }
         else if($data_arr['action']=='removeDoc'){
@@ -4282,12 +4282,14 @@ class C_api2 extends CI_Controller {
         else if($data_arr['action']=='readDoc'){
             $ID = $data_arr['ID'];
 
-            $data = $this->db->query('SELECT f.*, mf.TypeFiles AS M_TypeFiles, p.Name_other_files
+            $data = $this->db->query('SELECT f.*, mf.TypeFiles AS M_TypeFiles, p.Name_other_files, z.Name_University, j.Name_MajorProgramstudy AS NamaJurusan, k.Name_MajorProgramstudy
                                         FROM db_employees.files f
                                         LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
                                         LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
+                                        LEFT JOIN db_research.university AS z ON (f.NameUniversity = z.ID)
+                                        LEFT JOIN db_employees.major_programstudy_employees AS j ON (f.Major = j.ID)  
+                                        LEFT JOIN db_employees.major_programstudy_employees AS k ON (f.ProgramStudy = k.ID)
                                         WHERE f.ID = "'.$ID.'" ')->result_array();
-
 
             return print_r(json_encode($data));
         }
