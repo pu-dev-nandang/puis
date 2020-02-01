@@ -2865,10 +2865,9 @@ class C_api extends CI_Controller {
     public function rektorat_listacademicfile(){  //menu rektorat academic files
         $typefile = $this->input->get('type');
         $otherfile = $this->input->get('other');
-
         $requestData= $_REQUEST;
         
-        if ($typefile == "0" && $otherfile == "0") {
+        if ($typefile == "0") {
 
             $totalData = $this->db->query('SELECT f.*, mf.TypeFiles AS M_TypeFiles,  p.Name_other_files, xx.Name, ab.Name AS NamaCreate
                                             FROM db_employees.files f
@@ -2905,8 +2904,8 @@ class C_api extends CI_Controller {
         else {
 
                 $whereType = ($typefile!='') ? 'AND f.TypeFiles = "'.$typefile.'" ' : '';
-                $whereOtherFile = ($otherfile!='') ? 'AND f.ID_OtherFiles = "'.$otherfile.'" ' : ''; 
-                $uniowhere = $whereType.''.$whereOtherFile;
+                //$whereOtherFile = ($otherfile!='') ? 'AND f.ID_OtherFiles = "'.$otherfile.'" ' : ''; 
+                $uniowhere = $whereType;
 
                 $totalData = $this->db->query('SELECT f.*, mf.TypeFiles AS M_TypeFiles,  p.Name_other_files, xx.Name, ab.Name AS NamaCreate
                                             FROM db_employees.files f
@@ -2950,17 +2949,10 @@ class C_api extends CI_Controller {
             $row = $query[$i];
 
             $date_upload = date('d M Y H:i',strtotime($row['DateCreate']));
-            if($row["ID_OtherFiles"] == null) {
-                $id_other = "-";
-            } 
-            else {
-                $id_other = $row["Name_other_files"];
-            }
             
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["NIP"].' - '.$row["Name"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["M_TypeFiles"].'</div>';
-            $nestedData[] = '<div style="text-align: center;">'.$row["Name_other_files"].'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["Description_Files"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["NamaCreate"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$date_upload.'</div>';
@@ -2977,7 +2969,6 @@ class C_api extends CI_Controller {
             "data"            => $data
         );
         echo json_encode($json_data);
-
     }
 
 
@@ -3040,7 +3031,6 @@ class C_api extends CI_Controller {
     }
 
     public function getdatarequestdocument(){
-
         //$status = $this->input->get('s');
         $requestData= $_REQUEST;
         $NIP = $this->session->userdata('NIP');
@@ -3109,7 +3099,6 @@ class C_api extends CI_Controller {
             //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["NIP"].' - '.$row["Name"].'</div>';
-            //$nestedData[] = '<div style="text-align: center;">'.$row["TypeFiles"].'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["ForTask"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$StartDate.'  -  '.$EndDate.'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["DescriptionAddress"].'</div>';
@@ -4554,9 +4543,11 @@ class C_api extends CI_Controller {
                     $dataSearch = 'WHERE Name_MajorProgramstudy LIKE "%'.$search.'%" ORDER BY ID DESC';
                 }
 
-                $queryDefault = 'SELECT * FROM db_employees.major_programstudy_employees'.$dataSearch;
+                $queryDefault = 'SELECT * FROM db_employees.major_programstudy_employees '.$dataSearch;
 
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+                //print_r($sql); exit();
                 
                 $query = $this->db->query($sql)->result_array();
                 $queryDefaultRow = $this->db->query($queryDefault)->result_array();
@@ -6805,7 +6796,6 @@ class C_api extends CI_Controller {
 
             $NIP = $formInsert['formNIP'];
             $type_files = $formInsert['type_files'];
-            $kat_otherfiles = $formInsert['kat_otherfiles'];
             $NoDocument = strtoupper($formInsert['NoDocument']);
             $DescriptionFile = $formInsert['DescriptionFile'];
             $DateDocument = $formInsert['DateDocument'];
@@ -6813,19 +6803,14 @@ class C_api extends CI_Controller {
             $idlinkfiles = $formInsert['idlinkfiles'];
             $linkotherfile = $formInsert['linkotherfile'];
 
-            if($kat_otherfiles == "0") {
-                $id_kat_otherfile = NULL;
-            } else {
-                $id_kat_otherfile = $kat_otherfiles;
-            }
-
             $dataUpdate = array(
                 'No_Document' => $NoDocument,
                 'TypeFiles' => $type_files,
-                'ID_OtherFiles' => $id_kat_otherfile,
                 'Date_Files' => $DateDocument,
                 'Description_Files' => $DescriptionFile,
-                'LinkFiles' => $linkotherfile
+                'LinkFiles' => $linkotherfile,
+                'DateUpdate' => date('Y-m-d H:i:s'),
+                'UserUpdate' => $IDuser
             );
             $this->db->where('NIP', $NIP);
             $this->db->where('ID', $idlinkfiles);

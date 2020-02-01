@@ -1419,7 +1419,7 @@ function uploadfile_transcripts3(fileName_Transcript) {
 
         var formNIP = '<?php echo $NIP; ?>';
         var type_files = $('#e_typefiles option:selected').attr('id');
-        var kat_otherfiles = $('#e_JenisFiles option:selected').attr('id');
+        //var kat_otherfiles = $('#e_JenisFiles option:selected').attr('id');
         var NoDocument = $('#NoDocument').val();
         var DescriptionFile = $('#DescriptionFile').val();
         var DateDocument = $('#DateDocument').val();
@@ -1427,10 +1427,7 @@ function uploadfile_transcripts3(fileName_Transcript) {
         var typeotherfiles = $('#typeotherfiles').val();
         var idlinkfiles = $('#idlinkfiles').val();
         var newdate = DateDocument.split("/").reverse().join("-");
-        console.log(type_files);
-        console.log(kat_otherfiles);
-
-
+        
         if(formNIP!=null && formNIP!=''
                     && NoDocument!='' && NoDocument!=null
                     && DescriptionFile!='' && DescriptionFile!=null
@@ -1444,7 +1441,6 @@ function uploadfile_transcripts3(fileName_Transcript) {
                         formInsert : {
                             formNIP : formNIP,
                             type_files : type_files,
-                            kat_otherfiles : kat_otherfiles,
                             NoDocument : NoDocument,
                             DateDocument : DateDocument,
                             typeotherfiles : typeotherfiles,
