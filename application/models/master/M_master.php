@@ -49,7 +49,8 @@ class M_master extends CI_Model {
 
     public function showDataFiles_array($tabel)
     {
-        $sql = "SELECT * FROM db_employees.master_files WHERE ID NOT IN('14', '15') ";
+        //$sql = "SELECT * FROM db_employees.master_files WHERE ID NOT IN('14', '15') ";
+        $sql = "SELECT * FROM db_employees.master_files WHERE ID < 14";
         $query=$this->db->query($sql, array());
         return $query->result_array();
     }

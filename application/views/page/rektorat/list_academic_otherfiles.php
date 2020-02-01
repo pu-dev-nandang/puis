@@ -16,14 +16,6 @@
 </style>
 
 <style>
-    .btn-circle.btn-xl {
-    width: 70px;
-    height: 70px;
-    padding: 10px 16px;
-    border-radius: 35px;
-    font-size: 24px;
-    line-height: 1.33;
-}
 
 .btn-circle {
     width: 30px;
@@ -46,22 +38,14 @@
 
 </style> 
 
-<div class="filter-form" style="margin:0 auto;width:45%;text-align:center;margin-bottom:3em;">
+<div class="filter-form" style="margin:0 auto;width:50%;text-align:center;margin-bottom:3em;">
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-6 col-md-offset-3">
             <div class="thumbnail">
                 <select class="form-control" id="filterTypeFiles">
                     <option id="0" selected disabled="">--- All Type Files Academic ---</option>
                 </select>
             </div>
-        </div>
-        <div class="col-md-5">
-            <div class="thumbnail">
-                <select class="form-control" id="filterCategoryOtherFiles">
-                    <option id="0" selected disabled>--- All Category Other Files ---</option>
-                </select>
-            </div>
-            
         </div>
     </div>
 </div>
@@ -84,7 +68,6 @@
                             <th style="width: 1%;">No</th>
                             <th class="th-center" style="width: 10%;">NIP & Name</th>
                             <th class="th-center" style="width: 8%;">Type File</th>
-                            <th class="th-center" style="width: 9%;">Category Other File</th>
                             <th class="th-center" style="width: 12%;">Description File</th>
                             <th class="th-center" style="width: 10%;">User Upload </th>
                             <th class="th-center" style="width: 8%;">Date Upload </th>
@@ -102,7 +85,6 @@
     $(document).on('click','.btnviewgroupmodule', function () {
 
         var file_id = $(this).attr('file_id');
-       
         var url = base_url_js+'api/__reviewotherfile?s='+file_id; 
                       
         var token = jwt_encode({
@@ -110,7 +92,7 @@
             },'UAP)(*');
 
         $.post(url,{token:token},function (resultJson) {
-            console.log(resultJson); 
+            //console.log(resultJson); 
             var response = resultJson;
                 if(response.length>0){
                     var no = 1;
@@ -126,7 +108,6 @@
                         }
                         
                         if(response[i]['NameUniversity'] == null) {
-
                             var nama_univ = "-";
                             var no_ijazah = "-";
                             var name_major = "-";
@@ -134,9 +115,9 @@
                             var data_grade = "-";
                             var data_credit = "-";
                             var data_semester = "-";
-
-                        } else {
-                            var nama_univ = response[i]['NameUniversity'];
+                        } 
+                        else {
+                            var nama_univ = response[i]['Name_University'];
                             var no_ijazah = response[i]['NoIjazah'];
                             var name_major = response[i]['Name_MajorProgramstudy'];
                             var name_program = response[i]['NamaProgramStudy'];
@@ -201,13 +182,6 @@
                     else {        // 'Other Files'
 
                         var tgl_file = moment( response[i]['Date_Files']).format('DD MMM YYYY');
-                        
-                        if(response[i]['ID_OtherFiles'] == null) {
-                            var data_otherfile = "-";
-                        }
-                        else {
-                            var data_otherfile = response[i]['ID_OtherFiles'];
-                        }
 
                         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
                             ' <span aria-hidden="true">&times;</span></button> '+
@@ -221,10 +195,6 @@
                             '<tr>' +
                             '   <td style="width: 40%;">Type File </td>' +
                             '   <td><b>'+response[i]['M_TypeFiles']+'<b></td>' +
-                            '</tr>' +
-                            '</tr>' +
-                            '   <td style="width: 40%;">Category Other File</td>' +
-                            '   <td><b>'+data_otherfile+'<b></td>' +
                             '</tr>' +
                             '<tr>' +
                             '   <td style="width: 40%;">No. Document</td>' +
@@ -241,17 +211,12 @@
                             '</table> '+
                             '');
                         $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button>');
-                    
                         $('#GlobalModal').modal({
                             'backdrop' : 'static',
                             'show' : true
                         }); 
-
                     }
 
-
-                    
-                        
                     } //end for
                 } //end if
             }); //end json  
@@ -266,10 +231,15 @@
         loadfiltertypefiles();
     });
 
+    $(document).on('click','.filesublink',function () {
+        var filesubx = $(this).attr('filesublix');
+        var url = base_url_js+'uploads/files/'+filesubx;
+        window.open(url, '_blank',);
+    });
+
     function load_listacademicemployee(status) {
         var FilesType = $('#filterTypeFiles option:selected').attr('id');
-        var FilterOther = $('#filterCategoryOtherFiles option:selected').attr('id');
-
+        
         var dataTable = $('#tablerequestdoc').DataTable( {
             "processing": true,
             "destroy": true,
@@ -277,7 +247,7 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "ajax":{
-                url : base_url_js+"api/__getacademicfiles?type="+FilesType+"&other="+FilterOther,
+                url : base_url_js+"api/__getacademicfiles?type="+FilesType,
                 ordering : false,
                 type: "post",  
                 error: function(){  

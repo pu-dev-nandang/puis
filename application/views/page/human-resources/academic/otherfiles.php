@@ -337,7 +337,7 @@ $(document).ready(function () {
                         '                        <option id="'+response[i]['TypeFiles']+'" disabled selected>'+response[i]['NameFiles']+'</option>'+
                         '                        <?php for ($i=0; $i < count($G_TypeFiles); $i++): ?>       '+
                         '                            <?php if ($G_TypeFiles[$i]['Type'] == 1): ?>           '+
-                        '                               <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['TypeFiles'] ?></option>   '+ 
+                        '                               <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['NameFiles'] ?></option>   '+ 
                         '                            <?php endif ?>                                         '+
                         '                        <?php endfor ?>                                            '+
                         '                    </select>                                                      '+
@@ -440,8 +440,9 @@ $(document).on('click','.btnSubmitKatOtherFiles', function () {
                         $('#NotificationModal').modal('hide');
 
                         setTimeout(function () {
-                            $('.btnSubmitKatOtherFiles').html('Save').prop('disabled',false);
-                            window.location.href = '';
+                            //$('.btnSubmitKatOtherFiles').html('Save').prop('disabled',false);
+                            //window.location.href = '';
+                             loadFilesDetails();
                             $('.menuDetails[data-page="otherfiles"]').trigger('click');
 
                         },500);

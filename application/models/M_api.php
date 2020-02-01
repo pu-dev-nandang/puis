@@ -908,10 +908,9 @@ class M_api extends CI_Model {
 
      public function views_editotfiles($NIP,$IDfiles) {
 
-        $sql = "SELECT a.*, b.TypeFiles AS NameFiles, c.Name_other_files
+        $sql = "SELECT a.*, b.TypeFiles AS NameFiles
                 FROM db_employees.files AS a
                 LEFT JOIN db_employees.master_files AS b ON (a.TypeFiles = b.ID)
-                LEFT JOIN db_employees.master_other_files AS c ON (a.ID_OtherFiles = c.ID)
                 WHERE a.NIP= '".$NIP."' AND a.ID= '".$IDfiles."' AND a.Active = '1' ";
 
         $query=$this->db->query($sql, array());
