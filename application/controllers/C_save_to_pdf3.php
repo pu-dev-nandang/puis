@@ -3226,8 +3226,8 @@ class C_save_to_pdf3 extends CI_Controller {
 
 
     public function bap_online(){
-
-        $data_arr = $this->getInputToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhQ291cnNlIjp7Ik5JUCI6IjI1MTgwNTEiLCJOYW1lIjoiRGV3YSBTYWdpdGEgQWxmYWRpbiBOdXIiLCJQcm9kaUlEIjoiOSIsIkNvdXJzZSI6IlBlcmVuY2FuYWFuIEluZnJhc3RydWt0dXIgV2lsYXlhaCIsIkNyZWRpdCI6IjMiLCJDbGFzc0dyb3VwIjoiVVJQMTMiLCJTZW1lc3Rlck5hbWUiOiIyMDE5LzIwMjAgR2VuYXAiLCJUb3RhbFN0dWRlbnQiOiIwIiwiSURfQXR0ZCI6IjExNjQiLCJEZXRhaWxQcm9kaSI6W3siQ29kZSI6IlVSUCIsIk5hbWUiOiJQZXJlbmNhbmFhbiBXaWxheWFoIGRhbiBLb3RhIn0seyJDb2RlIjoiRU5WIiwiTmFtZSI6IlRla25payBMaW5na3VuZ2FuIn1dfSwiZGV0YWlsc0JBUCI6W3siUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9XX0.yItuS16tJOjVYS1KYHmjEPOqFdgbcorXSVwPn99r-1U');
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
 //        print_r($data_arr);
 //        exit;
 
@@ -3451,7 +3451,7 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(44,$h_10,'','LRB',1,'C');
 
 
-        $fpdf->Output('n.pdf','D');
+        $fpdf->Output($NIPLecturer.'_BAP_Online_'.$Course['ClassGroup'].'.pdf','I');
 
     }
 
