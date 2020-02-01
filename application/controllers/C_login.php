@@ -423,6 +423,7 @@ class C_login extends CI_Controller {
             'EmailPU'  => $dataSession[0]['EmailPU'],
             'Address'  => $dataSession[0]['Address'],
             'Photo'  => $dataSession[0]['Photo'],
+            'Password'  => $dataSession[0]['Password'],
             'PositionMain'  => array(
                 'IDDivision' => $dataSession[0]['IDDivision'],
                 'Division' => $dataSession[0]['Division'],

@@ -237,6 +237,13 @@
                                      <a href="<?php echo base_url('request-document-generator'); ?>"><i class="glyphicon glyphicon-transfer" aria-hidden="true"></i> Request Document Generator</a>
                                  </li>
                             <!-- End Adding for Testing -->
+
+                            <!-- Adding for Testing -->
+                            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; ?>
+                                 <li class="<?php echo $sw?> BlogAdminUrl">
+                                     <a href="javascript:void(0)"><i class="fa fa-rss" aria-hidden="true"></i> Blog Admin</a>
+                                 </li>
+                            <!-- End Adding for Testing -->
                     </ul>
                 </li>
             <?php } ?>
@@ -994,5 +1001,19 @@
 
 
      }
+
+     $(document).off('click', '.BlogAdminUrl').on('click', '.BlogAdminUrl',function(e) {
+        var url = "<?php echo url_blogadmin ?>"+'__cek_login';
+        data = {
+          Username : sessionNIP,
+          password_encryption : "<?php echo $this->session->userdata('Password') ?>",
+          LoginFrom : 'Pcam',
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ],'');
+     });
+     
 
 </script>
