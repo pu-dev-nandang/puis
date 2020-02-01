@@ -2,20 +2,33 @@
 <div class="container">
     <div class="row">
 
-        <div class="col-md-10 col-md-offset-1">
+        <div class="col-md-12">
             <div class="well">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                        <label>Class Of</label>
                         <select class="form-control filter-table" id="filterClassOf"></select>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label>Programme Study</label>
                         <select class="form-control filter-table" id="filterBaseProdi">
-                            <option value="">--- All Study Program ---</option>
+                            <option value="">--- All Programme Study ---</option>
                             <option disabled>------------------</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <select class="form-control filter-table" id="filterStatus"></select>
+                        <label>Student Status</label>
+                        <select class="form-control filter-table" id="filterStatus">
+                            <option value="">--- All Status ---</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 hide">
+                        <label>Status Judiciums</label>
+                        <select class="form-control filter-table" id="filterStatusJudiciums">
+                            <option value="">--- All Status ---</option>
+                            <option value="1" style="color: green;">Registered in the judicium list</option>
+                            <option value="-1" style="color: red;">Unregistered in the judicium list</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -36,13 +49,12 @@
         var YearNow = moment().subtract(4,'years').format('YYYY');
         loadSelectOptionClassOf_Year('#filterClassOf',parseInt(YearNow));
         loadSelectOptionBaseProdi('#filterBaseProdi','');
-        loadSelectOptionStatusStudent('#filterStatus',3);
+        loadSelectOptionStatusStudent('#filterStatus','');
 
         var firstLoad = setInterval(function (args) {
 
             var filterClassOf = $('#filterClassOf').val();
-            var filterStatus = $('#filterStatus').val();
-            if(filterClassOf!='' && filterClassOf!=null && filterStatus!='' && filterStatus!=null){
+            if(filterClassOf!='' && filterClassOf!=null){
                 loadDataStudent();
                 clearInterval(firstLoad);
             }
@@ -58,16 +70,16 @@
     function loadDataStudent(){
 
         var filterClassOf = $('#filterClassOf').val();
-        var filterStatus = $('#filterStatus').val();
-        if(filterClassOf!='' && filterClassOf!=null && filterStatus!='' && filterStatus!=null){
+
+        if(filterClassOf!='' && filterClassOf!=null){
 
             $('#viewDataTable').html(' <table class="table table-centre table-striped table-bordered" id="tableData">' +
                 '                <thead>' +
                 '                <tr>' +
                 '                    <th style="width: 1%;">No</th>' +
-                '                    <th style="width: 25%;">Student</th>' +
+                '                    <th style="width: 30%;">Student</th>' +
                 '                    <th>Study Program</th>' +
-                '                    <th style="width: 15%;">Status</th>' +
+                '                    <th style="width: 20%;">Judiciums Date</th>' +
                 '                    <th style="width: 7%;">SKPI</th>' +
                 '                </tr>' +
                 '                </thead>' +
@@ -78,12 +90,20 @@
             var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null) 
                 ? filterBaseProdi.split('.')[0] : '';
 
+            var filterStatusJudiciums = $('#filterStatusJudiciums').val();
+            var StatusJudiciums = (filterStatusJudiciums!='') ? filterStatusJudiciums : '';
+
+
+            var filterStatus = $('#filterStatus').val();
+            var StatusStudentID = (filterStatus!='') ? filterStatus : '';
+
             var url = base_url_js+'api/__crudConfigSKPI';
             var data = {
                 action : 'readStudentFromSKPI',
                 ClassOf : filterClassOf,
-                StatusStudentID : filterStatus,
-                ProdiID : ProdiID
+                StatusStudentID : StatusStudentID,
+                ProdiID : ProdiID,
+                StatusJudiciums : StatusJudiciums
             };
             
             var token = jwt_encode(data,'UAP)(*');

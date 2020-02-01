@@ -3224,4 +3224,235 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Output($filename,'I');
     }
 
+
+    public function bap_online(){
+
+        $data_arr = $this->getInputToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhQ291cnNlIjp7Ik5JUCI6IjI1MTgwNTEiLCJOYW1lIjoiRGV3YSBTYWdpdGEgQWxmYWRpbiBOdXIiLCJQcm9kaUlEIjoiOSIsIkNvdXJzZSI6IlBlcmVuY2FuYWFuIEluZnJhc3RydWt0dXIgV2lsYXlhaCIsIkNyZWRpdCI6IjMiLCJDbGFzc0dyb3VwIjoiVVJQMTMiLCJTZW1lc3Rlck5hbWUiOiIyMDE5LzIwMjAgR2VuYXAiLCJUb3RhbFN0dWRlbnQiOiIwIiwiSURfQXR0ZCI6IjExNjQiLCJEZXRhaWxQcm9kaSI6W3siQ29kZSI6IlVSUCIsIk5hbWUiOiJQZXJlbmNhbmFhbiBXaWxheWFoIGRhbiBLb3RhIn0seyJDb2RlIjoiRU5WIiwiTmFtZSI6IlRla25payBMaW5na3VuZ2FuIn1dfSwiZGV0YWlsc0JBUCI6W3siUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9LHsiUHJlc2VudCI6Ii0iLCJBYnNlbnQiOiItIiwiTGVjdHVyZXIiOltdLCJCQVAiOltdLCJTdGF0dXNFZGl0IjoiMSJ9XX0.yItuS16tJOjVYS1KYHmjEPOqFdgbcorXSVwPn99r-1U');
+//        print_r($data_arr);
+//        exit;
+
+        $fpdf = new Pdf_mc_table('L', 'mm', 'A4');
+        $fpdf->AddPage();
+        $fpdf->SetMargins(5,5,5);
+
+        $fpdf->SetAutoPageBreak(true, 5);
+
+        $fpdf->Image('./images/logo_tr.png',5,5,41);
+        $b = 0;
+        $h_3 = 3;
+        $h_5 = 5;
+
+        $Course = (array) $data_arr['dataCourse'];
+
+        $fpdf->SetFont('Arial','',7);
+        $fpdf->Cell(0,$h_3,'FM-UAP/AKD-08-02-REV.01',$b,1,'R');
+
+        $fpdf->SetFont('Arial','B',13);
+        $fpdf->Cell(0,$h_5,'Berita Acara Perkuliahan',$b,1,'C');
+
+        $fpdf->SetFont('Arial','',10);
+        $fpdf->Cell(0,$h_5,'Semester : '.$Course['SemesterName'],$b,1,'C');
+        $fpdf->Ln(3);
+
+        $fpdf->SetFont('Arial','',9);
+        $b='0';
+        $fpdf->setFillColor(242, 242, 242);
+
+        $fpdf->SetLineWidth(0.01);
+        $fpdf->SetDash(0.7,1);
+
+        // 287
+
+        $ProdiName = '';
+        if(count($Course['DetailProdi'])>0){
+            for($p=0;$p<count($Course['DetailProdi']);$p++){
+                $koma = ($p!=0) ? ', ' : '';
+                $ProdiName = $ProdiName.$koma.$Course['DetailProdi'][$p]->Code;
+            }
+        }
+
+        $fpdf->Cell(25,$h_5,'Program Studi',$b,0,'L');
+        $fpdf->Cell(5,$h_5,':',$b,0,'C');
+        $fpdf->SetFont('Arial','B',9);
+        $fpdf->Cell(72,$h_5,$ProdiName,'B',0,'L');
+        $fpdf->SetFont('Arial','',9);
+
+        $fpdf->Cell(25,$h_5,'Mata Kuliah',$b,0,'L');
+        $fpdf->Cell(5,$h_5,':',$b,0,'C');
+        $fpdf->SetFont('Arial','B',9);
+        $fpdf->Cell(110,$h_5,$Course['Course'],'B',0,'L');
+        $fpdf->SetFont('Arial','',9);
+
+        $fpdf->Cell(25,$h_5,'SKS',$b,0,'L');
+        $fpdf->Cell(5,$h_5,':',$b,0,'C');
+        $fpdf->SetFont('Arial','B',9);
+        $fpdf->Cell(15,$h_5,$Course['Credit'],'B',1,'L');
+        $fpdf->SetFont('Arial','',9);
+
+        $fpdf->Ln(1.5);
+        $fpdf->Cell(25,$h_5,'Dosen',$b,0,'L');
+        $fpdf->Cell(5,$h_5,':',$b,0,'C');
+        $fpdf->SetFont('Arial','B',9);
+        $fpdf->Cell(72,$h_5,$Course['Name'],'B',0,'L');
+        $fpdf->SetFont('Arial','',9);
+
+        $fpdf->Cell(25,$h_5,'Kelas / Grup',$b,0,'L');
+        $fpdf->Cell(5,$h_5,':',$b,0,'C');
+        $fpdf->SetFont('Arial','B',9);
+        $fpdf->Cell(55,$h_5,$Course['ClassGroup'],'B',0,'L');
+        $fpdf->SetFont('Arial','',9);
+
+        $fpdf->Cell(35,$h_5,'Mahasiswa Terdaftar',$b,0,'L');
+        $fpdf->Cell(5,$h_5,':',$b,0,'C');
+        $fpdf->SetFont('Arial','B',9);
+        $fpdf->Cell(15,$h_5,$Course['TotalStudent'],'B',0,'L');
+        $fpdf->SetFont('Arial','',9);
+
+
+        $fpdf->Cell(25,$h_5,'Semester',$b,0,'L');
+        $fpdf->Cell(5,$h_5,':',$b,0,'C');
+        $fpdf->SetFont('Arial','B',9);
+        $fpdf->Cell(15,$h_5,'','B',1,'L');
+        $fpdf->SetFont('Arial','',9);
+
+        $fpdf->setFillColor(130, 200, 222 );
+        $h_10 = 10;
+        $b = 1;
+
+        $fpdf->SetDash();
+        $fpdf->Ln(4);
+        $fpdf->SetFont('Arial','B',8);
+        $fpdf->Cell(9,$h_10,'Sesi',$b,0,'C',true);
+        $fpdf->Cell(25,$h_10,'Tanggal',$b,0,'C',true);
+        $fpdf->Cell(55,$h_10,'Pokok Bahasan',$b,0,'C',true);
+        $fpdf->Cell(55,$h_10,'Materi',$b,0,'C',true);
+        $fpdf->Cell(55,$h_10,'Keterangan',$b,0,'C',true);
+        $fpdf->Cell(15,$h_10,"Mhs Hdr",$b,0,'C',true);
+        $fpdf->Cell(29,$h_5,'Waktu',$b,0,'C',true);
+        $fpdf->Cell(44,$h_5,'Paraf & Nama',$b,1,'C',true);
+
+
+        $fpdf->Cell(214,0,'',0,0,'C');
+        $fpdf->Cell(14.5,$h_5,'Mulai',$b,0,'C',true);
+        $fpdf->Cell(14.5,$h_5,'Selesai',$b,0,'C',true);
+        $fpdf->Cell(19,$h_5,'Dosen',$b,0,'C',true);
+        $fpdf->Cell(25,$h_5,'Mahasiswa',$b,1,'C',true);
+
+        $fpdf->SetFont('Arial','',8);
+
+        $lineHight = 4;
+
+        $fpdf->SetWidths(array(9,25,55,55,55,15,14.5,14.5,19,25));
+//        $fpdf->SetLineHeight(6.2);
+        $fpdf->SetAligns(array('C','C','L','L','L','C','C','C','C','L'));
+
+        $dataBAP = $data_arr['detailsBAP'];
+        $NIPLecturer = $Course['NIP'];
+        $ReviewAkhir = '';
+
+        for($i=0;$i<14;$i++){
+
+            $d = (array) $dataBAP[$i];
+            $bap = (count($d['BAP'])>0) ? $d['BAP'][0] : [];
+
+            $Tanggal = (count($d['BAP'])>0 && $bap->InsertAt!='' && $bap->InsertAt!=null) ? date('d M Y',strtotime($bap->InsertAt)) : '';
+            $Subject = (count($d['BAP'])>0 && $bap->Subject!='' && $bap->Subject!=null) ? $bap->Subject : '';
+            $Material = (count($d['BAP'])>0 && $bap->Material!='' && $bap->Material!=null) ? $bap->Material : '';
+            $Description = (count($d['BAP'])>0 && $bap->Description!='' && $bap->Description!=null) ? $bap->Description : '';
+            $Present = (count($d['BAP'])>0 && $d['Present']!='' && $d['Present']!=null) ? $d['Present'] : '';
+
+            $dataLec = $d['Lecturer'];
+            $In = ''; $Out = '';
+            if(count($dataLec)>0){
+                for($l=0;$l<count($dataLec);$l++){
+                    if($NIPLecturer==$dataLec[$l]->NIP){
+                        $In = ($dataLec[$l]->In!='' && $dataLec[$l]->In!=null) ? substr($dataLec[$l]->In,0,5) : '';
+                        $Out = ($dataLec[$l]->Out!='' && $dataLec[$l]->Out!=null) ? substr($dataLec[$l]->Out,0,5) : '';
+                        break;
+                    }
+                }
+            }
+
+            $StdNPM = (count($d['BAP'])>0 && $bap->StudentSignBy!='' && $bap->StudentSignBy!=null) ? '('.$bap->StudentSignBy.') ' : '';
+            $StdName = (count($d['BAP'])>0 && $bap->Student!='' && $bap->Student!=null) ? $bap->Student : '';
+            $StdAt = (count($d['BAP'])>0 && $bap->StudentSignAt!='' && $bap->StudentSignAt!=null) ? date("d M Y H:s",strtotime($bap->StudentSignAt)) : '';
+
+            $viewStdName = (strlen($StdName)>35) ? substr($StdName,0,35).'__' : $StdName;
+
+
+
+            $fpdf->Row_bapOnline($lineHight,array(
+                ($i+1),$Tanggal,
+                $Subject,$Material,$Description,
+                $Present, $In, $Out,
+                "",
+                $viewStdName."\n".$StdNPM."\n".$StdAt,
+            ));
+
+            if($i==6){
+                $Review = (count($d['BAP'])>0 && $bap->Review!='' && $bap->Review!=null) ? $bap->Review : '';
+                $fpdf->SetFont('Arial','B',8);
+                $fpdf->Cell(287-44,$h_5,'Review Tengah Semester :','LRT',0,'L');
+                $fpdf->Cell(44,$h_5,'Koordinator/Kaprodi','LRT',1,'C');
+                $fpdf->SetFont('Arial','',8);
+                $fpdf->Cell(287-44,$h_10,$Review,'LRB',0,'L');
+                $fpdf->Cell(44,$h_10,'','LRB',1,'C');
+
+
+                $fpdf->AddPage();
+                $fpdf->SetMargins(5,5,5);
+
+                $fpdf->Image('./images/logo_tr.png',5,5,41);
+
+                $b = 0;
+                $fpdf->SetFont('Arial','',7);
+                $fpdf->Cell(0,$h_3,'FM-UAP/AKD-08-02-REV.01',$b,1,'R');
+
+                $fpdf->SetFont('Arial','B',13);
+                $fpdf->Cell(0,$h_5,'Berita Acara Perkuliahan',$b,1,'C');
+
+                $fpdf->SetFont('Arial','',10);
+                $fpdf->Cell(0,$h_5,'Semester : 2019/2020 Ganjil',$b,1,'C');
+                $fpdf->Ln(7);
+
+                $b = 1;
+
+                $fpdf->SetFont('Arial','B',8);
+                $fpdf->Cell(9,$h_10,'Sesi',$b,0,'C',true);
+                $fpdf->Cell(25,$h_10,'Tanggal',$b,0,'C',true);
+                $fpdf->Cell(55,$h_10,'Pokok Bahasan',$b,0,'C',true);
+                $fpdf->Cell(55,$h_10,'Materi',$b,0,'C',true);
+                $fpdf->Cell(55,$h_10,'Keterangan',$b,0,'C',true);
+                $fpdf->Cell(15,$h_10,"Mhs Hdr",$b,0,'C',true);
+                $fpdf->Cell(29,$h_5,'Waktu',$b,0,'C',true);
+                $fpdf->Cell(44,$h_5,'Paraf & Nama',$b,1,'C',true);
+
+
+                $fpdf->Cell(214,0,'',0,0,'C');
+                $fpdf->Cell(14.5,$h_5,'Mulai',$b,0,'C',true);
+                $fpdf->Cell(14.5,$h_5,'Selesai',$b,0,'C',true);
+                $fpdf->Cell(19,$h_5,'Dosen',$b,0,'C',true);
+                $fpdf->Cell(25,$h_5,'Mahasiswa',$b,1,'C',true);
+
+                $fpdf->SetFont('Arial','',8);
+            }
+
+            if($i==13){
+                $ReviewAkhir = (count($d['BAP'])>0 && $bap->Review!='' && $bap->Review!=null) ? $bap->Review : '';
+            }
+
+        }
+
+        $fpdf->SetFont('Arial','B',8);
+        $fpdf->Cell(287-44,$h_5,'Review Akhir Semester :','LRT',0,'L');
+        $fpdf->Cell(44,$h_5,'Koordinator/Kaprodi','LRT',1,'C');
+        $fpdf->SetFont('Arial','',8);
+        $fpdf->Cell(287-44,$h_10,$ReviewAkhir,'LRB',0,'L');
+        $fpdf->Cell(44,$h_10,'','LRB',1,'C');
+
+
+        $fpdf->Output('n.pdf','D');
+
+    }
+
 }

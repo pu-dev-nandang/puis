@@ -9764,8 +9764,9 @@ class C_api extends CI_Controller {
 
                 $requestData= $_REQUEST;
                 $ClassOf = $data_arr['ClassOf'];
-                $StatusStudentID = $data_arr['StatusStudentID'];
+                $StatusStudentID = ($data_arr['StatusStudentID']!='') ? ' AND ats.StatusStudentID = "'.$data_arr['StatusStudentID'].'" ' : '';
                 $WhereProdiID = ($data_arr['ProdiID']!='') ? ' AND ats.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
+
 
                 $dataSearch = '';
                 if( !empty($requestData['search']['value']) ) {
@@ -9777,13 +9778,20 @@ class C_api extends CI_Controller {
                 $queryDefault = 'SELECT ats.Name, ats.NPM, ps.Name AS ProdiName, ss.Description FROM db_academic.auth_students ats 
                                                 LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
                                                 LEFT JOIN db_academic.status_student ss ON (ss.ID = ats.StatusStudentID)
-                                                WHERE ats.Year = "'.$ClassOf.'" AND ats.StatusStudentID = "'.$StatusStudentID.'" '.$WhereProdiID.' '.$dataSearch.' ORDER BY ats.NPM ';
+                                                WHERE ats.Year = "'.$ClassOf.'" '.$StatusStudentID.$WhereProdiID.' '.$dataSearch.' ORDER BY ats.NPM ';
+
+                $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT ats.NPM FROM db_academic.auth_students ats 
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                                LEFT JOIN db_academic.status_student ss ON (ss.ID = ats.StatusStudentID)
+                                                WHERE ats.Year = "'.$ClassOf.'" '.$StatusStudentID.$WhereProdiID.' '.$dataSearch.') xx';
+
+
 
 
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
                 $query = $this->db->query($sql)->result_array();
-                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
                 $no = $requestData['start'] + 1;
                 $data = array();
@@ -9793,13 +9801,25 @@ class C_api extends CI_Controller {
                     $nestedData = array();
                     $row = $query[$i];
 
-                    $token = $this->jwt->encode(array('NPM' => $row['NPM']),"UAP)(*");;
+                    $dataJudiciums = $this->db->query('SELECT j.* FROM db_academic.judiciums_list jl 
+                                                        LEFT JOIN db_academic.judiciums j ON (j.ID = jl.JID) 
+                                                        WHERE jl.NPM = "'.$row['NPM'].'" ')->result_array();
+
+                    $token = $this->jwt->encode(array('NPM' => $row['NPM']),"UAP)(*");
+                    $btnDownloadSKPI = (count($dataJudiciums)>0)
+                        ? '<a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-href="'.base_url('save2pdf/cetakSKPI/'.$token).'"  class="btn btn-sm btn-default btn-default-primary btnDownloadSKPI">Show SKPI</a>' : '-';
+                    $JudiciumDate = (count($dataJudiciums)>0)
+                        ? $dataJudiciums[0]['JudiciumsDate'] : '';
+
+                    $viewJD = ($JudiciumDate!='') ? date('d M Y',strtotime($JudiciumDate)) : '<span style="color: red;font-size: 11px;">Students have not been registered in the judicium list</span>';
+
+
 
                     $nestedData[] = '<div>'.$no.'</div>';
-                    $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'</div>';
+                    $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b> - '.$row['NPM'].'<br/><span style="color: #2196f3;font-size: 11px;">Status : '.ucwords(strtolower($row['Description'])).'</span></div>';
                     $nestedData[] = '<div style="text-align: left;">'.$row['ProdiName'].'</div>';
-                    $nestedData[] = '<div>'.$row['Description'].'</div>';
-                    $nestedData[] = '<div><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-href="'.base_url('save2pdf/cetakSKPI/'.$token).'"  class="btn btn-sm btn-default btn-default-primary btnDownloadSKPI">Show SKPI</a></div>';
+                    $nestedData[] = '<div>'.$viewJD.'</div>';
+                    $nestedData[] = '<div>'.$btnDownloadSKPI.'</div>';
 
                     $data[] = $nestedData;
                     $no++;
@@ -9808,8 +9828,8 @@ class C_api extends CI_Controller {
 
                 $json_data = array(
                     "draw"            => intval( $requestData['draw'] ),
-                    "recordsTotal"    => intval(count($queryDefaultRow)),
-                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "recordsTotal"    => intval($queryDefaultRow),
+                    "recordsFiltered" => intval($queryDefaultRow),
                     "data"            => $data
                 );
                 echo json_encode($json_data);

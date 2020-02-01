@@ -4557,13 +4557,18 @@ class C_api3 extends CI_Controller {
                                         LEFT JOIN db_employees.employees em7 ON (fpc.Cl_StdLife_By = em7.NIP)
                                         LEFT JOIN db_admission.doc_mhs dm ON (dm.NPM = ats.NPM AND dm.ID_reg_doc_checklist = 3)
 
-                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.$WhereStatusTA.$dataSearch;
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.$WhereStatusTA.$dataSearch.' GROUP BY ats.NPM';
+
+            $queryDefaultTotal = 'SELECT COUNT(*) Total FROM (SELECT ats.NPM FROM db_academic.std_study_planning ssp
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
+                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.$WhereStatusTA.$dataSearch.' GROUP BY ats.NPM) xx';
 
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
             $query = $this->db->query($sql)->result_array();
-            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
             $no = $requestData['start'] + 1;
             $data = array();
@@ -4747,8 +4752,8 @@ class C_api3 extends CI_Controller {
 
             $json_data = array(
                 "draw"            => intval( $requestData['draw'] ),
-                "recordsTotal"    => intval(count($queryDefaultRow)),
-                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval($queryDefaultRow),
                 "data"            => $data
             );
             echo json_encode($json_data);
@@ -5013,9 +5018,18 @@ class C_api3 extends CI_Controller {
                     );
                     $lanjutInsert = true;
 
+                    // Get nomor judiciums
+                    $dataNoSKPI = $this->db->select('NoSKPI')->order_by('ID' ,'DESC')->limit(1)->get_where('db_academic.judiciums_list',array('JID' => $d['ID']))->result_array();
+
+                    $NoSKPI = 1;
+                    if(count($dataNoSKPI)>0){
+                        $NoSKPI = $dataNoSKPI[0]['NoSKPI'] + 1;
+                    }
+
                     $this->db->insert('db_academic.judiciums_list',array(
                         'JID' => $d['ID'],
-                        'NPM' => $NPM
+                        'NPM' => $NPM,
+                        'NoSKPI' => $NoSKPI
                     ));
 
                 } else {
@@ -5025,7 +5039,8 @@ class C_api3 extends CI_Controller {
                     );
                 }
 
-            } else {
+            }
+            else {
                 $lanjutInsert = true;
                 $result = array(
                     'Status' => 1
