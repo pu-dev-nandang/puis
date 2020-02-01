@@ -59,6 +59,51 @@ class Pdf_mc_table extends Pdf
         //Go to the next line
         $this->Ln($h);
     }
+
+    // Add by Nandang 30 Jan 2020
+    function Row_bapOnline($lineHight,$data)
+    {
+        // number of line
+        $nb=0;
+        // loop each data to find out greatest line number in a row.
+        for($i=0;$i<count($data);$i++){
+            // NbLines will calculate how many lines needed to display text wrapped in specified width.
+            // then max function will compare the result with current $nb. Returning the greatest one. And reassign the $nb.
+            $nb=max($nb,$this->NbLines($this->widths[$i],$data[$i]));
+        }
+
+        //multiply number of line with line height. This will be the height of current row
+        $h=19.5;
+        //Issue a page break first if needed
+        $this->CheckPageBreak($h);
+        //Draw the cells of current row
+        for($i=0;$i<count($data);$i++)
+        {
+            // width of the current col
+            $w=$this->widths[$i];
+            // alignment of the current col. if unset, make it left.
+            $a=isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
+            //Save the current position
+            $x=$this->GetX();
+            $y=$this->GetY();
+            //Draw the border
+            $this->Rect($x,$y,$w,$h);
+            //Print the text
+            if($i==(count($data)-1) || $i==2 || $i==3 || $i==4){
+                $this->SetFont('Arial','',6.5);
+            } else {
+                $this->SetFont('Arial','',8);
+            }
+
+
+
+            $this->MultiCell($w,$lineHight,$data[$i],0,$a);
+            //Put the position to the right of the cell
+            $this->SetXY($x+$w,$y);
+        }
+        //Go to the next line
+        $this->Ln($h);
+    }
     function CheckPageBreak($h)
     {
         //If the height h would cause an overflow, add a new page immediately

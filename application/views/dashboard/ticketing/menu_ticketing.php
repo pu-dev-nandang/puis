@@ -20,8 +20,8 @@
 
         <?php if ($this->session->userdata('IDdepartementNavigation')==6) { ?>
         <li class="<?php if($this->uri->segment(2)=='student-report') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('ticket/student-report'); ?>">Report Service <span class="badge" style="background-color:#03a9f4;"><span id="viewOpen"></span> Open</span>
-                <span class="badge" style="background-color:#FF9800;"><span id="viewProgress"></span> On Progress</span></a>
+            <a href="<?php echo base_url('ticket/student-report'); ?>">Report Service <span class="badge" style="background-color: #ffa500;"><span id="viewOpen"></span> Open</span>
+                <span class="badge" style="background-color: #44b1bf;"><span id="viewProgress"></span> On Progress</span></a>
         </li>
         <?php } ?>
 
