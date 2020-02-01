@@ -1,6 +1,8 @@
 <style type="text/css">
-	.mailing-list .list{}
-	.mailing-list .list > .mail{padding: 10px;font-size: 12px}
+	.mailing-list .list{max-height: 500px;position: relative;overflow: auto;border-right: 1px solid #ddd}
+	.mailing-list .list > .calculate{border-top:1px solid #ddd;}
+	.mailing-list .list > .calculate > p{margin:0px; padding: 10px;}
+	.mailing-list .list > .mail{padding: 10px;font-size: 12px;}
 	.mailing-list .list > .mail:not(:last-child){border-bottom:1px solid #ddd;}
 	.mailing-list .list > .mail.active,.mailing-list .list > .mail:hover{background-color: #a9c1d6;cursor: pointer;}
 	.mailing-list .list > .mail > .mail_to{color: #000;font-size: 14px}
@@ -12,7 +14,7 @@
 	.mailing-list .list > .mail > .mail_message{padding: 2px 0px}
 	.mailing-list .list > .mail > .mail_subject,.mailing-list .list > .mail > .mail_message,.mailing-list .list > .mail > .mail_to small{color: #605e5c}
 	.l-mail{display: block;}
-	.mailing-list .detail-mail{padding: 5px 0px}
+	.mailing-list .detail-mail{padding: 5px 0px;max-height: 500px;position: relative;overflow: auto;}
 	.mailing-list .detail-mail .info-created{border-bottom: 1px solid #ddd}
 	.mailing-list .detail-mail .info-created,.mailing-list .detail-mail .info{padding: 0px 10px}
 	.mailing-list .detail-mail .info-created > .act > .btn-remove-mail{padding: 5px 10px;color: red;}
@@ -39,9 +41,12 @@
 					<div class="mail_message"><span><?=substr($v->MessageOth,0,80).((strlen($v->MessageOth) > 80) ? "...":"")?></span></div>
 				</div>
 				<?php } }else{echo '<p style="padding:10px">Empty results</p>';} ?>
+				<div class="calculate">
+					<p>Total <?=count($results)?> mail</p>
+				</div>
 			</div>
 		</div>
-		<div class="col-sm-9 col-md-9" style="border-left:1px solid #ddd;padding-left:0px">
+		<div class="col-sm-9 col-md-9" style="padding-left:0px;height:100%">
 			<div class="detail-mail hidden">
 				<div class="info-created">
 					<div class="act pull-right">

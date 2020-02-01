@@ -19,7 +19,8 @@
 					<div class="panel-heading">
 						<div class="row">
 							<div class="col-sm-6">
-								<a class="btn btn-sm btn-primary btn-new-msg" href="<?=site_url('global-informations/message-blast/new')?>"><i class="fa fa-edit"></i> Create New Message</a>
+								<a class="btn btn-primary btn-new-msg" href="<?=site_url('global-informations/message-blast/new')?>"><i class="fa fa-edit"></i> Create New Message</a>
+								<button class="btn btn-info" type="button" type="button" data-toggle="collapse" data-target="#coll-filter" aria-expanded="false" aria-controls="coll-filter"><i class="fa fa-filter"></i> Filter</button>
 							</div>
 							<div class="col-sm-6">
 								<div class="pull-right">
@@ -28,7 +29,7 @@
 									    <i class="fa fa-cog"></i>
 									  </button>
 									  <ul class="dropdown-menu pull-right" aria-labelledby="drpConfig">
-									    <li><a href="<?=site_url('global-informations/subject-type')?>">Subject Type</a></li>
+									    <li><a href="<?=site_url('global-informations/subject-type')?>"><i class="fa fa-list-alt"></i> Subject Type</a></li>
 									  </ul>
 									</div>
 								</div>								
@@ -36,7 +37,7 @@
 							
 						</div>
 					</div>
-					<div class="panel-body" style="padding:0px">
+					<div class="panel-body collapse" style="padding:0px" id="coll-filter">
 						<div class="fetch-message">
 							<div class="row">
 								<div class="col-sm-3">
