@@ -286,9 +286,6 @@ class Globalinformation_model extends CI_Model{
 
           return $value;
     }
-
-
     /* end Added by Adhi */
-
 
 }

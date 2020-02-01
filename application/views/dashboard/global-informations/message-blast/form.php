@@ -27,10 +27,10 @@
 					</div>
 					<div class="panel-body">
 						<div class="frm-msg">
-							<form id="form-submit-mail" action="" method="post" autocomplete="off">
+							<form id="form-submit-mail" action="<?=site_url('global-informations/message-blast/send')?>" method="post" autocomplete="off">
 								<div class="form-group">
 									<label>From</label>
-									<input type="text" name="mail_from" value="it.support@podomorouniversity.ac.id" readonly class="form-control readonly required" required>
+									<input type="text" name="mail_from" value="pu@podomorouniversity.ac.id" readonly class="form-control readonly required" required>
 									<small class="text-danger text-message"></small>
 								</div>
 								<div class="form-group">
@@ -67,7 +67,7 @@
 								</div>
 								<div class="form-group">
 									<label>Type of Subject</label>
-									<select class="form-control" name="typeSubject" id="subjectType">
+									<select class="form-control required" name="typeSubject" id="subjectType" required>
 										<option value="">-Choose one-</option>	
 										<?php if(!empty($subject)){
 										foreach ($subject as $s) {
@@ -165,6 +165,7 @@
 			});
 		});
 
+
 		$("body #modal-participants").on("click",".btn-add-participants",function(){
 			var itsme = $(this);
 			var belongsto = $("body #modal-participants .modal-body input[name=belongsto]").val();
@@ -206,11 +207,13 @@
 			}
 		});
 
+
 		$("#form-submit-mail").on("click",".remove-mail",function(){
 			if(confirm("Are you sure wants to remove this mail ?")){
 				$(this).parent().remove();
 			}
 		});
+
 
 		function appendEmailTOReceiver(destination,mails) {
 			if(destination.length > 0 && mails.length > 0){
@@ -235,16 +238,18 @@
 				toastr.info('Successfully added to '+destination.toUpperCase());
 				
 			}else{
-				alert("Internal server error. Failed add participants mail.");
-				toastr.danger('Internal server error. Failed add participants mail from '+destination.toUpperCase());
+				toastr.warning('Internal server error. Failed add participants mail from '+destination.toUpperCase());
+				//alert("Internal server error. Failed add participants mail from "+destination.toUpperCase());
 			}
 		}
+
 
 		$(".btn-discard").click(function(){
 			if(confirm("Are you sure wants to DISCARD this message ?")){
 				$(location).attr("href","<?=site_url('global-informations/message-blast')?>");
 			}
 		});
+
 
 		$("#subjectType").change(function(){
 			var ID = $(this).val();
@@ -281,7 +286,7 @@
 				    				dearDestination += "All,";
 				    			}
 				    		}else{dearDestination="Dear,"}
-				    		var message = "<h5>"+dearDestination+"</h5>"+response.template;
+				    		var message = "<p>"+dearDestination+"</p>"+response.template;
 				    		$('#message-blst').summernote("code",message);
 				    	}
 				    }
@@ -290,6 +295,38 @@
 				$("#form-submit-mail .subject-field").val("");
 				$('#message-blst').summernote("code","");
 			}
+		});
+
+
+		$(".btn-submit").click(function(){
+			var error = false;
+			var itsme = $(this);
+			var itsform = itsme.parent().parent();
+		 	itsform.find(".required").each(function(){
+			  	var value = $(this).val();
+			  	if($.trim(value) == ''){
+			  		$(this).addClass("error");
+			  		$(this).parent().find(".text-message").text("Please fill this field");
+			  		error = false;
+			  	}else{
+			  		error = true;
+			  		$(this).removeClass("error");
+			  		$(this).parent().find(".text-message").text("");
+			  	}
+		  	});
+		 	
+		 	var totalError = itsform.find(".error").length;
+		 	var totalReceiver = $("#form-submit-mail .box-mail.receiver .list-mail .bg-mail").length;
+
+		  	if(error && totalError == 0 && totalReceiver > 0){
+		  		loading_modal_show();
+				$("#form-submit-mail")[0].submit();
+		  	}else{
+		  		alert("Please fill out the field"+((totalReceiver == 0) ? " and participants.":"") );
+		  		if(totalReceiver == 0){
+		  			$(".box-mail.receiver").next().text("Please fill this field");
+		  		}
+		  	}
 		});
 
 	});
