@@ -1007,7 +1007,7 @@
         data = {
           Username : sessionNIP,
           password_encryption : "<?php echo $this->session->userdata('Password') ?>",
-          LoginFrom : 'Pcam',
+          LoginFrom : 'Pcam', // Lecturer,Student
         }
         var token = jwt_encode(data,"UAP)(*");
         FormSubmitAuto(url, 'POST', [
