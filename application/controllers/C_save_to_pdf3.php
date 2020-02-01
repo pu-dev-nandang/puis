@@ -3355,17 +3355,18 @@ class C_save_to_pdf3 extends CI_Controller {
             $d = (array) $dataBAP[$i];
             $bap = (count($d['BAP'])>0) ? $d['BAP'][0] : [];
 
-            $Tanggal = (count($d['BAP'])>0 && $bap->InsertAt!='' && $bap->InsertAt!=null) ? date('d M Y',strtotime($bap->InsertAt)) : '';
+
             $Subject = (count($d['BAP'])>0 && $bap->Subject!='' && $bap->Subject!=null) ? $bap->Subject : '';
             $Material = (count($d['BAP'])>0 && $bap->Material!='' && $bap->Material!=null) ? $bap->Material : '';
             $Description = (count($d['BAP'])>0 && $bap->Description!='' && $bap->Description!=null) ? $bap->Description : '';
             $Present = (count($d['BAP'])>0 && $d['Present']!='' && $d['Present']!=null) ? $d['Present'] : '';
 
             $dataLec = $d['Lecturer'];
-            $In = ''; $Out = '';
+            $Tanggal = ''; $In = ''; $Out = '';
             if(count($dataLec)>0){
                 for($l=0;$l<count($dataLec);$l++){
                     if($NIPLecturer==$dataLec[$l]->NIP){
+                        $Tanggal = ($dataLec[$l]->Date!='' && $dataLec[$l]->Date!=null) ? date('d M Y',strtotime($dataLec[$l]->Date)) : '';
                         $In = ($dataLec[$l]->In!='' && $dataLec[$l]->In!=null) ? substr($dataLec[$l]->In,0,5) : '';
                         $Out = ($dataLec[$l]->Out!='' && $dataLec[$l]->Out!=null) ? substr($dataLec[$l]->Out,0,5) : '';
                         break;
