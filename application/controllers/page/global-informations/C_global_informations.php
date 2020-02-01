@@ -779,7 +779,7 @@ class C_global_informations extends Globalclass {
                 "draw"            => intval( $reqdata['draw'] ),
                 "recordsTotal"    => intval($TotalDataRS),
                 "recordsFiltered" => intval($TotalDataRS),
-                "data"            => (!empty($result) ? $result : null)
+                "data"            => (!empty($result) ? $result : 0)
             );
 
         }else{$json_data=null;}

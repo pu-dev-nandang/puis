@@ -72,7 +72,7 @@
 						</div>
 					</div>
 					<div class="panel-body" style="padding:0px">
-						<div class="load-list-mail">...</div>
+						<div class="load-list-mail"><center><i class="fa fa-circle-o-notch fa-spin"></i><center></div>
 					</div>
 				</div>
 			</div>
