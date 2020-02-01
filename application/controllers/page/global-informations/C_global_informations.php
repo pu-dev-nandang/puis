@@ -6,7 +6,7 @@ class C_global_informations extends Globalclass {
 
     function __construct(){
         parent::__construct();
-        $this->load->model(array("General_model","global-informations/Globalinformation_model"));
+        $this->load->model(array("General_model","global-informations/Globalinformation_model","M_sendemail"));
     }
 
 
@@ -299,7 +299,7 @@ class C_global_informations extends Globalclass {
     		$nestedData = array();    		
     		$nestedData[] = ($no++);
     		$nestedData[] = $lecturerBox;
-    		$nestedData[] = (!empty($v->PlaceOfBirth) ? $v->PlaceOfBirth : '').date("d F Y",strtotime($v->DateOfBirth));
+    		$nestedData[] = (!empty($v->PlaceOfBirth) ? $v->PlaceOfBirth.', ' : '').date("d F Y",strtotime($v->DateOfBirth));
     		$nestedData[] = $v->EmpReligion;
     		$nestedData[] = (!empty($v->Gender) ? (($v->Gender == "L") ? "Male":"Female") : "");
     		$nestedData[] = $v->EmpLevelDesc;
@@ -610,6 +610,134 @@ class C_global_informations extends Globalclass {
     	$data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
 		echo $this->load->view("dashboard/global-informations/message-blast/filter/Employee",$data,true);
 	}
+
+
+    public function messageBlastSend(){
+        $data = $this->input->post();
+        $json = array();
+        $myname = $this->session->userdata('Name');
+        $mynip = $this->session->userdata('NIP');
+        if($data){
+            $getCogMail = $this->General_model->fetchData("db_mail_blast.cog_limit",array())->row();
+            $limit = (!empty($getCogMail) ? $getCogMail->limit : 0);
+            $mail_bcc = (!empty($getCogMail) ? $getCogMail->mail_bcc : 'it@podomorouniversity.ac.id');
+            $message = "";
+            $receiver = $data["mail_receiver_to"];
+            $receiver_cc = $data["mail_receiver-cc_to"];
+            $mail_subject = $data["subject"];
+            $mail_message = $data["message"];
+            $totalMail = count($receiver) + count($receiver_cc) + 1;
+            
+            $status = false; $dataInsert = array();
+            if(count($receiver) > $limit ){
+                $finish = false;
+                $storedMail = array_chunk($receiver, $limit);
+                foreach ($storedMail as $s) {
+                    $sendEmail = $this->M_sendemail->sendEmail($s,$mail_subject,null,null,null,null,$mail_message,null,null,$receiver_cc,$mail_bcc);
+                    try {
+                        $finish = ($sendEmail['status'] == 1) ? true:false;
+                    } catch (Exception $e) {
+                        $finish = false;
+                    }                    
+                }
+                $message = "Mail sent ".(($finish) ? "successfully.":"failed.");
+                $status = $finish;
+                $dataInsert['isSend'] = $finish;
+            }else{
+                $sendEmail = $this->M_sendemail->sendEmail($receiver,$mail_subject,null,null,null,null,$mail_message,null,null,$receiver_cc,$mail_bcc);
+                try {
+                    $message = "Mail sent ".(($sendEmail == 1) ? "successfully.":"failed.");
+                    $status = (($sendEmail == 1) ? true : false);
+                    $dataInsert['isSend'] = $status;
+                } catch (Exception $e) {
+                    $message = "Mail sent failed. Internal server error.";
+                    $status = false;
+                    $dataInsert['isSend'] = $status;
+                }
+            }
+
+            //insert to db
+            if($status){                
+                $dataInsert['SubjectTypeID'] = $data['typeSubject'];
+                $dataInsert['mail_from'] = $data['mail_from'];
+                $dataInsert['mail_to'] = json_encode($data['mail_receiver_to']);
+                $dataInsert['mail_cc'] = json_encode($data['mail_receiver-cc_to']);
+                $dataInsert['mail_bcc'] = $mail_bcc;
+                $dataInsert['SubjectOth'] = $data['subject'];
+                $dataInsert['MessageOth'] = $data['message'];
+                $dataInsert['isFlag'] = 0;
+                $dataInsert['isShow'] = 1;
+                $dataInsert['createdby'] = $mynip."/".$myname;
+                $insertMailBlast = $this->General_model->insertData("db_mail_blast.mail_blast",$dataInsert);
+            }
+
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('global-informations/message-blast')); 
+        }
+    }
+
+
+    public function fetchMyMail(){
+        $data = $this->input->post();
+        $mynip = $this->session->userdata('NIP');
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $conditions = "createdby like '".$mynip."%' and isShow = 1";
+            $sortby = "created";
+            if(!empty($data_arr['Filter'])){            
+                $parse = parse_str($data_arr['Filter'],$output);
+                if(!empty($output['keywords'])){
+                    $conditions .= " and (mail_to like '%".$output['keywords']."%' or SubjectOth like '%".$output['keywords']."%' or MessageOth like '%".$output['keywords']."%' ) ";
+                }
+                if(!empty($output['sort_label'])){
+                    $sortby = $output['sort_label'];
+                }
+            }
+            $data['results'] = $this->General_model->fetchData("db_mail_blast.mail_blast",$conditions,$sortby,"desc")->result();
+            $this->load->view("dashboard/global-informations/message-blast/list",$data);
+        }
+    }
+
+
+    public function detailMail(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist = $this->General_model->fetchData("db_mail_blast.mail_blast",array("ID"=>$data_arr['MAILID']))->row();
+            if(!empty($isExist)){
+                $isExist->mail_to = json_decode($isExist->mail_to,true);
+                $isExist->mail_cc = json_decode($isExist->mail_cc,true);
+                $isExist->created = date("d F Y, H:i:s",strtotime($isExist->created));                
+
+                $json = $isExist;
+            }
+        }
+        echo json_encode($json);
+    }
+
+
+    public function removeMail(){
+        $data = $this->input->post();
+        $myname = $this->session->userdata('Name');
+        $mynip = $this->session->userdata('NIP');
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist = $this->General_model->fetchData("db_mail_blast.mail_blast",array("ID"=>$data_arr['MAILID']))->row();
+            if(!empty($isExist)){
+                $update = $this->General_model->updateData("db_mail_blast.mail_blast",array("isShow"=>0,"editedby"=>$mynip."/".$myname),array("ID"=>$data_arr['MAILID']));
+                $message = ($update) ? "Successfully updated":"Failed updated. Error ".$update;
+            }else{
+                $message = "Data is not founded. Try again.";
+            }
+            $json = array("message"=>$message);
+        }
+        echo json_encode($json);
+    }
 
 /*END MESSAGE BLAST*/
 

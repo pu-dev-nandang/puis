@@ -166,7 +166,7 @@ class M_sendemail extends CI_Model {
 
     }
 
-    public function sendEmail($to = null,$subject = null,$smtp_host = null,$smtp_port = null,$smtp_user = null,$smtp_pass = null,$text = null, $attach = null, $title = null)
+    public function sendEmail($to = null,$subject = null,$smtp_host = null,$smtp_port = null,$smtp_user = null,$smtp_pass = null,$text = null, $attach = null, $title = null,$cc=null,$bcc=null)
     {
         $arr = array(
             'status' => 1,
@@ -188,6 +188,14 @@ class M_sendemail extends CI_Model {
         $this->email->set_newline("\r\n");
         $this->email->from('pu@podomorouniversity.ac.id','PU Notifications');
         $this->email->to($to);
+        /*ADDED BY FEBRI @ JAN 2020*/
+        if(!empty($cc)){
+            $this->email->cc($cc);
+        }
+        if(!empty($bcc)){
+            $this->email->bcc($bcc);
+        }
+        /*ADDED BY FEBRI @ JAN 2020*/
         $this->email->subject($subject.' - '.$BilingID);
         $this->email->message($this->VariableClass['text']);
         if ($attach != null) {
