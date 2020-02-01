@@ -126,6 +126,7 @@ setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF
             define("url_sign_in_lecturers",$HostPath."lecturerpu.podomorouniversity.ac.id/", true);
             define("url_sign_in_students",$HostPath."studentpu.podomorouniversity.ac.id/", true);
             define("url_library","http://library.podomorouniversity.ac.id/", true);
+            define("url_blogadmin",$HostPath."adminblogs.podomorouniversity.ac.id/", true);
             
             define("path_register_online","/var/www/html/registeronline/", true);
             define('ENVIRONMENT', 'production',true);
@@ -145,6 +146,7 @@ setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF
             define("url_sign_in_lecturers",$HostPath."demolecturerpu.podomorouniversity.ac.id/", true);
             define("url_sign_in_students",$HostPath."demostudentpu.podomorouniversity.ac.id/", true);
             define("url_library","http://library.podomorouniversity.ac.id/", true);
+            define("url_blogadmin",$HostPath."demoadminblogs.podomorouniversity.ac.id/", true);
             
             define("path_register_online","C:/nginx/html/registeronline/", true);
             define('ENVIRONMENT', 'development',true);
@@ -170,6 +172,7 @@ setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF
             define("url_sign_in_lecturers",$HostPath."localhost".port."/lecturer/", true);
             define("url_sign_in_students",$HostPath."localhost".port."/students/", true);
             define("url_library","http://library.podomorouniversity.ac.id/", true);
+            define("url_blogadmin",$HostPath."localhost/blogscms/", true);
 
             define("url_lecturers",url_sign_in_lecturers."home", true);
             define("url_students",url_sign_in_students."home", true);
