@@ -10354,7 +10354,7 @@ class C_api extends CI_Controller {
                 "draw"            => intval( $reqdata['draw'] ),
                 "recordsTotal"    => intval($TotalDataPS),
                 "recordsFiltered" => intval($TotalDataPS),
-                "data"            => (!empty($result) ? $result : null)
+                "data"            => (!empty($result) ? $result : 0)
             );
 
         }else{$json_data=null;}
@@ -10376,6 +10376,7 @@ class C_api extends CI_Controller {
                 $search = $reqdata['search']['value'];
 
                 $param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);    
+                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' ","filter"=>"OR",);    
                 $param[] = array("field"=>"em.NIDN","data"=>" like '%".$search."%' )","filter"=>"OR",);    
             }
             if(!empty($data_arr['Filter'])){            
@@ -10513,7 +10514,7 @@ class C_api extends CI_Controller {
                 "draw"            => intval( $reqdata['draw'] ),
                 "recordsTotal"    => intval($TotalData),
                 "recordsFiltered" => intval($TotalData),
-                "data"            => (!empty($result) ? $result : null)
+                "data"            => (!empty($result) ? $result : 0)
             );
 
         }else{$json_data=null;}

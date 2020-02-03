@@ -30,6 +30,9 @@
 									  </button>
 									  <ul class="dropdown-menu pull-right" aria-labelledby="drpConfig">
 									    <li><a href="<?=site_url('global-informations/subject-type')?>"><i class="fa fa-list-alt"></i> Subject Type</a></li>
+									    <?php if($this->session->userdata('PositionMain')['IDDivision'] == 12){ ?>
+									    <li><a href="<?=site_url('global-informations/message-blast/configMail')?>"><i class="fa fa-cogs"></i> Mail Configuration</a></li>
+									    <?php } ?>
 									  </ul>
 									</div>
 								</div>								
