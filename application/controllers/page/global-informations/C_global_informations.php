@@ -646,8 +646,8 @@ class C_global_informations extends Globalclass {
             }else{
                 $sendEmail = $this->M_sendemail->sendEmail($receiver,$mail_subject,null,null,null,null,$mail_message,null,null,$receiver_cc,$mail_bcc);
                 try {
-                    $message = "Mail sent ".(($sendEmail == 1) ? "successfully.":"failed.");
-                    $status = (($sendEmail == 1) ? true : false);
+                    $message = "Mail sent ".(($sendEmail['status'] == 1) ? "successfully.":"failed.");
+                    $status = (($sendEmail['status'] == 1) ? true : false);
                     $dataInsert['isSend'] = $status;
                 } catch (Exception $e) {
                     $message = "Mail sent failed. Internal server error.";
