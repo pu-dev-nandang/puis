@@ -232,7 +232,7 @@
                         <?php } ?>
 
                             <!-- Adding for Testing -->
-                            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; ?>
+                            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
                                  <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='request-document-generator'){echo 'active';} ?>">
                                      <a href="<?php echo base_url('request-document-generator'); ?>"><i class="glyphicon glyphicon-transfer" aria-hidden="true"></i> Request Document Generator</a>
                                  </li>
