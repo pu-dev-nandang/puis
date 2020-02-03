@@ -187,7 +187,7 @@
 		                            <thead>
 		                                <tr>
 											<th width="2%"><input type="checkbox" name="select_all"></th>
-											<th width="30%">Lecturer</th>
+											<th width="30%">Employee</th>
 											<th width="20%">Study Program</th>
 											<th width="20%">Email</th>
 											<th width="20%">Email PU</th>

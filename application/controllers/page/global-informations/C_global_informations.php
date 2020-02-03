@@ -618,22 +618,23 @@ class C_global_informations extends Globalclass {
         $myname = $this->session->userdata('Name');
         $mynip = $this->session->userdata('NIP');
         if($data){
-            $getCogMail = $this->General_model->fetchData("db_mail_blast.cog_limit",array())->row();
+            $getCogMail = $this->General_model->fetchData("db_mail_blast.cog_mail",array())->row();
             $limit = (!empty($getCogMail) ? $getCogMail->limit : 0);
             $mail_bcc = (!empty($getCogMail) ? $getCogMail->mail_bcc : 'it@podomorouniversity.ac.id');
             $message = "";
             $receiver = $data["mail_receiver_to"];
-            $receiver_cc = $data["mail_receiver-cc_to"];
+            $receiver_cc = (!empty($data["mail_receiver-cc_to"]) ? $data["mail_receiver-cc_to"] : null);
+            $receiver_bcc = (!empty($data["mail_receiver-bcc_to"]) ? $data["mail_receiver-bcc_to"] : null);
             $mail_subject = $data["subject"];
             $mail_message = $data["message"];
-            $totalMail = count($receiver) + count($receiver_cc) + 1;
-            
+            $totalMail = count($receiver) + count($receiver_cc);
+            array_push($receiver_bcc, $mail_bcc);
             $status = false; $dataInsert = array();
             if(count($receiver) > $limit ){
                 $finish = false;
                 $storedMail = array_chunk($receiver, $limit);
                 foreach ($storedMail as $s) {
-                    $sendEmail = $this->M_sendemail->sendEmail($s,$mail_subject,null,null,null,null,$mail_message,null,null,$receiver_cc,$mail_bcc);
+                    $sendEmail = $this->M_sendemail->sendEmail($s,$mail_subject,null,null,null,null,$mail_message,null,null,$receiver_cc,$receiver_bcc);
                     try {
                         $finish = ($sendEmail['status'] == 1) ? true:false;
                     } catch (Exception $e) {
@@ -644,7 +645,7 @@ class C_global_informations extends Globalclass {
                 $status = $finish;
                 $dataInsert['isSend'] = $finish;
             }else{
-                $sendEmail = $this->M_sendemail->sendEmail($receiver,$mail_subject,null,null,null,null,$mail_message,null,null,$receiver_cc,$mail_bcc);
+                $sendEmail = $this->M_sendemail->sendEmail($receiver,$mail_subject,null,null,null,null,$mail_message,null,null,$receiver_cc,$receiver_bcc);
                 try {
                     $message = "Mail sent ".(($sendEmail['status'] == 1) ? "successfully.":"failed.");
                     $status = (($sendEmail['status'] == 1) ? true : false);
@@ -662,7 +663,7 @@ class C_global_informations extends Globalclass {
                 $dataInsert['mail_from'] = $data['mail_from'];
                 $dataInsert['mail_to'] = json_encode($data['mail_receiver_to']);
                 $dataInsert['mail_cc'] = json_encode($data['mail_receiver-cc_to']);
-                $dataInsert['mail_bcc'] = $mail_bcc;
+                $dataInsert['mail_bcc'] = json_encode($receiver_bcc);
                 $dataInsert['SubjectOth'] = $data['subject'];
                 $dataInsert['MessageOth'] = $data['message'];
                 $dataInsert['isFlag'] = 0;
@@ -848,5 +849,28 @@ class C_global_informations extends Globalclass {
         echo json_encode($json);
     }
 /*END SUBJECT TYPE*/
+
+
+/*CONFIGURATION MAIL*/
+    public function configMail(){
+        $data['title'] = "Mail Configuration";
+        if($this->input->post()){
+            $post = $this->input->post();
+            if(!empty($post['ID'])){
+                //update
+                $update = $this->General_model->updateData("db_mail_blast.cog_mail",$post,array("ID"=>$post['ID']));
+                $message = (($update) ? "Successfully":"Failed")." updated.";
+            }else{
+                //insert
+                $insert = $this->General_model->insertData("db_mail_blast.cog_mail",$post);
+                $message = (($insert) ? "Successfully":"Failed" )." saved.";
+            }
+            $this->session->set_flashdata("message",$message);
+        }
+        $data['result'] = $this->General_model->fetchData("db_mail_blast.cog_mail",array("isActive"=>1))->row();
+        $page = $this->load->view('dashboard/global-informations/message-blast/configMail',$data,true);
+        $this->blast_global_informations($page);
+    }
+/*END CONFIGURATION MAIL*/
 
 }

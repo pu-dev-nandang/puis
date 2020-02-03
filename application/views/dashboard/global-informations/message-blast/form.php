@@ -65,6 +65,24 @@
 									</div>
 									<small class="text-danger text-message"></small>
 								</div>
+								
+								<div class="form-group">
+									<label>BCC</label>
+									<div class="box-mail receiver-bcc" data-target="receiver-bcc">
+										<div class="row">
+											<div class="col-sm-10 col-md-9 left">
+												<div class="list-mail"></div>
+											</div>
+											<div class="col-sm-2 col-md-3 right">
+												<div class="act-find find-participants">
+													<span><i class="fa fa-search"></i> Find participants</span>																									
+												</div>
+											</div>
+										</div>
+									</div>
+									<small class="text-danger text-message"></small>
+								</div>
+
 								<div class="form-group">
 									<label>Type of Subject</label>
 									<select class="form-control required" name="typeSubject" id="subjectType" required>
