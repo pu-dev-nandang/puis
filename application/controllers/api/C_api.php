@@ -4609,6 +4609,7 @@ class C_api extends CI_Controller {
                     }
 
                     $nestedData[] = '<div style="text-align:center; color: #000000;">'.$no.'</div>';
+                    $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['TypeFiles'].'</div>';
                     $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['NameFiles'].'</div>';
                     $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
                     $data[] = $nestedData;
@@ -7135,16 +7136,18 @@ class C_api extends CI_Controller {
 
         else if($data_arr['action']=='update_mster_katother'){
 
+            $typefiles = $data_arr['name_sort'];
             $name_katother = ucwords($data_arr['name_katother']);
             
             $dataAttdS = $this->db->query('SELECT * FROM db_employees.master_files
-                                          WHERE NameFiles = "'.$name_katother.'" ')->result_array();
+                                          WHERE TypeFiles = "'.$typefiles.'" OR NameFiles = "'.$name_katother.'" ')->result_array();
 
             if(count($dataAttdS)>0){
                 return print_r(0);
             } 
             else {
                 $dataSave = array(
+                    'TypeFiles' => $typefiles,
                     'NameFiles' => $name_katother
                 );
                 $this->db->insert('db_employees.master_files',$dataSave);

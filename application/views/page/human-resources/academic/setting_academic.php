@@ -196,14 +196,18 @@
     $(document).on('click','.btnSubmitKatOtherFiles', function () {
         
         var name_katother = $('#name_kat_otherfiles').val();
+        var name_sort = $('#name_sort').val();
 
-            if(name_katother!='' && name_katother!=null
-                ){
+            if(name_sort!='' && name_sort!=null
+                && name_katother!='' && name_katother!=null
+             ){
                 loading_button('.btnSubmitKatOtherFiles');
 
                 var data = {
                     action : 'update_mster_katother',
-                    name_katother : name_katother
+                    name_katother : name_katother,
+                    name_sort : name_sort
+
                 };
 
                 var token = jwt_encode(data,'UAP)(*');
@@ -284,10 +288,14 @@
     $(document).on('click','.add_kat_otherfiles', function () {
         var body = '<div class="row">' +
             '         <div class="col-md-12">' +
-            '           <h4><b> ADD CATEGORY FILES</b></h4>' +
+            '           <h4><b> ADD CATEGORY OTHER FILES</b></h4>' +
             '           <div class="well">' +
-             '               <div class="form-group">' +
-            '                   <label>Name Category Other File</label>'+
+            '               <div class="form-group">' +
+            '                   <label>Name Sort (Alias)</label>'+
+            '                   <input class="form-control" id="name_sort">' +
+            '               </div>' +
+            '               <div class="form-group">' +
+            '                   <label>Name Category</label>'+
             '                   <input class="form-control" id="name_kat_otherfiles">' +
             '               </div>' +
             '           </div>' +
@@ -379,7 +387,8 @@
             '                    <thead>                                                                                '+
             '                    <tr style="background: #20485A;color: #FFFFFF;">                                       '+
             '                        <th style="width: 5%; text-align: center;">No</th>                                 '+
-            '                        <th style="width: 25%; text-align: center;">Name Category File</th>                '+
+            '                        <th style="width: 25%; text-align: center;">Name Sort (Alias)</th>                '+
+            '                        <th style="width: 25%; text-align: center;">Name Category</th>                '+
             '                        <th style="text-align: center;width: 8%;">Action</th>                              '+
             '                    </tr>                                                                                  '+
             '                    </thead>                                                                               '+
