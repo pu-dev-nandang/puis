@@ -481,11 +481,11 @@
             $("#tableEmployees tr").each(function(){
                 var a = $(this);
                 var No = a.find('td:eq(0)').text();
+                var NPM = a.find('td:eq(1)').text();;
+                var Name = a.find('td:eq(2) b').text();
+                var PathFoto = a.find('td:eq(2) img').attr("src");
                 var G_attr = a.find('td:eq(7)').find('.PrintIDCard');
                 var type = G_attr.attr('type');
-                var NPM = G_attr.attr('data-npm');
-                var Name = G_attr.attr('data-name');
-                var PathFoto = G_attr.attr('path');
                 var email = G_attr.attr('email');
                 var checkbox = '<input type="checkbox" class="uniform" type2 = "employees" data-npm="'+NPM+'" data-name="'+Name+'" path = "'+PathFoto+'" email = "'+email+'">';
                 a.find('td:eq(0)').html(No+'&nbsp'+checkbox);
