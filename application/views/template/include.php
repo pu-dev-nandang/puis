@@ -540,7 +540,21 @@
     }
 
     function dateTimeNow() {
-        return moment().format('YYYY-MM-DD HH:mm:ss');
+        var phpNowDateTime = '<?= date("Y-m-d H:i:s"); ?>';
+        // return moment().format('YYYY-MM-DD HH:mm:ss');
+        return phpNowDateTime;
+    }
+
+    function getDateNow() {
+        var phpNowDateTime = '<?= date("Y-m-d"); ?>';
+        // return moment().format('YYYY-MM-DD HH:mm:ss');
+        return phpNowDateTime;
+    }
+
+    function getTimeNow() {
+        var phpNowDate = '<?= date("H:i:s"); ?>';
+        // return moment().format('YYYY-MM-DD HH:mm:ss');
+        return phpNowDateTime;
     }
 
     function ucwords(str) {

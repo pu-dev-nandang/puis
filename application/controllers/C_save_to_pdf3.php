@@ -3228,21 +3228,149 @@ class C_save_to_pdf3 extends CI_Controller {
     public function bap_online(){
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
-//        print_r($data_arr);
-//        exit;
+
+//        print_r($data_arr);exit;
 
         $fpdf = new Pdf_mc_table('L', 'mm', 'A4');
+        $fpdf->AddPage();
+        $fpdf->SetMargins(5,5,5);
+        $fpdf->SetAutoPageBreak(true, 5);
+
+        $b = 0;
+        $h_3 = 3;
+        $h_5 = 5;
+        $h_10 = 10;
+
+        $fpdf->setFillColor(242, 242, 242);
+
+
+        // 287
+//        $fpdf->Image('./images/logo-l2.png',124.5,5,47);
+
+        $fpdf->Image('./images/new_logo_pu.png',5,5,41);
+
+
+        $fpdf->SetFont('Arial','',7);
+        $fpdf->Cell(0,$h_3,'FM-UAP/AKD-08-02-REV.01',$b,1,'R');
+
+
+        $label_spasi = 43.5;
+        $label_1 = 45;
+        $label_2 = 5;
+        $label_3 = 200 - $label_2 - $label_1;
+        $h_label = 10;
+
+        $Course = (array) $data_arr['dataCourse'];
+
+        // Maksimal 11 Dosen
+        $totalDosen = count($Course['TeamTeaching']);
+
+        $fpdf->SetFont('Arial','B',15);
+        $fpdf->Cell(0,$h_5,'Berita Acara Perkuliahan',$b,1,'C');
+
+        $fpdf->SetFont('Arial','',10);
+        $fpdf->Cell(0,$h_5,'Semester : '.$Course['SemesterName'],$b,1,'C');
+        $fpdf->Ln(7);
+
+
+
+        $fpdf->SetLineWidth(0.01);
+        $fpdf->SetDash(0.7,1);
+
+        $fpdf->SetFont('Arial','',11);
+        $b = '0';
+
+        if(count($Course['DetailProdi'])>0){
+            for($p=0;$p<count($Course['DetailProdi']);$p++){
+
+                if($p==0){
+                    $fpdf->Cell($label_spasi,$h_label,'',0,0,'C');
+                    $fpdf->Cell($label_1,$h_label,'Program Studi',$b,0,'L');
+                    $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+                    $fpdf->Cell($label_3,$h_label,$Course['DetailProdi'][$p]->Name,'B',1,'L');
+                } else {
+                    $fpdf->Cell($label_spasi,$h_label,'',0,0,'C');
+                    $fpdf->Cell($label_1,$h_label,'',$b,0,'L');
+                    $fpdf->Cell($label_2,$h_label,'',$b,0,'C');
+                    $fpdf->Cell($label_3,$h_label,$Course['DetailProdi'][$p]->Name,'B',1,'L');
+                }
+
+            }
+        }
+
+
+        $fpdf->Cell($label_spasi,$h_label,'',0,0,'C');
+        $fpdf->Cell($label_1,$h_label,'Mata Kuliah',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_3,$h_label,$Course['Course'],'B',1,'L');
+
+        $fpdf->Cell($label_spasi,$h_label,'',0,0,'C');
+        $fpdf->Cell($label_1,$h_label,'Kelas / Group',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_1,$h_label,$Course['ClassGroup'],'B',0,'L');
+        $fpdf->Cell($label_2,$h_label,'',$b,0,'C');
+        $fpdf->Cell($label_1,$h_label,'Mahasiswa Terdaftar',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell(50,$h_label,$Course['TotalStudent'],'B',1,'L');
+
+        $fpdf->Cell($label_spasi,$h_label,'',0,0,'C');
+        $fpdf->Cell($label_1,$h_label,'SKS',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_1,$h_label,$Course['Credit'],'B',0,'L');
+        $fpdf->Cell($label_2,$h_label,'',$b,0,'C');
+        $fpdf->Cell($label_1,$h_label,'Semester',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell(50,$h_label,'','B',1,'L');
+
+
+
+        $fpdf->Cell($label_spasi,$h_label,'',0,0,'C');
+        $fpdf->Cell($label_1,$h_label,'Jadwal',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_3,$h_label,$Course['DayName'].' | '.$Course['StartSessions'].' - '.$Course['EndSessions'],'B',1,'L');
+
+
+        $fpdf->Cell($label_spasi,$h_label,'',0,0,'C');
+        $fpdf->Cell($label_1,$h_label,'Ruang',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_3,$h_label,$Course['Room'],'B',1,'L');
+
+        $fpdf->Cell($label_spasi,$h_label,'',0,0,'C');
+        $fpdf->Cell($label_1,$h_label,'Dosen Koordinator',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_3,$h_label,$Course['Coordinator'].' - '.ucwords(strtolower($Course['CoordinatorName'])),'B',1,'L');
+
+        for ($t=0;$t<$totalDosen;$t++){
+            if($t==0){
+                $fpdf->Cell($label_spasi,$h_label,'',0,0,'C');
+                $fpdf->Cell($label_1,$h_label,'Tim Dosen',$b,0,'L');
+                $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+                $fpdf->Cell($label_3,$h_label,$Course['TeamTeaching'][$t]->NIP.' - '.ucwords(strtolower($Course['TeamTeaching'][$t]->Name)),'B',1,'L');
+            } else {
+                $fpdf->Cell($label_spasi,$h_label,'',0,0,'C');
+                $fpdf->Cell($label_1,$h_label,'',$b,0,'L');
+                $fpdf->Cell($label_2,$h_label,'',$b,0,'C');
+                $fpdf->Cell($label_3,$h_label,$Course['TeamTeaching'][$t]->NIP.' - '.ucwords(strtolower($Course['TeamTeaching'][$t]->Name)),'B',1,'L');
+            }
+        }
+
+        $fpdf->SetFont('Arial','',7);
+        $fpdf->SetTextColor(53, 75, 255);
+        $fpdf->SetXY(5,200);
+        $fpdf->Cell(0,$h_5,'Download on : '.date('l, d F Y H:i').' | Podomoro University',0,1,'R');
+        $fpdf->SetTextColor(0, 0, 0 );
+
+
+        // ========== Penutup Sampul ===========
+
         $fpdf->AddPage();
         $fpdf->SetMargins(5,5,5);
 
         $fpdf->SetAutoPageBreak(true, 5);
 
-        $fpdf->Image('./images/logo_tr.png',5,5,41);
-        $b = 0;
-        $h_3 = 3;
-        $h_5 = 5;
+        $fpdf->Image('./images/new_logo_pu.png',5,5,41);
 
-        $Course = (array) $data_arr['dataCourse'];
+        $b = 0;
 
         $fpdf->SetFont('Arial','',7);
         $fpdf->Cell(0,$h_3,'FM-UAP/AKD-08-02-REV.01',$b,1,'R');
@@ -3254,69 +3382,9 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(0,$h_5,'Semester : '.$Course['SemesterName'],$b,1,'C');
         $fpdf->Ln(3);
 
-        $fpdf->SetFont('Arial','',9);
-        $b='0';
-        $fpdf->setFillColor(242, 242, 242);
-
-        $fpdf->SetLineWidth(0.01);
-        $fpdf->SetDash(0.7,1);
-
-        // 287
-
-        $ProdiName = '';
-        if(count($Course['DetailProdi'])>0){
-            for($p=0;$p<count($Course['DetailProdi']);$p++){
-                $koma = ($p!=0) ? ', ' : '';
-                $ProdiName = $ProdiName.$koma.$Course['DetailProdi'][$p]->Code;
-            }
-        }
-
-        $fpdf->Cell(25,$h_5,'Program Studi',$b,0,'L');
-        $fpdf->Cell(5,$h_5,':',$b,0,'C');
-        $fpdf->SetFont('Arial','B',9);
-        $fpdf->Cell(72,$h_5,$ProdiName,'B',0,'L');
-        $fpdf->SetFont('Arial','',9);
-
-        $fpdf->Cell(25,$h_5,'Mata Kuliah',$b,0,'L');
-        $fpdf->Cell(5,$h_5,':',$b,0,'C');
-        $fpdf->SetFont('Arial','B',9);
-        $fpdf->Cell(110,$h_5,$Course['Course'],'B',0,'L');
-        $fpdf->SetFont('Arial','',9);
-
-        $fpdf->Cell(25,$h_5,'SKS',$b,0,'L');
-        $fpdf->Cell(5,$h_5,':',$b,0,'C');
-        $fpdf->SetFont('Arial','B',9);
-        $fpdf->Cell(15,$h_5,$Course['Credit'],'B',1,'L');
-        $fpdf->SetFont('Arial','',9);
-
-        $fpdf->Ln(1.5);
-        $fpdf->Cell(25,$h_5,'Dosen',$b,0,'L');
-        $fpdf->Cell(5,$h_5,':',$b,0,'C');
-        $fpdf->SetFont('Arial','B',9);
-        $fpdf->Cell(72,$h_5,$Course['Name'],'B',0,'L');
-        $fpdf->SetFont('Arial','',9);
-
-        $fpdf->Cell(25,$h_5,'Kelas / Grup',$b,0,'L');
-        $fpdf->Cell(5,$h_5,':',$b,0,'C');
-        $fpdf->SetFont('Arial','B',9);
-        $fpdf->Cell(55,$h_5,$Course['ClassGroup'],'B',0,'L');
-        $fpdf->SetFont('Arial','',9);
-
-        $fpdf->Cell(35,$h_5,'Mahasiswa Terdaftar',$b,0,'L');
-        $fpdf->Cell(5,$h_5,':',$b,0,'C');
-        $fpdf->SetFont('Arial','B',9);
-        $fpdf->Cell(15,$h_5,$Course['TotalStudent'],'B',0,'L');
-        $fpdf->SetFont('Arial','',9);
-
-
-        $fpdf->Cell(25,$h_5,'Semester',$b,0,'L');
-        $fpdf->Cell(5,$h_5,':',$b,0,'C');
-        $fpdf->SetFont('Arial','B',9);
-        $fpdf->Cell(15,$h_5,'','B',1,'L');
-        $fpdf->SetFont('Arial','',9);
 
         $fpdf->setFillColor(130, 200, 222 );
-        $h_10 = 10;
+
         $b = 1;
 
         $fpdf->SetDash();
@@ -3335,20 +3403,22 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(214,0,'',0,0,'C');
         $fpdf->Cell(14.5,$h_5,'Mulai',$b,0,'C',true);
         $fpdf->Cell(14.5,$h_5,'Selesai',$b,0,'C',true);
-        $fpdf->Cell(19,$h_5,'Dosen',$b,0,'C',true);
-        $fpdf->Cell(25,$h_5,'Mahasiswa',$b,1,'C',true);
+        $fpdf->Cell(22,$h_5,'Dosen',$b,0,'C',true);
+        $fpdf->Cell(22,$h_5,'Mahasiswa',$b,1,'C',true);
 
         $fpdf->SetFont('Arial','',8);
 
-        $lineHight = 4;
+        $lineHight = 3.5;
 
-        $fpdf->SetWidths(array(9,25,55,55,55,15,14.5,14.5,19,25));
+        $fpdf->SetWidths(array(9,25,55,55,55,15,14.5,14.5,22,22));
 //        $fpdf->SetLineHeight(6.2);
-        $fpdf->SetAligns(array('C','C','L','L','L','C','C','C','C','L'));
+        $fpdf->SetAligns(array('C','C','L','L','L','C','C','C','L','L'));
 
         $dataBAP = $data_arr['detailsBAP'];
         $NIPLecturer = $Course['NIP'];
         $ReviewAkhir = '';
+        $ReviewAkhir_ReviewedBy_Name = '';
+        $ReviewAkhir_ReviewedBy_Signatures = '';
 
         for($i=0;$i<14;$i++){
 
@@ -3380,30 +3450,61 @@ class C_save_to_pdf3 extends CI_Controller {
 
             $viewStdName = (strlen($StdName)>35) ? substr($StdName,0,35).'__' : $StdName;
 
+            $InsertName = (count($d['BAP'])>0 && $bap->InsertName!='' && $bap->InsertName!=null)
+                ? ucwords(strtolower($bap->InsertName)) : '';
+            $InsertBy = (count($d['BAP'])>0 && $bap->InsertBy!='' && $bap->InsertBy!=null)
+                ? "(".$bap->InsertBy.")" : '';
+            $InsertAt = (count($d['BAP'])>0 && $bap->InsertAt!='' && $bap->InsertAt!=null)
+                ? date("d M Y H:s",strtotime($bap->InsertAt)) : '';
+
 
 
             $fpdf->Row_bapOnline($lineHight,array(
                 ($i+1),$Tanggal,
                 $Subject,$Material,$Description,
                 $Present, $In, $Out,
-                "",
+                $InsertName."\n".$InsertBy."\n".$InsertAt,
                 $viewStdName."\n".$StdNPM."\n".$StdAt,
             ));
 
             if($i==6){
                 $Review = (count($d['BAP'])>0 && $bap->Review!='' && $bap->Review!=null) ? $bap->Review : '';
+
+                $ReviewedBy_Name = (count($d['BAP'])>0 && $bap->ReviewedBy_Name!='' && $bap->ReviewedBy_Name!=null) ? $bap->ReviewedBy_Name : '';
+                $ReviewedBy_Signatures = (count($d['BAP'])>0 && $bap->ReviewedBy_Signatures!='' && $bap->ReviewedBy_Signatures!=null) ? $bap->ReviewedBy_Signatures : '';
+
                 $fpdf->SetFont('Arial','B',8);
-                $fpdf->Cell(287-44,$h_5,'Review Tengah Semester :','LRT',0,'L');
-                $fpdf->Cell(44,$h_5,'Koordinator/Kaprodi','LRT',1,'C');
+                $fpdf->Cell(287-44,$h_5,'Review Tengah Semester :','0',0,'L');
+                $fpdf->Cell(44,$h_5,'Kaprodi','0',1,'C');
+
+                $y = $fpdf->GetY();
                 $fpdf->SetFont('Arial','',8);
-                $fpdf->Cell(287-44,$h_10,$Review,'LRB',0,'L');
-                $fpdf->Cell(44,$h_10,'','LRB',1,'C');
+                $fpdf->SetXY(5,$y);
+                $fpdf->MultiCell(287-44,$h_5,$Review,0,'L');
+
+                $fpdf->Rect(5,$y-5, 287-44, 21);
+                $fpdf->Rect(287+5-44,$y-5, 44, 21);
+
+                $fpdf->SetXY(287+5-44,$y+11);
+                $fpdf->MultiCell(44,$h_5,$ReviewedBy_Name,0,'C');
+
+
+                $fpdf->SetFont('Arial','',7);
+                $fpdf->SetTextColor(53, 75, 255);
+                $fpdf->SetXY(5,$y+16);
+                $fpdf->Cell(0,$h_5,'Download on : '.date('l, d F Y H:i').' | Podomoro University',0,1,'R');
+                $fpdf->SetTextColor(0, 0, 0 );
+
+                $PathImg = './uploads/signature/'.$ReviewedBy_Signatures;
+                if($ReviewedBy_Signatures!='' && file_exists($PathImg)){
+                    $fpdf->Image($PathImg,265,$y-2,15);
+                }
 
 
                 $fpdf->AddPage();
                 $fpdf->SetMargins(5,5,5);
 
-                $fpdf->Image('./images/logo_tr.png',5,5,41);
+                $fpdf->Image('./images/new_logo_pu.png',5,5,41);
 
                 $b = 0;
                 $fpdf->SetFont('Arial','',7);
@@ -3432,24 +3533,45 @@ class C_save_to_pdf3 extends CI_Controller {
                 $fpdf->Cell(214,0,'',0,0,'C');
                 $fpdf->Cell(14.5,$h_5,'Mulai',$b,0,'C',true);
                 $fpdf->Cell(14.5,$h_5,'Selesai',$b,0,'C',true);
-                $fpdf->Cell(19,$h_5,'Dosen',$b,0,'C',true);
-                $fpdf->Cell(25,$h_5,'Mahasiswa',$b,1,'C',true);
+                $fpdf->Cell(22,$h_5,'Dosen',$b,0,'C',true);
+                $fpdf->Cell(22,$h_5,'Mahasiswa',$b,1,'C',true);
 
                 $fpdf->SetFont('Arial','',8);
             }
 
             if($i==13){
                 $ReviewAkhir = (count($d['BAP'])>0 && $bap->Review!='' && $bap->Review!=null) ? $bap->Review : '';
+                $ReviewAkhir_ReviewedBy_Name = (count($d['BAP'])>0 && $bap->ReviewedBy_Name!='' && $bap->ReviewedBy_Name!=null) ? $bap->ReviewedBy_Name : '';
+                $ReviewAkhir_ReviewedBy_Signatures = (count($d['BAP'])>0 && $bap->ReviewedBy_Signatures!='' && $bap->ReviewedBy_Signatures!=null) ? $bap->ReviewedBy_Signatures : '';
             }
 
         }
 
         $fpdf->SetFont('Arial','B',8);
         $fpdf->Cell(287-44,$h_5,'Review Akhir Semester :','LRT',0,'L');
-        $fpdf->Cell(44,$h_5,'Koordinator/Kaprodi','LRT',1,'C');
+        $fpdf->Cell(44,$h_5,'Kaprodi','LRT',1,'C');
+
+        $y = $fpdf->GetY();
         $fpdf->SetFont('Arial','',8);
-        $fpdf->Cell(287-44,$h_10,$ReviewAkhir,'LRB',0,'L');
-        $fpdf->Cell(44,$h_10,'','LRB',1,'C');
+        $fpdf->SetXY(5,$y);
+        $fpdf->MultiCell(287-44,$h_5,$ReviewAkhir,0,'L');
+
+        $fpdf->Rect(5,$y-5, 287-44, 21);
+        $fpdf->Rect(287+5-44,$y-5, 44, 21);
+
+        $fpdf->SetXY(287+5-44,$y+11);
+        $fpdf->MultiCell(44,$h_5,$ReviewAkhir_ReviewedBy_Name,0,'C');
+
+        $fpdf->SetFont('Arial','',7);
+        $fpdf->SetTextColor(53, 75, 255);
+        $fpdf->SetXY(5,$y+16);
+        $fpdf->Cell(0,$h_5,'Download on : '.date('l, d F Y H:i').' | Podomoro University',0,1,'R');
+        $fpdf->SetTextColor(0, 0, 0 );
+
+        $PathImg2 = './uploads/signature/'.$ReviewAkhir_ReviewedBy_Signatures;
+        if($ReviewAkhir_ReviewedBy_Signatures!='' && file_exists($PathImg2)){
+            $fpdf->Image($PathImg2,265,$y-2,15);
+        }
 
 
         $fpdf->Output($NIPLecturer.'_BAP_Online_'.$Course['ClassGroup'].'.pdf','I');

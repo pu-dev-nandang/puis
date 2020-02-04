@@ -46,7 +46,7 @@
 </style>
 
 <div class="row">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-12">
         <div class="well">
             <div class="row">
                 <div class="col-xs-2">
@@ -145,7 +145,7 @@
             var dataTable = $('#tableAttendance').DataTable( {
                 "processing": true,
                 "serverSide": true,
-                "iDisplayLength" : 10,
+                "iDisplayLength" : 25,
                 "ordering" : false,
                 "language": {
                     "searchPlaceholder": "Group, Code, Course"
