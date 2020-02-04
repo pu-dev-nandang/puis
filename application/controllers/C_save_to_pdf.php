@@ -7412,16 +7412,19 @@ Phone: (021) 29200456';
                                                 ps.NameEng AS ProdiEng, ps.Degree, ps.TitleDegree,
                                                 ps.DegreeEng, ps.TitleDegreeEng, el.DescriptionEng AS ProdiLevelEng,
                                                 em.NIP AS DekanNIP,em.Name AS DekanName, em.TitleAhead, em.TitleBehind, em.Signatures, f.NameEng AS FacultyName,
-                                                el.MasaStudi, el2.DescriptionEng AS ProdiLevelFutureEng, jl.NoSKPI
+                                                el.MasaStudi, el2.DescriptionEng AS ProdiLevelFutureEng, jl.NoSKPI, jd.JudiciumsDate AS SKPI_JudiciumsDate
                                                 FROM db_academic.auth_students ats
                                                 LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
                                                 LEFT JOIN db_academic.judiciums_list jl ON (jl.NPM = ats.NPM)
+                                                LEFT JOIN db_academic.judiciums jd ON (jl.JID = jd.ID)
                                                 LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
                                                 LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
                                                 LEFT JOIN db_academic.education_level el ON (el.ID = ps.EducationLevelID)
                                                 LEFT JOIN db_academic.education_level el2 ON (el2.ID = ps.EducationLevelIDFuture)
                                                 WHERE ats.NPM = "'.$NPM.'" ')->result_array();
             $d = $dataStd[0];
+
+//            print_r($d);exit;
 
             if($d['NoSKPI']!='' && $d['NoSKPI']!=null){
 
@@ -7471,11 +7474,12 @@ Phone: (021) 29200456';
                 $pdf->SetFont('dinpromedium','',$fontHeader);
                 $pdf->Cell(0,$h,'DIPLOMA SUPPLEMENT',$border,1,'C');
 
-                $InputDate = explode('-', $d['GraduationDate']);
-                $bulanRomawi = ($d['GraduationDate']!='' && $d['GraduationDate']!=null) ? $this->m_master->romawiNumber($InputDate[1]) : '';
+                $InputDate = explode('-', $d['SKPI_JudiciumsDate']);
+                $bulanRomawi = ($d['SKPI_JudiciumsDate']!='' && $d['SKPI_JudiciumsDate']!=null) ? $this->m_master->romawiNumber($InputDate[1]) : '';
+                $Year2Number = ($d['SKPI_JudiciumsDate']!='' && $d['SKPI_JudiciumsDate']!=null) ? $InputDate[0] : '';
 
                 $pdf->SetFont('dinprolight','',$fontBody);
-                $pdf->Cell(0,$h,'Number : '.str_pad($d['NoSKPI'], 4, '0', STR_PAD_LEFT).'/UAP/SKPI-'.$d['CertificateSerialNumber'].'/'.$bulanRomawi.'/'.$d['GraduationYear'],$border,1,'C');
+                $pdf->Cell(0,$h,'Number : '.str_pad($d['NoSKPI'], 4, '0', STR_PAD_LEFT).'/UAP/SKPI-'.$d['CertificateSerialNumber'].'/'.$bulanRomawi.'/'.$Year2Number,$border,1,'C');
 
                 $pdf->SetFont('dinprolight','',7);
                 $pdf->Cell(0,2,$URLQrCode,$border,1,'R');
