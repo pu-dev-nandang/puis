@@ -55,6 +55,26 @@
             </li>
             <!-- END ADDED BY FEBRI @ JAN 2020 -->
 
+            <!-- ADDED BY FEBRI @ FEB 2020 -->
+            <li class="<?= ($this->uri->segment(2)=='master-aphris') ? 'current open' : ''?>">
+                <a href="javascript:void(0);">
+                    <i class="fa fa-user-circle"></i>
+                    Master Aphris
+                    <i class="arrow <?= ($this->uri->segment(2)=='master-aphris') ? 'icon-angle-down' : 'icon-angle-left'?>"></i></a>
+                    <?php $tablename = array("master_status","master_level","master_industry_type","master_company"); ?>
+                    <ul class="sub-menu">
+                        <?php foreach ($tablename as $tb) { ?>
+                        <li class="">
+                            <a href="<?=site_url('human-resources/master-aphris/'.$tb)?>">
+                                <i class="icon-angle-right"></i>
+                                <?php $expl = explode("master_", $tb); echo str_replace("_", " ", strtoupper($expl[1]));?>
+                            </a>
+                        </li>
+                        <?php } ?>
+                    </ul>
+            </li>
+            <!-- END ADDED BY FEBRI @ FEB 2020 -->
+
 
         </ul>
 
