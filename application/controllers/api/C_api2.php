@@ -2263,7 +2263,8 @@ class C_api2 extends CI_Controller {
             $w_semester = ($Semester!='' && $Semester!=0)
                 ? ' AND cd.Semester = "'.$Semester.'" ' : ' ' ;
 
-            $dataCID = $this->db->query('SELECT cd.Semester, mk.MKCode, mk.Name AS Coure, mk.NameEng AS CoureEng, cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit  FROM db_academic.curriculum_details cd
+            $dataCID = $this->db->query('SELECT cd.Semester, mk.MKCode, mk.Name AS Coure, mk.NameEng AS CoureEng, cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit  
+                                              FROM db_academic.curriculum_details cd
                                               LEFT JOIN db_academic.curriculum cur ON (cur.ID = cd.CurriculumID)
                                               LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
                                               WHERE cur.Year = "'.$ClassOf.'" AND cd.ProdiID = "'.$ProdiID.'" '.$w_semester.'
