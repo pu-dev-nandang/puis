@@ -1105,10 +1105,25 @@ class C_api2 extends CI_Controller {
                                         GROUP BY sd.ID
                                         ORDER BY d.ID, sd.StartSessions, s.ID ASC ';
 
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT s.ID FROM db_academic.schedule_details sd
+                                        LEFT JOIN db_academic.schedule s ON (sd.ScheduleID = s.ID)
+                                        LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                        LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                        LEFT JOIN db_academic.schedule_details_course sdc ON (s.ID = sdc.ScheduleID)
+                                        LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                        LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                        LEFT JOIN db_academic.attendance attd ON (attd.SemesterID = s.SemesterID AND attd.SDID = sd.ID)
+                                        WHERE ( s.ProgramsCampusID = "'.$ProgramsCampusID.'" AND
+                                        s.SemesterID = "'.$SemesterID.'" '.$w_Prodi.' '.$w_Day.' ) '.$dataSearch.'
+                                        GROUP BY sd.ID ) xx';
+
+
+
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
         $query = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
         $no = $requestData['start'];
         $data = array();
@@ -1256,8 +1271,8 @@ class C_api2 extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefaultRow)),
-            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval($queryDefaultRow),
             "data"            => $data
         );
 

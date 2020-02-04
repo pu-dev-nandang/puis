@@ -56,9 +56,9 @@
             "hideMethod": "fadeOut"
         };
 
-        function dateTimeNow() {
-            return moment().format('YYYY-MM-DD HH:mm:ss');
-        }
+        // function dateTimeNow() {
+        //     return moment().format('YYYY-MM-DD HH:mm:ss');
+        // }
 
         function loading_button(element) {
             $(''+element).html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');

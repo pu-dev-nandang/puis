@@ -73,7 +73,7 @@ class Pdf_mc_table extends Pdf
         }
 
         //multiply number of line with line height. This will be the height of current row
-        $h=19.5;
+        $h=20.5;
         //Issue a page break first if needed
         $this->CheckPageBreak($h);
         //Draw the cells of current row
@@ -89,12 +89,11 @@ class Pdf_mc_table extends Pdf
             //Draw the border
             $this->Rect($x,$y,$w,$h);
             //Print the text
-            if($i==(count($data)-1) || $i==2 || $i==3 || $i==4){
+            if($i==(count($data)-2) || $i==(count($data)-1) || $i==2 || $i==3 || $i==4){
                 $this->SetFont('Arial','',6.5);
             } else {
                 $this->SetFont('Arial','',8);
             }
-
 
 
             $this->MultiCell($w,$lineHight,$data[$i],0,$a);
