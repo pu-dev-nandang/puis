@@ -91,23 +91,37 @@ function load_table_activated_period_years()
    $("#Years").empty();
    var url = base_url_js+'budgeting/table_all/cfg_dateperiod/1';
    var thisYear = (new Date()).getFullYear();
-   $.post(url,function (resultJson) {
-    var response = jQuery.parseJSON(resultJson);
-    for(var i=0;i<response.length;i++){
-        //var selected = (i==0) ? 'selected' : '';
-        var selected = (response[i].Activated==1) ? 'selected' : '';
-        $('#Years').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+'</option>');
-    }
-    $('#Years').select2({
-       //allowClear: true
-    });
+      for (var i = 2019; i <= thisYear; i++) {
+        var selected = (i==0) ? 'selected' : '';
+        $('#Years').append('<option value="'+i+'" '+selected+'>'+i+'</option>');
+      }
 
-    // load bulan
-    var S_bulan = $('#Month');
-    SelectOptionloadBulan(S_bulan,'choice');
+      $('#Years').select2({
+         //allowClear: true
+      });
 
-    LoadDataForTable();
-   }); 
+      // load bulan
+      var S_bulan = $('#Month');
+      SelectOptionloadBulan(S_bulan,'choice');
+
+      LoadDataForTable();
+   // $.post(url,function (resultJson) {
+   //  var response = jQuery.parseJSON(resultJson);
+   //  for(var i=0;i<response.length;i++){
+   //      //var selected = (i==0) ? 'selected' : '';
+   //      var selected = (response[i].Activated==1) ? 'selected' : '';
+   //      $('#Years').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+'</option>');
+   //  }
+   //  $('#Years').select2({
+   //     //allowClear: true
+   //  });
+
+   //  // load bulan
+   //  var S_bulan = $('#Month');
+   //  SelectOptionloadBulan(S_bulan,'choice');
+
+   //  LoadDataForTable();
+   // }); 
 }
 
 $(document).off('change', '#Years,.SelectTemplate').on('change', '#Years,.SelectTemplate',function(e) {
