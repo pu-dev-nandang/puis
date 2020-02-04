@@ -183,8 +183,12 @@ $(document).ready(function () {
     $(document).on('click','.add_kat_otherfiles', function () {
         var body = '<div class="row">' +
             '         <div class="col-md-12">' +
-            '           <h4><b> ADD CATEGORY FILES</b></h4>' +
+            '           <h4><b> ADD CATEGORY OTHER FILES</b></h4>' +
             '           <div class="well">' +
+             '              <div class="form-group">' +
+            '                   <label>Name Sort (Alias)</label>'+
+            '                   <input class="form-control" id="name_sort">' +
+            '               </div>' +
             '               <div class="form-group">' +
             '                   <label>Name Category Other File</label>'+
             '                   <input class="form-control" id="name_kat_otherfiles">' +
@@ -350,7 +354,6 @@ $(document).ready(function () {
                         '                   <input class="form-control" id="NoDocument" value="'+response[i]['No_Document']+'"> '+
                         '               </div> '+
                         '          </div> '+
-                        
                         '           <div class="col-xs-5"> '+
                         '              <div class="form-group"> '+
                         '                  <label>Date Document</label> '+
@@ -363,7 +366,6 @@ $(document).ready(function () {
                         '                <textarea rows="3" cols="5" name="DescriptionFile" id="DescriptionFile" class="form-control" >'+response[i]['Description_Files']+' </textarea>'+
                         '            </div> '+
                         '        </div> '+
-                     
                         '        <div class="col-xs-6"> '+
                         '            <div class="form-group"> '+
                         '                <div id="element1">Review File : </div> '+
@@ -372,23 +374,19 @@ $(document).ready(function () {
                         '               </div> '+
                         '            </div> '+
                         '        </div>'+ 
-
-                        '        <form id="tagFM_OtherFile" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">  '+
-                        '            <label class="btn btn-sm btn-default btn-upload">                                  '+
+                        '        <form id="tagFM_OtherFile" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">   '+
+                        '            <label class="btn btn-sm btn-default btn-upload">                                                      '+
                         '                <i class="fa fa-upload margin-right"></i> Change File                                              '+
                         '                       <input type="file" id="fileOther" name="userfile" class="upload_files" accept="application/pdf"> '+
-                        '                    </label>                                                                                                                   '+
+                        '                    </label>                                                                                                              '+
                         '                <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p>              '+
                         '        </form>                     '+
-
-
                         '    <div class="row"> '+
                         '    <div class="col-md-12" style="text-align: right;"> '+
-                        '                <hr/> '+
+                        '         <hr/> '+
                         '    <div><input type="hidden" class="form-control" value="'+filesnametype+'" id="typeotherfiles"> </div>        '+
                         '    <div><input type="hidden" class="form-control" value="'+linkfileother+'" id="linkotherfile">   </div>       '+
                         '    <div><input type="hidden" class="form-control" value="'+idfiles+'" id="idlinkfiles">           </div>       '+
-
                         '         <div class="btn-group">   '+ 
                         '                <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i>Cancel</button> '+ 
                         '                <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="glyphicon glyphicon-floppy-disk"></i> Save</button> '+ 
@@ -414,19 +412,23 @@ $(document).ready(function () {
 
 <script>
 
-$(document).on('click','.btnSubmitKatOtherFiles', function () {
+    $(document).on('click','.btnSubmitKatOtherFiles', function () {
         var name_katother = $('#name_kat_otherfiles').val();
+        var name_sort = $('#name_sort').val();
 
-            if(name_katother!='' && name_katother!=null){
-                loading_button('.btnSubmitKatOtherFiles');
+        if(name_sort!='' && name_sort!=null
+            && name_katother!='' && name_katother!=null
+            ){
+            loading_button('.btnSubmitKatOtherFiles');
 
-                var data = {
-                    action : 'update_mster_katother',
-                    name_katother : name_katother
-                };
+            var data = {
+                action : 'update_mster_katother',
+                name_katother : name_katother,
+                name_sort : name_sort
+            };
 
-                var token = jwt_encode(data,'UAP)(*');
-                var url = base_url_js+'api/__loadMstruniversity';
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__loadMstruniversity';
 
                 $.post(url,{token:token},function (jsonResult) {
 
@@ -436,13 +438,12 @@ $(document).on('click','.btnSubmitKatOtherFiles', function () {
 
                     } else {
 
-                        toastr.success('Data saved','Success');
+                        toastr.success('Category Other File Saved','Success');
                         $('#NotificationModal').modal('hide');
 
                         setTimeout(function () {
-                            //$('.btnSubmitKatOtherFiles').html('Save').prop('disabled',false);
-                            //window.location.href = '';
                              loadFilesDetails();
+                             loadformsotherfiles();
                             $('.menuDetails[data-page="otherfiles"]').trigger('click');
 
                         },500);
