@@ -777,7 +777,7 @@ class C_global_informations extends Globalclass {
             $TotalDataRS = (!empty($totalData) ? $totalData->Total : 0);
             $result = $this->Globalinformation_model->fetchSubjectType(false,$param,(!empty($reqdata['start']) ? $reqdata['start']:0),(!empty($reqdata['length']) ? $reqdata['length'] : 0))->result();
             $json_data = array(
-                "draw"            => intval( $reqdata['draw'] ),
+                "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : 0) ),
                 "recordsTotal"    => intval($TotalDataRS),
                 "recordsFiltered" => intval($TotalDataRS),
                 "data"            => (!empty($result) ? $result : 0)
@@ -847,6 +847,12 @@ class C_global_informations extends Globalclass {
         }
 
         echo json_encode($json);
+    }
+
+
+    public function subjectWidget(){
+        $data['title'] = "Subject Type";
+        $this->load->view('dashboard/global-informations/message-blast/modal-subject',$data);
     }
 /*END SUBJECT TYPE*/
 

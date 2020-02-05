@@ -94,7 +94,7 @@ class C_lpmi extends Lpmi {
                             $no++;
                         }
                         echo '</tbody></table>';
-                        // /$message = "Your request data has been completed.";
+                        
                     }else{
                         $message = "Your request data is unavailable.";
                         $this->session->set_flashdata("message",$message);

@@ -83,16 +83,19 @@
 									<small class="text-danger text-message"></small>
 								</div>
 
-								<div class="form-group">
+								<div class="row form-group">
+									<div class="col-sm-4">
 									<label>Type of Subject</label>
-									<select class="form-control required" name="typeSubject" id="subjectType" required>
-										<option value="">-Choose one-</option>	
-										<?php if(!empty($subject)){
-										foreach ($subject as $s) {
-											echo "<option value='".$s->ID."'>".$s->subject."</option>";
-										} } ?>
-									</select>
-									<small class="text-danger text-message"></small>
+									<div class="input-group">
+								    	<select class="form-control required" name="typeSubject" id="subjectType" required>
+											<option value="">Choose One</option>
+										</select> <br> 
+										<small class="text-danger text-message"></small>
+								      	<div class="input-group-addon" style="border:0px;padding:0 0 0 10px">
+								      		<button class="btn btn-sm btn-default btn-subject" type="button" onclick="window.open(base_url_js+'global-informations/subject-type', '_blank', 'location=yes,height=700,width=990,scrollbars=yes,status=yes');"><i class="fa fa-paperclip"></i> Create New Subject</button><br>
+							      		</div>
+								    </div>
+								    </div>
 								</div>
 								<div class="form-group">
 									<label>Subject</label>
@@ -269,6 +272,51 @@
 		});
 
 
+	 	var open = false;
+	   	function isOpen(){
+	       if(open){
+	       	var data = {
+          		ISSELECT2 : true
+          	};
+          	var token = jwt_encode(data,'UAP)(*');
+          	$.ajax({
+			    type : 'POST',
+			    url : base_url_js+"global-informations/subject-type/fetching",
+			    data: {token:token},
+			    dataType : 'json',
+			    beforeSend :function(){},
+			    error : function(jqXHR){
+	            	$('body #GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                        '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                    $('body #GlobalModal .modal-body').html(jqXHR.responseText);
+                    $('body #GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                    $('body #GlobalModal').modal({
+                        'show' : true,
+                        'backdrop' : 'static'
+                    });
+			    },success : function(response){
+	    			var option = "<option value=''>Choose One</option>";
+			    	if(!jQuery.isEmptyObject(response)){
+			    		if(response.data.length > 0){
+			    			$("#subjectType").empty();
+			    			$.each(response.data,function(k,v){
+			    				option += "<option value='"+v.ID+"'>"+v.subject+"</option>";
+			    			});
+			    		}			    		
+			    	}
+	    			$("#subjectType").html(option);
+			    }
+			});
+	       	}
+	   	}
+
+
+		$("#subjectType").on("click", function() {
+	        open = !open;
+	        isOpen();
+	   	});
+
+
 		$("#subjectType").change(function(){
 			var ID = $(this).val();
 			if($.trim(ID).length > 0){
@@ -345,6 +393,35 @@
 		  			$(".box-mail.receiver").next().text("Please fill this field");
 		  		}
 		  	}
+		});
+
+		
+		$(".btn-subject").click(function(){
+			/*$.ajax({
+			    type : 'POST',
+			    url : base_url_js+"global-informations/subject-type",
+			    dataType : 'HTML',
+			    beforeSend :function(){},
+			    error : function(jqXHR){
+	            	$('body #GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                        '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                    $('body #GlobalModal .modal-body').html(jqXHR.responseText);
+                    $('body #GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                    $('body #GlobalModal').modal({
+                        'show' : true,
+                        'backdrop' : 'static'
+                    });
+			    },success : function(response){
+			    	$('body #GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+		                '<h4 class="modal-title">Create New Subject</h4>');
+			    	$('#GlobalModal .modal-dialog').css({"width":"80%"});
+		            $('body #GlobalModal .modal-body').html(response);
+		            $('body #GlobalModal').modal({
+		                'show' : true,
+		                'backdrop' : 'static'
+		            });
+			    }
+			});*/
 		});
 
 	});

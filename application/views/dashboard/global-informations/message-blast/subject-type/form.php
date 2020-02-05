@@ -1,5 +1,8 @@
 <div id="subject-type-form">
 	<div class="row" style="margin-bottom:10px">
+		<div class="col-sm-12 text-center">
+			<button type="button" class="btn btn-danger" onclick="window.open('', '_self', ''); window.close();"><i class="fa fa-times"></i> Close windows</button>
+		</div>
 		<div class="col-sm-12">
 			<a class="btn btn-sm btn-warning" href="<?=site_url('global-informations/subject-type')?>">
 				<i class="fa fa-chevron-left"></i> Bact to list
