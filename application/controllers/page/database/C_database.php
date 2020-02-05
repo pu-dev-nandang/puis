@@ -368,7 +368,7 @@ class C_database extends Globalclass {
         // load Nationality
         $data['Arr_nationality'] = json_encode($this->m_master->caribasedprimary('db_admission.country','ctr_active',1));
         $data['Religion'] = $this->General_model->fetchData("`db_admission`.`agama`",array())->result();
-        $data['companyInsurance'] = $this->General_model->fetchData("db_employees.master_company",array("Category"=>"insurance","IsActive"=>1),"Name","ASC")->result();
+        $data['companyInsurance'] = $this->General_model->fetchData("db_employees.master_company",array("IndustryID"=>33,"IsActive"=>1),"Name","ASC")->result();
         $content = $this->load->view('page/database/students/editStudent',$data,true);
         $this->temp($content);
     }

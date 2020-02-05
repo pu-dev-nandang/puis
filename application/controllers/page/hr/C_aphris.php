@@ -23,8 +23,6 @@ class C_aphris extends HR_Controler {
         $this->temp($page);
     }
 
-    
-
 
     public function masterFetch(){
     	$reqdata = $this->input->post();

@@ -6,12 +6,11 @@
 	});
 	</script>
 <?php } ?>
+<style type="text/css">#container.fixed-header{margin-top: 0px}</style>
 <div id="subject-type">
 	<div class="row">
-		<div class="col-sm-12">
-			<a class="btn btn-sm btn-warning" href="<?=site_url('global-informations/message-blast')?>">
-				<i class="fa fa-chevron-left"></i> Bact to message
-			</a>
+		<div class="col-sm-12 text-center">
+			<button type="button" class="btn btn-danger" onclick="window.open('', '_self', ''); window.close();"><i class="fa fa-times"></i> Close windows</button>
 		</div>
 		<div class="col-sm-12">
 			<div class="panel panel-default"  style="margin-top:10px">
@@ -49,7 +48,6 @@
 
 <script type="text/javascript">
 	function fetchingSubject() {
-        //loading_modal_show();
         var filtering = $("#form-filter").serialize();
         var token = jwt_encode({Filter : filtering},'UAP)(*');
 
@@ -83,7 +81,7 @@
                 }
             },
             "initComplete": function(settings, json) {
-                //loading_modal_hide();
+                loading_modal_hide();
             },
             "columns": [
 	          	{
@@ -112,6 +110,10 @@
         });
     }
 	$(document).ready(function(){
+		loading_modal_show();
+		$("#container.fixed-header").addClass("sidebar-closed");
+		$("header").remove();
+		$("#content .crumbs").remove();
 		fetchingSubject();
 		$(".btn-add-new").click(function(){
 			$.ajax({
