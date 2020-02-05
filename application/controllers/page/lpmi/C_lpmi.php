@@ -63,12 +63,11 @@ class C_lpmi extends Lpmi {
             
             $explodeProdi = explode(".", $data['prodi']);
             $prodiID = (!empty($explodeProdi[0]) ? $explodeProdi[0] : 0);
-            $prodiCode = (!empty($explodeProdi[1]) ? $explodeProdi[1] : null);
+            $prodiCode = (!empty($explodeProdi[1]) ? strtolower($explodeProdi[1]) : null);
 
             $message = "";
             if((!empty($semeseterID) && !empty($data['intake'])) && (!empty($prodiID)) ){
-                $tablename = "edomRecap_".strtolower($prodiCode)."_".$semeseterYear."_".$semesterType."_".$data['intake'];
-                var_dump($tablename);die();
+                $tablename = "edomRecap_".$prodiCode."_".$semeseterYear."_".$semesterType."_".$data['intake'];
                 //chek existing table
                 $isExistTable = $this->General_model->callStoredProcedure("select * from information_schema.`TABLES` where table_schema = 'db_statistik' and table_name = '".$tablename."'")->row();
                 if(!empty($isExistTable)){
@@ -102,7 +101,7 @@ class C_lpmi extends Lpmi {
                         redirect(site_url('lpmi/lecturer-evaluation/download-result'));
                     }
                 }else{
-                    $message = "Your request data is unavailable. Database is unavailable.";
+                    $message = "Your request data is unavailable. Database '".$tablename."' is unavailable.";
                     $this->session->set_flashdata("message",$message);
                     redirect(site_url('lpmi/lecturer-evaluation/download-result'));
                 }
