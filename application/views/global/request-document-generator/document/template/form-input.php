@@ -20,6 +20,7 @@
                 <div class="form-group">
                     <label>Upload Template</label>
                     <input type="file" name = "PathTemplate" id = "UploadFile">
+                    <p style="color: red;">* .docx </p>
                 </div>
               </div>
               <div class="col-md-4">
@@ -511,15 +512,15 @@
                                     '<div class = "form-group">'+
                                         '<label>Verify</label>'+
                                         '<select class = "form-control Input" field="Signature" name = "verify" key = "SET">'+
-                                            '<option value = "0">Manual</option>'+
-                                            '<option value = "1">Auto</option>'+
+                                            '<option value = "0">Auto Approve</option>'+
+                                            '<option value = "1">Manual Approve</option>'+
                                         '</select>'+
                                     '</div>'+
                                     '<div class = "form-group">'+
                                         '<label>CAP</label>'+
                                         '<select class = "form-control Input" field="Signature" name = "cap" key = "SET">'+
-                                            '<option value = "0">Manual</option>'+
-                                            '<option value = "1">Auto</option>'+
+                                            '<option value = "0">Auto</option>'+
+                                            '<option value = "1">Manual</option>'+
                                         '</select>'+
                                     '</div>'+
                                 '</div>'+
@@ -713,12 +714,13 @@
             AjaxSubmitTemplate(url,token).then(function(response){
                 if (response.status == 1) {
                     App_form_input.MapTable(response.callback);
-                    $('#Preview').prop('disabled',false);
                 }
+                 $('#Preview').prop('disabled',false);
                 end_loading_button2(selector,'Set Table');
             }).fail(function(response){
                toastr.error('No Result Data,please try again');
                end_loading_button2(selector,'Set Table');
+               $('#Preview').prop('disabled',false);
             })
             
         },
@@ -894,97 +896,132 @@
 
         // -- //
 
+        validation : function(){
+          var bool = true;
+          $('.Input').each(function(e){
+            if ($(this).is('select')) {
+              var v = $(this).find('option:selected').val();
+            }
+            else
+            {
+              var v = $(this).val();
+            }
+            
+            if ( (typeof v === 'undefined') || v == '' ||  v == null || v == '-' ){
+              bool = false;
+              return;
+            }
+          })
+
+          if (bool) {
+            if ($('#setTable').length) {
+              if (!$('.Input[name="MappingTable"]').length) {
+                bool = false;
+              }
+            }
+          }
+          
+
+          if (!bool) {
+            toastr.info('All Form is required');
+          }
+          
+          return bool;
+        },
+
         SubmitPreviewPDF : function(selector){
             var data = [];
             var DataCallback =  jwt_decode($('#FormDocument').attr('datacallback'));
             settingTemplate = DataCallback;
-            $('.Input').not('div').each(function(){
-                var el = $(this);
-                var attrname = el.attr('name').trim();
-                if (!$(this).is("select")) {
-                    var attrva = el.val();
-                }
-                else
-                {
-                    var attrva = el.find('option:selected').val();
-                }
-                
-                var attrkey = el.attr('key').trim();
-                var attrfield = el.attr('field').trim();
-                for (variable in settingTemplate){
-                    switch(variable) {
-                      case "SET":
-                        if (variable == attrkey) {
-                            App_form_input.set_SET(attrname,attrva,attrkey,attrfield,el);
-                        }
-                        break;
-                      case "USER":
-                        if (variable == attrkey) {
-                            /*
-                                USER get from session by Request
-                            */
-                        }
-                           
-                        break;
-                      case "INPUT":
-                        if (variable == attrkey) {
-                            App_form_input.set_INPUT(attrname,attrva,attrkey,attrfield,el);
-                        }
-                        break;
-                      case "GRAB":
-                        if (variable == attrkey) {
-                            App_form_input.set_GRAB(attrname,attrva,attrkey,attrfield,el);
-                        }
-                        break;
-                      case "TABLE":
+            var validation = App_form_input.validation();
+            if (validation) {
+              $('.Input').not('div').each(function(){
+                  var el = $(this);
+                  var attrname = el.attr('name').trim();
+                  if (!$(this).is("select")) {
+                      var attrva = el.val();
+                  }
+                  else
+                  {
+                      var attrva = el.find('option:selected').val();
+                  }
+                  
+                  var attrkey = el.attr('key').trim();
+                  var attrfield = el.attr('field').trim();
+                  for (variable in settingTemplate){
+                      switch(variable) {
+                        case "SET":
                           if (variable == attrkey) {
-                            App_form_input.set_TABLE(attrname,attrva,attrkey,attrfield,el);
+                              App_form_input.set_SET(attrname,attrva,attrkey,attrfield,el);
                           }
-                        break;
-                      case "GET":
-                        if (variable == attrkey) {
-                          App_form_input.set_GET(attrname,attrva,attrkey,attrfield,el);
-                        }
-                        break;
-                      case "DOCUMENT":
-                        
-                        break;
-                    }             
-                }
+                          break;
+                        case "USER":
+                          if (variable == attrkey) {
+                              /*
+                                  USER get from session by Request
+                              */
+                          }
+                             
+                          break;
+                        case "INPUT":
+                          if (variable == attrkey) {
+                              App_form_input.set_INPUT(attrname,attrva,attrkey,attrfield,el);
+                          }
+                          break;
+                        case "GRAB":
+                          if (variable == attrkey) {
+                              App_form_input.set_GRAB(attrname,attrva,attrkey,attrfield,el);
+                          }
+                          break;
+                        case "TABLE":
+                            if (variable == attrkey) {
+                              App_form_input.set_TABLE(attrname,attrva,attrkey,attrfield,el);
+                            }
+                          break;
+                        case "GET":
+                          if (variable == attrkey) {
+                            App_form_input.set_GET(attrname,attrva,attrkey,attrfield,el);
+                          }
+                          break;
+                        case "DOCUMENT":
+                          
+                          break;
+                      }             
+                  }
 
 
-            })
-            // console.log(settingTemplate);
-            // return;
-            var ArrUploadFilesSelector = [];
-            var url = base_url_js+"document-generator-action/__preview_template";
-            var token = jwt_encode(settingTemplate,'UAP)(*');
-            var UploadFile = $('#UploadFile');
-            var valUploadFile = UploadFile.val();
-            if (valUploadFile) { // if upload file
-                 var NameField = UploadFile.attr('name');
-                 var temp = {
-                     NameField : NameField,
-                     Selector : UploadFile,
-                 };
-                 ArrUploadFilesSelector.push(temp);
+              })
+              // console.log(settingTemplate);
+              // return;
+              var ArrUploadFilesSelector = [];
+              var url = base_url_js+"document-generator-action/__preview_template";
+              var token = jwt_encode(settingTemplate,'UAP)(*');
+              var UploadFile = $('#UploadFile');
+              var valUploadFile = UploadFile.val();
+              if (valUploadFile) { // if upload file
+                   var NameField = UploadFile.attr('name');
+                   var temp = {
+                       NameField : NameField,
+                       Selector : UploadFile,
+                   };
+                   ArrUploadFilesSelector.push(temp);
+              }
+              loading_button2(selector);
+              AjaxSubmitTemplate(url,token,ArrUploadFilesSelector).then(function(response){
+                  if (response.status == 1) {
+                      window.open(response.callback, '_blank');
+                      $('#btnSave').prop('disabled',false);
+                  }
+                  else
+                  {
+                      toastr.error('Something error,please try again');
+                  }
+                  end_loading_button2(selector,'Preview');
+              }).fail(function(response){
+                 toastr.error('Connection error,please try again');
+                 end_loading_button2(selector,'Preview');
+              })
             }
-            loading_button2(selector);
-            AjaxSubmitTemplate(url,token,ArrUploadFilesSelector).then(function(response){
-                if (response.status == 1) {
-                    window.open(response.callback, '_blank');
-                    $('#btnSave').prop('disabled',false);
-                }
-                else
-                {
-                    toastr.error('Something error,please try again');
-                }
-                end_loading_button2(selector,'Preview');
-            }).fail(function(response){
-               toastr.error('Connection error,please try again');
-               end_loading_button2(selector,'Preview');
-            })
-
         },
 
         SaveTemplate : function(selector){

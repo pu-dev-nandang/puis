@@ -421,7 +421,7 @@ class M_doc extends CI_Model {
 
     	$NIPExt = $this->session->userdata('NIP').'.docx';
     	$FileName = $NIPExt;
-    	$pathFolder = FCPATH."uploads\\document-generator\\template\\temp\\"; 
+    	$pathFolder = FCPATH."uploads/document-generator/template/temp/"; 
     	$pathFile = $pathFolder.$NIPExt; 
     	$TemplateProcessor->saveAs($pathFile,$pathFolder);
     	$convert = $this->ApiConvertDocxToPDF($pathFile,$pathFolder,$FileName);
@@ -842,7 +842,9 @@ class M_doc extends CI_Model {
        $WhereOrAnd = ($AddWhere == '') ? ' Where' : ' And';
        $AddWhere .= $WhereOrAnd.' a.DepartmentCreated = "'.$DepartmentID.'"';
 
-       $sql = 'select a.*,b.Name from db_generatordoc.document as a join db_employees.employees as b on a.UpdatedBy = b.NIP
+       $sql = 'select a.*,b.Name,c.NameCategorySrt from db_generatordoc.document as a 
+              join db_employees.employees as b on a.UpdatedBy = b.NIP
+              join db_generatordoc.category_document as c on a.ID_category_document = c.ID 
        		'.$AddWhere.'
        ';
        $query = $this->db->query($sql,array())->result_array();
@@ -1375,7 +1377,7 @@ class M_doc extends CI_Model {
         
         $NIPExt = $this->session->userdata('NIP').'.docx';
         $FileName = $NIPExt;
-        $pathFolder = FCPATH."uploads\\document-generator\\template\\temp\\"; 
+        $pathFolder = FCPATH."uploads/document-generator/template/temp/"; 
         $pathFile = $pathFolder.$NIPExt; 
         $TemplateProcessor->saveAs($pathFile,$pathFolder);
         $convert = $this->ApiConvertDocxToPDF($pathFile,$pathFolder,$FileName);
@@ -1508,12 +1510,16 @@ class M_doc extends CI_Model {
         $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
         
         $dataSave = $this->__saveApproval($dataSave,$rs['SET']['Signature']);
-        
+
         $dataSave = $this->__saveInput($dataSave,$dataToken['settingTemplate']['INPUT']);
         $getPath = $this->__savebyUserRequest($rs,$FileTemplate,$DocumentName);
         $dataSave['Path'] = $getPath;
         $this->__clearTempFile();
         $this->db->insert('db_generatordoc.document_data',$dataSave);
+
+        // send notification
+        $this->__send_notification($dataSave,'Request',$DocumentName);
+
         return 1;
 
     }
@@ -1583,7 +1589,7 @@ class M_doc extends CI_Model {
 
     private function __clearTempFile(){
         $ext = ['.docx','.pdf'];
-        $pathFolder = FCPATH."uploads\\document-generator\\template\\temp\\"; 
+        $pathFolder = FCPATH."uploads/document-generator/template/temp/"; 
         for ($i=0; $i < count($ext); $i++) { 
             $pathFile = $pathFolder.$this->session->userdata('NIP').$ext[$i];
             if (file_exists($pathFile)) {
@@ -1714,7 +1720,7 @@ class M_doc extends CI_Model {
             $FileNameExt = $expDe[0].'.docx';
         }
         
-        $pathFolder = FCPATH."uploads\\document-generator\\"; 
+        $pathFolder = FCPATH."uploads/document-generator/"; 
         $pathFile = $pathFolder.$FileNameExt; 
         $TemplateProcessor->saveAs($pathFile,$pathFolder);
         $convert = $this->ApiConvertDocxToPDF($pathFile,$pathFolder,$FileNameExt);
@@ -2000,7 +2006,7 @@ class M_doc extends CI_Model {
             }
             else
             {
-                $style = '<span style="color:green;"><i class="fa fa-check-circle"></i> Manually Approve</span>';
+                $style = '<span style="color:green;"><i class="fa fa-check-circle"></i> Auto Approve</span>';
                 if ($row['Approve1'] != '' && $row['Approve1'] != NULL ) {
                     if ($Appr == '') {
                         $Appr .= '<ul style = "margin-left:-25px;">';
@@ -2031,7 +2037,7 @@ class M_doc extends CI_Model {
                 $Appr .= '</ul>';
             }
             $nestedData[] = $Appr;
-            $nestedData[] = ($row['IsManually'] == 0) ? $row['Status'] : 'Manually Approve';
+            $nestedData[] = ($row['IsManually'] == 0) ? $row['Status'] : 'Auto Approve';
             // $nestedData[] = $row['Status'] ;
             $nestedData[] = $row['ID'];
             $token = $this->jwt->encode($row,"UAP)(*");
@@ -2183,7 +2189,142 @@ class M_doc extends CI_Model {
         $this->__clearTempFile();
         $this->db->where('ID',$dataID);
         $this->db->update('db_generatordoc.document_data',$dataSave);
+
+        // send notification
+        $this->__send_notification($dataSave,'Edit',$DocumentName);
+
         return 1;
+    }
+
+    public function __send_notification($dataSave,$action,$DocumentName,$numberApprove=1){
+        switch ($numberApprove) {
+            case 1:
+                if ($dataSave['Approve1Status'] == 0) {
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$action.' '.$DocumentName.' by '.$this->session->userdata('Name'),
+                                        'Description' => 'Approval',
+                                        'URLDirect' => 'request-document-generator/NeedApproval',
+                                        'CreatedBy' => $this->session->userdata('NIP'),
+                                      ),
+                        'To' => array(
+                                  'NIP' => array($dataSave['Approve1']),
+                                ),
+                        'Email' => 'No',
+                    );
+
+                    $url = url_pas.'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $this->m_master->apiservertoserver($url,$token);
+                }
+                break;
+            case 2:
+                if ($dataSave['Approve2Status'] == 0) {
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$DocumentName.' has been Approved by '.$this->session->userdata('Name').' as '.$action,
+                                        'Description' => 'Approval',
+                                        'URLDirect' => 'request-document-generator/NeedApproval',
+                                        'CreatedBy' => $this->session->userdata('NIP'),
+                                      ),
+                        'To' => array(
+                                  'NIP' => array($dataSave['Approve2']),
+                                ),
+                        'Email' => 'No',
+                    );
+
+                    $url = url_pas.'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $this->m_master->apiservertoserver($url,$token);
+                }
+                else
+                {
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$DocumentName.' has been Approved by '.$this->session->userdata('Name').' as '.$action,
+                                        'Description' => 'Approval Done',
+                                        'URLDirect' => 'request-document-generator',
+                                        'CreatedBy' => $this->session->userdata('NIP'),
+                                      ),
+                        'To' => array(
+                                  'NIP' => array($dataSave['UserNIP']),
+                                ),
+                        'Email' => 'No',
+                    );
+
+                    $url = url_pas.'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $this->m_master->apiservertoserver($url,$token);
+                }
+                break;
+            case 3:
+                if ($dataSave['Approve3Status'] == 0) {
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$DocumentName.' has been Approved by '.$this->session->userdata('Name').' as '.$action,
+                                        'Description' => 'Approval',
+                                        'URLDirect' => 'request-document-generator/NeedApproval',
+                                        'CreatedBy' => $this->session->userdata('NIP'),
+                                      ),
+                        'To' => array(
+                                  'NIP' => array($dataSave['Approve3']),
+                                ),
+                        'Email' => 'No',
+                    );
+
+                    $url = url_pas.'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $this->m_master->apiservertoserver($url,$token);
+                }
+                else
+                {
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$DocumentName.' has been Approved by '.$this->session->userdata('Name').' as '.$action,
+                                        'Description' => 'Approval Done',
+                                        'URLDirect' => 'request-document-generator',
+                                        'CreatedBy' => $this->session->userdata('NIP'),
+                                      ),
+                        'To' => array(
+                                  'NIP' => array($dataSave['UserNIP']),
+                                ),
+                        'Email' => 'No',
+                    );
+
+                    $url = url_pas.'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $this->m_master->apiservertoserver($url,$token);
+                }
+                break;
+            case 4: // Done
+                $data = array(
+                    'auth' => 's3Cr3T-G4N',
+                    'Logging' => array(
+                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$DocumentName.' has been Approved by '.$this->session->userdata('Name').' as '.$action,
+                                    'Description' => 'Approval Done',
+                                    'URLDirect' => 'request-document-generator',
+                                    'CreatedBy' => $this->session->userdata('NIP'),
+                                  ),
+                    'To' => array(
+                              'NIP' => array($dataSave['UserNIP']),
+                            ),
+                    'Email' => 'No',
+                );
+
+                $url = url_pas.'rest2/__send_notif_browser';
+                $token = $this->jwt->encode($data,"UAP)(*");
+                $this->m_master->apiservertoserver($url,$token);
+                break;
+            default:
+                # code...
+                break;
+        }
+        
     }
 
     public function ApproveDocument($dataToken){
@@ -2332,13 +2473,16 @@ class M_doc extends CI_Model {
         }
       
         $dataSave['Status'] = ($chk == 1) ? 'Approve' : 'Request';
-
         $DefFileName = $G_dt[0]['Path'];
         $getPath = $this->__AprrovebyUserRequest($rs,$FileTemplate,$DocumentName,$DefFileName);
         $dataSave['Path'] = $getPath;
         $this->__clearTempFile();
         $this->db->where('ID',$dataID);
         $this->db->update('db_generatordoc.document_data',$dataSave);
+
+        // send notification
+        $numberApprove = $approval_number + 1;
+        $this->__send_notification($G_dt[0],'Approve '.$approval_number,$DocumentName,$numberApprove);
 
         return 1;
     }
@@ -2464,7 +2608,7 @@ class M_doc extends CI_Model {
             $expDe = explode('.', $DefFileName);
             $FileNameExt = $expDe[0].'.docx';
         }
-        $pathFolder = FCPATH."uploads\\document-generator\\"; 
+        $pathFolder = FCPATH."uploads/document-generator/"; 
         $pathFile = $pathFolder.$FileNameExt; 
         $TemplateProcessor->saveAs($pathFile,$pathFolder);
         $convert = $this->ApiConvertDocxToPDF($pathFile,$pathFolder,$FileNameExt);
