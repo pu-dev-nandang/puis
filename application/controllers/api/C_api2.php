@@ -4419,12 +4419,17 @@ class C_api2 extends CI_Controller {
 
         $btnedit = $this->input->get('btnedit');
 
-        $orderBy = '';
+
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
-
             $search = $requestData['search']['value'];
-            $dataSearch = '';
+            $dataSearch = ' AND ( em.NIP LIKE "%'.$search.'%" 
+                                    OR em.Name LIKE "%'.$search.'%" 
+                                    OR c.Name LIKE "%'.$search.'%" 
+                                    OR c.Email LIKE "%'.$search.'%" 
+                                    OR c.Phone LIKE "%'.$search.'%" 
+                                    OR c.Mobile LIKE "%'.$search.'%" 
+                                    )';
         }
 
         if($btnedit=='0'){
@@ -4443,15 +4448,21 @@ class C_api2 extends CI_Controller {
                                                 LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
                                                 LEFT JOIN db_admission.crm_status cs ON (cs.ID = c.Status)
                                                 LEFT JOIN db_admission.crm_status_label csl ON (csl.ID = cs.LabelID)
-                                                WHERE c.PeriodID = "'.$PeriodID.'" '.$btnNIP.'  '.$dataSearch.' '.$orderBy;
+                                                WHERE c.PeriodID = "'.$PeriodID.'" '.$btnNIP.'  '.$dataSearch.' ORDER BY c.ID DESC';
 
 
+
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT c.ID FROM db_admission.crm c
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
+                                                LEFT JOIN db_admission.crm_status cs ON (cs.ID = c.Status)
+                                                LEFT JOIN db_admission.crm_status_label csl ON (csl.ID = cs.LabelID)
+                                                WHERE c.PeriodID = "'.$PeriodID.'" '.$btnNIP.'  '.$dataSearch.') xx';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
 
         $dataTable = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
         $query = $dataTable;
 
@@ -4485,8 +4496,8 @@ class C_api2 extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefaultRow)),
-            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval($queryDefaultRow),
             "data"            => $data
         );
         echo json_encode($json_data);
