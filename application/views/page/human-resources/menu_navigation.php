@@ -64,7 +64,7 @@
                     <?php $tablename = array("master_status","master_level","master_industry_type","master_company"); ?>
                     <ul class="sub-menu">
                         <?php foreach ($tablename as $tb) { ?>
-                        <li class="">
+                        <li class="<?= ($this->uri->segment(3)==$tb) ? 'current' : ''?>">
                             <a href="<?=site_url('human-resources/master-aphris/'.$tb)?>">
                                 <i class="icon-angle-right"></i>
                                 <?php $expl = explode("master_", $tb); echo str_replace("_", " ", strtoupper($expl[1]));?>

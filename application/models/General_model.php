@@ -2,6 +2,15 @@
  
 class General_model extends CI_Model{
 
+	public function countData($tablename,$data) {
+		$this->db->select("count(*) as Total");
+		$this->db->from($tablename);
+		$this->db->where($data);		
+		$query = $this->db->get();
+		return $query;
+	}
+	
+
 	public function fetchData($tablename,$data,$idsort="", $sort="", $limit=null,$groupBy=null) {
 		$this->db->from($tablename);
 		$this->db->where($data);
@@ -9,10 +18,20 @@ class General_model extends CI_Model{
 			 $this->db->group_by($groupBy); 
 		}
 		$this->db->order_by($idsort,$sort);
-		$this->db->limit($limit);
+		if(!empty($limit)){
+			$explode = explode("#", $limit);
+			if(!empty($explode)){
+				$start = $explode[0];
+				$limit = $explode[1];
+				$this->db->limit($limit,$start);				
+			}else{
+				$this->db->limit($limit);
+			}
+		}
 		$query = $this->db->get();
 		return $query;
 	}
+
 
 
 	public function insertData($tablename,$data){
