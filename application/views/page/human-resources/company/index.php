@@ -128,8 +128,8 @@
 				    beforeSend :function(){loading_modal_show()},
 		            error : function(jqXHR){
 		            	loading_modal_hide();
-		            	$("body #modalGlobal .modal-body").html(jqXHR.responseText);
-			      	  	$("body #modalGlobal").modal("show");
+		            	$("body #GlobalModal .modal-body").html(jqXHR.responseText);
+			      	  	$("body #GlobalModal").modal("show");
 				    },success : function(response){
 		            	loading_modal_hide();
 				    	$("#master-company").html(response);
@@ -151,8 +151,8 @@
 				    beforeSend :function(){loading_modal_show()},
 		            error : function(jqXHR){
 		            	loading_modal_hide();
-		            	$("body #modalGlobal .modal-body").html(jqXHR.responseText);
-			      	  	$("body #modalGlobal").modal("show");
+		            	$("body #GlobalModal .modal-body").html(jqXHR.responseText);
+			      	  	$("body #GlobalModal").modal("show");
 				    },success : function(response){
 		            	loading_modal_hide();
 				    	$("#master-company").html(response);
