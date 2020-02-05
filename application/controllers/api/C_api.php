@@ -6357,39 +6357,49 @@ class C_api extends CI_Controller {
                             $url = $urlAD;
                             $token = $this->jwt->encode($data,"UAP)(*");
                             $callback = $this->m_master->apiservertoserver($url,$token);
-                            // print_r($callback);die();
-                            // get email from AD
-                            $arr_email = $callback['email'];
-                            $formInsert['EmailPU'] = $arr_email[0];
-                            $UserID = explode('@', $formInsert['EmailPU']);
-                            $UserID = $UserID[0];
-                            $arr_callback = array(
-                                'UsernamePCam' => $formInsert['NIP'],
-                                'UsernamePC' => $UserID,
-                                'Password' => $Password,
-                                'EmailPU' => $formInsert['EmailPU'],
-                            );
+                            if (array_key_exists('email', $callback) && !empty($callback['email']) ) {
+                                // print_r($callback);die();
+                                // get email from AD
+                                $arr_email = $callback['email'];
+                                $formInsert['EmailPU'] = $arr_email[0];
+                                $UserID = explode('@', $formInsert['EmailPU']);
+                                $UserID = $UserID[0];
+                                $arr_callback = array(
+                                    'UsernamePCam' => $formInsert['NIP'],
+                                    'UsernamePC' => $UserID,
+                                    'Password' => $Password,
+                                    'EmailPU' => $formInsert['EmailPU'],
+                                );
 
-                            // insert card number
-                            if (array_key_exists('Access_Card_Number', $formInsert)) {
-                                $pager = $formInsert['Access_Card_Number'];
-                                if ($pager != '' && $pager != null) {
-                                    $data_arr = [
-                                        'pager' => $pager,
-                                    ];
-                                    $data = array(
-                                        'auth' => 's3Cr3T-G4N',
-                                        'Type' => 'Employee',
-                                        'UserID' => $UserID,
-                                        'data_arr' => $data_arr,
-                                    );
+                                // insert card number
+                                if (array_key_exists('Access_Card_Number', $formInsert)) {
+                                    $pager = $formInsert['Access_Card_Number'];
+                                    if ($pager != '' && $pager != null) {
+                                        $data_arr = [
+                                            'pager' => $pager,
+                                        ];
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Type' => 'Employee',
+                                            'UserID' => $UserID,
+                                            'data_arr' => $data_arr,
+                                        );
 
-                                    $url = URLAD.'__api/Edit';
-                                    $token = $this->jwt->encode($data,"UAP)(*");
-                                    $this->m_master->apiservertoserver($url,$token);
+                                        $url = URLAD.'__api/Edit';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
 
+                                    }
                                 }
                             }
+                            else
+                            {
+                                $rs['msg'] = 'Lost packet from Windows active directory, try again';
+                                $rs['status'] = 0;
+                                echo json_encode($rs);
+                                die(); // stop script
+                            }
+                            
                         }
                         else
                         {
