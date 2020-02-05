@@ -452,7 +452,7 @@ class C_po extends Transaksi_Controler {
                    }
 
                    // get pay_type
-                   $G_pay_type = $this->m_master->showData_array('db_purchasing.term_payment');
+                   $G_pay_type = $this->m_master->showData_array('db_purchasing.pay_type');
                    $ID_pay_type = $G_pay_type[0]['ID'];
 
                  // 5 PO & 6

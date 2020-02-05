@@ -140,7 +140,7 @@ class C_master extends Purchasing_Controler {
         $Item = $Input['Item'];
         $Desc = $Input['Desc'];
         $EstimaValue = $Input['EstimaValue'];
-        $Satuan = $Input['Satuan'];
+        
         $Departement = $Input['Departement'];
         $Detail = $Input['Detail'];
         $Detail = json_encode($Detail);
@@ -153,6 +153,7 @@ class C_master extends Purchasing_Controler {
         $path = FCPATH.'uploads\\budgeting\\catalog\\';
         switch ($Input['Action']) {
             case 'add':
+              $Satuan = $Input['Satuan'];
                 if (array_key_exists('fileData',$_FILES)) {
                    $path = './uploads/budgeting/catalog';
                    $uploadFile = $this->uploadDokumenMultiple($path,$filename);
@@ -232,6 +233,7 @@ class C_master extends Purchasing_Controler {
                 break;
             case 'edit':
                 $Get_Data = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
+                $Satuan = $Input['Satuan'];
                 if (array_key_exists('fileData',$_FILES)) {
                    $path = './uploads/budgeting/catalog';
                    $uploadFile = $this->uploadDokumenMultiple($path,$filename);
