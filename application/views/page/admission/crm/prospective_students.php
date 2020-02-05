@@ -1016,7 +1016,7 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "language": {
-                "searchPlaceholder": "Day, Room, Name / NIP Invigilator"
+                "searchPlaceholder": "Search..."
             },
             "ajax":{
                 url : base_url_js+"api2/__getTableProspectiveStudents?btnedit="+btnEdit, // json datasource
