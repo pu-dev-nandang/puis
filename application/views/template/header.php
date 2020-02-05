@@ -239,7 +239,7 @@
                             <!-- End Adding for Testing -->
 
                             <!-- Adding for Testing -->
-                            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; ?>
+                            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
                                  <li class="<?php echo $sw?> BlogAdminUrl">
                                      <a href="javascript:void(0)"><i class="fa fa-rss" aria-hidden="true"></i> Blog Admin</a>
                                  </li>
