@@ -19,7 +19,7 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Document Name</th>
+                                <th><span style="color: green;">Category</span> - Document</th>
                                 <th>Document Alias</th>
                                 <th>Document Template</th>
                                 <th>Preview</th>
@@ -60,6 +60,17 @@
                        'searchable': false,
                        'orderable': false,
                        'className': 'dt-body-center',
+                    },
+                    {
+                       'targets': 1,
+                       'searchable': false,
+                       'orderable': false,
+                       'className': 'dt-body-center',
+                       'render': function (data, type, full, meta){
+                           var tokenRow = jwt_decode(full[6]);
+                           var html = '<span style="color:green;">'+tokenRow['NameCategorySrt']+'</span> - '+ full[1];
+                           return html;
+                       }
                     },
                     {
                        'targets': 3,
