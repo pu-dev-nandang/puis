@@ -11,7 +11,7 @@
 					<h4 class="panel-title"><i class="fa fa-edit"></i> Form Company</h4>
 				</div>
 				<div class="panel-body">
-					<form id="form-company" action="<?=site_url('human-resources/master_insurance_company/save')?>" method="post" autocomplete="off">
+					<form id="form-company" action="<?=site_url('human-resources/master-aphris/master_company/save')?>" method="post" autocomplete="off">
 						<input type="hidden" name="ID" value="<?=(!empty($detail) ? $detail->ID : '')?>">
 						<div class="form-group">
 							<label>Company Name</label>
@@ -31,9 +31,19 @@
 						<div class="row">
 							<div class="col-sm-2">
 								<div class="form-group">
-									<label>Category</label>
-									<select class="form-control required" required readonly name="Category" >
-										<option value="insurance" selected>Insurance</option>
+									<label>Industry Type</label>
+									<select class="form-control required" required name="IndustryID" id="IndustryID_" >
+										<option value="">Choose one</option>
+										<?php if(!empty($type)){ 
+										foreach ($type as $t) { 
+											$selected = "";
+											if(!empty($detail)){
+												if($detail->IndustryID == $t->ID){
+													$selected = "selected";
+												}
+											}
+											echo '<option value="'.$t->ID.'" '.$selected.' >'.$t->name.'</option>';
+										}  } ?>
 									</select>
 									<small class="text-danger text-message"></small>
 								</div>
@@ -67,6 +77,7 @@
 			loading_modal_show();
 			location.reload(true);
 		});
+		//$("#IndustryID").select2({'width':'100%'});
 		$formcompany = $("#form-company");
 		$formcompany.on("click",".btn-save",function(){
 			var error = false;

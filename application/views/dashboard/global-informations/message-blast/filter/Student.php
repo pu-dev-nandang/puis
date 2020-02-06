@@ -247,8 +247,8 @@
 	            { "data": "EmailPU",
 	        	  "render": function (data, type, row, meta) {
 	        	  	var label = "";
-	        	  	var exEmailPU = $.trim(row.EmailPU);
-	        	  	var exEmail = $.trim(row.Email);
+	        	  	var exEmailPU = isValidEmailAddress($.trim(row.EmailPU));
+	        	  	var exEmail = isValidEmailAddress($.trim(row.Email));
 	        	  	if(exEmailPU.length > 1){
 						label += '<p><label><input type="checkbox" name="emailPU[]" value="'+row.EmailPU+'" class="check-box chk-child chk-'+row.NPM+' emailPU" data-name="'+row.Name+'"> '+row.EmailPU+'</label></p>';
 					}
@@ -261,8 +261,8 @@
 	            { "data": "EmailFather",
 	              "render": function (data, type, row, meta) {
 	              	var label = "";
-	              	var exEmailFather = $.trim(row.EmailFather);
-	              	var exEmailMother = $.trim(row.EmailMother);
+	              	var exEmailFather = isValidEmailAddress($.trim(row.EmailFather));
+	              	var exEmailMother = isValidEmailAddress($.trim(row.EmailMother));
 	        	  	if(exEmailFather.length > 1){
 	            		label += '<p><label><input type="checkbox" name="emailF[]" value="'+row.EmailFather+'" class="check-box chk-child chk-'+row.NPM+' emailF" data-name="'+row.Father+'"> '+row.EmailFather+'</label></p>';
 	        	  	}

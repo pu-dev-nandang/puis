@@ -2,7 +2,7 @@
 	if(!empty($message)){ ?>
 	<script type="text/javascript">
 	$(document).ready(function(){
-		toastr.warning("<?= $this->session->flashdata('message');?>",'Info!');
+		toastr.info("<?= $this->session->flashdata('message');?>",'Info!');
 	});
 	</script>
 <?php } ?>
@@ -16,7 +16,7 @@
 						<button class="btn btn-xs btn-primary btn-add-record" type="button"><i class="fa fa-plus"></i> Add New Record</button>
 					</div>
 					<h4 class="panel-title">
-						<i class="fa fa-bars"></i> <span>Data of Insurance Company</span>
+						<i class="fa fa-bars"></i> <span>List of master company</span>
 					</h4>
 				</div>
 				<div class="panel-body">
@@ -53,7 +53,7 @@
 		function fetchingDataInsurace() {
 	        //loading_modal_show();
 	        var data = {
-              Category : "insurance",
+              IndustryID : 33,
           	};
           	var token = jwt_encode(data,'UAP)(*');
 
@@ -70,7 +70,7 @@
 	            },
 	            "lengthMenu": [[10, 25, 50], [10, 25, 50]],
 	            "ajax":{
-	                url : base_url_js+'human-resources/master_insurance_company/fetch', // json datasource
+	                url : base_url_js+'human-resources/master-aphris/master_company/fetch', // json datasource
 	                ordering : false,
 	                data : {token:token},
 	                type: "post",  // method  , by default get
@@ -101,7 +101,10 @@
 	                    return "<p>"+data+"</p>"+((trimAdditionalInfo.length > 0) ? "<p>"+row.AdditionalInfo+"</p>":"");
 	                  }
 		          	},
-		            { "data": "Category",
+		            { "data": "IndustryID",
+		              "render": function(data,type,row){
+		              	return row.Industry.name;
+		              }
 		            },
 		            { "data": "IsActive",
 		              "render": function (data, type, row) {
@@ -123,7 +126,7 @@
 			$(".btn-add-record").click(function(){
 				$.ajax({
 				    type : 'POST',
-				    url : base_url_js+"human-resources/master_insurance_company/form",
+				    url : base_url_js+"human-resources/master-aphris/master_company/form",
 				    dataType : 'html',
 				    beforeSend :function(){loading_modal_show()},
 		            error : function(jqXHR){
@@ -145,7 +148,7 @@
 	          	var token = jwt_encode(data,'UAP)(*');
 				$.ajax({
 				    type : 'POST',
-				    url : base_url_js+"human-resources/master_insurance_company/form",
+				    url : base_url_js+"human-resources/master-aphris/master_company/form",
 				    data : {token:token},
 				    dataType : 'html',
 				    beforeSend :function(){loading_modal_show()},

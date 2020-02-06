@@ -529,7 +529,7 @@ class C_database extends Globalclass {
                         if(!empty($dataInsurance['InsuranceOTH']) && empty($dataInsurance['InsuranceID'])){
                             $isSameCompany = $this->General_model->fetchData("db_employees.master_company",array("Name"=>$dataInsurance['InsuranceOTH']))->row();
                             if(empty($isSameCompany)){
-                                $insertInsurance = $this->General_model->insertData("db_employees.master_company",array("Name"=>$dataInsurance['InsuranceOTH'],"IsActive"=>1,"Category"=>"insurance","createdby"=>$myNIP));
+                                $insertInsurance = $this->General_model->insertData("db_employees.master_company",array("Name"=>$dataInsurance['InsuranceOTH'],"IsActive"=>1,"IndustryID"=>33,"createdby"=>$myNIP));
                                 $dataInsurance['InsuranceID'] = $this->db->insert_id();
                             }
                         }
@@ -654,7 +654,7 @@ class C_database extends Globalclass {
                 if(!empty($data['InsuranceOTH'])){
                     $isSameCompany = $this->General_model->fetchData("db_employees.master_company",array("Name"=>$data['InsuranceOTH']))->row();
                     if(empty($isSameCompany)){
-                        $insertInsurance = $this->General_model->insertData("db_employees.master_company",array("Name"=>$data['InsuranceOTH'],"IsActive"=>1,"Category"=>"insurance","createdby"=>$myNIP));
+                        $insertInsurance = $this->General_model->insertData("db_employees.master_company",array("Name"=>$data['InsuranceOTH'],"IsActive"=>1,"IndustryID"=>33,"createdby"=>$myNIP));
                         $data['InsuranceID'] = $this->db->insert_id();
                     }
                 }
