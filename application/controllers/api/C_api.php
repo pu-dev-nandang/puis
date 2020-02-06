@@ -613,12 +613,13 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:left;"><a href="'.base_url('human-resources/employees/edit-employees/'.$row["NIP"]).'" style="font-weight: bold;">'.$row['NIP'].'</a>'.$needAppv.'</div>';
             $nestedData[] = '<a class="card-link" href="'.base_url('human-resources/employees/edit-employees/'.$row["NIP"]).'"><div style="margin-bottom:10px"><div  style="float:left;margin-right:10px;"><img src="'.$srcImg.'" style="max-width: 35px;" class="img-rounded"></div>'.
+                            '<span class="pull-right">View</span>'.
                             '<div  style="text-align:left;"><span class="regular name">'.$row['Name'].'</span><br/><span id="viewEmail'.$row['NIP'].'" style="color: #2196f3;">'.(!empty($Email) ? $Email:'-').'</span></div>'.
                             '</div><p><span class="regular '.((in_array($row['Gender'], $dataArrGender))? 'bg-primary':'').'"><i class="fa fa-'.(($row['Gender'] == 'L') ? 'mars':'venus').'"></i> '.$gender.'</span> &nbsp;
                                 <span class="regular '.((in_array($row['ReligionID'], $dataArrReligion))? 'bg-primary':'').'"><i class="fa fa-star"></i> '.$row['EmpReligion'].'</span> &nbsp; 
                                 <span class="regular '.((in_array($row['LevelEducationID'], $dataArrLevel))? 'bg-primary':'').'"><i class="fa fa-graduation-cap"></i> '.(!empty($row['EmpEdu']) ? $row['EmpEdu']:'-').'</span> </p></a>';
             $nestedData[] = '<div  style="text-align:left;">'.(!empty($row['PlaceOfBirth']) ? $row['PlaceOfBirth'].', ':'').date("d F Y",strtotime($row['DateOfBirth'])).'</div>';
-            $nestedData[] = '<div  style="text-align:left;">'.ucwords(strtolower($division)).'<br/>- '.ucwords(strtolower($position)).'</div>';
+            $nestedData[] = '<div  style="text-align:left;"><b>'.ucwords(strtoupper($division)).'</b><br/>- '.ucwords(strtolower($position)).'</div>';
             $nestedData[] = '<div  style="text-align:left;">'.$row['Address'].'</div>';
             /*$nestedData[] = '<div  style="text-align:left;">'.$row['Address'].'</div>';*/
             $statusLect = $this->General_model->fetchData("db_employees.employees_status","IDStatus='".$row['StatusLecturerID']."'")->row();
@@ -10147,7 +10148,7 @@ class C_api extends CI_Controller {
                     $token = $this->jwt->encode($dataToken,'UAP)(*');
                     $nameS = str_replace(' ','-',ucwords(strtolower($v->Name)));
 
-                    $disBtnEmail = (!empty($v->EmailPU) ? 'disabled' : '');
+                    $disBtnEmail = (!empty($v->EmailPU) ? '' : 'disabled');
 
                     $btnAct = '<div class="btn-group">
                                   <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -10155,10 +10156,8 @@ class C_api extends CI_Controller {
                                   </button>
                                   <ul class="dropdown-menu">
                                     <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
-                                    <li><a href="'.base_url('database/students/edit-students/ta_'.$v->ClassOf.'/'.$v->NPM.'/'.$nameS).'">Edit (Coming Soon)</a></li>';
+                                    <li><a href="'.base_url('database/students/edit-students/ta_'.$v->ClassOf.'/'.$v->NPM.'/'.$nameS).'">Edit</a></li>';
                     
-                    $requested = (($v->isApproved ==1) ? '':'disabled');
-                    $btnAct .=      '<li class="'.$requested.'"><a  href="javascript:void(0);" class="show-request" data-npm="'.$v->NPM.'" data-ta="'.$v->ClassOf.'">Request Approval</a></li>';
                     $btnAct .=      '<li role="separator" class="divider"></li>
                                     <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$v->EmailPU.'"
                                     data-year="'.$v->ClassOf.'" data-npm="'.$v->NPM.'" data-name="'.ucwords(strtolower($v->Name)).'"

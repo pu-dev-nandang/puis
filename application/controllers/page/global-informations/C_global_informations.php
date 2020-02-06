@@ -11,7 +11,7 @@ class C_global_informations extends Globalclass {
 
 
     public function index(){
-    	$content = $this->load->view('dashboard/global-informations/index','',true);
+        $content = $this->load->view('dashboard/global-informations/index','',true);
         $this->template($content);
     }
     
@@ -537,15 +537,20 @@ class C_global_informations extends Globalclass {
 
 /*MESSAGE BLAST*/
     public function messageBlast(){
-    	$data['title'] = "Message Blast";
+        $positionMain = $this->session->userdata('PositionMain')['IDDivision'].".".$this->session->userdata('PositionMain')['IDPosition'];
+        $data['access'] = $this->General_model->fetchData("db_mail_blast.role_mail",array("PositionMain"=>$positionMain))->row();
+        $data['title'] = "Message Blast";
     	$page = $this->load->view('dashboard/global-informations/message-blast/index',$data,true);
         $this->blast_global_informations($page);    	
     }
     
 
     public function messageBlastForm(){
-    	$data['title'] = "Create New Message Blast";
+        $positionMain = $this->session->userdata('PositionMain')['IDDivision'].".".$this->session->userdata('PositionMain')['IDPosition'];
+        $data['access'] = $this->General_model->fetchData("db_mail_blast.role_mail",array("PositionMain"=>$positionMain))->row();
+        $data['title'] = "Create New Message Blast";
         $data['subject'] = $this->General_model->fetchData("db_mail_blast.subject_type",array("IsActive"=>1))->result();
+        $data['configmail'] = $this->General_model->fetchData("db_mail_blast.cog_mail",array("isActive"=>1))->row();
     	$page = $this->load->view('dashboard/global-informations/message-blast/form',$data,true);
         $this->blast_global_informations($page);    	
     }
@@ -621,6 +626,7 @@ class C_global_informations extends Globalclass {
             $getCogMail = $this->General_model->fetchData("db_mail_blast.cog_mail",array())->row();
             $limit = (!empty($getCogMail) ? $getCogMail->limit : 0);
             $mail_bcc = (!empty($getCogMail) ? $getCogMail->mail_bcc : 'it@podomorouniversity.ac.id');
+            
             $message = "";
             $receiver = $data["mail_receiver_to"];
             $receiver_cc = (!empty($data["mail_receiver-cc_to"]) ? $data["mail_receiver-cc_to"] : null);
@@ -630,11 +636,21 @@ class C_global_informations extends Globalclass {
             $totalMail = count($receiver) + count($receiver_cc);
             array_push($receiver_bcc, $mail_bcc);
             $status = false; $dataInsert = array();
+
+            $dataMail = array("from"=>$getCogMail->mail_from,
+                              "from_label"=>$getCogMail->mail_from_label,
+                              "to"=>$receiver,
+                              "cc"=>$receiver_cc,
+                              "bcc"=>$receiver_bcc,
+                              "subject"=>$mail_subject,
+                              "message"=>$mail_message
+                              );
+
             if(count($receiver) > $limit ){
                 $finish = false;
                 $storedMail = array_chunk($receiver, $limit);
                 foreach ($storedMail as $s) {
-                    $sendEmail = $this->M_sendemail->sendEmail($s,$mail_subject,null,null,null,null,$mail_message,null,null,$receiver_cc,$receiver_bcc);
+                    $sendEmail = $this->Globalinformation_model->sendMail($dataMail);
                     try {
                         $finish = ($sendEmail['status'] == 1) ? true:false;
                     } catch (Exception $e) {
@@ -644,8 +660,9 @@ class C_global_informations extends Globalclass {
                 $message = "Mail sent ".(($finish) ? "successfully.":"failed.");
                 $status = $finish;
                 $dataInsert['isSend'] = $finish;
+
             }else{
-                $sendEmail = $this->M_sendemail->sendEmail($receiver,$mail_subject,null,null,null,null,$mail_message,null,null,$receiver_cc,$receiver_bcc);
+                $sendEmail = $this->Globalinformation_model->sendMail($dataMail);
                 try {
                     $message = "Mail sent ".(($sendEmail['status'] == 1) ? "successfully.":"failed.");
                     $status = (($sendEmail['status'] == 1) ? true : false);
@@ -684,18 +701,25 @@ class C_global_informations extends Globalclass {
         if($data){
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
-            $conditions = "createdby like '".$mynip."%' and isShow = 1";
+            $positionMain = $this->session->userdata('PositionMain')['IDDivision'].".".$this->session->userdata('PositionMain')['IDPosition'];
+            $getAccess = $this->General_model->fetchData("db_mail_blast.role_mail",array("PositionMain"=>$positionMain))->row();
+            if(!empty($getAccess)){
+                $conditions = "";
+            }else{
+                $conditions = "createdby like '".$mynip."%' and isShow = 1";                
+            }
             $sortby = "created";
             if(!empty($data_arr['Filter'])){            
                 $parse = parse_str($data_arr['Filter'],$output);
                 if(!empty($output['keywords'])){
-                    $conditions .= " and (mail_to like '%".$output['keywords']."%' or SubjectOth like '%".$output['keywords']."%' or MessageOth like '%".$output['keywords']."%' ) ";
+                    $conditions .= (!empty($conditions) ? ' and':'')." (mail_to like '%".$output['keywords']."%' or SubjectOth like '%".$output['keywords']."%' or MessageOth like '%".$output['keywords']."%' or createdby like '%".$output['keywords']."%' ) ";
                 }
                 if(!empty($output['sort_label'])){
                     $sortby = $output['sort_label'];
                 }
             }
-            $data['results'] = $this->General_model->fetchData("db_mail_blast.mail_blast",$conditions,$sortby,"desc")->result();
+            $data['access'] = $getAccess;
+            $data['results'] = $this->General_model->fetchData("db_mail_blast.mail_blast",(!empty($conditions) ? $conditions : array() ),$sortby,"desc")->result();
             $this->load->view("dashboard/global-informations/message-blast/list",$data);
         }
     }
@@ -859,24 +883,147 @@ class C_global_informations extends Globalclass {
 
 /*CONFIGURATION MAIL*/
     public function configMail(){
-        $data['title'] = "Mail Configuration";
-        if($this->input->post()){
-            $post = $this->input->post();
-            if(!empty($post['ID'])){
-                //update
-                $update = $this->General_model->updateData("db_mail_blast.cog_mail",$post,array("ID"=>$post['ID']));
-                $message = (($update) ? "Successfully":"Failed")." updated.";
-            }else{
-                //insert
-                $insert = $this->General_model->insertData("db_mail_blast.cog_mail",$post);
-                $message = (($insert) ? "Successfully":"Failed" )." saved.";
+        if($this->session->userdata('IDdepartementNavigation') == 12){
+            $data['title'] = "Mail Configuration";
+            if($this->input->post()){
+                $post = $this->input->post();
+                if(!empty($post['ID'])){
+                    //update
+                    $update = $this->General_model->updateData("db_mail_blast.cog_mail",$post,array("ID"=>$post['ID']));
+                    $message = (($update) ? "Successfully":"Failed")." updated.";
+                }else{
+                    //insert
+                    $insert = $this->General_model->insertData("db_mail_blast.cog_mail",$post);
+                    $message = (($insert) ? "Successfully":"Failed" )." saved.";
+                }
+                $this->session->set_flashdata("message",$message);
+                redirect(site_url('global-informations/message-blast/configMail')); 
             }
-            $this->session->set_flashdata("message",$message);
-        }
-        $data['result'] = $this->General_model->fetchData("db_mail_blast.cog_mail",array("isActive"=>1))->row();
-        $page = $this->load->view('dashboard/global-informations/message-blast/configMail',$data,true);
-        $this->blast_global_informations($page);
+            $data['result'] = $this->General_model->fetchData("db_mail_blast.cog_mail",array("isActive"=>1))->row();
+            $page = $this->load->view('dashboard/global-informations/message-blast/configMail',$data,true);
+            $this->blast_global_informations($page);
+        }else{show_404();}
     }
 /*END CONFIGURATION MAIL*/
+
+
+/*ACCESS ROLE */
+    public function messageBlastAccessRoles(){
+        if($this->session->userdata('IDdepartementNavigation') == 12){
+            $data['division'] = $this->General_model->fetchData("db_employees.division",array("StatusDiv"=>1))->result();
+            $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+            $page = $this->load->view('dashboard/global-informations/message-blast/roleMail',$data,true);
+            $this->blast_global_informations($page);
+        }else{show_404();}
+    }
+
+
+    public function messageBlastAccessRolesFetch(){
+        $reqdata = $this->input->post();
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $param = array();
+            
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+                $param[] = array("field"=>"(d.division","data"=>" like '%".$search."%' ","filter"=>"AND");
+                $param[] = array("field"=>"p.position","data"=>" like '%".$search."%' )","filter"=>"OR");
+            }
+            
+            $data = array();
+            $totalData = $this->Globalinformation_model->fetchAccessRole(true,$param)->row();
+            $TotalDataRS = (!empty($totalData) ? $totalData->Total : 0);
+            $result = $this->Globalinformation_model->fetchAccessRole(false,$param,(!empty($reqdata['start']) ? $reqdata['start']:0),(!empty($reqdata['length']) ? $reqdata['length'] : 0))->result();
+            $json_data = array(
+                "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : 0) ),
+                "recordsTotal"    => intval($TotalDataRS),
+                "recordsFiltered" => intval($TotalDataRS),
+                "data"            => (!empty($result) ? $result : 0)
+            );
+
+        }else{$json_data=null;}
+
+        $response = $json_data;
+        echo json_encode($response);
+    }
+
+
+    public function messageBlastAccessRolesSave(){
+        $data = $this->input->post();
+        $mynip = $this->session->userdata('NIP');
+        $json = array();
+        if($data){
+            $message = ""; $finish = false;
+            $conditions = array("ID"=>$data['ID']);
+            $data['PositionMain'] = $data['division'].'.'.$data['position'];
+            unset($data['division']);
+            unset($data['position']);
+            if(!empty($data['ID'])){
+                $isExist = $this->General_model->fetchData("db_mail_blast.role_mail",$conditions)->row();
+                if(!empty($isExist)){
+                    //update
+                    $data['editedby'] = $mynip;
+                    //var_dump($data);die();
+                    $update = $this->General_model->updateData("db_mail_blast.role_mail",$data,$conditions);
+                    $message = (($update) ? "Successfully":"Failed")." updated.";
+                    $finish = ($update) ? true : false;
+                }else{$message="Data not founded. Try again.";}
+            }else{
+                //insert
+                $data['createdby'] = $mynip;
+                $insert = $this->General_model->insertData("db_mail_blast.role_mail",$data);
+                $message = (($insert) ? "Successfully":"Failed")." saved.";
+                $finish = ($insert) ? true : false;
+            }
+
+            /*$this->session->set_flashdata("message",$message);
+            redirect(site_url('global-informations/message-blast/roles')); */
+
+            $json = array("message"=>$message,"finish"=>$finish);
+        }
+
+        echo json_encode($json);
+    }
+
+
+    public function messageBlastAccessRolesDetail(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            
+            $isExist = $this->General_model->fetchData("db_mail_blast.role_mail",array("ID"=>$data_arr['ID']))->row();
+            if(!empty($isExist)){
+                $explodePM = explode(".", $isExist->PositionMain);
+                $isExist->division = $explodePM[0];
+                $isExist->position = $explodePM[1];
+                $json = $isExist;
+            }
+        }
+
+        echo json_encode($json);
+    }
+    
+    
+    public function messageBlastAccessRolesDelete(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            
+            $isExist = $this->General_model->fetchData("db_mail_blast.role_mail",array("ID"=>$data_arr['ID']))->row();
+            if(!empty($isExist)){
+                $delete = $this->General_model->deleteData("db_mail_blast.role_mail",array("ID"=>$data_arr['ID']));
+                $json = array("message"=>(($delete) ? "Successfully removed":"Fail removed"), "finish"=>($delete) ? true:false);
+            }
+        }
+
+        echo json_encode($json);
+    }
+
+/*END ACCESS ROLE */
 
 }

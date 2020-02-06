@@ -19,7 +19,7 @@
 						<button class="btn btn-xs btn-success btn-add-new" type="button"><i class="fa fa-plus"></i> Add New Record</button>
 					</div>
 					<h4 class="panel-title">
-						<i class="fa fa-bars"></i> List of subject type
+						<i class="fa fa-bars"></i> List of template subject
 					</h4>
 				</div>
 				<div class="panel-body">					

@@ -179,6 +179,15 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label>Postcode</label>
+                            <input type="text" class="form-control" id="formPostcode" value="<?php echo $arrEmp['Postcode']; ?>">
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="col-md-6">
@@ -766,6 +775,7 @@
         var formEmailPU = $('#formEmailPU').val();
         var formEmail = $('#formEmail').val();
         var formAddress = $('#formAddress').val();
+        var formPostcode = $('#formPostcode').val();
 
         // Position Main
         var form_MainDivision = $('#form_MainDivision').val();
@@ -898,6 +908,7 @@
                     EmailPU: emailPU,
                     Password_Old: Password_Old,
                     Address: formAddress.trim(),
+                    Postcode: formPostcode,
                     Photo: fileName,
                     PositionOther1: PositionOther1,
                     PositionOther2: PositionOther2,

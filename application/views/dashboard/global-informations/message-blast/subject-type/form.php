@@ -13,7 +13,7 @@
 		<div class="col-sm-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4 class="panel-title">Form Subject Type</h4>
+					<h4 class="panel-title">Form Template Subject</h4>
 				</div>
 				<div class="panel-body">
 					<form id="form-subject-type" action="<?=site_url('global-informations/subject-type/save')?>" method="post" autocomplete="off">

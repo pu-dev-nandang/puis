@@ -6,6 +6,7 @@
 	.mailing-list .list > .mail:not(:last-child){border-bottom:1px solid #ddd;}
 	.mailing-list .list > .mail.active,.mailing-list .list > .mail:hover{background-color: #a9c1d6;cursor: pointer;}
 	.mailing-list .list > .mail > .mail_to{color: #000;font-size: 14px}
+	.mailing-list .list > .mail > .created_info{text-align: center;}
 	.mailing-list .list > .mail > .mail_to > .action{display: none;}
 	.mailing-list .list > .mail:hover > .mail_to > .action{display: block;}
 	.mailing-list .btn-remove-mail{color: #605e5c;cursor: pointer;}
@@ -28,10 +29,18 @@
 			    <?php if(!empty($results)){
 			    foreach ($results as $v) { ?>
 				<div class="mail" data-mail="<?=$v->ID?>">
+					<?php if(!empty($access)){
+					if($access->isView == 1){ ?>
+					<div class="created_info"><span>Created by <?=$v->createdby?></span>
+											 <?php if(empty($v->isShow)){?><p class="text-danger"><i class="fa fa-exclamation-triangle"></i> This message has been removed by user </p><?php } ?></div>
+					<?php } } ?>
 					<div class="mail_to">
+						<?php if(!empty($access)){
+						if($access->isDelete == 1){ ?>
 						<div class="action pull-right">
 							<span class="btn-remove-mail" data-mail="<?=$v->ID?>"><i class="fa fa-trash"></i></span>							
 						</div>
+						<?php } } ?>
 						<div class="to"><span><?php $mail_to=json_decode($v->mail_to,true); echo $mail_to[0].((count($mail_to) > 1) ? ' <small>etc</small>':'');?></span></div>
 					</div>
 					<div class="mail_subject">
@@ -49,10 +58,13 @@
 		<div class="col-sm-9 col-md-9" style="padding-left:0px;height:100%">
 			<div class="detail-mail hidden">
 				<div class="info-created">
+					<?php if(!empty($access)){
+						if($access->isDelete == 1){ ?>
 					<div class="act pull-right">
 						<span class="created">dd</span>
 						<span class="btn-remove-mail" title="Remove this message" data-mail="0"><i class="fa fa-trash"></i></span>
 					</div>
+					<?php } } ?>
 					<div class="sender">
 						<h4 class="createdby">d</h4>
 					</div>
