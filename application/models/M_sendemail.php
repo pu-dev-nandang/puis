@@ -425,5 +425,151 @@ class M_sendemail extends CI_Model {
         return $desc;
     }
 
+    public function resend_email_admission_no_record($to,$subject,$text = array(null,null,null,null,null)){
+        $this->load->model('master/m_master');
+        $arr = array(
+            'status' => 1,
+            'msg'=>'',
+            'email' => [],
+            );
+        $config_email = $this->loadEmailConfig();
+        // $getDeadline = $this->getDeadline();
+        $getDeadline = $text[2];
+        $max_execution_time = 630;
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
+
+        // $url_upload_bayar = base_url().'register/formupload/'.$text[0];
+        $this->load->library('email', $config_email['setting']);
+        $msg = '<div style="margin:0;padding:10px 0;background-color:#ebebeb;font-size:14px;line-height:20px;font-family:Helvetica,sans-serif;width:100%">
+                    <div class="adM">
+                    <br>
+                    </div>
+                    <table style="width:600px;margin:0 auto;background-color:#ebebeb" border="0" cellpadding="0" cellspacing="0">
+                        <tbody>
+                        <tr>
+                            <td></td>
+                            <td style="background-color:#fff;padding:0 30px;color:#333;vertical-align:top;border:1px solid #cccccc;">
+                            <br>
+                            <div style="text-align: center;">
+                                <img src="https://lh3.googleusercontent.com/mkqZdtpCm7IfWWrPdfxJBETqOTiEU09s3cr4tzfFwAGRl3WqH_pyo3yDGPKmpSHfMw1mSFU0JTRk-3yX9M7xAG5KiVHzuMS1DPHzFg=w500-h144-rw-no" style="max-width: 250px;">
+                                <hr style="border-top: 1px solid #cccccc;"/>
+                                <div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#607D8B">Registration</div>
+                            </div>
+                            <br/>';
+        // $SHeader = '<div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#2196f3">';
+        // $EHeader = '</div>';
+        $msg .= $config_email['text'];
+        
+        $style1 = '<div style="background: #00bcd414;border: 1px solid #2196f36e;min-height: 50px;width: 400px;margin: 0 auto;text-align: center;padding: 10px;">
+                    <b style="color: blue;">Rek BCA : 161.3888.555</b>
+                    <div style="color: red;"><b>';
+        $style2 = '</b></div>
+                    <span style="color: #827f7f;">';
+        $style3 = '</span>
+                </div>';
+        $style4 = '<div style="background: #ffeb3b47;border: 1px solid #2196f36e;min-height: 10px;width: 270px;margin: 0 auto;text-align: center;padding: 10px;margin-top: 10px;">
+                    <b style="color: #333;font-size: 16px;">';
+        $style5   = '</b>
+                </div>';                                                 
+        $payment = "Rp. ".number_format($text[1],2,",",".");
+        $msg = str_replace('[#Candidate]', $text[3], $msg);
+        $msg = str_replace('[#payment]', $payment, $msg);
+        $deadline = $getDeadline;
+        $deadline = explode(' ', $deadline);
+        $deadline0 = $this->m_master->getIndoBulan($deadline[0]);
+        $deadline1 = $deadline[1];
+        $deadline = $deadline0.' Time : '.$deadline1;
+
+        $NoRek = "Atas Nama : Yayasan Pendidikan Agung Podomoro";
+
+        // $msg = str_replace('[#deadline]', $deadline, $msg);
+
+        $msg = str_replace('[#VA]', $NoRek, $msg);
+        $msg = str_replace("[#styleheader1]", $style1, $msg);
+        $msg = str_replace("[#styleheader2]", $style2, $msg);
+        // $msg = str_replace("[#styleheader3]", $style3, $msg);
+        $msg = str_replace("[#styleheader4]", $style4, $msg);
+        $msg = str_replace("[#styleheader5]", $style5, $msg);
+
+        $msg .= '<div style="background: #efefef; padding: 10px;border: 1px solid #cccccc;">
+                    <strong>Note :</strong>
+                    If we do not receive your payment until the time limit specified then Your Account will be suspended
+                </div>
+                <br><br>
+                <p style="color:#EB6936;"><i>*) Do not reply, this email is sent automatically</i> </p>';
+
+        $this->email->set_newline("\r\n");
+        // $this->email->from('it@podomorouniversity.ac.id','IT Podomoro University');
+        $this->email->from('pu@podomorouniversity.ac.id','PU Notifications');
+        $this->email->to($to);
+        $this->email->subject($subject);
+        $this->email->message($msg);
+        //var_dump($this->email->send());
+        if($this->email->send())
+        {
+          $arr['status'] = 1;
+          $arr['msg'] = "Email Send";
+          $arr['email'] = [
+            'to' => $to,
+            'subject' => $subject,
+            'msg' => $msg,
+          ];
+        }
+        else
+        {
+            $arr['status'] = 0;
+            $arr['msg'] = $this->email->print_debugger();
+        }
+        return $arr;
+    }
+
+
+    public function ResendEmail($to = null,$subject = null,$smtp_host = null,$smtp_port = null,$smtp_user = null,$smtp_pass = null,$text = null, $attach = null, $title = null,$cc=null,$bcc=null)
+    {
+        $arr = array(
+            'status' => 1,
+            'msg'=>''
+        );
+        $this->VariableClass['smtp_host'] = $smtp_host;
+        $this->VariableClass['smtp_port'] = $smtp_port;
+        $this->VariableClass['smtp_user'] = $smtp_user;
+        $this->VariableClass['smtp_pass'] = $smtp_pass;
+
+        $config_email = $this->loadEmailConfig();
+        $max_execution_time = 630;
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
+        $BilingID = mt_rand();// unique number
+        $this->load->library('email', $config_email['setting']);
+        $this->email->set_newline("\r\n");
+        $this->email->from('pu@podomorouniversity.ac.id','PU Notifications');
+        $this->email->to($to);
+        /*ADDED BY FEBRI @ JAN 2020*/
+        if(!empty($cc)){
+            $this->email->cc($cc);
+        }
+        if(!empty($bcc)){
+            $this->email->bcc($bcc);
+        }
+    
+        $this->email->subject($subject.' - '.$BilingID);
+        $this->email->message($text);
+        if ($attach != null) {
+            $this->email->attach($attach);
+        }
+        if($this->email->send())
+        {
+            $arr['status'] = 1;
+            $arr['msg'] = "Email Send";
+        }
+        else
+        {
+            $arr['status'] = 0;
+            $arr['msg'] = $this->email->print_debugger();
+        }
+        return $arr;
+    }
+
 
 }

@@ -4334,4 +4334,64 @@ class M_admission extends CI_Model {
       }
     }
 
+    public function DetaiLResendEmail($RegisterID){
+      $query = $this->db->query(
+        'select a.*,c.Name as NameEmployee from db_admission.register_resend_email as a 
+         join db_admission.register_send_email as b on a.ID_register_send_email = b.ID_register_send_email
+         join db_employees.employees as c on c.NIP = a.Update_by
+         where b.RegisterID = '.$RegisterID.' 
+        '
+      )->result_array();
+      return $query;
+    }
+
+    public function ResendEmail($RegisterID){
+      $rs = ['status' => 0,'msg' => ''];
+      $this->load->model('m_sendemail');
+      // get old email
+      $ID_register_send_email = NULL;
+      $G_dt = $this->m_master->caribasedprimary('db_admission.register_send_email','RegisterID',$RegisterID);
+      if (count($G_dt) > 0) {
+        $EmailData = $G_dt[0]['EmailData'];
+        $EmailData = json_decode($EmailData,true);
+        $sendEmail = $this->m_sendemail->ResendEmail($EmailData['to'],$EmailData['subject'],null,null,null,null,$EmailData['msg']);
+        $ID_register_send_email = $G_dt[0]['ID_register_send_email'];
+      }
+      else
+      {
+        // send email current data dan save data di register_send_email
+        $G_registerID = $this->m_master->caribasedprimary('db_admission.register','ID',$RegisterID);
+        $subject = "Podomoro University Registration";
+
+        $datetime_expired = $G_registerID[0]['Datetime_expired'];
+        $Name = $G_registerID[0]['Name'];
+
+        $text = array($G_registerID[0]['MomenUnix'],$G_registerID[0]['PriceFormulir'],$datetime_expired,$Name);
+        $sendEmail = $this->m_sendemail->resend_email_admission_no_record($G_registerID[0]['Email'],$subject,$text);
+// as
+        $dataSave = [
+          'RegisterID' => $RegisterID,
+          'EmailData' => json_encode($sendEmail['email']),
+        ];
+
+        $this->db->insert('db_admission.register_send_email',$dataSave);
+        $ID_register_send_email = $this->db->insert_id();
+      }
+
+      if (isset($sendEmail) &&  !empty($sendEmail) && $sendEmail['status'] == 1 ) {
+        // insert data to register_resend_email
+        $dataSave = [
+          'ID_register_send_email' => $ID_register_send_email,
+          'Update_at' => date('Y-m-d H:i:s'),
+          'Update_by' => $this->session->userdata('NIP'),
+        ];
+
+        $this->db->insert('db_admission.register_resend_email',$dataSave);
+        $rs['status'] = 1;
+
+      }
+
+      return $rs;
+    }
+
 }
