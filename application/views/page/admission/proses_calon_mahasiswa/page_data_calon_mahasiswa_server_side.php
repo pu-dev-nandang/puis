@@ -55,6 +55,12 @@
                             </div>
                           </div>
                          <br>
+                         <div class="row">
+                           <div class="col-md-12">
+                             <p style="color: red;">* Detail resend email : history resend email tentang pembayaran formulir</p>
+                             <p style="color: red;">* Resend email : Resend email tentang pembayaran formulir</p>
+                           </div>
+                         </div>
                          <div class = "row">
                           <div class = "col-md-12">
                             <div class = "table-responsive">
@@ -64,6 +70,7 @@
                             </div>
                           </div>
                         </div>
+
                         <!-- <div  class="col-md-12" align="right" id="pagination_link"></div> -->
                     </div>
                 </div>
@@ -157,7 +164,7 @@
                                '<th>Detail Payment</th>'+
                                '<th>Status</th>'+
                                '<th>RegisterAt</th>'+
-                               '<th>Login</th>'+
+                               '<th>Action</th>'+
                            '</tr>'+
                            '</thead>'+
                            '<tbody id="dataRow"></tbody>'+
@@ -210,7 +217,6 @@
                        }
                    },
                    'createdRow': function( row, data, dataIndex ) {
-                          // console.log(data);
                          if(data[9] == 'Lunas')
                          {
                            $(row).attr('style', 'background-color: #8ED6EA; color: black;');
@@ -698,6 +704,88 @@
         form.attr('target', '_blank');
         form.appendTo('body').submit();
     }
+
+
+    $(document).on("click", ".btnResendEmail", function(event){
+      var selector = $(this);
+      //903
+        if (confirm('Are you sure ? ')) {
+          var url = base_url_js+"admission/ResendEmail";
+          var data = {
+              RegisterID : $(this).attr('registerid') ,
+          };
+          var token = jwt_encode(data,"UAP)(*");
+          loading_button2(selector);
+          $.post(url,{ token:token }, function (data) {
+            // action
+            if (data.status == 1) {
+              toastr.success('Email Send');
+            }
+            else
+            {
+              toastr.info('Connection time out error,try again');
+            }
+            end_loading_button2(selector,'<i class="fa fa-envelope"></i> Resend Email');
+
+          }).fail(function(xhr, status, error) {
+            end_loading_button2(selector,'<i class="fa fa-envelope"></i> Resend Email');
+            toastr.info('Connection time out error,try again');
+          });
+        }
+        
+    });
+    
+    $(document).on("click", ".btnDetaiLResendEmail", function(event){
+        var url = base_url_js+"admission/DetaiLResendEmail";
+        var data = {
+            RegisterID : $(this).attr('registerid') ,
+        };
+        var token = jwt_encode(data,"UAP)(*");
+        $.post(url,{ token:token }, function (data) {
+          // action
+          var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+              '';
+          var html  = '';
+            if (data.length > 0) {
+                html = '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                              '<table class = "table">'+
+                                '<thead>'+
+                                  '<tr>'+
+                                    '<td>No</td>'+
+                                    '<td>Send By</td>'+
+                                    '<td>time</td>'+
+                                  '</tr>'+
+                                '</thead>'+
+                                '<tbody>';
+                                    for (var i = 0; i < data.length; i++) {
+                                        html += '<tr>'+
+                                                  '<td>'+(i+1)+'</td>'+
+                                                  '<td>'+data[i].NameEmployee+'</td>'+
+                                                  '<td>'+data[i].Update_at+'</td>'+
+                                                '</tr>';
+                                    }
+
+                        html += '</tbody>'+
+                              '</table>'+
+                            '</div>'+
+                          '</div>'; 
+            }
+            else
+            {
+              html += '<p style = "color:red;">No data result</p>';
+            }
+                               
+          $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'History Resend Email </h4>');
+          $('#GlobalModalLarge .modal-body').html(html);
+          $('#GlobalModalLarge .modal-footer').html(footer);
+          $('#GlobalModalLarge').modal({
+              'show' : true,
+              'backdrop' : 'static'
+          });
+
+        })
+    });
 
     $(document).on("click", ".btnLoginPortalRegister", function(event){
       var url = '<?php echo url_registration; ?>'+'auth/loginByPcam';

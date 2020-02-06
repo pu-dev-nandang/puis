@@ -1153,6 +1153,7 @@ class C_admission extends Admission_Controler {
             // $nestedData[] = $row['NamePrody'];
             $Code = ($row['No_Ref'] != "") ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
             $nestedData[] = $No;
+
             $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['Phone'].'<br>'.$row['SchoolName'];
             $nestedData[] = $row['NamePrody'].'<br>'.$Code.'<br>'.$row['VA_number'];
             $nestedData[] = $row['NameSales'];
@@ -1180,7 +1181,19 @@ class C_admission extends Admission_Controler {
             $nestedData[] = $cicilan;
             $nestedData[] = $row['chklunas'];
             $nestedData[] = $row['RegisterAT'];
-            $nestedData[] = '<div style="text-align: center;"><button class="btn btn-sm btn-primary btnLoginPortalRegister " data-xx="'.$row['Email'].'" data-xx2="'.$row['FormulirCode'].'"  ><i class="fa fa-sign-in right-margin"></i> Login Portal</button></div>';
+
+            // get data resend email
+            $btnResendEmail = '';
+            if ($row['FormulirCode'] == '' || $row['FormulirCode'] == null || empty($row['FormulirCode'])) {
+              $btnResendEmail = '<button class = "btn btn-warning btnResendEmail" RegisterID = "'.$row['RegisterID'].'"><i class = "fa fa-envelope"></i> Resend Email</button>';
+            }
+            $btnDetaiLResendEmail = '<button class = "btn btn-default btnDetaiLResendEmail" RegisterID = "'.$row['RegisterID'].'"> Detail Resend Email</button>';
+
+            $nestedData[] = '<div style="text-align: center;"><button class="btn btn-sm btn-primary btnLoginPortalRegister " data-xx="'.$row['Email'].'" data-xx2="'.$row['FormulirCode'].'"  ><i class="fa fa-sign-in right-margin"></i> Login Portal</button>
+              <br/><br/>
+              '.$btnDetaiLResendEmail.'<br/><br/>
+              '.$btnResendEmail.'
+            </div>';
             $data[] = $nestedData;
             $No++;
         }
@@ -2882,6 +2895,24 @@ class C_admission extends Admission_Controler {
       {
         exit('No direct script access allowed');
       }
+    }
+
+    public function DetaiLResendEmail(){
+      header('Access-Control-Allow-Origin: *');
+      header('Content-Type: application/json');
+      $dataToken = $this->getInputToken();
+      $RegisterID = $dataToken['RegisterID'];
+      $rs =  $this->m_admission->DetaiLResendEmail($RegisterID);
+      echo json_encode($rs);
+    }
+
+    public function ResendEmail(){
+      header('Access-Control-Allow-Origin: *');
+      header('Content-Type: application/json');
+      $dataToken = $this->getInputToken();
+      $RegisterID = $dataToken['RegisterID'];
+      $rs =  $this->m_admission->ResendEmail($RegisterID);
+      echo json_encode($rs);
     }
 
 }
