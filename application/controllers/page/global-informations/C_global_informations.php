@@ -956,26 +956,43 @@ class C_global_informations extends Globalclass {
         if($data){
             $message = ""; $finish = false;
             $conditions = array("ID"=>$data['ID']);
-            $data['PositionMain'] = $data['division'].'.'.$data['position'];
+            /*$data['PositionMain'] = $data['division'].'.'.$data['position'];
             unset($data['division']);
-            unset($data['position']);
-            if(!empty($data['ID'])){
-                $isExist = $this->General_model->fetchData("db_mail_blast.role_mail",$conditions)->row();
-                if(!empty($isExist)){
-                    //update
-                    $data['editedby'] = $mynip;
-                    //var_dump($data);die();
-                    $update = $this->General_model->updateData("db_mail_blast.role_mail",$data,$conditions);
-                    $message = (($update) ? "Successfully":"Failed")." updated.";
-                    $finish = ($update) ? true : false;
-                }else{$message="Data not founded. Try again.";}
-            }else{
-                //insert
-                $data['createdby'] = $mynip;
-                $insert = $this->General_model->insertData("db_mail_blast.role_mail",$data);
-                $message = (($insert) ? "Successfully":"Failed")." saved.";
-                $finish = ($insert) ? true : false;
+            unset($data['position']);*/
+            $position = $data['position'];
+            
+            $dataRoles = array();
+            if(!empty($position)){
+                foreach ($position as $p) {
+                    if(!empty($p)){
+                        $PositionMain = $data['division'].".".$p;
+                        $dataRoles[] = array("ID"=>(!empty($data['ID']) ? $data['ID'] : null), "isWrite"=>$data['isWrite'], "isDelete"=>$data['isDelete'], "isView"=>$data['isView'], "isCreateTemplate"=>$data['isCreateTemplate'], "PositionMain"=>$PositionMain );
+                    }
+                }
             }
+
+
+            if(!empty($dataRoles)){
+                foreach ($dataRoles as $r) {
+                     if(!empty($r['ID'])){
+                        $isExist = $this->General_model->fetchData("db_mail_blast.role_mail",$conditions)->row();
+                        if(!empty($isExist)){
+                            //update
+                            $r['editedby'] = $mynip;
+                            //var_dump($data);die();
+                            $update = $this->General_model->updateData("db_mail_blast.role_mail",$r,$conditions);
+                            $message = (($update) ? "Successfully":"Failed")." updated.";
+                            $finish = ($update) ? true : false;
+                        }else{$message="Data not founded. Try again.";}
+                    }else{
+                        //insert
+                        $r['createdby'] = $mynip;
+                        $insert = $this->General_model->insertData("db_mail_blast.role_mail",$r);
+                        $message = (($insert) ? "Successfully":"Failed")." saved.";
+                        $finish = ($insert) ? true : false;
+                    }
+                }
+            }           
 
             /*$this->session->set_flashdata("message",$message);
             redirect(site_url('global-informations/message-blast/roles')); */

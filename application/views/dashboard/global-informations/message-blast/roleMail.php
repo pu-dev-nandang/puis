@@ -25,7 +25,7 @@
 							<div class="col-sm-12">
 								<label>Position Main</label>
 							</div>
-							<div class="col-sm-6">
+							<div class="col-sm-12">
 								<div class="form-group">						
 									<select class="form-control required division" required name="division">
 										<option value="">-Choose Division-</option>
@@ -36,16 +36,29 @@
 									<small class="text-danger text-message"></small>
 								</div>
 							</div>
-							<div class="col-sm-6">
-								<div class="form-group">
-									<select class="form-control required position" required name="position" disabled>
-										<option value="">-Choose Position-</option>
-										<?php foreach ($position as $p) {
-										echo '<option value="'.$p->ID.'">'.$p->Description.'</option>';
-										} ?>
-									</select>
-									<small class="text-danger text-message"></small>
-								</div>
+							<div class="col-sm-12">
+								<div class="row">
+									<div class="col-sm-12">
+										<div class="form-groups">
+						                  <label>Position</label>
+						                </div>
+						                <div style="overflow-y:auto;overflow-x:hidden;max-height:200px">
+					                	<div class="row">
+						                <?php if(!empty($position)){
+						                foreach ($position as $p) { ?>
+						                		<div class="col-sm-6">
+						                			<div class="checkbox">
+								                      <label>
+								                        <input type="checkbox" class="position position-<?=$p->ID?>" value="<?=$p->ID?>" name="position[]" > <?=$p->Description?>
+								                      </label>
+							                      </div>
+						                		</div>
+						                <?php } } ?>
+					                	</div>	
+					                	</div>	
+									</div>
+								</div>	
+								
 							</div>
 						</div>
 						
@@ -297,6 +310,7 @@
 				    		alert("Failed submited. Try again.");
 				    	}else{
 				    		$formPost.find(".form-control").val("");
+				    		$formPost.find(".position").prop("checked",false);
 				    		toastr.info(response.message,'Info!');
 				    		$('#fetch-data-tables .table').DataTable().destroy();
     						fetchingAccessRole();
@@ -333,15 +347,25 @@
                     });
 			    },success : function(response){
 	            	loading_modal_hide();
+	            	$formPost.find(".position").prop("checked",false);
 					if(jQuery.isEmptyObject(response)){
 			    		alert("Data not founded. Try again.");
 			    	}else{
 	            		$.each(response,function(k,v){
-			    			$formPost.find("."+k).val(v).prop("disabled",false);
+			    			if(k == "position"){
+		    					$formPost.find(".position").addClass("check-ones");
+		    					$formPost.find(".position-"+v).prop("checked",true);
+			    			}else{
+			    				$formPost.find("."+k).val(v).prop("disabled",false);
+			    			}
 			    		});
 			    	}
 			    }
 			});
+		});
+
+		$formPost.on("change",".check-ones",function(){
+			$('input.position').not(this).prop('checked', false);
 		});
 
 
