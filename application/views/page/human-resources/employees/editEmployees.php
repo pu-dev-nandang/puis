@@ -1,39 +1,55 @@
-
-<style>
-    #dataTableCerti tr th, #dataTableCerti tr td {
-        text-align: center;
-    }
+<style type="text/css">
+    #dataTableCerti tr th, #dataTableCerti tr td {text-align: center;}
+    #form-employee .tabulasi-emp > ul > li.active > a{background:#428bca;color:#fff;border:1px solid #428bca;}
+    #form-employee .cursor{cursor: pointer;}
+    #form-employee .cursor-disable{cursor: no-drop;}
 </style>
-
-<div class="panel panel-primary">
-    <div class="panel-heading" style="border-radius: 0px;">
-        <h4 class="header">Edit Employees</h4>
+<div id="form-employee">
+    <div class="row">
+        <div class="col-sm-12" style="margin-bottom:20px">
+            <a class="btn btn-warning" href="<?=site_url('human-resources/employees')?>"><i class="fa fa-angle-double-left"></i> Back to list</a>
+        </div>
+        <div class="col-sm-12">
+            <div class="tabulasi-emp">
+              <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a class="cursor">Personal Data</a></li>
+                <li><a href="<?=site_url('human-resources/employees/additional-info/'.$NIP)?>">Additional Information</a></li>
+              </ul>
+            </div>
+        </div>
     </div>
-    <div class="panel-body" style="min-height: 100px;">
 
-        <div class="row">
-            <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
-                <div class="row">
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>NIK / NIP</label>
-                            <input class="form-control" disabled id="formNIP" value="<?php echo $arrEmp['NIP']; ?>">
-                        </div>
-                    </div>
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>NUP</label>
-                            <input class="form-control" id="formNUP" value="<?php echo $arrEmp['NUP']; ?>">
-                        </div>
-                    </div>
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>NIDN</label>
-                            <input class="form-control" id="formNIDN" value="<?php echo $arrEmp['NIDN']; ?>">
-                        </div>
-                    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading" style="border-radius: 0px;">
+                    <h4 class="panel-title"><i class="fa fa-edit"></i> Edit Employer</h4>
+                </div>
+                <div class="panel-body" style="min-height: 100px;">
 
-                    <div class="col-xs-3">
+                    <div class="row">
+                        <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <div class="form-group">
+                                        <label>NIK / NIP</label>
+                                        <input class="form-control" disabled id="formNIP" value="<?php echo $arrEmp['NIP']; ?>">
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="form-group">
+                                        <label>NUP</label>
+                                        <input class="form-control" id="formNUP" value="<?php echo $arrEmp['NUP']; ?>">
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="form-group">
+                                        <label>NIDN</label>
+                                        <input class="form-control" id="formNIDN" value="<?php echo $arrEmp['NIDN']; ?>">
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-3">
                         <div class="form-group">
                             <label>NIDK</label>
                             <input class="form-control" id="formNIDK" value="<?php echo $arrEmp['NIDK']; ?>">
@@ -45,7 +61,7 @@
                 <div class="row">
                     <div class="col-xs-5">
                         <div class="form-group">
-                            <label>No KTP</label>
+                            <label>No KTP *</label>
                             <input class="form-control" id="formKTP" value="<?php echo $arrEmp['KTP']; ?>" />
                         </div>
                     </div>
@@ -57,7 +73,7 @@
                     </div>
                     <div class="col-xs-3">
                         <div class="form-group">
-                            <label>Religion</label>
+                            <label>Religion *</label>
                             <select class="form-control" id="formReligion"></select>
                         </div>
                     </div>
@@ -66,13 +82,13 @@
                 <div class="row">
                     <div class="col-xs-9">
                         <div class="form-group">
-                            <label>Name</label>
+                            <label>Name *</label>
                             <input class="form-control" id="formName" value="<?php echo $arrEmp['Name']; ?>" />
                         </div>
                     </div>
                     <div class="col-xs-3">
                         <div class="form-group">
-                            <label>Gender</label>
+                            <label>Gender *</label>
                             <select class="form-control" id="formGender">
                                 <option value="L">Male</option>
                                 <option value="P">Female</option>
@@ -99,7 +115,7 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="form-group">
-                            <label>Place Of Birth</label>
+                            <label>Place Of Birth *</label>
                             <input class="form-control" id="formPlaceOfBirht" value="<?php echo $arrEmp['PlaceOfBirth']; ?>" />
                         </div>
                     </div>
@@ -107,7 +123,7 @@
                         <div class="form-group">
 
                             <div class="thumbnail" style="padding: 10px;text-align: center;">
-                                <h4>Date Of Birth</h4>
+                                <h4>Date Of Birth *</h4>
                                 <div class="row">
                                     <div class="col-xs-4">
                                         <div class="form-group">
@@ -173,20 +189,21 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="form-group">
-                            <label>Address</label>
-                            <textarea rows="3" class="form-control" id="formAddress"><?php echo $arrEmp['Address']; ?></textarea>
+                            <label>Address *</label>
+                            <textarea rows="3" class="form-control" id="formAddress" placeholder="Same as your Address on identity card"><?php echo $arrEmp['Address']; ?></textarea>
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-xs-12">
+                    <div class="col-xs-2">
                         <div class="form-group">
-                            <label>Postcode</label>
+                            <label>Postcode *</label>
                             <input type="text" class="form-control" id="formPostcode" value="<?php echo $arrEmp['Postcode']; ?>">
                         </div>
                     </div>
                 </div>
+                <p><b>*) Please fill out this field by referring to ID card</b></p>
 
             </div>
 
@@ -446,6 +463,10 @@
 
     </div>
 </div>
+        </div>
+    </div>
+</div>
+
 
 
 

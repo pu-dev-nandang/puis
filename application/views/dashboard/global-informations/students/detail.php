@@ -181,57 +181,57 @@
 											</div>
 											<div class="content">
 												<div class="row">
-													<label class="col-sm-3">Program</label>
-													<p class="col-sm-9"><?=$detail->ProdiEdu."-".$detail->ProdiDegree?></p>
+													<label class="col-sm-4">Program</label>
+													<p class="col-sm-8"><?=$detail->ProdiEdu."-".$detail->ProdiDegree?></p>
 												</div>
 												<div class="row">
-													<label class="col-sm-3">Study Program</label>
-													<p class="col-sm-9"><?=$detail->ProdiNameEng?></p>
+													<label class="col-sm-4">Study Program</label>
+													<p class="col-sm-8"><?=$detail->ProdiNameEng?></p>
 												</div>
 												<div class="row">
-													<label class="col-sm-3">Year Intake</label>
-													<p class="col-sm-4"><?=$detail->ClassOf?></p>
+													<label class="col-sm-4">Year Intake</label>
+													<p class="col-sm-8"><?=$detail->ClassOf?></p>
 												</div>
 												<div class="row">
-													<label class="col-sm-3">NIM</label>
-													<p class="col-sm-9"><?=$detail->NPM?></p>
+													<label class="col-sm-4">NIM</label>
+													<p class="col-sm-8"><?=$detail->NPM?></p>
 												</div>
 												<div class="row">
-													<label class="col-sm-3">Email PU</label>
-													<p class="col-sm-9"><?=$detail->EmailPU?></p>
+													<label class="col-sm-4">Email PU</label>
+													<p class="col-sm-8"><?=$detail->EmailPU?></p>
 												</div>												
 												<div class="row">
-													<label class="col-sm-3">Status</label>
-													<p class="col-sm-4"><?=$detail->StatusStudent?></p>
+													<label class="col-sm-4">Status</label>
+													<p class="col-sm-8"><?=$detail->StatusStudent?></p>
 												</div>
 												<?php if($detail->StatusStudentID == 1){ ?>
 												<div class="row">
-													<label class="col-sm-3">Yudisium Date</label>
-													<p class="col-sm-4"><?=date("d F Y",strtotime($detail->YudisiumDate))?></p>
+													<label class="col-sm-4">Yudisium Date</label>
+													<p class="col-sm-8"><?=date("d F Y",strtotime($detail->YudisiumDate))?></p>
 												</div>
 												<div class="row">
-													<label class="col-sm-3">Graduation Date</label>
-													<p class="col-sm-4"><?=date("d F Y",strtotime($detail->GraduationDate))?></p>
+													<label class="col-sm-4">Graduation Date</label>
+													<p class="col-sm-8"><?=date("d F Y",strtotime($detail->GraduationDate))?></p>
 												</div>
 												<?php }else{ ?>
 												<div class="row">
-													<label class="col-sm-3">Current Semester</label>
-													<p class="col-sm-4 fetch-score semes"><i class="fa fa-circle-o-notch fa-spin"></i></p>
+													<label class="col-sm-4">Current Semester</label>
+													<p class="col-sm-8 fetch-score semes"><i class="fa fa-circle-o-notch fa-spin"></i></p>
 												</div>
 												<?php } ?>
+												<!-- <div class="row">
+													<label class="col-sm-4">IPS</label>
+													<p class="col-sm-8 fetch-score ips"><i class="fa fa-circle-o-notch fa-spin"></i></p>
+												</div> -->
 												<div class="row">
-													<label class="col-sm-3">IPS</label>
-													<p class="col-sm-4 fetch-score ips"><i class="fa fa-circle-o-notch fa-spin"></i></p>
-												</div>
-												<div class="row">
-													<label class="col-sm-3">IPK</label>
-													<p class="col-sm-4 fetch-score ipk"><i class="fa fa-circle-o-notch fa-spin"></i></p>
+													<label class="col-sm-4">IPK</label>
+													<p class="col-sm-8 fetch-score ipk"><i class="fa fa-circle-o-notch fa-spin"></i></p>
 												</div>
 
 												<?php if(!empty($detail->MentorNIP)){ ?>
 												<div class="row">
-													<label class="col-sm-3">Mentor</label>
-													<p class="col-sm-9"><?='<i class="fa fa-id-card"></i> '.$detail->MentorNIP.'<br><i class="fa fa-user"></i> '.$detail->Mentor.'<br><i class="fa fa-envelope"></i> '.(!empty($detail->MentorEmailPU) ? $detail->MentorEmailPU:'-')?></p>
+													<label class="col-sm-4">Mentor</label>
+													<p class="col-sm-8"><?='<i class="fa fa-id-card"></i> '.$detail->MentorNIP.'<br><i class="fa fa-user"></i> '.$detail->Mentor.'<br><i class="fa fa-envelope"></i> '.(!empty($detail->MentorEmailPU) ? $detail->MentorEmailPU:'-')?></p>
 												</div>
 												<?php } ?>
 											</div>
@@ -266,9 +266,9 @@
 			            	if(jQuery.isEmptyObject(response)){
 			            		$(".fetch-score").text(0);
 			            	}else{
-				            	$(".fetch-score.semes").text(response.GPA.LastSemester+" Term "+response.GPA.LastTerm);
-				            	$(".fetch-score.ips").text(response.GPA.IPS);
-				            	$(".fetch-score.ipk").text(response.GPA.IPK);
+				            	$(".fetch-score.semes").text(response.LastSemester);
+				            	$(".fetch-score.ips").text(0);
+				            	$(".fetch-score.ipk").text(response.dataIPK.IPK);
 			            	}
 			            }
 			        });

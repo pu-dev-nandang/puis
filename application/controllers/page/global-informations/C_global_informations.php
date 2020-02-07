@@ -6,7 +6,7 @@ class C_global_informations extends Globalclass {
 
     function __construct(){
         parent::__construct();
-        $this->load->model(array("General_model","global-informations/Globalinformation_model","M_sendemail"));
+        $this->load->model(array("General_model","global-informations/Globalinformation_model","M_sendemail","m_rest"));
     }
 
 
@@ -179,11 +179,16 @@ class C_global_informations extends Globalclass {
     	$key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($data['token'],$key);
         if($data){
-        	
-            $transcript = $this->Globalinformation_model->fetchStudentTranscript($data_arr['NPM']);
+        	$isExist = $this->General_model->fetchData("db_academic.auth_students",array("NPM"=>$data_arr['NPM']))->row();
+            if(!empty($isExist)){
+                //$transcript = $this->Globalinformation_model->fetchStudentTranscript($data_arr['NPM']);
+                $transcript = $this->m_rest->getTranscript($isExist->Year,$isExist->NPM,'ASC');
+                $getCurrentSemester = $this->General_model->fetchData("ta_2017.study_planning",array("NPM"=>$isExist->NPM),null,null,null,"SemesterID")->result();
+                $transcript['LastSemester'] = (!empty($getCurrentSemester) ? count($getCurrentSemester) : 0);
+                $json = (!empty($transcript) ? $transcript : null);
+            }
             //$transcript = $this->Globalinformation_model->fetchStudentTranscript("21140014");
             
-            $json = (!empty($transcript) ? $transcript : null);
             /*echo "<pre>";
             var_dump($json);die();*/
 
@@ -956,9 +961,6 @@ class C_global_informations extends Globalclass {
         if($data){
             $message = ""; $finish = false;
             $conditions = array("ID"=>$data['ID']);
-            /*$data['PositionMain'] = $data['division'].'.'.$data['position'];
-            unset($data['division']);
-            unset($data['position']);*/
             $position = $data['position'];
             
             $dataRoles = array();
@@ -993,9 +995,6 @@ class C_global_informations extends Globalclass {
                     }
                 }
             }           
-
-            /*$this->session->set_flashdata("message",$message);
-            redirect(site_url('global-informations/message-blast/roles')); */
 
             $json = array("message"=>$message,"finish"=>$finish);
         }

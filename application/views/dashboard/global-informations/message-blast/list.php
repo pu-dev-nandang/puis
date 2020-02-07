@@ -32,11 +32,11 @@
 					<?php if(!empty($access)){
 					if($access->isView == 1){ ?>
 					<div class="created_info"><span>Created by <?=$v->createdby?></span>
-											 <?php if(empty($v->isShow)){?><p class="text-danger"><i class="fa fa-exclamation-triangle"></i> This message has been removed by user </p><?php } ?></div>
+					<?php if(empty($v->isShow)){?><p class="text-danger"><i class="fa fa-exclamation-triangle"></i> This message has been removed by user </p><?php } ?></div>
 					<?php } } ?>
 					<div class="mail_to">
 						<?php if(!empty($access)){
-						if($access->isDelete == 1){ ?>
+						if(($access->isDelete == 1) && ($v->createdby == $this->session->userdata('NIP').'.'.$this->session->userdata('Name'))){ ?>
 						<div class="action pull-right">
 							<span class="btn-remove-mail" data-mail="<?=$v->ID?>"><i class="fa fa-trash"></i></span>							
 						</div>
