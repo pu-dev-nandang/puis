@@ -135,6 +135,7 @@
 
     $(document).on('click','.btnDownloadSKPI',function () {
        var _href = $(this).attr('data-href');
+       window.open(_href);return;
        var NPM = $(this).attr('data-npm');
        
        var url = base_url_js+'__setSKPIQRCode';

@@ -491,8 +491,9 @@
                 
                 $maxSize = (int)(QR_PNG_MAXIMUM_SIZE / (count($tab)+2*$this->margin));
                 
-                QRimage::png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin,$saveandprint);
-            
+                //QRimage::png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin,$saveandprint);
+                $callback = QRimage::png2($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin,$saveandprint);
+                return $callback;
             } catch (Exception $e) {
             
                 QRtools::log($outfile, $e->getMessage());

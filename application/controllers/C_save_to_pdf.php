@@ -6990,7 +6990,7 @@ Phone: (021) 29200456';
 
 
     public function cetakSKPI($token){
-
+        $this->load->library('Qrcode/qrlib');
         $data = $this->getInputToken($token);
 
         if(isset($data['NPM'])){
@@ -7053,9 +7053,18 @@ Phone: (021) 29200456';
                 $B = 226;
 
                 $URLQrCode = 'https://uap.ac.id/ds/'.$NPM;
+
+                // QRcode::png($data_arr['data'],'./images/SKPI/SKPI-QRCode.png','L', 10, 4);
+                $t = QRcode::png($URLQrCode,false,'L', 10, 4);
+                $pic = 'data://text/plain;base64,' . $t;
+                // extract dimensions from image
+                // $info = getimagesize($pic);
+                // $enc = base64_encode($t);
+
 //            QRcode::png($URLQrCode, './images/SKPI/frame.png', 'L', 10, 2);
                 $pdf->Image('./images/new_logo_pu.png',10,10,50);
-                $pdf->Image(url_pas.'images/SKPI/SKPI-QRCode.png',176,12.5,17);
+                $pdf->Image($pic,176,12.5,17,NULL,'png');
+                // $pdf->Image(url_pas.'images/SKPI/SKPI-QRCode.png',176,12.5,17);
                 $pdf->Image('./images/SKPI/frame-qrcode.png',174.5,11,20);
 
                 $pdf->Ln(17);
