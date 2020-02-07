@@ -166,6 +166,7 @@ class C_employees extends HR_Controler {
         $data['ProdiArr'] = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
         $arrEmp = $this->db->get_where('db_employees.employees',array('NIP'=>$NIP),1)->result_array();
         $data['arrEmp'] = (count($arrEmp)>0) ? $arrEmp[0] : [];
+        $data['NIP'] = $NIP;
 
         // Cek apakah NIP dapat di hapus secara permanen atau tidak
         $data['btnDelPermanent'] = $this->m_hr->checkPermanentDelete($NIP);
@@ -174,7 +175,7 @@ class C_employees extends HR_Controler {
 //        exit;
 
         $page = $this->load->view('page/'.$department.'/employees/editEmployees',$data,true);
-        $this->tab_menu($page);
+        $this->temp($page);
     }
 
     public function upload_photo(){
@@ -837,6 +838,20 @@ class C_employees extends HR_Controler {
         echo json_encode($json);
     }
     /*END ADDED BY FEBRI @ NOV 2019*/
+
+
+    /*ADDED BY FEBI @ FEB 2020*/
+    public function additionalInformation($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $department = parent::__getDepartement();
+            $data['NIP'] = $NIP;
+            $data['ProdiArr'] = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);            
+            $page = $this->load->view('page/'.$department.'/employees/additional-information',$data,true);
+            $this->temp($page);
+        }else{show_404();}
+    }
+    /*END ADDED BY FEBI @ FEB 2020*/
 
 
 }
