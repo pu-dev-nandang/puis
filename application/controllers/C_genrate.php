@@ -42,8 +42,10 @@ class C_genrate extends CI_Controller {
     public function setSKPIQRCode(){
 
         $data_arr = $this->getInputToken2();
-        QRcode::png($data_arr['data'],'./images/SKPI/SKPI-QRCode.png','L', 10, 4);
-
+        // QRcode::png($data_arr['data'],'./images/SKPI/SKPI-QRCode.png','L', 10, 4);
+        $t = QRcode::png($data_arr['data'],false,'L', 10, 4);
+        $enc = base64_encode($t);
+        print_r($enc);die();
         return print_r(1);
 
     }
