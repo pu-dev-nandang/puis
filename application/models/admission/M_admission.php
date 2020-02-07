@@ -4345,6 +4345,100 @@ class M_admission extends CI_Model {
       return $query;
     }
 
+    public function DataEmailSend($RegisterID){
+      $rs = '';
+      $this->load->library('JWT');
+      $G_dt = $this->m_master->caribasedprimary('db_admission.register_send_email','RegisterID',$RegisterID);
+      if (count($G_dt) > 0) {
+        $EmailData = $G_dt[0]['EmailData'];
+        $EmailData = json_decode($EmailData,true);
+        $rs = $this->jwt->encode($EmailData,"UAP)(*");
+      }
+      else
+      {
+        $G_registerID = $this->m_master->caribasedprimary('db_admission.register','ID',$RegisterID);
+        $subject = "Podomoro University Registration";
+
+        $datetime_expired = $G_registerID[0]['Datetime_expired'];
+        $Name = $G_registerID[0]['Name'];
+
+        $text = array($G_registerID[0]['MomenUnix'],$G_registerID[0]['PriceFormulir'],$datetime_expired,$Name);
+        $EmailData = $this->get_email_admission_no_record($G_registerID[0]['Email'],$subject,$text);
+        $rs = $this->jwt->encode($EmailData,"UAP)(*");
+      }
+
+      return $rs;
+    }
+
+    private function get_email_admission_no_record($to,$subject,$text){
+      $arr = [];
+      $this->load->model('m_sendemail');
+      $config_email = $this->m_sendemail->loadEmailConfig();
+      $getDeadline = $text[2];
+
+      $msg = '<div style="margin:0;padding:10px 0;background-color:#ebebeb;font-size:14px;line-height:20px;font-family:Helvetica,sans-serif;width:100%">
+                  <div class="adM">
+                  <br>
+                  </div>
+                  <table style="width:600px;margin:0 auto;background-color:#ebebeb" border="0" cellpadding="0" cellspacing="0">
+                      <tbody>
+                      <tr>
+                          <td></td>
+                          <td style="background-color:#fff;padding:0 30px;color:#333;vertical-align:top;border:1px solid #cccccc;">
+                          <br>
+                          <div style="text-align: center;">
+                              <img src="https://lh3.googleusercontent.com/mkqZdtpCm7IfWWrPdfxJBETqOTiEU09s3cr4tzfFwAGRl3WqH_pyo3yDGPKmpSHfMw1mSFU0JTRk-3yX9M7xAG5KiVHzuMS1DPHzFg=w500-h144-rw-no" style="max-width: 250px;">
+                              <hr style="border-top: 1px solid #cccccc;"/>
+                              <div style="font-family:Proxima Nova Semi-bold,Helvetica,sans-serif;font-weight:bold;font-size:24px;line-height:24px;color:#607D8B">Registration</div>
+                          </div>
+                          <br/>';
+      $msg .= $config_email['text'];
+      $style1 = '<div style="background: #00bcd414;border: 1px solid #2196f36e;min-height: 50px;width: 400px;margin: 0 auto;text-align: center;padding: 10px;">
+                  <b style="color: blue;">Rek BCA : 161.3888.555</b>
+                  <div style="color: red;"><b>';
+      $style2 = '</b></div>
+                  <span style="color: #827f7f;">';
+      $style3 = '</span>
+              </div>';
+      $style4 = '<div style="background: #ffeb3b47;border: 1px solid #2196f36e;min-height: 10px;width: 270px;margin: 0 auto;text-align: center;padding: 10px;margin-top: 10px;">
+                  <b style="color: #333;font-size: 16px;">';
+      $style5   = '</b>
+              </div>'; 
+      $payment = "Rp. ".number_format($text[1],2,",",".");
+      $msg = str_replace('[#Candidate]', $text[3], $msg);
+      $msg = str_replace('[#payment]', $payment, $msg);
+      $deadline = $getDeadline;
+      $deadline = explode(' ', $deadline);
+      $deadline0 = $this->m_master->getIndoBulan($deadline[0]);
+      $deadline1 = $deadline[1];
+      $deadline = $deadline0.' Time : '.$deadline1;
+      
+      $NoRek = "Atas Nama : Yayasan Pendidikan Agung Podomoro";
+
+      // $msg = str_replace('[#deadline]', $deadline, $msg);
+
+      $msg = str_replace('[#VA]', $NoRek, $msg);
+      $msg = str_replace("[#styleheader1]", $style1, $msg);
+      $msg = str_replace("[#styleheader2]", $style2, $msg);
+      // $msg = str_replace("[#styleheader3]", $style3, $msg);
+      $msg = str_replace("[#styleheader4]", $style4, $msg);
+      $msg = str_replace("[#styleheader5]", $style5, $msg);
+
+      $msg .= '<div style="background: #efefef; padding: 10px;border: 1px solid #cccccc;">
+                  <strong>Note :</strong>
+                  If we do not receive your payment until the time limit specified then Your Account will be suspended
+              </div>
+              <br><br>
+              <p style="color:#EB6936;"><i>*) Do not reply, this email is sent automatically</i> </p>';
+      $arr = [
+        'to' => $to,
+        'subject' => $subject,
+        'msg' => $msg,
+      ];
+
+      return $arr;        
+    }
+
     public function ResendEmail($RegisterID){
       $rs = ['status' => 0,'msg' => ''];
       $this->load->model('m_sendemail');

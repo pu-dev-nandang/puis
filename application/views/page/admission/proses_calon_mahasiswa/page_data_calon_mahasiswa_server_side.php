@@ -705,14 +705,13 @@
         form.appendTo('body').submit();
     }
 
-
-    $(document).on("click", ".btnResendEmail", function(event){
+    $(document).on("click", "#ModalbtnResendEmail", function(event){
       var selector = $(this);
       //903
         if (confirm('Are you sure ? ')) {
           var url = base_url_js+"admission/ResendEmail";
           var data = {
-              RegisterID : $(this).attr('registerid') ,
+              RegisterID : selector.attr('registerid'),
           };
           var token = jwt_encode(data,"UAP)(*");
           loading_button2(selector);
@@ -720,19 +719,59 @@
             // action
             if (data.status == 1) {
               toastr.success('Email Send');
+              $('#GlobalModalLarge').modal('hide');
             }
             else
             {
               toastr.info('Connection time out error,try again');
             }
-            end_loading_button2(selector,'<i class="fa fa-envelope"></i> Resend Email');
+            end_loading_button2(selector,'Send');
 
           }).fail(function(xhr, status, error) {
-            end_loading_button2(selector,'<i class="fa fa-envelope"></i> Resend Email');
+            end_loading_button2(selector,'Send');
             toastr.info('Connection time out error,try again');
           });
         }
         
+    });
+
+    $(document).on("click", ".btnResendEmail", function(event){
+      var selector = $(this);
+      var dataemailsend = jwt_decode(selector.attr('dataemailsend'));
+      var RegisterID = $(this).attr('registerid');
+      var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+              ' <button class  = "btn btn-success" id ="ModalbtnResendEmail" registerid = "'+RegisterID+'">Send</button>';
+      var html = '<div class = "row">'+
+                    '<div class = "col-md-12">'+
+                      '<table class = "table">'+
+                        '<tr>'+
+                          '<td>To</td>'+
+                          '<td>:</td>'+
+                          '<td>'+dataemailsend['to']+'</td>'+
+                        '</tr>'+
+                        '<tr>'+
+                          '<td>Subject</td>'+
+                          '<td>:</td>'+
+                          '<td>'+dataemailsend['subject']+'</td>'+
+                        '</tr>'+
+                        '<tr>'+
+                          '<td>Message</td>'+
+                          '<td>:</td>'+
+                          '<td>'+dataemailsend['msg']+'</td>'+
+                        '</tr>'+
+                      '</table>'+
+                    '</div>'+
+                  '</div>';    
+
+
+      $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'History Resend Email </h4>');
+      $('#GlobalModalLarge .modal-body').html(html);
+      $('#GlobalModalLarge .modal-footer').html(footer);
+      $('#GlobalModalLarge').modal({
+          'show' : true,
+          'backdrop' : 'static'
+      });
+      
     });
     
     $(document).on("click", ".btnDetaiLResendEmail", function(event){
