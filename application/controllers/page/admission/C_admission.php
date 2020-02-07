@@ -1094,7 +1094,7 @@ class C_admission extends Admission_Controler {
                   ) as chklunas,
                 (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
                 ,xx.Name as NameSales,
-                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref
+                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,a.StatusReg
                 from db_admission.register as a
                 LEFT join db_admission.school as b
                 on a.SchoolID = b.ID
@@ -1182,10 +1182,15 @@ class C_admission extends Admission_Controler {
             $nestedData[] = $row['chklunas'];
             $nestedData[] = $row['RegisterAT'];
 
+            
+
             // get data resend email
             $btnResendEmail = '';
-            if ($row['FormulirCode'] == '' || $row['FormulirCode'] == null || empty($row['FormulirCode'])) {
-              $btnResendEmail = '<button class = "btn btn-warning btnResendEmail" RegisterID = "'.$row['RegisterID'].'"><i class = "fa fa-envelope"></i> Resend Email</button>';
+            if ( ($row['FormulirCode'] == '' || $row['FormulirCode'] == null || empty($row['FormulirCode'])) && $row['StatusReg'] == 0 ) {
+              // show email to resend in html
+              $DataEmailSend = $this->m_admission->DataEmailSend($row['RegisterID']);
+
+              $btnResendEmail = '<button class = "btn btn-warning btnResendEmail" RegisterID = "'.$row['RegisterID'].'" DataEmailSend = "'.$DataEmailSend.'"><i class = "fa fa-envelope"></i> Resend Email</button>';
             }
             $btnDetaiLResendEmail = '<button class = "btn btn-default btnDetaiLResendEmail" RegisterID = "'.$row['RegisterID'].'"> Detail Resend Email</button>';
 
