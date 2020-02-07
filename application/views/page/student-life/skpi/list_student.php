@@ -136,7 +136,7 @@
     $(document).on('click','.btnDownloadSKPI',function () {
        var _href = $(this).attr('data-href');
        var NPM = $(this).attr('data-npm');
-       var url = base_url_files+'__setSKPIQRCode';
+       var url = base_url_js+'__setSKPIQRCode';
        var token = jwt_encode({
            data : 'https://uap.ac.id/ds/'+NPM
        },'UAP)(*');

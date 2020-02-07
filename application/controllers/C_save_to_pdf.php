@@ -7466,7 +7466,7 @@ Phone: (021) 29200456';
                 $URLQrCode = 'https://uap.ac.id/ds/'.$NPM;
 //            QRcode::png($URLQrCode, './images/SKPI/frame.png', 'L', 10, 2);
                 $pdf->Image('./images/new_logo_pu.png',10,10,50);
-                $pdf->Image(url_files.'images/SKPI/SKPI-QRCode.png',176,12.5,17);
+                $pdf->Image(url_pas.'images/SKPI/SKPI-QRCode.png',176,12.5,17);
                 $pdf->Image('./images/SKPI/frame-qrcode.png',174.5,11,20);
 
                 $pdf->Ln(17);
@@ -7766,7 +7766,7 @@ Phone: (021) 29200456';
 
                 $StudentName = $d['NPM'];
                 $nameF = str_replace(' ','_',$StudentName);
-                $pdf->Output('SKPI__'.$nameF.'.pdf','D');
+                $pdf->Output('SKPI__'.$nameF.'.pdf','I');
 
             } else {
                 echo 'Students are not yet registered in the graduation';
