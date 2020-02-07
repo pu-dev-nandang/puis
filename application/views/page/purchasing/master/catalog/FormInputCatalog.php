@@ -14,8 +14,8 @@
 				    <label class="control-label">Description</label>
 				</div>    
 				<div class="col-xs-3">
-				   <input type="text" name="Desc" id= "Desc" placeholder="Input Desc" class="form-control" maxlength="50">
-				   <span id="charsDesc">50</span> characters remaining
+				   <input type="text" name="Desc" id= "Desc" placeholder="Input Desc" class="form-control" maxlength="200">
+				   <span id="charsDesc">200</span> characters remaining
 				</div>
 			</div>
 		</div>
@@ -25,8 +25,8 @@
 				    <label class="control-label">Item Name</label>
 				</div>    
 				<div class="col-xs-3">
-				   <input type="text" name="ItemName" id= "ItemName" placeholder="Input ItemName" class="form-control" maxlength="35">
-				   <span id="charsItemName">35</span> characters remaining
+				   <input type="text" name="ItemName" id= "ItemName" placeholder="Input ItemName" class="form-control" maxlength="120">
+				   <span id="charsItemName">120</span> characters remaining
 				</div>
 				<div class="col-xs-2">
 				    <label class="control-label">Est Value</label>
@@ -118,14 +118,14 @@
 	function LoadFirst()
 	{
 		$("#ItemName").keyup(function(){
-			var maxLength = 35;
+			var maxLength = 120;
 			var length = $(this).val().length;
 			var length = maxLength-length;
 			$('#charsItemName').text(length);
 		})
 
 		$("#Desc").keyup(function(){
-			var maxLength = 50;
+			var maxLength = 200;
 			var length = $(this).val().length;
 			var length = maxLength-length;
 			$('#charsDesc').text(length);
