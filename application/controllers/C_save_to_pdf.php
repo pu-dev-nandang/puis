@@ -7355,7 +7355,7 @@ Phone: (021) 29200456';
 
                 $StudentName = $d['NPM'];
                 $nameF = str_replace(' ','_',$StudentName);
-                
+
                 $pdf->Output('SKPI__'.$nameF.'.pdf','I');
 
             } else {
