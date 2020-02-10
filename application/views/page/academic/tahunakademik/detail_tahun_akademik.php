@@ -52,14 +52,19 @@
     </tr>
     <tr>
         <td>Krs</td>
-        <td>
+        <td colspan="3">
+            <div style="text-align: center;color: #9E9E9E;font-weight: bold;">
+                <i class="fa fa-lock" style="margin-right: 5px;"></i> Locked by IT
+            </div>
+        </td>
+        <td class="hide">
             <input type="text" id="krs_start" nextElement="krs_end" name="regular" class="form-control form-tahun-akademik" readonly>
         </td>
-        <td>
+        <td class="hide">
             <input type="text" id="krs_end" name="regular" class="form-control form-tahun-akademik form-next">
         </td>
-        <td>
-            <a href="javascript:void(0);" id="idBtnSPKRS" data-head="KRS" data-load="prodi" class="btn btn-sm btn-warning btn-block">Special Case</a>
+        <td class="hide">
+            <a href="javascript:void(0);" id="idBtnSPKRS" data-head="KRS" data-load="prodi" class="btn btn-sm btn-warning btn-block hide">Special Case</a>
         </td>
     </tr>
     <tr>
