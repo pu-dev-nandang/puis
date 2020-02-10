@@ -31,8 +31,10 @@
 				<div class="mail" data-mail="<?=$v->ID?>">
 					<?php if(!empty($access)){
 					if($access->isView == 1){ ?>
-					<div class="created_info"><span>Created by <?=$v->createdby?></span>
-					<?php if(empty($v->isShow)){?><p class="text-danger"><i class="fa fa-exclamation-triangle"></i> This message has been removed by user </p><?php } ?></div>
+					<div class="created_info">
+						<span>Created by <?=$v->createdby?></span>
+						<?php if(empty($v->isShow)){?><p class="text-danger"><i class="fa fa-exclamation-triangle"></i> This message has been removed by user </p><?php } ?>
+					</div>
 					<?php } } ?>
 					<div class="mail_to">
 						<?php if(!empty($access)){
@@ -47,7 +49,7 @@
 						<div class="date pull-right"><span><?=date("d M Y",strtotime($v->created))?></span></div>
 						<div class="subject"><span><?=$v->SubjectOth?></span></div>
 					</div>
-					<div class="mail_message"><span><?=substr($v->MessageOth,0,80).((strlen($v->MessageOth) > 80) ? "...":"")?></span></div>
+					<div class="mail_message"><?=substr($v->MessageOth,0,20).((strlen($v->MessageOth) > 20) ? "...":"")?></div>
 				</div>
 				<?php } }else{echo '<p style="padding:10px">Empty results</p>';} ?>
 				<div class="calculate">

@@ -1,25 +1,11 @@
-<style type="text/css">
-    #dataTableCerti tr th, #dataTableCerti tr td {text-align: center;}
-    #form-employee .tabulasi-emp > ul > li.active > a{background:#428bca;color:#fff;border:1px solid #428bca;}
-    #form-employee .cursor{cursor: pointer;}
-    #form-employee .cursor-disable{cursor: no-drop;}
-</style>
-<div id="form-employee">
-    <div class="row">
-        <div class="col-sm-12" style="margin-bottom:20px">
-            <a class="btn btn-warning" href="<?=site_url('human-resources/employees')?>"><i class="fa fa-angle-double-left"></i> Back to list</a>
-        </div>
-        <div class="col-sm-12">
-            <div class="tabulasi-emp">
-              <ul class="nav nav-tabs" role="tablist">
-                <li class="active"><a class="cursor">Personal Data</a></li>
-                <li><a href="<?=site_url('human-resources/employees/additional-info/'.$NIP)?>">Additional Information</a></li>
-              </ul>
-            </div>
-        </div>
-    </div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
+        $("#form-employee .tabulasi-emp > ul > li.nv-personal").addClass("active");
+    });
+</script>
 
-    <div class="row">
+<div class="row">
         <div class="col-sm-12">
             <div class="panel panel-primary">
                 <div class="panel-heading" style="border-radius: 0px;">
@@ -50,11 +36,11 @@
                                 </div>
 
                                 <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>NIDK</label>
-                            <input class="form-control" id="formNIDK" value="<?php echo $arrEmp['NIDK']; ?>">
-                        </div>
-                    </div>
+                                    <div class="form-group">
+                                        <label>NIDK</label>
+                                        <input class="form-control" id="formNIDK" value="<?php echo $arrEmp['NIDK']; ?>">
+                                    </div>
+                                </div>
 
                 </div>
 
@@ -157,12 +143,19 @@
                             <input class="form-control" id="formPhone" value="<?php echo $arrEmp['Phone']; ?>" />
                         </div>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-xs-4">
                         <div class="form-group">
                             <label>Mobile</label>
                             <input class="form-control" id="formMobile" value="<?php echo $arrEmp['HP']; ?>" />
                         </div>
                     </div>
+                    <div class="col-xs-2">
+                        <div class="form-group">
+                            <label>Blood</label>
+                            <input class="form-control" id="formBlood" value="<?php echo $arrEmp['Blood']; ?>" />
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="row">
@@ -462,11 +455,6 @@
         </div>
 
     </div>
-</div>
-        </div>
-    </div>
-</div>
-
 
 
 
@@ -792,6 +780,7 @@
 
         var formPhone = $('#formPhone').val();
         var formMobile = $('#formMobile').val();
+        var formBlood = $('#formBlood').val();
 
         var formEmailPU = $('#formEmailPU').val();
         var formEmail = $('#formEmail').val();
@@ -925,6 +914,7 @@
                     DateOfBirth: DateOfBirht,
                     Phone: formPhone,
                     HP: formMobile,
+                    Blood: formBlood,
                     Email: formEmail,
                     EmailPU: emailPU,
                     Password_Old: Password_Old,
