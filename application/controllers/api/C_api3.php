@@ -6553,20 +6553,30 @@ class C_api3 extends CI_Controller {
 
     public function crudStudentReport(){
         $data_arr = $this->getInputToken2();
-
+        $data_arr =  json_decode(json_encode($data_arr),true);
+        $this->load->model('ticketing/m_ticketing');
         if($data_arr['action']=='inputStudentReport'){
-
+            $data_get = $data_arr['data'];
             $arrInsert = array(
-                'NPM' => $data_arr['NPM'],
-                'Title' => $data_arr['Title'],
-                'Description' => $data_arr['Description'],
+                'NPM' => $data_get['NPM'],
+                'Title' => $data_get['Title'],
+                'Description' => $data_get['Description'],
                 'Status' => '0',
                 'EntredAt' => $this->m_rest->getDateTimeNow()
             );
 
+            // upload files to nas
+            if (array_key_exists('Files', $_FILES)) {
+                $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                $path = 'ticketing';
+                $filename = 'Student_'.$data_get['NPM'];
+                $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$filename,'Files',$path,'array');
+                $uploadNas = $uploadNas[0];
+                $arrInsert['Files'] = $uploadNas;
+            }
+
             $this->db->insert('db_ticketing.ss_report',$arrInsert);
             $ID = $this->db->insert_id();
-
 
             $rand = $this->m_api->chekCodeReport();
 
@@ -6636,8 +6646,17 @@ class C_api3 extends CI_Controller {
 
         }
         else if($data_arr['action']=='studentReportInsertRespinse'){
-
             $dataForm = (array) $data_arr['dataForm'];
+            // upload files to nas
+            if (array_key_exists('Files', $_FILES)) {
+                $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                $path = 'ticketing';
+                $filename = 'Academic_'.$dataForm['EnrtedBy'];
+                $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$filename,'Files',$path,'array');
+                $uploadNas = $uploadNas[0];
+                $dataForm['Files'] = $uploadNas;
+            }
+
             $this->db->insert('db_ticketing.ss_report_response',$dataForm);
 
             if($dataForm['EntredType']=='1'){
@@ -6719,8 +6738,41 @@ class C_api3 extends CI_Controller {
 
                 $nestedData[] = '<div style="text-align: center;">'.$no.'</div>';
                 $nestedData[] = '<div><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'<br/><i class="fa fa-hashtag"></i> '.$row['ReportNumber'].'</div>';
+
+                // get files
+                $htmlFiles = '';
+                if ($row['Files'] != NULL && !empty($row['Files']) ) {
+                   $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
+                   $FilePath = $pathfolder.$row['Files'];
+                   $tokenFiles = $this->jwt->encode($FilePath,"UAP)(*");
+                   $urlFiles = url_files."fileGetAnyToken/".$tokenFiles;
+
+                   $htmlFiles = '<div style="margin-bottom: 5px;">
+                                    <a href= "'.$urlFiles.'" target="_blank">Files Upload<a>
+                                </div>';
+                }
+                
+
+                // btn create ticket
+                $BtnCreateTicket = '';
+                if ($row['Status'] != '2') {
+                    if ($row['TicketRelation'] == NULL) {
+                        $BtnCreateTicket = '| <a class = "btn btn-default btn-sm CreateTicketFromStd" data-id="'.$row['ID'].'"> Create Ticket </a>';
+                    }
+                    else
+                    {
+                        $BtnCreateTicket = '| <span style ="color:green;" >Ticket : '.$row['TicketRelation'].'</span>';
+                    }
+                    
+                }
+
+                if ($row['TicketRelation'] != NULL && $row['TicketRelation'] != '' ) {
+                    $BtnCreateTicket = '| <span style ="color:green;" >Ticket : '.$row['TicketRelation'].'</span>';
+                }
+
                 $nestedData[] = '<div><h4 style="margin-bottom: 3px;margin-top: 0px;">'.$row['Title'].'</h4><div style="margin-bottom: 5px;">Created : '.$Created.'</div><div class="well" style="max-height: 150px;overflow: auto;"><p>'.$row['Description'].'</p></div>
-                                        <a class="btn btn-primary btn-sm showDataResponse" data-id="'.$row['ID'].'"><i class="fa fa-comment margin-right"></i> '.$Response[0]['TotalResponse'].' Response</a> | <span style="font-size: 11px;color: #848484;">Last Updated : '.$LastUpdateAt.' By '.$LastUpdateBy.'</span></div>';
+                    '.$htmlFiles.'
+                                        <a class="btn btn-primary btn-sm showDataResponse" data-id="'.$row['ID'].'"><i class="fa fa-comment margin-right"></i> '.$Response[0]['TotalResponse'].' Response</a> '.$BtnCreateTicket.' | <span style="font-size: 11px;color: #848484;">Last Updated : '.$LastUpdateAt.' By '.$LastUpdateBy.'</span></div>';
                 $nestedData[] = '<div style="text-align: center;">'.$Sts.'</div>';
 
                 $data[] = $nestedData;
@@ -6755,6 +6807,78 @@ class C_api3 extends CI_Controller {
 
             return print_r(json_encode($data));
 
+        }
+        elseif ($data_arr['action'] = 'studentReportCreateTicket') {
+            $data_post =  [];
+            $data_get = $data_arr['dataForm'];
+            $IDReport = $data_get['IDReport'];
+            $CategoryID = $data_get['CategoryID'];
+            $RequestedBy = $data_get['RequestedBy'];
+            $DepartmentTicketID = $data_get['DepartmentTicketID'];
+            $DepartmentAbbr = $data_get['DepartmentAbbr'];
+            $Apikey = $data_get['Apikey'];
+            $Hjwtkey = $data_get['Hjwtkey'];
+            
+            $G_dt_report = $this->m_master->caribasedprimary('db_ticketing.ss_report','ID',$IDReport);
+            $Title = $G_dt_report[0]['Title'];
+            $Message = $G_dt_report[0]['Description'];
+            $data_post = [
+                'action' => "create",
+                'data' => [
+                    'CategoryID' => $CategoryID,
+                    'Title' => $Title,
+                    'Message' => $Message,
+                    'RequestedBy' => $RequestedBy,
+                    'DepartmentTicketID' => $DepartmentTicketID,
+                ],
+                'auth' => 's3Cr3T-G4N',
+                'DepartmentAbbr' => $DepartmentAbbr,
+            ];
+            $fileattach = [];
+            $urlPost = base_url().'rest_ticketing/__event_ticketing';
+            $customPost = [
+                'get' => $Apikey,
+                'header' => [
+                    'Hjwtkey' => $Hjwtkey,
+                ],
+                
+            ];
+            // download file if existing
+            $DownloadFiles = [];
+            if ($G_dt_report[0]['Files'] != NULL && $G_dt_report[0]['Files'] != ''  && !empty($G_dt_report[0]['Files'])) {
+                $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
+                $FilePath = 'uploads/'.$pathfolder.$G_dt_report[0]['Files'];
+                $urlFiles = url_files.$FilePath;
+                $DownloadFiles = $this->m_master->downloadByURL($urlFiles);
+                $fileattach = [
+                    'file_name_with_full_path' => $DownloadFiles['path'],
+                    'MimeType' => $this->m_master->MimeType($DownloadFiles['path']),
+                    'filename' => $DownloadFiles['filename'],
+                    'varfiles' => 'Files',
+                ];
+            }
+            
+            $postTicket = $this->m_master->PostSubmitAPIWithFile($urlPost,$data_post,$fileattach,$customPost);
+            if (array_key_exists('callback', $postTicket) && array_key_exists('NoTicket', $postTicket['callback'] )  ) {
+                // update relation
+                $dataSave = [
+                    'TicketRelation' => $postTicket['callback']['NoTicket'],
+                ];
+
+                $this->db->where('ID',$IDReport);
+                $this->db->update('db_ticketing.ss_report',$dataSave);
+
+                // delete files temp
+                if ( array_key_exists('filename', $DownloadFiles)) {
+                       $pathTemp =  './uploads/temp/'.$DownloadFiles['filename'];
+                       if (file_exists($pathTemp)) {
+                           unlink($pathTemp);
+                       }
+                }  
+            }
+            
+
+            echo json_encode($postTicket);
         }
 
     }

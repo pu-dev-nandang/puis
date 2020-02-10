@@ -399,4 +399,40 @@
         });
 
     }
+
+    function AjaxSubmitRestTicketing2(url='',token='',ArrUploadFilesSelector=[]){
+         var def = jQuery.Deferred();
+         var form_data = new FormData();
+         form_data.append('token',token);
+         if (ArrUploadFilesSelector.length>0) {
+            for (var i = 0; i < ArrUploadFilesSelector.length; i++) {
+                var NameField = ArrUploadFilesSelector[i].NameField+'[]';
+                var Selector = ArrUploadFilesSelector[i].Selector;
+                var UploadFile = Selector[0].files;
+                for(var count = 0; count<UploadFile.length; count++)
+                {
+                 form_data.append(NameField, UploadFile[count]);
+                }
+            }
+         }
+
+         $.ajax({
+           type:"POST",
+           url:url,
+           data: form_data,
+           contentType: false,       // The content type used when sending data to the server.
+           cache: false,             // To unable request pages to be cached
+           processData:false,
+           dataType: "json",
+           success:function(data)
+           {
+            def.resolve(data);
+           },  
+           error: function (data) {
+             // toastr.info('No Result Data'); 
+             def.reject();
+           }
+         })
+         return def.promise();
+    }
 </script>

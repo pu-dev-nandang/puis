@@ -105,19 +105,28 @@
             var dataResponse = '<hr/>';
             if(d.Response.length>0){
                 $.each(d.Response, function (i,v) {
-
                     var Cls = (v.EntredType=='1') ? '<span class="label label-default" style="float: right;"><i class="fa fa-check-circle"></i> Admin</span>' : '';
                     var ClsBg = (v.EntredType=='1') ? '#00bdd624' : '#9e9e9e0f';
                     var rsBy = (v.UpdatedAdmin!='' && v.UpdatedAdmin!=null) ? v.UpdatedAdmin : v.UpdatedUser;
+                    var FilesUpload = 'No Files Upload';
+                    if (v.Files != null && v.Files != '') {
+                        var pathfolders = "<?php echo ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? 'pcam/ticketing/' : 'localhost/ticketing/' ?>";
+                        var filePath = pathfolders+v.Files;
+                        // console.log(filePath);
+                        var tokenFiles  = jwt_encode(filePath,'UAP)(*');
+                        // console.log(tokenFiles);
+                        FilesUpload = '<a href = "'+base_url_files+'fileGetAnyToken/'+tokenFiles+'" target="_blank" >File</a>';
+                    }
                     dataResponse = dataResponse + '<table class="table table-bordered table-response">' +
                         '                <tr style="background: '+ClsBg+';">' +
-                        '                    <td style="position: relative;border-left: none;">' +
+                        '                    <td style="position: relative;border-left: none;" colspan = "2">' +
                         '                        <h5 style="margin-bottom: 1px;margin-top: 3px;">'+rsBy+Cls+'</h5>'+
                         '                        <div style="font-size: 11px;color: #999;">'+moment(v.EntredAt).format('dddd, DD MMM YYYY HH:mm')+'</div>'+
                         '                    </td>' +
                         '                </tr>' +
                         '                <tr>' +
                         '                    <td>'+v.Response+'</td>' +
+                        '                    <td>'+FilesUpload+'</td>' +
                         '                </tr>' +
                         '            </table>';
 
@@ -128,9 +137,13 @@
                 ? '<hr/><div class="form-group">' +
                 '    <textarea id="formResponse" class="form-control" rows="5" placeholder="Enter your response..."></textarea>' +
                 '</div>' +
+                '<div class="form-group">'+
+                 '<label>Upload</label>'+
+                 '<input type="file" id = "UploadFile" name = "Files">'+
+                '</div>'+
                 '<div class="form-group" style="text-align: right;">' +
                 '    <button class="btn btn-success" id="btnSubmitResponse">Submit</button>' +
-                '    <button class="btn btn-default" id="btnSubmitClose" style="color: red;float: left;font-weight: bold;">Close the report</button>' +
+                '    ' +
                 '</div>'
                 : '';
 
@@ -139,7 +152,7 @@
 
             $('#GlobalModal .modal-body').html(htmlss);
 
-            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#GlobalModal .modal-footer').html('<button class="btn btn-default" id="btnSubmitClose" style="color: red;float: left;font-weight: bold;">Close the report</button> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
             $('#GlobalModal').on('shown.bs.modal', function () {
                 $('#formResponse').focus();
@@ -152,47 +165,55 @@
 
 
             $('#btnSubmitResponse').click(function () {
+                var selector =  $(this);
                 var Response = $('#formResponse').val();
 
                 if(Response!='' && Response!=null){
 
                     if(confirm('Are you sure?')){
 
-                        loading_button('#btnSubmitResponse');
+                        var ArrUploadFilesSelector = [];
+                        var UploadFile = $('#UploadFile');
+                        var valUploadFile = UploadFile.val();
+                        if (valUploadFile) {
+                            var NameField = UploadFile.attr('name');
+                            var temp = {
+                                NameField : NameField,
+                                Selector : UploadFile,
+                            };
+                            ArrUploadFilesSelector.push(temp);
+                        }
+                        var validationFile = validationFileResponse(ArrUploadFilesSelector);
+                        if (validationFile) {
+                            loading_button('#btnSubmitResponse');
+                            var data = {
+                                action : 'studentReportInsertRespinse',
+                                dataForm : {
+                                    IDReport : d.ID,
+                                    Response : Response,
+                                    EntredType : '1',
+                                    EntredAt : dateTimeNow(),
+                                    EnrtedBy : sessionNIP
+                                }
+                            };
 
-                        var data = {
-                            action : 'studentReportInsertRespinse',
-                            dataForm : {
-                                IDReport : d.ID,
-                                Response : Response,
-                                EntredType : '1',
-                                EntredAt : dateTimeNow(),
-                                EnrtedBy : sessionNIP
-                            }
-                        };
-
-                        var token = jwt_encode(data,'UAP)(*');
-                        var url = base_url_js+'api3/__crudStudentReport';
-
-                        $.post(url,{token:token},function (result) {
-
-                            toastr.success('Response sent','Success');
-                            setTimeout(function () {
-                                showingDetailResponse(result);
-                            },500);
-
-
-                        });
-
-
+                            var token = jwt_encode(data,'UAP)(*');
+                            var url = base_url_js+'api3/__crudStudentReport';
+                            AjaxSubmitRestTicketing2(url,token,ArrUploadFilesSelector).then(function(result){
+                                toastr.success('Response sent','Success');
+                                setTimeout(function () {
+                                    showingDetailResponse(result);
+                                },500);
+                            }).fail(function(response){
+                               toastr.error('Connection error,please try again');
+                               end_loading_button2(selector,'Submit');     
+                            })
+                        }
                     }
 
                 } else {
                     toastr.warning('Response form are required','Warning');
                 }
-
-
-
 
             });
 
@@ -221,4 +242,125 @@
         });
 
     }
+
+    function validationFileResponse(ArrUploadFilesSelector){
+        var toatString = "";
+        // validation files
+        if (ArrUploadFilesSelector.length>0 && ArrUploadFilesSelector[0].Selector.length) {
+          var selectorfile = ArrUploadFilesSelector[0].Selector
+          var FilesValidation = file_validation_ticketing(selectorfile,'Upload File');
+          if (FilesValidation != '') {
+              toatString += FilesValidation + "<br>";
+          }
+          
+        }
+
+        if (toatString != "") {
+          toastr.error(toatString, 'Failed!!');
+          return false;
+        }
+        return true
+    }
+
+    $(document).off('click', '.CreateTicketFromStd').on('click', '.CreateTicketFromStd',function(e) {
+        var selector = $(this);
+        var ID = selector.attr('data-id');
+        loadingStart();
+        var htmlss = '<table class="table" id="tableNewTicket">' +
+            '    <tr>' +
+            '        <td>Category</td>' +
+            '        <td>:</td>' +
+            '        <td>' +
+            '            <select class="select2-select-00 full-width-fix input_form" name = "CategoryID"></select>' +
+            '        </td>' +
+            '    </tr>' +
+            '    <tr>' +
+            '        <td>Department</td>' +
+            '        <td>:</td>' +
+            '        <td>' +
+            '            <label class="lblDepartment">Auto selected by Category</label>' +
+            '        </td>' +
+            '    </tr>' +
+            '    <tr class="hide" id = "tr_ticket_number">' +
+            '        <td>Ticket Number</td>' +
+            '        <td>:</td>' +
+            '        <td>' +
+            '            <label class ="TicketNumber"></label>' +
+            '        </td>' +
+            '    </tr>' +
+            '</table>';
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        $('#GlobalModal .modal-footer').html('<button class = "btn btn-success BtnModalCreateTicket" data-id ="'+ID+'" > Submit </button>' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+            '');
+
+        var selector =  $('.input_form[name="CategoryID"]');
+        LoadSelectOptionCategory(selector);
+        var firstLoad = setInterval(function () {
+            var SelectCategoryID = $('.input_form[name="CategoryID"]').find('option:selected').val();
+            if(SelectCategoryID!='' && SelectCategoryID!=null && SelectCategoryID !='' && SelectCategoryID!=null){
+                loadingEnd(1);
+                $('#GlobalModal').modal({
+                    'show' : true,
+                    'backdrop' : 'static'
+                });
+                $('.input_form[name="CategoryID"]').trigger('change');
+                clearInterval(firstLoad);
+            }
+        },200);
+        setTimeout(function () {
+            clearInterval(firstLoad);
+            loadingEnd(500);
+        },5000);
+        
+    })
+
+    $(document).off('change', '.input_form[name="CategoryID"]').on('change', '.input_form[name="CategoryID"]',function(e) {
+        var ToDepartmentSelected = $(this).find('option:selected').attr('department');
+        $('.lblDepartment').html(ToDepartmentSelected);
+    })
+
+    $(document).off('click', '.BtnModalCreateTicket').on('click', '.BtnModalCreateTicket',function(e) {
+        var selector = $(this);
+        var ID = selector.attr('data-id');
+        if ($('.input_form[name="CategoryID"] option:selected').val() != '-') {
+            var data = {
+                action : 'studentReportCreateTicket',
+                dataForm : {
+                    IDReport : ID,
+                    CategoryID : $('.input_form[name="CategoryID"] option:selected').val(),
+                    RequestedBy : sessionNIP,
+                    DepartmentTicketID : DepartmentID,
+                    DepartmentAbbr : DepartmentAbbr,
+                    Apikey : '?apikey='+Apikey,
+                    Hjwtkey : Hjwtkey,
+                }
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api3/__crudStudentReport';
+            loading_button2(selector);
+            AjaxSubmitRestTicketing2(url,token).then(function(response){
+                if (response.status == 1) {
+                    selector.remove();
+                    var response_callback = response.callback;
+                    $('.TicketNumber').html(response_callback.NoTicket);
+                    $('#tr_ticket_number').removeClass('hide');
+                    toastr.success('Ticket Created');
+                    loadDataReport();
+                }
+                else
+                {
+                    toastr.error(response.msg);
+                    end_loading_button2(selector,'Submit');
+                }
+            }).fail(function(response){
+               toastr.error('Connection error,please try again');
+               end_loading_button2(selector,'Submit');     
+            })
+        }
+        
+    })
+    
 </script>
