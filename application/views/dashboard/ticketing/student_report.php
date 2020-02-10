@@ -108,14 +108,14 @@
                     var Cls = (v.EntredType=='1') ? '<span class="label label-default" style="float: right;"><i class="fa fa-check-circle"></i> Admin</span>' : '';
                     var ClsBg = (v.EntredType=='1') ? '#00bdd624' : '#9e9e9e0f';
                     var rsBy = (v.UpdatedAdmin!='' && v.UpdatedAdmin!=null) ? v.UpdatedAdmin : v.UpdatedUser;
-                    var FilesUpload = 'No Files Upload';
+                    var FilesUpload = '';
                     if (v.Files != null && v.Files != '') {
                         var pathfolders = "<?php echo ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? 'pcam/ticketing/' : 'localhost/ticketing/' ?>";
                         var filePath = pathfolders+v.Files;
                         // console.log(filePath);
                         var tokenFiles  = jwt_encode(filePath,'UAP)(*');
                         // console.log(tokenFiles);
-                        FilesUpload = '<a href = "'+base_url_files+'fileGetAnyToken/'+tokenFiles+'" target="_blank" >File</a>';
+                        FilesUpload = '<hr/><a class="btn btn-sm btn-default" href = "'+base_url_files+'fileGetAnyToken/'+tokenFiles+'" target="_blank" >Download File</a>';
                     }
                     dataResponse = dataResponse + '<table class="table table-bordered table-response">' +
                         '                <tr style="background: '+ClsBg+';">' +
@@ -125,8 +125,7 @@
                         '                    </td>' +
                         '                </tr>' +
                         '                <tr>' +
-                        '                    <td>'+v.Response+'</td>' +
-                        '                    <td>'+FilesUpload+'</td>' +
+                        '                    <td colspan = "2">'+v.Response+FilesUpload+'</td>' +
                         '                </tr>' +
                         '            </table>';
 

@@ -64,3 +64,4 @@ document/*
 **/uploads/document-generator/
 ***/uploads/document-generator/template/
 ****/uploads/document-generator/template/temp/
+**/uploads/temp/
