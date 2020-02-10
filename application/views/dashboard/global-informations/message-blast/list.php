@@ -63,12 +63,12 @@
 					<?php if(!empty($access)){
 						if($access->isDelete == 1){ ?>
 					<div class="act pull-right">
-						<span class="created">dd</span>
+						<span class="created"></span>
 						<span class="btn-remove-mail" title="Remove this message" data-mail="0"><i class="fa fa-trash"></i></span>
 					</div>
 					<?php } } ?>
 					<div class="sender">
-						<h4 class="createdby">d</h4>
+						<h4 class="createdby"></h4>
 					</div>
 				</div>
 				<div class="info">
@@ -95,7 +95,7 @@
 		$(".mailing-list .list").on("click",".mail",function(){
 			var itsme = $(this);
 			var mailID = itsme.data("mail");
-			if(mailID != 0){	
+			if(mailID != 0){
 				$(".mailing-list .list .mail").removeClass("active");
 				itsme.addClass("active");			
 				var data = {
@@ -131,11 +131,14 @@
 				    		}
 				    		if(k == "mail_cc"){
 				    			var appendCC = "";
-				    			$.each(v,function(key,val){
-				    				appendCC += "<span class='l-mail'>"+val+"</span>";
-				    			});
-				    			$(".mailing-list .detail-mail .list-mail_cc > .ccc > span").text("Cc: "+v[0]);
-			    				$(".mailing-list .detail-mail .list-mail_cc > .list").html(appendCC);
+				    			if(v != null){
+				    				$.each(v,function(key,val){
+					    				appendCC += "<span class='l-mail'>"+val+"</span>";
+					    			});
+					    			$(".mailing-list .detail-mail .list-mail_cc").show();
+					    			$(".mailing-list .detail-mail .list-mail_cc > .ccc > span").text("Cc: "+v[0]);
+				    				$(".mailing-list .detail-mail .list-mail_cc > .list").html(appendCC);
+			    				}else{$(".mailing-list .detail-mail .list-mail_cc").hide();}
 				    		}
 
 				    		$(".mailing-list .detail-mail").find("."+k).html(v);

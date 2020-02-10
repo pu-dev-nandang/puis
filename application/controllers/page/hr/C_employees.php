@@ -864,6 +864,7 @@ class C_employees extends HR_Controler {
         if(!empty($isExist)){
             $department = parent::__getDepartement();
             $data['NIP'] = $NIP;
+            $data['familytree'] = $this->General_model->fetchData("db_employees.master_family_relations",array("IsActive"=>1))->result();
             $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
             $page = $this->load->view('page/'.$department.'/employees/family',$data,true);
             $this->tab_menu_new_emp($page,$NIP);
