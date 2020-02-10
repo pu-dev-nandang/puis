@@ -711,8 +711,8 @@ class C_global_informations extends Globalclass {
             if(!empty($getAccess)){
                 $conditions = "";
             }else{
-                $conditions = "createdby like '".$mynip."%' and isShow = 1";                
             }
+                $conditions = "createdby like '".$mynip."%' and isShow = 1";                
             $sortby = "created";
             if(!empty($data_arr['Filter'])){            
                 $parse = parse_str($data_arr['Filter'],$output);
@@ -725,6 +725,7 @@ class C_global_informations extends Globalclass {
             }
             $data['access'] = $getAccess;
             $data['results'] = $this->General_model->fetchData("db_mail_blast.mail_blast",(!empty($conditions) ? $conditions : array() ),$sortby,"desc")->result();
+            
             $this->load->view("dashboard/global-informations/message-blast/list",$data);
         }
     }

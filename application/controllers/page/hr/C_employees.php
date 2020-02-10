@@ -175,7 +175,7 @@ class C_employees extends HR_Controler {
 //        exit;
 
         $page = $this->load->view('page/'.$department.'/employees/editEmployees',$data,true);
-        $this->temp($page);
+        $this->tab_menu_new_emp($page,$NIP);
     }
 
     public function upload_photo(){
@@ -841,15 +841,101 @@ class C_employees extends HR_Controler {
 
 
     /*ADDED BY FEBI @ FEB 2020*/
+    public function tab_menu_new_emp($page,$NIP){
+        $department = parent::__getDepartement();
+        $data['page'] = $page;
+        $data['employee'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $content = $this->load->view('page/'.$department.'/employees/tab_menu_new_emp',$data,true);
+        $this->temp($content);
+    }
     public function additionalInformation($NIP){
         $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
         if(!empty($isExist)){
             $department = parent::__getDepartement();
             $data['NIP'] = $NIP;
-            $data['ProdiArr'] = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);            
             $page = $this->load->view('page/'.$department.'/employees/additional-information',$data,true);
-            $this->temp($page);
+            $this->tab_menu_new_emp($page,$NIP);
         }else{show_404();}
+    }
+
+
+    public function family($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $department = parent::__getDepartement();
+            $data['NIP'] = $NIP;
+            $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $page = $this->load->view('page/'.$department.'/employees/family',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+    
+
+    public function careerLevel($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $department = parent::__getDepartement();
+            $data['NIP'] = $NIP;
+            $data['status'] = $this->General_model->fetchData("db_employees.master_status",array("IsActive"=>1))->result();
+            $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+            $data['division'] = $this->General_model->fetchData("db_employees.division",array('StatusDiv'=>1))->result();
+            $page = $this->load->view('page/'.$department.'/employees/career-level',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+    
+
+    public function educations($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $department = parent::__getDepartement();
+            $data['NIP'] = $NIP;
+            $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $data['industry'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
+            $page = $this->load->view('page/'.$department.'/employees/education',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+    
+
+    public function workExperience($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $department = parent::__getDepartement();
+            $data['NIP'] = $NIP;
+            $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $data['industry'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
+            $page = $this->load->view('page/'.$department.'/employees/experience',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function attendance($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $department = parent::__getDepartement();
+            $data['NIP'] = $NIP;
+            $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $data['industry'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
+            $page = $this->load->view('page/'.$department.'/employees/attendance',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function detailEmployeeOBJ(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();
+            if(!empty($isExist)){
+                $json = $isExist;
+            }
+        }
+        echo json_encode($json);
     }
     /*END ADDED BY FEBI @ FEB 2020*/
 
