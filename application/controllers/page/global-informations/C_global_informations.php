@@ -725,7 +725,7 @@ class C_global_informations extends Globalclass {
             }
             $data['access'] = $getAccess;
             $data['results'] = $this->General_model->fetchData("db_mail_blast.mail_blast",(!empty($conditions) ? $conditions : array() ),$sortby,"desc")->result();
-            
+
             $this->load->view("dashboard/global-informations/message-blast/list",$data);
         }
     }
@@ -916,7 +916,7 @@ class C_global_informations extends Globalclass {
 /*ACCESS ROLE */
     public function messageBlastAccessRoles(){
         if($this->session->userdata('IDdepartementNavigation') == 12){
-            $data['division'] = $this->General_model->fetchData("db_employees.division",array("StatusDiv"=>1))->result();
+            $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
             $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
             $page = $this->load->view('dashboard/global-informations/message-blast/roleMail',$data,true);
             $this->blast_global_informations($page);
