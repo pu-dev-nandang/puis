@@ -2,6 +2,7 @@
     $(document).ready(function(){
         $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
         $("#form-employee .tabulasi-emp > ul > li.nv-career").addClass("active");
+        $("#divisionID").select2({'width':'100%'});
     });
 </script>
 <form id="form-additional-info" action="" method="post" autocomplete="off">
@@ -49,7 +50,7 @@
         									<small class="text-danger text-message"></small></td>
         								<td><input type="text" class="form-control required" required name="endJoin[]" id="endJoin" placeholder="End Date">
         									<small class="text-danger text-message"></small></td>
-        								<td><select class="form-control required" name="statusLevelID" required>
+        								<td><select class="form-control required" name="statusLevelID[]" required>
         									<option value="">Choose Level</option>
         									<?php if(!empty($status)){
         									foreach ($status as $s) {
@@ -58,15 +59,15 @@
     										} } } ?>
         								</select>
         								<small class="text-danger text-message"></small></td>
-        								<td><select class="form-control required" name="divisionID" required>
-        									<option value="">Choose Division</option>
+        								<td><select class="required" name="divisionID[]" id="divisionID" required>
+        									<option>Choose Division</option>
         									<?php if(!empty($division)){
         									foreach ($division as $d) {
         										echo '<option value="'.$d->ID.'">'.$d->Division.'</option>';	
     										} } ?>
         								</select>
         								<small class="text-danger text-message"></small></td>
-        								<td><select class="form-control required" name="positionID" required>
+        								<td><select class="form-control required" name="positionID[]" required>
         									<option value="">Choose Position</option>
         									<?php if(!empty($position)){
         									foreach ($position as $p) {
@@ -76,7 +77,7 @@
         								<small class="text-danger text-message"></small></td>
         								<td><input type="text" name="jobTitle[]" class="form-control required" required></td>
         								<td></td>
-        								<td><select class="form-control required" name="statusID" required>
+        								<td><select class="form-control required" name="statusID[]" required>
         									<option value="">Choose Status</option>
         									<?php if(!empty($status)){
         									foreach ($status as $ss) {

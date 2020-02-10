@@ -64,13 +64,28 @@
         var fieldName = parent.data("source");
         var cloneRow = parent.find("#table-list-"+fieldName+" tbody tr:first").clone();
         var totalRow = parent.find("#table-list-"+fieldName+" tbody tr").length;
+        var num = totalRow+1;
         
-        var cloneInds = cloneRow.find(".industries select");
-        cloneInds.select2('destroy').select2();
-        cloneRow.find(".industries div#s2id_company-industry").remove();
-        cloneRow.find(".industries").append(cloneInds.select2({width:'100%'}));
+        /*DATEPICKER*/
+        var birthDate = cloneRow.find("#birthdate").removeClass("hasDatepicker");
+        birthDate.attr("id","#birthdate-"+num).datepicker({
+            dateFormat: 'dd-mm-yy',
+            changeYear: true,
+            changeMonth: true
+        });
 
-        cloneRow.find("td:first").text((totalRow+1));
+        /*DIVISION*/
+        var cloneDivition = cloneRow.find("select#divisionID");
+        cloneRow.find("#s2id_divisionID").remove();
+        cloneDivition.attr("id","divisionID-"+num).select2({width:'100%'});
+
+        /*POSITION*/
+        var cloneDivition = cloneRow.find("select#divisionID");
+        cloneRow.find("#s2id_divisionID").remove();
+        cloneDivition.attr("id","divisionID-"+num).select2({width:'100%'});        
+
+
+        cloneRow.find("td:first").text(num);
         cloneRow.find(".form-control").val("");
         parent.find("#table-list-"+fieldName+" tbody").append(cloneRow);
     });

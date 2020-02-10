@@ -2,12 +2,17 @@
     $(document).ready(function(){
         $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
         $("#form-employee .tabulasi-emp > ul > li.nv-family").addClass("active");
+        $("#birthdate").datepicker({
+            dateFormat: 'dd-mm-yy',
+            changeYear: true,
+            changeMonth: true
+        });
     });
 </script>
 <form id="form-additional-info" action="" method="post" autocomplete="off">
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <h4 class="panel-title"><i class="fa fa-edit"></i> Please fill up this form with correctly data</h4>
+            <h4 class="panel-title"><i class="fa fa-edit"></i> Please provide details of each regular family member</h4>
         </div>
         <div class="panel-body">
         	<div class="row">
@@ -24,14 +29,14 @@
                                     </button>
                                 </div>
                             </div>
-	        				<h4 class="panel-title">Family Relationship</h4>
+	        				<h4 class="panel-title">Family Member</h4>
 	        			</div>
 	        			<div class="panel-body">
 	        				<table class="table table-bordered" id="table-list-family">
 				        		<thead>
 				        			<tr>
 				        				<th width="2%" rowspan="2" style="vertical-align: middle">No</th>
-				        				<th style="vertical-align: middle" rowspan="2">Relation</th>
+				        				<th style="vertical-align: middle" rowspan="2">Relation with officer</th>
 				        				<th style="vertical-align: middle" rowspan="2">Gender</th>
 				        				<th style="text-align:center" colspan="2">Birtdate</th>
 				        				<th style="vertical-align: middle" rowspan="2">Last Education</th>
@@ -46,6 +51,10 @@
 				        				<td>1</td>
 				        				<td><select class="form-control required" required name="relation[]" >
 				        					<option value="">Choose one</option>
+				        					<?php if(!empty($familytree)){
+			        						foreach ($familytree as $f) {
+			        							echo '<option value="'.$f->ID.'">'.$f->name.'</option>';
+			        						} } ?>
 				        				</select>
 				        				<small class="text-danger text-message"></small></td>
 				        				<td><select class="form-control required" required name="gender[]">
@@ -54,7 +63,7 @@
 				        					<option value="P">Female</option>
 				        				</select><small class="text-danger text-message"></small></td>
 				        				<td><input type="text" class="form-control" name="placeBirth[]"><small class="text-danger text-message"></small></td>
-				        				<td><input type="text" class="form-control" name="birthdate[]"><small class="text-danger text-message"></small></td>
+				        				<td><input type="text" class="form-control" name="birthdate[]" id="birthdate"><small class="text-danger text-message"></small></td>
 				        				<td><select class="form-control required" required name="lastEdu[]" >
 				                            <option value="">Choose one</option>                                                            
 				                            <?php if(!empty($educationLevel)){
