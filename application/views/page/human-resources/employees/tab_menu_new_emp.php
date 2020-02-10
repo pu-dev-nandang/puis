@@ -80,9 +80,9 @@
         cloneDivition.attr("id","divisionID-"+num).select2({width:'100%'});
 
         /*POSITION*/
-        var cloneDivition = cloneRow.find("select#divisionID");
-        cloneRow.find("#s2id_divisionID").remove();
-        cloneDivition.attr("id","divisionID-"+num).select2({width:'100%'});        
+        var cloneDivition = cloneRow.find("select#positionID");
+        cloneRow.find("#s2id_positionID").remove();
+        cloneDivition.attr("id","positionID-"+num).select2({width:'100%'});        
 
 
         cloneRow.find("td:first").text(num);

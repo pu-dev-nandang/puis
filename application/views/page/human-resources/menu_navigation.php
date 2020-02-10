@@ -62,6 +62,12 @@
                             </a>
                         </li>
                         <?php } ?>
+                        <li class="<?= ($this->uri->segment(3)==$tb) ? 'current' : ''?>">
+                            <a href="#">
+                                <i class="icon-angle-right"></i>
+                                <span style="text-transform:uppercase">Structure Organization</span>
+                            </a>
+                        </li>
                     </ul>
             </li>
             <!-- END ADDED BY FEBRI @ FEB 2020 -->
