@@ -49,12 +49,12 @@
             <div class="tabulasi-emp">
               <ul class="nav nav-tabs" role="tablist">
                 <li class="nv-personal" ><a href="<?=site_url('human-resources/employees/edit-employees/'.$NIP)?>" ><i class="fa fa-user"></i> Personal Data</a></li>
-                <li class="nv-career" ><a href="<?=site_url('human-resources/employees/career-level/'.$NIP)?>"><i class="fa fa-suitcase"></i> Career Level</a></li>
+                <!-- <li class="nv-career" ><a href="<?=site_url('human-resources/employees/career-level/'.$NIP)?>"><i class="fa fa-suitcase"></i> Career Level</a></li>
                 <li class="nv-additional" ><a href="<?=site_url('human-resources/employees/additional-info/'.$NIP)?>"><i class="fa fa-user-plus"></i> Additional Information</a></li>
                 <li class="nv-family" ><a href="<?=site_url('human-resources/employees/family/'.$NIP)?>"><i class="fa fa-users"></i> Family</a></li>
                 <li class="nv-edu" ><a href="<?=site_url('human-resources/employees/educations/'.$NIP)?>"><i class="fa fa-graduation-cap"></i> Educations</a></li>
                 <li class="nv-experience" ><a href="<?=site_url('human-resources/employees/work-experience/'.$NIP)?>"><i class="fa fa-briefcase"></i> Work Experience</a></li>
-                <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li>
+                <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li> -->
               </ul>
             </div>
         </div>
@@ -81,13 +81,12 @@
         }
         
         /*DATEPICKER*/
-        var birthDate = cloneRow.find("#birthdate").removeClass("hasDatepicker");
-        birthDate.attr("id","#birthdate-"+num).datepicker({
-            dateFormat: 'dd-mm-yy',
+        var datePickerTD = cloneRow.find("td:nth-child(6) input[type=text]").removeClass("hasDatepicker").attr("id","datePicker-"+num);
+        datePickerTD.datepicker({
+            dateFormat: 'yy-mm-dd',
             changeYear: true,
             changeMonth: true
         });
-
         /*DIVISION*/
         var cloneDivition = cloneRow.find("select#divisionID");
         cloneRow.find("#s2id_divisionID").remove();
@@ -111,7 +110,36 @@
         var totalRow = parent.find("#table-list-"+fieldName+" tbody tr").length;
         if(totalRow > 1){
             var lastRow = parent.find("#table-list-"+fieldName+" tbody tr:last");
-
+            var hasAttr = lastRow.attr("data-table");
+            if(typeof hasAttr !== typeof undefined && hasAttr !== false){
+                if(confirm("Are you sure wants to remove this bank "+lastRow.data("name")+"?")){
+                    var data = {
+                      ID : lastRow.data("id"),
+                      TABLE : lastRow.data("table")
+                    };
+                    var token = jwt_encode(data,'UAP)(*');
+                    $.ajax({
+                        type : 'POST',
+                        url : base_url_js+"human-resources/employees/remove-additional",
+                        data : {token:token},
+                        dataType : 'json',
+                        beforeSend :function(){loading_modal_show()},
+                        error : function(jqXHR){
+                            loading_modal_hide();
+                            $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                            $("body #GlobalModal").modal("show");
+                        },success : function(response){
+                            loading_modal_hide();
+                            if(jQuery.isEmptyObject(response)){
+                                alert("Data not founded. Try again.");
+                            }else{
+                                lastRow.remove();
+                                toastr.info(""+response.message,'Info!');
+                            }
+                        }
+                    });
+                }
+            }else{lastRow.remove();}
         }
     });
 </script>

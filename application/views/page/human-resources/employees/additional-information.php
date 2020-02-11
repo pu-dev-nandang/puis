@@ -111,7 +111,7 @@
                                 <tbody>
                                 <?php if(!empty($myBank)){ $no=1;
                                 foreach ($myBank as $b) { ?>
-                                     <tr data-table="employees_bank_account" data-id="<?=$b->ID?>" >
+                                     <tr data-table="employees_bank_account" data-id="<?=$b->ID?>" data-name="<?=$b->bank?>">
                                         <td><?=$no++?></td>
                                         <td><input type="hidden" class="form-control" name="bankID[]" value="<?=$b->ID?>">
                                             <input type="text" class="form-control required" required name="bankName[]" value="<?=$b->bank?>">
