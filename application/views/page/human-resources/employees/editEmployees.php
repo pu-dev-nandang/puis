@@ -999,8 +999,9 @@
                 contentType : false,
                 processData : false,
                 success : function(data) {
-
-                    var jsonData = JSON.parse(data);
+                    console.log(data);
+                    
+                    //var jsonData = JSON.parse(data);
 
                     // if(typeof jsonData.success=='undefined'){
                     //     toastr.error(jsonData.error,'Error');

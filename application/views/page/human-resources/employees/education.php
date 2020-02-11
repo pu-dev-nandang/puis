@@ -5,6 +5,7 @@
     });
 </script>
 <form id="form-educations" action="<?=base_url('human-resources/employees/education-save')?>" method="post" autocomplete="off">
+    <input type="hidden" name="NIP" value="<?=$NIP?>">
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h4 class="panel-title"><i class="fa fa-edit"></i> Please fill up this form with correctly data</h4>
@@ -58,11 +59,11 @@
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control required" required name="eduCC[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control required" required name="eduMajor[]">
+                                        <td><input type="text" class="form-control" name="eduMajor[]">
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control required" required name="eduGraduation[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control required" required name="eduGPA[]">
+                                        <td><input type="text" class="form-control" name="eduGPA[]">
                                         <small class="text-danger text-message"></small></td>
                                     </tr>
                                 </tbody>
@@ -158,7 +159,7 @@
                                 <tbody>
                                     <tr>
                                         <td>1</td>
-                                        <td><input type="hidden" class="form-control" name="nonEduID[]">
+                                        <td><input type="hidden" class="form-control" name="trainingID[]">
                                         <input type="text" class="form-control" name="trainingTitle[]">
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control" name="trainingTrainer[]">
@@ -214,5 +215,7 @@
                 alert("Please fill out the field.");
             }
         });
+
+
 	});
 </script>
