@@ -158,6 +158,7 @@
 		fetchingData();
 
 		$(".btn-submit").click(function(){
+			loading_modal_show();
 			var error = false;
 			var itsme = $(this);
 			var itsform = itsme.parent().parent();
@@ -179,6 +180,7 @@
 		  		loading_modal_show();
 		  		$("#form-master")[0].submit();
 		  	}else{
+		  		loading_modal_show();
 		  		alert("Please fill out the field.");
 		  	}
 		  	

@@ -249,10 +249,10 @@
 	        	  	var label = "";
 	        	  	var exEmailPU = isValidEmailAddress($.trim(row.EmailPU));
 	        	  	var exEmail = isValidEmailAddress($.trim(row.Email));
-	        	  	if(exEmailPU.length > 1){
+	        	  	if(exEmailPU){
 						label += '<p><label><input type="checkbox" name="emailPU[]" value="'+row.EmailPU+'" class="check-box chk-child chk-'+row.NPM+' emailPU" data-name="'+row.Name+'"> '+row.EmailPU+'</label></p>';
 					}
-					if(exEmail.length > 1){
+					if(exEmail){
 	            		label += '<p><label><input type="checkbox" name="emailP[]" value="'+row.Email+'" class="check-box chk-child chk-'+row.NPM+' emailP" data-name="'+row.Name+'"> '+row.Email+'</label></p>';
 	        	  	}
 					return label
@@ -263,10 +263,10 @@
 	              	var label = "";
 	              	var exEmailFather = isValidEmailAddress($.trim(row.EmailFather));
 	              	var exEmailMother = isValidEmailAddress($.trim(row.EmailMother));
-	        	  	if(exEmailFather.length > 1){
+	        	  	if(exEmailFather){
 	            		label += '<p><label><input type="checkbox" name="emailF[]" value="'+row.EmailFather+'" class="check-box chk-child chk-'+row.NPM+' emailF" data-name="'+row.Father+'"> '+row.EmailFather+'</label></p>';
 	        	  	}
-	        	  	if(exEmailMother.length > 1){
+	        	  	if(exEmailMother){
 	            		label += '<p><label><input type="checkbox" name="emailM[]" value="'+row.EmailMother+'" class="check-box chk-child chk-'+row.NPM+' emailM" data-name="'+row.Mother+'"> '+row.EmailMother+'</label></p>';
 	        	  	}
 	        	  	return label
