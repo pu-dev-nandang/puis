@@ -181,7 +181,7 @@ class C_employees extends HR_Controler {
     public function upload_photo(){
 
         $fileName = $this->input->get('fileName');
-        print_r(fileName);
+        //print_r(fileName);
 
         $config['upload_path']          = './uploads/employees/';
         $config['allowed_types']        = 'gif|jpg|png|jpeg';
@@ -863,7 +863,7 @@ class C_employees extends HR_Controler {
     }
 
     public function listofmybank(){
-        # code...
+        
     }
 
 
@@ -935,7 +935,7 @@ class C_employees extends HR_Controler {
                     }
                 }
                 //var_dump($dataPost);die();
-            }else{$message="Empty data family member";}
+            }else{$message="Cannot saved. Empty data post.";}
 
             $this->session->set_flashdata("message",$message);
             redirect(site_url('human-resources/employees/family/'.$data['NIP']));
@@ -967,6 +967,66 @@ class C_employees extends HR_Controler {
             $data['industry'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
             $page = $this->load->view('page/'.$department.'/employees/education',$data,true);
             $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function educationSave(){
+        $data = $this->input->post();
+        if($data){
+            $dataEducation = array(); $message ="";
+            if(!empty($data['eduLevel'])){
+                for ($i=0; $i < count($data['eduLevel']); $i++) { 
+                    if(!empty($data['eduLevel'][$i])){
+                        $dataPostEdu = array("NIP"=>$data['NIP'],"levelEduID"=>$data['eduLevel'][$i], "intituteName"=>$data['eduInstitute'][$i], "location"=>$data['eduCC'][$i], "major"=>$data['eduMajor'][$i], "graduation"=>$data['eduGraduation'][$i], "gpa"=>$data['eduGPA'][$i] );
+                        if(!empty($data['eduID'][$i])){
+                            //update
+                            $update = $this->General_model->updateData("db_employees.employees_educations",$dataPostEdu,array("ID"=>$data['eduID'][$i]));
+                            $message = (($update) ? "Successfully":"Failed")." updated.";
+                        }else{
+                            //insert
+                            $insert = $this->General_model->insertData("db_employees.employees_educations",$dataPostEdu);
+                            $message = (($insert) ? "Successfully":"Failed")." saved.";
+                        }
+                    }
+                }
+            }else{$message = "Cannot saved. Empty data post.";}
+
+            if(!empty($data['nonEduduInstitute'])){
+                for ($j=0; $j < count($data['nonEduduInstitute']); $j++) { 
+                    if(!empty($data['nonEduduInstitute'][$i])){
+                        $dataPostNonEdu = array("NIP"=>$data['NIP'],"subject"=>$data['nonEduSubject'][$i],"intituteName"=>$data['nonEduduInstitute'][$i], "start_event"=>$data['nonEduStart'][$i], "end_event"=>$data['nonEduEnd'][$i], "location"=>$data['nonEduCC'][$i] );
+                        if(!empty($data['nonEduID'][$i])){
+                            $update = $this->General_model->updateData("db_employees.employees_educations_non_formal",$dataPostNonEdu);
+                            $message = (($update) ? "Successfully":"Failed")." updated.";
+                        }else{
+                            //insert
+                            $insert = $this->General_model->insertData("db_employees.employees_educations_non_formal",$dataPostNonEdu);
+                            $message = (($insert) ? "Successfully":"Failed")." saved.";
+                        }
+                    }
+                }
+            }
+            
+            if(!empty($data['trainingTitle'])){
+                for ($j=0; $j < count($data['trainingTitle']); $j++) { 
+                    if(!empty($data['trainingTitle'][$i])){
+                        $dataPostTraining = array("NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$i],"trainer"=>$data['trainingTrainer'][$i], "start_event"=>$data['trainingStart'][$i], "end_event"=>$data['trainingEnd'][$i], "location"=>$data['trainingLocation'][$i], "feedback"=>$data['trainingFeedback'][$i] );
+                        if(!empty($data['trainingID'][$i])){
+                            $update = $this->General_model->updateData("db_employees.employees_educations_training",$dataPostTraining);
+                            $message = (($update) ? "Successfully":"Failed")." updated.";
+                        }else{
+                            //insert
+                            $insert = $this->General_model->insertData("db_employees.employees_educations_training",$dataPostTraining);
+                            $message = (($insert) ? "Successfully":"Failed")." saved.";
+                        }
+                    }
+                }
+            }
+
+
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('human-resources/employees/family/'.$data['NIP']));
         }else{show_404();}
     }
     
