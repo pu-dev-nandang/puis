@@ -4,7 +4,7 @@
         $("#form-employee .tabulasi-emp > ul > li.nv-edu").addClass("active");
     });
 </script>
-<form id="form-additional-info" action="" method="post" autocomplete="off">
+<form id="form-educations" action="<?=base_url('human-resources/employees/education-save')?>" method="post" autocomplete="off">
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h4 class="panel-title"><i class="fa fa-edit"></i> Please fill up this form with correctly data</h4>
@@ -99,7 +99,6 @@
                                         <td>Subject</td>
                                         <td>Start Event</td>
                                         <td>End Event</td>
-                                        <td>Certificate</td>
                                         <td>Country/City</td>
                                     </tr>
                                 </thead>
@@ -115,7 +114,6 @@
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control" id="nonEduEnd" name="nonEduEnd[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="file" name="nonEduCertificate[]"></td>
                                         <td><input type="text" class="form-control" name="nonEduCC[]">
                                         <small class="text-danger text-message"></small></td>
                                     </tr>
@@ -184,7 +182,37 @@
         	
         </div>
         <div class="panel-footer text-right">
-            <button class="btn btn-success" type="button">Save changes</button>
+            <button class="btn btn-success btn-submit" type="button">Save changes</button>
         </div>
     </div>
 </form>
+
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#form-educations .btn-submit").click(function(){
+            var itsme = $(this);
+            var itsform = itsme.parent().parent().parent();
+            itsform.find(".required").each(function(){
+                var value = $(this).val();
+                if($.trim(value) == ''){
+                    $(this).addClass("error");
+                    $(this).parent().find(".text-message").text("Please fill this field");
+                    error = false;
+                }else{
+                    error = true;
+                    $(this).removeClass("error");
+                    $(this).parent().find(".text-message").text("");
+                }
+            });
+            
+            var totalError = itsform.find(".error").length;
+            if(error && totalError == 0 ){
+                loading_modal_show();
+                $("#form-educations")[0].submit();
+            }else{
+                alert("Please fill out the field.");
+            }
+        });
+	});
+</script>

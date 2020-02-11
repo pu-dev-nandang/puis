@@ -862,10 +862,13 @@ class C_employees extends HR_Controler {
         }else{show_404();}
     }
 
+    public function listofmybank(){
+        # code...
+    }
+
 
     public function additionalInformationSave(){
         $data = $this->input->post();
-        $json = array();
         if($data){
             $bankID = $data['bankID'];
             $bankName = $data['bankName'];
@@ -906,8 +909,37 @@ class C_employees extends HR_Controler {
             $data['NIP'] = $NIP;
             $data['familytree'] = $this->General_model->fetchData("db_employees.master_family_relations",array("IsActive"=>1))->result();
             $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $data['myfamily'] = $this->General_model->fetchData("db_employees.employees_family_member",array("NIP"=>$NIP))->result();
             $page = $this->load->view('page/'.$department.'/employees/family',$data,true);
             $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function familySave(){
+        $data = $this->input->post();
+        if($data){
+            if(!empty($data['relation'])){
+                $dataPost = array();
+                for ($i=0; $i < count($data['relation']); $i++) { 
+                    $dataPost = array("NIP"=>$data['NIP'],"name"=>$data['name'][$i],"relationID"=>$data['relation'][$i], "gender"=>$data['gender'][$i], "placeBirth"=>$data["placeBirth"][$i], "birthdate"=>$data["birthdate"][$i], "lastEduID"=>$data['lastEdu'][$i] );
+                    if(!empty($data['familyID'][$i])){
+                        $isExist = $this->General_model->fetchData("db_employees.employees_family_member",array("ID"=>$data['familyID'][$i]))->row();
+                        if(!empty($isExist)){
+                            $update = $this->General_model->updateData("db_employees.employees_family_member",$dataPost,array("ID"=>$data['familyID'][$i]));
+                            $message = (($insert) ? "Successfully":"Failed")." updated.";
+                        }else{$message = "Data not founded.";}
+                    }else{
+                        $insert = $this->General_model->insertData("db_employees.employees_family_member",$dataPost);
+                        $message = (($insert) ? "Successfully":"Failed")." saved.";
+                    }
+                }
+                //var_dump($dataPost);die();
+            }else{$message="Empty data family member";}
+
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('human-resources/employees/family/'.$data['NIP']));
+
         }else{show_404();}
     }
     
@@ -975,6 +1007,23 @@ class C_employees extends HR_Controler {
             if(!empty($isExist)){
                 $json = $isExist;
             }
+        }
+        echo json_encode($json);
+    }
+
+
+    public function removeAdditonal(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist = $this->General_model->fetchData("db_employees.".$data_arr['TABLE'],array("ID"=>$data_arr['ID']))->row();
+            if(!empty($isExist)){
+                $remove = $this->General_model->deleteData("db_employees.".$data_arr['TABLE'],array("ID"=>$data_arr['ID']));
+                $message = (($remove) ? "Successfully":"Failed")." removed.";
+            }else{$message = "Data not founded.";}
+            $json = array("message"=>$message);
         }
         echo json_encode($json);
     }

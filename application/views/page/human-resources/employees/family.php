@@ -2,14 +2,15 @@
     $(document).ready(function(){
         $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
         $("#form-employee .tabulasi-emp > ul > li.nv-family").addClass("active");
-        $("#birthdate").datepicker({
-            dateFormat: 'dd-mm-yy',
+        $("#datePicker").datepicker({
+            dateFormat: 'yy-mm-dd',
             changeYear: true,
             changeMonth: true
         });
     });
 </script>
-<form id="form-additional-info" action="" method="post" autocomplete="off">
+<form id="form-family-member" action="<?=base_url('human-resources/employees/family-save')?>" method="post" autocomplete="off">
+<input type="hidden" name="NIP" value="<?=$NIP?>">
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h4 class="panel-title"><i class="fa fa-edit"></i> Please provide details of each regular family member</h4>
@@ -38,6 +39,7 @@
 				        				<th width="2%" rowspan="2" style="vertical-align: middle">No</th>
 				        				<th style="vertical-align: middle" rowspan="2">Relation with officer</th>
 				        				<th style="vertical-align: middle" rowspan="2">Gender</th>
+				        				<th style="vertical-align: middle" rowspan="2">Name</th>
 				        				<th style="text-align:center" colspan="2">Birtdate</th>
 				        				<th style="vertical-align: middle" rowspan="2">Last Education</th>
 				        			</tr>
@@ -49,7 +51,8 @@
 				        		<tbody>
 				        			<tr>
 				        				<td>1</td>
-				        				<td><select class="form-control required" required name="relation[]" >
+				        				<td><input type="hidden" class="form-control fam-ID" name="familyID[]">
+			        					<select class="form-control required fam-relationID" required name="relation[]" >
 				        					<option value="">Choose one</option>
 				        					<?php if(!empty($familytree)){
 			        						foreach ($familytree as $f) {
@@ -57,14 +60,15 @@
 			        						} } ?>
 				        				</select>
 				        				<small class="text-danger text-message"></small></td>
-				        				<td><select class="form-control required" required name="gender[]">
+				        				<td><select class="form-control required fam-gender" required name="gender[]">
 				        					<option value="">Choose one</option>
 				        					<option value="L">Male</option>
 				        					<option value="P">Female</option>
 				        				</select><small class="text-danger text-message"></small></td>
-				        				<td><input type="text" class="form-control" name="placeBirth[]"><small class="text-danger text-message"></small></td>
-				        				<td><input type="text" class="form-control" name="birthdate[]" id="birthdate"><small class="text-danger text-message"></small></td>
-				        				<td><select class="form-control required" required name="lastEdu[]" >
+				        				<td><input type="text" class="form-control fam-name" name="name[]" ></td>
+				        				<td><input type="text" class="form-control fam-placeBirth" name="placeBirth[]"><small class="text-danger text-message"></small></td>
+				        				<td><input type="text" class="form-control datepicker-tmp fam-birthdate dp-1" name="birthdate[]" id="datePicker"><small class="text-danger text-message"></small></td>
+				        				<td><select class="form-control required fam-lastEduID" required name="lastEdu[]" >
 				                            <option value="">Choose one</option>                                                            
 				                            <?php if(!empty($educationLevel)){
 				                            foreach ($educationLevel as $v) {
@@ -82,7 +86,65 @@
         	
         </div>
         <div class="panel-footer text-right">
-            <button class="btn btn-success" type="button">Save changes</button>
+            <button class="btn btn-success btn-submit" type="button">Save changes</button>
         </div>
     </div>
 </form>
+
+<script type="text/javascript">
+	function loadMyFamily(response) {
+		$tableFamily = $("#table-list-family");
+		var temp = "";var num = 1;
+		$.each(response,function(k,v){
+			$cloneRow = $tableFamily.find("tbody tr:last").clone();
+			$cloneRow.attr("data-table","employees_family_member").attr("data-id",v.ID).attr("data-name",v.name);
+			$cloneRow.find("td:first").text(num);
+
+	        $.each(v,function(x,y){
+	        	$cloneRow.find(".fam-"+x).val(y);	        	
+	        	if(x == "birthdate"){
+	        		var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-"+num).removeClass("hasDatepicker");
+	        		cc.datepicker({
+			            dateFormat: 'yy-mm-dd',
+			            changeYear: true,
+			            changeMonth: true
+			        });
+	        	}
+	        });
+			
+			$tableFamily.find("tbody").append($cloneRow);
+			num++;	
+		});
+		$tableFamily.find("tbody tr:first").remove();
+	}
+	$(document).ready(function(){
+		var dataFamily = '<?=(!empty($myfamily) ? json_encode($myfamily) : null)?>';
+		var convertFams = JSON.parse(dataFamily);
+		loadMyFamily(convertFams);
+		
+		$("#form-family-member .btn-submit").click(function(){
+            var itsme = $(this);
+            var itsform = itsme.parent().parent().parent();
+            itsform.find(".required").each(function(){
+                var value = $(this).val();
+                if($.trim(value) == ''){
+                    $(this).addClass("error");
+                    $(this).parent().find(".text-message").text("Please fill this field");
+                    error = false;
+                }else{
+                    error = true;
+                    $(this).removeClass("error");
+                    $(this).parent().find(".text-message").text("");
+                }
+            });
+            
+            var totalError = itsform.find(".error").length;
+            if(error && totalError == 0 ){
+                loading_modal_show();
+                $("#form-family-member")[0].submit();
+            }else{
+                alert("Please fill out the field.");
+            }
+        });
+	});
+</script>
