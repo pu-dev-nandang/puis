@@ -179,4 +179,13 @@ class C_aphris extends HR_Controler {
     	}else{show_404();}
     }
 
+
+    public function structureOrganization(){
+        $data = $this->input->post();
+        $data= array();
+        $department = parent::__getDepartement();
+        $page = $this->load->view('page/'.$department.'/aphris/structure-organization/index',$data,true);
+        $this->temp($page);
+    }
+
 }

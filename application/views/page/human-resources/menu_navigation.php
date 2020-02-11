@@ -62,8 +62,8 @@
                             </a>
                         </li>
                         <?php } ?>
-                        <li class="<?= ($this->uri->segment(3)==$tb) ? 'current' : ''?>">
-                            <a href="#">
+                        <li class="<?= ($this->uri->segment(3)=='structure-organization') ? 'current' : ''?>">
+                            <a href="<?=site_url('human-resources/master-aphris/structure-organization')?>">
                                 <i class="icon-angle-right"></i>
                                 <span style="text-transform:uppercase">Structure Organization</span>
                             </a>

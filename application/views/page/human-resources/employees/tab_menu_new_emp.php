@@ -1,3 +1,12 @@
+<?php $message = $this->session->flashdata('message');
+    if(!empty($message)){ ?>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        toastr.info("<?= $this->session->flashdata('message');?>",'Info!');
+    });
+    </script>
+<?php } ?>
+
 <style type="text/css">
     #form-employee .tabulasi-emp > ul > li.active > a{background:#428bca;color:#fff;border:1px solid #428bca;}
     #form-employee .cursor{cursor: pointer;}
@@ -65,6 +74,11 @@
         var cloneRow = parent.find("#table-list-"+fieldName+" tbody tr:first").clone();
         var totalRow = parent.find("#table-list-"+fieldName+" tbody tr").length;
         var num = totalRow+1;
+
+        var hasAttr = cloneRow.attr("data-table");
+        if(typeof hasAttr !== typeof undefined && hasAttr !== false){
+            cloneRow.removeAttr("data-table").removeAttr("data-id");
+        }
         
         /*DATEPICKER*/
         var birthDate = cloneRow.find("#birthdate").removeClass("hasDatepicker");
@@ -96,7 +110,8 @@
         var fieldName = parent.data("source");
         var totalRow = parent.find("#table-list-"+fieldName+" tbody tr").length;
         if(totalRow > 1){
-            parent.find("#table-list-"+fieldName+" tbody tr:last").remove();                
+            var lastRow = parent.find("#table-list-"+fieldName+" tbody tr:last");
+
         }
     });
 </script>

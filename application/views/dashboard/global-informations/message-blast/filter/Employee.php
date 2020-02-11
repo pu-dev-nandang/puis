@@ -273,7 +273,7 @@
 						var label = "";
 						var exEmail = $.trim(row.Email);
 						vMail = (!isValidEmailAddress(exEmail) ? "":exEmail);
-						if(vMail.length > 1){
+						if(vMail){
 							label += '<p><label><input type="checkbox" name="emailP[]" value="'+vMail+'" class="check-box chk-child chk-'+row.NIP+' emailP" data-name="'+row.Name+'"> '+vMail+'</label></p>';
 						}
 						return label
@@ -285,7 +285,7 @@
 						var label = "";
 						var exEmailPU = $.trim(row.EmailPU);
 						vMail = (!isValidEmailAddress(exEmailPU) ? "":exEmailPU);
-						if(vMail.length > 1){
+						if(vMail){
 							label += '<p><label><input type="checkbox" name="emailPU[]" value="'+vMail+'" class="check-box chk-child chk-'+row.NIP+' emailP" data-name="'+row.Name+'"> '+vMail+'</label></p>';
 						}
 						return label

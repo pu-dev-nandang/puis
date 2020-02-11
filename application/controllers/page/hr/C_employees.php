@@ -848,13 +848,53 @@ class C_employees extends HR_Controler {
         $content = $this->load->view('page/'.$department.'/employees/tab_menu_new_emp',$data,true);
         $this->temp($content);
     }
+
+
     public function additionalInformation($NIP){
         $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
         if(!empty($isExist)){
             $department = parent::__getDepartement();
             $data['NIP'] = $NIP;
+            $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+            $data['myBank'] = $this->General_model->fetchData("db_employees.employees_bank_account",array("NIP"=>$NIP))->result();
             $page = $this->load->view('page/'.$department.'/employees/additional-information',$data,true);
             $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function additionalInformationSave(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $bankID = $data['bankID'];
+            $bankName = $data['bankName'];
+            $bankAccName = $data['bankAccName'];
+            $bankAccNum = $data['bankAccNum'];
+            unset($data['bankID']);
+            unset($data['bankName']);
+            unset($data['bankAccName']);
+            unset($data['bankAccNum']);
+
+            $conditions = array("NIP"=>$data['NIP']);
+            $update = $this->General_model->updateData("db_employees.employees",$data,$conditions);
+            if($update){
+                if(!empty($bankName)){
+                    for ($i=0; $i < count($bankName); $i++) { 
+                        if(!empty($bankID[$i])){
+                            $updateBank = $this->General_model->updateData("db_employees.employees_bank_account",array("NIP"=>$data['NIP'],"bank"=>$bankName[$i],"accountName"=>$bankAccName[$i],"accountNumber"=>$bankAccNum[$i]), array("ID"=>$bankID[$i]));
+                        }else{
+                            $inserBank = $this->General_model->insertData("db_employees.employees_bank_account",array("NIP"=>$data['NIP'],"bank"=>$bankName[$i],"accountName"=>$bankAccName[$i],"accountNumber"=>$bankAccNum[$i]));                        
+                        }
+                    }
+                }
+
+                $message = "Successfully saved.";
+            }else{$message = "Failed saved.";}
+
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('human-resources/employees/additional-info/'.$data['NIP']));
+
         }else{show_404();}
     }
 
@@ -938,6 +978,7 @@ class C_employees extends HR_Controler {
         }
         echo json_encode($json);
     }
+
     /*END ADDED BY FEBI @ FEB 2020*/
 
 

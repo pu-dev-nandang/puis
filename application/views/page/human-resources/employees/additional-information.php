@@ -1,4 +1,5 @@
-<form id="form-additional-info" action="" method="post" autocomplete="off">
+<form id="form-additional-info" action="<?=base_url('human-resources/employees/additional-info-save')?>" method="post" autocomplete="off">
+<input type="hidden" name="NIP" value="<?=$NIP?>">
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h4 class="panel-title"><i class="fa fa-edit"></i> Please fill up this form with correctly data</h4>
@@ -9,7 +10,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="pull-right">
-                                <label><input type="checkbox" class="samedata" value="<?=$NIP?>"> same data as IDCard</label>
+                                <label><input type="checkbox" class="samedata-check" value="<?=$NIP?>"> same data as IDCard</label>
                             </div>
                             <h4 class="panel-title">Current Address</h4>
                         </div>
@@ -64,14 +65,16 @@
                                     <div class="form-group">
                                         <label>BPJS Tenaga Kerja</label>
                                         <input type="text" class="form-control required" required name="IDBpjstk" value="<?=(!empty($detail) ? $detail->IDBpjstk : null)?>">
+                                        <small class="text-danger text-message"></small>
                                     </div>
                                     <div class="form-group">
                                         <label>BPJS Pensiun</label>
-                                        <input type="text" class="form-control required" required name="IDBpjspensiun" value="<?=(!empty($detail) ? $detail->IDBpjspensiun : null)?>">
+                                        <input type="text" class="form-control" name="IDBpjspensiun" value="<?=(!empty($detail) ? $detail->IDBpjspensiun : null)?>">
                                     </div>
                                     <div class="form-group">
                                         <label>BPJS Kesehatan</label>
                                         <input type="text" class="form-control required" required name="IDBpjskesehatan" value="<?=(!empty($detail) ? $detail->IDBpjskesehatan : null)?>">
+                                        <small class="text-danger text-message"></small>
                                     </div>
                                 </div>
                             </div>
@@ -106,6 +109,19 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                <?php if(!empty($myBank)){ $no=1;
+                                foreach ($myBank as $b) { ?>
+                                     <tr data-table="employees_bank_account" data-id="<?=$b->ID?>" >
+                                        <td><?=$no++?></td>
+                                        <td><input type="hidden" class="form-control" name="bankID[]" value="<?=$b->ID?>">
+                                            <input type="text" class="form-control required" required name="bankName[]" value="<?=$b->bank?>">
+                                            <small class="text-danger text-message"></small>
+                                        </td>
+                                        <td><input type="text" class="form-control required" required name="bankAccName[]" value="<?=$b->accountName?>"><small class="text-danger text-message"></small></td>
+                                        <td><input type="text" class="form-control required" required name="bankAccNum[]" value="<?=$b->accountNumber?>"><small class="text-danger text-message"></small></td>
+                                    </tr>
+                                <?php }  
+                                }else{ ?>
                                     <tr>
                                         <td>1</td>
                                         <td><input type="hidden" class="form-control" name="bankID[]">
@@ -115,6 +131,7 @@
                                         <td><input type="text" class="form-control required" required name="bankAccName[]"><small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control required" required name="bankAccNum[]"><small class="text-danger text-message"></small></td>
                                     </tr>
+                                <?php } ?>
                                 </tbody>
                             </table>
                         </div>
@@ -123,7 +140,7 @@
             </div>
         </div>
         <div class="panel-footer text-right">
-            <button class="btn btn-success" type="button">Save changes</button>
+            <button class="btn btn-success btn-submit" type="button">Save changes</button>
         </div>
     </div>
 </form>
@@ -133,7 +150,7 @@
         $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
         $("#form-employee .tabulasi-emp > ul > li.nv-additional").addClass("active");
 
-        $(".samedata").change(function(){
+        $(".samedata-check").change(function(){
             var data = {
               NIP : "<?=$NIP?>",
             };
@@ -161,6 +178,31 @@
                 });
             }else{
                 $("#form-additional-info").find(".samedata").val("");
+            }
+        });
+
+        $("#form-additional-info .btn-submit").click(function(){
+            var itsme = $(this);
+            var itsform = itsme.parent().parent().parent();
+            itsform.find(".required").each(function(){
+                var value = $(this).val();
+                if($.trim(value) == ''){
+                    $(this).addClass("error");
+                    $(this).parent().find(".text-message").text("Please fill this field");
+                    error = false;
+                }else{
+                    error = true;
+                    $(this).removeClass("error");
+                    $(this).parent().find(".text-message").text("");
+                }
+            });
+            
+            var totalError = itsform.find(".error").length;
+            if(error && totalError == 0 ){
+                loading_modal_show();
+                $("#form-additional-info")[0].submit();
+            }else{
+                alert("Please fill out the field.");
             }
         });
 
