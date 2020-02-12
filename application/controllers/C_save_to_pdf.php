@@ -7052,7 +7052,7 @@ Phone: (021) 29200456';
                 $G = 226;
                 $B = 226;
 
-                $URLQrCode = 'https://uap.ac.id/ds/'.$NPM;
+                $URLQrCode = url_sign_out.'search-people/detail-student/'.$NPM;
 
                 // QRcode::png($data_arr['data'],'./images/SKPI/SKPI-QRCode.png','L', 10, 4);
                 $t = QRcode::png($URLQrCode,false,'L', 10, 4);
@@ -7080,7 +7080,7 @@ Phone: (021) 29200456';
                 $pdf->Cell(0,$h,'Number : '.str_pad($d['NoSKPI'], 4, '0', STR_PAD_LEFT).'/UAP/SKPI-'.$d['CertificateSerialNumber'].'/'.$bulanRomawi.'/'.$Year2Number,$border,1,'C');
 
                 $pdf->SetFont('dinprolight','',7);
-                $pdf->Cell(0,2,$URLQrCode,$border,1,'R');
+//                $pdf->Cell(0,2,$URLQrCode,$border,1,'R');
                 $pdf->Ln(4);
                 $pdf->SetFont('dinprolight','',$fontBody);
                 $pdf->MultiCell($fullWidth,$h,"The Diploma Supplement accompanies a higher education certificate providing a standardized description oh the nature, level, context, content and status of the studies completed by its holder.",0);
