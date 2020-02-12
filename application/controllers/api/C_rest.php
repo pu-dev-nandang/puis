@@ -260,6 +260,23 @@ class C_rest extends CI_Controller {
         if($cekUser){
 
             $data = $this->m_rest->getTranscript($dataToken['ClassOf'],$dataToken['NPM'],'ASC');
+
+            if($dataToken['Source']=='Portal'){
+                unset($data['dataIPK']);
+                $dataCourse = $data['dataCourse'];
+                for($i=0;$i<count($dataCourse);$i++){
+                    unset($data['dataCourse'][$i]['Score']);
+                    unset($data['dataCourse'][$i]['Grade']);
+                    unset($data['dataCourse'][$i]['GradeValue']);
+
+                    unset($data['dataCourse'][$i]['CDID']);
+                    unset($data['dataCourse'][$i]['MKType']);
+                    unset($data['dataCourse'][$i]['MKID']);
+                    unset($data['dataCourse'][$i]['Point']);
+                    unset($data['dataCourse'][$i]['SemesterID']);
+                }
+            }
+
             return print_r(json_encode($data));
 
         } else {
