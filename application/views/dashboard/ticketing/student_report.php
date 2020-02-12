@@ -139,6 +139,10 @@
                 '<div class="form-group">'+
                  '<label>Upload</label>'+
                  '<input type="file" id = "UploadFile" name = "Files">'+
+                 '<div style="color: red;">'+
+                     '<p>Note : </p>'+
+                     '<p> * Max 2 mb</p>'+
+                 '</div>'+
                 '</div>'+
                 '<div class="form-group" style="text-align: right;">' +
                 '    <button class="btn btn-success" id="btnSubmitResponse">Submit</button>' +
