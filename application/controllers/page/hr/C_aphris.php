@@ -181,11 +181,56 @@ class C_aphris extends HR_Controler {
 
 
     public function structureOrganization(){
-        $data = $this->input->post();
         $data= array();
         $department = parent::__getDepartement();
         $page = $this->load->view('page/'.$department.'/aphris/structure-organization/index',$data,true);
         $this->temp($page);
+    }
+
+
+    public function fetchStructurOrganization(){
+        $data = $this->input->post();
+        $json = array();
+        //get parent sto
+        $parent = $this->General_model->fetchData("db_employees.sto_temp",array("isActive"=>1,"parentID"=>0))->row();
+        //get child
+        $children = $this->getChild($parent->ID);
+        $STO = array("name"=>$parent->title,
+                     "title"=>"nama orang",
+                     "id"=>$parent->ID,
+                     "children"=>(!empty($children) ? $children : null),
+                     "className"=>"middle-level");
+        
+        $json = $STO;
+        echo json_encode($json);
+    }
+
+    private function getChild($id){
+        $child = array();
+        $getChild = $this->General_model->fetchData("db_employees.sto_temp",array("isActive"=>1,"parentID"=>$id))->result();
+        foreach ($getChild as $c) {
+            $mychild = $this->getChild($c->ID);
+            $child[] = array("name"=>$c->title,
+                             "title"=>"nama orang", 
+                             "id"=>$c->ID,
+                             "children"=>(!empty($mychild) ? $mychild : null),
+                             "className"=>"middle-level");
+        }
+        return $child;
+    }
+
+    public function detailSTO(){
+        $data = $this->input->post();
+        if($data){
+            $department = parent::__getDepartement();
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","Type = 'emp' or IDStatus = '-1' ")->result();
+            $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
+            $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+            $data['detail'] = $this->General_model->fetchData("db_employees.sto_temp",array("ID"=>$data_arr['ID']))->row();            
+            $this->load->view('page/'.$department.'/aphris/structure-organization/detail',$data);
+        }else{show_404();}
     }
 
 }

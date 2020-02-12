@@ -1,61 +1,187 @@
 <link rel="stylesheet" type="text/css" href="<?=base_url('assets/OrgChart/dist/css/jquery.orgchart.min.css')?>">
-<script type="text/javascript" src="<?=base_url('assets/OrgChart/dist/js/jquery.orgchart.min.js')?>"></script>
+<script type="text/javascript" src="<?=base_url('assets/OrgChart/dist/js/jquery.orgchart.js')?>"></script>
+<script type="text/javascript" src="<?=base_url('assets/OrgChart/dist/js/html2canvas.min.js')?>"></script>
 <script type="text/javascript">
-	'use strict';
+	function filterNodes(keyWord) {
+	    if(!keyWord.length) {
+	      window.alert('Please type key word firstly.');
+	      return;
+	    } else {
+	    	keyWord = keyWord.toLowerCase();
+	      var $chart = $('body .orgchart');
+	      // disalbe the expand/collapse feture
+	      $chart.addClass('noncollapsable');
+	      // distinguish the matched nodes and the unmatched nodes according to the given key word
+	      $chart.find('.node').filter(function(index, node) {
+	          return $(node).text().toLowerCase().indexOf(keyWord) > -1;
+	        }).addClass('matched')
+	        .closest('table').parents('table').find('tr:first').find('.node').addClass('retained');
 
-(function($){
+	      // hide the unmatched nodes
+	      $chart.find('.matched,.retained').each(function(index, node) {
+	        $(node).removeClass('slide-up')
+	          .closest('.nodes').removeClass('hidden')
+	          .siblings('.lines').removeClass('hidden');
+	        var $unmatched = $(node).closest('table').parent().siblings().find('.node:first:not(.matched,.retained)')
+	          .closest('table').parent().addClass('hidden');
+	        $unmatched.parent().prev().children().slice(1, $unmatched.length * 2 + 1).addClass('hidden');
+	      });
 
-  $(function() {
+	      // hide the redundant descendant nodes of the matched nodes
+	      $chart.find('.matched').each(function(index, node) {
+	        if (!$(node).closest('tr').siblings(':last').find('.matched').length) {
+	          $(node).closest('tr').siblings().addClass('hidden');
+	        }
+	      });
+	    }
+  	}
 
-    var datascource = {
-      'name': 'Lao Lao',
-      'title': 'general manager',
-      'children': [
-        { 'name': 'Bo Miao', 'title': 'department manager' },
-        { 'name': 'Su Miao', 'title': 'department manager',
-          'children': [
-            { 'name': 'Tie Hua', 'title': 'senior engineer' },
-            { 'name': 'Hei Hei', 'title': 'senior engineer',
-              'children': [
-                { 'name': 'Pang Pang', 'title': 'engineer' },
-                { 'name': 'Xiang Xiang', 'title': 'UE engineer' }
-              ]
-            }
-          ]
-        },
-        { 'name': 'Hong Miao', 'title': 'department manager' },
-        { 'name': 'Chun Miao', 'title': 'department manager' }
-      ]
-    };
+	function clearFilterResult() {
+		$('.orgchart').removeClass('noncollapsable')
+		  .find('.node').removeClass('matched retained')
+		  .end().find('.hidden').removeClass('hidden')
+		  .end().find('.slide-up, .slide-left, .slide-right').removeClass('slide-up slide-right slide-left');
+	}
 
-    var oc = $('#chart-container').orgchart({
-      'data' : datascource,
-      'nodeContent': 'title',
-      'pan': true,
-      'zoom': true
-    });
 
-  });
+	function fetchSTO() {
+		var resultOBJ = [];
+		$.ajax({
+		    type : 'POST',
+		    url : base_url_js+"human-resources/master-aphris/fetch-sto",
+		    dataType : 'json',
+		    async: false,
+		    beforeSend :function(){
+		    	loading_modal_show();
+		    },error : function(jqXHR){
+		    	loading_modal_hide();
+            	$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                    '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                $('#GlobalModal .modal-body').html(jqXHR.responseText);
+                $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                $('#GlobalModal').modal({
+                    'show' : true,
+                    'backdrop' : 'static'
+                });
+		    },success : function(response){
+		    	loading_modal_hide();
+				resultOBJ = response;
+		    }
+		});
 
-})(jQuery);
+		return resultOBJ;
+	}
+	$(document).ready(function(){
+		var word = "itnama orang";
+		var h =word.toLowerCase().indexOf("it");
+		console.log(h);
+		var datascource = fetchSTO();
+		$('#chart-container').orgchart({
+	      'data' : datascource,
+	      'nodeContent': 'title',
+	      'pan': true,
+	      'zoom': true,
+	      'responseTime': 1000,
+	      'exportButton': true,
+      	  'exportFilename': 'PU-Stuctured-Organization'
+	    });
+
+	    $('#btn-filter-node').on('click', function() {
+	      filterNodes($('#key-word').val());
+	    });
+
+	    $('#btn-cancel').on('click', function() {
+	      clearFilterResult();
+	    });
+
+	    $('#key-word').on('keyup', function(event) {
+	      if (event.which === 13) {
+	        filterNodes(this.value);
+	      } else if (event.which === 8 && this.value.length === 0) {
+	        clearFilterResult();
+	      }
+	    });
+
+
+	    $("#chart-container").on("click",".node",function(){
+	    	var itsme = $(this);
+	    	var idParent = itsme.data("parent");
+	    	var idNode = itsme.find(".title").data("id");
+	    	var title = itsme.find(".title").text();
+	    	
+	    	var data = {
+	          ID : idNode,
+	      	};
+	      	var token = jwt_encode(data,'UAP)(*');
+	      	$.ajax({
+			    type : 'POST',
+			    url : base_url_js+"human-resources/master-aphris/detail-sto",
+			    data : {token:token},
+			    dataType : 'html',
+			    beforeSend :function(){loading_modal_show()},
+	            error : function(jqXHR){
+	            	loading_modal_hide();
+	            	$("body #GlobalModal .modal-body").html(jqXHR.responseText);
+		      	  	$("body #GlobalModal").modal("show");
+			    },success : function(response){
+	            	loading_modal_hide();
+	            	$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+		                '<h4 class="modal-title">Detail of '+title.toUpperCase()+'</h4>');
+		            $('#GlobalModal .modal-body').html(response);
+		            $('#GlobalModal .modal-footer').remove();
+		            $('#GlobalModal').modal({
+		                'show' : true,
+		                'backdrop' : 'static'
+		            });
+			    }
+			});
+
+	    	
+	    });
+	});
 </script>
 
 <style type="text/css">
 	#chart-container {
 	  font-family: Arial;
-	  height: 420px;
-	  border: 2px dashed #aaa;
+	  height: 500px;
 	  border-radius: 5px;
 	  overflow: auto;
-	  text-align: center;
 	}
-
-	#github-link {
-	  position: fixed;
-	  right: 10px;
-	  font-size: 3em;
-	}
+	#chart-container > .oc-export-btn{position: relative;right: 0;}
+	.orgchart { background: #fff; }
+	.orgchart .middle-level .title { background-color: #006699; }
+    .orgchart .middle-level .content { border-color: #006699; }
+    .orgchart .node.matched { background-color: rgba(238, 217, 54, 0.5); }
+    .orgchart .node .edge { display: none; }
 </style>
 
 
-<div id="chart-container"></div>
+<div id="structur-organization">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<i class="fa fa-chart"></i> Structure Organization on PU
+			</h4>
+		</div>
+		<div class="panel-heading">
+			<div class="filtering">
+				<div class="row">
+					<div class="col-sm-1 col-md-1">
+						<label>Search by node</label>
+					</div>
+					<div class="col-sm-2 col-md-2">
+						<input type="text" name="nodekey" class="form-control" placeholder="Node name" id="key-word" >
+					</div>
+					<div class="col-sm-2 col-md-2">
+						<button class="btn btn-success" type="button" id="btn-filter-node"><i class="fa fa-search"></i> Search</button>						
+						<button class="btn btn-default" type="button" id="btn-cancel">Cancel</button>						
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel-body">
+			<div id="chart-container"></div>			
+		</div>
+	</div>
+</div>

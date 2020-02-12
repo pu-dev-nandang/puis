@@ -109,29 +109,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <?php if(!empty($myBank)){ $no=1;
-                                foreach ($myBank as $b) { ?>
-                                     <tr data-table="employees_bank_account" data-id="<?=$b->ID?>" data-name="<?=$b->bank?>">
-                                        <td><?=$no++?></td>
-                                        <td><input type="hidden" class="form-control" name="bankID[]" value="<?=$b->ID?>">
-                                            <input type="text" class="form-control required" required name="bankName[]" value="<?=$b->bank?>">
-                                            <small class="text-danger text-message"></small>
-                                        </td>
-                                        <td><input type="text" class="form-control required" required name="bankAccName[]" value="<?=$b->accountName?>"><small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control required" required name="bankAccNum[]" value="<?=$b->accountNumber?>"><small class="text-danger text-message"></small></td>
-                                    </tr>
-                                <?php }  
-                                }else{ ?>
                                     <tr>
                                         <td>1</td>
-                                        <td><input type="hidden" class="form-control" name="bankID[]">
-                                            <input type="text" class="form-control required" required name="bankName[]">
+                                        <td><input type="hidden" class="form-control bank-ID" name="bankID[]">
+                                            <input type="text" class="form-control required bank-bank" required name="bankName[]">
                                             <small class="text-danger text-message"></small>
                                         </td>
-                                        <td><input type="text" class="form-control required" required name="bankAccName[]"><small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control required" required name="bankAccNum[]"><small class="text-danger text-message"></small></td>
+                                        <td><input type="text" class="form-control required bank-accountName" required name="bankAccName[]"><small class="text-danger text-message"></small></td>
+                                        <td><input type="text" class="form-control required bank-accountNumber" required name="bankAccNum[]"><small class="text-danger text-message"></small></td>
                                     </tr>
-                                <?php } ?>
                                 </tbody>
                             </table>
                         </div>
@@ -146,6 +132,7 @@
 </form>
 
 <script type="text/javascript">
+   
     $(document).ready(function(){
         $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
         $("#form-employee .tabulasi-emp > ul > li.nv-additional").addClass("active");
@@ -206,5 +193,23 @@
             }
         });
 
+        var mybank = fetchAdditionalData("<?=$NIP?>");
+        if(!jQuery.isEmptyObject(mybank)){
+            if(!jQuery.isEmptyObject(mybank.MyBank)){
+                $tablename = $("#table-list-bank"); var num = 1;
+                $.each(mybank.MyBank,function(key,value){
+                    $cloneRow = $tablename.find("tbody > tr:last").clone();
+                    $cloneRow.attr("data-table","employees_educations").attr("data-id",value.ID).attr("data-name",value.bank);
+                    $cloneRow.find("td:first").text(num);
+                    $.each(value,function(k,v){
+                        $cloneRow.find(".bank-"+k).val(v);                        
+                    });
+                    
+                    $tablename.find("tbody").append($cloneRow);
+                    num++;
+                });
+                $tablename.find("tbody tr:first").remove();
+            }
+        }
     });
 </script>

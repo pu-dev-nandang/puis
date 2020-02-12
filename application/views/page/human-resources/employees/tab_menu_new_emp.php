@@ -49,12 +49,12 @@
             <div class="tabulasi-emp">
               <ul class="nav nav-tabs" role="tablist">
                 <li class="nv-personal" ><a href="<?=site_url('human-resources/employees/edit-employees/'.$NIP)?>" ><i class="fa fa-user"></i> Personal Data</a></li>
-                <!-- <li class="nv-career" ><a href="<?=site_url('human-resources/employees/career-level/'.$NIP)?>"><i class="fa fa-suitcase"></i> Career Level</a></li>
+                <li class="nv-career" ><a href="<?=site_url('human-resources/employees/career-level/'.$NIP)?>"><i class="fa fa-suitcase"></i> Career Level</a></li>
                 <li class="nv-additional" ><a href="<?=site_url('human-resources/employees/additional-info/'.$NIP)?>"><i class="fa fa-user-plus"></i> Additional Information</a></li>
                 <li class="nv-family" ><a href="<?=site_url('human-resources/employees/family/'.$NIP)?>"><i class="fa fa-users"></i> Family</a></li>
                 <li class="nv-edu" ><a href="<?=site_url('human-resources/employees/educations/'.$NIP)?>"><i class="fa fa-graduation-cap"></i> Educations</a></li>
                 <li class="nv-experience" ><a href="<?=site_url('human-resources/employees/work-experience/'.$NIP)?>"><i class="fa fa-briefcase"></i> Work Experience</a></li>
-                <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li> -->
+                <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li>
               </ul>
             </div>
         </div>
@@ -67,6 +67,32 @@
 
 
 <script type="text/javascript">
+    function fetchAdditionalData(NIP) {
+        var data = {
+          NIP : NIP,
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var result = null;
+        $.ajax({
+            type : 'POST',
+            url : base_url_js+"human-resources/employees/detail",
+            data : {token:token},
+            dataType : 'json',
+            async: false,
+            beforeSend :function(){
+                //loading_modal_show();
+                $(".mailing-list .detailMail").addClass("hidden");
+            },error : function(jqXHR){
+                //loading_modal_hide();
+                $("body #modalGlobal .modal-body").html(jqXHR.responseText);
+                $("body #modalGlobal").modal("show");
+            },success : function(response){
+                result = response;
+            }
+        });
+
+        return result;
+    }
     $("#form-employee").on("click","#multiple-field .btn-add",function(){
         var itsme = $(this);
         var parent = itsme.parent().parent().parent().parent();
@@ -77,30 +103,49 @@
 
         var hasAttr = cloneRow.attr("data-table");
         if(typeof hasAttr !== typeof undefined && hasAttr !== false){
-            cloneRow.removeAttr("data-table").removeAttr("data-id");
+            cloneRow.removeAttr("data-table").removeAttr("data-id").removeAttr("data-name");
         }
         
-        /*DATEPICKER*/
-        var datePickerTD = cloneRow.find("td:nth-child(6) input[type=text]").removeClass("hasDatepicker").attr("id","datePicker-"+num);
-        datePickerTD.datepicker({
-            dateFormat: 'yy-mm-dd',
-            changeYear: true,
-            changeMonth: true
-        });
         /*DIVISION*/
-        var cloneDivition = cloneRow.find("select#divisionID");
+        /*var cloneDivition = cloneRow.find("select#divisionID");
         cloneRow.find("#s2id_divisionID").remove();
-        cloneDivition.attr("id","divisionID-"+num).select2({width:'100%'});
+        cloneDivition.attr("id","divisionID-"+num).select2({width:'100%'});*/
 
         /*POSITION*/
-        var cloneDivition = cloneRow.find("select#positionID");
+        /*var cloneDivition = cloneRow.find("select#positionID");
         cloneRow.find("#s2id_positionID").remove();
-        cloneDivition.attr("id","positionID-"+num).select2({width:'100%'});        
+        cloneDivition.attr("id","positionID-"+num).select2({width:'100%'});*/  
+
+        cloneRow.find("td input[type=text].datepicker-tmp").removeClass("hasDatepicker").attr("id","datePicker-"+fieldName+"-"+num);
+        cloneRow.find("td input[type=text].datepicker-sd").removeClass("hasDatepicker").attr("id","datePickerSD-"+fieldName+"-"+num);
+        cloneRow.find("td select.select2-tmp").attr("id","select2-"+fieldName+"-"+num);
+        cloneRow.find("td select.select2-sd").attr("id","select2SD-"+fieldName+"-"+num);
 
 
         cloneRow.find("td:first").text(num);
         cloneRow.find(".form-control").val("");
         parent.find("#table-list-"+fieldName+" tbody").append(cloneRow);
+        
+        /*DATEPICKER*/
+        parent.find("#table-list-"+fieldName+" tbody tr > td #datePicker-"+fieldName+"-"+num).datepicker({
+            dateFormat: 'yy-mm-dd',
+            changeYear: true,
+            changeMonth: true
+        });;
+        parent.find("#table-list-"+fieldName+" tbody tr > td #datePickerSD-"+fieldName+"-"+num).datepicker({
+            dateFormat: 'yy-mm-dd',
+            changeYear: true,
+            changeMonth: true
+        });;
+        /*SELECT2*/
+        var select2 = parent.find("#table-list-"+fieldName+" tbody tr > td #select2-"+fieldName+"-"+num);
+        select2.prev().remove();
+        select2.select2({width:'100%'});
+        var select2 = parent.find("#table-list-"+fieldName+" tbody tr > td #select2SD-"+fieldName+"-"+num);
+        select2.prev().remove();
+        select2.select2({width:'100%'});
+
+
     });
     
     $("#form-employee").on("click","#multiple-field .btn-remove",function(){
