@@ -50,6 +50,14 @@ class C_rest3 extends CI_Controller {
         return $data_arr;
     }
 
+    private function getInputToken3() // adhi to array 2020-02-13
+    {
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = json_decode(json_encode($this->jwt->decode($token,$key)),true) ;
+        return $data_arr;
+    }
+
     public function is_url_exist($url){
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
@@ -2842,6 +2850,101 @@ class C_rest3 extends CI_Controller {
       );
 
       echo json_encode($json_data);
+    }
+
+    public function lecturer_salary_sks(){
+      $requestData = $_REQUEST;
+      $Input = $this->getInputToken3();
+      $action = $Input['action'];
+      switch ($action) {
+        case 'read_server_side':
+              $AddwherePost = [];
+              $where='';
+              // filter by manually
+                foreach ($Input as $key => $value) {
+                  $SubArr = $Input[$key];
+                  if ($key == 'data') {
+                     foreach ($SubArr as $keySub => $valueSub) {
+                       switch ($keySub) {
+                         case 'SemesterID':
+                            $AddwherePost[] = array('field'=>'csl.`'.$keySub.'`','data'=>' = '.$valueSub ,'filter' =>' AND '); 
+                           break;
+                         
+                         default:
+                           # code...
+                           break;
+                       }
+                       
+                     }
+                      
+                  }
+                }
+              // end filter by manually
+
+              if(!empty($requestData['search']['value']) ) {
+                  $search = $requestData['search']['value'];
+                  $AddwherePost[] = array('field'=>'(emp.`'.'NIP'.'`','data'=>' like "'.$search.'%"' ,'filter' =>' AND ');     
+                  $AddwherePost[] = array('field'=>'emp.`'.'Name'.'`','data'=>' like "'.$search.'%" )' ,'filter' =>' OR ');     
+              }
+
+              $sql_select = 'select csl.ID,csl.SemesterID,csl.NIP,emp.Name as LecturerName,sms.Name as SemesterName,csl.Money,csl.UpdateAt,csl.UpdatedBy,empUpd.Name as UpdateByName';
+              $sql_from = ' from db_employees.credit_salary_lecturer as csl
+                                join db_academic.semester as sms on sms.ID = csl.SemesterID
+                                join db_employees.employees as emp on emp.NIP = csl.NIP
+                                join db_employees.employees as empUpd on empUpd.NIP = csl.UpdatedBy';
+              
+              if(!empty($AddwherePost)){
+                $where = ' WHERE ';
+                $counter = 0;
+                foreach ($AddwherePost as $key => $value) {
+                    if($counter==0){
+                        $where = $where.$value['field']." ".$value['data'];
+                    }
+                    else{
+                        $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                    }
+                    $counter++;
+                }
+              }
+
+              $Totaldata = $this->db->query('select count(*) as total from (
+                                                    select 1 '.$sql_from.$where.'
+
+                                              ) temp
+
+                       ')->row()->total;
+              $queryData = $this->db->query($sql_select.$sql_from.$where.' LIMIT '.$requestData['start'].' , '.$requestData['length'].' ')->result_array();
+              // print_r($this->db->last_query());die();
+              $No = (int)$requestData['start'] + 1;
+              $data = array();
+              for ($i=0; $i < count($queryData); $i++) { 
+                $row = $queryData[$i];
+                $nestedData = array();
+                $nestedData[] = $No;
+                $nestedData[] = $row['SemesterName'];
+                $nestedData[] = $row['LecturerName'];
+                $nestedData[] = $row['Money'];
+                $nestedData[] = $row['ID'];
+                $tokenRow = $this->jwt->encode($row,"UAP)(*");
+                $nestedData['data'] = $tokenRow;
+                $data[] = $nestedData;
+                $No++;
+              }
+
+              $json_data = array(
+                  "draw"            => intval( $requestData['draw'] ),
+                  "recordsTotal"    => intval($Totaldata ),
+                  "recordsFiltered" => intval( $Totaldata ),
+                  "data"            => $data,
+              );
+
+              echo json_encode($json_data);
+          break;
+        
+        default:
+          # code...
+          break;
+      }
     }
 
 }

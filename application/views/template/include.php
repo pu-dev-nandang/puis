@@ -1311,6 +1311,37 @@
         });
     }
 
+    function loSelectOptionSemester2(selector,selected) { // created by adhi 2020-02-13
+        var url = base_url_js+'api/__crudSemester';
+        var token = jwt_encode({action:'read',order:'DESC'},'UAP)(*');
+
+        $.post(url,{token:token},function (data_json) {
+
+            var option = selector;
+            if(data_json.length>0){
+                for(var i=0;i<data_json.length;i++){
+                    var selc = '';
+                    if(selected=='selectedNow') {
+                        selc = (data_json[i].Status==1) ? 'selected' : '';
+
+                    } else {
+                        if(selected!='' && selected!=null && typeof selected !== undefined){
+                            selc = (selected==data_json[i].ID) ? 'selected' : '';
+                        } else {
+                            selc = (data_json[i].Status==1) ? 'selected' : '';
+                        }
+
+                    }
+
+
+
+                    option.append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'.'+data_json[i].Code+'" '+selc+'>'+data_json[i].Name+'</option>');
+
+                }
+            }
+        });
+    }
+
     function loSelectOptionSemesterAntara(element,selected) {
         var url = base_url_js+'api/__crudSemester';
         var token = jwt_encode({action:'readAntara',order:'DESC'},'UAP)(*');
