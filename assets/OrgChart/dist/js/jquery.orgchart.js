@@ -1227,7 +1227,7 @@
       if (opts.nodeTemplate) {
         $nodeDiv.append(opts.nodeTemplate(data));
       } else {
-        $nodeDiv.append('<div class="title">' + data[opts.nodeTitle] + '</div>')
+        $nodeDiv.append('<div class="title" data-id="'+data[opts.nodeId]+'">' + data[opts.nodeTitle] + '</div>')
           .append(typeof opts.nodeContent !== 'undefined' ? '<div class="content">' + (data[opts.nodeContent] || '') + '</div>' : '');
       }
       //

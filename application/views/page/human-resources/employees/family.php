@@ -118,10 +118,6 @@
 		$tableFamily.find("tbody tr:first").remove();
 	}
 	$(document).ready(function(){
-		var dataFamily = '<?=(!empty($myfamily) ? json_encode($myfamily) : null)?>';
-		var convertFams = JSON.parse(dataFamily);
-		loadMyFamily(convertFams);
-		
 		$("#form-family-member .btn-submit").click(function(){
             var itsme = $(this);
             var itsform = itsme.parent().parent().parent();
@@ -146,5 +142,32 @@
                 alert("Please fill out the field.");
             }
         });
+
+        var myFams = fetchAdditionalData("<?=$NIP?>");
+        if(!jQuery.isEmptyObject(myFams)){
+            if(!jQuery.isEmptyObject(myFams.MyFamily)){
+                $tablename = $("#table-list-family"); var num = 1;
+                $.each(myFams.MyFamily,function(key,value){
+                    $cloneRow = $tablename.find("tbody > tr:last").clone();
+                    $cloneRow.attr("data-table","employees_family_member").attr("data-id",value.ID).attr("data-name",value.name);
+                    $cloneRow.find("td:first").text(num);
+                    $.each(value,function(k,v){
+                        $cloneRow.find(".fam-"+k).val(v);    
+                        if(k == "birthdate"){
+			        		var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-"+num).removeClass("hasDatepicker");
+			        		cc.datepicker({
+					            dateFormat: 'yy-mm-dd',
+					            changeYear: true,
+					            changeMonth: true
+					        });
+			        	}                    
+                    });
+                    
+                    $tablename.find("tbody").append($cloneRow);
+                    num++;
+                });
+                $tablename.find("tbody tr:first").remove();
+            }
+        }
 	});
 </script>

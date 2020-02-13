@@ -856,14 +856,10 @@ class C_employees extends HR_Controler {
             $department = parent::__getDepartement();
             $data['NIP'] = $NIP;
             $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
-            $data['myBank'] = $this->General_model->fetchData("db_employees.employees_bank_account",array("NIP"=>$NIP))->result();
+            
             $page = $this->load->view('page/'.$department.'/employees/additional-information',$data,true);
             $this->tab_menu_new_emp($page,$NIP);
         }else{show_404();}
-    }
-
-    public function listofmybank(){
-        
     }
 
 
@@ -927,7 +923,7 @@ class C_employees extends HR_Controler {
                         $isExist = $this->General_model->fetchData("db_employees.employees_family_member",array("ID"=>$data['familyID'][$i]))->row();
                         if(!empty($isExist)){
                             $update = $this->General_model->updateData("db_employees.employees_family_member",$dataPost,array("ID"=>$data['familyID'][$i]));
-                            $message = (($insert) ? "Successfully":"Failed")." updated.";
+                            $message = (($update) ? "Successfully":"Failed")." updated.";
                         }else{$message = "Data not founded.";}
                     }else{
                         $insert = $this->General_model->insertData("db_employees.employees_family_member",$dataPost);
@@ -978,7 +974,7 @@ class C_employees extends HR_Controler {
             if(!empty($data['eduLevel'])){
                 for ($i=0; $i < count($data['eduLevel']); $i++) { 
                     if(!empty($data['eduLevel'][$i])){
-                        $dataPostEdu = array("NIP"=>$data['NIP'],"levelEduID"=>$data['eduLevel'][$i], "intituteName"=>$data['eduInstitute'][$i], "location"=>$data['eduCC'][$i], "major"=>$data['eduMajor'][$i], "graduation"=>$data['eduGraduation'][$i], "gpa"=>$data['eduGPA'][$i] );
+                        $dataPostEdu = array("NIP"=>$data['NIP'],"levelEduID"=>$data['eduLevel'][$i], "instituteName"=>$data['eduInstitute'][$i], "location"=>$data['eduCC'][$i], "major"=>$data['eduMajor'][$i], "graduation"=>$data['eduGraduation'][$i], "gpa"=>$data['eduGPA'][$i] );
                         if(!empty($data['eduID'][$i])){
                             //update
                             $update = $this->General_model->updateData("db_employees.employees_educations",$dataPostEdu,array("ID"=>$data['eduID'][$i]));
@@ -992,12 +988,12 @@ class C_employees extends HR_Controler {
                 }
             }else{$message = "Cannot saved. Empty data post.";}
 
-            if(!empty($data['nonEduduInstitute'])){
-                for ($j=0; $j < count($data['nonEduduInstitute']); $j++) { 
-                    if(!empty($data['nonEduduInstitute'][$i])){
-                        $dataPostNonEdu = array("NIP"=>$data['NIP'],"subject"=>$data['nonEduSubject'][$i],"intituteName"=>$data['nonEduduInstitute'][$i], "start_event"=>$data['nonEduStart'][$i], "end_event"=>$data['nonEduEnd'][$i], "location"=>$data['nonEduCC'][$i] );
-                        if(!empty($data['nonEduID'][$i])){
-                            $update = $this->General_model->updateData("db_employees.employees_educations_non_formal",$dataPostNonEdu);
+            if(!empty($data['nonEduInstitute'])){
+                for ($j=0; $j < count($data['nonEduInstitute']); $j++) { 
+                    if(!empty($data['nonEduInstitute'][$j])){
+                        $dataPostNonEdu = array("NIP"=>$data['NIP'],"subject"=>$data['nonEduSubject'][$j],"instituteName"=>$data['nonEduInstitute'][$j], "start_event"=>$data['nonEduStart'][$j], "end_event"=>$data['nonEduEnd'][$j], "location"=>$data['nonEduCC'][$j] );
+                        if(!empty($data['nonEduID'][$j])){
+                            $update = $this->General_model->updateData("db_employees.employees_educations_non_formal",$dataPostNonEdu,array("ID"=>$data['nonEduID'][$j]));
                             $message = (($update) ? "Successfully":"Failed")." updated.";
                         }else{
                             //insert
@@ -1009,11 +1005,11 @@ class C_employees extends HR_Controler {
             }
             
             if(!empty($data['trainingTitle'])){
-                for ($j=0; $j < count($data['trainingTitle']); $j++) { 
-                    if(!empty($data['trainingTitle'][$i])){
-                        $dataPostTraining = array("NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$i],"trainer"=>$data['trainingTrainer'][$i], "start_event"=>$data['trainingStart'][$i], "end_event"=>$data['trainingEnd'][$i], "location"=>$data['trainingLocation'][$i], "feedback"=>$data['trainingFeedback'][$i] );
-                        if(!empty($data['trainingID'][$i])){
-                            $update = $this->General_model->updateData("db_employees.employees_educations_training",$dataPostTraining);
+                for ($k=0; $k < count($data['trainingTitle']); $k++) { 
+                    if(!empty($data['trainingTitle'][$k])){
+                        $dataPostTraining = array("NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$k],"trainer"=>$data['trainingTrainer'][$k], "start_event"=>$data['trainingStart'][$k], "end_event"=>$data['trainingEnd'][$k], "location"=>$data['trainingLocation'][$k], "feedback"=>$data['trainingFeedback'][$k] );
+                        if(!empty($data['trainingID'][$k])){
+                            $update = $this->General_model->updateData("db_employees.employees_educations_training",$dataPostTraining,array("ID"=>$data['trainingID'][$k]));
                             $message = (($update) ? "Successfully":"Failed")." updated.";
                         }else{
                             //insert
@@ -1024,9 +1020,9 @@ class C_employees extends HR_Controler {
                 }
             }
 
-
             $this->session->set_flashdata("message",$message);
-            redirect(site_url('human-resources/employees/family/'.$data['NIP']));
+            redirect(site_url('human-resources/employees/educations/'.$data['NIP']));
+
         }else{show_404();}
     }
     
@@ -1040,6 +1036,28 @@ class C_employees extends HR_Controler {
             $data['industry'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
             $page = $this->load->view('page/'.$department.'/employees/experience',$data,true);
             $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function workExperienceSave(){
+        $data = $this->input->post();
+        if($data){
+            $message = "";
+            if(!empty($data['comName'])){
+                for ($i=0; $i < count($data['comName']); $i++) { 
+                    $dataPost = array("NIP"=>$data['NIP'],"company"=>$data['comName'][$i],"industryID"=>$data['comIndustry'][$i], "start_join"=>$data['comStartJoin'][$i], "end_join"=>$data['comEndJoin'][$i], "jobTitle"=>$data['comJobTitle'][$i], "reason"=>$data['comReason'][$i] );
+                    if(!empty($data['comID'][$i])){
+                        $update = $this->General_model->updateData("db_employees.employees_experience",$dataPost,array("ID"=>$data['comID'][$i]));
+                        $message = (($update) ? "Successfully":"Failed")." updated.";
+                    }else{
+                        $insert = $this->General_model->insertData("db_employees.employees_experience",$dataPost);
+                        $message = (($insert) ? "Successfully":"Failed")." saved.";
+                    }
+                }
+            }else{$message = "Cannot saved. Empty data post.";}
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('human-resources/employees/work-experience/'.$data['NIP']));
         }else{show_404();}
     }
 
@@ -1065,6 +1083,12 @@ class C_employees extends HR_Controler {
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
             $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();
             if(!empty($isExist)){
+                $isExist->MyBank = $this->General_model->fetchData("db_employees.employees_bank_account",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducation = $this->General_model->fetchData("db_employees.employees_educations",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationNonFormal = $this->General_model->fetchData("db_employees.employees_educations_non_formal",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationTraining = $this->General_model->fetchData("db_employees.employees_educations_training",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyFamily = $this->General_model->fetchData("db_employees.employees_family_member",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyExperience = $this->General_model->fetchData("db_employees.employees_experience",array("NIP"=>$isExist->NIP))->result();
                 $json = $isExist;
             }
         }

@@ -2,7 +2,7 @@
     $(document).ready(function(){
         $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
         $("#form-employee .tabulasi-emp > ul > li.nv-career").addClass("active");
-        $("#divisionID,#positionID").select2({'width':'100%'});
+        $("#select2-career,#select2SD-career").select2({'width':'100%'});
     });
 </script>
 <form id="form-additional-info" action="" method="post" autocomplete="off">
@@ -59,7 +59,7 @@
     										} } } ?>
         								</select>
         								<small class="text-danger text-message"></small></td>
-        								<td><select class="required" name="divisionID[]" id="divisionID" required>
+        								<td><select class="required select2-tmp" name="divisionID[]" id="select2-career" required>
         									<option>Choose Division</option>
         									<?php if(!empty($division)){
         									foreach ($division as $d) {
@@ -67,7 +67,7 @@
     										} } ?>
         								</select>
         								<small class="text-danger text-message"></small></td>
-        								<td><select class="required" name="positionID[]" id="positionID" required>
+        								<td><select class="required select2-sd" name="positionID[]" id="select2SD-career" required>
         									<option>Choose Position</option>
         									<?php if(!empty($position)){
         									foreach ($position as $p) {

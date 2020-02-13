@@ -78,4 +78,17 @@ class M_hr extends CI_Model {
         return $data;
     }
 
+
+    /*ADDED BY FEBRI @ FEB 2020*/
+    public function getMemberSTO($data){
+        $this->db->select("a.STOID,a.JobTitle,a.IsActive, a.LevelID, c.*");
+        $this->db->from("db_employees.sto_rel_user a");
+        $this->db->join("db_employees.sto_temp b","a.STOID = b.ID","left");
+        $this->db->join("db_employees.employees c","c.NIP = a.NIP","left");
+        $this->db->where($data);
+        $query = $this->db->get();
+        return $query;
+    }
+    /*END ADDED BY FEBRI @ FEB 2020*/
+
 }
