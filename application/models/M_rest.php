@@ -1035,19 +1035,23 @@ class M_rest extends CI_Model {
             // Sistem Baru
             else {
 
-                $Coordinator = $this->db->query('SELECT s.*,em.Name AS CoordinatorName
+                $Coordinator = $this->db->query('SELECT s.*,em.Name AS CoordinatorName, cd.TotalSKS AS CourseCredit
                                               FROM db_academic.schedule s
                                               LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                              LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                              LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                               WHERE s.SemesterID = "'.$dataSemester[$i]['ID'].'" 
-                                              AND s.Coordinator = "'.$NIP.'" AND s.IsSemesterAntara = "0" ')->result_array();
+                                              AND s.Coordinator = "'.$NIP.'" AND s.IsSemesterAntara = "0" GROUP BY s.ID')->result_array();
 
-                $TeamTheaching = $this->db->query('SELECT s.*,em.Name AS CoordinatorName, stt.Status AS StatusTeamTeaching 
+                $TeamTheaching = $this->db->query('SELECT s.*,em.Name AS CoordinatorName, stt.Status AS StatusTeamTeaching, cd.TotalSKS AS CourseCredit
                                                         FROM db_academic.schedule_team_teaching stt 
                                                         LEFT JOIN db_academic.schedule s ON (s.ID=stt.ScheduleID)
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                        LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                        LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                         WHERE s.SemesterID ="'.$dataSemester[$i]['ID'].'" 
                                                         AND stt.NIP = "'.$NIP.'"
-                                                        AND s.IsSemesterAntara = "0" ')->result_array();
+                                                        AND s.IsSemesterAntara = "0" GROUP BY s.ID')->result_array();
 
                 $arr_p = array(
                     'SemesterID' => $dataSemester[$i]['ID'],

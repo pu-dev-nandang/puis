@@ -231,6 +231,12 @@
                             </li>
                         <?php } ?>
 
+                        <?php if(in_array(11,$rule_service)){ ?>
+                            <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='lecturer-performance'){echo 'active';} ?>">
+                                <a href="<?php echo base_url('lecturer-performance/lecturer-list'); ?>"><i class="fa fa-line-chart" aria-hidden="true"></i> Lecturer Performance</a>
+                            </li>
+                        <?php } ?>
+
                             <!-- Adding for Testing -->
                             <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
                                  <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='request-document-generator'){echo 'active';} ?>">
@@ -244,6 +250,7 @@
                                      <a href="javascript:void(0)"><i class="fa fa-rss" aria-hidden="true"></i> Blog Admin</a>
                                  </li>
                             <!-- End Adding for Testing -->
+
                     </ul>
                 </li>
             <?php } ?>
