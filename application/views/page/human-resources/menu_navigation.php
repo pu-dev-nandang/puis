@@ -47,7 +47,7 @@
             </li>
 
             <!-- ADDED BY FEBRI @ FEB 2020 -->
-            <li class="<?= ($this->uri->segment(2)=='master-aphris') ? 'current open' : ''?>">
+            <!-- <li class="<?= ($this->uri->segment(2)=='master-aphris') ? 'current open' : ''?>">
                 <a href="javascript:void(0);">
                     <i class="fa fa-user-circle"></i>
                     Master Aphris
@@ -69,7 +69,7 @@
                             </a>
                         </li>
                     </ul>
-            </li>
+            </li> -->
             <!-- END ADDED BY FEBRI @ FEB 2020 -->
 
 

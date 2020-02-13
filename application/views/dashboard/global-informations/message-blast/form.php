@@ -199,6 +199,17 @@
 			var participantMail = [];
 			if(belongsto.length > 1){
 			/* check if there's no list of email */
+			/*get from address book*/
+				$myAddressBook = $("body #modal-participants").find("#my-address-book .mybook");
+				$myAddressBook.each(function(){
+					if( $(this).is(":checked") ){
+						var email = $(this).val();
+						email = $.trim(email);
+						if(email.length > 0){
+							participantMail.push({name:email,email:email});
+						}
+					}
+				});
 			/* get the external mail list*/
 				$formParticipants = $("body #form-participants");
 				$extMails = $formParticipants.find(".ext-mailing-list > input[name=extmail]");
@@ -237,7 +248,11 @@
 
 		$("#form-submit-mail").on("click",".remove-mail",function(){
 			if(confirm("Are you sure wants to remove this mail ?")){
+				var getBox = $(this).parent().parent().parent().parent().parent();
 				$(this).parent().remove();
+				var destination = getBox.data("target");
+				var TotalMails = $("body #message-blast #form-submit-mail .box-mail."+destination+" .list-mail .bg-mail").length;
+				getBox.next().text("Total: "+(TotalMails)+" participant mails");
 			}
 		});
 

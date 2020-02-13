@@ -1,3 +1,11 @@
+<?php $message = $this->session->flashdata('message');
+	if(!empty($message)){ ?>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		toastr.info("<?= $this->session->flashdata('message');?>",'Info!');
+	});
+	</script>
+<?php } ?>
 <link rel="stylesheet" type="text/css" href="<?=base_url('assets/OrgChart/dist/css/jquery.orgchart.min.css')?>">
 <script type="text/javascript" src="<?=base_url('assets/OrgChart/dist/js/jquery.orgchart.js')?>"></script>
 <script type="text/javascript" src="<?=base_url('assets/OrgChart/dist/js/html2canvas.min.js')?>"></script>
@@ -56,7 +64,7 @@
 		    },error : function(jqXHR){
 		    	loading_modal_hide();
             	$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-                    '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                    '<h4 class="modal-title">Error Fetch Structure Organization</h4>');
                 $('#GlobalModal .modal-body').html(jqXHR.responseText);
                 $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
                 $('#GlobalModal').modal({
@@ -72,19 +80,18 @@
 		return resultOBJ;
 	}
 	$(document).ready(function(){
-		var word = "itnama orang";
-		var h =word.toLowerCase().indexOf("it");
-		console.log(h);
 		var datascource = fetchSTO();
-		$('#chart-container').orgchart({
-	      'data' : datascource,
-	      'nodeContent': 'title',
-	      'pan': true,
-	      'zoom': true,
-	      'responseTime': 1000,
-	      'exportButton': true,
-      	  'exportFilename': 'PU-Stuctured-Organization'
-	    });
+		if(!jQuery.isEmptyObject(datascource)){
+			$('#chart-container').orgchart({
+		      'data' : datascource,
+		      'nodeContent': 'title',
+		      'pan': true,
+		      'zoom': true,
+		      'responseTime': 1000,
+		      'exportButton': false,
+	      	  'exportFilename': 'PU-Stuctured-Organization'
+		    });
+		}else{}
 
 	    $('#btn-filter-node').on('click', function() {
 	      filterNodes($('#key-word').val());
@@ -126,7 +133,8 @@
 			    },success : function(response){
 	            	loading_modal_hide();
 	            	$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-		                '<h4 class="modal-title">Detail of '+title.toUpperCase()+'</h4>');
+		                '<h4 class="modal-title"><span>Detail of </span>'+title.toUpperCase()+'</h4>');
+		            $('#GlobalModal .modal-dialog').css({width:'80%'});
 		            $('#GlobalModal .modal-body').html(response);
 		            $('#GlobalModal .modal-footer').remove();
 		            $('#GlobalModal').modal({
@@ -161,7 +169,7 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">
-				<i class="fa fa-chart"></i> Structure Organization on PU
+				<i class="fa fa-sitemap"></i> Structure Organization on PU
 			</h4>
 		</div>
 		<div class="panel-heading">
