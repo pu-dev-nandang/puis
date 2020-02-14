@@ -50,6 +50,14 @@ class C_rest3 extends CI_Controller {
         return $data_arr;
     }
 
+    private function getInputToken3() // adhi to array 2020-02-13
+    {
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = json_decode(json_encode($this->jwt->decode($token,$key)),true) ;
+        return $data_arr;
+    }
+
     public function is_url_exist($url){
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
@@ -2842,6 +2850,296 @@ class C_rest3 extends CI_Controller {
       );
 
       echo json_encode($json_data);
+    }
+
+    public function lecturer_salary_sks(){
+      $requestData = $_REQUEST;
+      $Input = $this->getInputToken3();
+      $action = $Input['action'];
+      switch ($action) {
+        case 'read_server_side':
+              $AddwherePost = [];
+              $where='';
+              // filter by manually
+                foreach ($Input as $key => $value) {
+                  $SubArr = $Input[$key];
+                  if ($key == 'data') {
+                     foreach ($SubArr as $keySub => $valueSub) {
+                       switch ($keySub) {
+                         case 'SemesterID':
+                            $AddwherePost[] = array('field'=>'csl.`'.$keySub.'`','data'=>' = '.$valueSub ,'filter' =>' AND '); 
+                           break;
+                         
+                         default:
+                           # code...
+                           break;
+                       }
+                       
+                     }
+                      
+                  }
+                }
+              // end filter by manually
+
+              if(!empty($requestData['search']['value']) ) {
+                  $search = $requestData['search']['value'];
+                  $AddwherePost[] = array('field'=>'(emp.`'.'NIP'.'`','data'=>' like "'.$search.'%"' ,'filter' =>' AND ');     
+                  $AddwherePost[] = array('field'=>'emp.`'.'Name'.'`','data'=>' like "'.$search.'%" )' ,'filter' =>' OR ');     
+              }
+
+              $sql_select = 'select csl.ID,csl.SemesterID,csl.NIP,emp.Name as LecturerName,sms.Name as SemesterName,csl.Money,csl.UpdateAt,csl.UpdatedBy,empUpd.Name as UpdateByName';
+              $sql_from = ' from db_employees.credit_salary_lecturer as csl
+                                join db_academic.semester as sms on sms.ID = csl.SemesterID
+                                join db_employees.employees as emp on emp.NIP = csl.NIP
+                                join db_employees.employees as empUpd on empUpd.NIP = csl.UpdatedBy';
+              
+              if(!empty($AddwherePost)){
+                $where = ' WHERE ';
+                $counter = 0;
+                foreach ($AddwherePost as $key => $value) {
+                    if($counter==0){
+                        $where = $where.$value['field']." ".$value['data'];
+                    }
+                    else{
+                        $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                    }
+                    $counter++;
+                }
+              }
+
+              $Totaldata = $this->db->query('select count(*) as total from (
+                                                    select 1 '.$sql_from.$where.'
+
+                                              ) temp
+
+                       ')->row()->total;
+              $queryData = $this->db->query($sql_select.$sql_from.$where.' LIMIT '.$requestData['start'].' , '.$requestData['length'].' ')->result_array();
+              // print_r($this->db->last_query());die();
+              $No = (int)$requestData['start'] + 1;
+              $data = array();
+              for ($i=0; $i < count($queryData); $i++) { 
+                $row = $queryData[$i];
+                $nestedData = array();
+                $nestedData[] = $No;
+                $nestedData[] = $row['SemesterName'];
+                $nestedData[] = $row['LecturerName'];
+                $nestedData[] = $row['Money'];
+                $nestedData[] = $row['ID'];
+                $tokenRow = $this->jwt->encode($row,"UAP)(*");
+                $nestedData['data'] = $tokenRow;
+                $data[] = $nestedData;
+                $No++;
+              }
+
+              $json_data = array(
+                  "draw"            => intval( $requestData['draw'] ),
+                  "recordsTotal"    => intval($Totaldata ),
+                  "recordsFiltered" => intval( $Totaldata ),
+                  "data"            => $data,
+              );
+
+              echo json_encode($json_data);
+          break;
+        case 'add' :
+           $rs = ['status' => 0,'msg' => '' ];
+           $this->db->db_debug=false;
+           $dataSave = $Input['data'];
+           $dataSave['UpdateAt'] = date('Y-m-d H:i:s');
+           $sql = $this->db->insert('db_employees.credit_salary_lecturer',$dataSave);
+           if( !$sql )
+           {
+              $rs['msg'] = json_encode($this->db->error());
+           }
+           else
+           {
+            $rs['status'] = 1; 
+           }
+           $this->db->db_debug=true;
+           echo json_encode($rs);
+          break;
+        case 'edit' :
+           $rs = ['status' => 0,'msg' => '' ];
+           $this->db->db_debug=false;
+           $dataSave = $Input['data'];
+           $dataSave['UpdateAt'] = date('Y-m-d H:i:s');
+           $this->db->where('ID',$Input['ID']);
+           $sql = $this->db->update('db_employees.credit_salary_lecturer',$dataSave);
+           if( !$sql )
+           {
+              $rs['msg'] = json_encode($this->db->error());
+           }
+           else
+           {
+            $rs['status'] = 1; 
+           }
+           $this->db->db_debug=true;
+           echo json_encode($rs);
+          break;
+        case 'delete' :
+          $rs = ['status' => 0,'msg' => '' ];
+          $this->db->db_debug=false;
+          $this->db->where('ID',$Input['ID']);
+          $sql = $this->db->delete('db_employees.credit_salary_lecturer');
+          if( !$sql )
+          {
+             $rs['msg'] = json_encode($this->db->error());
+          }
+          else
+          {
+           $rs['status'] = 1; 
+          }
+
+          $this->db->db_debug=true;
+          echo json_encode($rs);
+          break;
+        case 'selection_read_server_side' :
+            $AddwherePost = [];
+            $where='';
+            // filter by manually
+              foreach ($Input as $key => $value) {
+                $SubArr = $Input[$key];
+                if ($key == 'data') {
+                   foreach ($SubArr as $keySub => $valueSub) {
+                     switch ($keySub) {
+                       case 'smt_active':
+                          $AddwherePost[] = array('field'=>'csl.`'.'SemesterID'.'`','data'=>' = '.($valueSub - 1) ,'filter' =>' AND '); 
+                         break;
+                       case 'SelectionCopy':
+                          $arr_SelectionCopy = $valueSub;
+                          $strValue = '';
+                          if (count($arr_SelectionCopy) > 0) {
+                            $strValue = '(';
+                            $strValue .= '"'.$arr_SelectionCopy[0].'"';
+                            for ($i=1; $i < count($arr_SelectionCopy); $i++) { 
+                              $strValue .= ',"'.$arr_SelectionCopy[$i].'"';
+                            }
+
+                             $strValue .= ')';
+                          }
+                          if ($strValue != '') {
+                             $AddwherePost[] = array('field'=>'csl.`'.'NIP'.'`','data'=>' not in'.$strValue ,'filter' =>' AND '); 
+                          }
+                         
+                         break;
+                       default:
+                         # code...
+                         break;
+                     }
+                     
+                   }
+                    
+                }
+              }
+            // end filter by manually
+
+            if(!empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $AddwherePost[] = array('field'=>'(emp.`'.'NIP'.'`','data'=>' like "'.$search.'%"' ,'filter' =>' AND ');     
+                $AddwherePost[] = array('field'=>'emp.`'.'Name'.'`','data'=>' like "'.$search.'%" )' ,'filter' =>' OR ');     
+            }
+
+            $sql_select = 'select csl.ID,csl.SemesterID,csl.NIP,emp.Name as LecturerName,sms.Name as SemesterName,csl.Money,csl.UpdateAt,csl.UpdatedBy,empUpd.Name as UpdateByName, 
+                          if( (select count(*) as total from db_employees.credit_salary_lecturer where SemesterID = '.$Input['smt_active'].' and NIP = csl.NIP limit 1 ) > 0 ,1,0 ) as SelectionThisSMT  ';
+            $sql_from = ' from db_employees.credit_salary_lecturer as csl
+                              join db_academic.semester as sms on sms.ID = csl.SemesterID
+                              join db_employees.employees as emp on emp.NIP = csl.NIP
+                              join db_employees.employees as empUpd on empUpd.NIP = csl.UpdatedBy';
+            
+            if(!empty($AddwherePost)){
+              $where = ' WHERE ';
+              $counter = 0;
+              foreach ($AddwherePost as $key => $value) {
+                  if($counter==0){
+                      $where = $where.$value['field']." ".$value['data'];
+                  }
+                  else{
+                      $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                  }
+                  $counter++;
+              }
+            }
+
+            $Totaldata = $this->db->query('select count(*) as total from (
+                                                  select 1 '.$sql_from.$where.'
+
+                                            ) temp
+
+                     ')->row()->total;
+            $queryData = $this->db->query($sql_select.$sql_from.$where.' LIMIT '.$requestData['start'].' , '.$requestData['length'].' ')->result_array();
+            // print_r($this->db->last_query());die();
+            $No = (int)$requestData['start'] + 1;
+            $data = array();
+            for ($i=0; $i < count($queryData); $i++) { 
+              $row = $queryData[$i];
+              $nestedData = array();
+              $nestedData[] = $No;
+              $nestedData[] = $row['SemesterName'];
+              $nestedData[] = $row['LecturerName'];
+              $nestedData[] = $row['Money'];
+              $nestedData[] = $row['ID'];
+              $tokenRow = $this->jwt->encode($row,"UAP)(*");
+              $nestedData['data'] = $tokenRow;
+              $data[] = $nestedData;
+              $No++;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($Totaldata ),
+                "recordsFiltered" => intval( $Totaldata ),
+                "data"            => $data,
+            );
+
+            echo json_encode($json_data);
+          break;
+        case 'submit_selection' :
+          $data = $Input['data'];
+          // get semester active
+          $G_smt = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+          $SemesterID = $G_smt[0]['ID'];
+          $sessionNIP = $Input['sessionNIP'];
+          $this->db->db_debug=false;
+          for ($i=0; $i < count($data); $i++) { 
+            $dataSave = [
+              'SemesterID' => $SemesterID,
+              'NIP' => $data[$i]['NIP'],
+              'Money' => $data[$i]['Money'],
+              'UpdateAt' => date('Y-m-d H:i:s'),
+              'UpdatedBy' => $sessionNIP,
+            ];
+
+            
+            $sql = $this->db->insert('db_employees.credit_salary_lecturer',$dataSave);
+            $FromID = $data[$i]['ID'];
+            $ToID = $this->db->insert_id();
+            if( !$sql )
+            {
+               // update
+               $sqlQuery = $this->db->query('select * from db_employees.credit_salary_lecturer where NIP = "'.$data[$i]['NIP'].'" and SemesterID = '.$SemesterID.' ')->result_array();
+               $FromID = $sqlQuery[0]['ID'];
+               $ToID = $FromID;
+               $this->db->where('ID',$FromID);
+               $this->db->update('db_employees.credit_salary_lecturer',$dataSave);
+            }
+
+            // insert to table copy_credit_salary_lecturer
+            $dataSave2 = [
+              'FromID' => $FromID,
+              'ToID' => $ToID,
+              'UpdateAt' => date('Y-m-d H:i:s'),
+              'UpdatedBy' => $sessionNIP,
+            ];
+            $this->db->insert('db_employees.copy_credit_salary_lecturer',$dataSave2);
+             
+
+          }
+          $this->db->db_debug=true;
+          echo json_encode(1);
+          break;
+        default:
+          # code...
+          break;
+      }
     }
 
 }
