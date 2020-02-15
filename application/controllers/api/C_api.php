@@ -10389,7 +10389,10 @@ class C_api extends CI_Controller {
                 //check data emp if lecturers
                 if(!empty($output['isLecturer'])){
                     $divLect = '14';
-                    $param[] = array("field"=>"em.PositionMain","data"=>" like'".$divLect.".%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"(em.PositionMain","data"=>" like'".$divLect.".%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"em.PositionOther1","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther2","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther3","data"=>" like'".$divLect.".%' )","filter"=>"OR",);
                     if( !empty($output['position'])){
                         $param[] = array("field"=>"em.PositionMain","data"=>" = '".$divLect.".".$output['position']."' ","filter"=>"AND",);    
                     }

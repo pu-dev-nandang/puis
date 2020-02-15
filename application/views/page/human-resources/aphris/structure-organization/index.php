@@ -162,6 +162,7 @@
     .orgchart .middle-level .content { border-color: #006699; }
     .orgchart .node.matched { background-color: rgba(238, 217, 54, 0.5); }
     .orgchart .node .edge { display: none; }
+    .orgchart .node .content{ height: auto;min-height: 28px;max-height: 100px;overflow: auto;}
 </style>
 
 

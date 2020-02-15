@@ -49,12 +49,12 @@
             <div class="tabulasi-emp">
               <ul class="nav nav-tabs" role="tablist">
                 <li class="nv-personal" ><a href="<?=site_url('human-resources/employees/edit-employees/'.$NIP)?>" ><i class="fa fa-user"></i> Personal Data</a></li>
-                <!-- <li class="nv-career" ><a href="<?=site_url('human-resources/employees/career-level/'.$NIP)?>"><i class="fa fa-suitcase"></i> Career Level</a></li>
+                <li class="nv-career" ><a href="<?=site_url('human-resources/employees/career-level/'.$NIP)?>"><i class="fa fa-suitcase"></i> Career Level</a></li>
                 <li class="nv-additional" ><a href="<?=site_url('human-resources/employees/additional-info/'.$NIP)?>"><i class="fa fa-user-plus"></i> Additional Information</a></li>
                 <li class="nv-family" ><a href="<?=site_url('human-resources/employees/family/'.$NIP)?>"><i class="fa fa-users"></i> Family</a></li>
                 <li class="nv-edu" ><a href="<?=site_url('human-resources/employees/educations/'.$NIP)?>"><i class="fa fa-graduation-cap"></i> Educations</a></li>
                 <li class="nv-experience" ><a href="<?=site_url('human-resources/employees/work-experience/'.$NIP)?>"><i class="fa fa-briefcase"></i> Work Experience</a></li>
-                <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li> -->
+                <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li>
               </ul>
             </div>
         </div>
@@ -106,21 +106,13 @@
             cloneRow.removeAttr("data-table").removeAttr("data-id").removeAttr("data-name");
         }
         
-        /*DIVISION*/
-        /*var cloneDivition = cloneRow.find("select#divisionID");
-        cloneRow.find("#s2id_divisionID").remove();
-        cloneDivition.attr("id","divisionID-"+num).select2({width:'100%'});*/
-
-        /*POSITION*/
-        /*var cloneDivition = cloneRow.find("select#positionID");
-        cloneRow.find("#s2id_positionID").remove();
-        cloneDivition.attr("id","positionID-"+num).select2({width:'100%'});*/  
-
         cloneRow.find("td input[type=text].datepicker-tmp").removeClass("hasDatepicker").attr("id","datePicker-"+fieldName+"-"+num);
         cloneRow.find("td input[type=text].datepicker-sd").removeClass("hasDatepicker").attr("id","datePickerSD-"+fieldName+"-"+num);
         cloneRow.find("td select.select2-tmp").attr("id","select2-"+fieldName+"-"+num);
         cloneRow.find("td select.select2-sd").attr("id","select2SD-"+fieldName+"-"+num);
-
+        
+        cloneRow.find("td input.select2-term-ft").attr("id","select2-term-ft-"+fieldName+"-"+num).removeClass("select2-offscreen").removeClass();
+        cloneRow.find("td input.select2-term-sd").attr("id","select2-term-sd-"+fieldName+"-"+num).removeClass("select2-offscreen");
 
         cloneRow.find("td:first").text(num);
         cloneRow.find(".form-control").val("");
@@ -141,10 +133,14 @@
         var select2 = parent.find("#table-list-"+fieldName+" tbody tr > td #select2-"+fieldName+"-"+num);
         select2.prev().remove();
         select2.select2({width:'100%'});
-        var select2 = parent.find("#table-list-"+fieldName+" tbody tr > td #select2SD-"+fieldName+"-"+num);
-        select2.prev().remove();
-        select2.select2({width:'100%'});
-
+        var select2SD = parent.find("#table-list-"+fieldName+" tbody tr > td #select2SD-"+fieldName+"-"+num);
+        select2SD.prev().remove();
+        select2SD.select2({width:'100%'});
+        var select2termft = parent.find("#table-list-"+fieldName+" tbody tr > td #select2-term-ft-"+fieldName+"-"+num);
+        select2termft.prev().remove();
+        select2GetDivision($("#select2-term-ft-"+fieldName+"-"+num));
+        var select2termsd = parent.find("#table-list-"+fieldName+" tbody tr > td #select2-term-sd-"+fieldName+"-"+num);
+        select2termsd.prev().remove();
 
     });
     

@@ -952,7 +952,6 @@ class C_employees extends HR_Controler {
             $this->tab_menu_new_emp($page,$NIP);
         }else{show_404();}
     }
-    
 
     public function educations($NIP){
         $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
