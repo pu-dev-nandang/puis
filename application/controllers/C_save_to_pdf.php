@@ -7083,7 +7083,7 @@ Phone: (021) 29200456';
 //                $pdf->Cell(0,2,$URLQrCode,$border,1,'R');
                 $pdf->Ln(4);
                 $pdf->SetFont('dinprolight','',$fontBody);
-                $pdf->MultiCell($fullWidth,$h,"The Diploma Supplement accompanies a higher education certificate providing a standardized description oh the nature, level, context, content and status of the studies completed by its holder.",0);
+                $pdf->MultiCell($fullWidth,$h,"The Diploma Supplement accompanies a higher education certificate providing a standardized description on the nature, level, context, content and status of the studies completed by its holder.",0);
 
 
                 // ====== BAGIAN 1 Dengan Foto ========
@@ -7329,7 +7329,7 @@ Phone: (021) 29200456';
                     $t_b = ($dataWarek['TitleBehind']!='' && $dataWarek['TitleBehind']!=null)
                         ? ' '.$dataWarek['TitleBehind'] : '';
                     $t_name = $dataWarek['Name'];
-                    $ttd_jabatan = 'Vice Rector of Academic';
+                    $ttd_jabatan = 'Vice Rector I';
                     $ttd_NIP = $dataWarek['NIP'];
                     $ttd_Signatures = $dataWarek['Signatures'];
 
