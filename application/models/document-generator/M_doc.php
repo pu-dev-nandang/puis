@@ -473,6 +473,7 @@ class M_doc extends CI_Model {
     	curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
     	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     	$pr = curl_exec($ch);
+        // print_r($pr);die();
     	$rs = (array) json_decode($pr,true);
     	if ($rs['status'] == 1 || $rs['status'] == '1') {
     		// download file
