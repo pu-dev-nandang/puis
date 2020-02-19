@@ -1,0 +1,48 @@
+@font-face {
+    font-family: 'MavenPro';
+    src: url("maven/MavenPro.ttf");
+    src: url("maven/MavenPro.ttf") format('ttf'),
+    url("maven/MavenPro.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: 'MavenPro-Black';
+    src: url("maven/static/MavenPro-Black.ttf");
+    src: url("maven/static/MavenPro-Black.ttf") format('ttf'),
+    url("maven/static/MavenPro-Black.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: 'MavenPro-Bold';
+    src: url("maven/static/MavenPro-Bold.ttf");
+    src: url("maven/static/MavenPro-Bold.ttf") format('ttf'),
+    url("maven/static/MavenPro-Bold.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: 'MavenPro-ExtraBold';
+    src: url("maven/static/MavenPro-ExtraBold.ttf");
+    src: url("maven/static/MavenPro-ExtraBold.ttf") format('ttf'),
+    url("maven/static/MavenPro-ExtraBold.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: 'MavenPro-Medium';
+    src: url("maven/static/MavenPro-Medium.ttf");
+    src: url("maven/static/MavenPro-Medium.ttf") format('ttf'),
+    url("maven/static/MavenPro-Medium.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: 'MavenPro-Regular';
+    src: url("maven/static/MavenPro-Regular.ttf");
+    src: url("maven/static/MavenPro-Regular.ttf") format('ttf'),
+    url("maven/static/MavenPro-Regular.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: 'MavenPro-SemiBold';
+    src: url("maven/static/MavenPro-SemiBold.ttf");
+    src: url("maven/static/MavenPro-SemiBold.ttf") format('ttf'),
+    url("maven/static/MavenPro-SemiBold.ttf") format('truetype');
+}

@@ -31,7 +31,7 @@ body {
   height: 100%;
 }
 body {
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "MavenPro";
   color: #555555;
   font-size: 13px;
 }
@@ -242,7 +242,7 @@ h6,
 .h5,
 .h6 {
   font-weight: 300;
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "MavenPro-SemiBold";
 }
 h2 {
   font-size: 25px;
@@ -319,7 +319,7 @@ span.red {
   color: #ffffff;
 }
 .navbar {
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /*font-family: "MavenPro";*/
   /* DEPRECATED
 	.nav > li:active, .nav > li.open {
 		//border-left-color: rgba(0, 0, 0, 0.28);
