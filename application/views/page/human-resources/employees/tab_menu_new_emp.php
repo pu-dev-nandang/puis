@@ -13,6 +13,10 @@
     #form-employee .cursor-disable{cursor: no-drop;}
     #form-employee .profile-info > h3{margin:0px;padding: 5px}
     #form-employee .profile-info > h3:first-child{font-weight: bold;text-transform: uppercase; }
+    .half-circle{border-radius: 10px;background: #eee;font-weight: bold;font-size: 12px;padding: 2px 5px;margin: 0px 8px }
+    .half-circle.blue{background: #2fa4e7;color: #fff}
+    .half-circle.orange{background: #dd5600;color: #fff}
+
 </style>
 <div id="form-employee">
     <div class="row">
@@ -25,19 +29,51 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="row">
+                        <?php 
+                        $today = date("Y-m-d");
+                        $birthDate = $employee->DateOfBirth;
+                        $diff = date_diff(date_create($birthDate), date_create($today));
+                        $myAge = $diff->format('%y');
+                        
+                        $firstJoin = $employee->JoinDate;
+                        $diffJ = date_diff(date_create($firstJoin), date_create($today));
+                        $myJobYear = $diffJ->format('%y');
+                        $myJobMonth = $diffJ->format('%m');
+                        $myJobDay = $diffJ->format('%d');
+
+                        ?>
                         <div class="col-sm-1">
                             <?php $imgPr = (!empty($employee->Photo) && file_exists('./uploads/employees/'.$employee->Photo)) ? base_url('uploads/employees/'.$employee->Photo) : base_url('images/icon/userfalse.png'); ?>
-                            <img id="imgThumbnail" src="<?php echo $imgPr; ?>" style="max-width: 100px;width: 100%;">                            
+                            <img class="img-thumbnail" id="imgThumbnail" src="<?php echo $imgPr; ?>" style="max-width: 100px;width: 100%;">                            
                         </div>
-                        <div class="col-sm-10">
+                        <div class="col-sm-4">
                             <div class="profile-info">
-                                <h3><?=$employee->Name?></h3>
+                                <h3><?=(!empty($employee->TitleAhead) ? $employee->TitleAhead.' ' : '').$employee->Name.(!empty($employee->TitleBehind) ? ', '.$employee->TitleBehind : '')?></h3>
                                 <h3><?=$employee->NIP?></h3>
                                 <h3><?=$employee->EmailPU?></h3>
+                                <h3><?=(!empty($employee->PlaceOfBirth) ? $employee->PlaceOfBirth.', ' : '').date("d F Y",strtotime($employee->DateOfBirth))?><span class="half-circle blue"><?=$myAge?> years</span></h3>
                             </div>
                         </div>
-                        <div class="col-sm-1">
-                            <button class="btn btn-primary btn-print btn-sm" type="button"><i class="fa fa-print"></i> Print ID Card</button>
+                        <div class="col-sm-5">
+                            <div class="profile-info">
+                                <h3>Division <?=$employee->DivisionMain?></h3>
+                                <h3><?=$employee->PositionMain?></h3>
+                                <h3>Join Date 
+                                <?php if(!empty($employee->JoinDate)){ ?>
+                                <?=date("d F Y",strtotime($employee->JoinDate))?> <span class="half-circle orange"><?=(!empty($myJobYear) ? $myJobYear.' years '.$myJobMonth.' months' : ( !empty($myJobMonth) ? $myJobMonth.' months '.$myJobDay.' days' : (!empty($myJobDay) ? $myJobDay.' days' : '-') ) ) ?></span>
+                                <?php }else{echo "-";} ?>
+                                </h3>
+                                <?php if(!empty($employee->ResignDate)){ ?> 
+                                <h3>Resign Date <?=date("d F Y",strtotime($employee->ResignDate))?></h3>
+                                <?php } ?>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="text-right">
+                                <button class="btn btn-success" type="button">
+                                <i class="fa fa-handshake-o"></i> <?=strtoupper($employee->EmpStatus)?>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

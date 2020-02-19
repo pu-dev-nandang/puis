@@ -844,7 +844,10 @@ class C_employees extends HR_Controler {
     public function tab_menu_new_emp($page,$NIP){
         $department = parent::__getDepartement();
         $data['page'] = $page;
-        $data['employee'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        //$data['employee'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $this->load->model('global-informations/Globalinformation_model');
+        $param[] = array("field"=>"em.NIP","data"=>" = ".$NIP." ","filter"=>"AND",);    
+        $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
         $content = $this->load->view('page/'.$department.'/employees/tab_menu_new_emp',$data,true);
         $this->temp($content);
     }
@@ -947,6 +950,9 @@ class C_employees extends HR_Controler {
             $data['NIP'] = $NIP;
             $data['status'] = $this->General_model->fetchData("db_employees.master_status",array("IsActive"=>1))->result();
             $data['division'] = $this->General_model->fetchData("db_employees.sto_temp",array( "typeNode"=>1,"isActive"=>1))->result();
+            $data['employees_status'] = $this->General_model->fetchData("db_employees.employees_status","Type != 'lec'")->result();
+            $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+            $data['currComp'] = $this->General_model->fetchData("db_employees.master_company",array("ID"=>1))->row();
             $page = $this->load->view('page/'.$department.'/employees/career-level',$data,true);
             $this->tab_menu_new_emp($page,$NIP);
         }else{show_404();}
@@ -957,6 +963,10 @@ class C_employees extends HR_Controler {
         $data = $this->input->post();
         if($data){
             $message = "";
+            if(!empty($data['JoinDate']) && !empty($data['StatusEmployeeID'])){
+                $updateDetail = $this->General_model->updateData("db_employees.employees",array("JoinDate"=>$data['JoinDate'],"ResignDate"=>(!empty($data['ResignDate']) ? $data['ResignDate'] : null),"StatusEmployeeID"=>$data['StatusEmployeeID']),array("NIP"=>$data['NIP']));
+            }
+
             if(!empty($data['startJoin'])){
                 for ($i=0; $i < count($data['startJoin']) ; $i++) {
                     $dataPost = array("NIP"=>$data['NIP'],"StartJoin"=>$data['startJoin'][$i], "EndJoin"=>$data['endJoin'][$i], "LevelID"=>$data['statusLevelID'][$i],"DepartmentID"=>$data['division'][$i],"PositionID"=>$data['position'][$i],"JobTitle"=>$data['jobTitle'][$i],"Superior"=>$data['superior'][$i],"StatusID"=>$data['statusID'][$i],"Remarks"=>$data['remarks'][$i]);
