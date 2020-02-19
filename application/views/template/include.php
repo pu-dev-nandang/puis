@@ -30,7 +30,7 @@
 <!--[if IE 8]>
 <link href="assets/css/ie8.css" rel="stylesheet" type="text/css" />
 <![endif]-->
-<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+
 
 <link rel="stylesheet" href="<?php echo base_url('assets/datepicter/css/bootstrap-datetimepicker.min.css'); ?>">
 
@@ -38,6 +38,8 @@
 <link rel="stylesheet" href="<?php echo base_url('assets/checkbox/checkbox.css'); ?>">
 
 <link rel="stylesheet" href="<?php echo base_url('assets/summernote/summernote.css'); ?>">
+
+<link rel="stylesheet" href="<?php echo base_url('assets/font/custom-font.css'); ?>">
 
 <style media="screen">
 
