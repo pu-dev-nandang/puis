@@ -313,12 +313,43 @@ class C_aphris extends HR_Controler {
                 }
                 //insert member 
                 if(!empty($NIP)){
+                    //get parent node 
+                    $ParentNode = $this->General_model->fetchData("db_employees.sto_temp",array("ID"=>$nodeID))->row();
+                    $ParentID = (!empty($ParentNode) ? $ParentNode->parentID : 0);
+                    $SuperiorParent = $this->m_hr->getMemberSTO(array("STOID"=>$ParentID))->row();
+                    $superiorNIP = (!empty($SuperiorParent) ? $SuperiorParent->NIP : '');
+                    $superiorName = (!empty($SuperiorParent) ? $superiorNIP."/".$SuperiorParent->Name : '');
+                    //end get parent node
+                    
+                    //check if division
+                    if(!empty($data['typeNode'])){
+                        if($data['typeNode'] == 1 ){
+                            //remove member old division             
+                            $deleteMember = $this->General_model->deleteData("db_employees.sto_rel_user",array("STOID"=>$nodeID));
+                        }
+                    }
+                    //end of division
+
                     for ($i=0; $i < count($NIP) ; $i++) { 
                         $checkExisMember = $this->General_model->fetchData("db_employees.sto_rel_user",array("STOID"=>$nodeID,"NIP"=>$NIP[$i]))->row();
+                        
                         if(!empty($checkExisMember)){
-                            $updateMember = $this->General_model->updateData("db_employees.sto_rel_user",array("JobTitle"=>$jobTitle[$i],"NIP"=>$NIP[$i],"StatusID"=>$StatusID[$i],"IsActive"=>$data['isActive']),array("NIP"=>$NIP[$i]));
+                            $excuteMember = $this->General_model->updateData("db_employees.sto_rel_user",array("JobTitle"=>$jobTitle[$i],"NIP"=>$NIP[$i],"StatusID"=>$StatusID[$i],"IsActive"=>$data['isActive']),array("NIP"=>$NIP[$i]));
                         }else{
-                            $insertMember = $this->General_model->insertData("db_employees.sto_rel_user",array("JobTitle"=>$jobTitle[$i],"NIP"=>$NIP[$i],"IsActive"=>$data['isActive'],"STOID"=>$nodeID,"StatusID"=>$StatusID[$i]));
+                            $excuteMember = $this->General_model->insertData("db_employees.sto_rel_user",array("JobTitle"=>$jobTitle[$i],"NIP"=>$NIP[$i],"IsActive"=>$data['isActive'],"STOID"=>$nodeID,"StatusID"=>$StatusID[$i]));
+                        }   
+
+                        //check on emp career
+                        if($excuteMember){
+                            $conditionCareer = array("NIP"=>$NIP[$i],"PositionID"=>$nodeID);
+                            $dataPostCareer = array("NIP"=>$NIP[$i],"DepartmentID"=>$ParentID,"PositionID"=>$nodeID,"JobTitle"=>$jobTitle[$i],"Superior"=>$superiorName,"StatusID"=>$StatusID[$i]);
+
+                            $isCareer = $this->General_model->fetchData("db_employees.employees_career",$conditionCareer)->row();
+                            if(!empty($isCareer)){
+                                $updateCareer = $this->General_model->updateData("db_employees.employees_career",$dataPostCareer,$conditionCareer);
+                            }else{
+                                $insertCareer = $this->General_model->insertData("db_employees.employees_career",$dataPostCareer);
+                            }
                         }
                     }
                 }
@@ -361,13 +392,37 @@ class C_aphris extends HR_Controler {
         if($data){
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
-            $conditions = array("NIP"=>$data_arr['NIP']);
-            $isExist = $this->General_model->fetchData("db_employees.sto_rel_user",$conditions)->row();
-            if(!empty($isExist)){
-                $delete = $this->General_model->deleteData("db_employees.sto_rel_user",array("NIP"=>$data_arr['NIP'],"STOID"=>$data_arr['STOID']));
-                $message = (($delete) ? "Successfully":"Failed")." removed.";
-            }else{$message = "Node is not found.";}
+            if(!empty($data_arr['NIP'])){
+                $conditions = array("NIP"=>$data_arr['NIP']);
+                $isExist = $this->General_model->fetchData("db_employees.sto_rel_user",$conditions)->row();
+                if(!empty($isExist)){
+                    $delete = $this->General_model->deleteData("db_employees.sto_rel_user",array("NIP"=>$data_arr['NIP'],"STOID"=>$data_arr['STOID']));
+                    
+                    $message = (($delete) ? "Successfully":"Failed")." removed.";
+                }else{$message = "Node is not found.";}
 
+                $json = array("message"=>$message);
+            }
+        }
+
+        echo json_encode($json);
+    }
+
+
+    public function changeNodeSTO(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            if(!empty($data_arr['NODE']) && !empty($data_arr['PARENT'])){
+                $isExist = $this->General_model->fetchData("db_employees.sto_temp","ID = ".$data_arr['NODE']." or ID = ".$data_arr['PARENT'])->result();                
+                if(!empty($isExist)){
+                    $update = $this->General_model->updateData("db_employees.sto_temp",array("parentID"=>$data_arr['PARENT']),array("ID"=>$data_arr['NODE']));
+                    $message = (($update) ? "Successfully":"Failed")." saved.";
+                }else{$message="Node not founded.";}
+
+            }else{ $message = "There's no Node selected."; }
             $json = array("message"=>$message);
         }
 

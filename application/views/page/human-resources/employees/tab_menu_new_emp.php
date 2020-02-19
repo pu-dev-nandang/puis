@@ -111,7 +111,7 @@
         cloneRow.find("td select.select2-tmp").attr("id","select2-"+fieldName+"-"+num);
         cloneRow.find("td select.select2-sd").attr("id","select2SD-"+fieldName+"-"+num);
         
-        cloneRow.find("td input.select2-term-ft").attr("id","select2-term-ft-"+fieldName+"-"+num).removeClass("select2-offscreen").removeClass();
+        cloneRow.find("td input.select2-term-ft").attr("id","select2-term-ft-"+fieldName+"-"+num).removeClass("select2-offscreen");
         cloneRow.find("td input.select2-term-sd").attr("id","select2-term-sd-"+fieldName+"-"+num).removeClass("select2-offscreen");
 
         cloneRow.find("td:first").text(num);

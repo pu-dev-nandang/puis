@@ -1,31 +1,8 @@
 <style type="text/css">.no-pad{padding: 0px;}</style>
 <script type="text/javascript">
 	function select2GetDivision($element) {
-        $element.select2({
-            ajax: { 
-                url: base_url_js+'human-resources/master-aphris/fetch-division',
-                type: "post",
-                dataType: 'json',
-                delay: 250,
-                data: function (term,status) {
-                  return {
-                    term: term
-                  };
-                },
-                results: function (data) {
-                    return {
-                        results: $.map(data, function (item) {
-                            return {
-                                text: item.title,
-                                slug: item.description,
-                                id: item.ID
-                            }
-                        })
-                    };
-                },
-               cache: true
-            },width : '100%'
-        }).on('change', function(){
+        $element.select2({width : '100%'})
+        .on('change', function(){
           var itsme = $(this);
           var ID = itsme.val();
           //ambil superior/headnya
@@ -37,8 +14,8 @@
         });
     }
 
-    function select2GetPosition($element,$parentID) {
-		$element.select2({
+    function select2GetPosition($element,$parentID,$value=0,$valueName="") {
+		var selectBox = $element.select2({
             ajax: { 
                 url: base_url_js+'human-resources/master-aphris/fetch-position',
                 type: "post",
@@ -62,9 +39,12 @@
                     };
                 },
                cache: true
-            }
+            },width:"100%"
         });
-        $element.prop("disabled",false);
+        if($value != 0 && $.trim($valueName).length > 0){
+            selectBox.select2('data', {id: $value, text: $valueName});            
+        }
+        selectBox.prop("disabled",false);
 	}
 
 
@@ -88,17 +68,10 @@
                 if(jQuery.isEmptyObject(response)){
                     alert("Data not founded. Try again.");
                 }else{
-                    console.log($element);
                     $element.val(response.NIP+"/"+response.Name);
                 }
             }
         });
-    }
-
-
-    function testAja(num) {
-        console.log(num);
-        return "result:"+num; 
     }
 
     $(document).ready(function(){
@@ -109,17 +82,32 @@
             changeYear: true,
             changeMonth: true
         });
-        select2GetDivision($("#select2-term-ft-career"));
+        $("#select2-career").select2({width:'100%'});
+        //select2GetDivision($("#select2-career"));
 
         $("#form-additional-info .btn-submit").click(function(){
             var itsme = $(this);
             var itsform = itsme.parent().parent().parent();
+            itsform.find(".select2-req").each(function(){
+                var value = $(this).val();
+                console.log("select2");
+                if($.trim(value) == ''){
+                    $(this).parent().find(".text-message").text("Please fill this field");
+                    error = false;  
+                    console.log($(this));                  
+                }else{
+                    error = true;
+                    $(this).parent().find(".text-message").text("");
+                }
+            });
             itsform.find(".required").each(function(){
                 var value = $(this).val();
+                console.log("required");
                 if($.trim(value) == ''){
                     $(this).addClass("error");
                     $(this).parent().find(".text-message").text("Please fill this field");
                     error = false;
+                    console.log($(this));                                      
                 }else{
                     error = true;
                     $(this).removeClass("error");
@@ -135,9 +123,76 @@
                 alert("Please fill out the field.");
             }
         });
+
+        
+        $("#form-additional-info").on("change",".select2-tmp",function(){
+            var itsme = $(this);
+            var ID = itsme.val();
+
+            $superior = itsme.parent().parent().find("#superior");
+            getSuperior(ID,$superior);
+            $positionSelect2 = itsme.parent().next().find(".select2-term-sd");
+            $positionSelect2.addClass("no-pad");
+            select2GetPosition($positionSelect2,ID);
+        });
+
+        var myData = fetchAdditionalData("<?=$NIP?>");
+        if(!jQuery.isEmptyObject(myData)){
+            if(!jQuery.isEmptyObject(myData.MyCareer)){
+                $tablename = $("#table-list-career"); var num = 1;
+                $.each(myData.MyCareer,function(key,value){
+                    $cloneRow = $tablename.find("tbody > tr:last").clone();
+                    $cloneRow.attr("data-table","employees_career").attr("data-id",value.ID).attr("data-name",value.JobTitle);
+                    $cloneRow.find("td:first").text(num);
+                    var DeptID = 0; var selectBoxDept = ""; var PositionID = 0;
+                    $.each(value,function(k,v){
+                        $cloneRow.find(".career-"+k).val(v);    
+                        if(k == "StartJoin"){
+                            var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-career-"+num).removeClass("hasDatepicker");
+                            cc.datepicker({
+                                dateFormat: 'yy-mm-dd',
+                                changeYear: true,
+                                changeMonth: true
+                            });
+                        }  
+                        if(k == "EndJoin"){
+                            var cc = $cloneRow.find(".datepicker-sd").attr("id","datePickerSD-career-"+num).removeClass("hasDatepicker");
+                            cc.datepicker({
+                                dateFormat: 'yy-mm-dd',
+                                changeYear: true,
+                                changeMonth: true
+                            });
+                        }  
+                        if(k == "DepartmentID"){
+                            var cc = $cloneRow.find(".select2-tmp").attr("id","select2-career-"+num);
+                            cc.prev().remove();
+                            cc.select2({width:'100%'});
+                            DeptID = v; 
+                            
+                            selectBoxDept = $cloneRow.find(".select2-term-sd").attr("id","select2SD-career-"+num);
+                            selectBoxDept.addClass("no-pad");
+                            selectBoxDept.prev().remove();
+                            select2GetPosition(selectBoxDept,DeptID);
+                        }
+                        if(k == "PositionID"){
+                            PositionID = v;
+                        }
+
+                        if(k == "PositionName"){
+                            select2GetPosition(selectBoxDept,DeptID,PositionID,v);
+                        }
+                    });
+                    
+                    $tablename.find("tbody").append($cloneRow);
+                    num++;
+                });
+                $tablename.find("tbody tr:first").remove();
+            }
+        }
     });
 </script>
-<form id="form-additional-info" action="" method="post" autocomplete="off">
+<form id="form-additional-info" action="<?=base_url('human-resources/employees/career-level-save')?>" method="post" autocomplete="off">
+    <input type="hidden" name="NIP" value="<?=$NIP?>">
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h4 class="panel-title"><i class="fa fa-edit"></i> Please fill up this form with correctly data</h4>
@@ -177,12 +232,12 @@
         						<tbody>
         							<tr>
         								<td>1</td>
-        								<td><input type="hidden" class="form-control required" required name="careerID[]">
-        									<input type="text" class="form-control required datepicker-tmp" id="datePicker-career" required name="startJoin[]" placeholder="Start Date" >
+        								<td><input type="hidden" class="form-control career-ID" name="careerID[]" >
+        									<input type="text" class="form-control required datepicker-tmp career-StartJoin" id="datePicker-career" required name="startJoin[]" placeholder="Start Date" >
         									<small class="text-danger text-message"></small></td>
-        								<td><input type="text" class="form-control required datepicker-sd" id="datePickerSD-career" required name="endJoin[]" placeholder="End Date">
+        								<td><input type="text" class="form-control required datepicker-sd career-EndJoin" id="datePickerSD-career" required name="endJoin[]" placeholder="End Date">
         									<small class="text-danger text-message"></small></td>
-        								<td><select class="form-control required" name="statusLevelID[]" required>
+        								<td><select class="form-control required career-LevelID" name="statusLevelID[]" required>
         									<option value="">Choose Level</option>
         									<?php if(!empty($status)){
         									foreach ($status as $s) {        										
@@ -190,14 +245,20 @@
     										} } ?>
         								</select>
         								<small class="text-danger text-message"></small></td>
-        								<td><input type="text" class="form-control no-pad required select2-term-ft" id="select2-term-ft-career">                                        
+        								<td>
+                                        <select class="form-control select2-req no-pad select2-tmp career-DepartmentID" name="division[]" id="select2-career" required>
+                                            <option value="">Choose one</option>
+                                            <?php if(!empty($division)){ 
+                                            foreach ($division as $d) { ?>
+                                            <option value="<?=$d->ID?>"><?=$d->title?></option>
+                                            <?php } } ?>
+                                        </select>
         								<small class="text-danger text-message"></small></td>
-        								<td><input type="text" class="form-control required select2-term-sd" id="select2-term-sd-career">
-
+        								<td><input type="text" class="form-control select2-term-sd position select2-req career-PositionID" id="select2-term-sd-career" name="position[]">
         								<small class="text-danger text-message"></small></td>
-        								<td><input type="text" name="jobTitle[]" class="form-control required" required></td>
-        								<td><input type="text" name="superior[]" readonly class="form-control required" id="superior" required><small class="text-danger text-message"></small></td>
-        								<td><select class="form-control required" name="statusID[]" required>
+        								<td><input type="text" name="jobTitle[]" class="form-control required career-JobTitle" required></td>
+        								<td><input type="text" name="superior[]" readonly class="form-control required career-Superior" id="superior" required><small class="text-danger text-message"></small></td>
+        								<td><select class="form-control required career-StatusID" name="statusID[]" required>
         									<option value="">Choose Status</option>
         									<?php if(!empty($status)){
         									foreach ($status as $ss) {
@@ -206,7 +267,7 @@
     										} } } ?>
         								</select>
         								<small class="text-danger text-message"></small></td>
-        								<td><input type="text" class="form-control" name="remarks[]" ></td>
+        								<td><input type="text" class="form-control career-Remarks" name="remarks[]" ></td>
         							</tr>
         						</tbody>
         					</table>

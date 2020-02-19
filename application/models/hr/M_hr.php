@@ -91,11 +91,22 @@ class M_hr extends CI_Model {
     }
 
     public function getTitleSTO($keyword=null){
-        $query = "select a.Position as Name, a.Description from db_employees.position a where a.Description like '%".$keyword."%'
+        $query = "select a.Position as Name, a.Description from db_employees.position a where a.Description like '%".$keyword."%' or a.Position like '%".$keyword."%'
                   union 
-                  select b.Division as Name, b.Description from db_employees.division b where b.Description like '%".$keyword."%' ";
+                  select b.Division as Name, b.Description from db_employees.division b where b.Description like '%".$keyword."%' or b.Division like '%".$keyword."%' ";
         $result = $this->db->query($query);
         return $result;
+    }
+
+    public function getEmpCareer($data){
+        $this->db->select("a.*, b.name as LevelName, c.title as DepartmentName, d.title as PositionName");
+        $this->db->from("db_employees.employees_career a");
+        $this->db->join("db_employees.master_level b","b.ID=a.LevelID","left");
+        $this->db->join("db_employees.sto_temp c","c.ID=a.DepartmentID","left");
+        $this->db->join("db_employees.sto_temp d","d.ID=a.PositionID","left");
+        $this->db->where($data);
+        $query = $this->db->get();
+        return $query;
     }
     /*END ADDED BY FEBRI @ FEB 2020*/
 

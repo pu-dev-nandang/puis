@@ -169,11 +169,16 @@
 						<small class="text-danger text-message"></small>
 					</div>
 				</div>
-				<div class="col-sm-4">
+				<div class="col-sm-3">
 					<div class="form-group">
 						<label>Job title</label>
 						<input type="text" class="form-control job-title" name="jobtitle[]" value="<?=$m->JobTitle?>">
 						<small class="text-danger text-message"></small>
+					</div>
+				</div>
+				<div class="col-sm-1 remove-row">
+					<div style="line-height:6">
+						<button class="btn btn-sm btn-danger btn-remove-row-user" data-nip="<?=$m->NIP?>" data-id="<?=$detail->ID?>" type="button"><i class="fa fa-trash"></i></button>
 					</div>
 				</div>
 			</div>
@@ -299,11 +304,12 @@
 				cloneRow.find(".form-control").val("").addClass("required");
 				cloneRow.find(".nip").val(NIP);
 				cloneRow.find(".name").val(Name);
+				cloneRow.find(".remove-row").remove();
 				if(typeNode == 2){
 					$formPost.find("#list-emp .panel-body .list-multiple-row").append(cloneRow);				
 				}else{
-					$formPost.find("#list-emp .panel-body .list-multiple-row").html(cloneRow);			
-					
+					$formPost.find("#list-emp .panel-body .multiple-row").remove();
+					$formPost.find("#list-emp .panel-body .list-multiple-row").html(cloneRow);
 				}
 				$formPost.find("#list-emp .multiple-row.hidden").remove();
 			}
@@ -430,13 +436,47 @@
 			$lastRow = $formPost.find("#list-emp .multiple-row:last");
 			var checkAttr = $lastRow.attr("data-table");
 			if (typeof checkAttr !== typeof undefined && checkAttr !== false) {
-				var NIP = itsme.data("nip");
-				var ID = itsme.data("id");
+				var NIP = $lastRow.data("nip");
+				var ID = $lastRow.data("id");
 				var data = {
 		          NIP : NIP ,
-		          ID : ID
+		          STOID : ID
 		      	};
 		      	var token = jwt_encode(data,'UAP)(*');
+		      	if(confirm("Are you sure wants to remove this "+NIP+" ?")){
+					$.ajax({
+					    type : 'POST',
+					    url : base_url_js+"human-resources/master-aphris/delete-sto-user",
+					    data : {token:token},
+					    dataType : 'json',
+					    error : function(jqXHR){
+					    	$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+			                    '<h4 class="modal-title">Error Fetch Student Data</h4>');
+			                $('#GlobalModal .modal-body').html(jqXHR.responseText);
+					    },success : function(response){
+					    	if(!jQuery.isEmptyObject(response)){					    		
+					    		$lastRow.remove();
+					    	}
+					    }
+					});
+				}
+			}else{
+				$lastRow.remove();
+			}
+		});
+
+
+		$formPost.on("click",".btn-remove-row-user",function(){
+			var itsme = $(this);			
+			var NIP = itsme.data("nip");
+			var ID = itsme.data("id");
+			var parent = itsme.parent().parent().parent();
+			var data = {
+	          NIP : NIP ,
+	          STOID : ID
+	      	};
+	      	var token = jwt_encode(data,'UAP)(*');
+	      	if(confirm("Are you sure wants to remove this "+NIP+" ?")){
 				$.ajax({
 				    type : 'POST',
 				    url : base_url_js+"human-resources/master-aphris/delete-sto-user",
@@ -447,20 +487,11 @@
 		                    '<h4 class="modal-title">Error Fetch Student Data</h4>');
 		                $('#GlobalModal .modal-body').html(jqXHR.responseText);
 				    },success : function(response){
-				    	if(!jQuery.isEmptyObject(response)){
-				    		var appendList = '<div class="emp-list">';
-				    		$.each(response,function(key,value){
-				    			appendList += '<p class="usr-select"><span>'+value.Description+'</span> ('+value.Name+')</p>';
-				    		});
-				    		appendList += '</div>';
-				    		$formPost.find(".autocomplete-position-name .load-list").css({display:'block'}).html(appendList);
-				    	}else{
-				    		$formPost.find(".autocomplete-position-name .load-list").html("").css({display:'none'});
+				    	if(!jQuery.isEmptyObject(response)){					    		
+				    		parent.remove();
 				    	}
 				    }
 				});
-			}else{
-				$lastRow.remove();
 			}
 		});
 
