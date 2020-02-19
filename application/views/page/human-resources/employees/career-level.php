@@ -77,7 +77,7 @@
     $(document).ready(function(){
         $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
         $("#form-employee .tabulasi-emp > ul > li.nv-career").addClass("active");
-        $("#datePicker-career,#datePickerSD-career").datepicker({
+        $("#datePicker-career,#datePickerSD-career,#JoinDate,#ResignDate").datepicker({
             dateFormat: 'yy-mm-dd',
             changeYear: true,
             changeMonth: true
@@ -198,6 +198,48 @@
             <h4 class="panel-title"><i class="fa fa-edit"></i> Please fill up this form with correctly data</h4>
         </div>
         <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                Status Employee
+                            </h4>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-bordered" id="table-status-emp">
+                                <thead>
+                                    <tr>
+                                        <th width="15%">Company</th>
+                                        <th>Join Date</th>
+                                        <th>Resign Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><?=(!empty($currComp) ? $currComp->Name: '')?></td>
+                                        <td><input type="text" name="JoinDate" class="form-control required" required id="JoinDate" value="<?=(!empty($detail) ? $detail->JoinDate : null)?>">
+                                        <small class="text-danger text-message"></small></td>
+                                        <td><input type="text" name="ResignDate" class="form-control" id="ResignDate" value="<?=(!empty($detail) ? $detail->ResignDate : null)?>">
+                                        <small class="text-danger text-message"></small></td>
+                                        <td><select class="form-control required" required name="StatusEmployeeID">
+                                            <option value="">Choose one</option>
+                                            <?php if(!empty($employees_status)){
+                                            foreach ($employees_status as $e) {
+                                                if(!empty($detail)){
+                                                    $selected = ($detail->StatusEmployeeID == $e->ID) ? "selected":"";
+                                                }else {$selected="";}
+                                                    echo '<option value="'.$e->IDStatus.'" '.$selected.'>'.$e->Description.'</option>';                                                
+                                             } } ?>
+                                        </select></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         	<div class="row">
         		<div class="col-sm-12">
         			<div class="panel panel-default" id="multiple-field" data-source="career">
@@ -247,7 +289,7 @@
         								<small class="text-danger text-message"></small></td>
         								<td>
                                         <select class="form-control select2-req no-pad select2-tmp career-DepartmentID" name="division[]" id="select2-career" required>
-                                            <option value="">Choose one</option>
+                                            <option>Choose one</option>
                                             <?php if(!empty($division)){ 
                                             foreach ($division as $d) { ?>
                                             <option value="<?=$d->ID?>"><?=$d->title?></option>
