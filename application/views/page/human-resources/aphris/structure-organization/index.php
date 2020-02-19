@@ -10,6 +10,31 @@
 <script type="text/javascript" src="<?=base_url('assets/OrgChart/dist/js/jquery.orgchart.js')?>"></script>
 <script type="text/javascript" src="<?=base_url('assets/OrgChart/dist/js/html2canvas.min.js')?>"></script>
 <script type="text/javascript">
+	function updateNode(nodeID,parentID) {
+		if(nodeID!=null && parentID!=null){		
+			var data = {
+	          NODE 	: nodeID,
+	          PARENT : parentID,
+	      	};
+	      	var token = jwt_encode(data,'UAP)(*');
+	      	$.ajax({
+			    type : 'POST',
+			    url : base_url_js+"human-resources/master-aphris/change-node",
+			    data : {token:token},
+			    dataType : 'json',
+	            error : function(jqXHR){
+	            	$("body #GlobalModal .modal-body").html(jqXHR.responseText);
+		      	  	$("body #GlobalModal").modal("show");
+			    },success : function(response){
+	            	if(!jQuery.isEmptyObject(response)){
+	            		toastr.info(response.message,'INFO!');
+	            	}else{alert("Failed change node.");}
+			    }
+			});
+		}
+	}
+
+
 	function filterNodes(keyWord) {
 	    if(!keyWord.length) {
 	      window.alert('Please type key word firstly.');
@@ -43,6 +68,7 @@
 	      });
 	    }
   	}
+
 
 	function clearFilterResult() {
 		$('.orgchart').removeClass('noncollapsable')
@@ -89,6 +115,7 @@
 		      'zoom': true,
 		      'responseTime': 1000,
 		      'exportButton': false,
+		      'draggable': true,
 	      	  'exportFilename': 'PU-Stuctured-Organization'
 		    });
 		}else{}
@@ -162,6 +189,34 @@
     .orgchart .middle-level .content { border-color: #006699; }
     .orgchart .node.matched { background-color: rgba(238, 217, 54, 0.5); }
     .orgchart .node .edge { display: none; }
+    .orgchart .node .content{ height: auto;min-height: 28px;max-height: 100px;overflow: auto;cursor: pointer !important;}
+
+/*
+ *  STYLE 6
+ */
+
+.orgchart .node .content::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+
+.orgchart .node .content::-webkit-scrollbar
+{
+	width: 5px;
+	background-color: #F5F5F5;
+}
+
+.orgchart .node .content::-webkit-scrollbar-thumb
+{
+	background-color: #0ae;
+	
+	background-image: -webkit-gradient(linear, 0 0, 0 100%,
+	                   color-stop(.5, rgba(255, 255, 255, .2)),
+					   color-stop(.5, transparent), to(transparent));
+}
+
+
 </style>
 
 

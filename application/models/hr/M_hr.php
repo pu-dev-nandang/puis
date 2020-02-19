@@ -81,10 +81,29 @@ class M_hr extends CI_Model {
 
     /*ADDED BY FEBRI @ FEB 2020*/
     public function getMemberSTO($data){
-        $this->db->select("a.STOID,a.JobTitle,a.IsActive, a.LevelID, c.*");
+        $this->db->select("a.STOID,a.JobTitle,a.IsActive, a.StatusID, c.*");
         $this->db->from("db_employees.sto_rel_user a");
         $this->db->join("db_employees.sto_temp b","a.STOID = b.ID","left");
         $this->db->join("db_employees.employees c","c.NIP = a.NIP","left");
+        $this->db->where($data);
+        $query = $this->db->get();
+        return $query;
+    }
+
+    public function getTitleSTO($keyword=null){
+        $query = "select a.Position as Name, a.Description from db_employees.position a where a.Description like '%".$keyword."%' or a.Position like '%".$keyword."%'
+                  union 
+                  select b.Division as Name, b.Description from db_employees.division b where b.Description like '%".$keyword."%' or b.Division like '%".$keyword."%' ";
+        $result = $this->db->query($query);
+        return $result;
+    }
+
+    public function getEmpCareer($data){
+        $this->db->select("a.*, b.name as LevelName, c.title as DepartmentName, d.title as PositionName");
+        $this->db->from("db_employees.employees_career a");
+        $this->db->join("db_employees.master_level b","b.ID=a.LevelID","left");
+        $this->db->join("db_employees.sto_temp c","c.ID=a.DepartmentID","left");
+        $this->db->join("db_employees.sto_temp d","d.ID=a.PositionID","left");
         $this->db->where($data);
         $query = $this->db->get();
         return $query;
