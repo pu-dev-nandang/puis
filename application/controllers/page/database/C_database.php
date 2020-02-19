@@ -349,8 +349,15 @@ class C_database extends Globalclass {
         $data['statusstd'] = $this->General_model->fetchData("db_academic.status_student",array())->result();
         $data['religion'] = $this->General_model->fetchData("db_admission.agama",array())->result();
         $data['yearIntake'] = $this->General_model->fetchData("db_academic.semester",array(),null,null,null,"Year")->result();
+
+        // Updated by Adhi 19-02-2020
+        $data['rest_setting_alumni'] = $this->m_master->showData_array('db_alumni.rest_setting');
+        // END by Adhi 19-02-2020
         $content = $this->load->view('page/database/students',$data,true);
         /*END UPDATED BY FEBRI @ JAN 2020*/
+
+
+
         $this->temp($content);
     }
 
