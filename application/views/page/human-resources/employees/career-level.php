@@ -77,7 +77,7 @@
     $(document).ready(function(){
         $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
         $("#form-employee .tabulasi-emp > ul > li.nv-career").addClass("active");
-        $("#datePicker-career,#datePickerSD-career,#JoinDate,#ResignDate").datepicker({
+        $("#datePicker-career,#datePickerSD-career,#datePicker-join,#datePickerSD-join").datepicker({
             dateFormat: 'yy-mm-dd',
             changeYear: true,
             changeMonth: true
@@ -90,11 +90,9 @@
             var itsform = itsme.parent().parent().parent();
             itsform.find(".select2-req").each(function(){
                 var value = $(this).val();
-                console.log("select2");
                 if($.trim(value) == ''){
                     $(this).parent().find(".text-message").text("Please fill this field");
                     error = false;  
-                    console.log($(this));                  
                 }else{
                     error = true;
                     $(this).parent().find(".text-message").text("");
@@ -102,12 +100,10 @@
             });
             itsform.find(".required").each(function(){
                 var value = $(this).val();
-                console.log("required");
                 if($.trim(value) == ''){
                     $(this).addClass("error");
                     $(this).parent().find(".text-message").text("Please fill this field");
                     error = false;
-                    console.log($(this));                                      
                 }else{
                     error = true;
                     $(this).removeClass("error");
@@ -177,10 +173,43 @@
                         if(k == "PositionID"){
                             PositionID = v;
                         }
-
                         if(k == "PositionName"){
                             select2GetPosition(selectBoxDept,DeptID,PositionID,v);
                         }
+                    });
+                    
+                    $tablename.find("tbody").append($cloneRow);
+                    num++;
+                });
+                $tablename.find("tbody tr:first").remove();
+            }
+
+            if(!jQuery.isEmptyObject(myData.MyHistorical)){
+                $tablename = $("#table-list-join"); var num = 1;
+                $.each(myData.MyHistorical,function(key,value){
+                    $cloneRow = $tablename.find("tbody > tr:last").clone();
+                    $cloneRow.attr("data-table","employees_joindate").attr("data-id",value.ID).attr("data-name",value.JobTitle);
+                    $cloneRow.find("td:first").text(num);
+                    var DeptID = 0; var selectBoxDept = ""; var PositionID = 0;
+                    $.each(value,function(k,v){
+                        $cloneRow.find(".join-"+k).val(v);
+                        if(k == "JoinDate"){
+                            var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-join-"+num).removeClass("hasDatepicker");
+                            cc.datepicker({
+                                dateFormat: 'yy-mm-dd',
+                                changeYear: true,
+                                changeMonth: true
+                            });
+                        } 
+                        if(k == "ResignDate"){
+                            var cc = $cloneRow.find(".datepicker-sd").attr("id","datePickerSD-join-"+num).removeClass("hasDatepicker");
+                            cc.datepicker({
+                                dateFormat: 'yy-mm-dd',
+                                changeYear: true,
+                                changeMonth: true
+                            });
+                        } 
+
                     });
                     
                     $tablename.find("tbody").append($cloneRow);
@@ -200,17 +229,28 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="panel panel-default">
+                    <div class="panel panel-default" id="multiple-field" data-source="join">
                         <div class="panel-heading">
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <button class="btn btn-default btn-xs btn-add" type="button">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                    <button class="btn btn-default btn-xs btn-remove" type="button">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
                             <h4 class="panel-title">
                                 Status Employee
                             </h4>
                         </div>
                         <div class="panel-body">
-                            <table class="table table-bordered" id="table-status-emp">
+                            <h3 style="margin-top:0px "><?=(!empty($currComp) ? $currComp->Name: '')?></h3>
+                            <table class="table table-bordered" id="table-list-join">
                                 <thead>
-                                    <tr>
-                                        <th width="15%">Company</th>
+                                    <tr>                                        
+                                        <th width="2%">No</th>
                                         <th>Join Date</th>
                                         <th>Resign Date</th>
                                         <th>Status</th>
@@ -218,19 +258,18 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><?=(!empty($currComp) ? $currComp->Name: '')?></td>
-                                        <td><input type="text" name="JoinDate" class="form-control required" required id="JoinDate" value="<?=(!empty($detail) ? $detail->JoinDate : null)?>">
+                                        <td>1</td>
+                                        <td>
+                                        <input type="hidden" class="form-control join-ID" name="joinID[]">
+                                        <input type="text" name="JoinDate[]" class="form-control required datepicker-tmp join-JoinDate" required id="datePicker-join">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" name="ResignDate" class="form-control" id="ResignDate" value="<?=(!empty($detail) ? $detail->ResignDate : null)?>">
+                                        <td><input type="text" name="ResignDate[]" class="form-control datepicker-sd join-ResignDate" id="datePickerSD-join">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><select class="form-control required" required name="StatusEmployeeID">
+                                        <td><select class="form-control required join-StatusEmployeeID" required name="StatusEmployeeID[]">
                                             <option value="">Choose one</option>
                                             <?php if(!empty($employees_status)){
                                             foreach ($employees_status as $e) {
-                                                if(!empty($detail)){
-                                                    $selected = ($detail->StatusEmployeeID == $e->ID) ? "selected":"";
-                                                }else {$selected="";}
-                                                    echo '<option value="'.$e->IDStatus.'" '.$selected.'>'.$e->Description.'</option>';                                                
+                                                echo '<option value="'.$e->IDStatus.'" >'.$e->Description.'</option>';                                                
                                              } } ?>
                                         </select></td>
                                     </tr>
@@ -261,7 +300,7 @@
         						<thead>
         							<tr>
         								<th width="2%">No</th>
-        								<th colspan="2">Site Date</th>
+        								<th colspan="2">Start/Site Date</th>
         								<th>Level</th>
         								<th width="10%">Dept</th>
         								<th width="10%">Position</th>
@@ -277,7 +316,7 @@
         								<td><input type="hidden" class="form-control career-ID" name="careerID[]" >
         									<input type="text" class="form-control required datepicker-tmp career-StartJoin" id="datePicker-career" required name="startJoin[]" placeholder="Start Date" >
         									<small class="text-danger text-message"></small></td>
-        								<td><input type="text" class="form-control required datepicker-sd career-EndJoin" id="datePickerSD-career" required name="endJoin[]" placeholder="End Date">
+        								<td><input type="text" class="form-control datepicker-sd career-EndJoin" id="datePickerSD-career" name="endJoin[]" placeholder="End Date">
         									<small class="text-danger text-message"></small></td>
         								<td><select class="form-control required career-LevelID" name="statusLevelID[]" required>
         									<option value="">Choose Level</option>

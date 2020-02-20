@@ -848,6 +848,8 @@ class C_employees extends HR_Controler {
         $this->load->model('global-informations/Globalinformation_model');
         $param[] = array("field"=>"em.NIP","data"=>" = ".$NIP." ","filter"=>"AND",);    
         $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
+        $getHistoricalJoin = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$NIP),"ID","ASC")->row();
+        $data['employee']->HistoricalJoin = (!empty($getHistoricalJoin) ? $getHistoricalJoin : null);
         $content = $this->load->view('page/'.$department.'/employees/tab_menu_new_emp',$data,true);
         $this->temp($content);
     }
@@ -949,7 +951,7 @@ class C_employees extends HR_Controler {
             $department = parent::__getDepartement();
             $data['NIP'] = $NIP;
             $data['status'] = $this->General_model->fetchData("db_employees.master_status",array("IsActive"=>1))->result();
-            $data['division'] = $this->General_model->fetchData("db_employees.sto_temp",array( "typeNode"=>1,"isActive"=>1))->result();
+            $data['division'] = $this->General_model->fetchData("db_employees.sto_temp",array("isMainSTO"=>1, "typeNode"=>1,"isActive"=>1))->result();
             $data['employees_status'] = $this->General_model->fetchData("db_employees.employees_status","Type != 'lec'")->result();
             $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
             $data['currComp'] = $this->General_model->fetchData("db_employees.master_company",array("ID"=>1))->row();
@@ -963,9 +965,26 @@ class C_employees extends HR_Controler {
         $data = $this->input->post();
         if($data){
             $message = "";
-            if(!empty($data['JoinDate']) && !empty($data['StatusEmployeeID'])){
+            /*if(!empty($data['JoinDate']) && !empty($data['StatusEmployeeID'])){
                 $updateDetail = $this->General_model->updateData("db_employees.employees",array("JoinDate"=>$data['JoinDate'],"ResignDate"=>(!empty($data['ResignDate']) ? $data['ResignDate'] : null),"StatusEmployeeID"=>$data['StatusEmployeeID']),array("NIP"=>$data['NIP']));
-            }
+            }*/
+
+            if(!empty($data['JoinDate'])){
+                for ($h=0; $h < count($data['JoinDate']); $h++) { 
+                    $dataPostJoin = array("NIP"=>$data['NIP'],"JoinDate"=>$data['JoinDate'][$h],"ResignDate"=>(!empty($data['ResignDate'][$h]) ? $data['ResignDate'][$h] : null ), "StatusEmployeeID"=>$data['StatusEmployeeID'][$h]);
+                    if(!empty($data['joinID'][$h])){
+                        $isExist = $this->General_model->fetchData("db_employees.employees_joindate",array("ID"=>$data['joinID'][$h]))->row();
+                        if(!empty($isExist)){
+                            $updateJoin = $this->General_model->updateData("db_employees.employees_joindate",$dataPostJoin,array("ID"=>$data['joinID'][$h]));
+                            $message = (($updateJoin) ? "Successfully":"Failed")." updated.";                            
+                        }else{$message = "Historical join not founded.";}
+                    }else{
+                        $insertJoin = $this->General_model->insertData("db_employees.employees_joindate",$dataPostJoin);
+                        $message = (($insertJoin) ? "Successfully":"Failed")." saved.";
+                    }
+                }
+            }else{$message .= "Cannot saved. Empty dataPost";}
+            
 
             if(!empty($data['startJoin'])){
                 for ($i=0; $i < count($data['startJoin']) ; $i++) {
@@ -984,17 +1003,17 @@ class C_employees extends HR_Controler {
                                 }
                             }
                             $message = (($update) ? "Successfully":"Failed")." updated.";
-                        }else{$message="Data not founded.";}
+                        }else{$message ="Data not founded.";}
                     }else{
                         $insert = $this->General_model->insertData("db_employees.employees_career",$dataPost);
                         if($insert){
                             //insert into STO
                             $insertSTO = $this->General_model->insertData("db_employees.sto_rel_user",$dataSTOUser);
                         }
-                        $message = (($insert) ? "Successfully":"Failed")." saved.";
+                        $message .= (($insert) ? "Successfully":"Failed")." saved.";
                     }
                 }
-            }else{$message = "Cannot saved. Empty dataPost";}
+            }else{$message .= "Cannot saved. Empty dataPost";}
 
             $this->session->set_flashdata("message",$message);
             redirect(site_url('human-resources/employees/career-level/'.$data['NIP']));
@@ -1132,6 +1151,7 @@ class C_employees extends HR_Controler {
             $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();
             if(!empty($isExist)){
                 //$isExist->MyCareer = $this->General_model->fetchData("db_employees.employees_career",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyHistorical = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$isExist->NIP))->result();
                 $isExist->MyCareer = $this->m_hr->getEmpCareer(array("a.NIP"=>$isExist->NIP))->result();
                 $isExist->MyBank = $this->General_model->fetchData("db_employees.employees_bank_account",array("NIP"=>$isExist->NIP))->result();
                 $isExist->MyEducation = $this->General_model->fetchData("db_employees.employees_educations",array("NIP"=>$isExist->NIP))->result();

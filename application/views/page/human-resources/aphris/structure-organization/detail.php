@@ -7,6 +7,7 @@
     padding: 5px 10px;
     border-radius: 5px;
 }
+#filter-user .add-me.active{background: #499249;color: #fff}
 .cursor{cursor: pointer;}
 .autocomplete-position-name{margin-bottom: 10px}
 .autocomplete-position-name .load-list{
@@ -226,7 +227,7 @@
 			<label>Active</label>
 			<select class="form-control required" required name="isActive">
 				<option value="">Choose one</option>
-				<option value="1" <?=($detail->isActive == 1) ? 'selected':''?> >Active</option>
+				<option value="1" <?=($detail->isActive == 1) ? 'selected':'selected'?> >Active</option>
 				<option value="0" <?=($detail->isActive == 0) ? 'selected':''?> >Not Active</option>
 			</select>
 			<small class="text-danger text-message"></small>
@@ -297,7 +298,8 @@
 			var Name = itsme.text();
 			var firstRow = $formPost.find("#list-emp .multiple-row:first");
 			var cloneRow = firstRow.clone();
-			if(!$formPost.find("#list-emp .multiple-row").hasClass("row-"+NIP)){
+			if(!$formPost.find("#list-emp .list-multiple-row > .multiple-row").hasClass("row-"+NIP)){
+				itsme.addClass("active");
 				cloneRow.removeClass("hidden").removeClass (function (index, className) {
 				    return (className.match (/\brow-\S+/g) || []).join(' ');
 				}).addClass("row-"+NIP).removeAttr("data-table").removeAttr("data-id");
@@ -312,7 +314,10 @@
 					$formPost.find("#list-emp .panel-body .list-multiple-row").html(cloneRow);
 				}
 				$formPost.find("#list-emp .multiple-row.hidden").remove();
+			}else{
+				$formPost.find("#list-emp .panel-body .list-multiple-row").html(cloneRow);
 			}
+
 		});
 
 		$formPost.on("click",".btn-submit",function(){
@@ -325,7 +330,6 @@
 			  		$(this).addClass("error");
 			  		$(this).parent().find(".text-message").text("Please fill this field");
 			  		error = false;
-			  		console.log($(this));
 			  	}else{
 			  		error = true;
 			  		$(this).removeClass("error");
