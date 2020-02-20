@@ -100,4 +100,26 @@ class C_rest_alumni extends CI_Controller {
       }
     }
 
+    public function authAlumniAPISession(){
+      $input = $this->getInputToken();
+      $action = $input['action'];
+      switch ($action) {
+        case 'authLogin':
+          $data = $input['data'];
+          $this->callback =  $this->m_alumni->authLogin($data);
+          echo json_encode($this->callback);
+          break;
+        
+        default:
+          # code...
+          break;
+      }
+    }
+
+    public function change_photo(){
+      $input = $this->getInputToken();
+      $this->callback = $this->m_alumni->change_photo($input);
+      echo json_encode($this->callback);
+    }
+
 }
