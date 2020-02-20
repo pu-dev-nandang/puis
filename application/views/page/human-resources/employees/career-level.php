@@ -320,9 +320,9 @@
         									<small class="text-danger text-message"></small></td>
         								<td><select class="form-control required career-LevelID" name="statusLevelID[]" required>
         									<option value="">Choose Level</option>
-        									<?php if(!empty($status)){
-        									foreach ($status as $s) {        										
-        										echo '<option value="'.$s->ID.'">'.$s->name.'</option>';	
+        									<?php if(!empty($level)){
+        									foreach ($level as $l) {        										
+        										echo '<option value="'.$l->ID.'">'.$l->name.'</option>';	
     										} } ?>
         								</select>
         								<small class="text-danger text-message"></small></td>
