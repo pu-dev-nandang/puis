@@ -34,13 +34,6 @@
                         $birthDate = $employee->DateOfBirth;
                         $diff = date_diff(date_create($birthDate), date_create($today));
                         $myAge = $diff->format('%y');
-                        
-                        $firstJoin = $employee->JoinDate;
-                        $diffJ = date_diff(date_create($firstJoin), date_create($today));
-                        $myJobYear = $diffJ->format('%y');
-                        $myJobMonth = $diffJ->format('%m');
-                        $myJobDay = $diffJ->format('%d');
-
                         ?>
                         <div class="col-sm-1">
                             <?php $imgPr = (!empty($employee->Photo) && file_exists('./uploads/employees/'.$employee->Photo)) ? base_url('uploads/employees/'.$employee->Photo) : base_url('images/icon/userfalse.png'); ?>
@@ -51,7 +44,7 @@
                                 <h3><?=(!empty($employee->TitleAhead) ? $employee->TitleAhead.' ' : '').$employee->Name.(!empty($employee->TitleBehind) ? ', '.$employee->TitleBehind : '')?></h3>
                                 <h3><?=$employee->NIP?></h3>
                                 <h3><?=$employee->EmailPU?></h3>
-                                <h3><?=(!empty($employee->PlaceOfBirth) ? $employee->PlaceOfBirth.', ' : '').date("d F Y",strtotime($employee->DateOfBirth))?><span class="half-circle blue"><?=$myAge?> years</span></h3>
+                                <h3><?=(!empty($employee->PlaceOfBirth) ? $employee->PlaceOfBirth.', ' : '').date("d F Y",strtotime($employee->DateOfBirth))?><span class="half-circle blue"><?=$myAge?> years old</span></h3>
                             </div>
                         </div>
                         <div class="col-sm-5">
@@ -59,8 +52,13 @@
                                 <h3>Division <?=$employee->DivisionMain?></h3>
                                 <h3><?=$employee->PositionMain?></h3>
                                 <h3>Join Date 
-                                <?php if(!empty($employee->JoinDate)){ ?>
-                                <?=date("d F Y",strtotime($employee->JoinDate))?> <span class="half-circle orange"><?=(!empty($myJobYear) ? $myJobYear.' years '.$myJobMonth.' months' : ( !empty($myJobMonth) ? $myJobMonth.' months '.$myJobDay.' days' : (!empty($myJobDay) ? $myJobDay.' days' : '-') ) ) ?></span>
+                                <?php if(!empty($employee->HistoricalJoin)){
+                                $firstJoin = $employee->HistoricalJoin->JoinDate;
+                                $diffJ = date_diff(date_create($firstJoin), date_create($today));
+                                $myJobYear = $diffJ->format('%y');
+                                $myJobMonth = $diffJ->format('%m');
+                                $myJobDay = $diffJ->format('%d'); ?>
+                                <?=date("d F Y",strtotime($employee->HistoricalJoin->JoinDate))?> <span class="half-circle orange"><?=(!empty($myJobYear) ? $myJobYear.' years '.$myJobMonth.' months' : ( !empty($myJobMonth) ? $myJobMonth.' months '.$myJobDay.' days' : (!empty($myJobDay) ? $myJobDay.' days' : '-') ) ) ?></span>
                                 <?php }else{echo "-";} ?>
                                 </h3>
                                 <?php if(!empty($employee->ResignDate)){ ?> 

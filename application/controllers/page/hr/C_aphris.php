@@ -183,7 +183,57 @@ class C_aphris extends HR_Controler {
     public function structureOrganization(){
         $data= array();
         $department = parent::__getDepartement();
+        $data['result'] = $this->General_model->fetchData("db_employees.sto_temp",array("parentID"=>0))->result();
         $page = $this->load->view('page/'.$department.'/aphris/structure-organization/index',$data,true);
+        $this->temp($page);
+    }
+
+    public function structureOrganizationDetail(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist  = $this->General_model->fetchData("db_employees.sto_temp",array("ID"=>$data_arr['ID']))->row();
+            if(!empty($isExist)){
+                $json = $isExist;
+            }
+        }
+        echo json_encode($json);
+    }
+
+
+    public function structureOrganizationSave(){
+        $data = $this->input->post();
+        if($data){
+            if(!empty($data['ID'])){
+                $isExist = $this->General_model->fetchData("db_employees.sto_temp",array("ID"=>$data['ID']))->row();
+                if($isExist){
+                    $update = $this->General_model->updateData("db_employees.sto_temp",$data,array("ID"=>$data['ID']));
+                    $message = (($update) ? "Successfully":"Failed")." updated.";
+                }else{$message = "Data not founded";}
+            }else{
+                $insert = $this->General_model->insertData("db_employees.sto_temp",$data);
+                $message = (($insert) ? "Successfully":"Failed")." saved.";
+            }
+
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('human-resources/master-aphris/structure-organization')); 
+
+        }else{show_404();}
+    }
+
+    public function structureOrganizationView(){
+        $data= array();
+        $department = parent::__getDepartement();
+        $Heading = $this->uri->segment(4);
+        $STOID = $this->uri->segment(5);
+        if(!empty($STOID) && !empty($Heading)){
+            $data["title"] = str_replace("-", " ", $Heading);
+            $explode = explode("STOPU00", $STOID);
+            $data["STOID"] = (!empty($explode[1]) ? $explode[1] : '');
+        }
+        $page = $this->load->view('page/'.$department.'/aphris/structure-organization/view',$data,true);
         $this->temp($page);
     }
 
@@ -192,7 +242,7 @@ class C_aphris extends HR_Controler {
         $data = $this->input->post();
         $json = array();
         //get parent sto
-        $parent = $this->General_model->fetchData("db_employees.sto_temp",array("isActive"=>1,"parentID"=>0),"ID","desc")->row();
+        $parent = $this->General_model->fetchData("db_employees.sto_temp",array("ID"=>$data['STOID'],"parentID"=>0),"ID","desc")->row();
         if(!empty($parent)){
             $member = $this->m_hr->getMemberSTO(array("a.STOID"=>$parent->ID))->row();
             $name = (!empty($member) ? (!empty($member->TitleAhead) ? $member->TitleAhead.' ' : '').$member->Name.(!empty($member->TitleBehind) ? ' '.$member->TitleBehind : ''):'-');
@@ -461,7 +511,7 @@ class C_aphris extends HR_Controler {
     public function fetchPosition(){
         $data = $this->input->post();
         if($data){
-            $response = $this->General_model->fetchData("db_employees.sto_temp","title like '%".$data['term']."%' and typeNode = 2 and isActive=1 and parentID = ".$data['id'])->result();
+            $response = $this->General_model->fetchData("db_employees.sto_temp","title like '%".$data['term']."%' and isActive=1 and parentID = ".$data['id'])->result();
             echo json_encode($response);
         }
     }

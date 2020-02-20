@@ -58,14 +58,14 @@
                         <li class="<?= ($this->uri->segment(3)==$tb) ? 'current' : ''?>">
                             <a href="<?=site_url('human-resources/master-aphris/'.$tb)?>">
                                 <i class="icon-angle-right"></i>
-                                <?php $expl = explode("master_", $tb); echo str_replace("_", " ", strtoupper($expl[1]));?>
+                                <?php $expl = explode("master_", $tb); echo str_replace("_", " ", ucfirst($expl[1]));?>
                             </a>
                         </li>
                         <?php } ?>
                         <li class="<?= ($this->uri->segment(3)=='structure-organization') ? 'current' : ''?>">
                             <a href="<?=site_url('human-resources/master-aphris/structure-organization')?>">
                                 <i class="icon-angle-right"></i>
-                                <span style="text-transform:uppercase">Structure Organization</span>
+                                <span>Structure Organization</span>
                             </a>
                         </li>
                     </ul>
