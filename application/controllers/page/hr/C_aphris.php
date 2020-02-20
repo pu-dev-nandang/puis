@@ -349,12 +349,15 @@ class C_aphris extends HR_Controler {
             //get highest level
             $isHighest = $this->General_model->fetchData("db_employees.sto_temp",array("ID"=>$data['URIID']))->row();
             $URI = 'human-resources/master-aphris/';
+            $isMain = null;
             if(!empty($isHighest)){
+                $isMain = ($isHighest->isMainSTO == 1) ? 1 : null;
                 $heading = str_replace(" ", "-", $isHighest->heading);
                 $code = 'STOPU00'.$isHighest->ID;
                 $URI .= 'structure-organization-view/'.$heading.'/'.$code;
             }else{$URI .= 'structure-organization';$message="Parent doesn't founded.";}
             unset($data['URIID']);
+
             $conditions = array("ID"=>$data['ID']);
             $isExist = $this->General_model->fetchData("db_employees.sto_temp",$conditions)->row();
             if(!empty($isExist)){
@@ -364,10 +367,12 @@ class C_aphris extends HR_Controler {
                 $nodeID = 0;
                 if(!empty($data['parentID'])){
                     unset($data['ID']);
+                    $data['isMainSTO'] = $isMain;
                     $execute = $this->General_model->insertData("db_employees.sto_temp",$data);
                     $nodeID = $this->db->insert_id();
                 }else{
                     $nodeID = $data['ID'];
+                    $data['isMainSTO'] = $isMain;
                     $data['editedby'] = $this->session->userdata('NIP')."/".$this->session->userdata('Name');
                     $execute = $this->General_model->updateData("db_employees.sto_temp",$data,$conditions);
                 }
