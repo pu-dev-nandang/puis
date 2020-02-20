@@ -963,6 +963,7 @@ class C_employees extends HR_Controler {
             $department = parent::__getDepartement();
             $data['NIP'] = $NIP;
             $data['status'] = $this->General_model->fetchData("db_employees.master_status",array("IsActive"=>1))->result();
+            $data['level'] = $this->General_model->fetchData("db_employees.master_level",array("IsActive"=>1))->result();
             $data['division'] = $this->General_model->fetchData("db_employees.sto_temp",array("isMainSTO"=>1, "typeNode"=>1,"isActive"=>1))->result();
             $data['employees_status'] = $this->General_model->fetchData("db_employees.employees_status","Type != 'lec'")->result();
             $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
@@ -1148,7 +1149,7 @@ class C_employees extends HR_Controler {
             $myName = $this->session->userdata('Name');
             $update = $this->General_model->updateData("db_employees.employees",array("UpdatedBy"=>$myNIP.'/'.$myName),$conditions);
 
-            
+
             }else{$message = "Cannot saved. Empty data post.";}
             $this->session->set_flashdata("message",$message);
             redirect(site_url('human-resources/employees/work-experience/'.$data['NIP']));
