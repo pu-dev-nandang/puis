@@ -286,6 +286,7 @@ class C_aphris extends HR_Controler {
             $department = parent::__getDepartement();
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $data['STOID'] = $data_arr['URIID'];
             $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","Type = 'emp' or IDStatus = '-1' ")->result();
             $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
             $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
@@ -345,6 +346,15 @@ class C_aphris extends HR_Controler {
     public function saveSTO(){
         $data = $this->input->post();
         if($data){
+            //get highest level
+            $isHighest = $this->General_model->fetchData("db_employees.sto_temp",array("ID"=>$data['URIID']))->row();
+            $URI = 'human-resources/master-aphris/';
+            if(!empty($isHighest)){
+                $heading = str_replace(" ", "-", $isHighest->heading);
+                $code = 'STOPU00'.$isHighest->ID;
+                $URI .= 'structure-organization-view/'.$heading.'/'.$code;
+            }else{$URI .= 'structure-organization';$message="Parent doesn't founded.";}
+            unset($data['URIID']);
             $conditions = array("ID"=>$data['ID']);
             $isExist = $this->General_model->fetchData("db_employees.sto_temp",$conditions)->row();
             if(!empty($isExist)){
@@ -406,8 +416,9 @@ class C_aphris extends HR_Controler {
 
                 $message = (($execute) ? "Successfully":"Failed")." saved.";
             }else{$message = "Node undefind. Try again";}
+            
             $this->session->set_flashdata("message",$message);
-            redirect(site_url('human-resources/master-aphris/structure-organization')); 
+            redirect(site_url($URI)); 
         }else{show_404();}
     }
 

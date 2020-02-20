@@ -32,6 +32,7 @@
 					<option value="2" <?=($detail->typeNode == 2) ? 'selected':''?> >Staff</option>
 				</select>
 				<small class="text-danger text-message"></small>
+				<input type="hidden" name="URIID" value="<?=!empty($STOID) ? $STOID : null?>">
 			</div>
 		</div>
 		<div class="col-sm-10">

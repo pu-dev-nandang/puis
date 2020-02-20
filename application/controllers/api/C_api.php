@@ -6414,6 +6414,13 @@ class C_api extends CI_Controller {
                     // end AD
                     $rs['arr_callback'] = $arr_callback; // for callback
                     $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
+
+                    /*ADDED BY FEBRI @ FEB 2020*/
+                    $myNIP = $this->session->userdata('NIP');
+                    $myName = $this->session->userdata('Name');
+                    $formInsert['EnteredBy'] = $myNIP.'/'.$myName;
+                    /*END ADDED BY FEBRI @ FEB 2020*/
+                    
                     $this->db->insert('db_employees.employees',$formInsert);
 
                     if ($Position == 6 || $Division == 15) {
@@ -6534,6 +6541,12 @@ class C_api extends CI_Controller {
 
                 // $formUpdate = (array) $data_arr['formUpdate'];
                 // $formUpdate['Password_Old'] = md5($formUpdate['Password_Old']);
+
+                /*ADDED BY FEBRI @ FEB 2020*/
+                $myNIP = $this->session->userdata('NIP');
+                $myName = $this->session->userdata('Name');
+                $formUpdate['UpdatedBy'] = $myNIP.'/'.$myName;
+                /*END ADDED BY FEBRI @ FEB 2020*/
 
                 $this->db->where('NIP', $data_arr['NIP']);
                 $this->db->update('db_employees.employees',$formUpdate);

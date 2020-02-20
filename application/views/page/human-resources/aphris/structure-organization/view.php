@@ -146,6 +146,7 @@
 	    	
 	    	var data = {
 	          ID : idNode,
+	          URIID : "<?=$STOID?>",
 	      	};
 	      	var token = jwt_encode(data,'UAP)(*');
 	      	$.ajax({

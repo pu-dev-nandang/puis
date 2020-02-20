@@ -37,7 +37,7 @@ class C_employees extends HR_Controler {
     {
         /*ADDED BY FEBRI @ JAN 2020*/
         $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","IDStatus != '-2'","IDStatus","asc")->result();
-        $data['division'] = $this->General_model->fetchData("db_employees.division",array("StatusDiv"=>1))->result();
+        $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
         $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
         $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
         $data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
@@ -766,6 +766,7 @@ class C_employees extends HR_Controler {
 
     public function empRequestAppv(){
         $data = $this->input->post();
+        $myNIP = $this->session->userdata('NIP');
         $myName = $this->session->userdata('Name');
         $json = array();
         if($data){
@@ -805,6 +806,7 @@ class C_employees extends HR_Controler {
                     unset($getTempEmpyReq->edited);
                     unset($getTempEmpyReq->editedby);
                     unset($getTempEmpyReq->pathPhoto);
+                    $getTempEmpyReq->UpdatedBy = $myNIP.'/'.$myName;
 
                     $updateTA = $this->General_model->updateData("db_employees.employees",$getTempEmpyReq,$conditions);
                     if($updateTA){
@@ -881,6 +883,9 @@ class C_employees extends HR_Controler {
             unset($data['bankAccNum']);
 
             $conditions = array("NIP"=>$data['NIP']);
+            $myNIP = $this->session->userdata('NIP');
+            $myName = $this->session->userdata('Name');
+            $data['UpdatedBy'] = $myNIP.'/'.$myName;
             $update = $this->General_model->updateData("db_employees.employees",$data,$conditions);
             if($update){
                 if(!empty($bankName)){
@@ -888,7 +893,7 @@ class C_employees extends HR_Controler {
                         if(!empty($bankID[$i])){
                             $updateBank = $this->General_model->updateData("db_employees.employees_bank_account",array("NIP"=>$data['NIP'],"bank"=>$bankName[$i],"accountName"=>$bankAccName[$i],"accountNumber"=>$bankAccNum[$i]), array("ID"=>$bankID[$i]));
                         }else{
-                            $inserBank = $this->General_model->insertData("db_employees.employees_bank_account",array("NIP"=>$data['NIP'],"bank"=>$bankName[$i],"accountName"=>$bankAccName[$i],"accountNumber"=>$bankAccNum[$i]));                        
+                            $insertBank = $this->General_model->insertData("db_employees.employees_bank_account",array("NIP"=>$data['NIP'],"bank"=>$bankName[$i],"accountName"=>$bankAccName[$i],"accountNumber"=>$bankAccNum[$i]));                        
                         }
                     }
                 }
@@ -935,6 +940,13 @@ class C_employees extends HR_Controler {
                         $message = (($insert) ? "Successfully":"Failed")." saved.";
                     }
                 }
+
+                $conditions = array("NIP"=>$data['NIP']);
+                $myNIP = $this->session->userdata('NIP');
+                $myName = $this->session->userdata('Name');
+                $update = $this->General_model->updateData("db_employees.employees",array("UpdatedBy"=>$myNIP.'/'.$myName),$conditions);
+
+
                 //var_dump($dataPost);die();
             }else{$message="Cannot saved. Empty data post.";}
 
@@ -965,10 +977,6 @@ class C_employees extends HR_Controler {
         $data = $this->input->post();
         if($data){
             $message = "";
-            /*if(!empty($data['JoinDate']) && !empty($data['StatusEmployeeID'])){
-                $updateDetail = $this->General_model->updateData("db_employees.employees",array("JoinDate"=>$data['JoinDate'],"ResignDate"=>(!empty($data['ResignDate']) ? $data['ResignDate'] : null),"StatusEmployeeID"=>$data['StatusEmployeeID']),array("NIP"=>$data['NIP']));
-            }*/
-
             if(!empty($data['JoinDate'])){
                 for ($h=0; $h < count($data['JoinDate']); $h++) { 
                     $dataPostJoin = array("NIP"=>$data['NIP'],"JoinDate"=>$data['JoinDate'][$h],"ResignDate"=>(!empty($data['ResignDate'][$h]) ? $data['ResignDate'][$h] : null ), "StatusEmployeeID"=>$data['StatusEmployeeID'][$h]);
@@ -983,6 +991,7 @@ class C_employees extends HR_Controler {
                         $message = (($insertJoin) ? "Successfully":"Failed")." saved.";
                     }
                 }
+
             }else{$message .= "Cannot saved. Empty dataPost";}
             
 
@@ -1014,6 +1023,11 @@ class C_employees extends HR_Controler {
                     }
                 }
             }else{$message .= "Cannot saved. Empty dataPost";}
+
+            $conditions = array("NIP"=>$data['NIP']);
+            $myNIP = $this->session->userdata('NIP');
+            $myName = $this->session->userdata('Name');
+            $update = $this->General_model->updateData("db_employees.employees",array("UpdatedBy"=>$myNIP.'/'.$myName),$conditions);
 
             $this->session->set_flashdata("message",$message);
             redirect(site_url('human-resources/employees/career-level/'.$data['NIP']));
@@ -1087,6 +1101,11 @@ class C_employees extends HR_Controler {
                 }
             }
 
+            $conditions = array("NIP"=>$data['NIP']);
+            $myNIP = $this->session->userdata('NIP');
+            $myName = $this->session->userdata('Name');
+            $update = $this->General_model->updateData("db_employees.employees",array("UpdatedBy"=>$myNIP.'/'.$myName),$conditions);
+
             $this->session->set_flashdata("message",$message);
             redirect(site_url('human-resources/employees/educations/'.$data['NIP']));
 
@@ -1122,6 +1141,14 @@ class C_employees extends HR_Controler {
                         $message = (($insert) ? "Successfully":"Failed")." saved.";
                     }
                 }
+
+
+            $conditions = array("NIP"=>$data['NIP']);
+            $myNIP = $this->session->userdata('NIP');
+            $myName = $this->session->userdata('Name');
+            $update = $this->General_model->updateData("db_employees.employees",array("UpdatedBy"=>$myNIP.'/'.$myName),$conditions);
+
+            
             }else{$message = "Cannot saved. Empty data post.";}
             $this->session->set_flashdata("message",$message);
             redirect(site_url('human-resources/employees/work-experience/'.$data['NIP']));
