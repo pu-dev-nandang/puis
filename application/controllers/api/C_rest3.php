@@ -2887,7 +2887,7 @@ class C_rest3 extends CI_Controller {
                   $AddwherePost[] = array('field'=>'emp.`'.'Name'.'`','data'=>' like "'.$search.'%" )' ,'filter' =>' OR ');     
               }
 
-              $sql_select = 'select csl.ID,csl.SemesterID,csl.NIP,emp.Name as LecturerName,sms.Name as SemesterName,csl.Money,csl.UpdateAt,csl.UpdatedBy,empUpd.Name as UpdateByName';
+              $sql_select = 'select csl.ID,csl.SemesterID,csl.NIP,emp.Name as LecturerName,sms.Name as SemesterName,csl.Money,csl.Allowance,csl.Allowance_NIDN,csl.UpdateAt,csl.UpdatedBy,empUpd.Name as UpdateByName';
               $sql_from = ' from db_employees.credit_salary_lecturer as csl
                                 join db_academic.semester as sms on sms.ID = csl.SemesterID
                                 join db_employees.employees as emp on emp.NIP = csl.NIP
@@ -2924,6 +2924,8 @@ class C_rest3 extends CI_Controller {
                 $nestedData[] = $row['SemesterName'];
                 $nestedData[] = $row['LecturerName'];
                 $nestedData[] = $row['Money'];
+                $nestedData[] = $row['Allowance'];
+                $nestedData[] = $row['Allowance_NIDN'];
                 $nestedData[] = $row['ID'];
                 $tokenRow = $this->jwt->encode($row,"UAP)(*");
                 $nestedData['data'] = $tokenRow;
@@ -3038,7 +3040,7 @@ class C_rest3 extends CI_Controller {
                 $AddwherePost[] = array('field'=>'emp.`'.'Name'.'`','data'=>' like "'.$search.'%" )' ,'filter' =>' OR ');     
             }
 
-            $sql_select = 'select csl.ID,csl.SemesterID,csl.NIP,emp.Name as LecturerName,sms.Name as SemesterName,csl.Money,csl.UpdateAt,csl.UpdatedBy,empUpd.Name as UpdateByName, 
+            $sql_select = 'select csl.ID,csl.SemesterID,csl.NIP,emp.Name as LecturerName,sms.Name as SemesterName,csl.Money,csl.Money,csl.Allowance,csl.Allowance_NIDN,csl.UpdateAt,csl.UpdatedBy,empUpd.Name as UpdateByName, 
                           if( (select count(*) as total from db_employees.credit_salary_lecturer where SemesterID = '.$Input['smt_active'].' and NIP = csl.NIP limit 1 ) > 0 ,1,0 ) as SelectionThisSMT  ';
             $sql_from = ' from db_employees.credit_salary_lecturer as csl
                               join db_academic.semester as sms on sms.ID = csl.SemesterID
@@ -3076,6 +3078,8 @@ class C_rest3 extends CI_Controller {
               $nestedData[] = $row['SemesterName'];
               $nestedData[] = $row['LecturerName'];
               $nestedData[] = $row['Money'];
+              $nestedData[] = $row['Allowance'];
+              $nestedData[] = $row['Allowance_NIDN'];
               $nestedData[] = $row['ID'];
               $tokenRow = $this->jwt->encode($row,"UAP)(*");
               $nestedData['data'] = $tokenRow;
@@ -3104,6 +3108,8 @@ class C_rest3 extends CI_Controller {
               'SemesterID' => $SemesterID,
               'NIP' => $data[$i]['NIP'],
               'Money' => $data[$i]['Money'],
+              'Allowance' => $data[$i]['Allowance'],
+              'Allowance_NIDN' => $data[$i]['Allowance_NIDN'],
               'UpdateAt' => date('Y-m-d H:i:s'),
               'UpdatedBy' => $sessionNIP,
             ];

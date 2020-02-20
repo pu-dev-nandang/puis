@@ -84,7 +84,9 @@
                                         <th>No</th>
                                         <th>Semester</th>
                                         <th>Lecturer Name</th>
-                                        <th>Salary</th>
+                                        <th>Honor</th>
+                                        <th>Allowance</th>
+                                        <th>NIDN Allowance</th>
                                         <th><i class="fa fa-cog"></i></th>
                                     </tr>
                                 </thead>
@@ -518,8 +520,16 @@
                                 '<label for="Name"></label>'+
                             '</div>'+
                             '<div class = "form-group">'+
-                                '<label>Salary per Credit</label>'+
+                                '<label>Honor per Credit</label>'+
                                 '<input type="text" class = "form-control frmModalLectureSalary" name = "Money">'+
+                            '</div>'+ 
+                            '<div class = "form-group">'+
+                                '<label>Allowance</label>'+
+                                '<input type="text" class = "form-control frmModalLectureSalary" name = "Allowance">'+
+                            '</div>'+
+                            '<div class = "form-group">'+
+                                '<label>NIDN Allowance</label>'+
+                                '<input type="text" class = "form-control frmModalLectureSalary" name = "Allowance_NIDN">'+
                             '</div>'+ 
                         '</div>'+
                     '</div>';
@@ -543,6 +553,12 @@
                             // set number money
                             $('.frmModalLectureSalary[name="Money"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
                             $('.frmModalLectureSalary[name="Money"]').maskMoney('mask', '9894');
+
+                            $('.frmModalLectureSalary[name="Allowance"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+                            $('.frmModalLectureSalary[name="Allowance"]').maskMoney('mask', '9894');
+
+                            $('.frmModalLectureSalary[name="Allowance_NIDN"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+                            $('.frmModalLectureSalary[name="Allowance_NIDN"]').maskMoney('mask', '9894');
                         },500);
                         
                         clearInterval(firstLoad);
@@ -563,7 +579,7 @@
                                 continue;
                             }
 
-                            if (key == 'Money') {
+                            if (key == 'Money' || key == 'Allowance' || key == 'Allowance_NIDN') {
                                 let n = dataObj[key].indexOf(".");
                                 dataObj[key] = dataObj[key].substring(0, n);
                             }
@@ -582,6 +598,12 @@
                             // set number money
                             $('.frmModalLectureSalary[name="Money"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
                             $('.frmModalLectureSalary[name="Money"]').maskMoney('mask', '9894');
+
+                            $('.frmModalLectureSalary[name="Allowance"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+                            $('.frmModalLectureSalary[name="Allowance"]').maskMoney('mask', '9894');
+
+                            $('.frmModalLectureSalary[name="Allowance_NIDN"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+                            $('.frmModalLectureSalary[name="Allowance_NIDN"]').maskMoney('mask', '9894');                            
                         },500);
                         
                         clearInterval(firstLoad);
@@ -656,7 +678,27 @@
                       }
                     },
                     {
-                        'targets': 4,
+                      'targets': 4,
+                      'searchable': false,
+                      'orderable': false,
+                      'className': 'dt-body-center',
+                      'render': function (data, type, full, meta){
+                        let html = formatRupiah(full[4]);
+                        return html;
+                      }
+                    },
+                    {
+                      'targets': 5,
+                      'searchable': false,
+                      'orderable': false,
+                      'className': 'dt-body-center',
+                      'render': function (data, type, full, meta){
+                        let html = formatRupiah(full[5]);
+                        return html;
+                      }
+                    },
+                    {
+                        'targets': 6,
                         'searchable': false,
                         'orderable': false,
                         'className': 'dt-body-center',
@@ -666,9 +708,9 @@
                                 '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
                                 '  </button>' +
                                 '  <ul class="dropdown-menu">' +
-                                '    <li><a href="javascript:void(0);" class="btnEditLecturerSalary" data-id="'+full[4]+'" data = "'+full['data']+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
+                                '    <li><a href="javascript:void(0);" class="btnEditLecturerSalary" data-id="'+full[6]+'" data = "'+full['data']+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
                                 '    <li role="separator" class="divider"></li>' +
-                                '    <li><a href="javascript:void(0);" class="btnRemoveLecturerSalary" data-id="'+full[4]+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
+                                '    <li><a href="javascript:void(0);" class="btnRemoveLecturerSalary" data-id="'+full[6]+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
                                 '  </ul>' +
                                 '</div>';
                             return btnAction;
@@ -729,7 +771,7 @@
                     v = ex[0];
                 }
 
-                if (nm =='Money') {
+                if (nm =='Money' || nm =='Allowance' || nm =='Allowance_NIDN') {
                     v = findAndReplace(v, ".","");
                 }
 
@@ -894,7 +936,9 @@
                                             '    <th>No</th>'+
                                             '    <th>Semester</th>'+
                                             '    <th>Lecturer Name</th>'+
-                                            '    <th>Salary</th>'+
+                                            '    <th>Honor Per Credit</th>'+
+                                            '    <th>Allowance</th>'+
+                                            '    <th>NIDN Allowance</th>'+
                                             '    <th><i class="fa fa-cog"></i></th>'+
                                             '</tr>'+
                                         '</thead>'+
@@ -913,7 +957,9 @@
                                         '<thead>'+
                                             '<tr>'+
                                             '    <th>Lecturer Name</th>'+
-                                            '    <th>Salary</th>'+
+                                            '    <th>Honor Per Credit</th>'+
+                                            '    <th>Allowance</th>'+
+                                            '    <th>NIDN Allowance</th>'+
                                             '    <th><i class="fa fa-cog"></i></th>'+
                                             '</tr>'+
                                         '</thead>'+
@@ -996,7 +1042,27 @@
                       }
                     },
                     {
-                        'targets': 4,
+                      'targets': 4,
+                      'searchable': false,
+                      'orderable': false,
+                      'className': 'dt-body-center',
+                      'render': function (data, type, full, meta){
+                        let html = formatRupiah(full[4]);
+                        return html;
+                      }
+                    },
+                    {
+                      'targets': 5,
+                      'searchable': false,
+                      'orderable': false,
+                      'className': 'dt-body-center',
+                      'render': function (data, type, full, meta){
+                        let html = formatRupiah(full[5]);
+                        return html;
+                      }
+                    },
+                    {
+                        'targets': 6,
                         'searchable': false,
                         'orderable': false,
                         'className': 'dt-body-center',
@@ -1033,7 +1099,8 @@
                     '<tr set_token = "'+set_token+'" '+style+'>'+
                         '<td>'+dataDecode['LecturerName']+'</td>'+
                         '<td>'+formatRupiah(dataDecode['Money'])+'</td>'+
-                        '<td>'+formatRupiah(dataDecode['Money'])+'</td>'+
+                        '<td>'+formatRupiah(dataDecode['Allowance'])+'</td>'+
+                        '<td>'+formatRupiah(dataDecode['Allowance_NIDN'])+'</td>'+
                         '<td>'+'<button class = "btn btn-danger removeAddLecturerSelected">Delete</button>'+'</td>'+
                     '</tr>'    
                 );
