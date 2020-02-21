@@ -766,7 +766,7 @@
                     var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                                  '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Print</button>'+
                                  /*ADDED BY FEBRI @ FEB 2020*/
-                                 '<a href="'+base_url_js+'human-resources/employees/employees-additional-info/'+dtmodal.UsernamePC'" class="btn btn-info">Go to additional form</a>';
+                                 '<a href="'+base_url_js+'human-resources/employees/employees-additional-info/'+dtmodal.UsernamePC+'" class="btn btn-info">Go to additional form</a>';
                                  /*END ADDED BY FEBRI @ FEB 2020*/
                     
                     $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Akses'+'</h4>');

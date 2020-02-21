@@ -1,4 +1,5 @@
 <style type="text/css">
+#form-sto-participants #list-emp > .panel-body > .multiple-row:nth-child(2) .remove-row{display: none}
 #filter-user .add-me{
 	cursor: pointer;
     background: #ddd;
@@ -19,6 +20,7 @@
     display: none; 
 }
 .autocomplete-position-name .load-list .emp-list > p{cursor: pointer;}
+
 </style>
 <?php if(!empty($detail)){ ?>
 <form id="form-sto-participants" action="<?=base_url('human-resources/master-aphris/save-sto')?>" method="post" autocomplete="off">
@@ -70,7 +72,7 @@
 			</div>
 			<h4 class="panel-title">Add employee for this node</h4>
 		</div>
-		<div class="panel panel-body" style="max-height:300px;overflow:auto">
+		<div class="panel-body" style="max-height:300px;overflow:auto">
 			<div class="panel panel-default collapse" id="filter-user">
 				<div class="panel-heading">	
 					<div class="pull-right">
@@ -142,7 +144,7 @@
 
 			<?php if(!empty($detail->member)){
 			foreach ($detail->member as $m) { ?>
-			<div class="row multiple-row" data-table="sto_rel_user" data-id="<?=$detail->ID?>" data-nip="<?=$m->NIP?>">
+			<div class="row multiple-row row-<?=$m->NIP?>" data-table="sto_rel_user" data-id="<?=$detail->ID?>" data-nip="<?=$m->NIP?>" data-career="<?=$m->CareerID?>">
 				<div class="col-sm-4">
 					<div class="form-group">
 						<label>Employee</label>
@@ -180,7 +182,7 @@
 				</div>
 				<div class="col-sm-1 remove-row">
 					<div style="line-height:6">
-						<button class="btn btn-sm btn-danger btn-remove-row-user" data-nip="<?=$m->NIP?>" data-id="<?=$detail->ID?>" type="button"><i class="fa fa-trash"></i></button>
+						<button class="btn btn-sm btn-danger btn-remove-row-user" data-nip="<?=$m->NIP?>" data-id="<?=$detail->ID?>"  data-career="<?=$m->CareerID?>" type="button"><i class="fa fa-trash"></i></button>
 					</div>
 				</div>
 			</div>
@@ -289,9 +291,11 @@
 				});
 			}else{alert("Please fill the user form for the filter");}
 		});
+
 		$formPost.on("click","#filter-user .btn-clear",function(){
 			$("#filter-user .list-data").html("");
 		});
+
 		$formPost.on("click","#filter-user .add-me",function(){
 			var itsme = $(this);
 			var typeNode = $formPost.find("select[name=typeNode]").val();
@@ -299,8 +303,10 @@
 			var Name = itsme.text();
 			var firstRow = $formPost.find("#list-emp .multiple-row:first");
 			var cloneRow = firstRow.clone();
-			if(!$formPost.find("#list-emp .list-multiple-row > .multiple-row").hasClass("row-"+NIP)){
+			if(!$formPost.find("#list-emp .multiple-row").hasClass("row-"+NIP)){
+				$formPost.find("#filter-user .add-me").removeClass("active");
 				itsme.addClass("active");
+
 				cloneRow.removeClass("hidden").removeClass (function (index, className) {
 				    return (className.match (/\brow-\S+/g) || []).join(' ');
 				}).addClass("row-"+NIP).removeAttr("data-table").removeAttr("data-id");
@@ -318,7 +324,6 @@
 			}else{
 				$formPost.find("#list-emp .panel-body .list-multiple-row").html(cloneRow);
 			}
-
 		});
 
 		$formPost.on("click",".btn-submit",function(){
@@ -438,47 +443,53 @@
 
 		$formPost.on("click",".btn-remove-emp",function(){
 			var itsme = $(this);
-			$lastRow = $formPost.find("#list-emp .multiple-row:last");
-			var checkAttr = $lastRow.attr("data-table");
-			if (typeof checkAttr !== typeof undefined && checkAttr !== false) {
-				var NIP = $lastRow.data("nip");
-				var ID = $lastRow.data("id");
-				var data = {
-		          NIP : NIP ,
-		          STOID : ID
-		      	};
-		      	var token = jwt_encode(data,'UAP)(*');
-		      	if(confirm("Are you sure wants to remove this "+NIP+" ?")){
-					$.ajax({
-					    type : 'POST',
-					    url : base_url_js+"human-resources/master-aphris/delete-sto-user",
-					    data : {token:token},
-					    dataType : 'json',
-					    error : function(jqXHR){
-					    	$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-			                    '<h4 class="modal-title">Error Fetch Student Data</h4>');
-			                $('#GlobalModal .modal-body').html(jqXHR.responseText);
-					    },success : function(response){
-					    	if(!jQuery.isEmptyObject(response)){					    		
-					    		$lastRow.remove();
-					    	}
-					    }
-					});
+			var totalRow = $formPost.find("#list-emp .multiple-row").length;
+			if(totalRow > 1){
+				$lastRow = $formPost.find("#list-emp .multiple-row:last");
+				var checkAttr = $lastRow.attr("data-table");
+				if (typeof checkAttr !== typeof undefined && checkAttr !== false) {
+					var NIP = $lastRow.data("nip");
+					var ID = $lastRow.data("id");
+					var CAREERID = $lastRow.data("CAREERID");
+					var data = {
+			          NIP : NIP ,
+			          STOID : ID,
+			          CAREERID : CAREERID
+			      	};
+			      	var token = jwt_encode(data,'UAP)(*');
+			      	if(confirm("Are you sure wants to remove this "+NIP+" ?")){
+						$.ajax({
+						    type : 'POST',
+						    url : base_url_js+"human-resources/master-aphris/delete-sto-user",
+						    data : {token:token},
+						    dataType : 'json',
+						    error : function(jqXHR){
+						    	$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+				                    '<h4 class="modal-title">Error Fetch Student Data</h4>');
+				                $('#GlobalModal .modal-body').html(jqXHR.responseText);
+						    },success : function(response){
+						    	if(!jQuery.isEmptyObject(response)){					    		
+						    		$lastRow.remove();
+						    	}
+						    }
+						});
+					}
+				}else{
+					$lastRow.remove();
 				}
-			}else{
-				$lastRow.remove();
 			}
 		});
-
 
 		$formPost.on("click",".btn-remove-row-user",function(){
 			var itsme = $(this);			
 			var NIP = itsme.data("nip");
 			var ID = itsme.data("id");
+			var CAREERID = itsme.data("career");
 			var parent = itsme.parent().parent().parent();
 			var data = {
 	          NIP : NIP ,
-	          STOID : ID
+	          STOID : ID,
+	          CAREERID : CAREERID
 	      	};
 	      	var token = jwt_encode(data,'UAP)(*');
 	      	if(confirm("Are you sure wants to remove this "+NIP+" ?")){
@@ -498,6 +509,22 @@
 				    }
 				});
 			}
+		});
+
+		$formPost.on("change","select[name=typeNode]",function(){
+			var value = $(this).val();
+			$rows = $formPost.find("#list-emp .panel-body .list-multiple-row .multiple-row");
+			var totalRow = $rows.length;
+			
+			if(value == 1){ //divisi
+				if(totalRow > 1){
+					var hasAttr = $rows.attr("data-nip");
+		            if(typeof hasAttr !== typeof undefined && hasAttr !== false){
+		            	$rows.not(":first").remove();
+		            }
+				}
+			}
+
 		});
 
 	});

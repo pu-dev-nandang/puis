@@ -66,7 +66,7 @@
             },success : function(response){
                 loading_modal_hide();
                 if(jQuery.isEmptyObject(response)){
-                    alert("Data not founded. Try again.");
+                    alert("Superior is EMPTY, please fill the superior name on Stucture Organization.");
                 }else{
                     $element.val(response.NIP+"/"+response.Name);
                 }

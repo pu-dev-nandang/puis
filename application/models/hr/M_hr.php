@@ -81,12 +81,16 @@ class M_hr extends CI_Model {
 
     /*ADDED BY FEBRI @ FEB 2020*/
     public function getMemberSTO($data){
-        $this->db->select("a.STOID,a.JobTitle,a.IsActive, a.StatusID, c.*");
-        $this->db->from("db_employees.sto_rel_user a");
-        $this->db->join("db_employees.sto_temp b","a.STOID = b.ID","left");
-        $this->db->join("db_employees.employees c","c.NIP = a.NIP","left");
+        $this->db->select("a.ID as CareerID,a.StartJoin,a.EndJoin,a.LevelID,a.DepartmentID,a.PositionID,a.JobTitle,a.Superior,a.StatusID,a.Remarks, e.*");
+        $this->db->from("db_employees.employees_career a");
+        $this->db->join("db_employees.employees_career b","b.NIP = a.NIP and b.PositionID = a.PositionID and a.StartJoin > b.StartJoin","left");
+        $this->db->join("db_employees.employees_career c","a.NIP = c.NIP and a.PositionID = c.PositionID and a.StartJoin > c.StartJoin and b.StartJoin > c.StartJoin","LEFT OUTER");
+        $this->db->join("db_employees.sto_temp d","a.PositionID = d.ID","left");
+        $this->db->join("db_employees.employees e","e.NIP = a.NIP","left");
         $this->db->where($data);
+        $this->db->group_by("a.NIP");
         $query = $this->db->get();
+
         return $query;
     }
 

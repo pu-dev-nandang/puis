@@ -1,4 +1,5 @@
 <script type="text/javascript">
+	
     $(document).ready(function(){
         $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
         $("#form-employee .tabulasi-emp > ul > li.nv-experience").addClass("active");
@@ -7,7 +8,13 @@
             changeYear: true,
             changeMonth: true
         });
-        $("#select2-experience").select2();
+        $("#select2-experience").select2({'width':'100%'});
+
+        var companyTags = companyName();
+	    $( "#autocomplete-experience" ).autocomplete({
+	      source: companyTags
+	    });
+
     });
 </script>
 <form id="form-experience" action="<?=base_url('human-resources/employees/experience-save')?>" method="post" autocomplete="off">
@@ -50,9 +57,9 @@
                                     <tr>
                                         <td>1</td>
                                         <td><input type="hidden" class="form-control exp-ID" name="comID[]">
-                                        <input type="text" class="form-control required exp-company" required name="comName[]">
+                                        <input type="text" class="form-control required exp-company autocomplete" required name="comName[]" id="autocomplete-experience">
                                         <small class="text-danger text-message"></small></td>
-                                        <td class="industries"><select class="required select2-tmp exp-industryID" required name="comIndustry[]" id="select2-experience">
+                                        <td class="industries"><select class="select2-tmp exp-industryID" name="comIndustry[]" id="select2-experience">
                                                 <option value="">Choose one</option>
                                                 <?php if(!empty($industry)){
                                                 foreach ($industry as $in) { 
@@ -93,6 +100,7 @@
                     $(this).addClass("error");
                     $(this).parent().find(".text-message").text("Please fill this field");
                     error = false;
+                    console.log($(this));
                 }else{
                     error = true;
                     $(this).removeClass("error");
