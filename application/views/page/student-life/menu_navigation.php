@@ -10,6 +10,20 @@
 <!--                    Diploma Supplement-->
 <!--                </a>-->
 <!--            </li>-->
+            <li class="<?= ($this->uri->segment(2)=='master') ? 'current open' : ''?>">
+                <a href="javascript:void(0);">
+                    <i class="icon-edit"></i>
+                    Data Master
+                    <i class="arrow <?= ($this->uri->segment(2)=='master') ? 'icon-angle-down' : 'icon-angle-left'?>"></i></a>
+                <ul class="sub-menu">
+                    <li class="<?= ($this->uri->segment(3)=='company') ? "current open" : ""?>">
+                        <a href="<?= base_url('student-life/master/company/list') ?>">
+                            <i class="icon-angle-right"></i>
+                            Company
+                        </a>
+                    </li>
+                </ul>
+            </li>
             <li class="<?php if($this->uri->segment(2)=='skpi'){echo"current";}?>">
                 <a href="<?php echo base_url('student-life/skpi');?>">
                     <i class="fa fa-file"></i>

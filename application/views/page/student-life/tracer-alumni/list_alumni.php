@@ -28,14 +28,14 @@
     <div class="col-md-4">
         <div class="well">
             <div class="row">
-                <div class="col-md-7">
+                <div class="col-md-12">
                     <select class="form-control" id="filterYear">
                         <option value="" selected disabled>All graduation year</option>
                         <option disabled>----------------</option>
                     </select>
                 </div>
-                <div class="col-md-5" style="border-left: 1px solid #CCCCCC;">
-                    <button class="btn btn-block btn-default" id="btnShowMasterCompany">Master Company</button>
+                <div class="col-md-5 hide" style="border-left: 1px solid #CCCCCC;">
+<!--                    <button class="btn btn-block btn-default" id="btnShowMasterCompany">Master Company</button>-->
                 </div>
             </div>
 
@@ -600,7 +600,8 @@
                     },500);
                 });
 
-            } else {
+            }
+            else {
                 toastr.error('All form are required');
             }
 

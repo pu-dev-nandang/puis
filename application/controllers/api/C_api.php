@@ -12703,4 +12703,43 @@ class C_api extends CI_Controller {
         return print_r(json_encode($data));
     }
 
+    public function getCompanyType(){
+
+        $data = $this->db->order_by('name','ASC')->get('db_employees.master_industry_type')->result_array();
+        return print_r(json_encode($data));
+    }
+    public function getProvince(){
+
+        $data = $this->db->order_by('ProvinceName','ASC')->get('db_admission.province')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getRegions($ProvinceID){
+
+        $data = $this->db->query('SELECT r.* FROM db_admission.region r LEFT JOIN db_admission.province_region pr ON (pr.RegionID = r.RegionID)
+                                    WHERE pr.ProvinceID = "'.$ProvinceID.'" 
+                                    ORDER BY r.RegionName ASC')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getDistric($RegionID){
+
+        $data = $this->db->query('SELECT d.* FROM db_admission.district d LEFT JOIN db_admission.region_district rd ON (rd.DistrictID = d.DistrictID)
+                                    WHERE rd.RegionID = "'.$RegionID.'" 
+                                    ORDER BY d.DistrictName ASC')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getRangeEmployees(){
+
+        $data = $this->db->order_by('ID','ASC')->get('db_studentlife.master_range_employees')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getGrossRevenue(){
+
+        $data = $this->db->order_by('ID','ASC')->get('db_studentlife.master_range_gross_revenue')->result_array();
+        return print_r(json_encode($data));
+    }
+
 }
