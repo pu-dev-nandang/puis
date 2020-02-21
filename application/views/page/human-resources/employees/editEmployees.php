@@ -433,7 +433,10 @@
         <div class="row">
             <div class="col-md-12"><hr/></div>
             <div class="col-md-6">
-                <div class="hide">
+                <?php
+                // 2017114 Irfan = Button sementara di munculin untuk Irfan IT dulu
+                $hideDelete = ($this->session->userdata('NIP') == '2017114') ? '' : 'hide'; ?>
+                <div class="<?= $hideDelete ?>">
                     <?php
                     $idBtnDelPermananet = ($btnDelPermanent['Status']==0) ? 'id="btnDelPeranentCuy"' : '';
                     $btnDis = ($btnDelPermanent['Status']==0) ? '' : 'disabled';
