@@ -764,6 +764,104 @@
         });
     }
 
+
+
+    function loadSelectOptionCompanyType(element,selected) {
+        var url = base_url_js+'api/__getCompanyType';
+        $.getJSON(url,function (jsonResult) {
+
+            if(jsonResult.length>0){
+                var option = $(element);
+                if(jsonResult.length>0){
+                    for(var i=0;i<jsonResult.length;i++){
+                        var data = jsonResult[i];
+                        option.append('<option value="'+data.ID+'">'+data.name+'</option>')
+                            .val(selected).trigger('change');
+                    }
+                }
+            }
+
+        });
+
+    }
+
+    function loadSelectOptionLoc_Province(element,selected){
+        var url = base_url_js+'api/__getProvince';
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.ProvinceID) ? 'selected' : '';
+                $(element).append('<option value="'+v.ProvinceID+'" '+sc+'>'+v.ProvinceName+'</option>');
+
+            })
+        });
+    }
+
+    function loadSelectOptionLoc_Regions(ProvinceID,element,selected){
+        var url = base_url_js+'api/__getRegions/'+ProvinceID;
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.RegionID) ? 'selected' : '';
+                $(element).append('<option value="'+v.RegionID+'" '+sc+'>'+v.RegionName+'</option>');
+
+            })
+        });
+    }
+
+    function loadSelectOptionLoc_District(RegionID,element,selected){
+        var url = base_url_js+'api/__getDistric/'+RegionID;
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.DistrictID) ? 'selected' : '';
+                $(element).append('<option value="'+v.DistrictID+'" '+sc+'>'+v.DistrictName+'</option>');
+
+            })
+        });
+    }
+    
+    function loadSelectOptionRangeEmployees(element,selected) {
+        var url = base_url_js+'api/__getRangeEmployees';
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.ID) ? 'selected' : '';
+
+                var opt = v.RangeStart+' - '+v.RangeEnd;
+                if(v.Type=='1') {
+                    opt = '&#60; '+v.RangeEnd;
+                } else if(v.Type=='2'){
+                    opt = v.RangeStart+' &#62;';
+                }
+
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+opt+'</option>');
+
+            })
+        });
+    }
+
+    function loadSelectOptionGrossRevenue(element,selected) {
+        var url = base_url_js+'api/__getGrossRevenue';
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.ID) ? 'selected' : '';
+
+                var opt = v.RangeStart+' - '+v.RangeEnd;
+                if(v.Type=='1') {
+                    opt = '&#60; '+v.RangeEnd;
+                } else if(v.Type=='2'){
+                    opt = v.RangeStart+' &#62;';
+                }
+
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+opt+'</option>');
+
+            })
+        });
+    }
+
+
     function loadSelectOptionCurriculumForlap(element,selected) {
         var url = base_url_js+"api/__getKurikulumSelectOption";
         $.get(url,function (data_json) {
