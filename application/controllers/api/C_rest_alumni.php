@@ -122,4 +122,10 @@ class C_rest_alumni extends CI_Controller {
       echo json_encode($this->callback);
     }
 
+    public function about_me(){
+      $input = $this->getInputToken();
+      $this->callback = $this->m_alumni->about_me($input);
+      echo json_encode($this->callback);
+    }
+
 }

@@ -75,6 +75,7 @@ class M_alumni extends CI_Model {
             'alumni_HP' => $dataUser[0]['HP'],
             'alumni_Email' => $dataUser[0]['Email'],
             'alumni_DateOfBirth' => $dataUser[0]['DateOfBirth'],
+            'alumni_PlaceOfBirth' => $dataUser[0]['PlaceOfBirth'],
             'alumni_EmailPU'  => $dataUser[0]['EmailPU'],
             'alumni_Faculty'  => $dataUser[0]['Faculty'],
             'alumni_ProdiID'  => $dataUser[0]['ProdiID'],
@@ -175,12 +176,88 @@ class M_alumni extends CI_Model {
             }
             $proc = $this->m_master->uploadDokumenSetFileName($filename,$varFiles,$path);
             if (!empty($proc)) {
-                $this->callback['status'] = 1; 
-                $this->callback['callback'] = $proc; 
+
+                $filenameDB = $proc[0];
+                $G_dt = $this->m_master->caribasedprimary('db_alumni.biodata','NPM',$NPM);
+                if (count($G_dt) > 0) {
+                    $this->db->db_debug=false;
+                    $this->db->where('NPM',$NPM);
+                    $query = $this->db->update('db_alumni.biodata',[
+                        'Photo' => $filenameDB,
+                        ]+$data
+                    );
+
+                    if( !$query )
+                    {
+                       $this->callback['msg'] = json_encode($this->db->error());
+                    }
+                    else
+                    {
+                     $this->callback['status'] = 1; 
+                    }
+                }
+                else
+                {
+                    $query = $this->db->insert('db_alumni.biodata',[
+                        'Photo' => $filenameDB,
+                        ]+$data
+                    );
+
+                    if( !$query )
+                    {
+                       $this->callback['msg'] = json_encode($this->db->error());
+                    }
+                    else
+                    {
+                     $this->callback['status'] = 1; 
+                    }
+
+                }
             }
             
         }
+        $this->db->db_debug=true;
+        return $this->callback;
+    }
 
+    public function about_me($dataToken){
+        $tbl = 'db_alumni.biodata';
+        $action = $dataToken['action'];
+        switch ($action) {
+            case 'add':
+                $data = $dataToken['data'];
+                $this->db->db_debug=false;
+                $query = $this->db->insert($tbl,$data);
+                if( !$query )
+                {
+                   $this->callback['msg'] = json_encode($this->db->error());
+                }
+                else
+                {
+                 $this->callback['status'] = 1; 
+                }
+                break;
+            case 'edit':
+                $data = $dataToken['data'];
+                $NPM = $dataToken['NPM'];
+                $this->db->db_debug=false;
+                $this->db->where('NPM',$NPM);
+                $query = $this->db->update($tbl,$data);
+                if( !$query )
+                {
+                   $this->callback['msg'] = json_encode($this->db->error());
+                }
+                else
+                {
+                 $this->callback['status'] = 1; 
+                }
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        $this->db->db_debug=true;
         return $this->callback;
     }
   
