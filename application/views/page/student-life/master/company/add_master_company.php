@@ -17,6 +17,9 @@
                 </div>
                 <div class="form-group">
                     <label>Industry</label>
+                    <div id="LastIndustry" class="alert alert-warning" role="alert">
+
+                    </div>
                     <div>
                         <select class="select2-select-00 form-master-company" style="width: 100%;" size="5" id="IndustryTypeID">
                             <option value=""></option>
@@ -128,10 +131,29 @@
             $('#Name').val(d.Name);
             $('#Brand').val(d.Brand);
 
-            loadSelectOptionCompanyType('#IndustryTypeID',d.IndustryTypeID);
-            loadSelectOptionLoc_Province('#ProvinceID',d.ProvinceID);
-            loadSelectOptionLoc_Regions(d.ProvinceID,'#RegionID',d.RegionID);
-            loadSelectOptionLoc_District(d.RegionID,'#DistrictID',d.DistrictID);
+            var IndustryTypeID = (d.IndustryTypeID!=null && d.IndustryTypeID!=''
+                && d.IndustryTypeID!=0 && d.IndustryTypeID!='0') ? d.IndustryTypeID : '';
+            loadSelectOptionCompanyType('#IndustryTypeID',IndustryTypeID);
+
+            if(IndustryTypeID==''){
+                $('#LastIndustry').html(d.Industry);
+            } else {
+                $('#LastIndustry').remove();
+            }
+
+            var ProvinceID = (d.ProvinceID!=null && ProvinceID!='') ? d.ProvinceID : '';
+            var RegionID = (d.RegionID!=null && d.RegionID!='') ? d.RegionID : '';
+            var DistrictID = (d.DistrictID!=null && d.DistrictID!='') ? d.DistrictID : '';
+            loadSelectOptionLoc_Province('#ProvinceID',ProvinceID);
+            if(ProvinceID!='') {
+
+                loadSelectOptionLoc_Regions(d.ProvinceID,'#RegionID',RegionID);
+            }
+            if(RegionID!=''){
+                loadSelectOptionLoc_District(d.RegionID,'#DistrictID',DistrictID);
+            }
+
+
 
             loadSelectOptionRangeEmployees('#EmployeeMemberRangeID',d.EmployeeMemberRangeID);
             loadSelectOptionGrossRevenue('#GrossRevenueID',d.GrossRevenueID);
