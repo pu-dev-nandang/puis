@@ -965,7 +965,7 @@ class C_employees extends HR_Controler {
             $data['status'] = $this->General_model->fetchData("db_employees.master_status",array("IsActive"=>1))->result();
             $data['level'] = $this->General_model->fetchData("db_employees.master_level",array("IsActive"=>1))->result();
             $data['division'] = $this->General_model->fetchData("db_employees.sto_temp",array("isMainSTO"=>1, "typeNode"=>1,"isActive"=>1))->result();
-            $data['employees_status'] = $this->General_model->fetchData("db_employees.employees_status","Type != 'lec'")->result();
+            $data['employees_status'] = $this->General_model->fetchData("db_employees.employees_status","Type != 'lec' and IDStatus != '-2'")->result();
             $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
             $data['currComp'] = $this->General_model->fetchData("db_employees.master_company",array("ID"=>1))->row();
             $page = $this->load->view('page/'.$department.'/employees/career-level',$data,true);
@@ -988,6 +988,7 @@ class C_employees extends HR_Controler {
                             $message = (($updateJoin) ? "Successfully":"Failed")." updated.";                            
                         }else{$message = "Historical join not founded.";}
                     }else{
+
                         $insertJoin = $this->General_model->insertData("db_employees.employees_joindate",$dataPostJoin);
                         $message = (($insertJoin) ? "Successfully":"Failed")." saved.";
                     }
@@ -998,28 +999,31 @@ class C_employees extends HR_Controler {
 
             if(!empty($data['startJoin'])){
                 for ($i=0; $i < count($data['startJoin']) ; $i++) {
-                    $dataPost = array("NIP"=>$data['NIP'],"StartJoin"=>$data['startJoin'][$i], "EndJoin"=>$data['endJoin'][$i], "LevelID"=>$data['statusLevelID'][$i],"DepartmentID"=>$data['division'][$i],"PositionID"=>$data['position'][$i],"JobTitle"=>$data['jobTitle'][$i],"Superior"=>$data['superior'][$i],"StatusID"=>$data['statusID'][$i],"Remarks"=>$data['remarks'][$i]);
+                    $dataPost = array("NIP"=>$data['NIP'],"StartJoin"=>$data['startJoin'][$i], "EndJoin"=>$data['endJoin'][$i], "LevelID"=>$data['statusLevelID'][$i],"DepartmentID"=>$data['division'][$i],"PositionID"=>$data['position'][$i],"JobTitle"=>$data['jobTitle'][$i],"Superior"=>$data['superior'][$i],"StatusID"=>$data['statusID'][$i],"Remarks"=>$data['remarks'][$i],"isShowSTO"=>0);
                     $dataSTOUser = array("NIP"=>$data['NIP'],"STOID"=>$data['position'][$i],"IsActive"=>1,"StatusID"=>$data['statusID'][$i],"JobTitle"=>$data['jobTitle'][$i]);
                     if(!empty($data['careerID'][$i])){
                         $isExist = $this->General_model->fetchData("db_employees.employees_career",array("ID"=>$data['careerID'][$i]))->row();
                         if(!empty($isExist)){
                             $update = $this->General_model->updateData("db_employees.employees_career",$dataPost,array("ID"=>$data['careerID'][$i]));
-                            if($update){
+                            /*if($update){
                                 $isExistSTO = $this->General_model->fetchData("db_employees.sto_rel_user",array("NIP"=>$data['NIP'],"STOID"=>$data['position'][$i]))->row();
                                 if(!empty($isExistSTO)){
                                     $updateSTO = $this->General_model->updateData("db_employees.sto_rel_user",$dataSTOUser,array("NIP"=>$data['NIP']));                                    
                                 }else{
                                     $insertSTO = $this->General_model->insertData("db_employees.sto_rel_user",$dataSTOUser);
                                 }
-                            }
+                            }*/
                             $message = (($update) ? "Successfully":"Failed")." updated.";
                         }else{$message ="Data not founded.";}
                     }else{
                         $insert = $this->General_model->insertData("db_employees.employees_career",$dataPost);
-                        if($insert){
+                        /*if($insert){
                             //insert into STO
-                            $insertSTO = $this->General_model->insertData("db_employees.sto_rel_user",$dataSTOUser);
-                        }
+                            $isExistSTO = $this->General_model->fetchData("db_employees.sto_rel_user",array("NIP"=>$data['NIP'],"STOID"=>$data['position'][$i]))->row();
+                            if(empty($isExistSTO)){
+                                $insertSTO = $this->General_model->insertData("db_employees.sto_rel_user",$dataSTOUser);
+                            }
+                        }*/
                         $message .= (($insert) ? "Successfully":"Failed")." saved.";
                     }
                 }
@@ -1133,6 +1137,11 @@ class C_employees extends HR_Controler {
             $message = "";
             if(!empty($data['comName'])){
                 for ($i=0; $i < count($data['comName']); $i++) { 
+                    //check company name
+                    $isMasterCompany = $this->General_model->fetchData("db_employees.master_company","Name like '%".$data['comName'][$i]."%'")->row();
+                    if(empty($isMasterCompany)){
+                        $insertCompany = $this->General_model->insertData("db_employees.master_company",array("Name"=>$data['comName'][$i],"IsActive"=>1,"IndustryID"=>$data['comIndustry'][$i]));
+                    }
                     $dataPost = array("NIP"=>$data['NIP'],"company"=>$data['comName'][$i],"industryID"=>$data['comIndustry'][$i], "start_join"=>$data['comStartJoin'][$i], "end_join"=>$data['comEndJoin'][$i], "jobTitle"=>$data['comJobTitle'][$i], "reason"=>$data['comReason'][$i] );
                     if(!empty($data['comID'][$i])){
                         $update = $this->General_model->updateData("db_employees.employees_experience",$dataPost,array("ID"=>$data['comID'][$i]));

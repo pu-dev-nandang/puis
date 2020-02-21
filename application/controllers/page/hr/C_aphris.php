@@ -206,6 +206,8 @@ class C_aphris extends HR_Controler {
     public function structureOrganizationSave(){
         $data = $this->input->post();
         if($data){
+            $data['isMainSTO'] = ($data['isMainSTO'] == 'Y') ? 1 : 0;
+            $data['isActive'] = 1;
             if(!empty($data['ID'])){
                 $isExist = $this->General_model->fetchData("db_employees.sto_temp",array("ID"=>$data['ID']))->row();
                 if($isExist){
@@ -244,7 +246,7 @@ class C_aphris extends HR_Controler {
         //get parent sto
         $parent = $this->General_model->fetchData("db_employees.sto_temp",array("ID"=>$data['STOID'],"parentID"=>0),"ID","desc")->row();
         if(!empty($parent)){
-            $member = $this->m_hr->getMemberSTO(array("a.STOID"=>$parent->ID))->row();
+            $member = $this->m_hr->getMemberSTO(array("a.PositionID"=>$parent->ID,"a.isShowSTO"=>1))->row();
             $name = (!empty($member) ? (!empty($member->TitleAhead) ? $member->TitleAhead.' ' : '').$member->Name.(!empty($member->TitleBehind) ? ' '.$member->TitleBehind : ''):'-');
             //get child
             $children = $this->getChild($parent->ID);
@@ -263,7 +265,8 @@ class C_aphris extends HR_Controler {
         $child = array();
         $getChild = $this->General_model->fetchData("db_employees.sto_temp",array("isActive"=>1,"parentID"=>$id))->result();
         foreach ($getChild as $c) {
-            $member = $this->m_hr->getMemberSTO(array("a.STOID"=>$c->ID))->result();
+            $member = $this->m_hr->getMemberSTO(array("a.PositionID"=>$c->ID,"a.isShowSTO"=>1))->result();
+            //$member = $this->General_model->fetchData("db_employees.employees_career",array("PositionID"=>$c->ID))->result();
             $listMember = "";
             if(!empty($member)){
                 foreach ($member as $m) {
@@ -292,7 +295,7 @@ class C_aphris extends HR_Controler {
             $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
             $data['detail'] = $this->General_model->fetchData("db_employees.sto_temp",array("ID"=>$data_arr['ID']))->row();
             $data['status'] = $this->General_model->fetchData("db_employees.master_status",array("IsActive"=>1))->result();
-            $getMember = $this->m_hr->getMemberSTO(array("a.STOID"=>$data_arr['ID']))->result();
+            $getMember = $this->m_hr->getMemberSTO(array("a.PositionID"=>$data_arr['ID'],"a.isShowSTO"=>1))->result();
             if(!empty($getMember)){
                 $data['detail']->member = $getMember;
             }
@@ -376,12 +379,13 @@ class C_aphris extends HR_Controler {
                     $data['editedby'] = $this->session->userdata('NIP')."/".$this->session->userdata('Name');
                     $execute = $this->General_model->updateData("db_employees.sto_temp",$data,$conditions);
                 }
+
                 //insert member 
                 if(!empty($NIP)){
                     //get parent node 
                     $ParentNode = $this->General_model->fetchData("db_employees.sto_temp",array("ID"=>$nodeID))->row();
                     $ParentID = (!empty($ParentNode) ? $ParentNode->parentID : 0);
-                    $SuperiorParent = $this->m_hr->getMemberSTO(array("STOID"=>$ParentID))->row();
+                    $SuperiorParent = $this->m_hr->getMemberSTO(array("a.PositionID"=>$ParentID,"a.isShowSTO"=>1))->row();
                     $superiorNIP = (!empty($SuperiorParent) ? $SuperiorParent->NIP : '');
                     $superiorName = (!empty($SuperiorParent) ? $superiorNIP."/".$SuperiorParent->Name : '');
                     //end get parent node
@@ -389,14 +393,27 @@ class C_aphris extends HR_Controler {
                     //check if division
                     if(!empty($data['typeNode'])){
                         if($data['typeNode'] == 1 ){
-                            //remove member old division             
-                            $deleteMember = $this->General_model->deleteData("db_employees.sto_rel_user",array("STOID"=>$nodeID));
+                            $checkSuperior = $this->General_model->fetchData("db_employees.employees_career",array("PositionID"=>$nodeID))->result();
+                            if($checkSuperior > 0 || !empty($checkSuperior)){
+                                foreach ($checkSuperior as $c) {
+                                    $changeStatusSuperior = $this->General_model->updateData("db_employees.employees_career",array("NIP"=>$c->NIP,"isShowSTO"=>0),array("PositionID"=>$nodeID));
+                                }
+                            }
                         }
                     }
                     //end of division
 
                     for ($i=0; $i < count($NIP) ; $i++) { 
-                        $checkExisMember = $this->General_model->fetchData("db_employees.sto_rel_user",array("STOID"=>$nodeID,"NIP"=>$NIP[$i]))->row();
+                        $conditionCareer = array("NIP"=>$NIP[$i],"PositionID"=>$nodeID,"JobTitle"=>$jobTitle[$i],"StatusID"=>$StatusID[$i]);
+                        $dataPostCareer = array("NIP"=>$NIP[$i],"DepartmentID"=>$ParentID,"PositionID"=>$nodeID,"JobTitle"=>$jobTitle[$i],"Superior"=>$superiorName,"StatusID"=>$StatusID[$i],"isShowSTO"=>1);
+
+                        $isCareer = $this->General_model->fetchData("db_employees.employees_career",$conditionCareer)->row();
+                        if(!empty($isCareer)){
+                            $updateCareer = $this->General_model->updateData("db_employees.employees_career",$dataPostCareer,$conditionCareer);
+                        }else{
+                            $insertCareer = $this->General_model->insertData("db_employees.employees_career",$dataPostCareer);
+                        }
+                        /*$checkExisMember = $this->General_model->fetchData("db_employees.sto_rel_user",array("STOID"=>$nodeID,"NIP"=>$NIP[$i]))->row();
                         
                         if(!empty($checkExisMember)){
                             $excuteMember = $this->General_model->updateData("db_employees.sto_rel_user",array("JobTitle"=>$jobTitle[$i],"NIP"=>$NIP[$i],"StatusID"=>$StatusID[$i],"IsActive"=>$data['isActive']),array("NIP"=>$NIP[$i]));
@@ -415,7 +432,7 @@ class C_aphris extends HR_Controler {
                             }else{
                                 $insertCareer = $this->General_model->insertData("db_employees.employees_career",$dataPostCareer);
                             }
-                        }
+                        }*/
                     }
                 }
 
@@ -459,12 +476,12 @@ class C_aphris extends HR_Controler {
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
             if(!empty($data_arr['NIP'])){
-                $conditions = array("NIP"=>$data_arr['NIP']);
-                $isExist = $this->General_model->fetchData("db_employees.sto_rel_user",$conditions)->row();
+                $conditions = array("ID"=>$data_arr['CAREERID']);
+                $isExist = $this->General_model->fetchData("db_employees.employees_career",$conditions)->row();
                 if(!empty($isExist)){
-                    $delete = $this->General_model->deleteData("db_employees.sto_rel_user",array("NIP"=>$data_arr['NIP'],"STOID"=>$data_arr['STOID']));
-                    
-                    $message = (($delete) ? "Successfully":"Failed")." removed.";
+                    //$delete = $this->General_model->deleteData("db_employees.sto_rel_user",array("NIP"=>$data_arr['NIP'],"STOID"=>$data_arr['STOID']));
+                    $update = $this->General_model->updateData("db_employees.employees_career",array("isShowSTO"=>0),$conditions);
+                    $message = (($update) ? "Successfully":"Failed")." removed.";
                 }else{$message = "Node is not found.";}
 
                 $json = array("message"=>$message);
@@ -538,11 +555,26 @@ class C_aphris extends HR_Controler {
         if($data){
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
-            $member = $this->m_hr->getMemberSTO(array("a.STOID"=>$data_arr['ID']))->row();
+            $member = $this->m_hr->getMemberSTO(array("a.PositionID"=>$data_arr['ID']))->row();
             if(!empty($member)){$json = $member;}
         }
         echo json_encode($json);
     }
+
+
+    public function fetchCompany(){
+        $json = array();
+        $json = $this->General_model->fetchData("db_employees.master_company",array("IsActive"=>1))->result();
+        echo json_encode($json);
+    }
+    
+
+    public function fetchCompanyBank(){
+        $json = array();
+        $json = $this->General_model->fetchData("db_finance.bank",array("Status"=>1))->result();
+        echo json_encode($json);
+    }
+
 
 
 }

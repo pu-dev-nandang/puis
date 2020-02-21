@@ -66,7 +66,7 @@
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control edu-major" name="eduMajor[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control required edu-graduation" required name="eduGraduation[]">
+                                        <td><input type="text" class="form-control required number edu-graduation" required name="eduGraduation[]" maxlength="4">
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control edu-gpa" name="eduGPA[]">
                                         <small class="text-danger text-message"></small></td>

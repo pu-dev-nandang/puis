@@ -83,12 +83,12 @@
             <div class="tabulasi-emp">
               <ul class="nav nav-tabs" role="tablist">
                 <li class="nv-personal" ><a href="<?=site_url('human-resources/employees/edit-employees/'.$NIP)?>" ><i class="fa fa-user"></i> Personal Data</a></li>
-                <li class="nv-career" ><a href="<?=site_url('human-resources/employees/career-level/'.$NIP)?>"><i class="fa fa-suitcase"></i> Career Level</a></li>
+                <!-- <li class="nv-career" ><a href="<?=site_url('human-resources/employees/career-level/'.$NIP)?>"><i class="fa fa-suitcase"></i> Career Level</a></li>
                 <li class="nv-additional" ><a href="<?=site_url('human-resources/employees/additional-info/'.$NIP)?>"><i class="fa fa-user-plus"></i> Additional Information</a></li>
                 <li class="nv-family" ><a href="<?=site_url('human-resources/employees/family/'.$NIP)?>"><i class="fa fa-users"></i> Family</a></li>
                 <li class="nv-edu" ><a href="<?=site_url('human-resources/employees/educations/'.$NIP)?>"><i class="fa fa-graduation-cap"></i> Educations</a></li>
                 <li class="nv-experience" ><a href="<?=site_url('human-resources/employees/work-experience/'.$NIP)?>"><i class="fa fa-briefcase"></i> Work Experience</a></li>
-                <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li>
+                <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li> -->
               </ul>
             </div>
         </div>
@@ -127,6 +127,53 @@
 
         return result;
     }
+
+    function companyName() {
+        var result = [];
+        $.ajax({
+            type : 'POST',
+            url : base_url_js+"human-resources/master-aphris/get-company",
+            dataType : 'json',
+            async: false,
+            error : function(jqXHR){
+                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                $("body #GlobalModal").modal("show");
+            },success : function(response){
+                if(!jQuery.isEmptyObject(response)){
+                    $.each(response,function(k,v){
+                        result.push(v.Name);                    
+                    });
+                }
+            }
+        });
+
+        return result;
+    }
+    
+    function bankName() {
+        var result = [];
+        $.ajax({
+            type : 'POST',
+            url : base_url_js+"human-resources/master-aphris/get-company-bank",
+            dataType : 'json',
+            async: false,
+            error : function(jqXHR){
+                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                $("body #GlobalModal").modal("show");
+            },success : function(response){
+                if(!jQuery.isEmptyObject(response)){
+                    $.each(response,function(k,v){
+                        result.push(v.Name);                    
+                    });
+                }
+            }
+        });
+
+        return result;
+    }
+
+
+
     $("#form-employee").on("click","#multiple-field .btn-add",function(){
         var itsme = $(this);
         var parent = itsme.parent().parent().parent().parent();
@@ -147,6 +194,8 @@
         
         cloneRow.find("td input.select2-term-ft").attr("id","select2-term-ft-"+fieldName+"-"+num).removeClass("select2-offscreen");
         cloneRow.find("td input.select2-term-sd").attr("id","select2-term-sd-"+fieldName+"-"+num).removeClass("select2-offscreen");
+
+        cloneRow.find("td input.autocomplete").attr("id","autocomplete-"+fieldName+"-"+num).removeClass("ui-autocomplete-input").removeAttr("autocomplete");
 
         cloneRow.find("td:first").text(num);
         cloneRow.find(".form-control").val("");
@@ -170,11 +219,30 @@
         var select2SD = parent.find("#table-list-"+fieldName+" tbody tr > td #select2SD-"+fieldName+"-"+num);
         select2SD.prev().remove();
         select2SD.select2({width:'100%'});
-        var select2termft = parent.find("#table-list-"+fieldName+" tbody tr > td #select2-term-ft-"+fieldName+"-"+num);
-        select2termft.prev().remove();
-        select2GetDivision($("#select2-term-ft-"+fieldName+"-"+num));
+        try{
+            var select2termft = parent.find("#table-list-"+fieldName+" tbody tr > td #select2-term-ft-"+fieldName+"-"+num);
+            select2termft.prev().remove();
+            select2GetDivision($("#select2-term-ft-"+fieldName+"-"+num));    
+        }catch(err){
+            console.log(err.message);
+        }
+        
         var select2termsd = parent.find("#table-list-"+fieldName+" tbody tr > td #select2-term-sd-"+fieldName+"-"+num);
         select2termsd.prev().remove();
+
+        /*AUTOCOMPLETE*/
+        var companyTags = companyName();
+        var autocomplete_company = parent.find("#table-list-"+fieldName+" tbody tr > td #autocomplete-experience-"+num);
+        autocomplete_company.autocomplete({
+          source: companyTags
+        });
+        
+        var companyBankTags = bankName();
+        var autocomplete_bank = parent.find("#table-list-"+fieldName+" tbody tr > td #autocomplete-bank-"+num);
+        autocomplete_bank.autocomplete({
+          source: companyBankTags
+        });
+
 
     });
     
@@ -216,5 +284,9 @@
                 }
             }else{lastRow.remove();}
         }
+    });
+    
+    $("body #form-employee").on("keyup keydown",".number",function(){
+        this.value = this.value.replace(/[^0-9\.]/g,'');
     });
 </script>

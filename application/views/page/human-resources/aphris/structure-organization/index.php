@@ -30,11 +30,11 @@
 							<small class="text-danger text-message"></small>
 						</div>
 						<div class="form-group">
-							<label>Status</label>
-							<select class="form-control required sto-isActive" required name="isActive">
+							<label>Is Main Structure</label>
+							<select class="form-control required sto-isMainSTO" required name="isMainSTO">
 								<option value="">Choose One</option>
-								<option value="1">Active</option>
-								<option value="0">Non Active</option>
+								<option value="Y">Yes</option>
+								<option value="N">No</option>
 							</select>
 							<small class="text-danger text-message"></small>
 						</div>
@@ -60,7 +60,7 @@
 									<th width="5%">No</th>
 									<th>Name</th>
 									<th>Highest Node</th>
-									<th>Status</th>
+									<th>Is Main Structural</th>
 									<th width="10%"></th>
 								</tr>
 							</thead>
@@ -71,7 +71,7 @@
 									<td><?=$no++?></td>
 									<td><?=$v->heading?></td>
 									<td><?=$v->title?></td>
-									<td><?=($v->isActive == 1) ? "Active":"Not Active"?></td>
+									<td><?=($v->isMainSTO == 1) ? "Yes":"No"?></td>
 									<td>
 										<div class="btn-groups">
 											<button class="btn btn-warning btn-sm btn-edit" data-id="<?=$v->ID?>" type="button">Edit</button>
@@ -114,9 +114,14 @@
 	            	$("body #GlobalModal .modal-body").html(jqXHR.responseText);
 		      	  	$("body #GlobalModal").modal("show");
 			    },success : function(response){
+	            	console.log(response);
 	            	if(!jQuery.isEmptyObject(response)){
 	            		$.each(response,function(k,v){
-	            			$formSTO.find(".sto-"+k).val(v);
+	            			if(k == 'isMainSTO'){
+	            				$formSTO.find(".sto-"+k).val((v == 1) ? 'Y':'N');
+	            			}else{
+	            				$formSTO.find(".sto-"+k).val(v);
+	            			}
 	            		});
 	            	}else{alert("Failed fetch node.");}
 			    }

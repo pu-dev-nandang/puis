@@ -25,12 +25,12 @@
                             <div class="row">
                                 <div class="col-sm-3">
                                     <label>Postcode</label>
-                                    <input type="text" class="form-control samedata samedata-Postcode required" required name="CurrPostCode" value="<?=(!empty($detail) ? $detail->CurrPostCode : null)?>" maxlength="5">
+                                    <input type="text" class="form-control samedata samedata-Postcode required number" required name="CurrPostCode" value="<?=(!empty($detail) ? $detail->CurrPostCode : null)?>" maxlength="5">
                                     <small class="text-danger text-message"></small>
                                 </div>
                                 <div class="col-sm-5">
                                     <label>Phone</label>
-                                    <input type="text" class="form-control samedata samedata-Phone" name="CurrPhone" value="<?=(!empty($detail) ? $detail->CurrPhone : null)?>" maxlength="12">
+                                    <input type="text" class="form-control samedata samedata-Phone number" name="CurrPhone" value="<?=(!empty($detail) ? $detail->CurrPhone : null)?>" maxlength="12">
                                 </div>
 
                             </div>
@@ -47,33 +47,33 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Family Card</label>
-                                        <input type="text" class="form-control required" required name="IDFamilyCard" value="<?=(!empty($detail) ? $detail->IDFamilyCard : null)?>">
+                                        <input type="text" class="form-control required number" required name="IDFamilyCard" value="<?=(!empty($detail) ? $detail->IDFamilyCard : null)?>">
                                         <small class="text-danger text-message"></small>
                                     </div>
                                     <div class="form-group">
                                         <label>NPWP</label>
-                                        <input type="text" class="form-control required" required name="IDNPWP" value="<?=(!empty($detail) ? $detail->IDNPWP : null)?>">
+                                        <input type="text" class="form-control required number" required name="IDNPWP" value="<?=(!empty($detail) ? $detail->IDNPWP : null)?>">
                                         <small class="text-danger text-message"></small>
                                     </div>
                                     <div class="form-group">
                                         <label>Passport</label>
-                                        <input type="text" class="form-control required" required name="IDPassport" value="<?=(!empty($detail) ? $detail->IDPassport : null)?>">
+                                        <input type="text" class="form-control required number" required name="IDPassport" value="<?=(!empty($detail) ? $detail->IDPassport : null)?>">
                                         <small class="text-danger text-message"></small>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>BPJS Tenaga Kerja</label>
-                                        <input type="text" class="form-control required" required name="IDBpjstk" value="<?=(!empty($detail) ? $detail->IDBpjstk : null)?>">
+                                        <input type="text" class="form-control required number" required name="IDBpjstk" value="<?=(!empty($detail) ? $detail->IDBpjstk : null)?>">
                                         <small class="text-danger text-message"></small>
                                     </div>
                                     <div class="form-group">
                                         <label>BPJS Pensiun</label>
-                                        <input type="text" class="form-control" name="IDBpjspensiun" value="<?=(!empty($detail) ? $detail->IDBpjspensiun : null)?>">
+                                        <input type="text" class="form-control number" name="IDBpjspensiun" value="<?=(!empty($detail) ? $detail->IDBpjspensiun : null)?>">
                                     </div>
                                     <div class="form-group">
                                         <label>BPJS Kesehatan</label>
-                                        <input type="text" class="form-control required" required name="IDBpjskesehatan" value="<?=(!empty($detail) ? $detail->IDBpjskesehatan : null)?>">
+                                        <input type="text" class="form-control required number" required name="IDBpjskesehatan" value="<?=(!empty($detail) ? $detail->IDBpjskesehatan : null)?>">
                                         <small class="text-danger text-message"></small>
                                     </div>
                                 </div>
@@ -112,11 +112,11 @@
                                     <tr>
                                         <td>1</td>
                                         <td><input type="hidden" class="form-control bank-ID" name="bankID[]">
-                                            <input type="text" class="form-control required bank-bank" required name="bankName[]">
+                                            <input type="text" class="form-control required bank-bank autocomplete" required name="bankName[]" id="autocomplete-bank">
                                             <small class="text-danger text-message"></small>
                                         </td>
                                         <td><input type="text" class="form-control required bank-accountName" required name="bankAccName[]"><small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control required bank-accountNumber" required name="bankAccNum[]"><small class="text-danger text-message"></small></td>
+                                        <td><input type="text" class="form-control required bank-accountNumber number" required name="bankAccNum[]"><small class="text-danger text-message"></small></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -211,5 +211,10 @@
                 $tablename.find("tbody tr:first").remove();
             }
         }
+
+        var companyBankTags = bankName();
+        $( "#autocomplete-bank" ).autocomplete({
+          source: companyBankTags
+        });
     });
 </script>
