@@ -10543,10 +10543,14 @@ class C_api extends CI_Controller {
 
             $totalData = $this->Globalinformation_model->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
-            $result = $this->Globalinformation_model->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+            if(!empty($reqdata['start']) && !empty($reqdata['length'])){
+                $result = $this->Globalinformation_model->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+            }else{
+                $result = $this->Globalinformation_model->fetchEmployee(false,$param)->result();
+            }
 
             $json_data = array(
-                "draw"            => intval( $reqdata['draw'] ),
+                "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
                 "recordsTotal"    => intval($TotalData),
                 "recordsFiltered" => intval($TotalData),
                 "data"            => (!empty($result) ? $result : 0)

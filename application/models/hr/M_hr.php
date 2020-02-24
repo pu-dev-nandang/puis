@@ -109,6 +109,7 @@ class M_hr extends CI_Model {
         $this->db->join("db_employees.sto_temp c","c.ID=a.DepartmentID","left");
         $this->db->join("db_employees.sto_temp d","d.ID=a.PositionID","left");
         $this->db->where($data);
+        $this->db->order_by("a.StartJoin, a.EndJoin","desc");
         $query = $this->db->get();
         return $query;
     }

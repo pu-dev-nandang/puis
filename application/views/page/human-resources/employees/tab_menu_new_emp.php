@@ -83,12 +83,13 @@
             <div class="tabulasi-emp">
               <ul class="nav nav-tabs" role="tablist">
                 <li class="nv-personal" ><a href="<?=site_url('human-resources/employees/edit-employees/'.$NIP)?>" ><i class="fa fa-user"></i> Personal Data</a></li>
-                <!-- <li class="nv-career" ><a href="<?=site_url('human-resources/employees/career-level/'.$NIP)?>"><i class="fa fa-suitcase"></i> Career Level</a></li>
+                <li class="nv-career" ><a href="<?=site_url('human-resources/employees/career-level/'.$NIP)?>"><i class="fa fa-suitcase"></i> Career Level</a></li>
                 <li class="nv-additional" ><a href="<?=site_url('human-resources/employees/additional-info/'.$NIP)?>"><i class="fa fa-user-plus"></i> Additional Information</a></li>
                 <li class="nv-family" ><a href="<?=site_url('human-resources/employees/family/'.$NIP)?>"><i class="fa fa-users"></i> Family</a></li>
                 <li class="nv-edu" ><a href="<?=site_url('human-resources/employees/educations/'.$NIP)?>"><i class="fa fa-graduation-cap"></i> Educations</a></li>
+                <li class="nv-training" ><a href="<?=site_url('human-resources/employees/training/'.$NIP)?>"><i class="fa fa-list-alt"></i> Training</a></li>
                 <li class="nv-experience" ><a href="<?=site_url('human-resources/employees/work-experience/'.$NIP)?>"><i class="fa fa-briefcase"></i> Work Experience</a></li>
-                <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li> -->
+                <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li>
               </ul>
             </div>
         </div>
@@ -128,6 +129,35 @@
         return result;
     }
 
+    function employees() {
+        var result = [];
+        var filtering = "sortby=em.ID&orderby=desc";        
+        var token = jwt_encode({Filter : filtering},'UAP)(*');
+        $.ajax({
+            type : 'POST',
+            url : base_url_js+"api/database/__fetchEmployees",
+            data : {token:token},
+            dataType : 'json',
+            async: false,
+            error : function(jqXHR){
+                console.log(jqXHR);
+                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                $("body #GlobalModal").modal("show");
+            },success : function(response){
+                if(!jQuery.isEmptyObject(response)){
+                    if(!jQuery.isEmptyObject(response.data)){
+                        $.each(response.data,function(k,v){
+                            result.push(v.NIP+"/"+v.Name);                    
+                        });
+                    }
+                }
+            }
+        });
+
+        return result;
+    }
+
+    
     function companyName() {
         var result = [];
         $.ajax({
@@ -149,6 +179,7 @@
 
         return result;
     }
+
     
     function bankName() {
         var result = [];
@@ -189,11 +220,12 @@
         
         cloneRow.find("td input[type=text].datepicker-tmp").removeClass("hasDatepicker").attr("id","datePicker-"+fieldName+"-"+num);
         cloneRow.find("td input[type=text].datepicker-sd").removeClass("hasDatepicker").attr("id","datePickerSD-"+fieldName+"-"+num);
-        cloneRow.find("td select.select2-tmp").attr("id","select2-"+fieldName+"-"+num);
-        cloneRow.find("td select.select2-sd").attr("id","select2SD-"+fieldName+"-"+num);
         
-        cloneRow.find("td input.select2-term-ft").attr("id","select2-term-ft-"+fieldName+"-"+num).removeClass("select2-offscreen");
-        cloneRow.find("td input.select2-term-sd").attr("id","select2-term-sd-"+fieldName+"-"+num).removeClass("select2-offscreen");
+        cloneRow.find("td select.select2-tmp").attr("id","select2-"+fieldName+"-"+num).prop("disabled",false);
+        cloneRow.find("td select.select2-sd").attr("id","select2SD-"+fieldName+"-"+num).prop("disabled",true);
+        
+        /*cloneRow.find("td .select2-term-ft").attr("id","select2-term-ft-"+fieldName+"-"+num).removeClass("select2-offscreen");
+        cloneRow.find("td .select2-term-sd").attr("id","select2-term-sd-"+fieldName+"-"+num).removeClass("select2-offscreen");*/
 
         cloneRow.find("td input.autocomplete").attr("id","autocomplete-"+fieldName+"-"+num).removeClass("ui-autocomplete-input").removeAttr("autocomplete");
 
@@ -206,12 +238,13 @@
             dateFormat: 'yy-mm-dd',
             changeYear: true,
             changeMonth: true
-        });;
+        });
         parent.find("#table-list-"+fieldName+" tbody tr > td #datePickerSD-"+fieldName+"-"+num).datepicker({
             dateFormat: 'yy-mm-dd',
             changeYear: true,
             changeMonth: true
-        });;
+        });
+
         /*SELECT2*/
         var select2 = parent.find("#table-list-"+fieldName+" tbody tr > td #select2-"+fieldName+"-"+num);
         select2.prev().remove();
@@ -219,17 +252,7 @@
         var select2SD = parent.find("#table-list-"+fieldName+" tbody tr > td #select2SD-"+fieldName+"-"+num);
         select2SD.prev().remove();
         select2SD.select2({width:'100%'});
-        try{
-            var select2termft = parent.find("#table-list-"+fieldName+" tbody tr > td #select2-term-ft-"+fieldName+"-"+num);
-            select2termft.prev().remove();
-            select2GetDivision($("#select2-term-ft-"+fieldName+"-"+num));    
-        }catch(err){
-            console.log(err.message);
-        }
         
-        var select2termsd = parent.find("#table-list-"+fieldName+" tbody tr > td #select2-term-sd-"+fieldName+"-"+num);
-        select2termsd.prev().remove();
-
         /*AUTOCOMPLETE*/
         var companyTags = companyName();
         var autocomplete_company = parent.find("#table-list-"+fieldName+" tbody tr > td #autocomplete-experience-"+num);
@@ -242,6 +265,13 @@
         autocomplete_bank.autocomplete({
           source: companyBankTags
         });
+        
+        var employeeTags = employees();
+        var autocomplete_employee = parent.find("#table-list-"+fieldName+" tbody tr > td #autocomplete-career-"+num);
+        autocomplete_employee.autocomplete({
+          source: employeeTags
+        });
+
 
 
     });

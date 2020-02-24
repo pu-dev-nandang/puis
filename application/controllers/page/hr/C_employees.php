@@ -964,7 +964,9 @@ class C_employees extends HR_Controler {
             $data['NIP'] = $NIP;
             $data['status'] = $this->General_model->fetchData("db_employees.master_status",array("IsActive"=>1))->result();
             $data['level'] = $this->General_model->fetchData("db_employees.master_level",array("IsActive"=>1))->result();
-            $data['division'] = $this->General_model->fetchData("db_employees.sto_temp",array("isMainSTO"=>1, "typeNode"=>1,"isActive"=>1))->result();
+            //$data['division'] = $this->General_model->fetchData("db_employees.sto_temp",array("isMainSTO"=>1, "typeNode"=>1,"isActive"=>1))->result();
+            $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
+            $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
             $data['employees_status'] = $this->General_model->fetchData("db_employees.employees_status","Type != 'lec' and IDStatus != '-2'")->result();
             $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
             $data['currComp'] = $this->General_model->fetchData("db_employees.master_company",array("ID"=>1))->row();
@@ -974,6 +976,7 @@ class C_employees extends HR_Controler {
     }
 
 
+    /* ## CAREER SAVING BY STO ##
     public function careerSave(){
         $data = $this->input->post();
         if($data){
@@ -1005,25 +1008,63 @@ class C_employees extends HR_Controler {
                         $isExist = $this->General_model->fetchData("db_employees.employees_career",array("ID"=>$data['careerID'][$i]))->row();
                         if(!empty($isExist)){
                             $update = $this->General_model->updateData("db_employees.employees_career",$dataPost,array("ID"=>$data['careerID'][$i]));
-                            /*if($update){
-                                $isExistSTO = $this->General_model->fetchData("db_employees.sto_rel_user",array("NIP"=>$data['NIP'],"STOID"=>$data['position'][$i]))->row();
-                                if(!empty($isExistSTO)){
-                                    $updateSTO = $this->General_model->updateData("db_employees.sto_rel_user",$dataSTOUser,array("NIP"=>$data['NIP']));                                    
-                                }else{
-                                    $insertSTO = $this->General_model->insertData("db_employees.sto_rel_user",$dataSTOUser);
-                                }
-                            }*/
                             $message = (($update) ? "Successfully":"Failed")." updated.";
                         }else{$message ="Data not founded.";}
                     }else{
                         $insert = $this->General_model->insertData("db_employees.employees_career",$dataPost);
-                        /*if($insert){
-                            //insert into STO
-                            $isExistSTO = $this->General_model->fetchData("db_employees.sto_rel_user",array("NIP"=>$data['NIP'],"STOID"=>$data['position'][$i]))->row();
-                            if(empty($isExistSTO)){
-                                $insertSTO = $this->General_model->insertData("db_employees.sto_rel_user",$dataSTOUser);
-                            }
-                        }*/
+                        $message .= (($insert) ? "Successfully":"Failed")." saved.";
+                    }
+                }
+            }else{$message .= "Cannot saved. Empty dataPost";}
+
+            $conditions = array("NIP"=>$data['NIP']);
+            $myNIP = $this->session->userdata('NIP');
+            $myName = $this->session->userdata('Name');
+            $update = $this->General_model->updateData("db_employees.employees",array("UpdatedBy"=>$myNIP.'/'.$myName),$conditions);
+
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('human-resources/employees/career-level/'.$data['NIP']));
+
+        }else{show_404();}
+    }
+    */
+
+    ## CAREER SAVING BY EXISTING POSITION MAIN ##
+    public function careerSave(){
+        $data = $this->input->post();
+        if($data){
+            $message = "";
+            if(!empty($data['JoinDate'])){
+                for ($h=0; $h < count($data['JoinDate']); $h++) { 
+                    $dataPostJoin = array("NIP"=>$data['NIP'],"JoinDate"=>$data['JoinDate'][$h],"ResignDate"=>(!empty($data['ResignDate'][$h]) ? $data['ResignDate'][$h] : null ), "StatusEmployeeID"=>$data['StatusEmployeeID'][$h]);
+                    if(!empty($data['joinID'][$h])){
+                        $isExist = $this->General_model->fetchData("db_employees.employees_joindate",array("ID"=>$data['joinID'][$h]))->row();
+                        if(!empty($isExist)){
+                            $updateJoin = $this->General_model->updateData("db_employees.employees_joindate",$dataPostJoin,array("ID"=>$data['joinID'][$h]));
+                            $message = (($updateJoin) ? "Successfully":"Failed")." updated.";                            
+                        }else{$message = "Historical join not founded.";}
+                    }else{
+
+                        $insertJoin = $this->General_model->insertData("db_employees.employees_joindate",$dataPostJoin);
+                        $message = (($insertJoin) ? "Successfully":"Failed")." saved.";
+                    }
+                }
+
+            }else{$message .= "Cannot saved. Empty dataPost";}
+            
+
+            if(!empty($data['startJoin'])){
+                for ($i=0; $i < count($data['startJoin']) ; $i++) {
+                    $dataPost = array("NIP"=>$data['NIP'],"StartJoin"=>$data['startJoin'][$i], "EndJoin"=>$data['endJoin'][$i], "LevelID"=>$data['statusLevelID'][$i],"DepartmentID"=>$data['division'][$i],"PositionID"=>$data['position'][$i],"JobTitle"=>$data['jobTitle'][$i],"Superior"=>$data['superior'][$i],"StatusID"=>$data['statusID'][$i],"Remarks"=>$data['remarks'][$i],"isShowSTO"=>0);
+                    $dataSTOUser = array("NIP"=>$data['NIP'],"STOID"=>$data['position'][$i],"IsActive"=>1,"StatusID"=>$data['statusID'][$i],"JobTitle"=>$data['jobTitle'][$i]);
+                    if(!empty($data['careerID'][$i])){
+                        $isExist = $this->General_model->fetchData("db_employees.employees_career",array("ID"=>$data['careerID'][$i]))->row();
+                        if(!empty($isExist)){
+                            $update = $this->General_model->updateData("db_employees.employees_career",$dataPost,array("ID"=>$data['careerID'][$i]));
+                            $message = (($update) ? "Successfully":"Failed")." updated.";
+                        }else{$message ="Data not founded.";}
+                    }else{
+                        $insert = $this->General_model->insertData("db_employees.employees_career",$dataPost);
                         $message .= (($insert) ? "Successfully":"Failed")." saved.";
                     }
                 }
@@ -1116,6 +1157,50 @@ class C_employees extends HR_Controler {
 
         }else{show_404();}
     }
+
+
+    public function training($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $department = parent::__getDepartement();
+            $data['NIP'] = $NIP;
+            $page = $this->load->view('page/'.$department.'/employees/training',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function trainingSave(){
+        $data = $this->input->post();
+        if($data){
+            $message ="";
+            if(!empty($data['trainingTitle'])){
+                for ($k=0; $k < count($data['trainingTitle']); $k++) { 
+                    if(!empty($data['trainingTitle'][$k])){
+                        $dataPostTraining = array("NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$k],"trainer"=>$data['trainingTrainer'][$k], "start_event"=>$data['trainingStart'][$k], "end_event"=>$data['trainingEnd'][$k], "location"=>$data['trainingLocation'][$k], "feedback"=>$data['trainingFeedback'][$k], "category"=>$data['trainingCategory'][$k] );
+                        if(!empty($data['trainingID'][$k])){
+                            $update = $this->General_model->updateData("db_employees.employees_educations_training",$dataPostTraining,array("ID"=>$data['trainingID'][$k]));
+                            $message = (($update) ? "Successfully":"Failed")." updated.";
+                        }else{
+                            //insert
+                            $insert = $this->General_model->insertData("db_employees.employees_educations_training",$dataPostTraining);
+                            $message = (($insert) ? "Successfully":"Failed")." saved.";
+                        }
+                    }
+                }
+            }
+
+            $conditions = array("NIP"=>$data['NIP']);
+            $myNIP = $this->session->userdata('NIP');
+            $myName = $this->session->userdata('Name');
+            $update = $this->General_model->updateData("db_employees.employees",array("UpdatedBy"=>$myNIP.'/'.$myName),$conditions);
+
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('human-resources/employees/training/'.$data['NIP']));
+
+        }else{show_404();}
+    }
+
     
 
     public function workExperience($NIP){
@@ -1188,8 +1273,8 @@ class C_employees extends HR_Controler {
             $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();
             if(!empty($isExist)){
                 //$isExist->MyCareer = $this->General_model->fetchData("db_employees.employees_career",array("NIP"=>$isExist->NIP))->result();
-                $isExist->MyHistorical = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$isExist->NIP))->result();
-                $isExist->MyCareer = $this->m_hr->getEmpCareer(array("a.NIP"=>$isExist->NIP))->result();
+                $isExist->MyHistorical = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$isExist->NIP),"ID","desc")->result();
+                $isExist->MyCareer = $this->m_hr->getEmpCareer(array("a.NIP"=>$isExist->NIP,"isShowSTO"=>0))->result();
                 $isExist->MyBank = $this->General_model->fetchData("db_employees.employees_bank_account",array("NIP"=>$isExist->NIP))->result();
                 $isExist->MyEducation = $this->General_model->fetchData("db_employees.employees_educations",array("NIP"=>$isExist->NIP))->result();
                 $isExist->MyEducationNonFormal = $this->General_model->fetchData("db_employees.employees_educations_non_formal",array("NIP"=>$isExist->NIP))->result();
