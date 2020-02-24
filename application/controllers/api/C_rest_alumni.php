@@ -122,9 +122,21 @@ class C_rest_alumni extends CI_Controller {
       echo json_encode($this->callback);
     }
 
-    public function about_me(){
+    public function save_biodata(){
       $input = $this->getInputToken();
-      $this->callback = $this->m_alumni->about_me($input);
+      $this->callback = $this->m_alumni->save_biodata($input);
+      echo json_encode($this->callback);
+    }
+
+    public function upd_tbl_ta(){
+      $input = $this->getInputToken();
+      $this->callback = $this->m_alumni->upd_tbl_ta($input);
+      echo json_encode($this->callback);
+    }
+
+    public function load_data_education(){
+      $input = $this->getInputToken();
+      $this->callback = $this->m_alumni->load_data_education($input);
       echo json_encode($this->callback);
     }
 

@@ -6,6 +6,7 @@ class M_alumni extends CI_Model {
     {
         parent::__construct();
         $this->load->model('master/m_master');
+        $this->load->model('m_rest_global');
         $this->load->library('JWT');
     }
 
@@ -220,7 +221,7 @@ class M_alumni extends CI_Model {
         return $this->callback;
     }
 
-    public function about_me($dataToken){
+    public function save_biodata($dataToken){
         $tbl = 'db_alumni.biodata';
         $action = $dataToken['action'];
         switch ($action) {
@@ -259,6 +260,113 @@ class M_alumni extends CI_Model {
 
         $this->db->db_debug=true;
         return $this->callback;
+    }
+
+    public function upd_tbl_ta($dataToken){
+        $tbl = $dataToken['tbl'];
+        $data = $dataToken['data'];
+        $NPM = $dataToken['NPM'];
+        $this->db->db_debug=false;
+        $this->db->where('NPM',$NPM);
+        $query = $this->db->update($tbl,$data);
+        if( !$query )
+        {
+           $this->callback['msg'] = json_encode($this->db->error());
+        }
+        else
+        {
+         $this->callback['status'] = 1; 
+        }
+
+        $this->db->db_debug=true;
+        return $this->callback;
+        
+    }
+
+    public function load_data_education($dataToken){
+        $data = $dataToken['data'];
+        $NPM = $data['NPM'];
+        $sql = 'select a.ID,a.NPM,a.ID_university,un.Name_University,jud.GraduationDate,a.edu_code,ed.edu_name,a.ctr_code,ctr.ctr_name,
+            a.ID_major_programstudy_employees,mjr.Name_MajorProgramstudy, a.IPK, a.Description
+            from db_alumni.education as a
+            join db_research.university as un on a.ID_university = un.ID
+            join db_academic.judiciums_list as judlst on judlst.NPM = a.NPM
+            join db_academic.judiciums as jud on jud.ID = judlst.JID
+            join db_admission.education as ed on ed.edu_code = a.edu_code
+            join db_admission.country as ctr on ctr.ctr_code = a.ctr_code
+            join db_employees.major_programstudy_employees as mjr on mjr.ID = a.ID_major_programstudy_employees
+            where a.NPM = "'.$NPM.'"
+            group by a.ID
+            order by ed.edu_sort asc
+            ';
+        $query = $this->db->query(
+            $sql
+        )->result_array();
+
+        if (count($query) == 0) {
+            // insert lulusan PU
+                // get IPK
+                $dataMHS = $this->m_rest_global->api_Biodata_MHS($NPM);
+
+
+            $dataSave = [
+                'NPM' => $NPM,
+                'ID_university' => 52, // podomoro unversity
+                'Date_graduation' => $this->__Date_graduation($NPM),
+                'edu_code' =>  $this->__education_lulusan($NPM),
+                'ctr_code' => '001', // indonesia
+                'ID_major_programstudy_employees' => $this->__major_programstudy_employees($NPM),
+                'IPK' => number_format($dataMHS[0]->IPK_data['dataIPK']['IPK'], 2),
+            ];
+
+            // print_r($dataSave);die();
+
+            $this->db->insert('db_alumni.education',$dataSave);
+
+            $query = $this->db->query(
+                $sql
+            )->result_array();
+        }
+
+        $this->callback['status'] = 1; 
+        $this->callback['callback'] = $query;
+        return  $this->callback;
+    }
+
+    private function __major_programstudy_employees($NPM){
+        $query = $this->db->query(
+            'select mps.ID from db_academic.auth_students as auts
+             join db_academic.program_study as pst on auts.ProdiID = pst.ID
+             join db_employees.major_programstudy_employees as mps on mps.LinkIDProgramStudy = pst.ID
+             where auts.NPM = "'.$NPM.'"
+             '
+        )->result_array();
+
+        return $query[0]['ID'];
+    }
+
+    private function __education_lulusan($NPM){
+        $query = $this->db->query(
+            'select ed.edu_code from db_academic.auth_students as auts
+             join db_academic.program_study as pst on auts.ProdiID = pst.ID
+             join db_academic.education_level as edlev on edlev.ID = pst.EducationLevelID
+             join db_admission.education as ed on ed.edu_name = edlev.Name
+             where auts.NPM = "'.$NPM.'"
+            '
+        )->result_array();
+
+        return $query[0]['edu_code'];
+    }
+
+    private function __Date_graduation($NPM){
+        $query = $this->db->query(
+            'select b.GraduationDate from db_academic.judiciums_list as a 
+             join db_academic.judiciums as b on a.JID = b.ID
+             where a.NPM = "'.$NPM.'"   
+             '
+        )->result_array();
+
+        return $query[0]['GraduationDate'];
     }
   
 }
