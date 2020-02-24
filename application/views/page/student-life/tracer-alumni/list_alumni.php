@@ -278,6 +278,7 @@
         $('#GlobalModal .modal-body').html('<div class="row">' +
             '    <div class="col-md-12">' +
             '        <div class="well">' +
+            '           <div style="text-align: right;margin-bottom: 5px;"><a href="'+base_url_js+'student-life/master/company/add-company" target="_blank">Add new master company</a></div>' +
             '            <input class="form-control" placeholder="Search company" id="filterCompany">' +
             '            <table class="table table-centre">' +
             '               <thead>' +
