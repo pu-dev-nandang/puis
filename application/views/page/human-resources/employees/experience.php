@@ -59,8 +59,8 @@
                                         <td><input type="hidden" class="form-control exp-ID" name="comID[]">
                                         <input type="text" class="form-control required exp-company autocomplete" required name="comName[]" id="autocomplete-experience">
                                         <small class="text-danger text-message"></small></td>
-                                        <td class="industries"><select class="select2-tmp exp-industryID" name="comIndustry[]" id="select2-experience">
-                                                <option value="">Choose one</option>
+                                        <td class="industries"><select class="select2-tmp select2-req exp-industryID" name="comIndustry[]" id="select2-experience">
+                                                <option>Choose one</option>
                                                 <?php if(!empty($industry)){
                                                 foreach ($industry as $in) { 
                                                     echo '<option value="'.$in->ID.'">'.$in->name.'</option>';
@@ -94,6 +94,24 @@
 		$("#form-experience .btn-submit").click(function(){
             var itsme = $(this);
             var itsform = itsme.parent().parent().parent();
+            itsform.find(".select2-req").each(function(){
+                var value = $(this).val();
+                if($.isNumeric(value)){
+                    if($.trim(value) == ''){
+                        error = false;  
+                        $(this).addClass("error");
+                        $(this).parent().find(".text-message").text("Please fill this field");
+                    }else{
+                        error = true;
+                        $(this).removeClass("error");
+                        $(this).parent().find(".text-message").text("");
+                    }
+                }else{
+                    error = false;  
+                    $(this).addClass("error");
+                    $(this).parent().find(".text-message").text("Please fill this field");
+                }
+            });
             itsform.find(".required").each(function(){
                 var value = $(this).val();
                 if($.trim(value) == ''){
