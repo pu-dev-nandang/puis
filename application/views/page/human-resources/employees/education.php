@@ -129,62 +129,6 @@
                     </div>
         		</div>
         	</div>
-
-        	<div class="row">
-        		<div class="col-sm-12">
-        			<div class="panel panel-default" id="multiple-field" data-source="training">
-                        <div class="panel-heading">
-                            <div class="pull-right">
-                                <div class="btn-group">
-                                    <button class="btn btn-default btn-xs btn-add" type="button">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
-                                    <button class="btn btn-default btn-xs btn-remove" type="button">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <h4 class="panel-title">
-                                Training
-                            </h4>
-                        </div>
-                        <div class="panel-body">
-                            <table class="table table-bordered" id="table-list-training">
-                                <thead>
-                                    <tr>
-                                        <td width="2%">No</td>
-                                        <td>Training Title</td>
-                                        <td>Trainer Name</td>
-                                        <td>Start Event</td>
-                                        <td>End Event</td>
-                                        <td>Location</td>
-                                        <td>Result Feedback</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td><input type="hidden" class="form-control train-ID" name="trainingID[]">
-                                        <input type="text" class="form-control train-name" name="trainingTitle[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control train-trainer" name="trainingTrainer[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control datepicker-tmp train-start_event" id="datePicker-training" name="trainingStart[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control datepicker-sd train-end_event" id="datePickerSD-training" name="trainingEnd[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control train-location" name="trainingLocation[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control train-feedback" name="trainingFeedback[]">
-                                        <small class="text-danger text-message"></small></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-        		</div>
-        	</div>
-
         	
         </div>
         <div class="panel-footer text-right">
@@ -272,39 +216,6 @@
                 });
                 $tablename.find("tbody tr:first").remove();
             }
-
-            if(!jQuery.isEmptyObject(myData.MyEducationTraining)){
-                $tablename = $("#table-list-training"); var num = 1;
-                $.each(myData.MyEducationTraining,function(key,value){
-                    $cloneRow = $tablename.find("tbody > tr:last").clone();
-                    $cloneRow.attr("data-table","employees_educations_training").attr("data-id",value.ID).attr("data-name",value.name);
-                    $cloneRow.find("td:first").text(num);
-                    $.each(value,function(k,v){
-                        $cloneRow.find(".train-"+k).val(v);    
-                        if(k == "start_event"){
-			        		var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-training-"+num).removeClass("hasDatepicker");
-			        		cc.datepicker({
-					            dateFormat: 'yy-mm-dd',
-					            changeYear: true,
-					            changeMonth: true
-					        });
-			        	}  
-			        	if(k == "end_event"){
-			        		var cc = $cloneRow.find(".datepicker-sd").attr("id","datePickerSD-training-"+num).removeClass("hasDatepicker");
-			        		cc.datepicker({
-					            dateFormat: 'yy-mm-dd',
-					            changeYear: true,
-					            changeMonth: true
-					        });
-			        	}
-                    });
-                    
-                    $tablename.find("tbody").append($cloneRow);
-                    num++;
-                });
-                $tablename.find("tbody tr:first").remove();
-            }
-
 
         }
 
