@@ -969,18 +969,42 @@
 
         }
         else {
-            var msg = '';
+            var msg = '<ol>';
             if(formName==''){
-                msg = 'Name is required';
-            } else if (formYearBirth=='' || formMontBirth=='' || formDateBirth==''){
-                msg = 'Birthday is required';
-            } else if(form_MainDivision==''){
-                msg = 'Main Division is required';
-            } else if (form_MainPosition==''){
-                msg = 'Main Position is required';
-            } else if(SerdosForm==false){
-                msg = 'Serdos Number are required'
+                msg += '<li>Name is required</li>';
+            } if (formYearBirth=='' || formMontBirth=='' || formDateBirth==''){
+                msg += '<li>Birthday is required</li>';
+            } if(form_MainDivision==''){
+                msg += '<li>Main Division is required</li>';
+            } if (form_MainPosition==''){
+                msg += '<li>Main Position is required</li>';
+            } if(SerdosForm==false){
+                msg += '<li>Serdos Number are required</li>';
             }
+            /*ADDED BY FEBRI @ FEB 2020*/
+            if(formNIP == ''){
+                msg += '<li>NIP is required</li>';
+            }
+            if(formKTP == ''){
+                msg += '<li>No KTP is required</li>';
+            }
+            if(formReligion == ''){
+                msg += '<li>Religion is required</li>';
+            }
+            if(formGender == ''){
+                msg += '<li>Gender is required</li>';
+            }
+            if(formPlaceOfBirht == ''){
+                msg += '<li>Place of birth is required</li>';
+            }
+            if(formAddress == ''){
+                msg += '<li>Address is required</li>';
+            }
+            if(formPostcode == ''){
+                msg += '<li>Postal code is required</li>';
+            }
+            msg += "</ol>";
+            /*END ADDED BY FEBRI @ FEB 2020*/
             toastr.error(msg,'Error');
         }
 

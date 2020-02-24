@@ -58,7 +58,7 @@
                                 $myJobYear = $diffJ->format('%y');
                                 $myJobMonth = $diffJ->format('%m');
                                 $myJobDay = $diffJ->format('%d'); ?>
-                                <?=date("d F Y",strtotime($employee->HistoricalJoin->JoinDate))?> <span class="half-circle orange"><?=(!empty($myJobYear) ? $myJobYear.' years '.$myJobMonth.' months' : ( !empty($myJobMonth) ? $myJobMonth.' months '.$myJobDay.' days' : (!empty($myJobDay) ? $myJobDay.' days' : '-') ) ) ?></span>
+                                <?=date("d F Y",strtotime($employee->HistoricalJoin->JoinDate))?> <span class="half-circle orange"><?=(!empty($myJobYear) ? $myJobYear.' years '.$myJobMonth.' months' : ( !empty($myJobMonth) ? $myJobMonth.' months '.$myJobDay.' days' : (!empty($myJobDay) ? $myJobDay.' days' : '0 month') ) ) ?></span>
                                 <?php }else{echo "-";} ?>
                                 </h3>
                                 <?php if(!empty($employee->ResignDate)){ ?> 
@@ -203,6 +203,50 @@
         return result;
     }
 
+
+    function UniversityName() {
+        var result = [];
+        $.ajax({
+            type : 'POST',
+            url : base_url_js+"human-resources/master-aphris/get-univ",
+            dataType : 'json',
+            async: false,
+            error : function(jqXHR){
+                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                $("body #GlobalModal").modal("show");
+            },success : function(response){
+                if(!jQuery.isEmptyObject(response)){
+                    $.each(response,function(k,v){
+                        result.push(v.Name_University);                    
+                    });
+                }
+            }
+        });
+
+        return result;
+    }
+    
+    function MajorName() {
+        var result = [];
+        $.ajax({
+            type : 'POST',
+            url : base_url_js+"human-resources/master-aphris/get-major",
+            dataType : 'json',
+            async: false,
+            error : function(jqXHR){
+                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                $("body #GlobalModal").modal("show");
+            },success : function(response){
+                if(!jQuery.isEmptyObject(response)){
+                    $.each(response,function(k,v){
+                        result.push(v.Name_MajorProgramstudy);
+                    });
+                }
+            }
+        });
+
+        return result;
+    }
 
 
     $("#form-employee").on("click","#multiple-field .btn-add",function(){

@@ -6425,6 +6425,23 @@ class C_api extends CI_Controller {
                     
                     $this->db->insert('db_employees.employees',$formInsert);
 
+                    //insert career
+                    $division = 0; $position=0;
+                    
+                    if(strpos($formInsert['PositionMain'],'.') !== false){
+                        $splitPositionMain = explode(".", $formInsert['PositionMain']);
+                        $division = $splitPositionMain[0];
+                        $position = $splitPositionMain[1];
+                    }
+                    $currentDate = date("Y-m-d");
+                    $plus1Year = date('Y-m-d', strtotime('+1 years'));
+                    $dataCareer = array("NIP"=>$formInsert['NIP'],"StartJoin"=>$currentDate,"EndJoin"=>$plus1Year,"LevelID"=>1,"DepartmentID"=>$division,"PositionID"=>$position,"StatusID"=>3,"isShowSTO"=>0);
+                    $insertCareer = $this->db->insert('db_employees.employees_career',$dataCareer);
+                    $dataJoin = array("NIP"=>$formInsert['NIP'],"JoinDate"=>$currentDate,"StatusEmployeeID"=>$formInsert['StatusEmployeeID']);
+                    $insertJoin = $this->db->insert('db_employees.employees_joindate',$dataJoin);
+                    die();
+                    //end career
+
                     if ($Position == 6 || $Division == 15) {
                         if ($Division == 15) {
                             for($i=0;$i<count($ProdiArr);$i++){

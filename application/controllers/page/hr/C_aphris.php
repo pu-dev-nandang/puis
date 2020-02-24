@@ -577,5 +577,23 @@ class C_aphris extends HR_Controler {
     }
 
 
+    public function fetcthUniversity(){
+        $json = array();
+        $json = $this->General_model->fetchData("db_research.university",array())->result();
+        echo json_encode($json);
+    }
+    
+    
+    public function fetcthMajor(){
+        $json = array();
+        $json = $this->General_model->fetchData("db_employees.major_programstudy_employees",array())->result();
+        echo json_encode($json);
+    }
+
+
+
+
+
+
 
 }

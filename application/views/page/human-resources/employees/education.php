@@ -166,6 +166,31 @@
         });
 
 
+        $("#form-educations").on("change",".edu-levelEduID",function(){
+            var itsme = $(this);
+            var value = itsme.val();
+            if($.trim(value) != ""){
+                if($.trim(value) >= 4 ){
+                    var parent = itsme.parent().parent();
+                    var autocomplete_univ = parent.find(".edu-instituteName");
+                    var autocomplete_major = parent.find(".edu-major");
+
+                    var UniversityTags = UniversityName();
+                    autocomplete_univ.autocomplete({
+                      source: UniversityTags
+                    });
+                    
+                    var MajorTags = MajorName();
+                    autocomplete_major.autocomplete({
+                      source: MajorTags
+                    });
+
+
+                }
+            }
+        });
+
+
 		var myData = fetchAdditionalData("<?=$NIP?>");
         if(!jQuery.isEmptyObject(myData)){
             if(!jQuery.isEmptyObject(myData.MyEducation)){
