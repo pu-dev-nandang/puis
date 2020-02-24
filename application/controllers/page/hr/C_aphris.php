@@ -117,18 +117,19 @@ class C_aphris extends HR_Controler {
     	if(!empty($reqdata['search']['value']) ) {
             $search = $reqdata['search']['value'];
 
-        	$param .= "Name like '%".$search."%' AND ";
+        	$param .= "Name like '%".$search."%' ";
         }
 
-        $result = $this->General_model->fetchData("db_employees.master_company",(!empty($param) ? $param : array()))->result();
+        $result = $this->General_model->fetchData("db_studentlife.master_company",(!empty($param) ? $param : array()),"Name","asc",$reqdata['start']."#".$reqdata['length'])->result();
         //var_dump($this->db->last_query());
-        $TotalData = (!empty($result)) ? count($result) : 0;
+        $TotalData = count($this->General_model->fetchData("db_studentlife.master_company",(!empty($param) ? $param : array()))->result());
         $no = $reqdata['start'] + 1;
         $dataSub = array();
         if(!empty($result)){
         	foreach ($result as $v) {
-        		$v->no = $no++;
-        		$v->Industry = $this->General_model->fetchData("db_employees.master_industry_type",array("ID"=>$v->IndustryID))->row();
+                $v->no = $no++;
+                $detailIndustry = $this->General_model->fetchData("db_employees.master_industry_type",array("ID"=>$v->IndustryTypeID))->row();
+                $v->Industry = (!empty($detailIndustry) ? $detailIndustry :null);
         		$dataSub[] = $v;        		
         	}
         	$json_data = array(
@@ -153,8 +154,8 @@ class C_aphris extends HR_Controler {
         if($data){
         	$key = "UAP)(*";
 	        $data_arr = (array) $this->jwt->decode($data['token'],$key);
-        	$data['detail'] = $this->General_model->fetchData("db_employees.master_company",array("ID"=>$data_arr['ID']))->row();
-        	$data['detail']->company  = $this->General_model->fetchData("db_employees.master_industry_type",array("ID"=>$data['detail']->IndustryID))->row();
+        	$data['detail'] = $this->General_model->fetchData("db_studentlife.master_company",array("ID"=>$data_arr['ID']))->row();
+        	$data['detail']->company  = $this->General_model->fetchData("db_employees.master_industry_type",array("ID"=>$data['detail']->IndustryTypeID))->row();
         }
         $data['type'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
         $this->load->view('page/'.$department.'/aphris/company/form',$data,false);
@@ -166,12 +167,12 @@ class C_aphris extends HR_Controler {
     	$data = $this->input->post();
     	if($data){
     		if(!empty($data['ID'])){
-    			$data['editedby'] = $this->session->userdata('NIP');
-    			$update = $this->General_model->updateData("db_employees.master_company",$data,array("ID"=>$data['ID']));
+    			$data['UpdatedBy'] = $this->session->userdata('NIP')."/FROM-M-EMP";
+    			$update = $this->General_model->updateData("db_studentlife.master_company",$data,array("ID"=>$data['ID']));
     			$message = ($update) ? "Successfully updated.":"Failed update.".$update;
     		}else{
-    			$data['createdby'] = $this->session->userdata('NIP');
-    			$insert = $this->General_model->insertData("db_employees.master_company",$data);
+    			$data['EntredBy'] = $this->session->userdata('NIP')."/FROM-M-EMP";
+    			$insert = $this->General_model->insertData("db_studentlife.master_company",$data);
     			$message = ($insert) ? "Successfully saved.":"Failed saved.".$insert;
     		}
     		$this->session->set_flashdata("message",$message);
@@ -564,7 +565,7 @@ class C_aphris extends HR_Controler {
 
     public function fetchCompany(){
         $json = array();
-        $json = $this->General_model->fetchData("db_employees.master_company",array("IsActive"=>1))->result();
+        $json = $this->General_model->fetchData("db_studentlife.master_company",array())->result();
         echo json_encode($json);
     }
     

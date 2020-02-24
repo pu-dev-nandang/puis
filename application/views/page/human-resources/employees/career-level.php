@@ -234,7 +234,7 @@
                             </h4>
                         </div>
                         <div class="panel-body">
-                            <h3 style="margin-top:0px "><?=(!empty($currComp) ? $currComp->Name: '')?></h3>
+                            <h3 style="margin-top:0px ">Yayasan Pendidikan Agung Podomoro - Podomoro University</h3>
                             <table class="table table-bordered" id="table-list-join">
                                 <thead>
                                     <tr>                                        
