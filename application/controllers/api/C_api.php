@@ -1466,20 +1466,20 @@ class C_api extends CI_Controller {
                                             LEFT JOIN db_academic.semester s ON (s.ID = ay.SemesterID)
                                             WHERE s.ID = "'.$SemesterID.'" ')->result_array();
 
-        if($data[0]['EditTimeTable']=='0'){
-            $dateNow = date('Y-m-d');
-            $data[0]['D'] = $dateNow;
-            if($data[0]['krsStart']<=$dateNow && $data[0]['krsEnd']>=$dateNow){
-                $data[0]['EditTimeTable'] = '0';
-            } else {
-                if($data[0]['Status']==1){
-                    $data[0]['EditTimeTable'] = '1';
-                } else {
-                    $data[0]['EditTimeTable'] = '0';
-                }
-
-            }
-        }
+//        if($data[0]['EditTimeTable']=='0'){
+//            $dateNow = date('Y-m-d');
+//            $data[0]['D'] = $dateNow;
+//            if($data[0]['krsStart']<=$dateNow && $data[0]['krsEnd']>=$dateNow){
+//                $data[0]['EditTimeTable'] = '0';
+//            } else {
+//                if($data[0]['Status']==1){
+//                    $data[0]['EditTimeTable'] = '1';
+//                } else {
+//                    $data[0]['EditTimeTable'] = '0';
+//                }
+//
+//            }
+//        }
 
         return $data;
 
