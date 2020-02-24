@@ -86,7 +86,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label>Number Of Branchef</label>
+                            <label>Number Of Branches</label>
                             <input class="form-control form-master-company" type="number" id="NumberOfBranchef" />
                         </div>
                     </div>
