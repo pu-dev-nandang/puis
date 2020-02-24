@@ -285,7 +285,7 @@
             var lastRow = parent.find("#table-list-"+fieldName+" tbody tr:last");
             var hasAttr = lastRow.attr("data-table");
             if(typeof hasAttr !== typeof undefined && hasAttr !== false){
-                if(confirm("Are you sure wants to remove this bank "+lastRow.data("name")+"?")){
+                if(confirm("Are you sure wants to remove this "+lastRow.data("name")+"?")){
                     var data = {
                       ID : lastRow.data("id"),
                       TABLE : lastRow.data("table")

@@ -969,7 +969,7 @@ class C_employees extends HR_Controler {
             $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
             $data['employees_status'] = $this->General_model->fetchData("db_employees.employees_status","Type != 'lec' and IDStatus != '-2'")->result();
             $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
-            $data['currComp'] = $this->General_model->fetchData("db_employees.master_company",array("ID"=>1))->row();
+            //$data['currComp'] = $this->General_model->fetchData("db_employees.master_company",array("ID"=>1))->row();
             $page = $this->load->view('page/'.$department.'/employees/career-level',$data,true);
             $this->tab_menu_new_emp($page,$NIP);
         }else{show_404();}
@@ -1223,10 +1223,10 @@ class C_employees extends HR_Controler {
             if(!empty($data['comName'])){
                 for ($i=0; $i < count($data['comName']); $i++) { 
                     //check company name
-                    $isMasterCompany = $this->General_model->fetchData("db_employees.master_company","Name like '%".$data['comName'][$i]."%'")->row();
+                    /*$isMasterCompany = $this->General_model->fetchData("db_employees.master_company","Name like '%".$data['comName'][$i]."%'")->row();
                     if(empty($isMasterCompany)){
                         $insertCompany = $this->General_model->insertData("db_employees.master_company",array("Name"=>$data['comName'][$i],"IsActive"=>1,"IndustryID"=>$data['comIndustry'][$i]));
-                    }
+                    }*/
                     $dataPost = array("NIP"=>$data['NIP'],"company"=>$data['comName'][$i],"industryID"=>$data['comIndustry'][$i], "start_join"=>$data['comStartJoin'][$i], "end_join"=>$data['comEndJoin'][$i], "jobTitle"=>$data['comJobTitle'][$i], "reason"=>$data['comReason'][$i] );
                     if(!empty($data['comID'][$i])){
                         $update = $this->General_model->updateData("db_employees.employees_experience",$dataPost,array("ID"=>$data['comID'][$i]));
