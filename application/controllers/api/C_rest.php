@@ -933,7 +933,8 @@ class C_rest extends CI_Controller {
                 $ScheduleID = $dataToken['ScheduleID'];
 //                $ScheduleID = 393;
 
-                $data = $this->db->query('SELECT ID,Sessions FROM db_academic.counseling_topic WHERE ScheduleID = "'.$ScheduleID.'" ')->result_array();
+                $data = $this->db->query('SELECT ID,Sessions FROM db_academic.counseling_topic 
+                    WHERE ScheduleID = "'.$ScheduleID.'" ')->result_array();
 
 
                 $result = [];
@@ -4087,6 +4088,43 @@ class C_rest extends CI_Controller {
         }
 
         return print_r(json_encode($result));
+
+    }
+
+    public function getDetailCourseByIDAttd($ID_Attd){
+
+        $dataDetail = $this->db->query('SELECT attd.ScheduleID, smt.Name AS SemesterName, s.ClassGroup, cd.TotalSKS AS Credit, 
+                                                    mk.Name AS Course, em.Name As CoordinatorName, s.Coordinator, sd.StartSessions, sd.EndSessions, cl.Room, d.Name AS DayName,
+                                                    s.TotalAssigment, gc.Assg1, gc.Assg2, gc.Assg3, gc.Assg4, gc.Assg5, gc.Assigment, gc.UTS, gc.UAS, gc.Status AS StatusSyllabus
+                                                    FROM db_academic.attendance attd
+                                                    LEFT JOIN db_academic.schedule s ON (s.ID = attd.ScheduleID)
+                                                    LEFT JOIN db_academic.grade_course gc ON (gc.SemesterID = attd.SemesterID AND gc.ScheduleID = attd.ScheduleID)
+                                                    LEFT JOIN db_academic.semester smt ON (smt.ID = attd.SemesterID)
+                                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                    WHERE attd.ID = "'.$ID_Attd.'" GROUP BY s.ID ')->result_array();
+
+        if(count($dataDetail)>0){
+            $ScheduleID = $dataDetail[0]['ScheduleID'];
+            $dataDetail[0]['DetailProdi'] = $this->db->query('SELECT ps.Code, ps.Name FROM db_academic.schedule_details_course sdc 
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                                WHERE sdc.ScheduleID = "'.$ScheduleID.'" GROUP BY sdc.ProdiID')->result_array();
+
+            $dataDetail[0]['TeamTeaching'] = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.schedule_team_teaching stt 
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                    WHERE stt.ScheduleID = "'.$ScheduleID.'" ORDER BY em.NIP ASC')->result_array();
+
+            $dataDetail[0]['TotalStudent'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.attendance_students 
+                                                            WHERE ID_Attd = "'.$ID_Attd.'" ')->result_array()[0]['Total'];
+
+        }
+
+        return print_r(json_encode($dataDetail[0]));
 
     }
 
