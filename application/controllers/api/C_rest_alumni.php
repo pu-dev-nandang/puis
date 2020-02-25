@@ -140,4 +140,16 @@ class C_rest_alumni extends CI_Controller {
       echo json_encode($this->callback);
     }
 
+    public function submit_education(){
+      $input = $this->getInputToken();
+      $this->callback = $this->m_alumni->submit_education($input);
+      echo json_encode($this->callback);
+    }
+
+    public function load_data_skills(){
+      $input = $this->getInputToken();
+      $this->callback = $this->m_alumni->load_data_skills($input);
+      echo json_encode($this->callback);
+    }
+
 }

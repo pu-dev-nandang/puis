@@ -286,8 +286,8 @@ class M_alumni extends CI_Model {
     public function load_data_education($dataToken){
         $data = $dataToken['data'];
         $NPM = $data['NPM'];
-        $sql = 'select a.ID,a.NPM,a.ID_university,un.Name_University,jud.GraduationDate,a.edu_code,ed.edu_name,a.ctr_code,ctr.ctr_name,
-            a.ID_major_programstudy_employees,mjr.Name_MajorProgramstudy, a.IPK, a.Description
+        $sql = 'select a.ID,a.NPM,a.ID_university,un.Name_University,jud.GraduationDate as Jud_GraduationDate,a.edu_code,ed.edu_name,a.ctr_code,ctr.ctr_name,
+            a.ID_major_programstudy_employees,mjr.Name_MajorProgramstudy, a.IPK, a.Description,auts.GraduationDate as GraduationDate
             from db_alumni.education as a
             join db_research.university as un on a.ID_university = un.ID
             join db_academic.judiciums_list as judlst on judlst.NPM = a.NPM
@@ -295,6 +295,7 @@ class M_alumni extends CI_Model {
             join db_admission.education as ed on ed.edu_code = a.edu_code
             join db_admission.country as ctr on ctr.ctr_code = a.ctr_code
             join db_employees.major_programstudy_employees as mjr on mjr.ID = a.ID_major_programstudy_employees
+            join db_academic.auth_students as auts on auts.NPM = a.NPM
             where a.NPM = "'.$NPM.'"
             group by a.ID
             order by ed.edu_sort asc
@@ -367,6 +368,85 @@ class M_alumni extends CI_Model {
         )->result_array();
 
         return $query[0]['GraduationDate'];
+    }
+
+    public function submit_education($dataToken){
+        $tbl = 'db_alumni.education';
+        $action = $dataToken['action'];
+        switch ($action) {
+            case 'add':
+                $data = $dataToken['data'];
+                $this->db->db_debug=false;
+                $query = $this->db->insert($tbl,$data);
+                if( !$query )
+                {
+                   $this->callback['msg'] = json_encode($this->db->error());
+                }
+                else
+                {
+                 $this->callback['status'] = 1; 
+                }
+                $this->db->db_debug=true;
+                break;
+            case 'edit':
+                $data = $dataToken['data'];
+                $ID = $dataToken['ID'];
+                $this->db->db_debug=false;
+                $this->db->where('ID',$ID);
+                $query = $this->db->update($tbl,$data);
+                if( !$query )
+                {
+                   $this->callback['msg'] = json_encode($this->db->error());
+                }
+                else
+                {
+                 $this->callback['status'] = 1; 
+                }
+                $this->db->db_debug=true;
+                break;
+            case 'delete':
+                $ID = $dataToken['ID'];
+                $this->db->db_debug=false;
+                $this->db->where('ID',$ID);
+                $query = $this->db->delete($tbl);
+                if( !$query )
+                {
+                   $this->callback['msg'] = json_encode($this->db->error());
+                }
+                else
+                {
+                 $this->callback['status'] = 1; 
+                }
+                $this->db->db_debug=true;
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        return $this->callback;
+    }
+
+    public function load_data_skills($dataToken){
+        $data = $dataToken['data'];
+        $NPM = $data['NPM'];
+        $rs = [];
+        $Level = ['Tingkat Lanjut','Menengah','Pemula'];
+        for ($i=0; $i < count($Level); $i++) { 
+            $sql = 'select * from db_alumni.skill where NPM = "'.$NPM.'" and Level = "'.$Level[$i].'"
+                        ';
+                    $query = $this->db->query(
+                        $sql
+                    )->result_array();
+            $rs[] = [
+                'level' => $Level[$i],
+                'data' => $query,
+            ];
+        }
+
+        $this->callback['status'] = 1; 
+        $this->callback['callback'] = $rs;
+        return  $this->callback;
     }
   
 }
