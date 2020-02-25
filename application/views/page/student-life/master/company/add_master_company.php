@@ -43,6 +43,7 @@
                             <div class="form-group">
                                 <label>Other Industry</label>
                                 <input type="text" class="form-control com-Industry" name="Industry" id="Industry" placeholder="Type industry name">
+                                <small class="text-danger text-message"></small>
                             </div>
                         </div>
                     </div>
@@ -278,6 +279,7 @@
     $(document).ready(function () {
         checkUpdate();
 
+        /*ADDED BY FEBRI @ FEB 2020*/
         $("#form-post-master").on("keyup keydown",".number",function(){
             this.value = this.value.replace(/[^0-9\.]/g,'');
         });
@@ -286,15 +288,14 @@
             var value = $(this).val();
             if($.isNumeric(value)){
                 if(value == 60){
-                    $("#form-post-master .oth-industry").removeClass('hidden');
+                    $("#form-post-master .oth-industry").removeClass('hidden').addClass("required");
                 }else{
-                    $("#form-post-master .oth-industry .com-Industry").val("");
+                    $("#form-post-master .oth-industry .com-Industry").val("").removeClass("required");
                     $("#form-post-master .oth-industry").addClass('hidden');
                 }
             }
         });
         
-        /*ADDED BY FEBRI @ FEB 2020*/
         
         $("#form-post-master").on("change","#StateID",function(){
             var value = $(this).val();
