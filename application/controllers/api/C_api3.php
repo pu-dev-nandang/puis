@@ -5986,9 +5986,13 @@ class C_api3 extends CI_Controller {
 
         }
         else if($data_arr['action']=='loadMasterCompany'){
-            $data = $this->db->order_by('ID','DESC')->get('db_studentlife.master_company')->result_array();
-
-            return print_r(json_encode($data));
+            //$data = $this->db->order_by('ID','DESC')->get('db_studentlife.master_company')->result_array();
+            $this->db->select("a.*,b.name as IndustryName");
+            $this->db->from('db_studentlife.master_company a');
+            $this->db->join('db_employees.master_industry_type b','b.ID = a.IndustryTypeID','left');
+            $this->db->order_by('a.ID','DESC');
+            $query = $this->db->get();
+            return print_r(json_encode($query->result_array()));
         }
         else if($data_arr['action']=='removeMasterCompany'){
             $ID = $data_arr['ID'];

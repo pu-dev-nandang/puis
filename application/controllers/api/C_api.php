@@ -12781,4 +12781,12 @@ class C_api extends CI_Controller {
         return print_r(json_encode($data));
     }
 
+
+    /*ADDED BY FEBRI @ FEB 2020*/
+    public function getState(){
+        $data = $this->db->order_by('ctr_name','ASC')->get('db_admission.country')->result_array();
+        return print_r(json_encode($data));
+    }
+    /*END ADDED BY FEBRI @ FEB 2020*/
+
 }
