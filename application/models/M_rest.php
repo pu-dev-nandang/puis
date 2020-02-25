@@ -1080,10 +1080,14 @@ class M_rest extends CI_Model {
         if(count($dataSch)){
             $this->load->model('m_api');
             for ($s = 0; $s < count($dataSch); $s++) {
-                $sesi = $this->db->query('SELECT sd.ScheduleID, cl.Room, d.NameEng, sd.StartSessions, sd.EndSessions
+                $sesi = $this->db->query('SELECT sd.ScheduleID, cl.Room, d.NameEng, sd.StartSessions, sd.EndSessions, 
+                                                   attd.ID AS ID_Attd, attd.SemesterID
                                                    FROM db_academic.schedule_details sd
                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID=sd.ClassroomID)
                                                    LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                   LEFT JOIN db_academic.attendance attd 
+                                                   ON (attd.SemesterID = '. $dataSch[$s]['SemesterID'].' 
+                                                   AND attd.ScheduleID = sd.ScheduleID AND attd.SDID = sd.ID)
                                                     WHERE sd.ScheduleID = "' . $dataSch[$s]['ID'] . '" ')->result_array();
                 $dataSch[$s]['detailSesi'] = $sesi;
 
