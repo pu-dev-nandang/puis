@@ -170,6 +170,8 @@ class M_alumni extends CI_Model {
             $path = './uploads/document/'.$NPM;
             if (!file_exists($path)) {
                 mkdir($path, 0777, true);
+                copy("./uploads/index.html",$path.'/index.html');
+                copy("./uploads/index.php",$path.'/index.php');
             }
 
             if (file_exists($path.'/'.$filename)) {
@@ -447,6 +449,24 @@ class M_alumni extends CI_Model {
         $this->callback['status'] = 1; 
         $this->callback['callback'] = $rs;
         return  $this->callback;
+    }
+
+    public function submit_skills($dataToken){
+        $data = $dataToken['data'];
+        $tbl = 'db_alumni.skill';
+        if (count($data) > 0) {
+            // delete first
+            $NPM = $data[0]['NPM'];
+            $this->db->where('NPM',$NPM);
+            $this->db->delete($tbl);
+
+            // insert batch
+            $this->db->insert_batch($tbl, $data);
+
+            $this->callback['status'] = 1; 
+        }
+
+        return $this->callback;
     }
   
 }
