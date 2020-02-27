@@ -2055,6 +2055,20 @@
             }
         });
     }
+    
+
+    function loadSelectOptionMaritalStatus(element,selected) {
+        var url = base_url_js+'api/__getMaritalStatus';
+
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = (selected!='' && typeof selected !== "undefined" && d.ID == selected) ? 'selected' : '';
+                $(element).append('<option value="'+d.ID+'" '+sc+'>'+d.name+'</option>');
+            }
+        });
+    }
+
 
     function loadSelectOptionEmployeesStatus(element,selected) {
         var url = base_url_js+'api/__getStatusEmployee';

@@ -55,7 +55,7 @@
                                                 <option value="">Choose one</option>                                                            
                                                 <?php if(!empty($educationLevel)){
                                                 foreach ($educationLevel as $v) {
-                                                echo '<option value="'.$v->ID.'">'.$v->Level.'</option>';
+                                                echo '<option value="'.$v->ID.'">'.$v->Level.' - '.$v->Description.'</option>';
                                                 } } ?>
                                             </select>
                                             <small class="text-danger text-message"></small>

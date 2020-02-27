@@ -6,7 +6,7 @@ class C_global_informations extends Globalclass {
 
     function __construct(){
         parent::__construct();
-        $this->load->model(array("General_model","global-informations/Globalinformation_model","M_sendemail","m_rest"));
+        $this->load->model(array("General_model","global-informations/Globalinformation_model","M_sendemail","m_rest","hr/m_hr"));
     }
 
 
@@ -503,7 +503,7 @@ class C_global_informations extends Globalclass {
 	                $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$isExist->Photo) : base_url('images/icon/userfalse.png') ;
 	            }
 	            $data['profilePIC'] = $srcImg;
-        		$data['detail'] = $isExist;
+        		
         		/*$splitMPosition = explode(".", $isExist->PositionMain);
     			$data['divisionMain'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitMPosition[0]))->row();
     			$data['positionMain'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitMPosition[1]))->row();*/
@@ -522,9 +522,48 @@ class C_global_informations extends Globalclass {
 	    			$data['othPositionDiv3'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitOTHPosition3[0]))->row();
 	    			$data['othPosition3'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitOTHPosition3[1]))->row();
     			}
+
+
+                /*APRISH DATA*/
+                $isExist->MyHistorical = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$isExist->NIP),"ID","ASC")->row();
+                $isExist->MyCareer = $this->m_hr->getEmpCareer(array("a.NIP"=>$isExist->NIP,"isShowSTO"=>0))->result();
+                $isExist->MyBank = $this->General_model->fetchData("db_employees.employees_bank_account",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducation = $this->General_model->fetchData("db_employees.employees_educations",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationNonFormal = $this->General_model->fetchData("db_employees.employees_educations_non_formal",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationTraining = $this->General_model->fetchData("db_employees.employees_educations_training",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyFamily = $this->General_model->fetchData("db_employees.employees_family_member",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyExperience = $this->General_model->fetchData("db_employees.employees_experience",array("NIP"=>$isExist->NIP))->result();
+                /*END APRISH DATA*/
+                $data['detail'] = $isExist;
+
+
         	}
         	$this->load->view('dashboard/global-informations/employees/detail',$data);
         }else{show_404();}
+    }
+
+
+    public function detailEmployeeOBJ(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();
+            if(!empty($isExist)){
+                //$isExist->MyCareer = $this->General_model->fetchData("db_employees.employees_career",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyHistorical = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$isExist->NIP),"ID","desc")->result();
+                $isExist->MyCareer = $this->m_hr->getEmpCareer(array("a.NIP"=>$isExist->NIP,"isShowSTO"=>0))->result();
+                $isExist->MyBank = $this->General_model->fetchData("db_employees.employees_bank_account",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducation = $this->General_model->fetchData("db_employees.employees_educations",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationNonFormal = $this->General_model->fetchData("db_employees.employees_educations_non_formal",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationTraining = $this->General_model->fetchData("db_employees.employees_educations_training",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyFamily = $this->General_model->fetchData("db_employees.employees_family_member",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyExperience = $this->General_model->fetchData("db_employees.employees_experience",array("NIP"=>$isExist->NIP))->result();
+                $json = $isExist;
+            }
+        }
+        echo json_encode($json);
     }
 
 

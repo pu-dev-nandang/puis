@@ -6439,7 +6439,7 @@ class C_api extends CI_Controller {
                     $insertCareer = $this->db->insert('db_employees.employees_career',$dataCareer);
                     $dataJoin = array("NIP"=>$formInsert['NIP'],"JoinDate"=>$currentDate,"StatusEmployeeID"=>$formInsert['StatusEmployeeID']);
                     $insertJoin = $this->db->insert('db_employees.employees_joindate',$dataJoin);
-                    die();
+                    $dataEducation = $this->db->insert('db_employees.employees_educations',array("NIP"=>$formInsert['NIP'],"LevelEduID"=>$formInsert['LevelEducationID']));
                     //end career
 
                     if ($Position == 6 || $Division == 15) {
@@ -12787,6 +12787,12 @@ class C_api extends CI_Controller {
         $data = $this->db->order_by('ctr_name','ASC')->get('db_admission.country')->result_array();
         return print_r(json_encode($data));
     }
+
+    public function getMaritalStatus(){
+        $data = $this->db->order_by('ID','ASC')->get('db_employees.master_marital_status')->result_array();
+        return print_r(json_encode($data));
+    }
+
     /*END ADDED BY FEBRI @ FEB 2020*/
 
 }

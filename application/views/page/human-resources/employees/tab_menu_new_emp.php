@@ -16,6 +16,10 @@
     .half-circle{border-radius: 10px;background: #eee;font-weight: bold;font-size: 12px;padding: 2px 5px;margin: 0px 8px }
     .half-circle.blue{background: #2fa4e7;color: #fff}
     .half-circle.orange{background: #dd5600;color: #fff}
+    .bgx{border:1px solid #ddd;padding: 6px 13px;font-weight: normal;border: 1px solid rgba(0, 0, 0, 0.13);}
+    .bgx.green{background-color: #51a351;color:#fff;}
+    .bgx.red{background-color: #bd362f;color:#fff;}
+    .bgx.blue{background-color: #3968c6;color:#fff;}
 
 </style>
 <div id="form-employee">
@@ -68,9 +72,9 @@
                         </div>
                         <div class="col-sm-2">
                             <div class="text-right">
-                                <button class="btn btn-success" type="button">
+                                <span class="bgx <?=(($employee->StatusEmployeeID == 2) ? 'green': ( ($employee->StatusEmployeeID == 1) ? 'blue':'red' ) )?>">
                                 <i class="fa fa-handshake-o"></i> <?=strtoupper($employee->EmpStatus)?>
-                                </button>
+                                </span>
                             </div>
                         </div>
                     </div>

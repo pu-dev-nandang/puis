@@ -928,7 +928,7 @@ class C_employees extends HR_Controler {
             if(!empty($data['relation'])){
                 $dataPost = array();
                 for ($i=0; $i < count($data['relation']); $i++) { 
-                    $dataPost = array("NIP"=>$data['NIP'],"name"=>$data['name'][$i],"relationID"=>$data['relation'][$i], "gender"=>$data['gender'][$i], "placeBirth"=>$data["placeBirth"][$i], "birthdate"=>$data["birthdate"][$i], "lastEduID"=>$data['lastEdu'][$i] );
+                    $dataPost = array("NIP"=>$data['NIP'],"name"=>$data['name'][$i],"relationID"=>$data['relation'][$i], "gender"=>$data['gender'][$i], "placeBirth"=>$data["placeBirth"][$i], "birthdate"=>$data["birthdate"][$i], "lastEduID"=>$data['lastEdu'][$i], "isCoverInsurance"=>$data['isCoverInsurance'][$i] );
                     if(!empty($data['familyID'][$i])){
                         $isExist = $this->General_model->fetchData("db_employees.employees_family_member",array("ID"=>$data['familyID'][$i]))->row();
                         if(!empty($isExist)){

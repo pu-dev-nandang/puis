@@ -11,6 +11,7 @@
         </div>
         <div class="panel-body">
             <div class="my-attendance">
+            <?php $open=false; if($open){ ?>
                 <table id="table-list-attendance" class="table table-bordered">
                     <thead>
                         <tr>
@@ -35,6 +36,7 @@
                         </tr>
                     </tbody>
                 </table>
+            <?php }else{echo "<h2 class='text-center'>Coming soon</h2>";} ?>
             </div>
         </div>
         
