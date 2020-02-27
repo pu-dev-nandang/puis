@@ -5986,9 +5986,20 @@ class C_api3 extends CI_Controller {
 
         }
         else if($data_arr['action']=='loadMasterCompany'){
-            $data = $this->db->order_by('ID','DESC')->get('db_studentlife.master_company')->result_array();
+            //$data = $this->db->order_by('ID','DESC')->get('db_studentlife.master_company')->result_array();
+            /*$this->db->select("a.*,b.name as IndustryName");
+            $this->db->from('db_studentlife.master_company a');
+            $this->db->join('db_employees.master_industry_type b','b.ID = a.IndustryTypeID','left');
+            $this->db->order_by('a.ID','DESC');
+            $query = $this->db->get();
+            return print_r(json_encode($query->result_array()));*/
 
-            return print_r(json_encode($data));
+            /*UPDATED BY FEBRI @ FEB 2020*/
+            $this->load->model('student-life/m_studentlife');
+            //$conditions['a.ID'] = (!empty($data_arr['ID']) ? $data_arr['ID'] : null);
+            $QUERY = $this->m_studentlife->fetchCompany()->result_array();
+            return print_r(json_encode($QUERY));
+            /*END UPDATED BY FEBRI @ FEB 2020*/
         }
         else if($data_arr['action']=='removeMasterCompany'){
             $ID = $data_arr['ID'];
