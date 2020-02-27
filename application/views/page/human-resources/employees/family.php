@@ -81,7 +81,7 @@
 				                        	<option value="">Choose one</option>
 				                        	<option value="1">Yes</option>
 				                        	<option value="0">No</option>
-				                        </select></td>
+				                        </select><small class="text-danger text-message"></small></td>
 				        			</tr>
 				        		</tbody>
 				        	</table>
