@@ -162,11 +162,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xs-12">
+                    <div class="col-xs-6">
                         <div class="form-group">
                             <label>Email Other</label>
                             <input class="form-control" id="formEmail" />
                         </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <label>Marital Status*</label>
+                        <select class="form-control" id="formMaritalStatus">
+                            <option value="">Choose One</option>
+                        </select>
                     </div>
                 </div>
 
@@ -408,6 +414,7 @@
           split++;
     }
     $(document).ready(function () {
+        loadSelectOptionMaritalStatus('#formMaritalStatus');
         loadYearOfBirth('#formYearBirth');
         loadMonthBirth('#formMontBirth');
 
@@ -559,6 +566,7 @@
 
         var formEmailPU = $('#formEmailPU').val();
         var formEmail = $('#formEmail').val();
+        var formMaritalStatus = $('#formMaritalStatus').val();
         var formAddress = $('#formAddress').val();
         var formPostcode = $('#formPostcode').val();
 
@@ -597,6 +605,7 @@
             && form_MainDivision!='' && form_MainDivision!=null
             && form_MainPosition!='' && form_MainPosition!=null
             && SerdosForm == true
+            && formMaritalStatus !='' && formPostcode !='' && formAddress !='' && formReligion !='' && formGender !=''
         ){
             loading_button('#btnSubmitEmployees');
             $('#btnCloseEmployees').prop('disabled',true);
@@ -677,6 +686,7 @@
                     Blood : formBlood,
                     Email : formEmail,
                     EmailPU : emailPU,
+                    MaritalStatus: formMaritalStatus,
                     Password_Old : Password_Old,
                     Address : formAddress,
                     Postcode : formPostcode,
@@ -826,6 +836,9 @@
             if(formPostcode == ''){
                 msg += '<li>Postal code is required</li>';
             }
+            if(formMaritalStatus == ''){
+                msg += '<li>Marital Status is required</li>';
+            } 
             msg += "</ol>";
             /*END ADDED BY FEBRI @ FEB 2020*/
             toastr.error(msg,'Error');

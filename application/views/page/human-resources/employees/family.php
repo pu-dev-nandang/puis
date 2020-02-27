@@ -42,6 +42,7 @@
 				        				<th style="vertical-align: middle" rowspan="2">Name</th>
 				        				<th style="text-align:center" colspan="2">Birtdate</th>
 				        				<th style="vertical-align: middle" rowspan="2">Last Education</th>
+				        				<th style="vertical-align: middle" rowspan="2">Covered Insurance</th>
 				        			</tr>
 				        			<tr>
 				        				<th>Place</th>
@@ -68,7 +69,7 @@
 				        				<td><input type="text" class="form-control fam-name" name="name[]" ></td>
 				        				<td><input type="text" class="form-control fam-placeBirth" name="placeBirth[]"><small class="text-danger text-message"></small></td>
 				        				<td><input type="text" class="form-control datepicker-tmp fam-birthdate dp-1" name="birthdate[]" id="datePicker"><small class="text-danger text-message"></small></td>
-				        				<td><select class="form-control required fam-lastEduID" required name="lastEdu[]" >
+				        				<td><select class="form-control fam-lastEduID" name="lastEdu[]" >
 				                            <option value="">Choose one</option>                                                            
 				                            <?php if(!empty($educationLevel)){
 				                            foreach ($educationLevel as $v) {
@@ -76,6 +77,11 @@
 				                            } } ?>
 				                        </select>
 				                        <small class="text-danger text-message"></small></td>
+				                        <td><select class="form-control required fam-isCoverInsurance" name="isCoverInsurance[]">
+				                        	<option value="">Choose one</option>
+				                        	<option value="1">Yes</option>
+				                        	<option value="0">No</option>
+				                        </select><small class="text-danger text-message"></small></td>
 				        			</tr>
 				        		</tbody>
 				        	</table>
