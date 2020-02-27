@@ -431,7 +431,7 @@ class C_global_informations extends Globalclass {
 
         if(!empty($data_arr['birthdate_start'])){
         	if(!empty($data_arr['birthdate_end'])){
-        		$param[] = array("field"=>"(em.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);    
+        		$param[] = array("field"=>"(em.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);
         		$param[] = array("field"=>"em.DateOfBirth","data"=>" <= '".date("Y-m-d",strtotime($data_arr['birthdate_end']))."' )","filter"=>"AND",);    
         	}else{
         		$param[] = array("field"=>"em.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);
@@ -562,7 +562,40 @@ class C_global_informations extends Globalclass {
 
 
     public function messageBlastFormParticipants(){
-		$data['t'] = "dsd";
+        $myname = $this->session->userdata('Name');
+        $mynip = $this->session->userdata('NIP');
+        $data = array();
+		$myAddressBook = array();
+        $AddressBook = $this->General_model->fetchData("db_mail_blast.mail_blast",array("createdby"=>$mynip."/".$myname))->result();
+        if(!empty($AddressBook)){
+            foreach ($AddressBook as $v) {
+                if(!empty($v->mail_to)){
+                    $mail_to = json_decode($v->mail_to);
+                    foreach ($mail_to as $n) {
+                        if(!in_array($n,$myAddressBook)){
+                            $myAddressBook[] = $n;
+                        }
+                    }
+                }
+                if(!empty($v->mail_cc)){
+                    $mail_cc = json_decode($v->mail_cc);
+                    foreach ($mail_cc as $c) {
+                        if(!in_array($c,$myAddressBook)){
+                            $myAddressBook[] = $c;
+                        }
+                    }
+                }
+                if(!empty($v->mail_bcc)){
+                    $mail_bcc = json_decode($v->mail_bcc);
+                    foreach ($mail_bcc as $b) {
+                        if(!in_array($b,$myAddressBook)){
+                            $myAddressBook[] = $b;
+                        }
+                    }
+                }
+            }
+        }
+        $data['myAddressBook'] = $myAddressBook;
 		echo $this->load->view('dashboard/global-informations/message-blast/formParticipants',$data,true);
 	}
 
@@ -634,8 +667,8 @@ class C_global_informations extends Globalclass {
             
             $message = "";
             $receiver = $data["mail_receiver_to"];
-            $receiver_cc = (!empty($data["mail_receiver-cc_to"]) ? $data["mail_receiver-cc_to"] : null);
-            $receiver_bcc = (!empty($data["mail_receiver-bcc_to"]) ? $data["mail_receiver-bcc_to"] : null);
+            $receiver_cc = (!empty($data["mail_receiver-cc_to"]) ? $data["mail_receiver-cc_to"] : array() );
+            $receiver_bcc = (!empty($data["mail_receiver-bcc_to"]) ? $data["mail_receiver-bcc_to"] : $mail_bcc );
             $mail_subject = $data["subject"];
             $mail_message = $data["message"];
             $totalMail = count($receiver) + count($receiver_cc);
@@ -684,7 +717,7 @@ class C_global_informations extends Globalclass {
                 $dataInsert['SubjectTypeID'] = $data['typeSubject'];
                 $dataInsert['mail_from'] = $data['mail_from'];
                 $dataInsert['mail_to'] = json_encode($data['mail_receiver_to']);
-                $dataInsert['mail_cc'] = json_encode($data['mail_receiver-cc_to']);
+                $dataInsert['mail_cc'] = !empty($data['mail_receiver_to']) ? json_encode($data['mail_receiver-cc_to']) : null;
                 $dataInsert['mail_bcc'] = json_encode($receiver_bcc);
                 $dataInsert['SubjectOth'] = $data['subject'];
                 $dataInsert['MessageOth'] = $data['message'];
@@ -708,11 +741,12 @@ class C_global_informations extends Globalclass {
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
             $positionMain = $this->session->userdata('PositionMain')['IDDivision'].".".$this->session->userdata('PositionMain')['IDPosition'];
             $getAccess = $this->General_model->fetchData("db_mail_blast.role_mail",array("PositionMain"=>$positionMain))->row();
+            
             if(!empty($getAccess)){
                 $conditions = "";
             }else{
+                $conditions = "createdby like '".$mynip."%' and isShow = 1";
             }
-                $conditions = "createdby like '".$mynip."%' and isShow = 1";                
             $sortby = "created";
             if(!empty($data_arr['Filter'])){            
                 $parse = parse_str($data_arr['Filter'],$output);
