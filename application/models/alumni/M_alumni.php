@@ -471,20 +471,26 @@ class M_alumni extends CI_Model {
 
     public function load_data_forum_server_side($dataToken){
         $requestData = $dataToken['data']['REQUEST'];
-        $NPM = $dataToken['data']['NPM'];
+        $NPM = $dataToken['data']['NPM']; // NPM or NIP
 
         $AddwherePost = [];
         $where='';
 
-        $AddwherePost[] = array('field'=>'(`'.'CreateBy'.'`','data'=>' = "'.$NPM.'")' ,'filter' =>' AND ');  
+        $AddwherePost[] = array('field'=>'(`'.'a`.`CreateBy'.'`','data'=>' = "'.$NPM.'"' ,'filter' =>' AND ');  
+        $AddwherePost[] = array('field'=>'`'.'b`.`UserID'.'`','data'=>' = "'.$NPM.'")' ,'filter' =>' or ');  
 
         if(!empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
-            $AddwherePost[] = array('field'=>'(`'.'Topic'.'`','data'=>' like "'.$search.'%")' ,'filter' =>' AND ');     
+            $AddwherePost[] = array('field'=>'(`'.'a`.`Topic'.'`','data'=>' like "'.$search.'%")' ,'filter' =>' AND ');     
         }
 
-        $sql_select = 'select * ';
-        $sql_from  = ' from db_alumni.forum';
+        $sql_select = 'select a.* ';
+        $sql_from  = ' from db_alumni.forum as a
+                       join db_alumni.forum_user as b on a.ForumID = b.ForumID
+
+        ';
+
+        $sqlCon = ' group by a.ForumID';
 
         if(!empty($AddwherePost)){
           $where = ' WHERE ';
@@ -501,13 +507,13 @@ class M_alumni extends CI_Model {
         }
 
         $Totaldata = $this->db->query('select count(*) as total from (
-                                              select 1 '.$sql_from.$where.'
+                                              select 1 '.$sql_from.$where.$sqlCon.'
 
                                         ) temp
 
                  ')->row()->total;
 
-        $queryData = $this->db->query($sql_select.$sql_from.$where.' LIMIT '.$requestData['start'].' , '.$requestData['length'].' ')->result_array();
+        $queryData = $this->db->query($sql_select.$sql_from.$where.$sqlCon.' LIMIT '.$requestData['start'].' , '.$requestData['length'].' ')->result_array();
 
         $No = (int)$requestData['start'] + 1;
         $data = array();
