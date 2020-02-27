@@ -1457,9 +1457,9 @@
         })
     }
     
-    function loadSelectOptionStudentYudisium(element,selected,status) {
+    function loadSelectOptionStudentYudisium(element,selected,status,SemesterID='') {
         var url = base_url_js+'api/__crudFinalProject';
-        var token = jwt_encode({action : 'getAllStdReg',Status:status},'UAP)(*');
+        var token = jwt_encode({action : 'getAllStdReg',SemesterID:SemesterID,Status:status},'UAP)(*');
         $.post(url,{token:token},function (jsonResult) {
 
             if(jsonResult.length>0){
@@ -1474,11 +1474,13 @@
                     } else if(v.Mentor2!=null && v.Mentor2!='' && mentor1==''){
                         mentor =  mentor1+')';
                     }
+                    
+                    if (mentor!=''){
+                        $(element).append('<option value="'+v.NPM+'" >'+v.NPM+' - '+v.Name+' '+mentor+'</option>')
+                            .val(selected).trigger('change');
+                    }
 
-                    var disabledrow =  (mentor=='') ? 'disabled ' : '';
 
-                    $(element).append('<option value="'+v.NPM+'" '+disabledrow+'>'+v.NPM+' - '+v.Name+' '+mentor+'</option>')
-                        .val(selected).trigger('change');
 
                 });
 

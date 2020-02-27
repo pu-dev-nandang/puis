@@ -9462,7 +9462,7 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='getAllStdReg'){
 
-                $SemesterID = '15';
+                $SemesterID = $data_arr['SemesterID'];
 
                 $queryDefault = 'SELECT ats.Name, ats.NPM, em4.Name AS Mentor1, em5.Name AS Mentor2
                                         FROM db_academic.std_study_planning ssp
@@ -9472,7 +9472,8 @@ class C_api extends CI_Controller {
                                         LEFT JOIN db_employees.employees em4 ON (ats.MentorFP1 = em4.NIP)
                                         LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
                                         
-                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" ORDER BY ats.NPM';
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" GROUP BY ats.NPM 
+                                        ORDER BY ats.NPM';
 
                 $data = $this->db->query($queryDefault)->result_array();
 
@@ -9579,11 +9580,22 @@ class C_api extends CI_Controller {
                         );
                         $this->db->insert('db_academic.final_project_schedule_student',$arr);
 
-                        // Update Status
-                        $this->db->where('NPM',$Student[$i]);
-                        $this->db->update('db_academic.final_project',array(
-                            'Status' => $data_arr['StatusStd']
-                        ));
+                        // Cek apakah sudah ada di tabel final projek apa blm jika belum maka akan di tambahkan
+                        $ckstd = $this->db->get_where('db_academic.final_project',array('NPM' => $Student[$i]))->result_array();
+
+                        if(count($ckstd)<=0){
+                            $this->db->insert('db_academic.final_project',array(
+                                'NPM' => $Student[$i],
+                                'Status' => $data_arr['StatusStd']
+                            ));
+                        } else {
+                            // Update Status
+                            $this->db->where('NPM',$Student[$i]);
+                            $this->db->update('db_academic.final_project',array(
+                                'Status' => $data_arr['StatusStd']
+                            ));
+                        }
+
                     }
                 }
 
@@ -12737,7 +12749,6 @@ class C_api extends CI_Controller {
     }
 
     public function getGrossRevenue(){
-
         $data = $this->db->order_by('ID','ASC')->get('db_studentlife.master_range_gross_revenue')->result_array();
         return print_r(json_encode($data));
     }

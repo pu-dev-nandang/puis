@@ -4786,7 +4786,9 @@ class C_api3 extends CI_Controller {
                                         LEFT JOIN db_academic.schedule sc ON (sc.ID = ssp.ScheduleID)
                                         LEFT JOIN db_employees.employees em4 ON (ats.MentorFP1 = em4.NIP)
                                         LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
-                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.$dataSearch;
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.$dataSearch.' GROUP BY ssp.NPM';
+
+//            print_r($queryDefault);exit;
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
