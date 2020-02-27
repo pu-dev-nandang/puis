@@ -468,5 +468,143 @@ class M_alumni extends CI_Model {
 
         return $this->callback;
     }
+
+    public function load_data_forum_server_side($dataToken){
+        $requestData = $dataToken['data']['REQUEST'];
+        $NPM = $dataToken['data']['NPM'];
+
+        $AddwherePost = [];
+        $where='';
+
+        $AddwherePost[] = array('field'=>'(`'.'CreateBy'.'`','data'=>' = "'.$NPM.'")' ,'filter' =>' AND ');  
+
+        if(!empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $AddwherePost[] = array('field'=>'(`'.'Topic'.'`','data'=>' like "'.$search.'%")' ,'filter' =>' AND ');     
+        }
+
+        $sql_select = 'select * ';
+        $sql_from  = ' from db_alumni.forum';
+
+        if(!empty($AddwherePost)){
+          $where = ' WHERE ';
+          $counter = 0;
+          foreach ($AddwherePost as $key => $value) {
+              if($counter==0){
+                  $where = $where.$value['field']." ".$value['data'];
+              }
+              else{
+                  $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+              }
+              $counter++;
+          }
+        }
+
+        $Totaldata = $this->db->query('select count(*) as total from (
+                                              select 1 '.$sql_from.$where.'
+
+                                        ) temp
+
+                 ')->row()->total;
+
+        $queryData = $this->db->query($sql_select.$sql_from.$where.' LIMIT '.$requestData['start'].' , '.$requestData['length'].' ')->result_array();
+
+        $No = (int)$requestData['start'] + 1;
+        $data = array();
+
+        for ($i=0; $i < count($queryData); $i++) { 
+          $row = $queryData[$i];
+          $nestedData = array();
+          $nestedData[] = $No;
+          // get Name by TypeUserID
+          if ($row['TypeUserID'] == 1) {
+              $G_dt = $this->m_master->caribasedprimary('db_academic.auth_students','NPM',$row['CreateBy']);
+          }
+          else
+          {
+            $G_dt = $this->m_master->caribasedprimary('db_employees.employees','NIP',$row['CreateBy']);
+          }
+          $nestedData[] = $G_dt[0]['Name'];
+          $nestedData[] = $row['Topic'];
+          $nestedData[] = $row['CreateAt'];
+
+          //  get user
+          $G_user = $this->db->query('
+                            select a.*,b.Name,b.DivisionName from db_alumni.forum_user as a
+                            join  (
+                                    select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                                    UNION
+                                    select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                                    from db_employees.employees as emp
+                                    join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                                ) as b on b.UserID = a.UserID
+                                where a.ForumID = '.$row['ForumID'].'
+                            ')->result_array();
+          $row['G_user'] = $G_user;
+
+          // get Comment
+          $G_comment =  $this->db->query('
+                            select a.*,b.Name,b.DivisionName from db_alumni.forum_comment as a
+                            join  (
+                                    select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                                    UNION
+                                    select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                                    from db_employees.employees as emp
+                                    join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                                ) as b on b.UserID = a.UserID
+                                where a.ForumID = '.$row['ForumID'].'
+                        ')->result_array();
+          $row['G_comment'] = $G_comment;
+          $nestedData[] = $row['ForumID'];
+          $tokenRow = $this->jwt->encode($row,"UAP)(*");
+          $nestedData['data'] = $tokenRow;
+          $data[] = $nestedData;
+          $No++;
+        }
+
+        $this->callback['status'] = 1; 
+        $this->callback['callback'] = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($Totaldata ),
+            "recordsFiltered" => intval( $Totaldata ),
+            "data"            => $data,
+        );
+
+        return $this->callback;
+
+    }
+
+    public function submit_forum_alumni($dataToken){
+        $tbl1 = 'db_alumni.forum';
+        $tbl2 = 'db_alumni.forum_comment';
+        $tbl3 = 'db_alumni.forum_user';
+        $action = $dataToken['action'];
+        switch ($action) {
+            case 'add':
+                $data_forum = $dataToken['data']['forum'];
+                $this->db->insert($tbl1,$data_forum);
+                $ForumID = $this->db->insert_id();
+
+                $data_forum_user =  $dataToken['data']['forum_user'];
+                // print_r($ForumID);die();
+                for ($i=0; $i < count($data_forum_user); $i++) { 
+                   $dataSave = [
+                    'ForumID' => $ForumID,
+                    'UserID' => $data_forum_user[$i],
+                   ];
+
+                   $this->db->insert($tbl3,$dataSave);
+                }
+
+                $this->callback['status'] = 1; 
+                return $this->callback;
+
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+    }
   
 }

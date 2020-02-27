@@ -3355,9 +3355,15 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function getEmployeeByDepartment($IDDivision)
     {
         $sql = "select * from db_employees.employees
-                where SPLIT_STR(PositionMain, '.', 1) = ? and StatusEmployeeID != -1
+                where ( 
+                        SPLIT_STR(PositionMain, '.', 1) = ?  or 
+                        SPLIT_STR(PositionOther1, '.', 1) = ? or
+                        SPLIT_STR(PositionOther2, '.', 1) = ? or
+                        SPLIT_STR(PositionOther3, '.', 1) = ?
+                      ) 
+                      and StatusEmployeeID != -1
                 ";
-        $query=$this->db->query($sql, array($IDDivision))->result_array();
+        $query=$this->db->query($sql, array($IDDivision,$IDDivision,$IDDivision,$IDDivision))->result_array();
         return $query;
     }
 

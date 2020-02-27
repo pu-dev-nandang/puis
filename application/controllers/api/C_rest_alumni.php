@@ -158,4 +158,16 @@ class C_rest_alumni extends CI_Controller {
       echo json_encode($this->callback);
     }
 
+    public function load_data_forum_server_side(){
+      $input = $this->getInputToken();
+      $this->callback = $this->m_alumni->load_data_forum_server_side($input);
+      echo json_encode($this->callback);
+    }
+
+    public function submit_forum_alumni(){
+      $input = $this->getInputToken();
+      $this->callback = $this->m_alumni->submit_forum_alumni($input);
+      echo json_encode($this->callback);
+    }
+
 }
