@@ -91,21 +91,44 @@
                 resultOBJ = response;
             }
         });
-
         if(!jQuery.isEmptyObject(resultOBJ)){
             var dataTable = $('#divTableCompany #tableCompany').DataTable( {
                 "data" : resultOBJ,
                 "columns": [
                     { "data": null },
-                    { "data": "Name"},
-                    { "data": "Industry",
+                    { "data": "CompanyName",
                       "render": function (data, type, row, meta) {
-                        var label = (!jQuery.isEmptyObject(row.IndustryTypeID) ? row.IndustryName : ((!jQuery.isEmptyObject(data)) ? data : '-') ) ;
+                        return '<p class="com-info">'+row.CompanyName+(!jQuery.isEmptyObject(row.Brand) ? '<br><small>'+row.Brand+'</small>':'') +'</p>';
+                      }
+                    },
+                    { "data": "CompanyIndustryName",
+                      "render": function (data, type, row, meta) {
+                        var label = "";
+                        if(!jQuery.isEmptyObject(row.Industry)){
+                            label += row.Industry;
+                        }else{
+                            label += row.CompanyIndustryName;
+                        }
                         
                         return label;
                       }
                     },
-                    { "data": "Address" },
+                    { "data": "Address",
+                       "render": function (data, type, row, meta) {
+                            var label = '<p class="com-info">'+row.CompanyAddress;
+                            if(!jQuery.isEmptyObject(row.CompanyDistrictName) && !jQuery.isEmptyObject(row.CompanyRegionName) && !jQuery.isEmptyObject(row.CompanyProvinceName) && !jQuery.isEmptyObject(row.CompanyPostcode)){
+                                label += '<br>'+row.CompanyDistrictName+', '+row.CompanyRegionName+', '+row.CompanyProvinceName+' '+row.CompanyPostcode+', ';
+                            }
+                            if(!jQuery.isEmptyObject(row.CompanyCountryName)){
+                                label += row.CompanyCountryName;
+                            }
+                            if(!jQuery.isEmptyObject(row.Phone)){
+                                label += '<br>'+row.Phone;
+                            }
+                            label += '</p>';
+                        return label;
+                      }
+                    },
                     { "data": "ID",
                       "render": function (data) {
                         var label = '<div class="btn-group"><button title="Edit" class="btn btn-warning btn-sm btnCompanyEdit" type="button" data-id="'+data+'"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-danger btnCompanyRemove" data-id="'+data+'" type="button" title="Remove"><i class="fa fa-trash"></i></button></div>';
