@@ -60,7 +60,7 @@
                     if(jsonResult.Status==1 || jsonResult.Status=='1'){
                         toastr.success(jsonResult.Msg,'Success');
                         setTimeout(function (                                                                                                                                            ) {
-                            loadDataCompany();
+                            location.reload();
                         },500);
                     } else {
                         toastr.warning(jsonResult.Msg,'Warning');

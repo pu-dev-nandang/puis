@@ -81,8 +81,8 @@
                         </div>
                         <div class="col-sm-2">
                             <div class="form-group">
-                                <label>State</label>
-                                <select class="com-StateID select2-req" id="StateID" name="StateID"></select>
+                                <label>Country</label>
+                                <select class="com-CountryID select2-req" id="CountryID" name="CountryID"></select>
                                 <small class="text-danger text-message"></small>
                             </div>
                             <div class="form-group">
@@ -174,6 +174,7 @@
             /*UPDATED BY FEBRI @ FEB 2020*/
             var DistrictID = 0; var ProvinceID = 0; var RegionID = 0;
             $.each(d,function(k,v){
+                console.log(k);
                 $("#form-post-master #"+k).val(v);
                 if(k == "IndustryTypeID"){
                     var keyval = 60;
@@ -188,8 +189,8 @@
                 if(k == "GrossRevenueID"){
                     loadSelectOptionGrossRevenue('#GrossRevenueID',v);
                 }
-                if(k == "StateID"){
-                    loadSelectOptionState('#StateID',v);
+                if(k == "CountryID"){
+                    loadSelectOptionCountry('#CountryID',v);
                 }
 
                 if(k == "ProvinceID"){
@@ -250,7 +251,7 @@
             */
 
         } else {
-            loadSelectOptionState("#StateID",'');
+            loadSelectOptionCountry("#CountryID",'');
             loadSelectOptionCompanyType('#IndustryTypeID','');
             //loadSelectOptionLoc_Province('#ProvinceID','');
 
@@ -262,10 +263,10 @@
     }
 
     /*ADDED BY FEBRI @ FEB 2020*/
-    function loadSelectOptionState(element,selected) {
-        var url = base_url_js+'api/__getState';
+    function loadSelectOptionCountry(element,selected) {
+        var url = base_url_js+'api/__getCountry';
         $.getJSON(url,function (jsonResult) {
-            $(element).append('<option>-- Select State --</option>');
+            $(element).append('<option>-- Select Country --</option>');
             $.each(jsonResult,function (i,v) {
                 var sc = (selected==v.ctr_code) ? 'selected' : '';
                 $(element).append('<option value="'+v.ctr_code+'" '+sc+'>'+v.ctr_name+'</option>');
@@ -288,7 +289,8 @@
             var value = $(this).val();
             if($.isNumeric(value)){
                 if(value == 60){
-                    $("#form-post-master .oth-industry").removeClass('hidden').addClass("required");
+                    $("#form-post-master .oth-industry").removeClass('hidden');
+                    $("#form-post-master .oth-industry .com-Industry").addClass("required");
                 }else{
                     $("#form-post-master .oth-industry .com-Industry").val("").removeClass("required");
                     $("#form-post-master .oth-industry").addClass('hidden');
@@ -297,7 +299,7 @@
         });
         
         
-        $("#form-post-master").on("change","#StateID",function(){
+        $("#form-post-master").on("change","#CountryID",function(){
             var value = $(this).val();
             if($.isNumeric(value)){
                 if(value == '001'){
@@ -331,30 +333,12 @@
             var error = false;
             var itsme = $(this);
             var itsform = itsme.parent().parent().parent().parent().parent();
-            itsform.find(".select2-req").each(function(){
-                var value = $(this).val();
-                if($.isNumeric(value)){
-                    if($.trim(value) == ''){
-                        error = false;  
-                        $(this).addClass("error");
-                        $(this).parent().find(".text-message").text("Please fill this field");
-                    }else{
-                        error = true;
-                        $(this).removeClass("error");
-                        $(this).parent().find(".text-message").text("");
-                    }
-                }else{
-                    error = false;  
-                    $(this).addClass("error");
-                    $(this).parent().find(".text-message").text("Please fill this field");
-                }
-            });
-            itsform.find(".required").each(function(){
+            itsform.find(".required,.select2-req").each(function(){
                 var value = $(this).val();
                 if($.trim(value) == ''){
                     $(this).addClass("error");
                     $(this).parent().find(".text-message").text("Please fill this field");
-                    error = false;
+                    error = false;                    
                 }else{
                     error = true;
                     $(this).removeClass("error");
@@ -388,7 +372,7 @@
                 $.post(url,{token:token},function (result) {
                     toastr.success('Data saved','Success');
                     setTimeout(function () {
-                        location.reload();
+                        window.location.replace("<?=site_url('student-life/master/company/list')?>");
                     },500);
                 });
 
