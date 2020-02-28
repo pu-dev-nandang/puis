@@ -107,7 +107,7 @@
                         if(!jQuery.isEmptyObject(row.Industry)){
                             label += row.Industry;
                         }else{
-                            label += row.CompanyIndustryName;
+                            label += (!jQuery.isEmptyObject(row.CompanyIndustryName) ? row.CompanyIndustryName : '-');
                         }
                         
                         return label;
@@ -115,7 +115,7 @@
                     },
                     { "data": "Address",
                        "render": function (data, type, row, meta) {
-                            var label = '<p class="com-info">'+row.CompanyAddress;
+                            var label = '<p class="com-info">'+(!jQuery.isEmptyObject(row.CompanyAddress) ? row.CompanyAddress : '');
                             if(!jQuery.isEmptyObject(row.CompanyDistrictName) && !jQuery.isEmptyObject(row.CompanyRegionName) && !jQuery.isEmptyObject(row.CompanyProvinceName) && !jQuery.isEmptyObject(row.CompanyPostcode)){
                                 label += '<br>'+row.CompanyDistrictName+', '+row.CompanyRegionName+', '+row.CompanyProvinceName+' '+row.CompanyPostcode+', ';
                             }
