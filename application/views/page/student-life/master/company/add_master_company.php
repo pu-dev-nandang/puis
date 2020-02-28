@@ -303,8 +303,11 @@
             var value = $(this).val();
             if($.isNumeric(value)){
                 if(value == '001'){
-                    $(".isrequire").addClass("required");
+                    $("#form-post-master .isrequire").addClass("required").prop("disabled",false);;
                     loadSelectOptionLoc_Province('#ProvinceID','');
+                }else{
+                    $("#form-post-master .isrequire").val("").removeClass("required").prop("disabled",true);
+                    $("#form-post-master .isrequire").next().text("");
                 }
             }
         });
