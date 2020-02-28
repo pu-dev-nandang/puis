@@ -12090,8 +12090,19 @@ class C_api extends CI_Controller {
         else if($data_arr['action']=='getTotalUnreadLog'){
 
             $UserID = $data_arr['UserID'];
-            $data = $this->db->select('ID')->get_where('db_notifikasi.logging_user',
-                array('UserID' => $UserID, "StatusRead" => "0"))->result_array();
+            $where = 'where b.UserID =  "'.$UserID.'" and b.StatusRead  = "0" ';
+            if (array_key_exists('Alumni', $data_arr) && $data_arr['Alumni'] == 'yes' ) {
+                $where .= ' And a.URLDirectAlumni is NOT NULL and a.URLDirectAlumni != ""';
+            }
+
+            $data = $this->db->query('
+                                        select b.ID from db_notifikasi.logging as a
+                                        join db_notifikasi.logging_user as b on a.ID = b.IDLogging
+                                        '.$where.'
+                                    ')->result_array();
+
+            // $data = $this->db->select('ID')->get_where('db_notifikasi.logging_user',
+                // array('UserID' => $UserID, "StatusRead" => "0"))->result_array();
             return print_r(json_encode(count($data)));
         }
         else if($data_arr['action']=='readLogUser'){
@@ -12101,6 +12112,9 @@ class C_api extends CI_Controller {
         elseif ($data_arr['action'] == 'ReadAllLog') {
             $UserID = $data_arr['UserID'];
             $this->db->where('UserID', $UserID);
+            if (array_key_exists('Alumni', $data_arr) && $data_arr['Alumni'] == 'yes' ) {
+                 $this->db->where('IDLogging in (select ID from db_notifikasi.logging where ID = IDLogging ) ');
+            }
             $this->db->update('db_notifikasi.logging_user',array('StatusRead' => '1', 'ShowNotif' => '1'));
             return print_r(json_encode(1));
         }

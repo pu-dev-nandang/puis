@@ -564,6 +564,7 @@ class M_alumni extends CI_Model {
           $nestedData[] = $row['ForumID'];
           $tokenRow = $this->jwt->encode($row,"UAP)(*");
           $nestedData['data'] = $tokenRow;
+          $nestedData['tokenURL'] = $this->jwt->encode((int) $row['ForumID'],"UAP)(*");
           $data[] = $nestedData;
           $No++;
         }
@@ -580,6 +581,26 @@ class M_alumni extends CI_Model {
 
     }
 
+    public function send_notif($data){
+        $url = url_pas.'rest2/__send_notif_browser';
+        $token = $this->jwt->encode($data,"UAP)(*");
+        $this->m_master->apiservertoserver($url,$token);
+    }
+
+    private function __UserEMP_NPM($UserID) // UserID = NIP or NPM
+    {
+        $sql =' select * from 
+                (
+                    select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                    UNION
+                    select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                    from db_employees.employees as emp
+                    join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                ) xx where UserID = "'.$UserID.'"    
+                ';
+        return $this->db->query($sql)->result_array();
+    }
+
     public function submit_forum_alumni($dataToken){
         $tbl1 = 'db_alumni.forum';
         $tbl2 = 'db_alumni.forum_comment';
@@ -592,7 +613,6 @@ class M_alumni extends CI_Model {
                 $ForumID = $this->db->insert_id();
 
                 $data_forum_user =  $dataToken['data']['forum_user'];
-                // print_r($ForumID);die();
                 for ($i=0; $i < count($data_forum_user); $i++) { 
                    $dataSave = [
                     'ForumID' => $ForumID,
@@ -601,6 +621,31 @@ class M_alumni extends CI_Model {
 
                    $this->db->insert($tbl3,$dataSave);
                 }
+
+                $tokenURL = $this->jwt->encode($ForumID,"UAP)(*");
+                // send notif
+                $UserIDCreateBy = $data_forum['CreateBy'];
+                $GetDataCreateBy = $this->__UserEMP_NPM($UserIDCreateBy);
+                $URLDirect = 'student-life/alumni/forum/detail/'.$tokenURL;
+                $URLDirectAlumni = 'forum/detail-topic/'.$tokenURL;
+
+                $dataNotif = [
+                    'auth' => 's3Cr3T-G4N',
+                    'Logging' => array(
+                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Forum alumni was created by '.$GetDataCreateBy[0]['Name'],
+                                    'Description' => 'Title : '.$data_forum['Topic'],
+                                    'URLDirect' => $URLDirect,
+                                    'URLDirectAlumni' => $URLDirectAlumni,
+                                    'CreatedBy' => $UserIDCreateBy,
+                                    'CreatedName' => $GetDataCreateBy[0]['Name'],
+                                  ),
+                    'To' => array(
+                              'NIP' => $data_forum_user,
+                            ),
+                    'Email' => 'No'
+                ];
+
+                $this->send_notif($dataNotif);
 
                 $this->callback['status'] = 1; 
                 return $this->callback;
@@ -611,6 +656,85 @@ class M_alumni extends CI_Model {
                 # code...
                 break;
         }
+    }
+
+    public function get_detail_topic($dataToken){
+        $ForumID = $dataToken['data']['ID'];
+        $rs = $this->m_master->caribasedprimary('db_alumni.forum','ForumID',$ForumID);
+        for ($i=0; $i < count($rs); $i++) { 
+            $row = $rs[$i];
+
+            if ($row['TypeUserID'] == 1) {
+                $G_dt = $this->m_master->caribasedprimary('db_academic.auth_students','NPM',$row['CreateBy']);
+            }
+            else
+            {
+              $G_dt = $this->m_master->caribasedprimary('db_employees.employees','NIP',$row['CreateBy']);
+            }
+
+            $rs[$i]['NameCreateBy'] = $G_dt[0]['Name'];
+
+            //  get user
+            $G_user = $this->db->query('
+                              select a.*,b.Name,b.DivisionName from db_alumni.forum_user as a
+                              join  (
+                                      select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                                      UNION
+                                      select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                                      from db_employees.employees as emp
+                                      join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                                  ) as b on b.UserID = a.UserID
+                                  where a.ForumID = '.$row['ForumID'].'
+                              ')->result_array();
+            $rs[$i]['G_user'] = $G_user;
+
+            // get Comment
+            $G_comment =  $this->db->query('
+                              select a.*,b.Name,b.DivisionName from db_alumni.forum_comment as a
+                              join  (
+                                      select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                                      UNION
+                                      select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                                      from db_employees.employees as emp
+                                      join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                                  ) as b on b.UserID = a.UserID
+                                  where a.ForumID = '.$row['ForumID'].' and a.ParentCommentID is NULL
+                          ')->result_array();
+            $G_comment = $this->get_recursive_comment($G_comment);
+
+
+            $rs[$i]['G_comment'] = $G_comment;
+
+        }
+
+         $this->callback['status'] = 1; 
+         $this->callback['callback'] = $rs;
+         return $this->callback;
+    }
+
+    public function get_recursive_comment($data){
+        for ($i=0; $i < count($data); $i++) { 
+             $data[$i] = $this->recursive_comment($data[$i]);
+        }
+
+        return $data;
+    }
+
+    public function recursive_comment($row){
+        $Forum_CommentID =  $row['Forum_CommentID'];
+        $Q = $this->db->query('
+                select a.*,b.Name,b.DivisionName from db_alumni.forum_comment as a
+                join  (
+                        select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                        UNION
+                        select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                        from db_employees.employees as emp
+                        join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                    ) as b on b.UserID = a.UserID
+                    where a.ParentCommentID = '.$Forum_CommentID.' 
+                 ')->result_array();
+        $row['comment_child'] = $this->get_recursive_comment($Q);
+        return $row;
     }
   
 }

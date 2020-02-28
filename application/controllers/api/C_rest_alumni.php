@@ -170,4 +170,10 @@ class C_rest_alumni extends CI_Controller {
       echo json_encode($this->callback);
     }
 
+    public function get_detail_topic(){
+      $input = $this->getInputToken();
+      $this->callback = $this->m_alumni->get_detail_topic($input);
+      echo json_encode($this->callback);
+    }
+
 }
