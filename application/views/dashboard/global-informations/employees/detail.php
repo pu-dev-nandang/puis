@@ -9,11 +9,10 @@
     .bgx.red{background-color: #bd362f;color:#fff;}
     .bgx.blue{background-color: #3968c6;color:#fff;}
 
-    #independent-box .box-heading{background: #067ec3;color: #fff;width: auto;display: inline-block; padding: 0px 50px 0px 20px;text-align: left;}
-    #independent-box .box-heading.green{background: #2ba24f}
-    #independent-box .box-heading.orange{background: #d28801}
-    #independent-box .box-heading > h4{font-size: 16px}
+    #independent-box .box-heading{text-align: left;margin-bottom: 30px;}
+    #independent-box .box-heading > h4{font-size: 18px;text-transform: uppercase;font-weight: 100;display: inline-block;background: #067ec3;color: #fff;margin:0px;margin: 0px;padding: 10px 60px 10px 20px;}
     #independent-box .box-ctn{font-size: 14px}
+    #independent-box .panel,#independent-box .panel-body{padding-top: 0px}
 
 </style>
 <div id="detail-user">
@@ -80,11 +79,11 @@
 
 			<div class="row" id="independent-box">
 				<div class="col-sm-6">
-					<div class="box-heading green">
-						<h4><i class="fa fa-user"></i> Personal Details</h4>
-					</div>
 					<div class="panel panel-default">
 						<div class="panel-body">
+							<div class="box-heading">
+								<h4><i class="fa fa-user"></i> Personal Data</h4>
+							</div>
 							<div class="row">
 								<div class="col-sm-12">
 									<div class="box-ctn historical">
@@ -134,11 +133,12 @@
 					</div>
 				</div>
 				<div class="col-sm-6">
-					<div class="box-heading orange">
-						<h4><i class="fa fa-bookmark"></i> Employee Details</h4>
-					</div>
+					
 					<div class="panel panel-default">
 						<div class="panel-body">
+							<div class="box-heading">
+								<h4><i class="fa fa-bookmark"></i> Employee Detail</h4>
+							</div>
 							<div class="row">
 								<div class="col-sm-12">
 									<div class="box-ctn academic">										
