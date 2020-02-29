@@ -1505,7 +1505,7 @@
                     } else if(v.Mentor2!=null && v.Mentor2!='' && mentor1==''){
                         mentor =  mentor1+')';
                     }
-                    
+
                     if (mentor!=''){
                         $(element).append('<option value="'+v.NPM+'" >'+v.NPM+' - '+v.Name+' '+mentor+'</option>')
                             .val(selected).trigger('change');

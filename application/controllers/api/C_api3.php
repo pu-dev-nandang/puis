@@ -4764,7 +4764,6 @@ class C_api3 extends CI_Controller {
 
             $requestData= $_REQUEST;
 
-            $SemesterID = $data_arr['SemesterID'];
 
             $ProdiID = (isset($data_arr['ProdiID']) && $data_arr['ProdiID']!='') ? $data_arr['ProdiID'] : '';
             $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
@@ -4776,6 +4775,12 @@ class C_api3 extends CI_Controller {
                                 OR ats.NPM LIKE "%'.$search.'%" )';
             }
 
+            $AsKaprodi = $data_arr['AsKaprodi'];
+            $NIP = $data_arr['NIP'];
+            $whereNonKaprodi = ($AsKaprodi=='0') ? ' AND (ats.MentorFP1 = "'.$NIP.'" OR ats.MentorFP2 = "'.$NIP.'") ' : '';
+            $whereSemesterID = ($AsKaprodi=='1') ? ' AND ssp.SemesterID = '.$data_arr['SemesterID'].' ' : '';
+
+
             $queryDefault = 'SELECT ssp.*, ats.Name AS StudentName, mk.MKCode,
                                         mk.NameEng AS CourseEng, sc.ClassGroup,
                                         ats.MentorFP1, em4.Name AS MentorFP1Name, ats.MentorFP2, em5.Name AS MentorFP2Name,
@@ -4786,14 +4791,16 @@ class C_api3 extends CI_Controller {
                                         LEFT JOIN db_academic.schedule sc ON (sc.ID = ssp.ScheduleID)
                                         LEFT JOIN db_employees.employees em4 ON (ats.MentorFP1 = em4.NIP)
                                         LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
-                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.$dataSearch.' GROUP BY ssp.NPM';
+                                        WHERE mk.Yudisium = "1" '.$whereSemesterID.$whereNonKaprodi.$WhereProdi.$dataSearch.' GROUP BY ssp.NPM';
 
 //            print_r($queryDefault);exit;
+
+            $queryDefaultTotal = 'SELECT COUNT(*) Total FROM ('.$queryDefault.') xx';
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
             $query = $this->db->query($sql)->result_array();
-            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
             $no = $requestData['start'] + 1;
             $data = array();
@@ -4889,8 +4896,8 @@ class C_api3 extends CI_Controller {
 
             $json_data = array(
                 "draw"            => intval( $requestData['draw'] ),
-                "recordsTotal"    => intval(count($queryDefaultRow)),
-                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval($queryDefaultRow),
                 "data"            => $data
             );
             echo json_encode($json_data);
