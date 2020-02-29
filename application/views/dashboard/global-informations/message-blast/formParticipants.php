@@ -28,6 +28,25 @@
 					</div>
 				</div>		
 			</div>
+			<div class="col-sm-6">
+				<div class="panel panel-default" id="my-address-book">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<i class="fa fa-address-book"></i> My Address Book
+						</h4>
+					</div>
+					<div class="panel-body" style="max-height:120px;overflow:auto">
+						<div class="row">
+							<?php if(!empty($myAddressBook)){ 
+							foreach ($myAddressBook as $b) { ?>
+							<div class="col-sm-6">
+								<label><input type="checkbox" class="mybook" value="<?=$b?>"> <?=$b?></label>
+							</div>
+							<?php } } ?>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		
 		<div class="row">

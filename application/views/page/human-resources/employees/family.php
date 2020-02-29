@@ -42,6 +42,7 @@
 				        				<th style="vertical-align: middle" rowspan="2">Name</th>
 				        				<th style="text-align:center" colspan="2">Birtdate</th>
 				        				<th style="vertical-align: middle" rowspan="2">Last Education</th>
+				        				<th style="vertical-align: middle" rowspan="2">Covered Insurance</th>
 				        			</tr>
 				        			<tr>
 				        				<th>Place</th>
@@ -68,7 +69,7 @@
 				        				<td><input type="text" class="form-control fam-name" name="name[]" ></td>
 				        				<td><input type="text" class="form-control fam-placeBirth" name="placeBirth[]"><small class="text-danger text-message"></small></td>
 				        				<td><input type="text" class="form-control datepicker-tmp fam-birthdate dp-1" name="birthdate[]" id="datePicker"><small class="text-danger text-message"></small></td>
-				        				<td><select class="form-control required fam-lastEduID" required name="lastEdu[]" >
+				        				<td><select class="form-control fam-lastEduID" name="lastEdu[]" >
 				                            <option value="">Choose one</option>                                                            
 				                            <?php if(!empty($educationLevel)){
 				                            foreach ($educationLevel as $v) {
@@ -76,6 +77,11 @@
 				                            } } ?>
 				                        </select>
 				                        <small class="text-danger text-message"></small></td>
+				                        <td><select class="form-control required fam-isCoverInsurance" name="isCoverInsurance[]">
+				                        	<option value="">Choose one</option>
+				                        	<option value="1">Yes</option>
+				                        	<option value="0">No</option>
+				                        </select><small class="text-danger text-message"></small></td>
 				        			</tr>
 				        		</tbody>
 				        	</table>
@@ -118,10 +124,6 @@
 		$tableFamily.find("tbody tr:first").remove();
 	}
 	$(document).ready(function(){
-		var dataFamily = '<?=(!empty($myfamily) ? json_encode($myfamily) : null)?>';
-		var convertFams = JSON.parse(dataFamily);
-		loadMyFamily(convertFams);
-		
 		$("#form-family-member .btn-submit").click(function(){
             var itsme = $(this);
             var itsform = itsme.parent().parent().parent();
@@ -146,5 +148,32 @@
                 alert("Please fill out the field.");
             }
         });
+
+        var myFams = fetchAdditionalData("<?=$NIP?>");
+        if(!jQuery.isEmptyObject(myFams)){
+            if(!jQuery.isEmptyObject(myFams.MyFamily)){
+                $tablename = $("#table-list-family"); var num = 1;
+                $.each(myFams.MyFamily,function(key,value){
+                    $cloneRow = $tablename.find("tbody > tr:last").clone();
+                    $cloneRow.attr("data-table","employees_family_member").attr("data-id",value.ID).attr("data-name",value.name);
+                    $cloneRow.find("td:first").text(num);
+                    $.each(value,function(k,v){
+                        $cloneRow.find(".fam-"+k).val(v);    
+                        if(k == "birthdate"){
+			        		var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-"+num).removeClass("hasDatepicker");
+			        		cc.datepicker({
+					            dateFormat: 'yy-mm-dd',
+					            changeYear: true,
+					            changeMonth: true
+					        });
+			        	}                    
+                    });
+                    
+                    $tablename.find("tbody").append($cloneRow);
+                    num++;
+                });
+                $tablename.find("tbody tr:first").remove();
+            }
+        }
 	});
 </script>
