@@ -552,7 +552,10 @@ class M_alumni extends CI_Model {
           $G_comment =  $this->db->query('
                             select a.*,b.Name,b.DivisionName from db_alumni.forum_comment as a
                             join  (
-                                    select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                                    select a.NPM as UserID,a.Name, "Student" as DivisionName from db_academic.auth_students as a
+                                    join (
+                                       '.$this->queryGetMHS().'
+                                    ) ta_std on ta_std.NPM = a.NPM
                                     UNION
                                     select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
                                     from db_employees.employees as emp
@@ -658,57 +661,87 @@ class M_alumni extends CI_Model {
         }
     }
 
+    private function queryGetMHS(){
+       $arr = $this->m_master->ShowDBLikes();
+       $str = 'select NPM,Name,Photo from '.$arr[0].'.students';
+       for ($i=1; $i < count($arr); $i++) { 
+           $str .= ' 
+                    UNION
+                    select NPM,Name,Photo from '.$arr[$i].'.students    
+                ';
+       }
+
+       return $str;
+    }
+
     public function get_detail_topic($dataToken){
         $ForumID = $dataToken['data']['ID'];
+        $UserID = $dataToken['data']['UserID'];
         $rs = $this->m_master->caribasedprimary('db_alumni.forum','ForumID',$ForumID);
-        for ($i=0; $i < count($rs); $i++) { 
-            $row = $rs[$i];
+        if (count($rs) > 0) {
+           for ($i=0; $i < count($rs); $i++) { 
+               $row = $rs[$i];
 
-            if ($row['TypeUserID'] == 1) {
-                $G_dt = $this->m_master->caribasedprimary('db_academic.auth_students','NPM',$row['CreateBy']);
-            }
-            else
-            {
-              $G_dt = $this->m_master->caribasedprimary('db_employees.employees','NIP',$row['CreateBy']);
-            }
+               if ($row['TypeUserID'] == 1) {
+                   $G_dt = $this->m_master->caribasedprimary('db_academic.auth_students','NPM',$row['CreateBy']);
+               }
+               else
+               {
+                 $G_dt = $this->m_master->caribasedprimary('db_employees.employees','NIP',$row['CreateBy']);
+               }
 
-            $rs[$i]['NameCreateBy'] = $G_dt[0]['Name'];
+               $rs[$i]['NameCreateBy'] = $G_dt[0]['Name'];
 
-            //  get user
-            $G_user = $this->db->query('
-                              select a.*,b.Name,b.DivisionName from db_alumni.forum_user as a
-                              join  (
-                                      select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
-                                      UNION
-                                      select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
-                                      from db_employees.employees as emp
-                                      join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
-                                  ) as b on b.UserID = a.UserID
-                                  where a.ForumID = '.$row['ForumID'].'
-                              ')->result_array();
-            $rs[$i]['G_user'] = $G_user;
+               //  get user
+               $G_user = $this->db->query('
+                                 select a.*,b.Name,b.DivisionName,b.Photo,b.Year from db_alumni.forum_user as a
+                                 join  (
+                                         select a.NPM as UserID,a.Name, "Student" as DivisionName,ta_std.Photo,a.Year as Year from db_academic.auth_students as a
+                                         join (
+                                            '.$this->queryGetMHS().'
+                                         ) ta_std on ta_std.NPM = a.NPM
+                                         UNION
+                                         select emp.NIP as UserID,emp.Name,divi.Division as DivisionName,emp.Photo,""
+                                         from db_employees.employees as emp
+                                         join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                                     ) as b on b.UserID = a.UserID
+                                     where a.ForumID = '.$row['ForumID'].'
+                                 ')->result_array();
+               $rs[$i]['G_user'] = $G_user;
 
-            // get Comment
-            $G_comment =  $this->db->query('
-                              select a.*,b.Name,b.DivisionName from db_alumni.forum_comment as a
-                              join  (
-                                      select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
-                                      UNION
-                                      select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
-                                      from db_employees.employees as emp
-                                      join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
-                                  ) as b on b.UserID = a.UserID
-                                  where a.ForumID = '.$row['ForumID'].' and a.ParentCommentID is NULL
-                          ')->result_array();
-            $G_comment = $this->get_recursive_comment($G_comment);
+               // get Comment
+               $G_comment =  $this->db->query('
+                                 select a.*,b.Name,b.DivisionName,b.Photo,b.Year from db_alumni.forum_comment as a
+                                 join  (
+                                         select a.NPM as UserID,a.Name, "Student" as DivisionName,ta_std.Photo,a.Year from db_academic.auth_students as a
+                                         join (
+                                            '.$this->queryGetMHS().'
+                                         ) ta_std on ta_std.NPM = a.NPM
+                                         UNION
+                                         select emp.NIP as UserID,emp.Name,divi.Division as DivisionName,emp.Photo,""
+                                         from db_employees.employees as emp
+                                         join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                                     ) as b on b.UserID = a.UserID
+                                     where a.ForumID = '.$row['ForumID'].' and a.ParentCommentID is NULL
+                             ')->result_array();
+               $G_comment = $this->get_recursive_comment($G_comment);
 
 
-            $rs[$i]['G_comment'] = $G_comment;
+               $rs[$i]['G_comment'] = $G_comment;
 
+           }
+
+           // update read comment
+           $this->db->where('ForumID',$ForumID);
+           $this->db->where('UserID',$UserID);
+           $this->db->update('db_alumni.forum_user',[
+            'ReadComment' => 1,
+           ]);
+
+            $this->callback['status'] = 1; 
+            $this->callback['callback'] = $rs;
         }
-
-         $this->callback['status'] = 1; 
-         $this->callback['callback'] = $rs;
+        
          return $this->callback;
     }
 
@@ -723,11 +756,14 @@ class M_alumni extends CI_Model {
     public function recursive_comment($row){
         $Forum_CommentID =  $row['Forum_CommentID'];
         $Q = $this->db->query('
-                select a.*,b.Name,b.DivisionName from db_alumni.forum_comment as a
+                select a.*,b.Name,b.DivisionName,b.Photo,b.Year from db_alumni.forum_comment as a
                 join  (
-                        select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                        select a.NPM as UserID,a.Name, "Student" as DivisionName,ta_std.Photo,a.Year from db_academic.auth_students as a
+                        join (
+                           '.$this->queryGetMHS().'
+                        ) ta_std on ta_std.NPM = a.NPM
                         UNION
-                        select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                        select emp.NIP as UserID,emp.Name,divi.Division as DivisionName,emp.Photo,""
                         from db_employees.employees as emp
                         join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
                     ) as b on b.UserID = a.UserID
@@ -735,6 +771,69 @@ class M_alumni extends CI_Model {
                  ')->result_array();
         $row['comment_child'] = $this->get_recursive_comment($Q);
         return $row;
+    }
+
+    public function submit_comment_forum($dataToken){
+        $tbl = 'db_alumni.forum_comment';
+        $dataSave = $dataToken['data'];
+        $this->db->db_debug=false;
+        $query = $this->db->insert($tbl,$dataSave);
+        if( !$query )
+        {
+           $this->callback['msg'] = json_encode($this->db->error());
+        }
+        else
+        {
+         $this->callback['status'] = 1; 
+        }
+        $this->db->db_debug=true;
+
+        // send notif
+        $ForumID = $dataSave['ForumID'];
+        $tokenURL = $this->jwt->encode($ForumID,"UAP)(*");
+        $UserIDCreateBy = $dataSave['UserID'];
+        $GetDataCreateBy = $this->__UserEMP_NPM($UserIDCreateBy);
+        $URLDirect = 'student-life/alumni/forum/detail/'.$tokenURL;
+        $URLDirectAlumni = 'forum/detail-topic/'.$tokenURL;
+
+        $data_forum_user = [];
+        $data_forum_user[] = $UserIDCreateBy;
+
+        $DepartmentID = 16; // kemahasiswaan
+        $G_dt = $this->m_master->getEmployeeByDepartment($DepartmentID);
+        for ($i=0; $i < count($G_dt); $i++) { 
+            $data_forum_user[]= $G_dt[$i]['NIP'];
+        }
+
+
+        // update to unread
+        $dataSaveUser = [
+         'ReadComment' => 0,
+        ];
+        $this->db->where('ForumID',$ForumID);
+        $this->db->update('db_alumni.forum_user',$dataSaveUser);
+
+
+        $dataNotif = [
+            'auth' => 's3Cr3T-G4N',
+            'Logging' => array(
+                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Comment forum alumni was created by '.$GetDataCreateBy[0]['Name'],
+                            'Description' => substr($dataSave['Comment'], 0,20),
+                            'URLDirect' => $URLDirect,
+                            'URLDirectAlumni' => $URLDirectAlumni,
+                            'CreatedBy' => $UserIDCreateBy,
+                            'CreatedName' => $GetDataCreateBy[0]['Name'],
+                          ),
+            'To' => array(
+                      'NIP' => $data_forum_user,
+                    ),
+            'Email' => 'No'
+        ];
+
+        $this->send_notif($dataNotif);
+        return $this->callback;
+
+
     }
   
 }
