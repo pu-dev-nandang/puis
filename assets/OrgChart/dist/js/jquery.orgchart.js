@@ -996,6 +996,7 @@
     },
     //
     dropHandler: function (event) {
+      
       var $dropZone = $(event.delegateTarget);
       var $dragged = this.$chart.data('dragged');
 
@@ -1054,6 +1055,15 @@
           .find('.bottomEdge').remove()
           .end().end().siblings().remove();
       }
+
+
+      /*CUSTOMIZE INDEPENDENT*/
+      var NextParentNodeID = $dropZone.attr("id");
+      var CurrNodeID = $dragged.attr("id");
+      var NextNodeParentID = $dropZone.attr("id");
+      updateNode(CurrNodeID,NextNodeParentID);
+      /*END CUSTOMIZE INDEPENDENT*/
+
     },
     //
     touchstartHandler: function (event) {
@@ -1171,7 +1181,7 @@
       dst.style.pointerEvents = 'none';
       // and repeat for all children
       for (var i = 0; i < src.children.length; i++) {
-        this.copyStyle(src.children[i], dst.children[i]);
+        this.copyStyle(src.children[i], dst.children[i]);        
       }
     },
     //
@@ -1227,7 +1237,7 @@
       if (opts.nodeTemplate) {
         $nodeDiv.append(opts.nodeTemplate(data));
       } else {
-        $nodeDiv.append('<div class="title">' + data[opts.nodeTitle] + '</div>')
+        $nodeDiv.append('<div class="title" data-id="'+data[opts.nodeId]+'">' + data[opts.nodeTitle] + '</div>')
           .append(typeof opts.nodeContent !== 'undefined' ? '<div class="content">' + (data[opts.nodeContent] || '') + '</div>' : '');
       }
       //
@@ -1267,6 +1277,7 @@
         this.touchHandled = false;
         this.touchMoved = false;
         this.touchTargetNode = null;
+
       }
       // allow user to append dom modification after finishing node create of orgchart
       if (opts.createNode) {

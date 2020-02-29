@@ -1411,6 +1411,37 @@
         });
     }
 
+    function loSelectOptionSemester2(selector,selected) { // created by adhi 2020-02-13
+        var url = base_url_js+'api/__crudSemester';
+        var token = jwt_encode({action:'read',order:'DESC'},'UAP)(*');
+
+        $.post(url,{token:token},function (data_json) {
+
+            var option = selector;
+            if(data_json.length>0){
+                for(var i=0;i<data_json.length;i++){
+                    var selc = '';
+                    if(selected=='selectedNow') {
+                        selc = (data_json[i].Status==1) ? 'selected' : '';
+
+                    } else {
+                        if(selected!='' && selected!=null && typeof selected !== undefined){
+                            selc = (selected==data_json[i].ID) ? 'selected' : '';
+                        } else {
+                            selc = (data_json[i].Status==1) ? 'selected' : '';
+                        }
+
+                    }
+
+
+
+                    option.append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'.'+data_json[i].Code+'" '+selc+' status = "'+data_json[i].Status+'" >'+data_json[i].Name+'</option>');
+
+                }
+            }
+        });
+    }
+
     function loSelectOptionSemesterAntara(element,selected) {
         var url = base_url_js+'api/__crudSemester';
         var token = jwt_encode({action:'readAntara',order:'DESC'},'UAP)(*');
@@ -2026,6 +2057,20 @@
             }
         });
     }
+    
+
+    function loadSelectOptionMaritalStatus(element,selected) {
+        var url = base_url_js+'api/__getMaritalStatus';
+
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = (selected!='' && typeof selected !== "undefined" && d.ID == selected) ? 'selected' : '';
+                $(element).append('<option value="'+d.ID+'" '+sc+'>'+d.name+'</option>');
+            }
+        });
+    }
+
 
     function loadSelectOptionEmployeesStatus(element,selected) {
         var url = base_url_js+'api/__getStatusEmployee';
@@ -2470,6 +2515,51 @@
                         
         });
         return def.promise();
+    }
+
+    /* Adhi 2020-02-14 */
+    function AjaxSubmitForm(url='',token='',ArrUploadFilesSelector=[],Apikey='',requestHeader={}){
+         var def = jQuery.Deferred();
+         var form_data = new FormData();
+         form_data.append('token',token);
+         if (ArrUploadFilesSelector.length>0) {
+            for (var i = 0; i < ArrUploadFilesSelector.length; i++) {
+                var NameField = ArrUploadFilesSelector[i].NameField+'[]';
+                var Selector = ArrUploadFilesSelector[i].Selector;
+                var UploadFile = Selector[0].files;
+                for(var count = 0; count<UploadFile.length; count++)
+                {
+                 form_data.append(NameField, UploadFile[count]);
+                }
+            }
+         }
+
+         $.ajax({
+           type:"POST",
+           // url:url+'?apikey='+Apikey,
+           url:(Apikey!='') ? url+'?apikey='+Apikey : url,
+           data: form_data,
+           contentType: false,       // The content type used when sending data to the server.
+           cache: false,             // To unable request pages to be cached
+           processData:false,
+           dataType: "json",
+           beforeSend: function (xhr)
+           {
+              // xhr.setRequestHeader("Hjwtkey",Hjwtkey);
+              for (key in requestHeader){
+                 xhr.setRequestHeader(key,requestHeader[key]);
+              }
+             
+           },
+           success:function(data)
+           {
+            def.resolve(data);
+           },  
+           error: function (data) {
+             def.reject();
+           }
+         })
+         return def.promise();
     }
 
 </script>

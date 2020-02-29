@@ -6,7 +6,7 @@ class C_global_informations extends Globalclass {
 
     function __construct(){
         parent::__construct();
-        $this->load->model(array("General_model","global-informations/Globalinformation_model","M_sendemail","m_rest"));
+        $this->load->model(array("General_model","global-informations/Globalinformation_model","M_sendemail","m_rest","hr/m_hr"));
     }
 
 
@@ -236,9 +236,12 @@ class C_global_informations extends Globalclass {
         	$param[] = array("field"=>"ps.NameEng","data"=>" like '%".$data_arr['lecturer']."%' ","filter"=>"OR",);    
         	$param[] = array("field"=>"em.Name","data"=>" like '%".$data_arr['lecturer']."%' )","filter"=>"OR",);    
         }
-        if(!empty($data_arr['position'])){
-        	$param[] = array("field"=>"em.PositionMain","data"=>" like '14%".$data_arr['position']."' ","filter"=>"AND",);    
-        }
+        //if(!empty($data_arr['position'])){
+            $param[] = array("field"=>"(em.PositionMain", "data"=>" like'14".$data_arr['position'].".%' ","filter"=>"AND",);
+            $param[] = array("field"=>"em.PositionOther1","data"=>" like'14".$data_arr['position'].".%' ","filter"=>"OR",);
+            $param[] = array("field"=>"em.PositionOther2","data"=>" like'14".$data_arr['position'].".%' ","filter"=>"OR",);
+            $param[] = array("field"=>"em.PositionOther3","data"=>" like'14".$data_arr['position'].".%' )","filter"=>"OR",);
+        //}
         if(!empty($data_arr['study_program'])){
         	$param[] = array("field"=>"em.ProdiID","data"=>" =".$data_arr['study_program']." ","filter"=>"AND",);    
         }
@@ -277,12 +280,13 @@ class C_global_informations extends Globalclass {
             $orderBy = " em.ID DESC";
         }
 
-        $param[] = array("field"=>"em.PositionMain","data"=>" like'14.%' ","filter"=>"AND",);
+        //$param[] = array("field"=>"em.PositionMain","data"=>" like'14.%' ","filter"=>"AND",);
 
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchLecturer(true,$param)->row();
     	$TotalData = (!empty($totalData) ? $totalData->Total : 0);
     	$result = $this->Globalinformation_model->fetchLecturer(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+        //var_dump($this->db->last_query());
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
     		if(!empty($v->PositionMain)){
@@ -332,7 +336,7 @@ class C_global_informations extends Globalclass {
         $data_arr = (array) $this->jwt->decode($data['token'],$key);
         if($data){
         	$param[] = array("field"=>"em.ID","data"=>" =".$data_arr['ID']." ","filter"=>"AND");    
-        	$isExist = $this->Globalinformation_model->fetchLecturer(false,$param)->row();
+            $isExist = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
         	if(!empty($isExist)){
         		//$isExist->detailTA = $this->Globalinformation_model->detailStudent("ta_".$isExist->Year.".students",array("a.NPM"=>$data_arr['NPM']))->row();
         		$url_image = './uploads/employees/'.$isExist->Photo;
@@ -341,10 +345,7 @@ class C_global_informations extends Globalclass {
 	                $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$isExist->Photo) : base_url('images/icon/userfalse.png') ;
 	            }
 	            $data['profilePIC'] = $srcImg;
-        		$data['detail'] = $isExist;
-        		$splitMPosition = explode(".", $isExist->PositionMain);
-    			$data['divisionMain'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitMPosition[0]))->row();
-    			$data['positionMain'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitMPosition[1]))->row();
+        		
     			if(!empty($isExist->PositionOther1)){
 	    			$splitOTHPosition1 = explode(".", $isExist->PositionOther1);
 	    			$data['othPositionDiv1'] = $this->General_model->fetchData("db_employees.division",array("ID"=>(!empty($splitOTHPosition1[0]) ? $splitOTHPosition1[0] : null)))->row();
@@ -360,6 +361,20 @@ class C_global_informations extends Globalclass {
 	    			$data['othPositionDiv3'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitOTHPosition3[0]))->row();
 	    			$data['othPosition3'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitOTHPosition3[1]))->row();
     			}
+
+
+                /*APRISH DATA*/
+                $isExist->MyHistorical = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$isExist->NIP),"ID","ASC")->row();
+                $isExist->MyCareer = $this->m_hr->getEmpCareer(array("a.NIP"=>$isExist->NIP,"isShowSTO"=>0))->result();
+                $isExist->MyBank = $this->General_model->fetchData("db_employees.employees_bank_account",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducation = $this->General_model->fetchData("db_employees.employees_educations",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationNonFormal = $this->General_model->fetchData("db_employees.employees_educations_non_formal",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationTraining = $this->General_model->fetchData("db_employees.employees_educations_training",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyFamily = $this->General_model->fetchData("db_employees.employees_family_member",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyExperience = $this->General_model->fetchData("db_employees.employees_experience",array("NIP"=>$isExist->NIP))->result();
+                /*END APRISH DATA*/
+                $data['detail'] = $isExist;
+
         	}
         	$this->load->view('dashboard/global-informations/lecturers/detail',$data);
         }else{show_404();}
@@ -431,7 +446,7 @@ class C_global_informations extends Globalclass {
 
         if(!empty($data_arr['birthdate_start'])){
         	if(!empty($data_arr['birthdate_end'])){
-        		$param[] = array("field"=>"(em.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);    
+        		$param[] = array("field"=>"(em.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);
         		$param[] = array("field"=>"em.DateOfBirth","data"=>" <= '".date("Y-m-d",strtotime($data_arr['birthdate_end']))."' )","filter"=>"AND",);    
         	}else{
         		$param[] = array("field"=>"em.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);
@@ -503,7 +518,7 @@ class C_global_informations extends Globalclass {
 	                $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$isExist->Photo) : base_url('images/icon/userfalse.png') ;
 	            }
 	            $data['profilePIC'] = $srcImg;
-        		$data['detail'] = $isExist;
+        		
         		/*$splitMPosition = explode(".", $isExist->PositionMain);
     			$data['divisionMain'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitMPosition[0]))->row();
     			$data['positionMain'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitMPosition[1]))->row();*/
@@ -522,9 +537,48 @@ class C_global_informations extends Globalclass {
 	    			$data['othPositionDiv3'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitOTHPosition3[0]))->row();
 	    			$data['othPosition3'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitOTHPosition3[1]))->row();
     			}
+
+
+                /*APRISH DATA*/
+                $isExist->MyHistorical = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$isExist->NIP),"ID","ASC")->row();
+                $isExist->MyCareer = $this->m_hr->getEmpCareer(array("a.NIP"=>$isExist->NIP,"isShowSTO"=>0))->result();
+                $isExist->MyBank = $this->General_model->fetchData("db_employees.employees_bank_account",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducation = $this->General_model->fetchData("db_employees.employees_educations",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationNonFormal = $this->General_model->fetchData("db_employees.employees_educations_non_formal",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationTraining = $this->General_model->fetchData("db_employees.employees_educations_training",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyFamily = $this->General_model->fetchData("db_employees.employees_family_member",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyExperience = $this->General_model->fetchData("db_employees.employees_experience",array("NIP"=>$isExist->NIP))->result();
+                /*END APRISH DATA*/
+                $data['detail'] = $isExist;
+
+
         	}
         	$this->load->view('dashboard/global-informations/employees/detail',$data);
         }else{show_404();}
+    }
+
+
+    public function detailEmployeeOBJ(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();
+            if(!empty($isExist)){
+                //$isExist->MyCareer = $this->General_model->fetchData("db_employees.employees_career",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyHistorical = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$isExist->NIP),"ID","desc")->result();
+                $isExist->MyCareer = $this->m_hr->getEmpCareer(array("a.NIP"=>$isExist->NIP,"isShowSTO"=>0))->result();
+                $isExist->MyBank = $this->General_model->fetchData("db_employees.employees_bank_account",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducation = $this->General_model->fetchData("db_employees.employees_educations",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationNonFormal = $this->General_model->fetchData("db_employees.employees_educations_non_formal",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationTraining = $this->General_model->fetchData("db_employees.employees_educations_training",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyFamily = $this->General_model->fetchData("db_employees.employees_family_member",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyExperience = $this->General_model->fetchData("db_employees.employees_experience",array("NIP"=>$isExist->NIP))->result();
+                $json = $isExist;
+            }
+        }
+        echo json_encode($json);
     }
 
 
@@ -562,7 +616,40 @@ class C_global_informations extends Globalclass {
 
 
     public function messageBlastFormParticipants(){
-		$data['t'] = "dsd";
+        $myname = $this->session->userdata('Name');
+        $mynip = $this->session->userdata('NIP');
+        $data = array();
+		$myAddressBook = array();
+        $AddressBook = $this->General_model->fetchData("db_mail_blast.mail_blast",array("createdby"=>$mynip."/".$myname))->result();
+        if(!empty($AddressBook)){
+            foreach ($AddressBook as $v) {
+                if(!empty($v->mail_to)){
+                    $mail_to = json_decode($v->mail_to);
+                    foreach ($mail_to as $n) {
+                        if(!in_array($n,$myAddressBook)){
+                            $myAddressBook[] = $n;
+                        }
+                    }
+                }
+                if(!empty($v->mail_cc)){
+                    $mail_cc = json_decode($v->mail_cc);
+                    foreach ($mail_cc as $c) {
+                        if(!in_array($c,$myAddressBook)){
+                            $myAddressBook[] = $c;
+                        }
+                    }
+                }
+                if(!empty($v->mail_bcc)){
+                    $mail_bcc = json_decode($v->mail_bcc);
+                    foreach ($mail_bcc as $b) {
+                        if(!in_array($b,$myAddressBook)){
+                            $myAddressBook[] = $b;
+                        }
+                    }
+                }
+            }
+        }
+        $data['myAddressBook'] = $myAddressBook;
 		echo $this->load->view('dashboard/global-informations/message-blast/formParticipants',$data,true);
 	}
 
@@ -634,8 +721,8 @@ class C_global_informations extends Globalclass {
             
             $message = "";
             $receiver = $data["mail_receiver_to"];
-            $receiver_cc = (!empty($data["mail_receiver-cc_to"]) ? $data["mail_receiver-cc_to"] : null);
-            $receiver_bcc = (!empty($data["mail_receiver-bcc_to"]) ? $data["mail_receiver-bcc_to"] : null);
+            $receiver_cc = (!empty($data["mail_receiver-cc_to"]) ? $data["mail_receiver-cc_to"] : array() );
+            $receiver_bcc = (!empty($data["mail_receiver-bcc_to"]) ? $data["mail_receiver-bcc_to"] : $mail_bcc );
             $mail_subject = $data["subject"];
             $mail_message = $data["message"];
             $totalMail = count($receiver) + count($receiver_cc);
@@ -684,7 +771,7 @@ class C_global_informations extends Globalclass {
                 $dataInsert['SubjectTypeID'] = $data['typeSubject'];
                 $dataInsert['mail_from'] = $data['mail_from'];
                 $dataInsert['mail_to'] = json_encode($data['mail_receiver_to']);
-                $dataInsert['mail_cc'] = json_encode($data['mail_receiver-cc_to']);
+                $dataInsert['mail_cc'] = !empty($data['mail_receiver_to']) ? json_encode($data['mail_receiver-cc_to']) : null;
                 $dataInsert['mail_bcc'] = json_encode($receiver_bcc);
                 $dataInsert['SubjectOth'] = $data['subject'];
                 $dataInsert['MessageOth'] = $data['message'];
@@ -708,11 +795,12 @@ class C_global_informations extends Globalclass {
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
             $positionMain = $this->session->userdata('PositionMain')['IDDivision'].".".$this->session->userdata('PositionMain')['IDPosition'];
             $getAccess = $this->General_model->fetchData("db_mail_blast.role_mail",array("PositionMain"=>$positionMain))->row();
+            
             if(!empty($getAccess)){
                 $conditions = "";
             }else{
+                $conditions = "createdby like '".$mynip."%' and isShow = 1";
             }
-                $conditions = "createdby like '".$mynip."%' and isShow = 1";                
             $sortby = "created";
             if(!empty($data_arr['Filter'])){            
                 $parse = parse_str($data_arr['Filter'],$output);

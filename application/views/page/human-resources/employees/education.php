@@ -2,6 +2,11 @@
     $(document).ready(function(){
         $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
         $("#form-employee .tabulasi-emp > ul > li.nv-edu").addClass("active");
+        $("#datePicker-non-educations,#datePickerSD-non-educations,#datePicker-training,#datePickerSD-training").datepicker({
+            dateFormat: 'yy-mm-dd',
+            changeYear: true,
+            changeMonth: true
+        });
     });
 </script>
 <form id="form-educations" action="<?=base_url('human-resources/employees/education-save')?>" method="post" autocomplete="off">
@@ -45,25 +50,25 @@
                                 <tbody>
                                     <tr>
                                         <td>1</td>
-                                        <td><input type="hidden" class="form-control" name="eduID[]">
-                                            <select class="form-control required" required name="eduLevel[]" >
+                                        <td><input type="hidden" class="form-control edu-ID" name="eduID[]">
+                                            <select class="form-control required edu-levelEduID" required name="eduLevel[]" >
                                                 <option value="">Choose one</option>                                                            
                                                 <?php if(!empty($educationLevel)){
                                                 foreach ($educationLevel as $v) {
-                                                echo '<option value="'.$v->ID.'">'.$v->Level.'</option>';
+                                                echo '<option value="'.$v->ID.'">'.$v->Level.' - '.$v->Description.'</option>';
                                                 } } ?>
                                             </select>
                                             <small class="text-danger text-message"></small>
                                         </td>
-                                        <td><input type="text" class="form-control required" required name="eduInstitute[]">
+                                        <td><input type="text" class="form-control required edu-instituteName" required name="eduInstitute[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control required" required name="eduCC[]">
+                                        <td><input type="text" class="form-control required edu-location" required name="eduCC[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control" name="eduMajor[]">
+                                        <td><input type="text" class="form-control edu-major" name="eduMajor[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control required" required name="eduGraduation[]">
+                                        <td><input type="text" class="form-control required number edu-graduation" required name="eduGraduation[]" maxlength="4">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control" name="eduGPA[]">
+                                        <td><input type="text" class="form-control edu-gpa" name="eduGPA[]">
                                         <small class="text-danger text-message"></small></td>
                                     </tr>
                                 </tbody>
@@ -106,71 +111,16 @@
                                 <tbody>
                                     <tr>
                                         <td>1</td>
-                                        <td><input type="hidden" class="form-control" name="nonEduID[]">
-                                        <input type="text" class="form-control" name="nonEduduInstitute[]">
+                                        <td><input type="hidden" class="form-control non-edu-ID" name="nonEduID[]">
+                                        <input type="text" class="form-control non-edu-instituteName" name="nonEduInstitute[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control" name="nonEduSubject[]">
+                                        <td><input type="text" class="form-control non-edu-subject" name="nonEduSubject[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control" id="nonEduStart" name="nonEduStart[]">
+                                        <td><input type="text" class="form-control datepicker-tmp non-edu-start_event" id="datePicker-non-educations" name="nonEduStart[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control" id="nonEduEnd" name="nonEduEnd[]">
+                                        <td><input type="text" class="form-control datepicker-sd non-edu-end_event" id="datePickerSD-non-educations" name="nonEduEnd[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control" name="nonEduCC[]">
-                                        <small class="text-danger text-message"></small></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-        		</div>
-        	</div>
-
-        	<div class="row">
-        		<div class="col-sm-12">
-        			<div class="panel panel-default" id="multiple-field" data-source="training">
-                        <div class="panel-heading">
-                            <div class="pull-right">
-                                <div class="btn-group">
-                                    <button class="btn btn-default btn-xs btn-add" type="button">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
-                                    <button class="btn btn-default btn-xs btn-remove" type="button">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <h4 class="panel-title">
-                                Training
-                            </h4>
-                        </div>
-                        <div class="panel-body">
-                            <table class="table table-bordered" id="table-list-training">
-                                <thead>
-                                    <tr>
-                                        <td width="2%">No</td>
-                                        <td>Training Title</td>
-                                        <td>Trainer Name</td>
-                                        <td>Start Event</td>
-                                        <td>End Event</td>
-                                        <td>Location</td>
-                                        <td>Result Feedback</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td><input type="hidden" class="form-control" name="trainingID[]">
-                                        <input type="text" class="form-control" name="trainingTitle[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control" name="trainingTrainer[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control" id="trainingStart" name="trainingStart[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control" id="trainingEnd" name="trainingEnd[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control" name="trainingLocation[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control" name="trainingFeedback[]">
+                                        <td><input type="text" class="form-control non-edu-location" name="nonEduCC[]">
                                         <small class="text-danger text-message"></small></td>
                                     </tr>
                                 </tbody>
@@ -179,7 +129,6 @@
                     </div>
         		</div>
         	</div>
-
         	
         </div>
         <div class="panel-footer text-right">
@@ -216,6 +165,84 @@
             }
         });
 
+
+        $("#form-educations").on("change",".edu-levelEduID",function(){
+            var itsme = $(this);
+            var value = itsme.val();
+            if($.trim(value) != ""){
+                if($.trim(value) >= 4 ){
+                    var parent = itsme.parent().parent();
+                    var autocomplete_univ = parent.find(".edu-instituteName");
+                    var autocomplete_major = parent.find(".edu-major");
+
+                    var UniversityTags = UniversityName();
+                    autocomplete_univ.autocomplete({
+                      source: UniversityTags
+                    });
+                    
+                    var MajorTags = MajorName();
+                    autocomplete_major.autocomplete({
+                      source: MajorTags
+                    });
+
+
+                }
+            }
+        });
+
+
+		var myData = fetchAdditionalData("<?=$NIP?>");
+        if(!jQuery.isEmptyObject(myData)){
+            if(!jQuery.isEmptyObject(myData.MyEducation)){
+                $tablename = $("#table-list-educations"); var num = 1;
+                $.each(myData.MyEducation,function(key,value){
+                    $cloneRow = $tablename.find("tbody > tr:last").clone();
+                    $cloneRow.attr("data-table","employees_educations").attr("data-id",value.ID).attr("data-name",value.instituteName);
+                    $cloneRow.find("td:first").text(num);
+                    $.each(value,function(k,v){
+                        $cloneRow.find(".edu-"+k).val(v);    
+                    });
+                    
+                    $tablename.find("tbody").append($cloneRow);
+                    num++;
+                });
+                $tablename.find("tbody tr:first").remove();
+            }
+
+            if(!jQuery.isEmptyObject(myData.MyEducationNonFormal)){
+                $tablename = $("#table-list-non-educations"); var num = 1;
+                $.each(myData.MyEducationNonFormal,function(key,value){
+                    $cloneRow = $tablename.find("tbody > tr:last").clone();
+                    $cloneRow.attr("data-table","employees_educations_non_formal").attr("data-id",value.ID).attr("data-name",value.instituteName);
+                    $cloneRow.find("td:first").text(num);
+                    $.each(value,function(k,v){
+                        $cloneRow.find(".non-edu-"+k).val(v);    
+                        if(k == "start_event"){
+			        		var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-"+num).removeClass("hasDatepicker");
+			        		cc.datepicker({
+					            dateFormat: 'yy-mm-dd',
+					            changeYear: true,
+					            changeMonth: true
+					        });
+			        	}  
+			        	if(k == "end_event"){
+			        		var cc = $cloneRow.find(".datepicker-sd").attr("id","datePickerSD-"+num).removeClass("hasDatepicker");
+			        		cc.datepicker({
+					            dateFormat: 'yy-mm-dd',
+					            changeYear: true,
+					            changeMonth: true
+					        });
+			        	}  
+
+                    });
+                    
+                    $tablename.find("tbody").append($cloneRow);
+                    num++;
+                });
+                $tablename.find("tbody tr:first").remove();
+            }
+
+        }
 
 	});
 </script>

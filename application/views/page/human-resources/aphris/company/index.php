@@ -31,7 +31,6 @@
 												<th>Company Name</th>
 												<th>Address</th>
 												<th>Category Company</th>
-												<th>Status</th>
 												<th width="5%"></th>
 											</tr>
 										</thead>
@@ -98,19 +97,18 @@
 		            { "data": "Address",
 		              "render": function (data, type, row) {
 	                    var trimAdditionalInfo = $.trim("AdditionalInfo");
-	                    return "<p>"+data+"</p>"+((trimAdditionalInfo.length > 0) ? "<p>"+row.AdditionalInfo+"</p>":"");
+	                    return "<p>"+data+"</p>";
 	                  }
 		          	},
-		            { "data": "IndustryID",
+		            { "data": "IndustryTypeID",
 		              "render": function(data,type,row){
-		              	return row.Industry.name;
+		              	if(!jQuery.isEmptyObject(row.Industry)){
+		              		return row.Industry.name;
+		              	}else {
+		              		return '';
+		              	}
 		              }
 		            },
-		            { "data": "IsActive",
-		              "render": function (data, type, row) {
-	                    return "<span>"+((row.IsActive == 1) ? "Active":"Non Active")+"</span>";
-	                  }
-	            	},
 		            { "data": "ID",
 		              "render": function (data, type, row) {
 	                    return '<div class="btn-group"><button class="btn btn-xs btn-warning btn-edit" type="button" title="Edit" data-id="'+data+'"><i class="fa fa-edit"></i></button></div>';
