@@ -9257,13 +9257,18 @@ class C_api extends CI_Controller {
                                         fpc.Cl_Finance, fpc.Cl_Finance_By, fpc.Cl_Finance_At, emp2.Name AS Cl_Finance_Name,
                                         fpc.Cl_Kaprodi, fpc.Cl_Kaprodi_By, fpc.Cl_Kaprodi_At, emp3.Name AS Cl_Kaprodi_Name,
                                         fpc.Cl_Academic, fpc.Cl_Academic_By, fpc.Cl_Academic_At, emp6.Name AS Cl_Academic_Name,
-                                        fpc.Cl_StdLife, fpc.Cl_StdLife_By, fpc.Cl_StdLife_At, emp7.Name AS Cl_StdLife_Name
-
+                                        fpc.Cl_StdLife, fpc.Cl_StdLife_By, fpc.Cl_StdLife_At, emp7.Name AS Cl_StdLife_Name,
+                                        
+                                        fpn.finance AS Finance_Note
+              
                                         FROM db_academic.auth_students ats
                                         LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
                                         LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
                                         LEFT JOIN db_academic.final_project fp ON (ats.NPM = fp.NPM)
+                                        
                                         LEFT JOIN db_academic.final_project_clearance fpc ON (fpc.NPM = ats.NPM)
+                                        LEFT JOIN db_academic.final_project_note fpn ON (fpn.NPM = ats.NPM)
+                                        
 
                                         LEFT JOIN db_employees.employees emp1 ON (fpc.Cl_Library_By = emp1.NIP)
                                         LEFT JOIN db_employees.employees emp2 ON (fpc.Cl_Finance_By = emp2.NIP)
@@ -9357,6 +9362,12 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
 
+            }
+            else if($data_arr['action']=='viewCheckStatusDocumentSkripsi'){
+                $NPM = $data_arr['NPM'];
+                $data = $this->db->query('SELECT fpf.Status, fpf.Noted FROM db_academic.final_project_files fpf 
+                                                                WHERE fpf.NPM = "'.$NPM.'"')->result_array();
+                return print_r(json_encode($data));
             }
             else if($data_arr['action']=='updateDocumentSkripsi'){
 

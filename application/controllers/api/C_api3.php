@@ -4539,7 +4539,8 @@ class C_api3 extends CI_Controller {
                                         fpc.Cl_Kaprodi, fpc.Cl_Kaprodi_By, fpc.Cl_Kaprodi_At, em3.Name AS Cl_Kaprodi_Name,
                                         fpc.Cl_Academic, fpc.Cl_Academic_By, fpc.Cl_Academic_At, em6.Name AS Cl_Academic_Name,
                                         ats.MentorFP1, em4.Name AS MentorFP1Name, ats.MentorFP2, em5.Name AS MentorFP2Name,
-                                        ats.ID AS AUTHID, dm.Attachment AS IjazahSMA
+                                        ats.ID AS AUTHID, dm.Attachment AS IjazahSMA,
+                                        fpn.finance AS Note_Finance
                                         FROM db_academic.std_study_planning ssp
                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
                                         LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
@@ -4549,6 +4550,7 @@ class C_api3 extends CI_Controller {
                                         LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
 
                                         LEFT JOIN db_academic.final_project_clearance fpc ON (fpc.NPM = ats.NPM)
+                                        LEFT JOIN db_academic.final_project_note fpn ON (fpn.NPM = ats.NPM)
 
                                         LEFT JOIN db_employees.employees em1 ON (fpc.Cl_Library_By = em1.NIP)
                                         LEFT JOIN db_employees.employees em2 ON (fpc.Cl_Finance_By = em2.NIP)
@@ -4673,9 +4675,12 @@ class C_api3 extends CI_Controller {
                 // Finance
                 $dateTm = ($row['Cl_Finance_At']!='' && $row['Cl_Finance_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['Cl_Finance_At'])).'</div>' : '';
                 if($AS!='Prodi' && ($DeptID=='9' || $DeptID==9)){
+
+                    $v_note_finance = ($row['Note_Finance']!='' && $row['Note_Finance']!=null) ? '<textarea class="form-control" style="color: #333;" id="finance_viewValueNote_'.$row['NPM'].'" readonly>'.$row['Note_Finance'].'</textarea><hr style="margin-bottom: 5px;margin-top: 5px;"/>' : '';
+
                     $c_Finance = ($row['Cl_Finance']!=null && $row['Cl_Finance']!='' && $row['Cl_Finance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Finance_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Finance">Clearance</button>';
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Finance">Clearance</button><hr style="margin-top: 10px;margin-bottom: 7px;" /><div style="text-align: left;" id="finance_viewNote_'.$row['NPM'].'">'.$v_note_finance.'</div><a href="javascript:void(0);" class="btnNote" data-dept="finance" data-npm="'.$row['NPM'].'"><i class="fa fa-edit"></i> Note</a>';
                 } else {
                     $c_Finance = ($row['Cl_Finance']!=null && $row['Cl_Finance']!='' && $row['Cl_Finance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Finance_Name'].''.$dateTm
@@ -5076,6 +5081,35 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode($result));
 
 
+
+        }
+
+        else if($data_arr['action']=='updateNotetoClearent'){
+
+            // Cek apakah sudah ada atau blm
+            $Dept = $data_arr['Dept'];
+            $NPM = $data_arr['NPM'];
+            $dataCk = $this->db->select('ID')->get_where('db_academic.final_project_note',array(
+                'NPM' => $NPM
+            ))->result_array();
+
+            $dataForm = array(
+                'NPM' => $NPM,
+                $Dept => $data_arr['Note'],
+                $Dept.'At' => $data_arr['DateTime'],
+                $Dept.'By' => $data_arr['User']
+            );
+
+            if(count($dataCk)>0){
+                // Update
+                $this->db->where('ID', $dataCk[0]['ID']);
+                $this->db->update('db_academic.final_project_note',$dataForm);
+            } else {
+                // Insert
+                $this->db->insert('db_academic.final_project_note',$dataForm);
+            }
+
+            return print_r(1);
 
         }
 

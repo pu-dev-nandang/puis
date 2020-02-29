@@ -168,4 +168,79 @@
     });
 
 
+    // === Adding Note Button ===
+    $(document).on('click','.btnNote',function () {
+
+        var dept = $(this).attr('data-dept');
+        var NPM = $(this).attr('data-npm');
+
+        var valNote = $('#'+dept+'_viewValueNote_'+NPM).val();
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Note to '+NPM+'</h4>');
+
+        var htmlss = '<div class="row">' +
+            '        <div class="col-md-12">' +
+            '              <input class="hide" id="formNote_NPM" value="'+NPM+'">' +
+            '              <input class="hide" id="formNote_Dept" value="'+dept+'">' +
+            '             <textarea class="form-control" id="formNote_Note" rows="5" maxlength="255" placeholder="Please enter notes here...">'+valNote+'</textarea>' +
+            '               <p class="help-block">Maximum 255 character</p>' +
+            '        </div>' +
+            '    </div>';
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> <button type="button" id="submitNoteForm" class="btn btn-success">Submit</button>');
+
+        $('#GlobalModal').on('shown.bs.modal', function () {
+            $('#formSimpleSearch').focus();
+        })
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+    });
+
+    $(document).on('click','#submitNoteForm',function () {
+
+        var NPM = $('#formNote_NPM').val();
+        var Dept = $('#formNote_Dept').val();
+        var Note = $('#formNote_Note').val();
+
+        if(Note!='') {
+
+            loading_buttonSm('#submitNoteForm');
+
+            var token = jwt_encode({
+                action : 'updateNotetoClearent',
+                NPM : NPM,
+                Dept : Dept,
+                Note : Note,
+                User : sessionNIP,
+                DateTime : getDateTimeNow()
+            },'UAP)(*');
+            var url = base_url_js+'api3/__crudYudisium';
+
+            $.post(url,{token:token},function (result) {
+
+                $('#'+Dept+'_viewNote_'+NPM).html('<textarea class="form-control" style="color: #333;" id="'+Dept+'_viewValueNote_'+NPM+'" readonly>'+Note+'</textarea><hr style="margin-bottom: 5px;margin-top: 5px;"/>');
+
+                toastr.success('Data saved','Success');
+
+                setTimeout(function () {
+                    $('#GlobalModal').modal('hide');
+                },500);
+
+            });
+        } else {
+            toastr.warning('Form note required','Warning');
+        }
+
+
+
+    });
+
+
 </script>
