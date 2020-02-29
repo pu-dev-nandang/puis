@@ -9326,6 +9326,12 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
 
             }
+            else if($data_arr['action']=='viewCheckStatusDocumentSkripsi'){
+                $NPM = $data_arr['NPM'];
+                $data = $this->db->query('SELECT fpf.Status, fpf.Noted FROM db_academic.final_project_files fpf 
+                                                                WHERE fpf.NPM = "'.$NPM.'"')->result_array();
+                return print_r(json_encode($data));
+            }
             else if($data_arr['action']=='updateDocumentSkripsi'){
 
                 $NPM = $data_arr['NPM'];
