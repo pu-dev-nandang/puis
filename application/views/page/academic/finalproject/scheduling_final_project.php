@@ -71,17 +71,17 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Coordinator Penguji</label>
+                <label>Examiner Coordinator</label>
                 <select class="form-exam" style="width: 100%;" size="5" id="formCOPenguji">
                     <option value=""></option>
                 </select>
             </div>
             <div class="form-group">
-                <label>Team Penguji</label>
+                <label>Examiner Team</label>
                 <select class="form-exam" multiple style="width: 100%;" size="5" id="formTeamPenguji"></select>
             </div>
             <div class="form-group">
-                <label>Student</label>
+                <label>Students who already have a mentor</label>
                 <div id="viewDataStd"></div>
             </div>
             <div id="viewTableStudent"></div>
