@@ -519,8 +519,8 @@
                                     '<div class = "form-group">'+
                                         '<label>CAP</label>'+
                                         '<select class = "form-control Input" field="Signature" name = "cap" key = "SET">'+
-                                            '<option value = "0">Auto</option>'+
-                                            '<option value = "1">Manual</option>'+
+                                            '<option value = "0">Manual</option>'+
+                                            '<option value = "1">Auto</option>'+
                                         '</select>'+
                                     '</div>'+
                                 '</div>'+
