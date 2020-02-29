@@ -34,13 +34,13 @@
 
     <div class="col-md-12">
 
-        <table class="table table-bordered table-striped" id="tableList">
+        <table class="table table-bordered table-striped table-centre" id="tableList">
             <thead>
             <tr>
                 <th style="width: 1%;">No</th>
                 <th>Date Time</th>
                 <th style="width: 10%;">Room</th>
-                <th>Penguji</th>
+                <th>Examiner</th>
                 <th style="width: 3%;">
                     <i class="fa fa-cog"></i>
                 </th>
@@ -112,7 +112,11 @@
                         var Std = '';
                         if(v.Student.length>0){
                             $.each(v.Student,function (i3,v3) {
-                                Std = Std+'<div>'+v3.NPM+' - '+v3.Name+'</div>';
+
+                                var Mentor2 = (v3.MentorFP2!='' && v3.MentorFP2!=null) ? '<li>'+v3.MentorFP2+' - '+v3.MentorFP2Name+'</li>' : '';
+
+                                Std = Std+'<div><b>'+v3.NPM+' - '+v3.Name+'</b><ol style="color: #9E9E9E;">' +
+                                    '<li>'+v3.MentorFP1+' - '+v3.MentorFP1Name+'</li>' +Mentor2+'</ol></div>';
                             });
                         }
 
@@ -131,11 +135,15 @@
                             '<td>'+(i+1)+'</td>' +
                             '<td>'+date+'<br/>'+time+'</td>' +
                             '<td>'+v.Room+'</td>' +
-                            '<td>'+Examiner+'</td>' +
+                            '<td style="text-align: left;">'+Examiner+'</td>' +
                             '<td>'+btn+'</td>' +
-                            '<td>'+Std+'</td>' +
+                            '<td style="text-align: left;">'+Std+'</td>' +
                             '</tr>');
                     })
+                } else {
+                    $('#listSch').html('<tr>' +
+                        '<td colspan="6">Data not yet</td>' +
+                        '</tr>');
                 }
 
             });

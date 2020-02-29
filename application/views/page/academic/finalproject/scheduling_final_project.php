@@ -13,7 +13,7 @@
 
 
 <div class="row" style="margin-top: 30px;">
-    <div class="col-md-6 col-md-offset-3">
+    <div class="col-md-8 col-md-offset-2">
         <div class="well">
             <div class="form-group">
                 <div class="row">

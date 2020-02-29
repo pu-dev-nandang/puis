@@ -9503,9 +9503,13 @@ class C_api extends CI_Controller {
                 if(count($data)>0){
                     for($i=0;$i<count($data);$i++){
                         // Get Std
-                        $data[$i]['Student'] = $this->db->query('SELECT sp.*, ats.Name  FROM db_academic.final_project_schedule_student sp 
+                        $data[$i]['Student'] = $this->db->query('SELECT sp.*, ats.Name, ats.MentorFP1, ats.MentorFP2, em1.Name AS MentorFP1Name, em2.Name AS MentorFP2Name   
+                                                        FROM db_academic.final_project_schedule_student sp
                                                         LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sp.NPM)
+                                                        LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                                        LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
                                                         WHERE sp.FPSID = "'.$data[$i]['ID'].'" ')->result_array();
+
                         $data[$i]['Examiner'] = $this->db->query('SELECT sp.*, em.Name  FROM db_academic.final_project_schedule_lecturer sp 
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = sp.NIP)
                                                         WHERE sp.FPSID = "'.$data[$i]['ID'].'" ')->result_array();
@@ -9644,8 +9648,11 @@ class C_api extends CI_Controller {
                                                                               ORDER BY fpsl.Type DESC ')->result_array();
 
                         // Get Student
-                        $data[$i]['Students'] = $this->db->query('SELECT fpss.*, ats.Name, fp.Status AS StatusFinalProject FROM db_academic.final_project_schedule_student fpss 
+                        $data[$i]['Students'] = $this->db->query('SELECT fpss.*, ats.Name, fp.Status AS StatusFinalProject, ats.MentorFP1, ats.MentorFP2, em1.Name AS MentorFP1Name, em2.Name AS MentorFP2Name  
+                                                                            FROM db_academic.final_project_schedule_student fpss
                                                                             LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpss.NPM)
+                                                                            LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                                                            LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
                                                                             LEFT JOIN db_academic.final_project fp ON(fp.NPM = fpss.NPM)
                                                                             WHERE fpss.FPSID = "'.$data[$i]['ID'].'" 
                                                                             ORDER BY fpss.NPM ASC ')->result_array();
