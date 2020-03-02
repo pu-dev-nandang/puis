@@ -5444,10 +5444,15 @@ class C_api3 extends CI_Controller {
                                           LEFT JOIN db_employees.employees em ON (em.NIP = fpf.EmUpdateBy)
                                            '.$WhereStatus.$dataSearch.' ORDER BY fpf.UpdatedAt ASC';
 
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT fpf.*, ats.Name, ps.Name AS ProdiName, em.Name AS EmUpdateByName FROM db_academic.final_project_files fpf
+                                          LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpf.NPM)
+                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                          LEFT JOIN db_employees.employees em ON (em.NIP = fpf.EmUpdateBy) '.$WhereStatus.$dataSearch.' ) xx';
+
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
             $dataTable = $this->db->query($sql)->result_array();
-            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
             $query = $dataTable;
 
@@ -5491,8 +5496,8 @@ class C_api3 extends CI_Controller {
 
             $json_data = array(
                 "draw"            => intval( $requestData['draw'] ),
-                "recordsTotal"    => intval(count($queryDefaultRow)),
-                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval($queryDefaultRow),
                 "data"            => $data
             );
             echo json_encode($json_data);
