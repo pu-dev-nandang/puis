@@ -832,8 +832,130 @@ class M_alumni extends CI_Model {
 
         $this->send_notif($dataNotif);
         return $this->callback;
+    }
 
+    public function Testimony($dataToken){
+        $action = $dataToken['action'];
+        switch ($action) {
+            case 'read':
+                $rs = ['data' => [], 'info' => [] ];
+                $query_data = $this->db->query(
+                    'select a.*,b.Name as NameNPM,c.Name as NameApproved,d.Name as NameUpdateBy 
+                     from db_alumni.testimony as a
+                     left join  (
+                             select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                             UNION
+                             select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                             from db_employees.employees as emp
+                             join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                         ) as b on a.NPM = b.UserID
+                    left join  (
+                            select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                            UNION
+                            select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                            from db_employees.employees as emp
+                            join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                        ) as c on a.NIP_Approved = c.UserID
+                    left join  (
+                            select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                            UNION
+                            select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                            from db_employees.employees as emp
+                            join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                        ) as d on a.UpdateBy = d.UserID
+                        where a.NPM = "'.$dataToken['NPM'].'" limit 1
+                    '
+                )->result_array();
 
+                $query_info = [];
+                if (count($query_data) > 0) {
+                   $ID_testimony = $query_data[0]['ID'];
+                   $query_info = $this->db->query(
+                       'select a.*,b.Name as CreateBy from db_alumni.testimony_info as a
+                        left join (
+                                select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                                UNION
+                                select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                                from db_employees.employees as emp
+                                join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                            ) as b on a.CreateBy = b.UserID 
+
+                       '
+                   )->result_array();
+                }
+                
+
+                $rs = ['data' => $query_data, 'info' => $query_info ];
+                $this->callback['status'] = 1; 
+                $this->callback['callback'] = $rs;
+                break;
+            case 'submit' : 
+                $G_dt = $this->m_master->caribasedprimary('db_alumni.testimony','NPM',$dataToken['NPM']);
+                $actionSet = (count($G_dt) > 0 ) ? 'Edit' : 'Create';
+                $data = $dataToken['data'];
+                $data['NPM'] = $dataToken['NPM'];
+                $data['Status'] = 0;
+                if ($actionSet == 'Edit') {
+                    $this->db->where('NPM',$data['NPM']);
+                    $this->db->update('db_alumni.testimony',$data);
+                    $ID_testimony = $G_dt[0]['ID'];
+                }
+                else{
+                    $this->db->insert('db_alumni.testimony',$data);
+                    $ID_testimony = $this->db->insert_id();
+                }
+
+                // insert to info
+                $this->__insert_info_testimony($ID_testimony,$actionSet,$data['NPM']);
+
+                // send notification
+                    $tokenURL = $this->jwt->encode($ID_testimony,"UAP)(*");
+                    $URLDirect = 'student-life/alumni/testimony/detail/'.$tokenURL;
+                    $URLDirectAlumni = 'portal/testimony';
+                    $G_dt_User = $this->__UserEMP_NPM($data['UpdateBy']);
+                    $data_to_user = [];
+
+                    $DepartmentID = 16; // kemahasiswaan
+                    $G_dt = $this->m_master->getEmployeeByDepartment($DepartmentID);
+                    for ($i=0; $i < count($G_dt); $i++) { 
+                        $data_to_user[]= $G_dt[$i]['NIP'];
+                    }
+                    $dataNotif = [
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Testimony was '.$actionSet.' by '.$G_dt_User[0]['Name'],
+                                        'Description' => substr($data['Testimony'], 0,20),
+                                        'URLDirect' => $URLDirect,
+                                        'URLDirectAlumni' => $URLDirectAlumni,
+                                        'CreatedBy' => $data['UpdateBy'],
+                                        'CreatedName' => $G_dt_User[0]['Name'],
+                                      ),
+                        'To' => array(
+                                  'NIP' => $data_to_user,
+                                ),
+                        'Email' => 'No'
+                    ];
+
+                    $this->send_notif($dataNotif);
+                // end send notification
+
+                $this->callback['status'] = 1; 
+                $this->callback['callback'] = 1;
+                break;
+        }
+
+        return $this->callback;
+    }
+
+    private function __insert_info_testimony($ID_testimony,$Info,$CreateBy){
+        $dataSave = [
+            'ID_testimony' => $ID_testimony,
+            'Info' => $Info,
+            'CreateBy' => $CreateBy,
+            'CreateAt' => date('Y-m-d H:i:s'),
+        ];
+
+        $this->db->insert('db_alumni.testimony_info',$dataSave);
     }
   
 }
