@@ -9389,6 +9389,26 @@ class C_api extends CI_Controller {
 
 
             }
+            else if($data_arr['action']=='updateTitlePlanSkripsi'){
+                $NPM = $data_arr['NPM'];
+                $dataCheckTitle = $this->db->get_where('db_academic.final_project',
+                    array('NPM' => $NPM))->result_array();
+
+                $dataForm = (array) $data_arr['dataForm'];
+                $dataForm['NPM'] = $NPM;
+
+                if(count($dataCheckTitle)>0){
+                    $this->db->where('NPM', $NPM);
+                    $this->db->update('db_academic.final_project',$dataForm);
+                } else {
+                    $this->db->insert('db_academic.final_project',$dataForm);
+                }
+
+//                print_r($dataForm);exit;
+
+                return print_r(1);
+
+            }
             else if($data_arr['action']=='viewScheduleStdSeminar'){
 
                 $NPM = $data_arr['NPM'];
