@@ -160,6 +160,11 @@ class C_rest_alumni extends CI_Controller {
 
     public function load_data_forum_server_side(){
       $input = $this->getInputToken();
+      if (array_key_exists('action', $input) && $input['action'] == 'all' ) {
+        $input['data'] = [];
+        $input['data']['REQUEST'] = $_REQUEST;
+      }
+
       $this->callback = $this->m_alumni->load_data_forum_server_side($input);
       echo json_encode($this->callback);
     }
@@ -168,6 +173,31 @@ class C_rest_alumni extends CI_Controller {
       $input = $this->getInputToken();
       $this->callback = $this->m_alumni->submit_forum_alumni($input);
       echo json_encode($this->callback);
+    }
+
+    public function submit_forum_alumni_studentlife(){
+      $input = $this->getInputToken();
+      $Selection = $input['Selection'];
+      $dataProc = $input;
+      $dataProc['data']['forum']['CreateBy'] = $input['sessionNIP'];
+      $dataProc['data']['forum']['CreateAt'] = date('Y-m-d H:i:s');
+      $dataProc['data']['forum']['TypeUserID'] = 2;
+      $ToUser = [];
+      for ($i=0; $i < count($Selection); $i++) { 
+        $ToUser[] = $Selection[$i];
+      }
+
+      $DepartmentID = 16; // kemahasiswaan
+      $G_dt = $this->m_master->getEmployeeByDepartment($DepartmentID);
+      for ($i=0; $i < count($G_dt); $i++) { 
+          $ToUser[]= $G_dt[$i]['NIP'];
+      }
+
+      $dataProc['data']['forum_user'] = $ToUser;
+
+      $this->m_alumni->submit_forum_alumni($dataProc);
+
+      echo json_encode(1);
     }
 
     public function get_detail_topic(){

@@ -471,14 +471,18 @@ class M_alumni extends CI_Model {
 
     public function load_data_forum_server_side($dataToken){
         $requestData = $dataToken['data']['REQUEST'];
-        $NPM = $dataToken['data']['NPM']; // NPM or NIP
-
         $AddwherePost = [];
         $where='';
-
-        $AddwherePost[] = array('field'=>'(`'.'a`.`CreateBy'.'`','data'=>' = "'.$NPM.'"' ,'filter' =>' AND ');  
-        $AddwherePost[] = array('field'=>'`'.'b`.`UserID'.'`','data'=>' = "'.$NPM.'")' ,'filter' =>' or ');  
-
+        if (array_key_exists('action', $dataToken) && $dataToken['action'] == 'all' ) { // for PCAM
+            # code...
+        }
+        else
+        {
+            $NPM = $dataToken['data']['NPM']; // NPM or NIP
+            $AddwherePost[] = array('field'=>'(`'.'a`.`CreateBy'.'`','data'=>' = "'.$NPM.'"' ,'filter' =>' AND ');  
+            $AddwherePost[] = array('field'=>'`'.'b`.`UserID'.'`','data'=>' = "'.$NPM.'")' ,'filter' =>' or ');  
+        }
+        
         if(!empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
             $AddwherePost[] = array('field'=>'(`'.'a`.`Topic'.'`','data'=>' like "'.$search.'%")' ,'filter' =>' AND ');     
@@ -580,7 +584,13 @@ class M_alumni extends CI_Model {
             "data"            => $data,
         );
 
-        return $this->callback;
+        if (array_key_exists('action', $dataToken) && $dataToken['action'] == 'all' ) { // for PCAM
+            return $this->callback['callback'];
+        }
+        else
+        {
+            return $this->callback;
+        }
 
     }
 
@@ -793,7 +803,7 @@ class M_alumni extends CI_Model {
         $tokenURL = $this->jwt->encode($ForumID,"UAP)(*");
         $UserIDCreateBy = $dataSave['UserID'];
         $GetDataCreateBy = $this->__UserEMP_NPM($UserIDCreateBy);
-        $URLDirect = 'student-life/alumni/forum/detail/'.$tokenURL;
+        $URLDirect = 'student-life/tracer-alumni/forum/detail/'.$tokenURL;
         $URLDirectAlumni = 'forum/detail-topic/'.$tokenURL;
 
         $data_forum_user = [];
@@ -910,7 +920,7 @@ class M_alumni extends CI_Model {
 
                 // send notification
                     $tokenURL = $this->jwt->encode($ID_testimony,"UAP)(*");
-                    $URLDirect = 'student-life/alumni/testimony/detail/'.$tokenURL;
+                    $URLDirect = 'student-life/tracer-alumni/testimony/detail/'.$tokenURL;
                     $URLDirectAlumni = 'portal/testimony';
                     $G_dt_User = $this->__UserEMP_NPM($data['UpdateBy']);
                     $data_to_user = [];

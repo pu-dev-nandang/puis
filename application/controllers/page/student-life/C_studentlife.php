@@ -3,9 +3,23 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class C_studentlife extends Student_Life {
 
+    private $varClass = [];
+
     function __construct()
     {
         parent::__construct();
+    }
+
+    private function __setting_rest_alumni(){
+        $G_setting = $this->m_master->showData_array('db_alumni.rest_setting');
+        $this->varClass = $G_setting[0];
+        $this->varClass['customPost'] = [
+            'get' => '?apikey='.$this->varClass['Apikey'],
+            'header' => [
+                'Hjwtkey' => $this->varClass['Hjwtkey'],
+            ],
+            
+        ];
     }
 
 
@@ -100,5 +114,13 @@ class C_studentlife extends Student_Life {
         $page = $this->load->view('page/'.$data['department'].'/tracer-alumni/form_accreditation',$data,true);
         $this->menu_stracert_alumni($page);
     }
+
+    public function forum_alumni(){
+        $this->__setting_rest_alumni();
+        $this->varClass['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$this->varClass['department'].'/tracer-alumni/forum_alumni',$this->varClass,true);
+        $this->menu_stracert_alumni($page);
+    }
+
 
 }
