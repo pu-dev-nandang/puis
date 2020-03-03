@@ -463,16 +463,12 @@ class C_rest extends CI_Controller {
     /*UPDATED BY FEBRI @ MARCH 2020*/    
     public function getListStudentScoresOBJ(){
         $requestData= $_REQUEST;
-
         $data_arr = $this->getInputToken();
-
-
-
         $time = strtotime("-1 year", time());
         $CurrDate = date("Y", $time);
-        $w_ClassOf = ($data_arr['ClassOf']!='' && $data_arr['ClassOf']!=null) ? ' AND ast.Year = "'.$data_arr['ClassOf'].'"' : ' AND ast.Year = '.$CurrDate;
-        $w_ProdiGroupID = ($data_arr['ProdiGroupID']!='' && $data_arr['ProdiGroupID']!=null) ? ' AND ast.ProdiGroupID = "'.$data_arr['ProdiGroupID'].'"' : '';
-        $w_StatusStudent = ($data_arr['StatusStudent']!='' && $data_arr['StatusStudent']!=null) ? ' AND ast.StatusStudentID = "'.$data_arr['StatusStudent'].'"' : '';
+        $w_ClassOf = (!empty($data_arr['ClassOf']) && $data_arr['ClassOf']!='' && $data_arr['ClassOf']!=null) ? ' AND ast.Year = "'.$data_arr['ClassOf'].'"' : ' AND ast.Year = '.$CurrDate;
+        $w_ProdiGroupID = (!empty($data_arr['ProdiGroupID']) && $data_arr['ProdiGroupID']!='' && $data_arr['ProdiGroupID']!=null) ? ' AND ast.ProdiGroupID = "'.$data_arr['ProdiGroupID'].'"' : '';
+        $w_StatusStudent = (!empty($data_arr['StatusStudent']) && $data_arr['StatusStudent']!='' && $data_arr['StatusStudent']!=null) ? ' AND ast.StatusStudentID = "'.$data_arr['StatusStudent'].'"' : '';
         $dataWhere = $w_ClassOf.' '.$w_ProdiGroupID.' '.$w_StatusStudent;
 
         $dataSearch = '';
@@ -488,6 +484,7 @@ class C_rest extends CI_Controller {
                                                           LEFT JOIN db_academic.status_student ss ON (ast.StatusStudentID = ss.ID)
                                                           LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = ast.NPM)
                                                           LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                                                          LEFT JOIN db_academic.prodi_group pg ON (pg.ProdiID = ma.NIP)
                                                           WHERE ( ast.ProdiID = "'.$data_arr['ProdiID'].'" '.$dataWhere.' ) '.$dataSearch.'
                                                           ORDER BY ast.Year DESC, ast.NPM ASC';
         if(!empty($requestData['start']) && !empty($requestData['length'])){
@@ -508,6 +505,11 @@ class C_rest extends CI_Controller {
 
             $db_ = 'ta_'.$row['Year'];
             $dataDetailStd = $this->db->select('Photo')->get_where($db_.'.students',array('NPM' => $row['NPM']),1)->result_array();
+
+            //getdetail prodi_group
+            if(!empty($row['ProdiGroupID'])){
+                $prodiGroup = $this->db->get_where('db_academic.prodi_group',array('ID' => $row['ProdiGroupID']))->row();
+            }
 
             // Get Photo
             $exp_photo = explode(' ',$dataDetailStd[0]['Photo']);
@@ -568,7 +570,7 @@ class C_rest extends CI_Controller {
                     'URL_Photo' => $url_photo, 'URL_Back' => base_url('student/list-student-scores-as-head'))
                 ,'UAP)(*');
 
-            $data[] = array("No"=>$no,"Photo"=>$url_photo,"NPM"=>$row['NPM'],"Student"=>$row['Name'],"MentorName"=>$row['Mentor'],"MentorNIP"=>$row['NIP'],"ListSemester"=>$listSemester,"IPK"=>number_format($IPK,2),"Token"=>$token,"StatusDescription"=>ucwords(strtolower($row['StatusDescription'])));
+            $data[] = array("No"=>$no,"Photo"=>$url_photo,"NPM"=>$row['NPM'],"Student"=>$row['Name'],"PGID"=>$row['ProdiGroupID'],"ProdiGroupID"=>(!empty($prodiGroup) ? $prodiGroup->Code : null),"MentorName"=>$row['Mentor'],"MentorNIP"=>$row['NIP'],"ListSemester"=>$listSemester,"IPK"=>number_format($IPK,2),"Token"=>$token,"StatusDescription"=>ucwords(strtolower($row['StatusDescription'])));
             $no++;
         }
 
