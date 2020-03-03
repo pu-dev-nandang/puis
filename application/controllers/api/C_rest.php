@@ -306,6 +306,7 @@ class C_rest extends CI_Controller {
 
     }
 
+    # OLD SCRIPT TO GET STUDENT SCORES
     public function getListStudentScores(){
         $requestData= $_REQUEST;
 
@@ -436,7 +437,7 @@ class C_rest extends CI_Controller {
             $nestedData[] = '<div  style="text-align:left;">'.$student.'</div>';
             $nestedData[] = '<div  style="text-align:left;">'.$row['Mentor'].'<br/><span style="font-size: 12px;color: #808080;">'.$row['NIP'].'</span></div>';
             $nestedData[] = '<div  style="text-align:left;">'.$listSemester.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$IPK.'</div>';
+            $nestedData[] = $IPK;
             $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.ucwords(strtolower($row['StatusDescription'])).'</div>';
 
@@ -457,6 +458,132 @@ class C_rest extends CI_Controller {
 
 
     }
+    #END OLD SCRIPT
+
+    /*UPDATED BY FEBRI @ MARCH 2020*/    
+    public function getListStudentScoresOBJ(){
+        $requestData= $_REQUEST;
+
+        $data_arr = $this->getInputToken();
+
+
+
+        $time = strtotime("-1 year", time());
+        $CurrDate = date("Y", $time);
+        $w_ClassOf = ($data_arr['ClassOf']!='' && $data_arr['ClassOf']!=null) ? ' AND ast.Year = "'.$data_arr['ClassOf'].'"' : ' AND ast.Year = '.$CurrDate;
+        $w_ProdiGroupID = ($data_arr['ProdiGroupID']!='' && $data_arr['ProdiGroupID']!=null) ? ' AND ast.ProdiGroupID = "'.$data_arr['ProdiGroupID'].'"' : '';
+        $w_StatusStudent = ($data_arr['StatusStudent']!='' && $data_arr['StatusStudent']!=null) ? ' AND ast.StatusStudentID = "'.$data_arr['StatusStudent'].'"' : '';
+        $dataWhere = $w_ClassOf.' '.$w_ProdiGroupID.' '.$w_StatusStudent;
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = 'AND ( ast.Name LIKE "%'.$search.'%" OR ast.NPM LIKE "%'.$search.'%"
+                           OR ss.Description LIKE "%'.$search.'%" OR em.Name LIKE "%'.$search.'%"
+                             OR em.NIP LIKE "%'.$search.'%")';
+        }
+
+        $queryDefault = 'SELECT ast.*, ss.Description AS StatusDescription, em.Name AS Mentor, em.NIP
+                                                          FROM db_academic.auth_students ast
+                                                          LEFT JOIN db_academic.status_student ss ON (ast.StatusStudentID = ss.ID)
+                                                          LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = ast.NPM)
+                                                          LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                                                          WHERE ( ast.ProdiID = "'.$data_arr['ProdiID'].'" '.$dataWhere.' ) '.$dataSearch.'
+                                                          ORDER BY ast.Year DESC, ast.NPM ASC';
+        if(!empty($requestData['start']) && !empty($requestData['length'])){
+            $sql = $queryDefault.' LIMIT '.(!empty($requestData['start']) ? $requestData['start'] : 0).','.(!empty($requestData['length']) ? $requestData['length'] : 0).' ';            
+        }else{
+            $sql = $queryDefault;
+        }
+        
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = (!empty($requestData['start']) ? $requestData['start'] : 0) + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            $db_ = 'ta_'.$row['Year'];
+            $dataDetailStd = $this->db->select('Photo')->get_where($db_.'.students',array('NPM' => $row['NPM']),1)->result_array();
+
+            // Get Photo
+            $exp_photo = explode(' ',$dataDetailStd[0]['Photo']);
+            if($dataDetailStd[0]['Photo']!='' && $dataDetailStd[0]['Photo']!=null && count($exp_photo)==1){
+                $url_photo = base_url().'uploads/students/'.$db_.'/'.$dataDetailStd[0]['Photo'];
+            } else {
+                $url_photo = base_url().'images/icon/userfalse.png';
+            }
+
+            // Get Semester
+            $dataSemester = $this->db->order_by('ID','ASC')->get_where('db_academic.semester',
+                array('Year >=' => $row['Year']))->result_array();
+
+            $listSemester = '';
+            $Semester = 1;
+            if(count($dataSemester)>0){
+                for($s=0;$s<count($dataSemester);$s++){
+                    $d_s = $dataSemester[$s];
+                    $dataScore = $this->db->query('SELECT * FROM '.$db_.'.study_planning sr
+                                                                    WHERE sr.SemesterID = "'.$d_s['ID'].'"
+                                                                    AND sr.NPM = "'.$row['NPM'].'" ')->result_array();
+
+                    $koma = ($s!=0) ? '' : '';
+                    if(count($dataScore)>0){
+
+                        $IPS_totalCredit = 0;
+                        $IPS_totalGradeValue = 0;
+
+                        for($c=0;$c<count($dataScore);$c++){
+                            $d_sc = $dataScore[$c];
+                            $IPS_totalCredit = $IPS_totalCredit + $d_sc['Credit'];
+                            $IPS_totalGradeValue = $IPS_totalGradeValue + ($d_sc['Credit'] * $d_sc['GradeValue']);
+                        }
+
+                        $IPS = ($IPS_totalGradeValue>0) ? $IPS_totalGradeValue/$IPS_totalCredit : 0.00;
+
+
+                        $listSemester = $listSemester.''.$koma.' <span class="label label-default"> Smt '.$Semester.' : '.number_format(round($IPS, 2),2).'</span> ';
+
+
+                    } else {
+                        if($d_s['Status']==1){
+                            break;
+                        }
+                        $listSemester = $listSemester.''.$koma.' <span class="label label-default"> Smt '.$Semester.' : -</span> ';
+                    }
+
+                    if($d_s['Status']==1){
+                        break;
+                    }
+                    $Semester+=1;
+                }
+            }
+
+            $dataNewTr = $this->m_rest->getTranscript($row['Year'],$row['NPM'],'ASC');
+            $IPK = $dataNewTr['dataIPK']['IPK'];
+            $token = $this->jwt->encode(array('NPM' => $row['NPM'],'ClassOf' => $row['Year'],'Name' => $row['Name'],
+                    'URL_Photo' => $url_photo, 'URL_Back' => base_url('student/list-student-scores-as-head'))
+                ,'UAP)(*');
+
+            $data[] = array("No"=>$no,"Photo"=>$url_photo,"NPM"=>$row['NPM'],"Student"=>$row['Name'],"MentorName"=>$row['Mentor'],"MentorNIP"=>$row['NIP'],"ListSemester"=>$listSemester,"IPK"=>number_format($IPK,2),"Token"=>$token,"StatusDescription"=>ucwords(strtolower($row['StatusDescription'])));
+            $no++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( (!empty($requestData['draw']) ? $requestData['draw'] :null) ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval(count($queryDefaultRow)),
+            "data"            => (!empty($data) ? $data : 0)
+        );
+
+        echo json_encode($json_data);
+
+
+    }
+    /*END UPDATED BY FEBRI @ MARCH 2020*/
 
     // Nandang - Get Student digunakan khusus untuk selec2.js
     public function getStudent_ServerSide(){

@@ -142,7 +142,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <p><b>Internal Insurance</b></p>
+                                    <p><b>Corporate Insurance</b></p>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
