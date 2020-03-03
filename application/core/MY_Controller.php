@@ -44,6 +44,12 @@ class MY_Controller extends CI_Controller {
 
     }
 
+    public function decodeToken($token,$key=''){
+        $key = ($key == '') ? "UAP)(*" : $key ;
+        $decode = $this->jwt->decode($token,$key);
+        return $decode;
+    }
+
 
 }
 

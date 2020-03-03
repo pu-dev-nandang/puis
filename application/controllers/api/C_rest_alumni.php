@@ -218,4 +218,10 @@ class C_rest_alumni extends CI_Controller {
       echo json_encode($this->callback);
     }
 
+    public function testimony_ApproveOrReject(){
+      $input = $this->getInputToken();
+      $this->callback = $this->m_alumni->testimony_ApproveOrReject($input);
+      echo json_encode($this->callback);
+    }
+
 }

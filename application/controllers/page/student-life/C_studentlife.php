@@ -122,5 +122,20 @@ class C_studentlife extends Student_Life {
         $this->menu_stracert_alumni($page);
     }
 
+    public function forum_alumni_detail($token){
+        $this->__setting_rest_alumni();
+        $this->varClass['ForumID'] = $this->decodeToken($token);
+        $this->varClass['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$this->varClass['department'].'/tracer-alumni/forum_alumni_detail',$this->varClass,true);
+        $this->menu_stracert_alumni($page);
+    }
+
+    public function testimony(){
+        $this->__setting_rest_alumni();
+        $this->varClass['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$this->varClass['department'].'/tracer-alumni/testimony',$this->varClass,true);
+        $this->menu_stracert_alumni($page);
+    }
+
 
 }

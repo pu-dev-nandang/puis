@@ -639,7 +639,7 @@ class M_alumni extends CI_Model {
                 // send notif
                 $UserIDCreateBy = $data_forum['CreateBy'];
                 $GetDataCreateBy = $this->__UserEMP_NPM($UserIDCreateBy);
-                $URLDirect = 'student-life/alumni/forum/detail/'.$tokenURL;
+                $URLDirect = 'student-life/tracer-alumni/forum/detail/'.$tokenURL;
                 $URLDirectAlumni = 'forum/detail-topic/'.$tokenURL;
 
                 $dataNotif = [
@@ -952,6 +952,113 @@ class M_alumni extends CI_Model {
                 $this->callback['status'] = 1; 
                 $this->callback['callback'] = 1;
                 break;
+            case 'server_side':
+                $requestData = $_REQUEST;
+                $AddwherePost = [];
+                $where='';
+                $filterStatus = $dataToken['data']['filterStatus'];
+                if ($filterStatus != '') {
+                     $AddwherePost[] = array('field'=>'`'.'a`.`Status'.'`','data'=>' = "'.$filterStatus.'"' ,'filter' =>' AND ');
+                }
+
+                if (array_key_exists('SearchUrlID', $dataToken['data'])) {
+                    $AddwherePost[] = array('field'=>'`'.'a`.`ID'.'`','data'=>' = "'.$dataToken['data']['SearchUrlID'].'"' ,'filter' =>' AND ');
+                }
+
+                if(!empty($requestData['search']['value']) ) {
+                    $search = $requestData['search']['value'];
+                    $AddwherePost[] = array('field'=>'(`'.'a`.`NPM'.'`','data'=>' like "'.$search.'%"' ,'filter' =>' AND ');     
+                    $AddwherePost[] = array('field'=>'(`'.'b`.`Name'.'`','data'=>' like "'.$search.'%")' ,'filter' =>' OR ');     
+                }
+
+                $sql_select = 'select a.*,b.Name as NameNPM,c.Name as NameApproved,d.Name as NameUpdateBy ';
+                $sql_from = '
+                     from db_alumni.testimony as a
+                     left join  (
+                             select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                             UNION
+                             select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                             from db_employees.employees as emp
+                             join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                         ) as b on a.NPM = b.UserID
+                    left join  (
+                            select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                            UNION
+                            select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                            from db_employees.employees as emp
+                            join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                        ) as c on a.NIP_Approved = c.UserID
+                    left join  (
+                            select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                            UNION
+                            select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                            from db_employees.employees as emp
+                            join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                        ) as d on a.UpdateBy = d.UserID
+                ';
+                $sqlCon = ''; // group by or order by
+
+                if(!empty($AddwherePost)){
+                  $where = ' WHERE ';
+                  $counter = 0;
+                  foreach ($AddwherePost as $key => $value) {
+                      if($counter==0){
+                          $where = $where.$value['field']." ".$value['data'];
+                      }
+                      else{
+                          $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                      }
+                      $counter++;
+                  }
+                }
+
+                $Totaldata = $this->db->query('select count(*) as total from (
+                                                      select 1 '.$sql_from.$where.$sqlCon.'
+
+                                                ) temp
+
+                         ')->row()->total;
+                $queryData = $this->db->query($sql_select.$sql_from.$where.$sqlCon.' LIMIT '.$requestData['start'].' , '.$requestData['length'].' ')->result_array();
+                $No = (int)$requestData['start'] + 1;
+                $data = array();
+
+                for ($i=0; $i < count($queryData); $i++) { 
+                    $row = $queryData[$i];
+                    $nestedData = array();
+                    $nestedData[] = $No;
+                    $nestedData[] = $row['NameNPM'];
+                    $nestedData[] = $row['UpdateAt'];
+                    $nestedData[] = $row['Testimony'];
+                    $nestedData[] = $row['Status'];
+                    // get info
+                    $ID_testimony = $row['ID'];
+                    $query_info = $this->db->query(
+                        'select a.*,b.Name as CreateBy from db_alumni.testimony_info as a
+                         left join (
+                                 select NPM as UserID,Name, "Student" as DivisionName from db_academic.auth_students
+                                 UNION
+                                 select emp.NIP as UserID,emp.Name,divi.Division as DivisionName
+                                 from db_employees.employees as emp
+                                 join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+                             ) as b on a.CreateBy = b.UserID 
+
+                        '
+                    )->result_array();
+                    $row['info'] = $query_info;
+                    $tokenRow = $this->jwt->encode($row,"UAP)(*");
+                    $nestedData['data'] = $tokenRow;
+                    $nestedData['tokenURL'] = $this->jwt->encode((int) $ID_testimony,"UAP)(*");
+                    $data[] = $nestedData;
+                    $No++;
+                }
+
+                return array(
+                        "draw"            => intval( $requestData['draw'] ),
+                        "recordsTotal"    => intval($Totaldata ),
+                        "recordsFiltered" => intval( $Totaldata ),
+                        "data"            => $data,
+                    );
+                break;
         }
 
         return $this->callback;
@@ -966,6 +1073,24 @@ class M_alumni extends CI_Model {
         ];
 
         $this->db->insert('db_alumni.testimony_info',$dataSave);
+    }
+
+    public function testimony_ApproveOrReject($dataToken){
+        $data = $dataToken['data'];
+        $dataSave = [
+            'Status' => $data['Status'],
+            'NIP_Approved' => $data['UserID'],
+        ];
+
+        $this->db->where('ID',$data['ID']);
+        $this->db->update('db_alumni.testimony',$dataSave);
+
+        $info = ($data['Status'] == 1 || $data['Status'] == '1' ) ? 'Approve' : 'Reject';
+        $this->__insert_info_testimony($data['ID'],$info,$data['UserID']);
+        $this->callback['status'] = 1; 
+        
+        return $this->callback;
+
     }
   
 }

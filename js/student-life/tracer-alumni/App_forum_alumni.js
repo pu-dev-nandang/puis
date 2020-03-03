@@ -1,4 +1,3 @@
-// console.log(CustomPost);
 let oTableAlumniForum;
 let oTableSelection;
 let SelectionCopy=[];
@@ -60,7 +59,7 @@ class App_forum_alumni {
 		          'className': 'dt-body-center',
 		          'render': function (data, type, full, meta){
 		            let html = '<div style="text-align:left;">'+
-		            				'<a href="'+base_url_js+'student-life/alumni/forum/detail/'+full['tokenURL']+'">'+full[2]+'</a>'+
+		            				'<a href="'+base_url_js+'student-life/tracer-alumni/forum/detail/'+full['tokenURL']+'">'+full[2]+'</a>'+
 		            				'<br/>'+
 		            				'<span style="font-size: 12px;color: #9e9e9e;">Owner : '+full[1]+'</span>'+
 		            				'<br/>'+
