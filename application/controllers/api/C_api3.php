@@ -5996,7 +5996,6 @@ class C_api3 extends CI_Controller {
 
             /*UPDATED BY FEBRI @ FEB 2020*/
             $this->load->model('student-life/m_studentlife');
-            //$conditions['a.ID'] = (!empty($data_arr['ID']) ? $data_arr['ID'] : null);
             $QUERY = $this->m_studentlife->fetchCompany()->result_array();
             return print_r(json_encode($QUERY));
             /*END UPDATED BY FEBRI @ FEB 2020*/
