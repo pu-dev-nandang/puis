@@ -6001,13 +6001,18 @@ class C_api3 extends CI_Controller {
             $dataForm = (array) $data_arr['dataForm'];
             if($ID!=''){
                 // Update
+                if (!array_key_exists('UpdatedBy', $dataForm)) {
+                    $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                }
                 $dataForm['Logs'] = null;
-                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                //$dataForm['UpdatedBy'] = $this->session->userdata('NIP');
                 $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
                 $this->db->where('ID', $ID);
                 $this->db->update('db_studentlife.alumni_experience',$dataForm);
             } else {
-                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                if (!array_key_exists('EntredBy', $dataForm)) {
+                    $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                }
                 $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
                 $this->db->insert('db_studentlife.alumni_experience',$dataForm);
             }
@@ -6016,17 +6021,22 @@ class C_api3 extends CI_Controller {
 
         }
         else if($data_arr['action']=='saveMasterCompany'){
-
             $ID = $data_arr['ID'];
             $dataForm = (array) $data_arr['dataForm'];
 
             if($ID!=''){
-                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                if (!array_key_exists('UpdatedBy', $dataForm)) {
+                    $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                }
+                // $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
                 $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
                 $this->db->where('ID', $ID);
                 $this->db->update('db_studentlife.master_company',$dataForm);
             } else {
-                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                if (!array_key_exists('EntredBy', $dataForm)) {
+                    $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                }
+                // $dataForm['EntredBy'] = $this->session->userdata('NIP');
                 $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
                 $this->db->insert('db_studentlife.master_company',$dataForm);
             }
