@@ -5953,6 +5953,7 @@ class C_api3 extends CI_Controller {
             $dataForm = (array) $data_arr['dataForm'];
             if($ID!=''){
                 // Update
+                $dataForm['Logs'] = null;
                 $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
                 $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
                 $this->db->where('ID', $ID);
