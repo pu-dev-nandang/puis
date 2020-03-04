@@ -10186,6 +10186,16 @@ class C_api extends CI_Controller {
                     }
                 }
 
+                // Filter Portal Alumni is active or not
+                if(!empty($output['isPortalAlumi'])){
+                    if ($output['isPortalAlumi'] == 1) {
+                        $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" > 0","filter"=>"AND",); 
+                    }
+                    else if ($output['isPortalAlumi'] == 0) {
+                        $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" = 0","filter"=>"AND",);
+                    }
+                }
+
                 /*SORTING*/
                 if(!empty($output['sortby']) && !empty($output['orderby'])){
                     $orderBy = $output['sortby']." ".$output['orderby'];
@@ -10241,13 +10251,17 @@ class C_api extends CI_Controller {
                                   <ul class="dropdown-menu">
                                     <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
                                     <li><a href="'.base_url('database/students/edit-students/ta_'.$v->ClassOf.'/'.$v->NPM.'/'.$nameS).'">Edit</a></li>';
-
+                    $ActSetAlumni = ($v->StatusStudentID == 1) ? '<li role="separator" class="divider"></li>
+                                    <li><a class = "BtnSetAlumni" href = "javascript:void(0);" data-npm="'.$v->NPM.'" data-alumni = "'.$v->StatusPortalAlumni.'" data-name = "'.$v->Name.'" > Set Portal Alumni </a>
+                                    </li>' : '';
                     $btnAct .=      '<li role="separator" class="divider"></li>
                                     <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$v->EmailPU.'"
                                     data-year="'.$v->ClassOf.'" data-npm="'.$v->NPM.'" data-name="'.ucwords(strtolower($v->Name)).'"
                                     data-statusid="'.$v->StatusStudentID.'">Change Status</a>
                                     </li>
-                                    <li><a class = "PrintIDCard" href="javascript:void(0);" type = "student" data-npm="'.$v->NPM.'" data-name="'.ucwords(strtolower($v->Name)).'" path = '.$srcImg.' email = "'.$v->EmailPU.'">Print ID Card</a></li>
+                                    <li><a class = "PrintIDCard" href="javascript:void(0);" type = "student" data-npm="'.$v->NPM.'" data-name="'.ucwords(strtolower($v->Name)).'" path = '.$srcImg.' email = "'.$v->EmailPU.'">Print ID Card</a>
+                                    </li>
+                                    '.$ActSetAlumni.'
                                   </ul>
                                 </div>';
 
@@ -10296,7 +10310,12 @@ class C_api extends CI_Controller {
                     $nestedData[] = "<p class='text-center'>".(($v->Gender == "L") ? 'Male':'Female')."</p>";
                     $nestedData[] = "<center>".$v->ClassOf."</center>";
                     $nestedData[] = $v->ProdiNameEng;
-                    $nestedData[] = (($v->StatusStudentID == 1) ? $v->StatusStudent."<p>Graduated in ".(!empty($v->GraduationYear) ? $v->GraduationYear : date('Y',strtotime($v->GraduationDate))).", <br><small><i class='fa fa-graduation-cap'></i> ".date('D,d F Y',strtotime($v->GraduationDate))."</small></p>" : $v->StatusStudent);
+
+                    // check Direct Portal ALumni
+                    $PortalAlumniLabel = ($v->StatusPortalAlumni > 0) ? '<p style = "color:blue;">Direct Portal Alumni</p>' : '<p style = "color:blue;">Direct Portal Student</p>';
+                    $nestedData[] = (($v->StatusStudentID == 1) ? $v->StatusStudent."<p>Graduated in ".(!empty($v->GraduationYear) ? $v->GraduationYear : date('Y',strtotime($v->GraduationDate))).", <br><small><i class='fa fa-graduation-cap'></i> ".date('D,d F Y',strtotime($v->GraduationDate))."</small></p>
+                        ".$PortalAlumniLabel."
+                        " : $v->StatusStudent);
                     $nestedData[] = '<div style="text-align:center;">'.$fm.'</div>';
                     $nestedData[] = $btnAct;
                     $nestedData[] = '<div style="text-align:center;"><button class="btn btn-sm btn-default btn-default-primary btnLoginPortalStudents" data-npm="'.$v->NPM.'">Login Portal</button></div>';
@@ -12158,8 +12177,19 @@ class C_api extends CI_Controller {
         else if($data_arr['action']=='getTotalUnreadLog'){
 
             $UserID = $data_arr['UserID'];
-            $data = $this->db->select('ID')->get_where('db_notifikasi.logging_user',
-                array('UserID' => $UserID, "StatusRead" => "0"))->result_array();
+            $where = 'where b.UserID =  "'.$UserID.'" and b.StatusRead  = "0" ';
+            if (array_key_exists('Alumni', $data_arr) && $data_arr['Alumni'] == 'yes' ) {
+                $where .= ' And a.URLDirectAlumni is NOT NULL and a.URLDirectAlumni != ""';
+            }
+
+            $data = $this->db->query('
+                                        select b.ID from db_notifikasi.logging as a
+                                        join db_notifikasi.logging_user as b on a.ID = b.IDLogging
+                                        '.$where.'
+                                    ')->result_array();
+
+            // $data = $this->db->select('ID')->get_where('db_notifikasi.logging_user',
+                // array('UserID' => $UserID, "StatusRead" => "0"))->result_array();
             return print_r(json_encode(count($data)));
         }
         else if($data_arr['action']=='readLogUser'){
@@ -12169,6 +12199,9 @@ class C_api extends CI_Controller {
         elseif ($data_arr['action'] == 'ReadAllLog') {
             $UserID = $data_arr['UserID'];
             $this->db->where('UserID', $UserID);
+            if (array_key_exists('Alumni', $data_arr) && $data_arr['Alumni'] == 'yes' ) {
+                 $this->db->where('IDLogging in (select ID from db_notifikasi.logging where ID = IDLogging ) ');
+            }
             $this->db->update('db_notifikasi.logging_user',array('StatusRead' => '1', 'ShowNotif' => '1'));
             return print_r(json_encode(1));
         }

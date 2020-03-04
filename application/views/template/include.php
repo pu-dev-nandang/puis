@@ -2567,5 +2567,49 @@
          })
          return def.promise();
     }
+    /* End */
+
+    function AjaxSubmitFormPromises(url='',token='',ArrUploadFilesSelector=[],Apikey='',requestHeader={}){
+        return new Promise((resolve, reject) => {
+           var form_data = new FormData();
+           form_data.append('token',token);
+           if (ArrUploadFilesSelector.length>0) {
+              for (var i = 0; i < ArrUploadFilesSelector.length; i++) {
+                  var NameField = ArrUploadFilesSelector[i].NameField+'[]';
+                  var Selector = ArrUploadFilesSelector[i].Selector;
+                  var UploadFile = Selector[0].files;
+                  for(var count = 0; count<UploadFile.length; count++)
+                  {
+                   form_data.append(NameField, UploadFile[count]);
+                  }
+              }
+           }
+
+           $.ajax({
+             type:"POST",
+             // url:url+'?apikey='+Apikey,
+             url:(Apikey!='') ? url+'?apikey='+Apikey : url,
+             data: form_data,
+             contentType: false,       // The content type used when sending data to the server.
+             cache: false,             // To unable request pages to be cached
+             processData:false,
+             dataType: "json",
+             beforeSend: function (xhr)
+             {
+                for (key in requestHeader){
+                   xhr.setRequestHeader(key,requestHeader[key]);
+                }
+               
+             },
+             success:function(data)
+             {
+              resolve(data);
+             },  
+             error: function (data) {
+               reject();
+             }
+           })
+        })
+    }
 
 </script>

@@ -11,6 +11,8 @@ class M_master extends CI_Model {
         $pas = md5('Uap)(*&^%');
         $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
         $this->passApiKey =  $pass;
+        $this->load->library('JWT');
+
     }
     public function get_departement()
     {
@@ -3353,9 +3355,15 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function getEmployeeByDepartment($IDDivision)
     {
         $sql = "select * from db_employees.employees
-                where SPLIT_STR(PositionMain, '.', 1) = ? and StatusEmployeeID != -1
+                where ( 
+                        SPLIT_STR(PositionMain, '.', 1) = ?  or 
+                        SPLIT_STR(PositionOther1, '.', 1) = ? or
+                        SPLIT_STR(PositionOther2, '.', 1) = ? or
+                        SPLIT_STR(PositionOther3, '.', 1) = ?
+                      ) 
+                      and StatusEmployeeID != -1
                 ";
-        $query=$this->db->query($sql, array($IDDivision))->result_array();
+        $query=$this->db->query($sql, array($IDDivision,$IDDivision,$IDDivision,$IDDivision))->result_array();
         return $query;
     }
 
@@ -3999,12 +4007,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function PostSubmitAPIWithFile($url,$post,$fileattach=[],$customPost=[])
     {
-
         /*
-            post = array (
-                'token' => {any}
-            );
-
             fileattach = array(
                 'file_name_with_full_path' => {any},
                 'MimeType' => {any},
@@ -4064,9 +4067,67 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $pr = curl_exec($ch);
+        // print_r($pr);die();
         $rs = (array) json_decode($pr,true);
         curl_close ($ch);
         return $rs;
+    }
+
+    public function uploadDokumenSetFileName($filename,$varFiles = 'UploadFile',$path)
+    {
+      $countfiles = count($_FILES[$varFiles ]['name']);
+
+      $output = array();
+      // Looping all files
+      for($i=0;$i<$countfiles;$i++){
+            $config = array();
+            if(!empty($_FILES[$varFiles ]['name'][$i])){
+
+              // Define new $_FILES array - $_FILES['file']
+              $_FILES['file']['name'] = $_FILES[$varFiles]['name'][$i];
+              $_FILES['file']['type'] = $_FILES[$varFiles]['type'][$i];
+              $_FILES['file']['tmp_name'] = $_FILES[$varFiles]['tmp_name'][$i];
+              $_FILES['file']['error'] = $_FILES[$varFiles]['error'][$i];
+              $_FILES['file']['size'] = $_FILES[$varFiles]['size'][$i];
+
+              // Set preference
+              $config['upload_path'] = $path.'/';
+              $config['allowed_types'] = '*';
+              $config['overwrite'] = TRUE;
+              $no = $i + 1;
+              $config['file_name'] = $filename;
+
+              $filenameUpload = $_FILES['file']['name'];
+              $ext = pathinfo($filenameUpload, PATHINFO_EXTENSION);
+              $filenameNew = (count($countfiles) > 1) ? $filename.'_'.$no.'_'.mt_rand().'.'.$ext : $filename;
+
+              //Load upload library
+              $this->load->library('upload',$config);
+              $this->upload->initialize($config);
+
+              // File upload
+              if($this->upload->do_upload('file')){
+                // Get data about the file
+                $uploadData = $this->upload->data();
+                if (count($countfiles) > 1) {
+                   $filePath = $uploadData['file_path'];
+                   $filename_uploaded = $uploadData['file_name'];
+                   // rename file
+                   $old = $filePath.'/'.$filename_uploaded;
+                   $new = $filePath.'/'.$filenameNew;
+
+                   rename($old, $new);
+                   if (file_exists($old)) {
+                       unlink($old);
+                   }
+                }
+                
+                $output[] = $filenameNew;
+              }
+            }
+        }
+
+        return $output; // return array and encode to insert to db
     }
 
 

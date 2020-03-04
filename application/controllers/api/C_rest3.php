@@ -2813,6 +2813,7 @@ class C_rest3 extends CI_Controller {
    
 
     public function LoadStudents_server_side(){
+      $input = $this->getInputToken2();
       $this->load->model("global-informations/Globalinformation_model");
       $requestData = $_REQUEST;
       $param= [];
@@ -2820,7 +2821,31 @@ class C_rest3 extends CI_Controller {
           $search = $requestData['search']['value'];
           $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$search."%' ","filter"=>"AND",);    
           $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$search."%' ","filter"=>"OR",);    
-          $param[] = array("field"=>"ps.`NameEng`","data"=>" like '%".$search."%' )","filter"=>"OR",);    
+          $param[] = array("field"=>"ps.`NameEng`","data"=>" like '%".$search."%' ","filter"=>"OR",);    
+          $param[] = array("field"=>"ps.`Name`","data"=>" like '%".$search."%' )","filter"=>"OR",);    
+      }
+
+      // Filter Portal Alumni is active or not
+      if(array_key_exists('isPortalAlumi', $input)){
+          if ($input['isPortalAlumi'] == 1) {
+              $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" > 0","filter"=>"AND",); 
+          }
+          else if ($input['isPortalAlumi'] == 0) {
+              $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" = 0","filter"=>"AND",);
+          }
+      }
+
+      // filtering selection
+      if (array_key_exists('Selection', $input)) {
+        $strFilter = '';
+        $Selection = $input['Selection'];
+        if (count($Selection) > 0) {
+          $strFilter = "'".$Selection[0]."'";
+          for ($i=1; $i < count($Selection); $i++) { 
+            $strFilter .= ",'".$Selection[$i]."'";
+          }
+          $param[] = array("field"=>"ta.`NPM`","data"=>" not in (".$strFilter.") ","filter"=>" AND",);
+        }
       }
       
       $totalData = $this->Globalinformation_model->fetchTotalDataStudent($param)->Total;

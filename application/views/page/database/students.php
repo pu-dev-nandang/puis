@@ -59,6 +59,17 @@
                                         </select>
                                     </div>
                                 </div>
+                                <?php $hide = ($this->session->userdata('IDdepartementNavigation') == 6) ? '' : 'hide' ?>
+                                <div class="col-sm-2 <?php echo $hide ?>">
+                                    <div class="form-group">
+                                        <label>Portal Alumni</label>  
+                                        <select class="form-control" name="SelectPortalAlumi" id="SelectPortalAlumi">
+                                            <option value="">-Choose one-</option>
+                                            <option value="1">Aktif</option>
+                                            <option value="0">Non Aktif</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row">                               
                                 <div class="col-sm-2">
@@ -271,14 +282,7 @@
 <script type="text/javascript">
     function fetchingData(isapprove=false,sort=null,order=null) {
         loading_modal_show();
-        var filtering = $("#form-filter").serialize();
-        if(isapprove){
-            filtering = filtering+"&isapprove="+isapprove;
-        }
-        if((sort && order) || ( sort !== null && order !== null) ){
-          filtering = filtering+"&sortby="+sort+"&orderby="+order;
-        }    
-        var token = jwt_encode({Filter : filtering},'UAP)(*');
+        
         var dataTable = $('#fetch-data-tables #table-list-data').DataTable( {
             destroy: true,
             retrieve:true,
@@ -292,7 +296,27 @@
             "ajax":{
                 url : base_url_js+'api/database/__getListStudentPS', // json datasource
                 ordering : false,
-                data : {token:token},
+                // data : {token:token},
+                data: function(token) {
+                    // Read values
+                    var filtering = $("#form-filter").serialize();
+                    if(isapprove){
+                        filtering = filtering+"&isapprove="+isapprove;
+                    }
+
+                    // filtering to portal alumni
+                    let SelectPortalAlumi = $('#SelectPortalAlumi option:selected').val();
+                    if (SelectPortalAlumi != '' && SelectPortalAlumi != undefined ) {
+                        filtering += '&isPortalAlumi='+SelectPortalAlumi;
+                    }
+
+                    if((sort && order) || ( sort !== null && order !== null) ){
+                      filtering = filtering+"&sortby="+sort+"&orderby="+order;
+                    }
+
+                    var get_token = jwt_encode({Filter : filtering},'UAP)(*');
+                    token.token = get_token;
+                },
                 type: "post",  // method  , by default get
                 error: function(jqXHR){  // error handling
                     loading_modal_hide();
@@ -310,6 +334,8 @@
                 loading_modal_hide();
             }
         });
+
+        TableSess = dataTable;
     }
 
     function getFormData($form){
@@ -357,13 +383,13 @@
         });
 
 
-        $("#fetch-data-tables").on("change","#example-select-all",function(){
-            if($(this).is(':checked')){
-                $("#fetch-data-tables").find("#table-list-data > tbody input[type=checkbox]").prop("checked",true);
-            }else{
-                $("#fetch-data-tables").find("#table-list-data > tbody input[type=checkbox]").prop("checked",false);                
-            }
-        });
+        // $("#fetch-data-tables").on("change","#example-select-all",function(){
+        //     if($(this).is(':checked')){
+        //         $("#fetch-data-tables").find("#table-list-data > tbody input[type=checkbox]").prop("checked",true);
+        //     }else{
+        //         $("#fetch-data-tables").find("#table-list-data > tbody input[type=checkbox]").prop("checked",false);                
+        //     }
+        // });
 
 
         $('#btnStdDownloadtoExcel').click(function () {
@@ -430,16 +456,6 @@
 
     });
 </script>
-
-
-
-
-
-
-
-
-
-
 
 
  
@@ -929,7 +945,7 @@
     });
 
     // Handle click on "Select all" control
-    /*$(document).on('click','#example-select-all',function () {    
+    $(document).on('click','#example-select-all',function () {    
        // Get all rows with search applied
        var rows = TableSess.rows({ 'search': 'applied' }).nodes();
        // Check/uncheck checkboxes for all rows in the table
@@ -994,7 +1010,7 @@
             }
        })
 
-    });*/
+    });
 
     // Handle click on "Select all" control
     /*$(document).on('click','#example-select-all2',function () {    
@@ -1106,4 +1122,75 @@
 
     /*END ADDED BY FEBRI @ NOV 2019*/
 
+
+    // Add Alumni 2020-02-19 by Alhadi Rahman
+    $(document).off('click', '.BtnSetAlumni').on('click', '.BtnSetAlumni',function(e) {
+        var NPM = $(this).attr('data-npm');
+        var NameSTD = $(this).attr('data-name');
+        var dtAlumni = $(this).attr('data-alumni');
+        var selected = (dtAlumni > 0 ) ? 'selected' : ''; 
+        var html = '<div class = "row">'+
+                        '<div class = "col-md-12">'+
+                            '<div class = "form-group">'+
+                                '<label>Set Alumni</label>'+
+                                '<select class = "form-control" id = "ChooseAlumni">'+
+                                    '<option value = "0">Non Aktif</option>'+
+                                    '<option value = "1" '+selected+'>Aktif</option>'+
+                                '</select>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>';
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Set Portal Alumni '+NPM+' - '+NameSTD+' </h4>');
+        $('#GlobalModal .modal-body').html(html);
+        $('#GlobalModal .modal-footer').html('<button class = "btn btn-success" id = "btnSaveModalPortalAlumni" data-npm = "'+NPM+'">Save</button>'+' <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });                
+
+    })
+
+    $(document).off('click', '#btnSaveModalPortalAlumni').on('click', '#btnSaveModalPortalAlumni',function(e) {
+        var NPM = $(this).attr('data-npm');
+        var selector = $(this);
+        var ChooseAlumni = $('#ChooseAlumni option:selected').val();
+        let dataform = {
+            action : 'registration',
+            data : {
+                NPM : NPM,
+                ChooseAlumni : ChooseAlumni,
+                UpdateBy : sessionNIP,
+            },
+            auth : 's3Cr3T-G4N',
+            sessionNIP : sessionNIP,
+        };
+        let token = jwt_encode(dataform,'UAP)(*');
+        let url = base_url_js+'rest_alumni/__registration';
+        var Apikey = '<?php echo $rest_setting_alumni[0]['Apikey'] ?>';
+        var Header = {
+            Hjwtkey : '<?php echo $rest_setting_alumni[0]['Hjwtkey'] ?>'
+        };
+        loading_button2(selector);
+        AjaxSubmitForm(url,token,[],Apikey,Header).then(function(response){
+            if (response.status == 1) {
+                toastr.success('Success');
+                TableSess.ajax.reload(null, false);
+                $('#GlobalModal').modal('hide');
+            }
+            else
+            {
+                toastr.error('Connection error,please try again');
+                end_loading_button2(selector);
+            }
+        }).fail(function(response){
+           toastr.error('Connection error,please try again');
+           end_loading_button2(selector);     
+        })    
+
+    })
+    // end Portal Alumni by Adhi
+    
+    
 </script> 
