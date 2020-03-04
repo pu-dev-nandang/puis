@@ -39,6 +39,7 @@ class M_studentlife extends CI_Model {
 		$this->db->join("db_admission.region f","f.RegionID = b.RegionID","left");
 		$this->db->join("db_admission.district g","g.DistrictID = b.DistrictID","left");
 		$this->db->where($data);
+		$this->db->order_by("ID","desc");
 		$query = $this->db->get();
 		return $query;
 	}

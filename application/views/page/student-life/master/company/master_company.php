@@ -130,8 +130,15 @@
                       }
                     },
                     { "data": "ID",
-                      "render": function (data) {
-                        var label = '<div class="btn-group"><button title="Edit" class="btn btn-warning btn-sm btnCompanyEdit" type="button" data-id="'+data+'"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-danger btnCompanyRemove" data-id="'+data+'" type="button" title="Remove"><i class="fa fa-trash"></i></button></div>';
+                      "render": function (data, type, row, meta) {
+                        var label = '';
+                        if(row.isStudent == 1 && (jQuery.isEmptyObject(row.Brand) || jQuery.isEmptyObject(row.IndustryTypeID) 
+                                               || jQuery.isEmptyObject(row.Address) || jQuery.isEmptyObject(row.CountryID) 
+                                               || jQuery.isEmptyObject(row.ProvinceID) || jQuery.isEmptyObject(row.RegionID) 
+                                               || jQuery.isEmptyObject(row.DistrictID) || jQuery.isEmptyObject(row.Postcode) ) ){
+                            label += '<button style="width:100%" title="Please complete this company" class="btn btn-info btn-sm btnCompanyEdit" type="button" data-id="'+data+'"><i class="fa fa-exclamation-triangle"></i> Need Attention</button>';
+                        }
+                        label +='<div class="btn-group"  style="width:100%"><button title="Edit" style="width:50%" class="btn btn-warning btn-sm btnCompanyEdit" type="button" data-id="'+data+'"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-danger btnCompanyRemove" data-id="'+data+'" type="button" title="Remove" style="width:50%"><i class="fa fa-trash"></i></button></div>';
                         return label;
                       }
                     }

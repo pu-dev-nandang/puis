@@ -6004,6 +6004,8 @@ class C_api3 extends CI_Controller {
                 if (!array_key_exists('UpdatedBy', $dataForm)) {
                     $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
                 }
+                $dataForm['Logs'] = null;
+                //$dataForm['UpdatedBy'] = $this->session->userdata('NIP');
                 $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
                 $this->db->where('ID', $ID);
                 $this->db->update('db_studentlife.alumni_experience',$dataForm);
