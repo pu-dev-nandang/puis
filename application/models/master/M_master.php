@@ -1067,6 +1067,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             'FormulirCode' => $FormulirCode,
             // 'VerificationBY' => $this->session->userdata('NIP'),
             'VerificationAT' => date('Y-m-d H:i:s'),
+            'UpdateAT' => date('Y-m-d H:i:s'),
         );
 
         if ($tgl != null) {
