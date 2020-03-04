@@ -3568,7 +3568,7 @@ class M_api extends CI_Model {
 
     }
 
-    public function __getStudentApprovedKRS($SemesterID,$ScheduleID){
+    public function __getStudentApprovedKRS($SemesterID,$ScheduleID,$Type=''){
         // Fungsi ini mengambil student dari yang sudah di approve dan dari yang masih planning
 
         $dataCL = $this->getClassOf();
@@ -3577,16 +3577,25 @@ class M_api extends CI_Model {
         for($c=0;$c<count($dataCL);$c++){
             $d = $dataCL[$c];
             $db_ = 'ta_'.$d['Year'];
-            $dataSP = $this->db->query('SELECT sp.NPM,s.Name FROM '.$db_.'.study_planning sp
+            $dataSP = $this->db->query('SELECT sp.NPM,s.Name, sp.UTS, sp.UAS, 
+                                                    sp.Evaluasi1, sp.Evaluasi2, sp.Evaluasi3 ,sp.Evaluasi4 ,sp.Evaluasi5,
+                                                    sp.Score, sp.Grade FROM '.$db_.'.study_planning sp
                                                     LEFT JOIN '.$db_.'.students s ON (s.NPM = sp.NPM)
                                                     WHERE sp.SemesterID = "'.$SemesterID.'"
                                                     AND sp.ScheduleID = "'.$ScheduleID.'"
                                                     ORDER BY sp.NPM ASC ')->result_array();
 
             if(count($dataSP)>0){
-                for($s=0;$s<count($dataSP);$s++){
-                    array_push($res,$dataSP[$s]['NPM']);
+                if($Type==''){
+                    for($s=0;$s<count($dataSP);$s++){
+                        array_push($res,$dataSP[$s]['NPM']);
+                    }
+                } else {
+                    for($s=0;$s<count($dataSP);$s++){
+                        array_push($res,$dataSP[$s]);
+                    }
                 }
+
             }
         }
 

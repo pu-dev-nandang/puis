@@ -28,6 +28,19 @@ class M_table extends CI_Model {
 	public function __NPM(){
 		return array();
 	}
+	public function __Year(){
+		$s = 2014;
+		$rs = [];
+		$end = date('Y');
+		for ($i=$s; $i <= $end; $i++) { 
+			$rs[] = [
+				'ID' => $i,
+				'Value' => $i,
+			];
+		}
+
+		return $rs;
+	}
 
 	public function __generate($Props){
 		$DepartmentID = $this->session->userdata('DepartmentIDDocument');
@@ -57,6 +70,7 @@ class M_table extends CI_Model {
 				'#SemesterID' => $querySQLSMT,
 				'#NIP' => $this->__NIP(),
 				'#NPM' => $this->__NPM(),
+				'#Year' => $this->__Year(),
 			],
 			'selectEmployees' => $querySQLEmployees,
 			// 'MapTable' => [] => by JS

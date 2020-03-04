@@ -8,6 +8,7 @@ class C_studentlife extends Student_Life {
     function __construct()
     {
         parent::__construct();
+        $this->load->model('student-life/m_studentlife','stdlife');
     }
 
     private function __setting_rest_alumni(){
@@ -41,6 +42,43 @@ class C_studentlife extends Student_Life {
         $page = $this->load->view('page/'.$data['department'].'/diploma-supplement/list_student',$data,true);
         $this->menu_diploma_supplement($page);
     }
+
+    // ===== MASTER ====
+
+    // ++ Master Company ++
+    public function menu_master_company($page){
+        $data['page'] = $page;
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/master/company/menu_master_company',$data,true);
+        $this->temp($content);
+    }
+
+    public function master_company(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/master/company/master_company',$data,true);
+        $this->menu_master_company($page);
+    }
+
+    public function add_master_company(){
+
+        $ID = $this->input->get('id');
+
+        $detailCompany = [];
+        if($ID!='' && $ID!=null){
+            $detailCompany = $this->stdlife->getDetailCompanyByID($ID);
+        }
+
+
+        $data['detailCompany'] = $detailCompany;
+
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/master/company/add_master_company',$data,true);
+        $this->menu_master_company($page);
+    }
+
+
+
+
 
     // ===== SKPI ====
     private function menu_skpi($page){

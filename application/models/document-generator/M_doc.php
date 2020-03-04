@@ -52,6 +52,8 @@ class M_doc extends CI_Model {
 		    if(preg_match_all('/{+(.*?)}/', $v, $matches)){
 		    	for ($z=0; $z < count($matches[1]); $z++) { 
     		        $str = trim($matches[1][$z]);
+                    // $strMatch = $matches[1];
+                    // $str = $this->__filterKeyScript($strMatch);
     		        $ex = explode('.', $str);
     		        if (count($ex) > 0) {
     		        	/*
@@ -194,6 +196,26 @@ class M_doc extends CI_Model {
         return $rs;
     }
 
+    private function __filterKeyScript($matches){
+        $rs = '';
+        $arr_key = [$this->KeySET,$this->KeyUSER,$this->KeyINPUT,$this->KeyGRAB,$this->KeyTABLE,$this->KeyGET];
+        for ($i=0; $i < count($matches); $i++) { 
+            $s = $matches[$i];
+            $ex = explode('.', $s);
+            for ($j=0; $j < count($arr_key); $j++) { 
+                
+                if ($ex[0] == $arr_key[$j]) {
+                    $rs = $ex[0];
+                    break;
+                }
+            }
+            
+
+        }
+
+        return $rs;
+    }
+
     public function preview_template($Input){
     	$this->load->model('document-generator/m_set');
     	$this->load->model('document-generator/m_user');
@@ -207,6 +229,9 @@ class M_doc extends CI_Model {
     	foreach ($line as $v) {
     	    if(preg_match_all('/{+(.*?)}/', $v, $matches)){
     	        $str = trim($matches[1][0]);
+                $strMatch = $matches[1];
+                $str = $this->__filterKeyScript($strMatch);
+                // print_r($matches);
     	        $ex = explode('.', $str);
     	        if (count($ex) > 0) {
     	        	switch ($ex[0]) {
@@ -314,6 +339,8 @@ class M_doc extends CI_Model {
     		if(preg_match_all('/{+(.*?)}/', $v, $matches)){
     			for ($z=0; $z < count($matches[1]); $z++) { 
 	    		    $str = trim($matches[1][$z]);
+                    // $strMatch = $matches[1];
+                    // $str = $this->__filterKeyScript($strMatch);
 	    		    $ex = explode('.', $str);
 	    		    $setValue = $str;
 	    		    // print_r($str.'<br/>');
@@ -910,6 +937,8 @@ class M_doc extends CI_Model {
     	foreach ($line as $v) {
     	    if(preg_match_all('/{+(.*?)}/', $v, $matches)){
     	        $str = trim($matches[1][0]);
+                $strMatch = $matches[1];
+                $str = $this->__filterKeyScript($strMatch);
     	        $ex = explode('.', $str);
     	        if (count($ex) > 0) {
     	        	switch ($ex[0]) {
@@ -1021,15 +1050,17 @@ class M_doc extends CI_Model {
         $rs = [];
         $ID = $dataToken['ID'];
         $G_dt = $this->m_master->caribasedprimary('db_generatordoc.document','ID',$ID);
-
         $FileTemplate    = './uploads/document-generator/template/'.$G_dt[0]['PathTemplate'];
         $line = $this->__readDoc($FileTemplate);
+        // print_r($line);die();
         $Filtering = [];
         $Input = $dataToken['settingTemplate'];
         $DepartmentID = $dataToken['DepartmentID'];
         foreach ($line as $v) {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 $str = trim($matches[1][0]);
+                $strMatch = $matches[1];
+                $str = $this->__filterKeyScript($strMatch);
                 $ex = explode('.', $str);
                 if (count($ex) > 0) {
                     switch ($ex[0]) {
@@ -1115,6 +1146,8 @@ class M_doc extends CI_Model {
                 }
             }
         }
+
+        // print_r($rs);die();
 
         return $this->__preview_templatebyUserRequest($rs,$FileTemplate);
     }
@@ -1285,6 +1318,8 @@ class M_doc extends CI_Model {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 for ($z=0; $z < count($matches[1]); $z++) { 
                     $str = trim($matches[1][$z]);
+                    // $strMatch = $matches[1];
+                    // $str = $this->__filterKeyScript($strMatch);
                     $ex = explode('.', $str);
                     $setValue = $str;
                     // print_r($str.'<br/>');
@@ -1405,6 +1440,8 @@ class M_doc extends CI_Model {
         foreach ($line as $v) {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 $str = trim($matches[1][0]);
+                $strMatch = $matches[1];
+                $str = $this->__filterKeyScript($strMatch);
                 $ex = explode('.', $str);
                 if (count($ex) > 0) {
                     switch ($ex[0]) {
@@ -1617,6 +1654,8 @@ class M_doc extends CI_Model {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 for ($z=0; $z < count($matches[1]); $z++) { 
                     $str = trim($matches[1][$z]);
+                    // $strMatch = $matches[1];
+                    // $str = $this->__filterKeyScript($strMatch);
                     $ex = explode('.', $str);
                     $setValue = $str;
                     // print_r($str.'<br/>');
@@ -2077,6 +2116,8 @@ class M_doc extends CI_Model {
         foreach ($line as $v) {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 $str = trim($matches[1][0]);
+                $strMatch = $matches[1];
+                $str = $this->__filterKeyScript($strMatch);
                 $ex = explode('.', $str);
                 if (count($ex) > 0) {
                     switch ($ex[0]) {
@@ -2351,6 +2392,8 @@ class M_doc extends CI_Model {
         foreach ($line as $v) {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 $str = trim($matches[1][0]);
+                $strMatch = $matches[1];
+                $str = $this->__filterKeyScript($strMatch);
                 $ex = explode('.', $str);
                 if (count($ex) > 0) {
                     switch ($ex[0]) {
@@ -2497,6 +2540,8 @@ class M_doc extends CI_Model {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 for ($z=0; $z < count($matches[1]); $z++) { 
                     $str = trim($matches[1][$z]);
+                    $strMatch = $matches[1];
+                    $str = $this->__filterKeyScript($strMatch);
                     $ex = explode('.', $str);
                     $setValue = $str;
                     // print_r($str.'<br/>');

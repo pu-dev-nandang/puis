@@ -23,17 +23,12 @@
 							<textarea name="Address" class="form-control required" required placeholder="Jl. name of road, Villages, City/Distrik, Province, Postal Code"><?=(!empty($detail) ? $detail->Address : null)?></textarea>
 							<small class="text-danger text-message"></small>
 						</div>
-						<div class="form-group">
-							<label>Additional Info</label>
-							<textarea class="form-control" name="AdditionalInfo" placeholder="Contact number/mail/fax"><?=(!empty($detail) ? $detail->AdditionalInfo : null)?></textarea>
-							<small class="text-danger text-message"></small>
-						</div>
 						<div class="row">
 							<div class="col-sm-2">
 								<div class="form-group">
 									<label>Industry Type</label>
-									<select class="form-control required" required name="IndustryID" id="IndustryID_" >
-										<option value="">Choose one</option>
+									<select class="select2-req" name="IndustryTypeID" id="IndustryID_" >
+										<option>Choose one</option>
 										<?php if(!empty($type)){ 
 										foreach ($type as $t) { 
 											$selected = "";
@@ -47,17 +42,6 @@
 									</select>
 									<small class="text-danger text-message"></small>
 								</div>
-							</div>
-							<div class="col-sm-2">
-								<div class="form-group">
-									<label>Is Active</label>
-									<select class="form-control required" required name="IsActive" >
-										<option value="">Choose One</option>
-										<option value="1" <?=(!empty($detail) ? (($detail->IsActive == 1) ? 'selected':'') : '')?> >Yes</option>
-										<option value="0" <?=(!empty($detail) ? (($detail->IsActive == 0) ? 'selected':'') : '')?> >No</option>
-									</select>
-									<small class="text-danger text-message"></small>
-								</div>	
 							</div>
 						</div>
 						<div class="form-group">
@@ -73,6 +57,7 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function(){
+		$("#IndustryID_").select2({width:'100%'});
 		$(".btn-back").click(function(){
 			loading_modal_show();
 			location.reload(true);
@@ -83,6 +68,24 @@
 			var error = false;
 			var itsme = $(this);
 			var itsform = itsme.parent().parent();
+			itsform.find(".select2-req").each(function(){
+                var value = $(this).val();
+                if($.isNumeric(value)){
+                    if($.trim(value) == ''){
+                        error = false;  
+                        $(this).addClass("error");
+                        $(this).parent().find(".text-message").text("Please fill this field");
+                    }else{
+                        error = true;
+                        $(this).removeClass("error");
+                        $(this).parent().find(".text-message").text("");
+                    }
+                }else{
+                    error = false;  
+                    $(this).addClass("error");
+                    $(this).parent().find(".text-message").text("Please fill this field");
+                }
+            });
 		 	itsform.find(".required").each(function(){
 			  	var value = $(this).val();
 			  	if($.trim(value) == ''){

@@ -10,7 +10,7 @@
                 <div class="row">
                     <div class="col-xs-3">
                         <div class="form-group">
-                            <label>NIK / NIP</label>
+                            <label>NIK / NIP *</label>
                             <input class="form-control" id="formNIP" />
                         </div>
                     </div>
@@ -39,7 +39,7 @@
                 <div class="row">
                     <div class="col-xs-5">
                         <div class="form-group">
-                            <label>No KTP</label>
+                            <label>No KTP *</label>
                             <input class="form-control" id="formKTP" />
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                     </div>
                     <div class="col-xs-3">
                         <div class="form-group">
-                            <label>Religion</label>
+                            <label>Religion *</label>
                             <select class="form-control" id="formReligion"></select>
                         </div>
                     </div>
@@ -60,13 +60,13 @@
                 <div class="row">
                     <div class="col-xs-9">
                         <div class="form-group">
-                            <label>Name</label>
+                            <label>Name *</label>
                             <input class="form-control" id="formName"/>
                         </div>
                     </div>
                     <div class="col-xs-3">
                         <div class="form-group">
-                            <label>Gender</label>
+                            <label>Gender *</label>
                             <select class="form-control" id="formGender">
                                 <option value="L">Male</option>
                                 <option value="P">Female</option>
@@ -93,7 +93,7 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="form-group">
-                            <label>Place Of Birth</label>
+                            <label>Place Of Birth *</label>
                             <input class="form-control" id="formPlaceOfBirht" />
                         </div>
                     </div>
@@ -101,7 +101,7 @@
                         <div class="form-group">
 
                             <div class="thumbnail" style="padding: 10px;text-align: center;">
-                                <h4>Date Of Birth</h4>
+                                <h4>Date Of Birth *</h4>
                                 <div class="row">
                                     <div class="col-xs-4">
                                         <div class="form-group">
@@ -162,18 +162,24 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xs-12">
+                    <div class="col-xs-6">
                         <div class="form-group">
                             <label>Email Other</label>
                             <input class="form-control" id="formEmail" />
                         </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <label>Marital Status*</label>
+                        <select class="form-control" id="formMaritalStatus">
+                            <option value="">Choose One</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="form-group">
-                            <label>Address</label>
+                            <label>Address *</label>
                             <textarea rows="3" class="form-control" id="formAddress"></textarea>
                         </div>
                     </div>
@@ -182,11 +188,12 @@
                 <div class="row">
                     <div class="col-xs-2">
                         <div class="form-group">
-                            <label>Postcode</label>
+                            <label>Postcode *</label>
                             <input type="text" class="form-control" id="formPostcode" maxlength="5">
                         </div>
                     </div>
                 </div>
+                <p><b>*) Please fill out this field by referring to ID card</b></p>
 
 
             </div>
@@ -407,6 +414,7 @@
           split++;
     }
     $(document).ready(function () {
+        loadSelectOptionMaritalStatus('#formMaritalStatus');
         loadYearOfBirth('#formYearBirth');
         loadMonthBirth('#formMontBirth');
 
@@ -558,6 +566,7 @@
 
         var formEmailPU = $('#formEmailPU').val();
         var formEmail = $('#formEmail').val();
+        var formMaritalStatus = $('#formMaritalStatus').val();
         var formAddress = $('#formAddress').val();
         var formPostcode = $('#formPostcode').val();
 
@@ -596,6 +605,7 @@
             && form_MainDivision!='' && form_MainDivision!=null
             && form_MainPosition!='' && form_MainPosition!=null
             && SerdosForm == true
+            && formMaritalStatus !='' && formPostcode !='' && formAddress !='' && formReligion !='' && formGender !=''
         ){
             loading_button('#btnSubmitEmployees');
             $('#btnCloseEmployees').prop('disabled',true);
@@ -676,6 +686,7 @@
                     Blood : formBlood,
                     Email : formEmail,
                     EmailPU : emailPU,
+                    MaritalStatus: formMaritalStatus,
                     Password_Old : Password_Old,
                     Address : formAddress,
                     Postcode : formPostcode,
@@ -766,7 +777,7 @@
                     var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                                  '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Print</button>'+
                                  /*ADDED BY FEBRI @ FEB 2020*/
-                                 '<a href="'+base_url_js+'human-resources/employees/employees-additional-info/'+dtmodal.UsernamePC'" class="btn btn-info">Go to additional form</a>';
+                                 '<a href="'+base_url_js+'human-resources/employees/employees-additional-info/'+dtmodal.UsernamePC+'" class="btn btn-info">Go to additional form</a>';
                                  /*END ADDED BY FEBRI @ FEB 2020*/
                     
                     $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Akses'+'</h4>');
@@ -791,18 +802,45 @@
             });
 
         } else {
-            var msg = '';
+            var msg = '<ol>';
             if(formName==''){
-                msg = 'Name is required';
-            } else if (formYearBirth=='' || formMontBirth=='' || formDateBirth==''){
-                msg = 'Birthday is required';
-            } else if(form_MainDivision==''){
-                msg = 'Main Division is required';
-            } else if (form_MainPosition==''){
-                msg = 'Main Position is required';
-            } else if(SerdosForm==false){
-                msg = 'Serdos Number are required'
+                msg += '<li>Name is required</li>';
+            } if (formYearBirth=='' || formMontBirth=='' || formDateBirth==''){
+                msg += '<li>Birthday is required</li>';
+            } if(form_MainDivision==''){
+                msg += '<li>Main Division is required</li>';
+            } if (form_MainPosition==''){
+                msg += '<li>Main Position is required</li>';
+            } if(SerdosForm==false){
+                msg += '<li>Serdos Number are required</li>';
             }
+            /*ADDED BY FEBRI @ FEB 2020*/
+            if(formNIP == ''){
+                msg += '<li>NIP is required</li>';
+            }
+            if(formKTP == ''){
+                msg += '<li>No KTP is required</li>';
+            }
+            if(formReligion == ''){
+                msg += '<li>Religion is required</li>';
+            }
+            if(formGender == ''){
+                msg += '<li>Gender is required</li>';
+            }
+            if(formPlaceOfBirht == ''){
+                msg += '<li>Place of birth is required</li>';
+            }
+            if(formAddress == ''){
+                msg += '<li>Address is required</li>';
+            }
+            if(formPostcode == ''){
+                msg += '<li>Postal code is required</li>';
+            }
+            if(formMaritalStatus == ''){
+                msg += '<li>Marital Status is required</li>';
+            } 
+            msg += "</ol>";
+            /*END ADDED BY FEBRI @ FEB 2020*/
             toastr.error(msg,'Error');
         }
 
