@@ -1041,6 +1041,7 @@ class M_alumni extends CI_Model {
                                  from db_employees.employees as emp
                                  join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
                              ) as b on a.CreateBy = b.UserID 
+                             where a.ID_testimony = "'.$ID_testimony.'"
 
                         '
                     )->result_array();
