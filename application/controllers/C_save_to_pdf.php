@@ -7185,7 +7185,7 @@ Phone: (021) 29200456';
 
                 $pdf->SetFillColor($R, $G, $B);
                 $pdf->SetFont('dinpromedium','',$fontBody_1);
-                $pdf->Cell($midWidth,$h_2,$dataPT['NoSK'],$border,0,'L',true);
+                $pdf->Cell($midWidth,$h_2,$dataPT['NoAkta'],$border,0,'L',true);
                 $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
                 $pdf->Cell($midWidth,$h_2,'Indonesian and English',$border,1,'L',true);
 
@@ -7201,7 +7201,7 @@ Phone: (021) 29200456';
 
                 $pdf->SetFillColor($R, $G, $B);
                 $pdf->SetFont('dinpromedium','',$fontBody_1);
-                $pdf->Cell($midWidth,$h_2,$dataPT['NamaEng'],$border,0,'L',true);
+                $pdf->Cell($midWidth,$h_2,$dataPT['Nama'],$border,0,'L',true);
                 $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
                 $pdf->Cell($midWidth,$h_2,'According to Degree Certificate',$border,1,'L',true);
                 $pdf->Ln($rowSpace);
