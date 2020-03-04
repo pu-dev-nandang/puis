@@ -7038,11 +7038,11 @@ class C_api extends CI_Controller {
                 $IDuser = $this->session->userdata('NIP');
                 $NoDocument = strtoupper($formInsert['NoDocument']);
                 $DateDocument = $formInsert['DateDocument'];
-                $type = $formInsert['type'];
+                $Colom = $formInsert['type'];
                 //$kat_otherfiles = $formInsert['kat_otherfiles'];
                 $DescriptionFile = $formInsert['DescriptionFile'];
                 $fileName = $formInsert['fileName'];
-                $Get_MasterFiles = $this->m_master->MasterfileStatus($type);
+                $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
                 $dataSave = array(
                     'NIP' => $NIP,
                     'TypeFiles' => $Get_MasterFiles[0]['ID'],

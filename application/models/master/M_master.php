@@ -2618,7 +2618,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function MasterfileStatus($Colom)
     {
 
-        $sql = 'SELECT ID FROM db_employees.master_files where TypeFiles = "'.$Colom.'" ';
+        $sql = 'SELECT ID FROM db_employees.master_files where NameFiles = "'.$Colom.'" ';
         $query=$this->db->query($sql, array())->result_array();
         return $query;
 
