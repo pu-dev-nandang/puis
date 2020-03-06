@@ -28,14 +28,14 @@
     <div class="col-md-4">
         <div class="well">
             <div class="row">
-                <div class="col-md-7">
+                <div class="col-md-12">
                     <select class="form-control" id="filterYear">
-                        <option value="" selected disabled>All graduation year</option>
+                        <option value="" selected>All graduation year</option>
                         <option disabled>----------------</option>
                     </select>
                 </div>
-                <div class="col-md-5" style="border-left: 1px solid #CCCCCC;">
-                    <button class="btn btn-block btn-default" id="btnShowMasterCompany">Master Company</button>
+                <div class="col-md-5 hide" style="border-left: 1px solid #CCCCCC;">
+<!--                    <button class="btn btn-block btn-default" id="btnShowMasterCompany">Master Company</button>-->
                 </div>
             </div>
 
@@ -210,6 +210,37 @@
                             WorkSuitability = '<b style="color: green;">High</b>';
                         }
 
+                        var LastUpdated = "";
+                        if(!jQuery.isEmptyObject(v.UpdatedBy)){
+                            var LogsB = "";
+                            var LogsA = "";
+                            if(!jQuery.isEmptyObject(v.Logs)){
+                                var parse = jQuery.parseJSON(v.Logs);
+
+                                if(parse['before'] == 0){
+                                    LogsB = "Low";
+                                }else if(parse['before'] == 1){
+                                    LogsB = "Middle";
+                                }else if(parse['before'] == 2 ){
+                                    LogsB = "High";
+                                }else{
+                                    LogsB = "unknown";
+                                }
+
+                                if(parse['after'] == 0){
+                                    LogsA = "Low";
+                                }else if(parse['after'] == 1){
+                                    LogsA = "Middle";
+                                }else if(parse['after'] == 2 ){
+                                    LogsA = "High";
+                                }else{
+                                    LogsA = "unknown";
+                                }
+
+
+                            }
+                            LastUpdated ='<tr><td colspan="3"><p>Last edited by</p><p><span>'+v.UpdatedBy+' at '+v.UpdatedAt+'</span>'+(!jQuery.isEmptyObject(v.Logs) ? ' - <span>Change work suitability from <b>'+LogsB+'</b> tobe <b>'+LogsA+'</b></span>' : '')+'</p></td></tr>';
+                        }
 
 
                         $('#listBodyExperience').append('<tr>' +
@@ -252,7 +283,7 @@
                             '    <td style="text-align: center;">' +
                             '        <button class="btn btn-default btnEditExperience" data-token="'+jwt_encode(v,'UAP)(*')+'" data-id="'+v.ID+'">Edit</button>' +
                             '    </td>' +
-                            '</tr>');
+                            '</tr>'+LastUpdated+'');
                     });
                 } else {
                     $('#listBodyExperience').append('<tr>' +
@@ -278,6 +309,7 @@
         $('#GlobalModal .modal-body').html('<div class="row">' +
             '    <div class="col-md-12">' +
             '        <div class="well">' +
+            '           <div style="text-align: right;margin-bottom: 5px;"><a href="'+base_url_js+'student-life/master/company/add-company" target="_blank">Add new master company</a></div>' +
             '            <input class="form-control" placeholder="Search company" id="filterCompany">' +
             '            <table class="table table-centre">' +
             '               <thead>' +
@@ -378,7 +410,7 @@
         loadSelectOptionMonth('#EndMonth','');
 
 
-
+        
         if(Token!=''){
 
             // console.log(dataToken);
@@ -600,7 +632,8 @@
                     },500);
                 });
 
-            } else {
+            }
+            else {
                 toastr.error('All form are required');
             }
 

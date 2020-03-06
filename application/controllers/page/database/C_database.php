@@ -176,7 +176,7 @@ class C_database extends Globalclass {
     {
         /*ADDED BY FEBRI @ JAN 2020*/
         $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","IDStatus != '-2'","IDStatus","asc")->result();
-        $data['division'] = $this->General_model->fetchData("db_employees.division",array("StatusDiv"=>1))->result();
+        $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
         $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
         $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
         $data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
@@ -349,8 +349,15 @@ class C_database extends Globalclass {
         $data['statusstd'] = $this->General_model->fetchData("db_academic.status_student",array())->result();
         $data['religion'] = $this->General_model->fetchData("db_admission.agama",array())->result();
         $data['yearIntake'] = $this->General_model->fetchData("db_academic.semester",array(),null,null,null,"Year")->result();
+
+        // Updated by Adhi 19-02-2020
+        $data['rest_setting_alumni'] = $this->m_master->showData_array('db_alumni.rest_setting');
+        // END by Adhi 19-02-2020
         $content = $this->load->view('page/database/students',$data,true);
         /*END UPDATED BY FEBRI @ JAN 2020*/
+
+
+
         $this->temp($content);
     }
 

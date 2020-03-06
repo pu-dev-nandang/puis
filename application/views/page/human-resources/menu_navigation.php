@@ -47,12 +47,12 @@
             </li>
 
             <!-- ADDED BY FEBRI @ FEB 2020 -->
-            <!-- <li class="<?= ($this->uri->segment(2)=='master-aphris') ? 'current open' : ''?>">
+            <li class="<?= ($this->uri->segment(2)=='master-aphris') ? 'current open' : ''?>">
                 <a href="javascript:void(0);">
                     <i class="fa fa-user-circle"></i>
                     Master Aphris
                     <i class="arrow <?= ($this->uri->segment(2)=='master-aphris') ? 'icon-angle-down' : 'icon-angle-left'?>"></i></a>
-                    <?php $tablename = array("master_status","master_level","master_industry_type","master_company","master_family_relations"); ?>
+                    <?php $tablename = array("master_status","master_level","master_industry_type","master_company","master_marital_status","master_family_relations"); ?>
                     <ul class="sub-menu">
                         <?php foreach ($tablename as $tb) { ?>
                         <li class="<?= ($this->uri->segment(3)==$tb) ? 'current' : ''?>">
@@ -69,7 +69,7 @@
                             </a>
                         </li>
                     </ul>
-            </li> -->
+            </li>
             <!-- END ADDED BY FEBRI @ FEB 2020 -->
 
 

@@ -306,6 +306,7 @@ class C_rest extends CI_Controller {
 
     }
 
+    # OLD SCRIPT TO GET STUDENT SCORES
     public function getListStudentScores(){
         $requestData= $_REQUEST;
 
@@ -436,7 +437,7 @@ class C_rest extends CI_Controller {
             $nestedData[] = '<div  style="text-align:left;">'.$student.'</div>';
             $nestedData[] = '<div  style="text-align:left;">'.$row['Mentor'].'<br/><span style="font-size: 12px;color: #808080;">'.$row['NIP'].'</span></div>';
             $nestedData[] = '<div  style="text-align:left;">'.$listSemester.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$IPK.'</div>';
+            $nestedData[] = $IPK;
             $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.ucwords(strtolower($row['StatusDescription'])).'</div>';
 
@@ -457,6 +458,134 @@ class C_rest extends CI_Controller {
 
 
     }
+    #END OLD SCRIPT
+
+    /*UPDATED BY FEBRI @ MARCH 2020*/    
+    public function getListStudentScoresOBJ(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+        $time = strtotime("-1 year", time());
+        $CurrDate = date("Y", $time);
+        $w_ClassOf = (!empty($data_arr['ClassOf']) && $data_arr['ClassOf']!='' && $data_arr['ClassOf']!=null) ? ' AND ast.Year = "'.$data_arr['ClassOf'].'"' : ' AND ast.Year = '.$CurrDate;
+        $w_ProdiGroupID = (!empty($data_arr['ProdiGroupID']) && $data_arr['ProdiGroupID']!='' && $data_arr['ProdiGroupID']!=null) ? ' AND ast.ProdiGroupID = "'.$data_arr['ProdiGroupID'].'"' : '';
+        $w_StatusStudent = (!empty($data_arr['StatusStudent']) && $data_arr['StatusStudent']!='' && $data_arr['StatusStudent']!=null) ? ' AND ast.StatusStudentID = "'.$data_arr['StatusStudent'].'"' : '';
+        $dataWhere = $w_ClassOf.' '.$w_ProdiGroupID.' '.$w_StatusStudent;
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = 'AND ( ast.Name LIKE "%'.$search.'%" OR ast.NPM LIKE "%'.$search.'%"
+                           OR ss.Description LIKE "%'.$search.'%" OR em.Name LIKE "%'.$search.'%"
+                             OR em.NIP LIKE "%'.$search.'%")';
+        }
+
+        $queryDefault = 'SELECT ast.*, ss.Description AS StatusDescription, em.Name AS Mentor, em.NIP
+                                                          FROM db_academic.auth_students ast
+                                                          LEFT JOIN db_academic.status_student ss ON (ast.StatusStudentID = ss.ID)
+                                                          LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = ast.NPM)
+                                                          LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                                                          LEFT JOIN db_academic.prodi_group pg ON (pg.ProdiID = ma.NIP)
+                                                          WHERE ( ast.ProdiID = "'.$data_arr['ProdiID'].'" '.$dataWhere.' ) '.$dataSearch.'
+                                                          ORDER BY ast.Year DESC, ast.NPM ASC';
+        if(!empty($requestData['start']) && !empty($requestData['length'])){
+            $sql = $queryDefault.' LIMIT '.(!empty($requestData['start']) ? $requestData['start'] : 0).','.(!empty($requestData['length']) ? $requestData['length'] : 0).' ';            
+        }else{
+            $sql = $queryDefault;
+        }
+        
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = (!empty($requestData['start']) ? $requestData['start'] : 0) + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            $db_ = 'ta_'.$row['Year'];
+            $dataDetailStd = $this->db->select('Photo')->get_where($db_.'.students',array('NPM' => $row['NPM']),1)->result_array();
+
+            //getdetail prodi_group
+            if(!empty($row['ProdiGroupID'])){
+                $prodiGroup = $this->db->get_where('db_academic.prodi_group',array('ID' => $row['ProdiGroupID']))->row();
+            }
+
+            // Get Photo
+            $exp_photo = explode(' ',$dataDetailStd[0]['Photo']);
+            if($dataDetailStd[0]['Photo']!='' && $dataDetailStd[0]['Photo']!=null && count($exp_photo)==1){
+                $url_photo = base_url().'uploads/students/'.$db_.'/'.$dataDetailStd[0]['Photo'];
+            } else {
+                $url_photo = base_url().'images/icon/userfalse.png';
+            }
+
+            // Get Semester
+            $dataSemester = $this->db->order_by('ID','ASC')->get_where('db_academic.semester',
+                array('Year >=' => $row['Year']))->result_array();
+
+            $listSemester = '';
+            $Semester = 1;
+            if(count($dataSemester)>0){
+                for($s=0;$s<count($dataSemester);$s++){
+                    $d_s = $dataSemester[$s];
+                    $dataScore = $this->db->query('SELECT * FROM '.$db_.'.study_planning sr
+                                                                    WHERE sr.SemesterID = "'.$d_s['ID'].'"
+                                                                    AND sr.NPM = "'.$row['NPM'].'" ')->result_array();
+
+                    $koma = ($s!=0) ? '' : '';
+                    if(count($dataScore)>0){
+
+                        $IPS_totalCredit = 0;
+                        $IPS_totalGradeValue = 0;
+
+                        for($c=0;$c<count($dataScore);$c++){
+                            $d_sc = $dataScore[$c];
+                            $IPS_totalCredit = $IPS_totalCredit + $d_sc['Credit'];
+                            $IPS_totalGradeValue = $IPS_totalGradeValue + ($d_sc['Credit'] * $d_sc['GradeValue']);
+                        }
+
+                        $IPS = ($IPS_totalGradeValue>0) ? $IPS_totalGradeValue/$IPS_totalCredit : 0.00;
+
+
+                        $listSemester = $listSemester.''.$koma.' <span class="label label-default"> Smt '.$Semester.' : '.number_format(round($IPS, 2),2).'</span> ';
+
+
+                    } else {
+                        if($d_s['Status']==1){
+                            break;
+                        }
+                        $listSemester = $listSemester.''.$koma.' <span class="label label-default"> Smt '.$Semester.' : -</span> ';
+                    }
+
+                    if($d_s['Status']==1){
+                        break;
+                    }
+                    $Semester+=1;
+                }
+            }
+
+            $dataNewTr = $this->m_rest->getTranscript($row['Year'],$row['NPM'],'ASC');
+            $IPK = $dataNewTr['dataIPK']['IPK'];
+            $token = $this->jwt->encode(array('NPM' => $row['NPM'],'ClassOf' => $row['Year'],'Name' => $row['Name'],
+                    'URL_Photo' => $url_photo, 'URL_Back' => base_url('student/list-student-scores-as-head'))
+                ,'UAP)(*');
+
+            $data[] = array("No"=>$no,"Photo"=>$url_photo,"NPM"=>$row['NPM'],"Student"=>$row['Name'],"PGID"=>$row['ProdiGroupID'],"ProdiGroupID"=>(!empty($prodiGroup) ? $prodiGroup->Code : null),"MentorName"=>$row['Mentor'],"MentorNIP"=>$row['NIP'],"ListSemester"=>$listSemester,"IPK"=>number_format($IPK,2),"Token"=>$token,"StatusDescription"=>ucwords(strtolower($row['StatusDescription'])));
+            $no++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( (!empty($requestData['draw']) ? $requestData['draw'] :null) ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval(count($queryDefaultRow)),
+            "data"            => (!empty($data) ? $data : 0)
+        );
+
+        echo json_encode($json_data);
+
+
+    }
+    /*END UPDATED BY FEBRI @ MARCH 2020*/
 
     // Nandang - Get Student digunakan khusus untuk selec2.js
     public function getStudent_ServerSide(){
@@ -933,7 +1062,8 @@ class C_rest extends CI_Controller {
                 $ScheduleID = $dataToken['ScheduleID'];
 //                $ScheduleID = 393;
 
-                $data = $this->db->query('SELECT ID,Sessions FROM db_academic.counseling_topic WHERE ScheduleID = "'.$ScheduleID.'" ')->result_array();
+                $data = $this->db->query('SELECT ID,Sessions FROM db_academic.counseling_topic 
+                    WHERE ScheduleID = "'.$ScheduleID.'" ')->result_array();
 
 
                 $result = [];
@@ -4087,6 +4217,43 @@ class C_rest extends CI_Controller {
         }
 
         return print_r(json_encode($result));
+
+    }
+
+    public function getDetailCourseByIDAttd($ID_Attd){
+
+        $dataDetail = $this->db->query('SELECT attd.ScheduleID, smt.Name AS SemesterName, s.ClassGroup, cd.TotalSKS AS Credit, 
+                                                    mk.Name AS Course, em.Name As CoordinatorName, s.Coordinator, sd.StartSessions, sd.EndSessions, cl.Room, d.Name AS DayName,
+                                                    s.TotalAssigment, gc.Assg1, gc.Assg2, gc.Assg3, gc.Assg4, gc.Assg5, gc.Assigment, gc.UTS, gc.UAS, gc.Status AS StatusSyllabus
+                                                    FROM db_academic.attendance attd
+                                                    LEFT JOIN db_academic.schedule s ON (s.ID = attd.ScheduleID)
+                                                    LEFT JOIN db_academic.grade_course gc ON (gc.SemesterID = attd.SemesterID AND gc.ScheduleID = attd.ScheduleID)
+                                                    LEFT JOIN db_academic.semester smt ON (smt.ID = attd.SemesterID)
+                                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                    WHERE attd.ID = "'.$ID_Attd.'" GROUP BY s.ID ')->result_array();
+
+        if(count($dataDetail)>0){
+            $ScheduleID = $dataDetail[0]['ScheduleID'];
+            $dataDetail[0]['DetailProdi'] = $this->db->query('SELECT ps.Code, ps.Name FROM db_academic.schedule_details_course sdc 
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                                WHERE sdc.ScheduleID = "'.$ScheduleID.'" GROUP BY sdc.ProdiID')->result_array();
+
+            $dataDetail[0]['TeamTeaching'] = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.schedule_team_teaching stt 
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                    WHERE stt.ScheduleID = "'.$ScheduleID.'" ORDER BY em.NIP ASC')->result_array();
+
+            $dataDetail[0]['TotalStudent'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.attendance_students 
+                                                            WHERE ID_Attd = "'.$ID_Attd.'" ')->result_array()[0]['Total'];
+
+        }
+
+        return print_r(json_encode($dataDetail[0]));
 
     }
 

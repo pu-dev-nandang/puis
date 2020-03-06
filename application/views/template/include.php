@@ -30,7 +30,7 @@
 <!--[if IE 8]>
 <link href="assets/css/ie8.css" rel="stylesheet" type="text/css" />
 <![endif]-->
-<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+
 
 <link rel="stylesheet" href="<?php echo base_url('assets/datepicter/css/bootstrap-datetimepicker.min.css'); ?>">
 
@@ -38,6 +38,8 @@
 <link rel="stylesheet" href="<?php echo base_url('assets/checkbox/checkbox.css'); ?>">
 
 <link rel="stylesheet" href="<?php echo base_url('assets/summernote/summernote.css'); ?>">
+
+<link rel="stylesheet" href="<?php echo base_url('assets/font/custom-font.css'); ?>">
 
 <style media="screen">
 
@@ -553,6 +555,12 @@
         return phpNowDateTime;
     }
 
+    function getDateTimeNow() {
+        var phpNowDateTime = '<?= date("Y-m-d H:i:s"); ?>';
+        // return moment().format('YYYY-MM-DD HH:mm:ss');
+        return phpNowDateTime;
+    }
+
     function getDateNow() {
         var phpNowDateTime = '<?= date("Y-m-d"); ?>';
         // return moment().format('YYYY-MM-DD HH:mm:ss');
@@ -761,6 +769,104 @@
             }
         });
     }
+
+
+
+    function loadSelectOptionCompanyType(element,selected) {
+        var url = base_url_js+'api/__getCompanyType';
+        $.getJSON(url,function (jsonResult) {
+
+            if(jsonResult.length>0){
+                var option = $(element);
+                if(jsonResult.length>0){
+                    for(var i=0;i<jsonResult.length;i++){
+                        var data = jsonResult[i];
+                        option.append('<option value="'+data.ID+'">'+data.name+'</option>')
+                            .val(selected).trigger('change');
+                    }
+                }
+            }
+
+        });
+
+    }
+
+    function loadSelectOptionLoc_Province(element,selected){
+        var url = base_url_js+'api/__getProvince';
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.ProvinceID) ? 'selected' : '';
+                $(element).append('<option value="'+v.ProvinceID+'" '+sc+'>'+v.ProvinceName+'</option>');
+
+            })
+        });
+    }
+
+    function loadSelectOptionLoc_Regions(ProvinceID,element,selected){
+        var url = base_url_js+'api/__getRegions/'+ProvinceID;
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.RegionID) ? 'selected' : '';
+                $(element).append('<option value="'+v.RegionID+'" '+sc+'>'+v.RegionName+'</option>');
+
+            })
+        });
+    }
+
+    function loadSelectOptionLoc_District(RegionID,element,selected){
+        var url = base_url_js+'api/__getDistric/'+RegionID;
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.DistrictID) ? 'selected' : '';
+                $(element).append('<option value="'+v.DistrictID+'" '+sc+'>'+v.DistrictName+'</option>');
+
+            })
+        });
+    }
+    
+    function loadSelectOptionRangeEmployees(element,selected) {
+        var url = base_url_js+'api/__getRangeEmployees';
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.ID) ? 'selected' : '';
+
+                var opt = v.RangeStart+' - '+v.RangeEnd;
+                if(v.Type=='1') {
+                    opt = '&#60; '+v.RangeEnd;
+                } else if(v.Type=='2'){
+                    opt = v.RangeStart+' &#62;';
+                }
+
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+opt+'</option>');
+
+            })
+        });
+    }
+
+    function loadSelectOptionGrossRevenue(element,selected) {
+        var url = base_url_js+'api/__getGrossRevenue';
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.ID) ? 'selected' : '';
+
+                var opt = v.RangeStart+' - '+v.RangeEnd;
+                if(v.Type=='1') {
+                    opt = '&#60; '+v.RangeEnd;
+                } else if(v.Type=='2'){
+                    opt = v.RangeStart+' &#62;';
+                }
+
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+opt+'</option>');
+
+            })
+        });
+    }
+
 
     function loadSelectOptionCurriculumForlap(element,selected) {
         var url = base_url_js+"api/__getKurikulumSelectOption";
@@ -1388,9 +1494,9 @@
         })
     }
     
-    function loadSelectOptionStudentYudisium(element,selected,status) {
+    function loadSelectOptionStudentYudisium(element,selected,status,SemesterID='') {
         var url = base_url_js+'api/__crudFinalProject';
-        var token = jwt_encode({action : 'getAllStdReg',Status:status},'UAP)(*');
+        var token = jwt_encode({action : 'getAllStdReg',SemesterID:SemesterID,Status:status},'UAP)(*');
         $.post(url,{token:token},function (jsonResult) {
 
             if(jsonResult.length>0){
@@ -1406,10 +1512,12 @@
                         mentor =  mentor1+')';
                     }
 
-                    var disabledrow =  (mentor=='') ? 'disabled ' : '';
+                    if (mentor!=''){
+                        $(element).append('<option value="'+v.NPM+'" >'+v.NPM+' - '+v.Name+' '+mentor+'</option>')
+                            .val(selected).trigger('change');
+                    }
 
-                    $(element).append('<option value="'+v.NPM+'" '+disabledrow+'>'+v.NPM+' - '+v.Name+' '+mentor+'</option>')
-                        .val(selected).trigger('change');
+
 
                 });
 
@@ -1955,6 +2063,20 @@
             }
         });
     }
+    
+
+    function loadSelectOptionMaritalStatus(element,selected) {
+        var url = base_url_js+'api/__getMaritalStatus';
+
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = (selected!='' && typeof selected !== "undefined" && d.ID == selected) ? 'selected' : '';
+                $(element).append('<option value="'+d.ID+'" '+sc+'>'+d.name+'</option>');
+            }
+        });
+    }
+
 
     function loadSelectOptionEmployeesStatus(element,selected) {
         var url = base_url_js+'api/__getStatusEmployee';
@@ -2444,6 +2566,50 @@
            }
          })
          return def.promise();
+    }
+    /* End */
+
+    function AjaxSubmitFormPromises(url='',token='',ArrUploadFilesSelector=[],Apikey='',requestHeader={}){
+        return new Promise((resolve, reject) => {
+           var form_data = new FormData();
+           form_data.append('token',token);
+           if (ArrUploadFilesSelector.length>0) {
+              for (var i = 0; i < ArrUploadFilesSelector.length; i++) {
+                  var NameField = ArrUploadFilesSelector[i].NameField+'[]';
+                  var Selector = ArrUploadFilesSelector[i].Selector;
+                  var UploadFile = Selector[0].files;
+                  for(var count = 0; count<UploadFile.length; count++)
+                  {
+                   form_data.append(NameField, UploadFile[count]);
+                  }
+              }
+           }
+
+           $.ajax({
+             type:"POST",
+             // url:url+'?apikey='+Apikey,
+             url:(Apikey!='') ? url+'?apikey='+Apikey : url,
+             data: form_data,
+             contentType: false,       // The content type used when sending data to the server.
+             cache: false,             // To unable request pages to be cached
+             processData:false,
+             dataType: "json",
+             beforeSend: function (xhr)
+             {
+                for (key in requestHeader){
+                   xhr.setRequestHeader(key,requestHeader[key]);
+                }
+               
+             },
+             success:function(data)
+             {
+              resolve(data);
+             },  
+             error: function (data) {
+               reject();
+             }
+           })
+        })
     }
 
 </script>

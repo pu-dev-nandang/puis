@@ -81,11 +81,35 @@ class M_hr extends CI_Model {
 
     /*ADDED BY FEBRI @ FEB 2020*/
     public function getMemberSTO($data){
-        $this->db->select("a.STOID,a.JobTitle,a.IsActive, a.LevelID, c.*");
-        $this->db->from("db_employees.sto_rel_user a");
-        $this->db->join("db_employees.sto_temp b","a.STOID = b.ID","left");
-        $this->db->join("db_employees.employees c","c.NIP = a.NIP","left");
+        $this->db->select("a.ID as CareerID,a.StartJoin,a.EndJoin,a.LevelID,a.DepartmentID,a.PositionID,a.JobTitle,a.Superior,a.StatusID,a.Remarks, e.*");
+        $this->db->from("db_employees.employees_career a");
+        $this->db->join("db_employees.employees_career b","b.NIP = a.NIP and b.PositionID = a.PositionID and a.StartJoin > b.StartJoin","left");
+        $this->db->join("db_employees.employees_career c","a.NIP = c.NIP and a.PositionID = c.PositionID and a.StartJoin > c.StartJoin and b.StartJoin > c.StartJoin","LEFT OUTER");
+        $this->db->join("db_employees.sto_temp d","a.PositionID = d.ID","left");
+        $this->db->join("db_employees.employees e","e.NIP = a.NIP","left");
         $this->db->where($data);
+        $this->db->group_by("a.NIP");
+        $query = $this->db->get();
+
+        return $query;
+    }
+
+    public function getTitleSTO($keyword=null){
+        $query = "select a.Position as Name, a.Description from db_employees.position a where a.Description like '%".$keyword."%' or a.Position like '%".$keyword."%'
+                  union 
+                  select b.Division as Name, b.Description from db_employees.division b where b.Description like '%".$keyword."%' or b.Division like '%".$keyword."%' ";
+        $result = $this->db->query($query);
+        return $result;
+    }
+
+    public function getEmpCareer($data){
+        $this->db->select("a.*, b.name as LevelName, c.title as DepartmentName, d.title as PositionName");
+        $this->db->from("db_employees.employees_career a");
+        $this->db->join("db_employees.master_level b","b.ID=a.LevelID","left");
+        $this->db->join("db_employees.sto_temp c","c.ID=a.DepartmentID","left");
+        $this->db->join("db_employees.sto_temp d","d.ID=a.PositionID","left");
+        $this->db->where($data);
+        $this->db->order_by("a.StartJoin, a.EndJoin","desc");
         $query = $this->db->get();
         return $query;
     }

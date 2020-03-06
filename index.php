@@ -108,7 +108,8 @@ setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF
 	$ServerName = $_SERVER['SERVER_NAME'];
 	define("URLAD","http://10.1.30.2:8076/", true);
 	define("url_files","https://"."files.podomorouniversity.ac.id/", true);
-	define("url_DocxToPDf","http://10.1.10.31/apidocxtopdf/", true);
+	define("url_DocxToPDf","http://10.1.10.31/apidocxtopdf/", true); // my local adhi
+	// define("url_DocxToPDf","http://10.1.30.33/docxtopdf/", true);
 	
 	switch ($ServerName) {
 		case 'pcam.podomorouniversity.ac.id':

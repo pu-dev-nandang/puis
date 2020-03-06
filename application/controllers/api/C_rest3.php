@@ -2813,6 +2813,7 @@ class C_rest3 extends CI_Controller {
    
 
     public function LoadStudents_server_side(){
+      $input = $this->getInputToken2();
       $this->load->model("global-informations/Globalinformation_model");
       $requestData = $_REQUEST;
       $param= [];
@@ -2820,7 +2821,31 @@ class C_rest3 extends CI_Controller {
           $search = $requestData['search']['value'];
           $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$search."%' ","filter"=>"AND",);    
           $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$search."%' ","filter"=>"OR",);    
-          $param[] = array("field"=>"ps.`NameEng`","data"=>" like '%".$search."%' )","filter"=>"OR",);    
+          $param[] = array("field"=>"ps.`NameEng`","data"=>" like '%".$search."%' ","filter"=>"OR",);    
+          $param[] = array("field"=>"ps.`Name`","data"=>" like '%".$search."%' )","filter"=>"OR",);    
+      }
+
+      // Filter Portal Alumni is active or not
+      if(array_key_exists('isPortalAlumi', $input)){
+          if ($input['isPortalAlumi'] == 1) {
+              $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" > 0","filter"=>"AND",); 
+          }
+          else if ($input['isPortalAlumi'] == 0) {
+              $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" = 0","filter"=>"AND",);
+          }
+      }
+
+      // filtering selection
+      if (array_key_exists('Selection', $input)) {
+        $strFilter = '';
+        $Selection = $input['Selection'];
+        if (count($Selection) > 0) {
+          $strFilter = "'".$Selection[0]."'";
+          for ($i=1; $i < count($Selection); $i++) { 
+            $strFilter .= ",'".$Selection[$i]."'";
+          }
+          $param[] = array("field"=>"ta.`NPM`","data"=>" not in (".$strFilter.") ","filter"=>" AND",);
+        }
       }
       
       $totalData = $this->Globalinformation_model->fetchTotalDataStudent($param)->Total;
@@ -2887,7 +2912,7 @@ class C_rest3 extends CI_Controller {
                   $AddwherePost[] = array('field'=>'emp.`'.'Name'.'`','data'=>' like "'.$search.'%" )' ,'filter' =>' OR ');     
               }
 
-              $sql_select = 'select csl.ID,csl.SemesterID,csl.NIP,emp.Name as LecturerName,sms.Name as SemesterName,csl.Money,csl.UpdateAt,csl.UpdatedBy,empUpd.Name as UpdateByName';
+              $sql_select = 'select csl.ID,csl.SemesterID,csl.NIP,emp.Name as LecturerName,sms.Name as SemesterName,csl.Money,csl.Allowance,csl.Allowance_NIDN,csl.UpdateAt,csl.UpdatedBy,empUpd.Name as UpdateByName';
               $sql_from = ' from db_employees.credit_salary_lecturer as csl
                                 join db_academic.semester as sms on sms.ID = csl.SemesterID
                                 join db_employees.employees as emp on emp.NIP = csl.NIP
@@ -2924,6 +2949,8 @@ class C_rest3 extends CI_Controller {
                 $nestedData[] = $row['SemesterName'];
                 $nestedData[] = $row['LecturerName'];
                 $nestedData[] = $row['Money'];
+                $nestedData[] = $row['Allowance'];
+                $nestedData[] = $row['Allowance_NIDN'];
                 $nestedData[] = $row['ID'];
                 $tokenRow = $this->jwt->encode($row,"UAP)(*");
                 $nestedData['data'] = $tokenRow;
@@ -3038,7 +3065,7 @@ class C_rest3 extends CI_Controller {
                 $AddwherePost[] = array('field'=>'emp.`'.'Name'.'`','data'=>' like "'.$search.'%" )' ,'filter' =>' OR ');     
             }
 
-            $sql_select = 'select csl.ID,csl.SemesterID,csl.NIP,emp.Name as LecturerName,sms.Name as SemesterName,csl.Money,csl.UpdateAt,csl.UpdatedBy,empUpd.Name as UpdateByName, 
+            $sql_select = 'select csl.ID,csl.SemesterID,csl.NIP,emp.Name as LecturerName,sms.Name as SemesterName,csl.Money,csl.Money,csl.Allowance,csl.Allowance_NIDN,csl.UpdateAt,csl.UpdatedBy,empUpd.Name as UpdateByName, 
                           if( (select count(*) as total from db_employees.credit_salary_lecturer where SemesterID = '.$Input['smt_active'].' and NIP = csl.NIP limit 1 ) > 0 ,1,0 ) as SelectionThisSMT  ';
             $sql_from = ' from db_employees.credit_salary_lecturer as csl
                               join db_academic.semester as sms on sms.ID = csl.SemesterID
@@ -3076,6 +3103,8 @@ class C_rest3 extends CI_Controller {
               $nestedData[] = $row['SemesterName'];
               $nestedData[] = $row['LecturerName'];
               $nestedData[] = $row['Money'];
+              $nestedData[] = $row['Allowance'];
+              $nestedData[] = $row['Allowance_NIDN'];
               $nestedData[] = $row['ID'];
               $tokenRow = $this->jwt->encode($row,"UAP)(*");
               $nestedData['data'] = $tokenRow;
@@ -3104,6 +3133,8 @@ class C_rest3 extends CI_Controller {
               'SemesterID' => $SemesterID,
               'NIP' => $data[$i]['NIP'],
               'Money' => $data[$i]['Money'],
+              'Allowance' => $data[$i]['Allowance'],
+              'Allowance_NIDN' => $data[$i]['Allowance_NIDN'],
               'UpdateAt' => date('Y-m-d H:i:s'),
               'UpdatedBy' => $sessionNIP,
             ];

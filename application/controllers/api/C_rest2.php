@@ -59,7 +59,7 @@ class C_rest2 extends CI_Controller {
                     Parameter
                     var data = {
                         'auth' => 's3Cr3T-G4N',
-                        'Logging' : {fieldTable}, //  field CreatedBy,salah satu field URL,Title,Description required
+                        'Logging' : {fieldTable}, //   CreatedBy,URL,Title,Description required
                         'To' : {
                             'NIP' : [], berbentuk array indeks // boleh salah satu
                             'Div' : [], berbentuk array indeks // boleh salah satu
@@ -85,7 +85,7 @@ class C_rest2 extends CI_Controller {
                                $url = base_url('uploads/employees/'.$G_emp[0]['Photo']);
                                $img_profile = ($this->is_url_exist($url) && $G_emp[0]['Photo']!='')
                                    ? $url
-                                   : url_server_ws.'/images/icon/lecturer.png';
+                                   : url_pas.'/images/icon/lecturer.png';
                                $Logging['Icon'] = $img_profile;   
                         }
 
@@ -134,7 +134,7 @@ class C_rest2 extends CI_Controller {
                                                    SPLIT_STR(a.PositionMain, ".", 2) as PositionMain2,
                                                          a.StatusEmployeeID
                                                     FROM   db_employees.employees as a
-                                                    where SPLIT_STR(a.PositionMain, ".", 1) = ? and a.StatusEmployeeID != -1        
+                                                    where ( SPLIT_STR(a.PositionMain, ".", 1) = ? or SPLIT_STR(a.PositionOther1, ".", 1) = ? or SPLIT_STR(a.PositionOther2, ".", 1) = ? or SPLIT_STR(a.PositionOther3, ".", 1) = ? ) and a.StatusEmployeeID != -1        
                                                 ';
                                             $query=$this->db->query($sql, array($Div[$i]))->result_array();
                                             for ($j=0; $j < count($query); $j++) { 
@@ -4487,11 +4487,15 @@ class C_rest2 extends CI_Controller {
 
         $dataToken = $this->getInputToken2();
         $NIP = $dataToken['NIP'];
+        if (array_key_exists('Alumni', $dataToken) && $dataToken['Alumni'] == 'yes') {
+            $dataSearch .= ' And ( l.URLDirectAlumni != NULL or l.URLDirectAlumni != "" ) ';
+        }
         $queryDefault = 'SELECT l.*,lu.StatusRead,lu.ShowNotif,lu.ID as ID_logging_user
                               FROM db_notifikasi.logging_user lu
                               LEFT JOIN db_notifikasi.logging l ON (l.ID = lu.IDLogging)
                               WHERE lu.UserID = "'.$NIP.'" '.$dataSearch.'
                               ORDER BY l.CreatedAt DESC ';
+        // print_r($queryDefault);die();
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -4539,7 +4543,7 @@ class C_rest2 extends CI_Controller {
             $nestedData[] = '<div style="text-align:center;"><img src="'.$row['Icon'].'" style="width: 100%;max-width: 40px;border: 1px solid #FFFFFF;"></div>';
             $nestedData[] = '<div>'.$user.'</div>';
             $nestedData[] = $row['StatusRead'];
-
+            $nestedData['data'] = $this->jwt->encode($row,"UAP)(*");
             $no++;
 
             $data[] = $nestedData;
