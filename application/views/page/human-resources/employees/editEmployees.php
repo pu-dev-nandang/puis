@@ -171,11 +171,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xs-12">
+                    <div class="col-xs-6">
                         <div class="form-group">
                             <label>Email Other</label>
                             <input class="form-control" id="formEmail" value="<?php echo $arrEmp['Email']; ?>" />
                         </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <label>Marital Status*</label>
+                        <select class="form-control" id="formMaritalStatus">
+                            <option value="">Choose One</option>
+                        </select>
                     </div>
                 </div>
 
@@ -472,6 +478,8 @@
           split++;
     }
     $(document).ready(function () {
+        loadSelectOptionMaritalStatus('#formMaritalStatus',<?= $arrEmp['MaritalStatus']; ?>);
+
         loadSelectOptionReligi('#formReligion',<?= $arrEmp['ReligionID']; ?>);
         $('#formGender').val("<?= $arrEmp['Gender']; ?>");
 
@@ -787,6 +795,7 @@
 
         var formEmailPU = $('#formEmailPU').val();
         var formEmail = $('#formEmail').val();
+        var formMaritalStatus = $('#formMaritalStatus').val();
         var formAddress = $('#formAddress').val();
         var formPostcode = $('#formPostcode').val();
 
@@ -825,6 +834,7 @@
             && form_MainDivision!='' && form_MainDivision!=null
             && form_MainPosition!='' && form_MainPosition!=null
             && SerdosForm==true
+            && formMaritalStatus !='' && formPostcode !='' && formAddress !='' && formReligion !='' && formGender !=''
         ) {
 
             loading_button('#btnUpdate');
@@ -919,6 +929,7 @@
                     HP: formMobile,
                     Blood: formBlood,
                     Email: formEmail,
+                    MaritalStatus: formMaritalStatus,
                     EmailPU: emailPU,
                     Password_Old: Password_Old,
                     Address: formAddress.trim(),
@@ -969,18 +980,45 @@
 
         }
         else {
-            var msg = '';
+            var msg = '<ol>';
             if(formName==''){
-                msg = 'Name is required';
-            } else if (formYearBirth=='' || formMontBirth=='' || formDateBirth==''){
-                msg = 'Birthday is required';
-            } else if(form_MainDivision==''){
-                msg = 'Main Division is required';
-            } else if (form_MainPosition==''){
-                msg = 'Main Position is required';
-            } else if(SerdosForm==false){
-                msg = 'Serdos Number are required'
+                msg += '<li>Name is required</li>';
+            } if (formYearBirth=='' || formMontBirth=='' || formDateBirth==''){
+                msg += '<li>Birthday is required</li>';
+            } if(form_MainDivision==''){
+                msg += '<li>Main Division is required</li>';
+            } if (form_MainPosition==''){
+                msg += '<li>Main Position is required</li>';
+            } if(SerdosForm==false){
+                msg += '<li>Serdos Number are required</li>';
             }
+            /*ADDED BY FEBRI @ FEB 2020*/
+            if(formNIP == ''){
+                msg += '<li>NIP is required</li>';
+            }
+            if(formKTP == ''){
+                msg += '<li>No KTP is required</li>';
+            }
+            if(formReligion == ''){
+                msg += '<li>Religion is required</li>';
+            }
+            if(formGender == ''){
+                msg += '<li>Gender is required</li>';
+            }
+            if(formPlaceOfBirht == ''){
+                msg += '<li>Place of birth is required</li>';
+            }
+            if(formAddress == ''){
+                msg += '<li>Address is required</li>';
+            }
+            if(formMaritalStatus == ''){
+                msg += '<li>Marital Status is required</li>';
+            }            
+            if(formPostcode == ''){
+                msg += '<li>Postal code is required</li>';
+            }
+            msg += "</ol>";
+            /*END ADDED BY FEBRI @ FEB 2020*/
             toastr.error(msg,'Error');
         }
 

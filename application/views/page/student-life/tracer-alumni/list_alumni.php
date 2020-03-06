@@ -30,7 +30,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <select class="form-control" id="filterYear">
-                        <option value="" selected disabled>All graduation year</option>
+                        <option value="" selected>All graduation year</option>
                         <option disabled>----------------</option>
                     </select>
                 </div>
@@ -210,6 +210,37 @@
                             WorkSuitability = '<b style="color: green;">High</b>';
                         }
 
+                        var LastUpdated = "";
+                        if(!jQuery.isEmptyObject(v.UpdatedBy)){
+                            var LogsB = "";
+                            var LogsA = "";
+                            if(!jQuery.isEmptyObject(v.Logs)){
+                                var parse = jQuery.parseJSON(v.Logs);
+
+                                if(parse['before'] == 0){
+                                    LogsB = "Low";
+                                }else if(parse['before'] == 1){
+                                    LogsB = "Middle";
+                                }else if(parse['before'] == 2 ){
+                                    LogsB = "High";
+                                }else{
+                                    LogsB = "unknown";
+                                }
+
+                                if(parse['after'] == 0){
+                                    LogsA = "Low";
+                                }else if(parse['after'] == 1){
+                                    LogsA = "Middle";
+                                }else if(parse['after'] == 2 ){
+                                    LogsA = "High";
+                                }else{
+                                    LogsA = "unknown";
+                                }
+
+
+                            }
+                            LastUpdated ='<tr><td colspan="3"><p>Last edited by</p><p><span>'+v.UpdatedBy+' at '+v.UpdatedAt+'</span>'+(!jQuery.isEmptyObject(v.Logs) ? ' - <span>Change work suitability from <b>'+LogsB+'</b> tobe <b>'+LogsA+'</b></span>' : '')+'</p></td></tr>';
+                        }
 
 
                         $('#listBodyExperience').append('<tr>' +
@@ -252,7 +283,7 @@
                             '    <td style="text-align: center;">' +
                             '        <button class="btn btn-default btnEditExperience" data-token="'+jwt_encode(v,'UAP)(*')+'" data-id="'+v.ID+'">Edit</button>' +
                             '    </td>' +
-                            '</tr>');
+                            '</tr>'+LastUpdated+'');
                     });
                 } else {
                     $('#listBodyExperience').append('<tr>' +
@@ -379,7 +410,7 @@
         loadSelectOptionMonth('#EndMonth','');
 
 
-
+        
         if(Token!=''){
 
             // console.log(dataToken);

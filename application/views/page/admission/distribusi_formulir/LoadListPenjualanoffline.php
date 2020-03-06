@@ -277,8 +277,17 @@
 		});
 
 		$('#tableData4 tbody').on('click', '.inputFormulir', function () {
-			var obj = $(this).attr('data-smt')
-			window.open(obj,'_blank');
+			var obj = $(this).attr('data-smt');
+			var url = "<?php echo url_registration ?>"+'LoginByPcamDetected';
+			data = {
+			  redirect : obj,
+			  NIP : sessionNIP,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			FormSubmitAuto(url, 'POST', [
+			    { name: 'token', value: token },
+			]);
+			// window.open(obj,'_blank');
 		});		
 
     }

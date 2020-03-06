@@ -192,6 +192,7 @@
 
 			var data = {
               ID : ID,
+              DBNAME : "<?=$title?>"
           	};
           	var token = jwt_encode(data,'UAP)(*');
           	$.ajax({

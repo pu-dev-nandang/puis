@@ -30,6 +30,7 @@ class C_api4 extends CI_Controller {
         $token = $this->input->post('token');
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
+        $data_arr = json_decode(json_encode($data_arr),true);
         return $data_arr;
     }
 
@@ -123,5 +124,17 @@ class C_api4 extends CI_Controller {
         echo json_encode($json);
     }
     /*END ADDED BY FEBRI @ JAN 2020*/
+
+    public function getTableMaster(){
+        $input = $this->getInputToken2();
+        if (array_key_exists('table', $input)) {
+            $data = $this->m_master->showData_array($input['table']);
+            echo json_encode($data);
+        }
+        else
+        {
+            echo '{"status":"999","message":"Not Authenfication"}'; 
+        }
+    }
 
 }

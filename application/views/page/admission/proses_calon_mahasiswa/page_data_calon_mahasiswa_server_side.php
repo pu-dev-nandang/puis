@@ -833,6 +833,7 @@
       data = {
         Email : Email,
         Code : Code,
+        NIP : sessionNIP,
       }
       var token = jwt_encode(data,"UAP)(*");
       submit(url, 'POST', [
