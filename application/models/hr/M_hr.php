@@ -78,4 +78,36 @@ class M_hr extends CI_Model {
         return $data;
     }
 
+    public function getDataRecapitulation($data_arr){
+
+        $SemesterID = $data_arr['SemesterID'];
+        $ProdiID = $data_arr['ProdiID'];
+        $StatusLecturerID = $data_arr['StatusLecturerID'];
+
+        $data = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
+                                           WHERE em.ProdiID = "'.$ProdiID.'"
+                                             AND em.StatusLecturerID = "'.$StatusLecturerID.'" ' )->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $NIP = $data[$i]['NIP'];
+                $dataSchedule = $this->db->query('SELECT s.ID AS ScheduleID, s.Coordinator AS NIP FROM db_academic.schedule s 
+                                                    WHERE s.SemesterID = 16 AND s.Coordinator = "'.$NIP.'"
+                                                    UNION ALL SELECT s.ID AS ScheduleID, s.Coordinator AS NIP 
+                                                    FROM db_academic.schedule_team_teaching stt LEFT JOIN db_academic.schedule s ON (s.ID = stt.ScheduleID) 
+                                                    WHERE s.SemesterID = 16 AND stt.NIP = "'.$NIP.'"')->rsult_array();
+
+                // Get Schedule Details dan ID Attd
+                if(count($dataSchedule)>0){
+                    for($s=0;$s<count($dataSchedule);$s++){
+                        $dataAttdID = $this->db->query('SELECT ScheduleID FORM db_academic.schedule_details 
+                                                    WHERE ScheduleID = "'.$dataSchedule[$s][''].'" ')->result_array();
+                    }
+                }
+
+            }
+        }
+
+    }
+
 }
