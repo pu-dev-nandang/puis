@@ -7179,9 +7179,9 @@ class C_api extends CI_Controller {
 
         else if($data_arr['action']=='update_mster_katother'){
 
-            $typefiles = $data_arr['name_sort'];
             $name_katother = ucwords($data_arr['name_katother']);
-
+            $typefiles = preg_replace('/\s+/', '_', $data_arr['name_sort']);
+            
             $dataAttdS = $this->db->query('SELECT * FROM db_employees.master_files
                                           WHERE TypeFiles = "'.$typefiles.'" OR NameFiles = "'.$name_katother.'" ')->result_array();
 
