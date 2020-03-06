@@ -6423,7 +6423,8 @@ class C_api extends CI_Controller {
                     $formInsert['EnteredBy'] = $myNIP.'/'.$myName;
                     /*END ADDED BY FEBRI @ FEB 2020*/
                     
-                    $this->db->insert('db_employees.employees',$formInsert);
+                    $insert = $this->db->insert('db_employees.employees',$formInsert);
+                    
 
                     //insert career
                     $division = 0; $position=0;
@@ -6434,8 +6435,9 @@ class C_api extends CI_Controller {
                         $position = $splitPositionMain[1];
                     }
                     $currentDate = date("Y-m-d");
-                    $plus1Year = date('Y-m-d', strtotime('+1 years'));
-                    $dataCareer = array("NIP"=>$formInsert['NIP'],"StartJoin"=>$currentDate,"EndJoin"=>$plus1Year,"LevelID"=>1,"DepartmentID"=>$division,"PositionID"=>$position,"StatusID"=>3,"isShowSTO"=>0);
+                    $plus1Year = date('Y-m-d', strtotime('-1 day -1 month +1 years'));
+                    $isStatusID = (($formInsert['StatusEmployeeID'] == 2) ? 3 : (($formInsert['StatusEmployeeID'] == 7) ? 6 : 0) );
+                    $dataCareer = array("NIP"=>$formInsert['NIP'],"StartJoin"=>$currentDate,"EndJoin"=>$plus1Year,"LevelID"=>1,"DepartmentID"=>$division,"PositionID"=>$position,"StatusID"=>$isStatusID,"isShowSTO"=>0);
                     $insertCareer = $this->db->insert('db_employees.employees_career',$dataCareer);
                     $dataJoin = array("NIP"=>$formInsert['NIP'],"JoinDate"=>$currentDate,"StatusEmployeeID"=>$formInsert['StatusEmployeeID']);
                     $insertJoin = $this->db->insert('db_employees.employees_joindate',$dataJoin);

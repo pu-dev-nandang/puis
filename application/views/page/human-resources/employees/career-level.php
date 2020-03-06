@@ -206,6 +206,108 @@
                 dept.prop("disabled",false);
             }
         });
+
+        <?php if(!empty($_GET['next'])){
+        if($_GET['next'] == "Y"){ ?>
+        if(!jQuery.isEmptyObject(myData)){
+            var mailSplit = ((!jQuery.isEmptyObject(myData.EmailPU)) ? myData.EmailPU.split('@') : '');
+            var Username = (!jQuery.isEmptyObject(mailSplit[0]) ? mailSplit[0]:'');
+
+            var d = new Date(myData.DateOfBirth);
+            var getMonth = '' + (d.getMonth() + 1);
+            var getDay = '' + d.getDate();
+            var getYear = d.getFullYear();
+
+            if (getMonth.length < 2) getMonth = '0' + getMonth;
+            if (getDay.length < 2) getDay = '0' + getDay;
+
+            var UserPassword = getDay+getMonth+getYear.toString().substring(2);
+
+            var html  = '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                                '<table class = "table">'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            'Username PC'+
+                                        '</td>'+
+                                        '<td>'+
+                                            ':'+
+                                        '</td>'+
+                                        '<td>'+
+                                            '<div class = "UsernamePC" dt = "'+Username+'">'+Username+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+ 
+                                    '<tr>'+
+                                        '<td>'+
+                                            'Username Aplikasi PCAM'+
+                                        '</td>'+
+                                        '<td>'+
+                                            ':'+
+                                        '</td>'+
+                                        '<td>'+
+                                            '<div class = "UsernamePCam" dt = "'+myData.NIP+'">'+myData.NIP+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            'Password'+
+                                        '</td>'+
+                                        '<td>'+
+                                            ':'+
+                                        '</td>'+
+                                        '<td>'+
+                                            '<div class = "PasswordFill" dt = "'+UserPassword+'">'+UserPassword+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+
+                                    '<tr>'+
+                                        '<td>'+
+                                            'Email PU'+
+                                        '</td>'+
+                                        '<td>'+
+                                            ':'+
+                                        '</td>'+
+                                        '<td>'+
+                                            '<div class = "EmailPUFill" dt = "'+myData.EmailPU+'">'+myData.EmailPU+
+                                            '</div>'+
+                                        '</td>'+
+                                    '</tr>'+
+                                '</table>'+
+                            '</div>'+
+                        '</div>';                           
+            var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
+                         '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Print</button>';
+
+            $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Akses'+'</h4>');
+            $('#GlobalModalLarge .modal-body').html(html);
+            $('#GlobalModalLarge .modal-footer').html(footer);
+            $('#GlobalModalLarge').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+        }
+
+        $(document).off('click', '#ModalbtnSaveForm').on('click', '#ModalbtnSaveForm',function(e) {
+            var UsernamePC = $('.UsernamePC').attr('dt'); 
+            var UsernamePCam = $('.UsernamePCam').attr('dt');
+            var PasswordFill = $('.PasswordFill').attr('dt');
+            var EmailPUFill = $('.EmailPUFill').attr('dt');
+
+            var url = base_url_js+'save2pdf/print_akses_karyawan';
+            data = {
+              UsernamePC : UsernamePC,
+              UsernamePCam : UsernamePCam,
+              PasswordFill : PasswordFill,
+              EmailPUFill : EmailPUFill,
+            }
+            var token = jwt_encode(data,"UAP)(*");
+            FormSubmitAuto(url, 'POST', [
+                { name: 'token', value: token },
+            ]);
+        });
+        <?php } } ?>
     });
 </script>
 <form id="form-additional-info" action="<?=base_url('human-resources/employees/career-level-save')?>" method="post" autocomplete="off">
@@ -288,7 +390,7 @@
         						<thead>
         							<tr>
         								<th width="2%">No</th>
-        								<th colspan="2">Start/Site Date</th>
+        								<th colspan="3">Start/Site Date</th>
         								<th>Level</th>
         								<th width="10%">Dept</th>
         								<th width="10%">Position</th>
@@ -304,7 +406,8 @@
         								<td><input type="hidden" class="form-control career-ID" name="careerID[]" >
         									<input type="text" class="form-control required datepicker-tmp career-StartJoin" id="datePicker-career" required name="startJoin[]" placeholder="Start Date" >
         									<small class="text-danger text-message"></small></td>
-        								<td><input type="text" class="form-control required datepicker-sd career-EndJoin" id="datePickerSD-career" name="endJoin[]" placeholder="End Date">
+        								<td>until</td>
+                                        <td><input type="text" class="form-control required datepicker-sd career-EndJoin" id="datePickerSD-career" name="endJoin[]" placeholder="End Date">
         									<small class="text-danger text-message"></small></td>
         								<td><select class="form-control required career-LevelID" name="statusLevelID[]" required>
         									<option value="">Choose Level</option>
@@ -341,7 +444,7 @@
     										} } } ?>
         								</select>
         								<small class="text-danger text-message"></small></td>
-        								<td><input type="text" class="form-control career-Remarks" name="remarks[]" ></td>
+        								<td><input type="text" class="form-control career-Remarks" name="remarks[]" placeholder="No SK" ></td>
         							</tr>
         						</tbody>
         					</table>

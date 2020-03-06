@@ -144,13 +144,35 @@
                                 <div class="col-sm-12">
                                     <p><b>Corporate Insurance</b></p>
                                 </div>
-                                <div class="col-sm-4">
+                                <div class="col-sm-3">
                                     <div class="form-group">
                                         <label>Number of Card</label>
                                         <input type="text" class="form-control required number" required name="IDInsuranceInternal" value="<?=(!empty($detail) ? $detail->IDInsuranceInternal : null)?>">
                                         <small class="text-danger text-message"></small>
                                     </div>
                                 </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Company</label>
+                                        <input type="text" class="form-control required" required name="InsuranceInternalCompany" value="<?=(!empty($detail) ? $detail->InsuranceInternalCompany : null)?>">
+                                        <small class="text-danger text-message"></small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Efective from</label>
+                                        <input type="text" class="form-control required" required name="InsuranceInternalStartDate" id="InsuranceInternalStartDate" value="<?=(!empty($detail) ? $detail->InsuranceInternalStartDate : null)?>">
+                                        <small class="text-danger text-message"></small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>To</label>
+                                        <input type="text" class="form-control required" required name="InsuranceInternalEndDate" id="InsuranceInternalEndDate" value="<?=(!empty($detail) ? $detail->InsuranceInternalEndDate : null)?>">
+                                        <small class="text-danger text-message"></small>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -247,6 +269,12 @@
         var companyBankTags = bankName();
         $( "#autocomplete-bank" ).autocomplete({
           source: companyBankTags
+        });
+
+        $("#InsuranceInternalEndDate,#InsuranceInternalStartDate").datepicker({
+            dateFormat: 'yy-mm-dd',
+            changeYear: true,
+            changeMonth: true
         });
     });
 </script>

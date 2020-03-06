@@ -256,7 +256,6 @@
       </div>
     </div>
 </div>
-<a href="lala.php#/bakekok">tembak</a>
 <div id="fetchRequestDataEmp"></div>
 
 

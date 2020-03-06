@@ -18,7 +18,7 @@
         <div class="panel-body">
         	<div class="row">
         		<div class="col-sm-12">
-        			<div class="panel panel-default" id="multiple-field" data-source="training-holding">
+        			<div class="panel panel-default" id="multiple-field" data-source="training">
                         <div class="panel-heading">
                             <div class="pull-right">
                                 <div class="btn-group">
@@ -31,20 +31,22 @@
                                 </div>
                             </div>
                             <h4 class="panel-title">
-                                Holding Training 
+                                Training 
                             </h4>
                         </div>
                         <div class="panel-body">
-                            <table class="table table-bordered table-holding" id="table-list-training-holding">
+                            <table class="table table-bordered table-training" id="table-list-training">
                                 <thead>
                                     <tr>
                                         <td width="2%">No</td>
                                         <td>Training Title</td>
-                                        <td>Trainer Name</td>
+                                        <td>Organizer</td>
                                         <td>Start Event</td>
                                         <td>End Event</td>
                                         <td>Location</td>
-                                        <td>Result Feedback</td>
+                                        <td colspan="2">Cost</td>
+                                        <td>Certificate</td>
+                                        <td width="10%">Category</td>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -54,16 +56,25 @@
                                         <input type="hidden" class="train-category" name="trainingCategory[]" value="holding">
                                         <input type="text" class="form-control train-name required" name="trainingTitle[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control train-trainer required" name="trainingTrainer[]">
+                                        <td><input type="text" class="form-control train-organizer required" name="organizer[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control datepicker-tmp required train-start_event" id="datePicker-training-holding" name="trainingStart[]">
+                                        <td><input type="text" class="form-control datepicker-tmp required train-start_event" id="datePicker-training" name="trainingStart[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control datepicker-sd required train-end_event" id="datePickerSD-training-holding" name="trainingEnd[]">
+                                        <td><input type="text" class="form-control datepicker-sd required train-end_event" id="datePickerSD-training" name="trainingEnd[]">
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control train-location required" name="trainingLocation[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control train-feedback" name="trainingFeedback[]">
+                                        <td><input type="text" class="form-control train-costCompany number" name="trainingCostCompany[]" placeholder="Cost from company">
                                         <small class="text-danger text-message"></small></td>
+                                        <td><input type="text" class="form-control train-costEmployee number required" name="trainingCostEmployee[]" placeholder="Cost from employee">
+                                        <small class="text-danger text-message"></small></td>
+                                        <td><div class="fetch-file train-certificate"></div><input type="file" name="certificate[]"  accept="application/pdf" ></td>
+                                        <td><select name="category" class="form-control required">
+                                            <option value="">Choose one</option>
+                                            <option value="local">Local</option>
+                                            <option value="holding">Holding</option>
+                                            <option value="external">External</option>
+                                        </select><small class="text-danger text-message"></small></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -71,64 +82,6 @@
                     </div>
         		</div>
         	</div>
-
-
-        	<div class="row">
-        		<div class="col-sm-12">
-        			<div class="panel panel-default" id="multiple-field" data-source="training-local">
-                        <div class="panel-heading">
-                            <div class="pull-right">
-                                <div class="btn-group">
-                                    <button class="btn btn-default btn-xs btn-add" type="button">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
-                                    <button class="btn btn-default btn-xs btn-remove" type="button">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <h4 class="panel-title">
-                                Local Training 
-                            </h4>
-                        </div>
-                        <div class="panel-body">
-                            <table class="table table-bordered table-local" id="table-list-training-local">
-                                <thead>
-                                    <tr>
-                                        <td width="2%">No</td>
-                                        <td>Training Title</td>
-                                        <td>Trainer Name</td>
-                                        <td>Start Event</td>
-                                        <td>End Event</td>
-                                        <td>Location</td>
-                                        <td>Result Feedback</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td><input type="hidden" class="form-control train-ID" name="trainingID[]">
-                                        <input type="hidden" class="train-category" name="trainingCategory[]" value="local">
-                                        <input type="text" class="form-control train-name required" name="trainingTitle[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control train-trainer required" name="trainingTrainer[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control datepicker-tmp required train-start_event" id="datePicker-training-local" name="trainingStart[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control datepicker-sd required train-end_event" id="datePickerSD-training-local" name="trainingEnd[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control train-location required" name="trainingLocation[]">
-                                        <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control train-feedback" name="trainingFeedback[]">
-                                        <small class="text-danger text-message"></small></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-        		</div>
-        	</div>
-
         	
         </div>
         <div class="panel-footer text-right">
@@ -170,10 +123,10 @@
 		var myData = fetchAdditionalData("<?=$NIP?>");
         if(!jQuery.isEmptyObject(myData)){
             if(!jQuery.isEmptyObject(myData.MyEducationTraining)){
-                $tablename = $(".table-holding");var num = 1;
+                $tablename = $(".table-training");var num = 1;
                 $.each(myData.MyEducationTraining,function(key,value){
             		var isHolding = false;
-            		if(value.category == "holding"){
+            		//if(value.category == "holding"){
 	                	$cloneRow = $tablename.find("tbody > tr:last").clone();
 	                    $cloneRow.attr("data-table","employees_educations_training").attr("data-id",value.ID).attr("data-name",value.name);
 	                    $cloneRow.find("td:first").text(num);
@@ -199,43 +152,9 @@
 
 	            		$tablename.find("tbody").append($cloneRow);
 	                    num++;
-                	}
+                	//}
                 });
-                $tablename.find("tbody tr:first").remove();
-
-
-                $tablename2 = $(".table-local");var num_ = 1;
-                $.each(myData.MyEducationTraining,function(key,value){
-            		var isHolding = false;
-            		if(value.category == "local"){
-	                	$cloneRow = $tablename2.find("tbody > tr:last").clone();
-	                    $cloneRow.attr("data-table","employees_educations_training").attr("data-id",value.ID).attr("data-name",value.name);
-	                    $cloneRow.find("td:first").text(num_);
-	                    $.each(value,function(k,v){
-	                    	$cloneRow.find(".train-"+k).val(v);    
-	                        if(k == "start_event"){
-				        		var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-training-local-"+num_).removeClass("hasDatepicker");
-				        		cc.datepicker({
-						            dateFormat: 'yy-mm-dd',
-						            changeYear: true,
-						            changeMonth: true
-						        });
-				        	}  
-				        	if(k == "end_event"){
-				        		var cc = $cloneRow.find(".datepicker-sd").attr("id","datePickerSD-training-local-"+num_).removeClass("hasDatepicker");
-				        		cc.datepicker({
-						            dateFormat: 'yy-mm-dd',
-						            changeYear: true,
-						            changeMonth: true
-						        });
-				        	}     
-	                    });
-
-	            		$tablename2.find("tbody").append($cloneRow);
-	                    num_++;
-                	}
-                });
-                $tablename2.find("tbody tr:first").remove();
+                $tablename.find("tbody tr:first").remove();                
             }
 
 

@@ -104,16 +104,6 @@ class C_employees extends HR_Controler {
             return print_r(json_encode($error));
         }
         else {
-            
-            //$dataUpdate = array(
-            //    'type_file' => $Colom,
-            //    'NIP' => $User,
-             //   'name_file' => $fileName,
-             //   'user_create' =>$this->session->userdata('NIP') 
-            //);
-            //$this->db->insert('db_employees.temp_files',$dataUpdate);
-            // $this->m_master->save_images($fileName, $User);
-                            
             $success = array('success' => $this->upload->data());
             $success['success']['formGrade'] = 0;
             // Cek apakah di db sudah ada
@@ -1177,7 +1167,7 @@ class C_employees extends HR_Controler {
             if(!empty($data['trainingTitle'])){
                 for ($k=0; $k < count($data['trainingTitle']); $k++) { 
                     if(!empty($data['trainingTitle'][$k])){
-                        $dataPostTraining = array("NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$k],"trainer"=>$data['trainingTrainer'][$k], "start_event"=>$data['trainingStart'][$k], "end_event"=>$data['trainingEnd'][$k], "location"=>$data['trainingLocation'][$k], "feedback"=>$data['trainingFeedback'][$k], "category"=>$data['trainingCategory'][$k] );
+                        $dataPostTraining = array("NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$k],"organizer"=>$data['organizer'][$k], "start_event"=>$data['trainingStart'][$k], "end_event"=>$data['trainingEnd'][$k], "location"=>$data['trainingLocation'][$k], "feedback"=>$data['trainingFeedback'][$k], "category"=>$data['trainingCategory'][$k] );
                         if(!empty($data['trainingID'][$k])){
                             $update = $this->General_model->updateData("db_employees.employees_educations_training",$dataPostTraining,array("ID"=>$data['trainingID'][$k]));
                             $message = (($update) ? "Successfully":"Failed")." updated.";
