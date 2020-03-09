@@ -512,8 +512,8 @@
                                     '<div class = "form-group">'+
                                         '<label>Verify</label>'+
                                         '<select class = "form-control Input" field="Signature" name = "verify" key = "SET">'+
-                                            '<option value = "0">Auto Approve</option>'+
-                                            '<option value = "1">Manual Approve</option>'+
+                                            '<option value = "0">Manual Approve</option>'+
+                                            '<option value = "1">Auto Approve</option>'+
                                         '</select>'+
                                     '</div>'+
                                     '<div class = "form-group">'+
