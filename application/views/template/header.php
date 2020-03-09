@@ -233,7 +233,7 @@
 
                         <?php if(in_array(11,$rule_service)){ ?>
                             <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='lecturer-performance'){echo 'active';} ?>">
-                                <a href="<?php echo base_url('lecturer-performance/lecturer-list'); ?>"><i class="fa fa-line-chart" aria-hidden="true"></i> Lecturer Performance</a>
+                                <a href="<?php echo base_url('lecturer-performance/lecturer-list'); ?>"><i class="fa fa-line-chart" aria-hidden="true"></i> Lecturers Credit (BKD)</a>
                             </li>
                         <?php } ?>
 
@@ -1021,6 +1021,6 @@
             { name: 'token', value: token },
         ],'');
      });
-     
+
 
 </script>
