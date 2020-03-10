@@ -282,7 +282,7 @@
 
                                 Tarif_Tunjangan = (v2.Fee_Tunjangan!='' && v2.Fee_Tunjangan!=null
                                     && v2.Fee_Tunjangan!=0 && v2.Fee_Tunjangan!='0')
-                                    ? parseFloat(v2.Fee_Tunjangan) * parseInt(v2.AttendingSameDate) : 0;
+                                    ? parseFloat(v2.Fee_Tunjangan) * parseInt(v.AttendingSameDate) : 0;
 
 
                                 var tr_depan = (i2!=0) ? '<tr>'
@@ -294,8 +294,8 @@
                                 var tr_grandTotal = '';
                                 var tr_Keterangan = '';
                                 if(i2==0){
-                                    var tkn = jwt_encode(v2.AttendingSameDate_Details,'UAP)(*');
-                                    tr_jumlah_kedatangan = '<td rowspan="'+rwSpan+'"><a href="javascript:void(0);" class="showAttendingSameDate" data-no="'+no+'" data-attd="'+tkn+'">'+v2.AttendingSameDate+'</a></td>';
+                                    var tkn = jwt_encode(v.AttendingSameDate_Details,'UAP)(*');
+                                    tr_jumlah_kedatangan = '<td rowspan="'+rwSpan+'"><a href="javascript:void(0);" class="showAttendingSameDate" data-no="'+no+'" data-attd="'+tkn+'">'+v.AttendingSameDate+'</a></td>';
 
 
 
@@ -395,8 +395,6 @@
     }
 
 
-    // showAttendingSameDate
-    // showAttending
 
     $(document).on('click','.showAttending',function () {
         var no = $(this).attr('data-no');
@@ -459,13 +457,22 @@
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Jumlah Kedatangan | '+Name+'</h4>');
 
-        var li = '';
+        var tr = '';
         $.each(d,function (i,v) {
-            var viewDate = (v.Date!='' && v.Date!=null) ? moment(v.Date).format('dddd, DD MMM YYYY') : '';
-            li = li+'<li>'+viewDate+'</li>'
+            var viewDay = (v.Date!='' && v.Date!=null) ? moment(v.Date).format('dddd') : '';
+            var viewDate = (v.Date!='' && v.Date!=null) ? moment(v.Date).format('DD MMMM YYYY') : '';
+            tr = tr+'<tr>' +
+                '<td>'+(i+1)+'</td>' +
+                '<td>'+viewDay+'</td>' +
+                '<td>'+viewDate+'</td>' +
+                '</tr>'
         });
 
-        var htmlss = '<ul>'+li+'</ul>';
+        var htmlss = '<table class="table table-bordered table-striped table-centre"><tr>' +
+            '<th style="width: 5%;">No</th>' +
+            '<th style="width: 25%;">Day</th>' +
+            '<th>Date</th>' +
+            '</tr>'+tr+'</table>';
 
         $('#GlobalModal .modal-body').html(htmlss);
 

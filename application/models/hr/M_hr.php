@@ -121,6 +121,9 @@ class M_hr extends CI_Model {
             ? ' AND em.ProdiID = "'.$data_arr['ProdiID'].'" ' : '';
         $StatusLecturerID = $data_arr['StatusLecturerID'];
 
+        $dateStart = $data_arr['RangeStart'];
+        $dateEnd = $data_arr['RangeEnd'];
+
 
 
         $data = $this->db->query('SELECT em.NIP, em.Name, ps.Code AS ProdiCode FROM db_employees.employees em 
@@ -131,6 +134,8 @@ class M_hr extends CI_Model {
         if(count($data)>0){
             for($i=0;$i<count($data);$i++){
                 $NIP = $data[$i]['NIP'];
+                $arrID_Attd = [];
+
                 $dataSchedule = $this->db->query('SELECT s.ID AS ScheduleID, s.Coordinator AS NIP, mk.NameEng AS Course, cd.TotalSKS AS Credit, csl.Money AS Fee_SKS,   
                                                     csl.Allowance AS Fee_Tunjangan, csl.Allowance_NIDN AS Fee_NIDN
                                                     FROM db_academic.schedule s
@@ -171,35 +176,58 @@ class M_hr extends CI_Model {
                                                                         LEFT JOIN db_academic.attendance attd ON (attd.ScheduleID = sd.ScheduleID AND attd.SDID = sd.ID)
                                                                         WHERE sd.ScheduleID = "'.$dataSchedule[$s]['ScheduleID'].'" ')->result_array();
 
+
                         $Attending = 0;
-                        $AttendingSameDate = 0;
+
                         if(count($dataAttdID)>0){
                             for($a=0;$a<count($dataAttdID);$a++){
-                                $dateStart = $data_arr['RangeStart'];
-                                $dateEnd = $data_arr['RangeEnd'];
+
                                 $dataDetail = $this->db->query('SELECT attdl.* FROM db_academic.attendance_lecturers attdl 
                                                                             WHERE attdl.ID_Attd = "'.$dataAttdID[$a]['ID_Attd'].'"
                                                                              AND attdl.Date >= "'.$dateStart.'"
                                                                               AND attdl.Date <= "'.$dateEnd.'"')->result_array();
 
                                 // Mendapatkan attending dengan hari yang sama
-                                $dataDetail_sameDate = $this->db->query('SELECT attdl.* FROM db_academic.attendance_lecturers attdl 
-                                                                            WHERE attdl.ID_Attd = "'.$dataAttdID[$a]['ID_Attd'].'"
-                                                                             AND attdl.Date >= "'.$dateStart.'"
-                                                                              AND attdl.Date <= "'.$dateEnd.'" GROUP BY attdl.Date')->result_array();
+
+                                array_push($arrID_Attd,$dataAttdID[$a]['ID_Attd']);
+
+
 
                                 $Attending = count($dataDetail);
                                 $dataSchedule[$s]['Attending_Details'] = $dataDetail;
-                                $AttendingSameDate = count($dataDetail_sameDate);
-                                $dataSchedule[$s]['AttendingSameDate_Details'] = $dataDetail_sameDate;
+
+
+
                             }
+
+
                         }
+
+
+
 
 //                        $dataSchedule[$s]['DetailAttendance'] = $dataAttdID;
                         $dataSchedule[$s]['Attending'] = $Attending;
-                        $dataSchedule[$s]['AttendingSameDate'] = $AttendingSameDate;
                     }
+
+                    $querySameDate = '';
+                    if(count($arrID_Attd)>0){
+                        for($att=0;$att<count($arrID_Attd);$att++){
+                            $ckOR = ($att!=0) ? ' OR ' : '';
+                            $querySameDate = $querySameDate.$ckOR.'attdl.ID_Attd = "'.$arrID_Attd[$att].'" ';
+                        }
+                    }
+
+                    $dataDetail_sameDate = $this->db->query('SELECT attdl.Date FROM db_academic.attendance_lecturers attdl 
+                                                                            WHERE  attdl.Date >= "'.$dateStart.'"
+                                                                              AND attdl.Date <= "'.$dateEnd.'" AND ('.$querySameDate.') GROUP BY attdl.Date ORDER BY attdl.Date')->result_array();
+
+                    $AttendingSameDate = count($dataDetail_sameDate);
+                    $data[$i]['AttendingSameDate_Details'] = $dataDetail_sameDate;
+                    $data[$i]['AttendingSameDate'] = $AttendingSameDate;
+
                 }
+
 
                 $data[$i]['Schedule'] = $dataSchedule;
 
