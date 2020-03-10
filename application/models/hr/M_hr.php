@@ -117,32 +117,97 @@ class M_hr extends CI_Model {
     public function getDataRecapitulation($data_arr){
 
         $SemesterID = $data_arr['SemesterID'];
-        $ProdiID = $data_arr['ProdiID'];
+        $ProdiID = ($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null && isset($data_arr['ProdiID']))
+            ? ' AND em.ProdiID = "'.$data_arr['ProdiID'].'" ' : '';
         $StatusLecturerID = $data_arr['StatusLecturerID'];
 
-        $data = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
-                                           WHERE em.ProdiID = "'.$ProdiID.'"
-                                             AND em.StatusLecturerID = "'.$StatusLecturerID.'" ' )->result_array();
+
+
+        $data = $this->db->query('SELECT em.NIP, em.Name, ps.Code AS ProdiCode FROM db_employees.employees em 
+                                           LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                                           WHERE em.StatusLecturerID = "'.$StatusLecturerID.'" 
+                                             '.$ProdiID.' ORDER BY em.ProdiID, em.NIP ASC ' )->result_array();
 
         if(count($data)>0){
             for($i=0;$i<count($data);$i++){
                 $NIP = $data[$i]['NIP'];
-                $dataSchedule = $this->db->query('SELECT s.ID AS ScheduleID, s.Coordinator AS NIP FROM db_academic.schedule s 
-                                                    WHERE s.SemesterID = 16 AND s.Coordinator = "'.$NIP.'"
-                                                    UNION ALL SELECT s.ID AS ScheduleID, s.Coordinator AS NIP 
-                                                    FROM db_academic.schedule_team_teaching stt LEFT JOIN db_academic.schedule s ON (s.ID = stt.ScheduleID) 
-                                                    WHERE s.SemesterID = 16 AND stt.NIP = "'.$NIP.'"')->rsult_array();
+                $dataSchedule = $this->db->query('SELECT s.ID AS ScheduleID, s.Coordinator AS NIP, mk.NameEng AS Course, cd.TotalSKS AS Credit, csl.Money AS Fee_SKS,   
+                                                    csl.Allowance AS Fee_Tunjangan, csl.Allowance_NIDN AS Fee_NIDN
+                                                    FROM db_academic.schedule s
+                                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                    LEFT JOIN db_employees.credit_salary_lecturer csl ON (csl.NIP = s.Coordinator AND csl.SemesterID = s.SemesterID)
+                                                    WHERE s.SemesterID = "'.$SemesterID.'" AND s.Coordinator = "'.$NIP.'" GROUP BY s.ID
+                                                    UNION ALL 
+                                                    SELECT s.ID AS ScheduleID, stt.NIP, mk.NameEng AS Course, cd.TotalSKS AS Credit, csl.Money AS Fee_SKS, 
+                                                    csl.Allowance AS Fee_Tunjangan, csl.Allowance_NIDN AS Fee_NIDN 
+                                                    FROM db_academic.schedule_team_teaching stt 
+                                                    LEFT JOIN db_academic.schedule s ON (s.ID = stt.ScheduleID) 
+                                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                    LEFT JOIN db_employees.credit_salary_lecturer csl ON (csl.NIP = stt.NIP AND csl.SemesterID = s.SemesterID)
+                                                    WHERE s.SemesterID = "'.$SemesterID.'" AND stt.NIP = "'.$NIP.'"  GROUP BY s.ID')->result_array();
 
                 // Get Schedule Details dan ID Attd
                 if(count($dataSchedule)>0){
                     for($s=0;$s<count($dataSchedule);$s++){
-                        $dataAttdID = $this->db->query('SELECT ScheduleID FORM db_academic.schedule_details 
-                                                    WHERE ScheduleID = "'.$dataSchedule[$s][''].'" ')->result_array();
+
+                        // Get total dosen
+                        $dataTotalDosen = $this->db->query('SELECT s.Coordinator AS NIP, em.Name FROM db_academic.schedule s 
+                                                                    LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                                    WHERE s.ID = "'.$dataSchedule[$s]['ScheduleID'].'"
+                                                                     UNION ALL 
+                                                                     SELECT stt.NIP, em.Name 
+                                                                     FROM db_academic.schedule_team_teaching stt 
+                                                                      LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                                      WHERE stt.ScheduleID = "'.$dataSchedule[$s]['ScheduleID'].'"')->result_array();
+                        $dataSchedule[$s]['TotalLecturer'] = count($dataTotalDosen);
+                        $dataSchedule[$s]['TotalLecturer_Details'] = $dataTotalDosen;
+
+
+                        $dataAttdID = $this->db->query('SELECT sd.ScheduleID, sd.ID AS SDID, attd.ID AS ID_Attd FROM db_academic.schedule_details sd 
+                                                                        LEFT JOIN db_academic.attendance attd ON (attd.ScheduleID = sd.ScheduleID AND attd.SDID = sd.ID)
+                                                                        WHERE sd.ScheduleID = "'.$dataSchedule[$s]['ScheduleID'].'" ')->result_array();
+
+                        $Attending = 0;
+                        $AttendingSameDate = 0;
+                        if(count($dataAttdID)>0){
+                            for($a=0;$a<count($dataAttdID);$a++){
+                                $dateStart = $data_arr['RangeStart'];
+                                $dateEnd = $data_arr['RangeEnd'];
+                                $dataDetail = $this->db->query('SELECT attdl.* FROM db_academic.attendance_lecturers attdl 
+                                                                            WHERE attdl.ID_Attd = "'.$dataAttdID[$a]['ID_Attd'].'"
+                                                                             AND attdl.Date >= "'.$dateStart.'"
+                                                                              AND attdl.Date <= "'.$dateEnd.'"')->result_array();
+
+                                // Mendapatkan attending dengan hari yang sama
+                                $dataDetail_sameDate = $this->db->query('SELECT attdl.* FROM db_academic.attendance_lecturers attdl 
+                                                                            WHERE attdl.ID_Attd = "'.$dataAttdID[$a]['ID_Attd'].'"
+                                                                             AND attdl.Date >= "'.$dateStart.'"
+                                                                              AND attdl.Date <= "'.$dateEnd.'" GROUP BY attdl.Date')->result_array();
+
+                                $Attending = count($dataDetail);
+                                $dataSchedule[$s]['Attending_Details'] = $dataDetail;
+                                $AttendingSameDate = count($dataDetail_sameDate);
+                                $dataSchedule[$s]['AttendingSameDate_Details'] = $dataDetail_sameDate;
+                            }
+                        }
+
+//                        $dataSchedule[$s]['DetailAttendance'] = $dataAttdID;
+                        $dataSchedule[$s]['Attending'] = $Attending;
+                        $dataSchedule[$s]['AttendingSameDate'] = $AttendingSameDate;
                     }
                 }
 
+                $data[$i]['Schedule'] = $dataSchedule;
+
             }
         }
+
+
+        return $data;
 
     }
 
