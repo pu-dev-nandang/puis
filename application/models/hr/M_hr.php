@@ -180,33 +180,43 @@ class M_hr extends CI_Model {
                         $Attending = 0;
 
                         if(count($dataAttdID)>0){
+
+                            $dataArrDetail = [];
+
                             for($a=0;$a<count($dataAttdID);$a++){
 
                                 $dataDetail = $this->db->query('SELECT attdl.* FROM db_academic.attendance_lecturers attdl 
                                                                             WHERE attdl.ID_Attd = "'.$dataAttdID[$a]['ID_Attd'].'"
                                                                              AND attdl.Date >= "'.$dateStart.'"
-                                                                              AND attdl.Date <= "'.$dateEnd.'"')->result_array();
+                                                                              AND attdl.Date <= "'.$dateEnd.'"
+                                                                              AND attdl.NIP = "'.$NIP.'" 
+                                                                              ORDER BY attdl.Date')->result_array();
 
                                 // Mendapatkan attending dengan hari yang sama
 
                                 array_push($arrID_Attd,$dataAttdID[$a]['ID_Attd']);
 
-
-
-                                $Attending = count($dataDetail);
-                                $dataSchedule[$s]['Attending_Details'] = $dataDetail;
-
+                                if(count($dataDetail)>0){
+                                    for($ab=0;$ab<count($dataDetail);$ab++){
+                                        array_push($dataArrDetail,$dataDetail[$ab]);
+                                    }
+                                }
 
 
                             }
+
+                            usort($dataArrDetail, function($a, $b) {
+                                return strtotime($a['Date']) - strtotime($b['Date']);
+                            });
+
+                            $Attending = count($dataArrDetail);
+                            $dataSchedule[$s]['Attending_Details'] = $dataArrDetail;
 
 
                         }
 
 
 
-
-//                        $dataSchedule[$s]['DetailAttendance'] = $dataAttdID;
                         $dataSchedule[$s]['Attending'] = $Attending;
                     }
 
@@ -220,7 +230,9 @@ class M_hr extends CI_Model {
 
                     $dataDetail_sameDate = $this->db->query('SELECT attdl.Date FROM db_academic.attendance_lecturers attdl 
                                                                             WHERE  attdl.Date >= "'.$dateStart.'"
-                                                                              AND attdl.Date <= "'.$dateEnd.'" AND ('.$querySameDate.') GROUP BY attdl.Date ORDER BY attdl.Date')->result_array();
+                                                                              AND attdl.Date <= "'.$dateEnd.'"
+                                                                              AND attdl.NIP = "'.$NIP.'" 
+                                                                              AND ('.$querySameDate.') GROUP BY attdl.Date ORDER BY attdl.Date')->result_array();
 
                     $AttendingSameDate = count($dataDetail_sameDate);
                     $data[$i]['AttendingSameDate_Details'] = $dataDetail_sameDate;
