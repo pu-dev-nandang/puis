@@ -51,7 +51,7 @@
                                 <h3><?=(!empty($employee->PlaceOfBirth) ? $employee->PlaceOfBirth.', ' : '').date("d F Y",strtotime($employee->DateOfBirth))?><span class="half-circle blue"><?=$myAge?> years old</span></h3>
                             </div>
                         </div>
-                        <div class="col-sm-5">
+                        <div class="col-sm-4">
                             <div class="profile-info">
                                 <h3>Division <?=$employee->DivisionMain?></h3>
                                 <h3><?=$employee->PositionMain?></h3>
@@ -70,7 +70,7 @@
                                 <?php } ?>
                             </div>
                         </div>
-                        <div class="col-sm-2">
+                        <div class="col-sm-3">
                             <div class="text-right">
                                 <span class="bgx <?=(($employee->StatusEmployeeID == 2) ? 'green': ( ($employee->StatusEmployeeID == 1) ? 'blue':'red' ) )?>">
                                 <i class="fa fa-handshake-o"></i> <?=strtoupper($employee->EmpStatus)?>
@@ -94,6 +94,7 @@
                 <li class="nv-training" ><a href="<?=site_url('human-resources/employees/training/'.$NIP)?>"><i class="fa fa-list-alt"></i> Training</a></li>
                 <li class="nv-experience" ><a href="<?=site_url('human-resources/employees/work-experience/'.$NIP)?>"><i class="fa fa-briefcase"></i> Work Experience</a></li>
                 <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li>
+                <li class="nv-financial" ><a href="<?=site_url('human-resources/employees/credential-financial/'.$NIP)?>"><i class="fa fa-credit-card"></i> Credential Financial</a></li>
               </ul>
             </div>
         </div>
@@ -230,6 +231,7 @@
         return result;
     }
     
+
     function MajorName() {
         var result = [];
         $.ajax({
@@ -252,6 +254,20 @@
         return result;
     }
 
+
+    function timeList() {
+        var time = [];
+        for (var i = 0; i < 24; i++) {
+            var h=i;
+            if(i < 10){ h= "0"+i; }
+            for (var j = 0; j < 6; j++) {
+                var m = j;
+                if(j < 10){m=j+"0";}
+                time.push(h+":"+m);
+            };
+        }
+        return time;
+    }
 
     $("#form-employee").on("click","#multiple-field .btn-add",function(){
         var itsme = $(this);
@@ -276,10 +292,13 @@
         cloneRow.find("td .select2-term-sd").attr("id","select2-term-sd-"+fieldName+"-"+num).removeClass("select2-offscreen");*/
 
         cloneRow.find("td input.autocomplete").attr("id","autocomplete-"+fieldName+"-"+num).removeClass("ui-autocomplete-input").removeAttr("autocomplete");
-
+        
         cloneRow.find("td:first").text(num);
         cloneRow.find(".form-control").val("");
         parent.find("#table-list-"+fieldName+" tbody").append(cloneRow);
+
+        cloneRow.find("td input.autocomplete").attr("id","autocomplete-start-"+fieldName+"-"+num).removeClass("ui-autocomplete-input").removeAttr("autocomplete").val("00:00");
+        cloneRow.find("td input.autocomplete").attr("id","autocomplete-end-"+fieldName+"-"+num).removeClass("ui-autocomplete-input").removeAttr("autocomplete").val("00:00");
         
         /*DATEPICKER*/
         parent.find("#table-list-"+fieldName+" tbody tr > td #datePicker-"+fieldName+"-"+num).datepicker({
@@ -319,6 +338,18 @@
         autocomplete_employee.autocomplete({
           source: employeeTags
         });
+        
+        var timeTags = timeList();
+        var autocomplete_time = parent.find("#table-list-"+fieldName+" tbody tr > td #autocomplete-start-training-"+num);
+        autocomplete_time.autocomplete({
+          source: timeTags
+        });
+        
+        var timeTags = timeList();
+        var autocomplete_time = parent.find("#table-list-"+fieldName+" tbody tr > td #autocomplete-end-training-"+num);
+        autocomplete_time.autocomplete({
+          source: timeTags
+        });
 
 
 
@@ -329,11 +360,11 @@
         var parent = itsme.parent().parent().parent().parent();
         var fieldName = parent.data("source");
         var totalRow = parent.find("#table-list-"+fieldName+" tbody tr").length;
-        if(totalRow > 1){
-            var lastRow = parent.find("#table-list-"+fieldName+" tbody tr:last");
-            var hasAttr = lastRow.attr("data-table");
-            if(typeof hasAttr !== typeof undefined && hasAttr !== false){
-                if(confirm("Are you sure wants to remove this "+lastRow.data("name")+"?")){
+        var lastRow = parent.find("#table-list-"+fieldName+" tbody tr:last");
+        var hasAttr = lastRow.attr("data-table");
+        if(typeof hasAttr !== typeof undefined && hasAttr !== false){
+            if(confirm("Are you sure wants to remove this "+lastRow.data("name")+"?")){
+                //if(totalRow > 1){
                     var data = {
                       ID : lastRow.data("id"),
                       TABLE : lastRow.data("table")
@@ -359,8 +390,19 @@
                             }
                         }
                     });
+                /*}else if(totalRow == 1){
+                    lastRow.find("input,select,textarea, .form-control").val("");
+                }*/
+                if(totalRow == 1){
+                    location.reload();
                 }
-            }else{lastRow.remove();}
+            }
+        }else{
+            if(totalRow == 1){
+                lastRow.find(".form-control, input, select,textarea").val("");
+            }else{
+                lastRow.remove();
+            }
         }
     });
     

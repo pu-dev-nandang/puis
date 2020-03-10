@@ -1167,23 +1167,72 @@ class C_employees extends HR_Controler {
             if(!empty($data['trainingTitle'])){
                 for ($k=0; $k < count($data['trainingTitle']); $k++) { 
                     if(!empty($data['trainingTitle'][$k])){
-                        $dataPostTraining = array("NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$k],"organizer"=>$data['organizer'][$k], "start_event"=>$data['trainingStart'][$k], "end_event"=>$data['trainingEnd'][$k], "location"=>$data['trainingLocation'][$k], "feedback"=>$data['trainingFeedback'][$k], "category"=>$data['trainingCategory'][$k] );
+                        $err_msg = "";
+                        if(!empty($_FILES['certificate']['name'][$k])){
+                            
+                            $ispic = false;
+                            $file_name = $_FILES['certificate']['name'][$k];
+                            $file_size =$_FILES['certificate']['size'][$k];
+                            $file_tmp =$_FILES['certificate']['tmp_name'][$k];
+                            $file_type=$_FILES['certificate']['type'][$k];
+                            if($file_type == "image/jpeg" || $file_type == "image/png"){
+                                $ispic = true;
+                            }else {
+                                $ispic = false;
+                                $err_msg     .= "Extention image '".$file_name."' doesn't allowed.";
+                            }
+                            if($file_size > 2000000){ //2Mb
+                                $ispic = false;
+                                $err_msg     .= "Size of image '".$file_name."'s too large from 2Mb.";
+                            }else { $ispic = true; }
+
+                            $trainingTitleFilename = preg_replace('/\s+/', "_", $data['trainingTitle'][$k]);
+                            $newFilename = $data['NIP']."-TRAINING-".$trainingTitleFilename."-".date('ymd').".jpg";
+
+                            $folderPCAM = 'uploads/profile/training';
+                            if(!file_exists($folderPCAM)){
+                                mkdir($folderPCAM,0777);
+                                $error403 = "<html><head><title>403 Forbidden</title></head><body><p>Directory access is forbidden.</p></body></html>";
+                                file_put_contents($folderPCAM."/index.html", $error403);
+                            }
+                            if($ispic){
+                                $moveimage = move_uploaded_file($file_tmp,$folderPCAM."//".$newFilename);
+                                if(!$moveimage){
+                                    $err_msg .= "<b>Failed insert file.</b><br>";
+                                }else{
+                                    $data['certificate'][$k] = $newFilename;
+                                }
+                            }
+                        }
+
+                        $dataPostTraining = array("NIP"=>$data['NIP'],
+                                                  "name"=>$data['trainingTitle'][$k],
+                                                  "organizer"=>$data['organizer'][$k], 
+                                                  "start_event"=>$data['trainingStart'][$k]." ".(!empty($data['trainingStartTime'][$k]) ? $data['trainingStartTime'][$k].":00" : "00:00:00"), 
+                                                  "end_event"=>$data['trainingEnd'][$k]." ".(!empty($data['trainingEndTime'][$k]) ? $data['trainingEndTime'][$k].":00" : "00:00:00"), 
+                                                  "location"=>$data['trainingLocation'][$k], 
+                                                  "category"=>$data['trainingCategory'][$k],
+                                                  "costCompany"=>$data['trainingCostCompany'][$k],
+                                                  "costEmployee"=>$data['trainingCostEmployee'][$k],
+                                                  "certificate"=>(!empty($data['certificate'][$k]) ? $data['certificate'][$k] : null),
+                                                   );
                         if(!empty($data['trainingID'][$k])){
                             $update = $this->General_model->updateData("db_employees.employees_educations_training",$dataPostTraining,array("ID"=>$data['trainingID'][$k]));
-                            $message = (($update) ? "Successfully":"Failed")." updated.";
+                            $message = (($update) ? "Successfully":"Failed")." updated.".(!empty($err_msg) ? "<br>".$err_msg:"");
                         }else{
                             //insert
                             $insert = $this->General_model->insertData("db_employees.employees_educations_training",$dataPostTraining);
-                            $message = (($insert) ? "Successfully":"Failed")." saved.";
-                        }
+                            $message = (($insert) ? "Successfully":"Failed")." saved.".(!empty($err_msg) ? "<br>".$err_msg:"");
+                        } 
+
                     }
                 }
-            }
 
-            $conditions = array("NIP"=>$data['NIP']);
-            $myNIP = $this->session->userdata('NIP');
-            $myName = $this->session->userdata('Name');
-            $update = $this->General_model->updateData("db_employees.employees",array("UpdatedBy"=>$myNIP.'/'.$myName),$conditions);
+                $conditions = array("NIP"=>$data['NIP']);
+                $myNIP = $this->session->userdata('NIP');
+                $myName = $this->session->userdata('Name');
+                $update = $this->General_model->updateData("db_employees.employees",array("UpdatedBy"=>$myNIP.'/'.$myName),$conditions);
+            }           
 
             $this->session->set_flashdata("message",$message);
             redirect(site_url('human-resources/employees/training/'.$data['NIP']));
@@ -1254,7 +1303,22 @@ class C_employees extends HR_Controler {
     }
 
 
+    public function credentialFinancial($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $department = parent::__getDepartement();
+            $data['NIP'] = $NIP;
+            $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $data['industry'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
+            $page = $this->load->view('page/'.$department.'/employees/credential-financial',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
     public function detailEmployeeOBJ(){
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
         $data = $this->input->post();
         $json = array();
         if($data){

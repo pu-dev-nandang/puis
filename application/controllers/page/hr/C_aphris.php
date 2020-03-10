@@ -591,6 +591,36 @@ class C_aphris extends HR_Controler {
     }
 
 
+    public function scheduleApproval(){
+        $data= array();
+        $department = parent::__getDepartement();
+        $data['result'] = $this->General_model->fetchData("db_employees.schedule_approval",array())->row();
+        $page = $this->load->view('page/'.$department.'/aphris/schedule-approval',$data,true);
+        $this->temp($page);
+    }
+
+
+    public function scheduleApprovalSave(){
+        $data = $this->input->post();
+        if($data){
+            $execute = false;
+            if(!empty($data['ID'])){
+                $conditions = array("ID"=>$data['ID']);
+                $isExist = $this->General_model->fetchData("db_employees.schedule_approval",$conditions)->row();
+                if(!empty($isExist)){
+                    $data['UpdatedBy'] = $this->session->userdata('NIP');
+                    $execute = $this->General_model->updateData("db_employees.schedule_approval",$data,$conditions);                    
+                }else{$message = "Data not founded.";}
+            }else{
+                $data['CreatedBy'] = $this->session->userdata('NIP');
+                $execute = $this->General_model->insertData("db_employees.schedule_approval",$data);
+            }
+            $message = (($execute) ? "Successfully":"Failed")." saved.";
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('human-resources/master-aphris/schedule-approval'));
+        }else{show_404();}
+    }
+
 
 
 
