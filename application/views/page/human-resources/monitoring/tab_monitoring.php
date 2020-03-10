@@ -6,8 +6,11 @@
         <li class="<?php if($this->uri->segment(3)=='with-range-date') { echo 'active'; } ?>">
             <a href="<?php echo base_url('human-resources/monitoring-attendance/with-range-date'); ?>">With Range Date</a>
         </li>
-        <li class="<?php if($this->uri->segment(3)=='lecturer-fees') { echo 'active'; } ?>">
+        <li class="<?php if($this->uri->segment(3)=='lecturer-fees') { echo 'active'; } ?> hide">
             <a href="<?php echo base_url('human-resources/monitoring-attendance/lecturer-fees'); ?>">Set Lecturer Fees</a>
+        </li>
+        <li class="<?php if($this->uri->segment(3)=='recapitulation-salaries') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('human-resources/monitoring-attendance/recapitulation-salaries'); ?>">Recapitulation Salaries</a>
         </li>
         <li class="<?php if($this->uri->segment(3)=='permanent-lecturer') { echo 'active'; } ?> hide">
             <a href="<?php echo base_url('human-resources/monitoring-attendance/permanent-lecturer'); ?>">Resume (Coming Soon)</a>

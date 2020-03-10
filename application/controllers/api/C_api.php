@@ -6663,6 +6663,13 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+
+            else if($data_arr['action']=='getDataRecapitulation'){
+
+                $data = $this->m_hr->getDataRecapitulation($data_arr);
+
+                return print_r(json_encode($data));
+            }
         }
 
     }
