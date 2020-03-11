@@ -21,7 +21,8 @@ class M_setting extends CI_Model {
             $AddWhere = ' and a.DepartmentID = "'.$DepartmentID.'"';
         }
 
-        $sql = 'select a.Descriptions,c.Name as NameEmployees,a.ID,a.DepartmentID,a.UpdatedBy,a.UpdatedAt,qdj.NameDepartment,qdj.NameDepartmentIND
+        $sql = 'select a.Descriptions,c.Name as NameEmployees,a.ID,a.DepartmentID,a.UpdatedBy,a.UpdatedAt,qdj.NameDepartment,qdj.NameDepartmentIND,
+                a.TemplateMessage
                 from db_ticketing.category as a '.$this->m_general->QueryDepartmentJoin('a.DepartmentID').'
                 left join db_employees.employees as c on a.UpdatedBy = c.NIP
                 where  a.Active = 1  '.$AddWhere.'

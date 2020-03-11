@@ -125,7 +125,7 @@
                                    '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
                                    '  </button>' +
                                    '  <ul class="dropdown-menu">' +
-                                   '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[3]+'" data = "'+full[9]+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
+                                   '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[3]+'" data = "'+full[10]+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
                                    '    <li role="separator" class="divider"></li>' +
                                    '    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[3]+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
                                    '  </ul>' +
@@ -159,12 +159,20 @@
             var html = '';
             html = '<div class="row">'+
                         '<div class="col-md-12">'+
-                            '<div class = "row">'+
+                            '<div class = "row" style = "margin-bottom:10px;">'+
                                 '<div class="col-sm-3">'+
                                     '<label class="control-label">Descriptions</label>'+
                                 '</div>'+
                                 '<div class="col-sm-6">'+
                                      '<textarea class="form-control input" name="Descriptions"></textarea>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class = "row">'+
+                                '<div class="col-sm-3">'+
+                                    '<label class="control-label">Template Message</label>'+
+                                '</div>'+
+                                '<div class="col-sm-6">'+
+                                     '<textarea class="form-control input" name="TemplateMessage" rows ="6"></textarea>'+
                                 '</div>'+
                             '</div>'+
                         '</div>'+

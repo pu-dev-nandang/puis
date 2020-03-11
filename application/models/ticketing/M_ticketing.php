@@ -64,7 +64,7 @@ class M_ticketing extends CI_Model {
         $this->db->insert('db_ticketing.received',$dataSave);
     }
 
-    private function Ticketing_uploadNas($filename)
+    public function Ticketing_uploadNas($filename)
     {
         $headerOrigin = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? serverRoot : "http://localhost";
         $path = 'ticketing';
@@ -552,6 +552,7 @@ class M_ticketing extends CI_Model {
     public function getDataReceived($arr)
     {
         $strWhere = '';
+        $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         foreach ($arr as $key => $value) {
             $AndOrWhere = ($strWhere == '') ? 'where ' : ' and ';
             $strWhere .= $AndOrWhere.'a.'.$key.' = "'.$value.'"';
@@ -566,6 +567,14 @@ class M_ticketing extends CI_Model {
                 order by a.ID asc
         ';
         $query = $this->db->query($sql,array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            if ($query[$i]['FileUpload'] != null  && $query[$i]['FileUpload'] != '') {
+                $temp = $pathfolder.$query[$i]['FileUpload'];
+                $token = $this->jwt->encode($temp,"UAP)(*");
+                $query[$i]['FileUpload'] = url_files."fileGetAnyToken/".$token;
+            }
+            
+        }
         return $query;
     }
 
