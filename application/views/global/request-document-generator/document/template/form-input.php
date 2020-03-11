@@ -514,6 +514,7 @@
                                         '<select class = "form-control Input" field="Signature" name = "verify" key = "SET">'+
                                             '<option value = "0">Approve Manual</option>'+
                                             '<option value = "1">Approve by System</option>'+
+                                            '<option value = "2">Auto Approve</option>'+
                                         '</select>'+
                                     '</div>'+
                                     '<div class = "form-group">'+
