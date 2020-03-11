@@ -312,6 +312,11 @@ class C_rest_ticketing extends CI_Controller {
             $rs = [];
             $dataToken = json_decode(json_encode($dataToken),true);
             $dataToken['action'] = 'update';
+            if (array_key_exists('Files', $_FILES)) {
+                $NoTicket = $dataToken['NoTicket'];
+                $uploadNas = $this->m_ticketing->Ticketing_uploadNas($NoTicket.'_close');
+                $dataToken['data']['FileUpload'] = $uploadNas;
+            }
             $this->m_ticketing->TableReceivedAction($dataToken);
             $this->__trigger_close_ticket($dataToken);
             $rs = ['status' => 1,'msg' => ''];
