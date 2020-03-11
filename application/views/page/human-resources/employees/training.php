@@ -50,8 +50,8 @@
                                         <td colspan="2">End Event</td>
                                         <td>Location</td>
                                         <td colspan="2">Cost</td>
-                                        <td>Certificate</td>
-                                        <td width="10%">Category*</td>
+                                        <td>Certificate*</td>
+                                        <td width="10%">Category</td>
                                     </tr>
                                 </thead>
                                 <tbody>

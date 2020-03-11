@@ -151,6 +151,22 @@
                         	cc.prev().remove();
                         	cc.select2({width:'100%'});
                         }
+                        if(k=="start_join"){
+                            var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-"+num).removeClass("hasDatepicker");
+                            cc.datepicker({
+                                dateFormat: 'yy-mm-dd',
+                                changeYear: true,
+                                changeMonth: true
+                            });
+                        }
+                        if(k=="end_join"){
+                            var cc = $cloneRow.find(".datepicker-sd").attr("id","datePicker-"+num).removeClass("hasDatepicker");
+                            cc.datepicker({
+                                dateFormat: 'yy-mm-dd',
+                                changeYear: true,
+                                changeMonth: true
+                            });
+                        }
                     });
                     
                     $tablename.find("tbody").append($cloneRow);
