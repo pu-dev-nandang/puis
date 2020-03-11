@@ -229,8 +229,8 @@ class M_doc extends CI_Model {
     	foreach ($line as $v) {
     	    if(preg_match_all('/{+(.*?)}/', $v, $matches)){
     	        $str = trim($matches[1][0]);
-                $strMatch = $matches[1];
-                $str = $this->__filterKeyScript($strMatch);
+                // $strMatch = $matches[1];
+                // $str = $this->__filterKeyScript($strMatch);
                 // print_r($matches);
     	        $ex = explode('.', $str);
     	        if (count($ex) > 0) {
@@ -635,7 +635,7 @@ class M_doc extends CI_Model {
     		$keyApproval = $arrValue[$i]['number'];
 
     		// show signature image or not
-    		if ($arrValue[$i]['verify']['valueVerify'] == 1) {
+    		if ($arrValue[$i]['verify']['valueVerify'] == 1 || $arrValue[$i]['verify']['valueVerify'] == 2) {
     			$img = $arrValue[$i]['verify']['img'];
     			for ($j=0; $j < count($arrKomponen); $j++) {
     				$str = $arrKomponen[$j]; 
@@ -1158,7 +1158,7 @@ class M_doc extends CI_Model {
             // $keyApproval = $i + 1;
             $keyApproval = $arrValue[$i]['number'];
             // show signature image or not
-            if ($arrValue[$i]['verify']['valueVerify'] == 1) {
+            if ($arrValue[$i]['verify']['valueVerify'] == 1 || $arrValue[$i]['verify']['valueVerify'] == 2) {
                 $img = $arrValue[$i]['verify']['img'];
                 for ($j=0; $j < count($arrKomponen); $j++) {
                     $str = $arrKomponen[$j]; 
@@ -2684,7 +2684,7 @@ class M_doc extends CI_Model {
             // $keyApproval = $i + 1;
             $keyApproval = $arrValue[$i]['number'];
             // show signature image or not
-            if ($arrValue[$i]['verify']['valueVerify'] == 1) {
+            if ($arrValue[$i]['verify']['valueVerify'] == 1 || $arrValue[$i]['verify']['valueVerify'] == 2) {
                 $img = $arrValue[$i]['verify']['img'];
                 for ($j=0; $j < count($arrKomponen); $j++) {
                     $str = $arrKomponen[$j]; 
@@ -2695,7 +2695,7 @@ class M_doc extends CI_Model {
                         if (count($exKey2)) {
                             switch ($exKey2[0]) {
                                 case 'Image':
-                                    if ($arrValue[$i]['approve'] == 1) {
+                                    if ($arrValue[$i]['verify']['valueVerify'] == 2 || $arrValue[$i]['approve'] == 1) {
                                        $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
                                        $TemplateProcessor->setImageValue($setValue, 
                                            array('path' => $img, 

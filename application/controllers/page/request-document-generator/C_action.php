@@ -35,6 +35,14 @@ class C_action extends ServiceDocumentGenerator_Controler {
 			case 'edit':
 				$rs = $this->m_doc->editbyUserRequest($dataToken);
 				break;
+			case 'batal':
+				$ID = $dataToken['dataID'];
+				$this->db->where('ID',$ID);
+				$this->db->update('db_generatordoc.document_data',array(
+					'Status' => 'Batal'
+				));
+				$rs = 1;
+				break;
 			default:
 				# code...
 				break;

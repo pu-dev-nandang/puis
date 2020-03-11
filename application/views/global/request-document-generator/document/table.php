@@ -531,6 +531,14 @@
 		App_table.ApproveOrReject(dataID,dataToken,approval_number,'Reject',Note);
 	})
 
+	$(document).off('click', '.btnBatal').on('click', '.btnBatal',function(e) {
+		var itsme = $(this);
+		var action = 'batal';
+		var dataID = itsme.attr('data-id');
+		App_input.SaveData(itsme,action,dataID);
+	})
+	
+
 	
 
 	$(document).off('click', '.btnLog').on('click', '.btnLog',function(e) {
