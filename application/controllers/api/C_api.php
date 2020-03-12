@@ -2460,7 +2460,7 @@ class C_api extends CI_Controller {
 
                 $dataProgram = $this->db->query('SELECT s.ID AS ScheduleID, s.ProgramsCampusID, sem.Name AS SemesterName,
                                                               s.ClassGroup, s.Coordinator, s.TeamTeaching,
-                                                             s.SemesterID, s.Attendance , mk.NameEng AS CourseEng, cd.TotalSKS AS TotalCredit
+                                                             s.SemesterID, s.Attendance, s.OnlineLearning, mk.NameEng AS CourseEng, cd.TotalSKS AS TotalCredit
                                                             FROM db_academic.schedule s
                                                             LEFT JOIN db_academic.semester sem ON (sem.ID = s.SemesterID)
                                                             LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
