@@ -512,16 +512,16 @@
                                     '<div class = "form-group">'+
                                         '<label>Verify</label>'+
                                         '<select class = "form-control Input" field="Signature" name = "verify" key = "SET">'+
-                                            '<option value = "0">Approve Manual</option>'+
-                                            '<option value = "1">Approve by System</option>'+
-                                            '<option value = "2">Auto Approve</option>'+
+                                            '<option value = "0">Manual Approve</option>'+
+                                            '<option value = "1">Manual Approve by System</option>'+
+                                            '<option value = "2">Auto Approve by System</option>'+
                                         '</select>'+
                                     '</div>'+
                                     '<div class = "form-group">'+
                                         '<label>CAP</label>'+
                                         '<select class = "form-control Input" field="Signature" name = "cap" key = "SET">'+
-                                            '<option value = "0">Cap Manual</option>'+
-                                            '<option value = "1">Cap by system</option>'+
+                                            '<option value = "0">Manual Cap </option>'+
+                                            '<option value = "1">Auto Cap by System</option>'+
                                         '</select>'+
                                     '</div>'+
                                 '</div>'+
