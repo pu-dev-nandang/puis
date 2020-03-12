@@ -486,7 +486,10 @@
 							bool = true;
 							html += '<ul>';
 						}
-						var textVerify = (dt[i].verify == 1) ? 'Approve by System' : 'Approve Manual';
+						var textVerify = (dt[i].verify == 1) ? 'Manual Approve by System' : 'Manual Approve';
+						if (dt[i].verify == 2) {
+							textVerify = 'Auto Approve by System'
+						}
 						html += '<li style = "margin-left : -20px;">Approval '+(i+1)+' : '+'<span style="color:green;">'+selectChoose[j].Value+'</span>'+'<br/>'+'<label>'+textVerify+'</label>'+'</li>';
 						break;
 					}
