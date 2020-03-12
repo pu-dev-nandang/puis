@@ -118,6 +118,20 @@
                 </td>
 
             <tr>
+            <tr>
+                <td>Online Learning</td>
+                <td>:</td>
+                <td>
+                    <div class="checkbox checbox-switch switch-primary">
+                        <label>
+                            <input type="checkbox" id="formOnlineLearning">
+                            <span></span>
+<!--                            <i> | Filter Attendance in UAS (75%)</i>-->
+                        </label>
+                    </div>
+                </td>
+
+            <tr>
                 <td>Class Group</td>
                 <td>:</td>
                 <td><input class="form-control" id="formClassGroup" style="max-width: 130px;"/> </td>
@@ -556,12 +570,14 @@
             }
 
             var Attendance = ($('#formAttendance').is(':checked')) ? '1' : '0';
+            var OnlineLearning = ($('#formOnlineLearning').is(':checked')) ? '1' : '0';
 
             var data = {
                 action : 'updateInfoInEditCourse',
                 SemesterID : SemesterID,
                 ScheduleID : ScheduleID,
                 UpdateForm : {
+                    OnlineLearning : OnlineLearning,
                     Attendance : Attendance,
                     ClassGroup : formClassGroup,
                     Coordinator : formCoordinator,
@@ -627,6 +643,9 @@
 
             var ct_attenance = (s.Attendance=='1') ? true : false;
             $('#formAttendance').prop('checked',ct_attenance);
+
+            var ct_OnlineLearning = (s.OnlineLearning=='1') ? true : false;
+            $('#formOnlineLearning').prop('checked',ct_OnlineLearning);
 
             $('#formClassGroup').val(s.ClassGroup);
             $('#formScheduleID').val(s.ScheduleID);
