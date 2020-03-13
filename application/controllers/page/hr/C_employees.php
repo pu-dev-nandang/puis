@@ -732,6 +732,7 @@ class C_employees extends HR_Controler {
 
     /*ADDED BY FEBRI @ NOV 2019*/
     public function empRequest(){
+        $this->load->helper("General_helper");
         $data = $this->input->post();
         if($data){
             $key = "UAP)(*";
@@ -739,16 +740,20 @@ class C_employees extends HR_Controler {
             $conditions = array("NIP"=>$data_arr['NIP']);
             $isExist = $this->General_model->fetchData("db_employees.employees",$conditions)->row();
             if(!empty($isExist)){
+                $isExist->MyHistorical = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$isExist->NIP),"ID","desc")->result();
+                $isExist->MyCareer = $this->m_hr->getEmpCareer(array("a.NIP"=>$isExist->NIP,"isShowSTO"=>0))->result();
+                $isExist->MyBank = $this->General_model->fetchData("db_employees.employees_bank_account",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducation = $this->General_model->fetchData("db_employees.employees_educations",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationNonFormal = $this->General_model->fetchData("db_employees.employees_educations_non_formal",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyEducationTraining = $this->General_model->fetchData("db_employees.employees_educations_training",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyFamily = $this->General_model->fetchData("db_employees.employees_family_member",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyExperience = $this->General_model->fetchData("db_employees.employees_experience",array("NIP"=>$isExist->NIP))->result();
+                
                 $data['NIP'] = $data_arr['NIP'];
-                $data['detail_ori'] = $isExist;
-                $data['religion_ori'] = $this->General_model->fetchData("db_employees.religion",array("IDReligion"=>$isExist->ReligionID))->row();
-                $data['province_ori'] = $this->General_model->fetchData("db_employees.data_province",array("IDProvince"=>$isExist->ProvinceID))->row();
-                $data['city_ori'] = $this->General_model->fetchData("db_employees.data_city",array("IDCity"=>$isExist->CityID))->row();
-                $conditions['isApproval'] = 1;
-                $data['detail_req'] = $this->General_model->fetchData("db_employees.tmp_employees",$conditions)->row();
-                $data['religion_req'] = $this->General_model->fetchData("db_employees.religion",array("IDReligion"=>$data['detail_req']->ReligionID))->row();
-                $data['province_req'] = $this->General_model->fetchData("db_employees.data_province",array("IDProvince"=>$data['detail_req']->ProvinceID))->row();
-                $data['city_req'] = $this->General_model->fetchData("db_employees.data_city",array("IDCity"=>$data['detail_req']->CityID))->row();
+                $data['origin'] = $isExist;
+                
+                $Logs = json_decode($isExist->Logs);
+                $data['request'] = $Logs;             
             }
         }
         $this->load->view('page/human-resources/employees/requestMerging',$data);
@@ -1343,6 +1348,7 @@ class C_employees extends HR_Controler {
 
 
     public function removeAdditonal(){
+        header('Access-Control-Allow-Origin: *');
         $data = $this->input->post();
         $json = array();
         if($data){

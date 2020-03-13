@@ -508,7 +508,7 @@ class C_api extends CI_Controller {
 
             if(!empty($output['isapprove'])){
                 if($output['isapprove']){
-                    $dataWhere .= "AND (te.isApproval = 1) ";
+                    $dataWhere .= "AND em.isApproved = 1 ";
                 }
             }
 
@@ -602,9 +602,9 @@ class C_api extends CI_Controller {
                           </ul>
                         </div>';
 
-            $isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
+            //$isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
             $needAppv = "";
-            if(!empty($isRequested)){
+            if($row['isApproved'] == 1){
                 if($this->session->userdata('IDdepartementNavigation') == 13){
                     $needAppv = '<p><button class="btn btn-xs btn-info btn-appv" type="button" data-nip="'.$row["NIP"].'" title="Need approving for biodata" ><i class="fa fa-warning"></i> Need Approval</button></p>';
                 }

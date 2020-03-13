@@ -253,7 +253,7 @@
                 $tablename = $("#table-list-bank"); var num = 1;
                 $.each(mybank.MyBank,function(key,value){
                     $cloneRow = $tablename.find("tbody > tr:last").clone();
-                    $cloneRow.attr("data-table","employees_educations").attr("data-id",value.ID).attr("data-name",value.bank);
+                    $cloneRow.attr("data-table","employees_bank_account").attr("data-id",value.ID).attr("data-name",value.bank);
                     $cloneRow.find("td:first").text(num);
                     $.each(value,function(k,v){
                         $cloneRow.find(".bank-"+k).val(v);                        

@@ -277,13 +277,11 @@
                 '            </tr>' +
                 '            </thead>' +
                 '        </table>');
-            /*UPDATED BY FEBRI @ JAN 2020*/
-            /*var filterStatusEmployees = $('#filterStatusEmployees').val();
-            var token = jwt_encode({StatusEmployeeID : filterStatusEmployees},'UAP)(*');*/
+            /*UPDATED BY FEBRI @ JAN 2020*/            
             var filtering = $("#form-filter").serialize();
             if(isapprove){
-              filtering = filtering+"&isapprove="+isapprove;
-          }
+                filtering = filtering+"&isapprove="+isapprove;
+            }
             if((sort && order) || ( sort !== null && order !== null) ){
               filtering = filtering+"&sortby="+sort+"&orderby="+order;
             }
