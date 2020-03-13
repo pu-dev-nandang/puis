@@ -115,7 +115,8 @@
 										'<label>'+'Notes'+'</label>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
-										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 // '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -189,7 +190,8 @@
 										'<label>'+'Notes'+'</label>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
-										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 // '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
