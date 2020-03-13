@@ -1065,6 +1065,12 @@ class C_rest extends CI_Controller {
                 $data = $this->db->query('SELECT ID,Sessions FROM db_academic.counseling_topic 
                     WHERE ScheduleID = "'.$ScheduleID.'" ')->result_array();
 
+                $dataCkOnline = $this->db->select('OnlineLearning')->get_where('db_academic.schedule',array('ID' => $ScheduleID))->result_array();
+
+                if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+                    $dataOpenDate = $this->m_rest->getRangeDateLearningOnline($ScheduleID);
+                }
+
 
                 $result = [];
 
@@ -1091,14 +1097,39 @@ class C_rest extends CI_Controller {
                         }
                     }
 
-                    $arr = array(
-                        'Sessions' => $i,
-                        'Status' => $Status,
-                        'TopicID' => $TopicID,
-                        'TotalComment' => $TotalComment
-                    );
+                    if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+
+                        $arr = array(
+                            'Sessions' => ($i),
+                            'Status' => $Status,
+                            'isOnline' => 1,
+                            'TopicID' => $TopicID,
+                            'TotalComment' => $TotalComment,
+                            'StatusOnline' => $dataOpenDate[$i - 1]['Status'],
+                            'RangeStart' => $dataOpenDate[$i - 1]['RangeStart'],
+                            'RangeEnd' => $dataOpenDate[$i - 1]['RangeEnd']
+
+                        );
+
+                    } else {
+                        $arr = array(
+                            'Sessions' => ($i),
+                            'Status' => $Status,
+                            'isOnline' => 0,
+                            'TopicID' => $TopicID,
+                            'TotalComment' => $TotalComment
+                        );
+                    }
+
+
                     array_push($result,$arr);
                 }
+
+                // Cek apakah online atau tidak
+
+
+
+
 
                 return print_r(json_encode($result));
 

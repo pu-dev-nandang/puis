@@ -2058,4 +2058,73 @@ class M_rest extends CI_Model {
         return $data;
     }
 
+    public function getRangeDateLearningOnline($ScheduleID){
+
+        $dataSch = $this->db->query('SELECT d.NumberOfDay, ay.kuliahStart , ay.utsEnd FROM db_academic.schedule_details sd 
+                                        LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                        LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
+                                        LEFT JOIN db_academic.academic_years ay ON (ay.SemesterID = s.SemesterID)
+                                        WHERE sd.ScheduleID = "'.$ScheduleID.'"
+                                         ORDER BY sd.DayID ASC LIMIT 1 ')->result_array();
+
+
+        $Day = $dataSch[0]['NumberOfDay'];
+
+
+
+        $dateRangeStart = $dataSch[0]['kuliahStart']; // Start kuliah
+        $dateRangeStart_AfterUTS = $dataSch[0]['utsEnd']; // End of UTS
+
+
+        $dateStart = $this->getFirstDatelearningOnline($dateRangeStart,$Day);
+        $f = $this->getRangeDateMidSemester($dateStart);
+
+        $dateStart_AfterUTS = $this->getFirstDatelearningOnline($dateRangeStart_AfterUTS,$Day);
+        $f2 = $this->getRangeDateMidSemester($dateStart_AfterUTS);
+        if(count($f2)>0){
+            for($i=0;$i<count($f2);$i++){
+                $f2[$i]['Session'] = $i+8;
+                array_push($f,$f2[$i]);
+            }
+        }
+
+        return $f;
+
+    }
+
+    public function getRangeDateMidSemester($dateStart){
+
+        $dateNow = date('Y-m-d');
+        $newStartDate = $dateStart;
+        $arrResult = [];
+        for($s=0;$s<7;$s++){
+            $RangeEnd = date("Y-m-d", strtotime($newStartDate." +6 days"));
+
+            $Status = ($newStartDate <= $dateNow && $RangeEnd >= $dateNow) ? 1 : 0;
+
+            $arr = array(
+                'Session' => ($s+1),
+                'RangeStart' => $newStartDate,
+                'RangeEnd' => $RangeEnd,
+                'Status' => $Status
+            );
+            $newStartDate = date("Y-m-d", strtotime($RangeEnd." +1 days"));
+            array_push($arrResult,$arr);
+        }
+        return $arrResult;
+    }
+
+    public function getFirstDatelearningOnline($StartDate,$DayNumber){
+        $result = '';
+        for($i=0;$i<=7;$i++){
+            $dtNow = date("Y-m-d", strtotime($StartDate." +".$i." days"));
+            $dtNumber = date("N", strtotime($StartDate." +".$i." days"));
+            if($DayNumber==$dtNumber){
+                $result = $dtNow;
+                break;
+            }
+        }
+        return $result;
+    }
+
 }

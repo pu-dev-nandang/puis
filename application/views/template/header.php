@@ -427,7 +427,7 @@
 
         $('#GlobalModal').on('shown.bs.modal', function () {
             $('#formSimpleSearch').focus();
-        })
+        });
 
         $('#GlobalModal').modal({
             'show' : true,
