@@ -7377,5 +7377,24 @@ Phone: (021) 29200456';
 
     }
 
+    public function recapitulation_salaries(){
+
+        $pdf = new FPDF('L','mm','A4');
+        $pdf->SetMargins(5,5,5);
+        $pdf->AddPage();
+
+        $pdf->Image('./images/new_logo_pu.png',5,3,50);
+
+        $pdf->SetFont('Arial','',9);
+
+        $border = 1;
+        $h = 5;
+        $x = $pdf->GetX();
+        $y = $pdf->GetY();
+        $pdf->Cell(40,$h,$x.' - '.$y,$border,0,'L');
+
+        $pdf->Output('SKBP__.pdf','I');
+    }
+
 
 }

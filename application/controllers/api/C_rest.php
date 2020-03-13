@@ -1143,6 +1143,85 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function crudTask(){
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+        if($cekUser){
+            if($dataToken['action']=='checkSessionsToNewTask'){
+
+                $ScheduleID = $dataToken['ScheduleID'];
+
+                $dataCkOnline = $this->db->select('OnlineLearning')->get_where('db_academic.schedule',array('ID' => $ScheduleID))->result_array();
+
+                if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+                    $dataOpenDate = $this->m_rest->getRangeDateLearningOnline($ScheduleID);
+                }
+
+                $result = [];
+                for($i=1;$i<=14;$i++){
+
+
+                    // Cek sudah ada atau blm
+//                    $dataCkSession = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task  st
+//                                                            WHERE st.ScheduleID = "'.$ScheduleID.'"
+//                                                             AND st.Session = "'.$i.'" ')->result_array();
+//
+//                    $Status = ($dataCkSession[0]['Total']>0) ? -1 : 1;
+
+                    $Status =  1;
+
+
+                    if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+
+                        $arr = array(
+                            'Sessions' => ($i),
+                            'Status' => $Status,
+                            'isOnline' => 1,
+                            'StatusOnline' => $dataOpenDate[$i - 1]['Status'],
+                            'RangeStart' => $dataOpenDate[$i - 1]['RangeStart'],
+                            'RangeEnd' => $dataOpenDate[$i - 1]['RangeEnd']
+
+                        );
+
+                    } else {
+                        $arr = array(
+                            'Sessions' => ($i),
+                            'Status' => $Status,
+                            'isOnline' => 0
+                        );
+                    }
+
+                    array_push($result,$arr);
+
+                }
+
+                return print_r(json_encode($result));
+
+            }
+            else if($dataToken['action']=='checkSessionsInTask'){
+                $ScheduleID = $dataToken['ScheduleID'];
+                $Session = $dataToken['Session'];
+
+                $dataCkSession = $this->db->query('SELECT * FROM db_academic.schedule_task  st
+                                                            WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                             AND st.Session = "'.$Session.'" ')->result_array();
+
+                if(count($dataCkSession)>0){
+                    $d = $dataCkSession[0];
+                    $dataCkSession[0]['Details'] = $this->db->query('SELECT sts.* FROM db_academic.schedule_task_student sts 
+                                                                    WHERE sts.IDST = "'.$d['ID'].'" ')->result_array();
+                }
+
+                return print_r(json_encode($dataCkSession));
+            }
+        } else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+    }
+
     public function getPaymentStudent(){
         $dataToken = $this->getInputToken();
         $cekUser = $this->cekAuthAPI($dataToken['auth']);
