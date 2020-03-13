@@ -386,10 +386,11 @@
 							'<div class = "form-group">'+
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
-										'<label>'+'Message'+'</label>'+
+										'<label>'+'Notes'+'</label>'+
 									'</div>'+
 									'<div class = "col-xs-9">'+
-										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived" '+dis+' >'+valTextArea+'</textarea>'+
+										 // '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived" '+dis+' >'+valTextArea+'</textarea>'+
+										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived" '+dis+' >'+''+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -685,10 +686,11 @@
 							'<div class = "form-group">'+
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
-										'<label>'+'Message'+'</label>'+
+										'<label>'+' Notes'+'</label>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
-										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 // '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+

@@ -246,7 +246,10 @@
             var row = data_received[i];
             var GetWorker = '';
             var DataReceived_Details = row.DataReceived_Details;
+            
             if (DataReceived_Details.length >  0) {
+              GetWorker += '<p style = "color:blue;">Notes :</p>';
+              GetWorker += '<p style = "color:blue;">'+nl2br(row.MessageReceived)+'</p>';
               GetWorker += '<table class = "table" style ="margin-top:15px;">'+
                               '<tr>'+
                                   '<td style="padding:4px;">Worker</td>'+
@@ -278,7 +281,7 @@
             if (row.Comment != '' && row.Comment != null && row.Comment != undefined ) {
               GetWorker += '<div class = "form-group" style="margin-top:5px;color:#0066ff;">'+
                               '<label>Comment from Handler : </label>'+
-                              '<p>'+br2nl(row.Comment)+'</p>'+
+                              '<p>'+nl2br(row.Comment)+'</p>'+
                             '</div>';  
             }
 
