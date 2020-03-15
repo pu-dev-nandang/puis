@@ -143,7 +143,7 @@ class M_rest extends CI_Model {
 
                 $data = $this->db->query('SELECT sp.ScheduleID,sp.TypeSchedule,mk.MKCode,mk.Name AS MKName,mk.nameEng AS MKNameEng,cd.TotalSKS AS Credit,
                                                 sp.StatusSystem,sc.ClassGroup, sc.TeamTeaching,
-                                                em.NIP,em.Name,em.TitleAhead, em.TitleBehind, em.EmailPU, sp.TransferCourse
+                                                em.NIP,em.Name,em.TitleAhead, em.TitleBehind, em.EmailPU, sp.TransferCourse, sc.OnlineLearning
                                                 FROM '.$db.'.study_planning sp
                                                 LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
                                                 LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)

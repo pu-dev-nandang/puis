@@ -102,6 +102,119 @@ class C_upload extends CI_Controller {
 
     }
 
+    // Upload task
+    function upload_task(){
+
+        $f = $this->input->get('f');
+
+        $lanjut = true;
+        $file_name = '';
+        if($f==1 || $f=='1'){
+
+            $unix_name = $this->input->post('formNameFile');
+            $config['upload_path']          = './uploads/task/';
+            $config['allowed_types']        = 'pdf';
+            $config['max_size']             = 8000;
+//        $config['max_width']            = 1024;
+//        $config['max_height']           = 768;
+            $config['file_name'] = $unix_name;
+            $this->load->library('upload', $config);
+            if ( ! $this->upload->do_upload('userfile'))
+            {
+                $error = array('error' => $this->upload->display_errors());
+                $lanjut = false;
+                return print_r(json_encode($error));
+            }
+            else
+            {
+                $success = array('success' => $this->upload->data());
+                $file_name = $success['success']['file_name'];
+            }
+
+        }
+
+        if($lanjut){
+
+            $data_insert = array(
+                'ScheduleID' => $this->input->post('formScheduleID'),
+                'Session' => $this->input->post('formSession'),
+                'NIP' => $this->input->post('formNIP'),
+                'Title' => $this->input->post('formTitle'),
+                'Description' => $this->input->post('formDescription'),
+                'File' => $file_name,
+                'EntredBy' => $this->input->post('formNIP'),
+                'EntredAt' => $this->m_rest->getDateTimeNow()
+            );
+
+            $this->db->insert('db_academic.schedule_task',$data_insert);
+            $idInsert = $this->db->insert_id();
+            $success['success']['InsertID'] = $idInsert;
+
+            return print_r(json_encode($success));
+
+        }
+
+
+
+
+
+    }
+    function upload_task_std(){
+
+        $f = $this->input->get('f');
+
+        $lanjut = true;
+        $file_name = '';
+        if($f==1 || $f=='1'){
+
+            $unix_name = $this->input->post('formNameFile');
+            $config['upload_path']          = './uploads/task/';
+            $config['allowed_types']        = 'pdf';
+            $config['max_size']             = 8000;
+//        $config['max_width']            = 1024;
+//        $config['max_height']           = 768;
+            $config['file_name'] = $unix_name;
+            $this->load->library('upload', $config);
+            if ( ! $this->upload->do_upload('userfile'))
+            {
+                $error = array('error' => $this->upload->display_errors());
+                $lanjut = false;
+                return print_r(json_encode($error));
+            }
+            else
+            {
+                $success = array('success' => $this->upload->data());
+                $file_name = $success['success']['file_name'];
+            }
+
+        }
+
+        if($lanjut){
+
+
+            $data_insert = array(
+                'IDST' => $this->input->post('formIDST'),
+                'NPM' => $this->input->post('formNPM'),
+                'Description' => $this->input->post('formDescription'),
+                'File' => $file_name,
+                'EntredBy' => $this->input->post('formNPM'),
+                'EntredAt' => $this->m_rest->getDateTimeNow()
+            );
+
+            $this->db->insert('db_academic.schedule_task_student',$data_insert);
+            $idInsert = $this->db->insert_id();
+            $success['success']['InsertID'] = $idInsert;
+
+            return print_r(json_encode($success));
+
+        }
+
+
+
+
+
+    }
+
 
 
 }
