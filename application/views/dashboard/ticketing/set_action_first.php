@@ -491,7 +491,8 @@
 				var MessageReceived =  itsme.find('.input_assign_to[name="MessageReceived"]').val();
 				var DueDate =  itsme.find('.input_assign_to[name="DueDate"]').val();
 				var NIP =  itsme.find('.input_assign_to[name="NIP"]').val();
-				if (MessageReceived == '' ||  MessageReceived == undefined || NIP == null || NIP == undefined ) {
+				// if (MessageReceived == '' ||  MessageReceived == undefined || NIP == null || NIP == undefined ) {
+				if (NIP == null || NIP == undefined ) {
 					// toastr.info('Please check input Assign To on index of '+Index);
 					toastr.info('Please check input Assign To');
 					bool = false;
