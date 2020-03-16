@@ -11202,7 +11202,7 @@ class C_api extends CI_Controller {
         }
 
         $queryDefault = 'SELECT s.ID, s.CombinedClasses, s.ClassGroup, s.Coordinator, em.Name AS CoordinatorName,
-                                      s.TeamTeaching, s.SubSesi, s.Attendance, cd.TotalSKS AS Credit,
+                                      s.TeamTeaching, s.SubSesi, s.Attendance, cd.TotalSKS AS Credit, s.OnlineLearning,
                                        mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng,
                                        cd.ID AS CDID
                                       FROM db_academic.schedule s
@@ -11245,6 +11245,7 @@ class C_api extends CI_Controller {
 
             $SubSesi = ($row['SubSesi']=='1') ? '<br/><span class="label label-warning">Sub-Sesi</span>' : '';
             $Attendance = ($row['Attendance']=='0') ? '<br/><span class="label label-danger"><i class="fa fa-filter margin-right"></i> No Attd</span>' : '';
+            $Attendance = ($row['OnlineLearning']=='1') ? '<br/><span class="label label-success">Online</span>' : '';
 
             $dataSchedule = $this->db->query('SELECT cl.Room, d.NameEng AS DayEng, sd.StartSessions, sd.EndSessions, attd.ID AS ID_Attd
                                                                       FROM db_academic.schedule_details sd
