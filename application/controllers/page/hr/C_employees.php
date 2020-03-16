@@ -971,6 +971,10 @@ class C_employees extends HR_Controler {
     public function additionalInformationSave(){
         $data = $this->input->post();
         if($data){
+            $action = "additional-info";
+            if(!empty($data['action'])){
+                $action = $data['action'];unset($data['action']);
+            }
             $bankID = $data['bankID'];
             $bankName = $data['bankName'];
             $bankAccName = $data['bankAccName'];
@@ -1000,7 +1004,7 @@ class C_employees extends HR_Controler {
             }else{$message = "Failed saved.";}
 
             $this->session->set_flashdata("message",$message);
-            redirect(site_url('human-resources/employees/additional-info/'.$data['NIP']));
+            redirect(site_url('human-resources/employees/'.$action.'/'.$data['NIP']));
 
         }else{show_404();}
     }
@@ -1411,14 +1415,14 @@ class C_employees extends HR_Controler {
     }
 
 
-    public function credentialFinancial($NIP){
+    public function credentialBenefit($NIP){
         $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
         if(!empty($isExist)){
             $department = parent::__getDepartement();
             $data['NIP'] = $NIP;
             $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
             $data['industry'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
-            $page = $this->load->view('page/'.$department.'/employees/credential-financial',$data,true);
+            $page = $this->load->view('page/'.$department.'/employees/credential-benefit',$data,true);
             $this->tab_menu_new_emp($page,$NIP);
         }else{show_404();}
     }
