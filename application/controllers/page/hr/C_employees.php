@@ -771,6 +771,109 @@ class C_employees extends HR_Controler {
             $message = ""; $isfinish = false;
             $isExist = $this->General_model->fetchData("db_employees.employees",$conditions)->row();
             if(!empty($isExist)){
+                if($data_arr['ACT'] == 2){ //for rejected
+                    $dataPost = array("isApproved"=>2,"NoteApproved"=>(!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null));                    
+                    $rejectData = $this->General_model->updateData("db_employees.employees",$dataPost,$conditions);
+                    $message = ($rejectData ? "Successfully":"Failed")." saved.";
+                }else if($data_arr['ACT'] == 0){ //for approved
+                    if(!empty($isExist->Logs)){
+                        $Logs = json_decode($isExist->Logs);
+                        
+                        if(!empty($Logs->Photo)){
+                            $reqPhoto = $Logs->Photo;
+                            $currPhoto = $isExist->Photo;
+                            $folderPCAM = 'uploads/employees/';
+                            if(file_exists($folderPCAM.$currPhoto)){
+                                if(rename($folderPCAM.$reqPhoto, $folderPCAM.$currPhoto)){
+                                    $Logs->Photo = $currPhoto;
+                                }
+                            }                            
+                        }     
+
+                        if(!empty($Logs->MyBank)){
+                            $MyBank = $Logs->MyBank; unset($Logs->MyBank);
+                            foreach ($MyBank as $b) {
+                                if(!empty($b->ID)){
+                                    $conditions['ID'] = $b->ID;
+                                    $updateChild = $this->General_model->updateData("db_employees.employees_bank_account",$b,$conditions);
+                                }else{
+                                    unset($b->ID);
+                                    $insertChild = $this->General_model->insertData("db_employees.employees_bank_account",$b);
+                                }
+                            }
+                        }
+                        if(!empty($Logs->MyFamily)){
+                            $MyFamily = $Logs->MyFamily;unset($Logs->MyFamily);
+                            foreach ($MyFamily as $b) {
+                                if(!empty($b->ID)){
+                                    $conditions['ID'] = $b->ID;
+                                    $updateChild = $this->General_model->updateData("db_employees.employees_family_member",$b,$conditions);
+                                }else{
+                                    unset($b->ID);
+                                    $insertChild = $this->General_model->insertData("db_employees.employees_family_member",$b);
+                                }
+                            }
+                        }
+                        if(!empty($Logs->MyEducation)){
+                            $MyEducation = $Logs->MyEducation;unset($Logs->MyEducation);
+                            foreach ($MyEducation as $b) {
+                                if(!empty($b->ID)){
+                                    $conditions['ID'] = $b->ID;
+                                    $updateChild = $this->General_model->updateData("db_employees.employees_educations",$b,$conditions);
+                                }else{
+                                    unset($b->ID);
+                                    $insertChild = $this->General_model->insertData("db_employees.employees_educations",$b);
+                                }
+                            }
+                        }
+                        if(!empty($Logs->MyEducationNonFormal)){
+                            $MyEducationNonFormal = $Logs->MyEducationNonFormal;unset($Logs->MyEducationNonFormal);
+                            foreach ($MyEducationNonFormal as $b) {
+                                if(!empty($b->ID)){
+                                    $conditions['ID'] = $b->ID;
+                                    $updateChild = $this->General_model->updateData("db_employees.employees_educations_non_formal",$b,$conditions);
+                                }else{
+                                    unset($b->ID);
+                                    $insertChild = $this->General_model->insertData("db_employees.employees_educations_non_formal",$b);
+                                }
+                            }
+                        }
+                        if(!empty($Logs->MyEducationTraining)){
+                            $MyEducationTraining = $Logs->MyEducationTraining;unset($Logs->MyEducationTraining);
+                            foreach ($MyEducationTraining as $b) {
+                                if(!empty($b->ID)){
+                                    $conditions['ID'] = $b->ID;
+                                    $updateChild = $this->General_model->updateData("db_employees.employees_educations_training",$b,$conditions);
+                                }else{
+                                    unset($b->ID);
+                                    $insertChild = $this->General_model->insertData("db_employees.employees_educations_training",$b);
+                                }
+                            }
+                        }
+                        if(!empty($Logs->MyExperience)){
+                            $MyExperience = $Logs->MyExperience;unset($Logs->MyExperience);
+                            foreach ($MyExperience as $b) {
+                                if(!empty($b->ID)){
+                                    $conditions['ID'] = $b->ID;
+                                    $updateChild = $this->General_model->updateData("db_employees.employees_experience",$b,$conditions);
+                                }else{
+                                    unset($b->ID);
+                                    $insertChild = $this->General_model->insertData("db_employees.employees_experience",$b);
+                                }
+                            }
+                        }
+
+                        $Logs->Logs = null;
+                        $Logs->isApproved = null;
+                        $Logs->UpdatedAt = $myNIP."/".$myName;
+                        $updatedPersonalData = $this->General_model->updateData("db_employees.employees",$Logs,$conditions);
+                        $message = (($updatedPersonalData) ? "Successfully":"Failed")." saved.";
+                        $isfinish = $updatedPersonalData;
+
+                    }else{$message = "No data requested.";}
+                }else{$message="Unknow request approved.";}
+            }else{$message="Student data is not founded.";}
+            /*if(!empty($isExist)){
                 if($data_arr['ACT'] == 1){
                     $getTempEmpyReq = $this->General_model->fetchData("db_employees.tmp_employees",$conditions)->row();
                     $dataAppv = array();
@@ -828,7 +931,7 @@ class C_employees extends HR_Controler {
                     $message = (($updateTempStd) ? "Successfully":"Failed")." saved." ;
                     $isfinish = $updateTempStd;
                 }
-            }else{$message="Student data is not founded.";}
+            }else{$message="Student data is not founded.";}*/
             $json = array("message"=>$message,"finish"=>$isfinish);
         }
 
@@ -1096,7 +1199,7 @@ class C_employees extends HR_Controler {
             if(!empty($data['eduLevel'])){
                 for ($i=0; $i < count($data['eduLevel']); $i++) { 
                     if(!empty($data['eduLevel'][$i])){
-                        $dataPostEdu = array("NIP"=>$data['NIP'],"levelEduID"=>$data['eduLevel'][$i], "instituteName"=>$data['eduInstitute'][$i], "location"=>$data['eduCC'][$i], "major"=>$data['eduMajor'][$i], "graduation"=>$data['eduGraduation'][$i], "gpa"=>$data['eduGPA'][$i] );
+                        $dataPostEdu = array("NIP"=>$data['NIP'],"levelEduID"=>$data['eduLevel'][$i], "instituteName"=>$data['eduInstitute'][$i], "location"=>$data['eduCC'][$i], "major"=>$data['eduMajor'][$i], "graduation"=>$data['eduGraduation'][$i], "gpa"=>$data['eduGPA'][$i], "Note"=>$data['Note'][$i] );
                         if(!empty($data['eduID'][$i])){
                             //update
                             $update = $this->General_model->updateData("db_employees.employees_educations",$dataPostEdu,array("ID"=>$data['eduID'][$i]));
@@ -1271,7 +1374,7 @@ class C_employees extends HR_Controler {
                     if(empty($isMasterCompany)){
                         $insertCompany = $this->General_model->insertData("db_employees.master_company",array("Name"=>$data['comName'][$i],"IsActive"=>1,"IndustryID"=>$data['comIndustry'][$i]));
                     }*/
-                    $dataPost = array("NIP"=>$data['NIP'],"company"=>$data['comName'][$i],"industryID"=>$data['comIndustry'][$i], "start_join"=>$data['comStartJoin'][$i], "end_join"=>$data['comEndJoin'][$i], "jobTitle"=>$data['comJobTitle'][$i], "reason"=>$data['comReason'][$i] );
+                    $dataPost = array("NIP"=>$data['NIP'],"company"=>$data['comName'][$i],"industryID"=>$data['comIndustry'][$i], "start_join"=>$data['comStartJoin'][$i], "end_join"=>$data['comEndJoin'][$i], "jobTitle"=>$data['comJobTitle'][$i], "reason"=>$data['comReason'][$i], "Note"=>$data['Note'][$i] );
                     if(!empty($data['comID'][$i])){
                         $update = $this->General_model->updateData("db_employees.employees_experience",$dataPost,array("ID"=>$data['comID'][$i]));
                         $message = (($update) ? "Successfully":"Failed")." updated.";

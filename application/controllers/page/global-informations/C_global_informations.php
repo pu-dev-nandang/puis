@@ -308,7 +308,7 @@ class C_global_informations extends Globalclass {
     		$nestedData = array();    		
     		$nestedData[] = ($no++);
     		$nestedData[] = $lecturerBox;
-    		$nestedData[] = (!empty($v->PlaceOfBirth) ? $v->PlaceOfBirth.', ' : '').date("d F Y",strtotime($v->DateOfBirth));
+    		//$nestedData[] = (!empty($v->PlaceOfBirth) ? $v->PlaceOfBirth.', ' : '').date("d F Y",strtotime($v->DateOfBirth));
     		$nestedData[] = $v->EmpReligion;
     		$nestedData[] = (!empty($v->Gender) ? (($v->Gender == "L") ? "Male":"Female") : "");
     		$nestedData[] = $v->EmpLevelDesc;
@@ -474,15 +474,15 @@ class C_global_informations extends Globalclass {
             }
 
     		$empBox = '<div class="detail-user" data-user="'.$v->ID.'"> 
-    						<img class="std-img img-rounded" src="'.$srcImg.'">
-    						<p class="nip">'.$v->NIP.'</p>
-    						<p class="name">'.$v->Name.'</p>
-    						<p class="email"><i class="fa fa-envelope-o"></i> '.(!empty($v->EmailPU) ? $v->EmailPU : "-").'</p>
-    					   </div>';
+						<img class="std-img img-rounded" src="'.$srcImg.'">
+						<p class="nip">'.$v->NIP.'</p>
+						<p class="name">'.$v->Name.'</p>
+						<p class="email"><i class="fa fa-envelope-o"></i> '.(!empty($v->EmailPU) ? $v->EmailPU : "-").'</p>
+					   </div>';
     		$nestedData = array();    		
     		$nestedData[] = ($no++);
     		$nestedData[] = $empBox;
-    		$nestedData[] = (!empty($v->PlaceOfBirth) ?$v->PlaceOfBirth.', ':'' ).date("d F Y",strtotime($v->DateOfBirth)).(!empty($v->isMyBirthday) ? "<p class='bday'>It's My Birthday</p>" : "");
+    		//$nestedData[] = (!empty($v->PlaceOfBirth) ?$v->PlaceOfBirth.', ':'' ).date("d F Y",strtotime($v->DateOfBirth)).(!empty($v->isMyBirthday) ? "<p class='bday'>It's My Birthday</p>" : "");
     		$nestedData[] = "<center>".$v->EmpReligion.'</center>';
     		$nestedData[] = "<center>".(!empty($v->Gender) ? (($v->Gender == "L") ? "Male":"Female") : "").'</center>';
     		$nestedData[] = $v->EmpLevelEduName;

@@ -51,6 +51,7 @@
                                         <th>End Join</th>
                                         <th>Job Title</th>
                                         <th>Reason Exit</th>
+                                        <th>Note</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -75,6 +76,7 @@
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control exp-reason required" required name="comReason[]">
                                         <small class="text-danger text-message"></small></td>
+                                        <td><textarea class="form-control exp-Note" name="Note[]" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>

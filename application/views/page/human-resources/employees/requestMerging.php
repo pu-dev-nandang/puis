@@ -946,7 +946,7 @@
 			var NIP = itsme.data("nip");
 			var NOTE = $("#form-approval-req textarea[name=note]").val();
 			var isvalid = false;
-			if(ACT == 3){
+			if(ACT == 2){
 			    console.log("reject");
 			    if($.trim(NOTE) == ''){
 			          console.log("isi:"+$(this).val());
@@ -958,7 +958,7 @@
 			          $("#form-approval-req textarea[name=note]").removeClass("error");
 			          $("#form-approval-req textarea[name=note]").parent().find(".message-error").text("");
 			    }
-			}else if(ACT == 1){
+			}else if(ACT == 0){
 			    isvalid = true;
 			}     
 
@@ -972,7 +972,7 @@
 		          var token = jwt_encode(data,'UAP)(*');
 		          $.ajax({
 		              type : 'POST',
-		              url : base_url_js+"database/lecturers/req-appv",
+		              url : base_url_js+"human-resources/employee-request-appv",
 		              data: {token:token},
 		              dataType : 'json',
 		              beforeSend:function(){
@@ -1019,7 +1019,6 @@
 				});
 			});
 		});
-
 		
 	});
 </script>

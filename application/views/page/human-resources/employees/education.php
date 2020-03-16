@@ -45,6 +45,7 @@
                                         <td>Major</td>
                                         <td>Graduation Year</td>
                                         <td>GPA</td>
+                                        <td>Note</td>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -70,6 +71,7 @@
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control edu-gpa" name="eduGPA[]">
                                         <small class="text-danger text-message"></small></td>
+                                        <td><textarea class="form-control edu-Note" name="Note[]" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
