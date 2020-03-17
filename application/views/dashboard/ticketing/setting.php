@@ -78,6 +78,10 @@
         </div>
     </div>
 </div>
+<div id = "pageAuthDashboard" style="margin-top: 10px;">
+  
+</div>
+<script type="text/javascript" src="<?php echo base_url('js/ticketing/Class_setting.js'); ?>"></script>
 <script type="text/javascript">
     var oTable;
     var oTable2;
@@ -482,77 +486,129 @@
         },
     };
 
-$(document).ready(function(){
-    var selectorDepartment = $('#SelectDepartmentID');
-    LoadSelectOptionDepartmentFiltered(selectorDepartment);
-    var firstLoad = setInterval(function () {
-        var SelectDepartmentID = $('#SelectDepartmentID').val();
-        if(SelectDepartmentID!='' && SelectDepartmentID!=null && SelectDepartmentID !='' && SelectDepartmentID!=null){
-            App_ticketing_setting_category.Loaded();
-            App_ticketing_setting_admin.Loaded();
+    $(document).ready(function(){
+        var selectorDepartment = $('#SelectDepartmentID');
+        LoadSelectOptionDepartmentFiltered(selectorDepartment);
+        var firstLoad = setInterval(function () {
+            var SelectDepartmentID = $('#SelectDepartmentID').val();
+            if(SelectDepartmentID!='' && SelectDepartmentID!=null && SelectDepartmentID !='' && SelectDepartmentID!=null){
+                App_ticketing_setting_category.Loaded();
+                App_ticketing_setting_admin.Loaded();
+                clearInterval(firstLoad);
+            }
+        },1000);
+        setTimeout(function () {
             clearInterval(firstLoad);
+        },5000);
+    });
+
+    $(document).off('change', '#SelectDepartmentID').on('change', '#SelectDepartmentID',function(e) {
+        var getValue = $(this).find('option:selected').val();
+        var setDepartment = UpdateVarDepartmentID(getValue);
+        if (setDepartment) {
+            oTable.ajax.reload( null, false );
+            oTable2.ajax.reload( null, false );
         }
-    },1000);
-    setTimeout(function () {
-        clearInterval(firstLoad);
-    },5000);
-});
+    })
 
-$(document).off('change', '#SelectDepartmentID').on('change', '#SelectDepartmentID',function(e) {
-    var getValue = $(this).find('option:selected').val();
-    var setDepartment = UpdateVarDepartmentID(getValue);
-    if (setDepartment) {
-        oTable.ajax.reload( null, false );
-        oTable2.ajax.reload( null, false );
+    $(document).off('click', '.btn-add-category').on('click', '.btn-add-category',function(e) {
+        App_ticketing_setting_category.ModalForm();
+    })
+
+    $(document).off('click', '#ModalbtnSaveForm').on('click', '#ModalbtnSaveForm',function(e) {
+        var selector = $(this);
+        var action = $(this).attr('action');
+        var data_id = $(this).attr('data-id');
+        App_ticketing_setting_category.ActionData(selector,action,data_id);
+    })
+
+    $(document).off('click','.btnRemove').on('click','.btnRemove',function(e){
+        var selector = $(this);
+        var data_id = $(this).attr('data-id');
+        App_ticketing_setting_category.ActionData(selector,'delete',data_id);
+    })
+
+    $(document).off('click','.btnEdit').on('click','.btnEdit',function(e){
+        var ID = $(this).attr('data-id');
+        var Token = $(this).attr('data');
+        var data = jwt_decode(Token);
+       App_ticketing_setting_category.ModalForm('Form Category','edit',ID,data);
+    })
+
+    $(document).off('click', '.btn-add-admin').on('click', '.btn-add-admin',function(e) {
+        App_ticketing_setting_admin.ModalForm();
+    })
+
+    $(document).off('click', '#ModalbtnSaveFormAdmin').on('click', '#ModalbtnSaveFormAdmin',function(e) {
+        var selector = $(this);
+        var action = $(this).attr('action');
+        var data_id = $(this).attr('data-id');
+        App_ticketing_setting_admin.ActionData(selector,action,data_id);
+    })
+
+    $(document).off('click','.btnRemoveAdmin').on('click','.btnRemoveAdmin',function(e){
+        var selector = $(this);
+        var data_id = $(this).attr('data-id');
+        App_ticketing_setting_admin.ActionData(selector,'delete',data_id);
+    })
+
+    $(document).off('click','.btnEditAdmin').on('click','.btnEditAdmin',function(e){
+        var ID = $(this).attr('data-id');
+        var Token = $(this).attr('data');
+        var data = jwt_decode(Token);
+        App_ticketing_setting_admin.ModalForm('Form Admin','edit',ID,data);
+    })
+
+</script>
+
+<script type="text/javascript">
+  let oTable3;
+  let App_setting;
+  $(document).ready(function(e){
+    App_setting = new Class_setting(DepartmentID);
+    if (DepartmentID == 'NA.12') {
+      let selectorPage = $('#pageAuthDashboard');
+      App_setting.pageAuthDashboard().writeHtml(selectorPage).insertJs(() => {
+           let selector = $('#Tblticket_setting_dashboard');
+           App_setting.LoadTable_setting_dashboard(selector);
+      });
     }
-})
+  })
 
-$(document).off('click', '.btn-add-category').on('click', '.btn-add-category',function(e) {
-    App_ticketing_setting_category.ModalForm();
-})
+  $(document).off('click','.btn-add-person').on('click','.btn-add-person',function(e){
+      App_setting.ModalAddAuthDashboard('add','').insertJs(() => {
+        let selector = $(".showAutoComplete");
+        App_setting.__AutoCompleteEmployee(selector);
+      });
+  })
 
-$(document).off('click', '#ModalbtnSaveForm').on('click', '#ModalbtnSaveForm',function(e) {
-    var selector = $(this);
-    var action = $(this).attr('action');
-    var data_id = $(this).attr('data-id');
-    App_ticketing_setting_category.ActionData(selector,action,data_id);
-})
+  $(document).off('click','.btnEditDashboard').on('click','.btnEditDashboard',function(e){
+    let ID = $(this).attr('data-id');
+    let data = jwt_decode($(this).attr('data'));
+    App_setting.ModalAddAuthDashboard('edit',data['ID']).insertJs(() => {
+      let selector = $(".showAutoComplete");
+      for(var key in data) {
+          $('.input[name="'+key+'"]').val(data[key]);
+          if (key == 'NIP') {
+             $('.input[name="'+key+'"]').attr('selectedtext',data['NameAdmin']);
+             selector.val(data['NameAdmin']);
+          }
+      }
+      App_setting.__AutoCompleteEmployee(selector);
+    });
+  })
 
-$(document).off('click','.btnRemove').on('click','.btnRemove',function(e){
-    var selector = $(this);
-    var data_id = $(this).attr('data-id');
-    App_ticketing_setting_category.ActionData(selector,'delete',data_id);
-})
+  $(document).off('click','#ModalbtnSaveFormDashboard').on('click','#ModalbtnSaveFormDashboard',function(e) {
+    let selector = $(this);
+    let action = selector.attr('action');
+    let ID = selector.attr('data-id');
+    App_setting.Submit(selector,action,ID);
+  })
 
-$(document).off('click','.btnEdit').on('click','.btnEdit',function(e){
-    var ID = $(this).attr('data-id');
-    var Token = $(this).attr('data');
-    var data = jwt_decode(Token);
-   App_ticketing_setting_category.ModalForm('Form Category','edit',ID,data);
-})
-
-$(document).off('click', '.btn-add-admin').on('click', '.btn-add-admin',function(e) {
-    App_ticketing_setting_admin.ModalForm();
-})
-
-$(document).off('click', '#ModalbtnSaveFormAdmin').on('click', '#ModalbtnSaveFormAdmin',function(e) {
-    var selector = $(this);
-    var action = $(this).attr('action');
-    var data_id = $(this).attr('data-id');
-    App_ticketing_setting_admin.ActionData(selector,action,data_id);
-})
-
-$(document).off('click','.btnRemoveAdmin').on('click','.btnRemoveAdmin',function(e){
-    var selector = $(this);
-    var data_id = $(this).attr('data-id');
-    App_ticketing_setting_admin.ActionData(selector,'delete',data_id);
-})
-
-$(document).off('click','.btnEditAdmin').on('click','.btnEditAdmin',function(e){
-    var ID = $(this).attr('data-id');
-    var Token = $(this).attr('data');
-    var data = jwt_decode(Token);
-    App_ticketing_setting_admin.ModalForm('Form Admin','edit',ID,data);
-})
-
+  $(document).off('click','.btnRemoveDashboard').on('click','.btnRemoveDashboard',function(e){
+    let selector = $(this);
+    let action = 'delete';
+    let ID = selector.attr('data-id');
+    App_setting.Submit(selector,action,ID);
+  })
 </script>

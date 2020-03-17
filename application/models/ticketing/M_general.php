@@ -189,9 +189,14 @@ class M_general extends CI_Model {
             $query=$this->db->query($sql, array())->result_array();
             return $query;
         }
-        else
+        elseif(array_key_exists('search', $dataToken))
         {
-            return array();
+            $search = $dataToken['search'];
+            $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a
+              where (a.Name like "%'.$search.'%" or a.NIP like "%'.$search.'%" ) and a.StatusEmployeeID > 0
+              ';
+            $query=$this->db->query($sql, array())->result_array();
+            return $query;
         }
         
     }

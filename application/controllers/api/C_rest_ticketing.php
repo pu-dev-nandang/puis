@@ -120,6 +120,7 @@ class C_rest_ticketing extends CI_Controller {
     public function CRUDAdmin(){
       try {
         $dataToken = $this->getInputToken();
+        $dataToken = json_decode(json_encode($dataToken),true);
         $action = $dataToken['action'];
         switch ($action) {
           case 'read':
@@ -137,6 +138,28 @@ class C_rest_ticketing extends CI_Controller {
           case 'edit' : 
              $rs = $this->m_setting->ActionTable('edit',$dataToken,'db_ticketing.admin_register');
              echo json_encode($rs);
+            break;
+          case 'read_auth_dashboard' : 
+             $rs = $this->m_setting->LoadDataAuthDashboard($dataToken);
+             echo json_encode($rs);
+            break;
+          case 'auth_dashboard' : 
+             $subdata = $dataToken['subdata'];
+             $actionSubdata = $subdata['action'];
+             switch ($actionSubdata) {
+               case 'edit':
+                 $rs = $this->m_setting->ActionTable('edit',$subdata,'db_ticketing.auth_dashboard');
+                 echo json_encode($rs);
+                 break;
+               case 'add':
+                 $rs = $this->m_setting->ActionTable('add',$subdata,'db_ticketing.auth_dashboard');
+                 echo json_encode($rs);
+                 break;
+                case 'delete' : 
+                   $rs = $this->m_setting->ActionTable('remove',$subdata,'db_ticketing.auth_dashboard');
+                   echo json_encode($rs);
+                  break;
+             }
             break;
         }
         // end switch
