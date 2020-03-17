@@ -2058,6 +2058,54 @@ class M_rest extends CI_Model {
         return $data;
     }
 
+
+    public function getRangeDateLearningOnlinePerSession($ScheduleID,$Session){
+
+        $data = $this->getRangeDateLearningOnline($ScheduleID);
+
+        $result = [];
+        for($i=0;$i<count($data);$i++){
+            if($data[$i]['Session']==$Session){
+
+                // Comment
+                $data[$i]['TotalComment'] = $this->db->query('SELECT COUNT(*) AS Total 
+                                                    FROM db_academic.counseling_comment cc 
+                                                    LEFT JOIN db_academic.counseling_topic ct ON (ct.ID = cc.TopicID)
+                                                    WHERE ct.ScheduleID = "'.$ScheduleID.'"
+                                                    AND ct.Sessions = "'.$Session.'" ')->result_array()[0]['Total'];
+
+                // cek apakah topik sudah dibuat atau blm
+                $data[$i]['CheckTopik'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.counseling_topic ct 
+                                                                        WHERE ct.ScheduleID = "'.$ScheduleID.'"
+                                                                        AND ct.Sessions = "'.$Session.'" ')->result_array()[0]['Total'];
+
+                // Task
+                $data[$i]['TotalTask'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task_student std
+                                                                    LEFT JOIN db_academic.schedule_task st ON (st.ID = std.IDST)
+                                                                    WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                                     AND st.Session = "'.$Session.'" ')->result_array()[0]['Total'];
+
+                // cek apakah task sudah dibuat atau blm
+                $data[$i]['CheckTask'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task st
+                                                                    WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                                     AND st.Session = "'.$Session.'" ')->result_array()[0]['Total'];
+
+                // Material
+                $data[$i]['dataMaterial'] = $this->db->query('SELECT sm.File FROM db_academic.schedule_material sm 
+                                                                    WHERE sm.ScheduleID = "'.$ScheduleID.'"
+                                                                     AND sm.Session = "'.$Session.'" ')->result_array();
+
+
+                $result = $data[$i];
+
+                break;
+            }
+        }
+
+        return $result;
+
+    }
+
     public function getRangeDateLearningOnline($ScheduleID){
 
         $dataSch = $this->db->query('SELECT d.NumberOfDay, ay.kuliahStart , ay.utsEnd FROM db_academic.schedule_details sd 
@@ -2125,6 +2173,21 @@ class M_rest extends CI_Model {
             }
         }
         return $result;
+    }
+
+    public function getAllLecturerByScheduleID($ScheuldeID){
+
+        $data = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.schedule s 
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                            WHERE s.ID = "'.$ScheuldeID.'"
+                                             UNION ALL 
+                                             SELECT em.NIP, em.Name FROM db_academic.schedule_team_teaching stt
+                                             LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                             WHERE stt.ScheduleID = "'.$ScheuldeID.'"
+                                             ')->result_array();
+
+        return $data;
+
     }
 
 }
