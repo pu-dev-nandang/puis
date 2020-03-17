@@ -873,65 +873,6 @@ class C_employees extends HR_Controler {
                     }else{$message = "No data requested.";}
                 }else{$message="Unknow request approved.";}
             }else{$message="Student data is not founded.";}
-            /*if(!empty($isExist)){
-                if($data_arr['ACT'] == 1){
-                    $getTempEmpyReq = $this->General_model->fetchData("db_employees.tmp_employees",$conditions)->row();
-                    $dataAppv = array();
-                    if(empty($getTempEmpyReq->Photo)){
-                        unset($getTempEmpyReq->Photo);
-                    }else{
-                        $imgReq = $getTempEmpyReq->pathPhoto."uploads/profile/".$getTempEmpyReq->Photo;
-                        $ch = curl_init($imgReq);
-                        $fp = fopen('./uploads/employees/'.$getTempEmpyReq->Photo, 'wb');
-                        curl_setopt($ch, CURLOPT_FILE, $fp);
-                        curl_setopt($ch, CURLOPT_HEADER, 0);
-                        curl_exec($ch);
-                        curl_close($ch);
-                        fclose($fp);
-
-                        //remove picture
-                        $tmp_pic = $_SERVER['DOCUMENT_ROOT'].'/lecturer/uploads/profile/'.$getTempEmpyReq->Photo;
-                        unlink($tmp_pic);
-
-                        $dataAppv["Photo"] = null;
-                    }
-                    unset($getTempEmpyReq->ID);
-                    unset($getTempEmpyReq->NIP);
-                    unset($getTempEmpyReq->isApproval);
-                    unset($getTempEmpyReq->note);
-                    unset($getTempEmpyReq->created);
-                    unset($getTempEmpyReq->createdby);
-                    unset($getTempEmpyReq->edited);
-                    unset($getTempEmpyReq->editedby);
-                    unset($getTempEmpyReq->pathPhoto);
-                    $getTempEmpyReq->UpdatedBy = $myNIP.'/'.$myName;
-
-                    $updateTA = $this->General_model->updateData("db_employees.employees",$getTempEmpyReq,$conditions);
-                    if($updateTA){
-                        //check if has a different birthdate between old and new
-                        if($isExist->DateOfBirth != $getTempEmpyReq->DateOfBirth){
-                            //update birthdate-pass on auth student
-                            $updateOldPass = $this->General_model->updateData("db_employees.employees",array("Password_old"=>date("dmy",strtotime($getTempEmpyReq->DateOfBirth))),$conditions);
-                        }
-
-                        //update status table temp_student
-                        $dataAppv['isApproval'] = 2;
-                        $dataAppv['note'] = (!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null);
-                        $dataAppv['editedby'] = $myName;
-                        $updateTempStd = $this->General_model->updateData("db_employees.tmp_employees",$dataAppv,$conditions);
-                        $message = (($updateTempStd) ? "Successfully":"Failed")." saved.";
-                        $isfinish = $updateTempStd;
-                    }else{
-                        $message = "Failed saved data. Try again.";
-                    }
-
-                }else{
-                    //update status Rejected table temp_student
-                    $updateTempStd = $this->General_model->updateData("db_employees.tmp_employees",array("isApproval"=>$data_arr['ACT'],"note"=>(!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null),"editedby"=>$myName),$conditions);
-                    $message = (($updateTempStd) ? "Successfully":"Failed")." saved." ;
-                    $isfinish = $updateTempStd;
-                }
-            }else{$message="Student data is not founded.";}*/
             $json = array("message"=>$message,"finish"=>$isfinish);
         }
 
@@ -1447,6 +1388,8 @@ class C_employees extends HR_Controler {
                 $isExist->MyEducationTraining = $this->General_model->fetchData("db_employees.employees_educations_training",array("NIP"=>$isExist->NIP))->result();
                 $isExist->MyFamily = $this->General_model->fetchData("db_employees.employees_family_member",array("NIP"=>$isExist->NIP))->result();
                 $isExist->MyExperience = $this->General_model->fetchData("db_employees.employees_experience",array("NIP"=>$isExist->NIP))->result();
+                $isExist->MyBPJS = $this->General_model->fetchData("db_employees.employees_bpjs",array("NIP"=>$isExist->NIP),"Type","asc")->result();
+                $isExist->MyAllowance = $this->General_model->fetchData("db_employees.employees_allowance",array("NIP"=>$isExist->NIP))->result();
                 $json = $isExist;
             }
         }
@@ -1471,7 +1414,266 @@ class C_employees extends HR_Controler {
         echo json_encode($json);
     }
 
-    /*END ADDED BY FEBI @ FEB 2020*/
 
+    public function credentialBenefitSave(){
+        $data = $this->input->post();
+        if($data){
+            $action = $data['action'];unset($data['action']);
+            $message = "";
+            $conditions = array("NIP"=>$data['NIP']);
+            $isExist = $this->General_model->fetchData("db_employees.employees",$conditions)->row();
+            if(empty($isExist)){show_404();}
+            
+            if($action == "BPJS"){
+                if(!empty($data['CardNumber'])){
+                    $isvalid = false;
+                    for ($i=0; $i < count($data['CardNumber']) ; $i++) { 
+                        if(!empty($data['CardNumber'][$i]) && !empty($data['NIP'])){
+                            $dataPost = array("NIP"=>$data['NIP'],"CardNumber"=>$data['CardNumber'][$i],"Type"=>$data['Type'][$i],"CutsEmployer"=>$data['CutsEmployer'][$i],"CutsEmployee"=>$data['CutsEmployee'][$i]);
+                            
+                            //check card number on employee
+                            if(!empty($data['Type'][$i])){
+                                $bpjsType = "";
+                                switch ($data['Type'][$i]) {
+                                case 1:
+                                    $bpjsType = "IDBpjstk";
+                                    break;
+                                case 2:
+                                    $bpjsType = "IDBpjspensiun";
+                                    break;
+                                case 3:
+                                    $bpjsType = "IDBpjskesehatan";
+                                    break;                                
+                                default:
+                                    $bpjsType = "";
+                                    break;
+                                }
+                                if(!empty($bpjsType)){
+                                    $conditions[$bpjsType] = $data['CardNumber'][$i];
+                                    $isExistCard = $this->General_model->fetchData("db_employees.employees",$conditions)->row();
+                                    if(!empty($isExistCard)){
+                                        $isvalid = true;
+                                        unset($conditions[$bpjsType]);
+                                    }
+                                }
+                            }
+
+                            if($isvalid){
+                                $conditions['CardNumber'] = $data['CardNumber'][$i];
+                                $isExistBPJS = $this->General_model->fetchData("db_employees.employees_bpjs",$conditions)->row();
+                                if(!empty($isExistBPJS)){
+                                    //update
+                                    $update = $this->General_model->updateData("db_employees.employees_bpjs",$dataPost,$conditions);
+                                    $message = (($update) ? "Successfully":"Failed")." updated.";
+                                }else{
+                                    //insert
+                                    $insert = $this->General_model->insertData("db_employees.employees_bpjs",$dataPost);
+                                    $message = (($insert) ? "Successfully":"Failed")." saved.";
+                                }
+                                unset($conditions['CardNumber']);
+                            }else{$message="Card Number [".$data['CardNumber'][$i]."] is not exist.";}
+                        }else{$message = "No post data.";}
+                    }
+                }else{$message = "There's no post data on BPJS.";}
+            }else if($action = "ALLOWANCE"){
+                if(!empty($data['Allowance'])){
+                    for ($a=0; $a < count($data['Allowance']); $a++) { 
+                        $dataPost = array("NIP"=>$data['NIP'],"Allowance"=>$data['Allowance'][$a],"Price"=>$data['Price'][$a],"Note"=>$data['Note'][$a]);
+                        if(!empty($data['ID'][$a])){
+                            $execute = $this->General_model->updateData("db_employees.employees_allowance",$dataPost,array("ID"=>$data['ID']));
+                        }else{
+                            $execute = $this->General_model->insertData("db_employees.employees_allowance",$dataPost);
+                        }
+                        $message = (($execute) ? "Successfully":"Failed")." saved.";
+                    }
+                }else{$message = "There's no post data on Allowance.";}
+            }
+
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('human-resources/employees/credential-benefit/'.$data['NIP']));
+        }else{show_404();}
+    }
+
+
+
+    public function attendanceTemp(){
+        $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","IDStatus != '-2'","IDStatus","asc")->result();
+        $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
+        $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+        $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
+        $data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+
+        $department = parent::__getDepartement();
+        $page = $this->load->view('page/'.$department.'/attendance-temp/index',$data,true);
+        $this->temp($page);
+    }
+
+
+    public function fetchAttdTempEmp(){
+        $reqdata = $this->input->post();
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $param = array();$orderBy=" em.ID DESC ";
+
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+
+                $param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);
+                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' ","filter"=>"OR",);
+                $param[] = array("field"=>"em.NIDN","data"=>" like '%".$search."%' )","filter"=>"OR",);
+            }
+            if(!empty($data_arr['Filter'])){
+                $parse = parse_str($data_arr['Filter'],$output);
+
+                //check data emp if lecturers
+                if(!empty($output['isLecturer'])){
+                    $divLect = '14';
+                    $param[] = array("field"=>"(em.PositionMain","data"=>" like'".$divLect.".%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"em.PositionOther1","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther2","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther3","data"=>" like'".$divLect.".%' )","filter"=>"OR",);
+                    if( !empty($output['position'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$divLect.".".$output['position']."' ","filter"=>"AND",);
+                    }
+                    if(!empty($output['status'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['status']) == 1){
+                            $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['status'] as $s) {
+                                $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                    if(!empty($output['study_program'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['study_program']) == 1){
+                            $param[] = array("field"=>"em.ProdiID","data"=>" ='".$output['study_program'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['study_program'] as $s) {
+                                $param[] = array("field"=>"em.ProdiID","data"=>" ='".$s."' ".((($sn < count($output['study_program'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                }
+                //check data for employee
+                else{
+                    if(!empty($output['division'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);
+                    }
+                    if( !empty($output['division']) && !empty($output['position'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);
+                    }
+
+                    if(!empty($output['status'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['status']) == 1){
+                            $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['status'] as $s) {
+                                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                }
+
+                if(!empty($output['staff'])){
+                    $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"ps.NameEng","data"=>" like '%".$output['staff']."%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.Name","data"=>" like '%".$output['staff']."%' )","filter"=>"OR",);
+                }
+                if(!empty($output['religion'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['religion']) == 1){
+                        $param[] = array("field"=>"em.ReligionID","data"=>" ='".$output['religion'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['religion'] as $s) {
+                            $param[] = array("field"=>"em.ReligionID","data"=>" ='".$s."' ".((($sn < count($output['religion'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['gender'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['gender']) == 1){
+                        $param[] = array("field"=>"em.Gender","data"=>" ='".$output['gender'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['gender'] as $s) {
+                            $param[] = array("field"=>"em.Gender","data"=>" ='".$s."' ".((($sn < count($output['gender'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['level_education'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['level_education']) == 1){
+                        $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$output['level_education'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['level_education'] as $s) {
+                            $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$s."' ".((($sn < count($output['level_education'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+
+                if(!empty($output['attendance_start'])){
+                    if(!empty($output['attendance_end'])){
+                        $param[] = array("field"=>"(DATE(lem.AccessedOn)","operate"=>" >= ","data"=>"'".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                        $param[] = array("field"=>"DATE(lem.AccessedOn)","operate"=>" <= ","data"=>"'".date("Y-m-d",strtotime($output['attendance_end']))."' )","filter"=>"AND",);
+                    }else{
+                        $param[] = array("field"=>"DATE(lem.AccessedOn)","operate"=>" >= ","data"=>"'".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                    }
+                }else{
+                    $param[] = array("field"=>"DATE(lem.AccessedOn)","operate"=>"=","data"=>"'".date("Y-m-d")."' ","filter"=>"AND",);
+                }
+
+                if(!empty($output['sorted'])){
+                    $orderBy = $output['sorted'];
+                }
+            }
+
+            $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
+            $TotalData = (!empty($totalData) ? $totalData->Total : 0);
+            if(!empty($reqdata['start']) && !empty($reqdata['length'])){
+                $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+            }else{
+                $result = $this->m_hr->fetchEmployee(false,$param)->result();
+            }
+
+            $json_data = array(
+                "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
+                "recordsTotal"    => intval($TotalData),
+                "recordsFiltered" => intval($TotalData),
+                "data"            => (!empty($result) ? $result : 0)
+            );
+
+        }else{$json_data=null;}
+        $response = $json_data;
+        echo json_encode($response);
+    }
+
+    /*END ADDED BY FEBI @ FEB 2020*/
 
 }

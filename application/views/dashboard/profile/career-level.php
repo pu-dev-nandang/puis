@@ -9,10 +9,10 @@
             changeMonth: true
         });
         $("#select2-career,#select2SD-career").select2({width:'100%'});
-        var employeeTags = employees();
+        /*var employeeTags = employees();
         $( "#autocomplete-career" ).autocomplete({
           source: employeeTags
-        });
+        });*/
 
         $("#form-additional-info .btn-submit").click(function(){
             var itsme = $(this);
@@ -99,9 +99,7 @@
                             var cc = $cloneRow.find(".select2-sd").attr("id","select2SD-career-"+num);
                             cc.prev().remove();
                             cc.prop("disabled",false);
-                            cc.select2({width:'100%'});
-                            console.log("ehey");
-                             
+                            cc.select2({width:'100%'});                             
                         }
                     });
                     
@@ -308,9 +306,11 @@
             ]);
         });
         <?php } } ?>
+
+        $("#form-additional-info").find(".form-control").prop("disabled","disabled");
     });
 </script>
-<div id="form-additional-info" action="<?=base_url('human-resources/employees/career-level-save')?>" method="post" autocomplete="off">
+<form id="form-additional-info" action="<?=base_url('human-resources/employees/career-level-save')?>" method="post" autocomplete="off">
     <input type="hidden" name="NIP" value="<?=$NIP?>">
     <div class="panel panel-primary">
         <div class="panel-heading">
@@ -321,16 +321,6 @@
                 <div class="col-sm-12">
                     <div class="panel panel-default" id="multiple-field" data-source="join">
                         <div class="panel-heading">
-                            <div class="pull-right">
-                                <div class="btn-group">
-                                    <button class="btn btn-default btn-xs btn-add" type="button">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
-                                    <button class="btn btn-default btn-xs btn-remove" type="button">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
                             <h4 class="panel-title">
                                 Historical of Employment Status
                             </h4>
@@ -373,16 +363,6 @@
         		<div class="col-sm-12">
         			<div class="panel panel-default" id="multiple-field" data-source="career">
         				<div class="panel-heading">
-        					<div class="pull-right">
-                                <div class="btn-group">
-                                    <button class="btn btn-default btn-xs btn-add" type="button">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
-                                    <button class="btn btn-default btn-xs btn-remove" type="button">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-                                </div>
-                            </div>
         					<h4 class="panel-title">Career Level</h4>
         				</div>
         				<div class="panel-body">
@@ -454,4 +434,4 @@
         	</div>
         </div>
     </div>
-</div>
+</form>

@@ -119,7 +119,7 @@
 		      'draggable': true,
 	      	  'exportFilename': 'PU-Stuctured-Organization'
 		    });
-		}else{}
+		}
 
 	    $('#btn-filter-node').on('click', function() {
 	      filterNodes($('#key-word').val());

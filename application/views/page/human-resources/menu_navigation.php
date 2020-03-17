@@ -78,6 +78,14 @@
 
                     </ul>
             </li>
+
+
+            <li class="<?php if($this->uri->segment(2)=='attendance-temp'){echo"current";}?>">
+                <a href="<?php echo base_url('human-resources/attendance-temp');?>">
+                    <i class="fa fa-sign-in"></i>
+                    Attendance Temporary
+                </a>
+            </li>
             <!-- END ADDED BY FEBRI @ FEB 2020 -->
 
 

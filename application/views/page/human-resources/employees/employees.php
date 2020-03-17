@@ -156,6 +156,7 @@
           <div class="form-group" style="padding-top:22px">
             <button class="btn btn-primary btn-filter" type="button"><i class="fa fa-search"></i> Search</button>
             <a class="btn btn-default" href="">Clear Filter</a>
+            <button class="btn btn-default pull-right" type="button" id="btn-need-appv" data-status="close"><i class="fa fa-warning"></i> Need approval for request biodata</button>
           </div>
           
         </form>
@@ -212,11 +213,6 @@
 <!-- END ADDED BY FEBRI @ DEC 2019 -->
 
 <!-- UPDATED BY FEBRI @ JAN 2019 -->
-<div class="row">
-    <div class="col-md-12">
-        <button class="btn btn-default" type="button" id="btn-need-appv" data-status="close"><i class="fa fa-warning"></i> Need approval for request biodata</button>
-    </div>
-</div>
 <div class="row" style="margin-top: 10px">
     <div class="col-md-12">
       <div class="panel panel-default">

@@ -101,7 +101,7 @@
     </div>
     
     <div class="row">
-        <div class="col-sm-12"> <?php echo $page; ?> </div>
+        <div class="col-sm-12"> <?=$page; ?> </div>
     </div>
 </div>
 

@@ -1,7 +1,7 @@
 <script type="text/javascript">
     $(document).ready(function(){
-        $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
-        $("#form-employee .tabulasi-emp > ul > li.nv-edu").addClass("active");
+        $("#form-employee .navigation-tabs ul > li").removeClass("active");
+        $("#form-employee .navigation-tabs ul > li.nv-edu").addClass("active");
         $("#datePicker-non-educations,#datePickerSD-non-educations,#datePicker-training,#datePickerSD-training").datepicker({
             dateFormat: 'yy-mm-dd',
             changeYear: true,
@@ -9,8 +9,9 @@
         });
     });
 </script>
-<form id="form-educations" action="<?=base_url('human-resources/employees/education-save')?>" method="post" autocomplete="off">
+<form id="form-educations" action="<?=base_url('profile/save-changes')?>" method="post" autocomplete="off" style="margin:0px">
     <input type="hidden" name="NIP" value="<?=$NIP?>">
+    <input class="form-control" name="action" type="hidden" value="educations" />
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h4 class="panel-title"><i class="fa fa-edit"></i> Please fill up this form with correctly data</h4>
@@ -45,7 +46,6 @@
                                         <td>Major</td>
                                         <td>Graduation Year</td>
                                         <td>GPA</td>
-                                        <td>Note</td>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -67,13 +67,11 @@
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control edu-major" name="eduMajor[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control required number edu-graduation" name="eduGraduation[]" maxlength="4">
+                                        <td><input type="text" class="form-control required number edu-graduation" required name="eduGraduation[]" maxlength="4">
                                         <small class="text-danger text-message"></small>
-                                        <label><input type="checkbox" class="checkme"> until now</label>
-                                        </td>
+                                        <label><input type="checkbox" class="checkme"> until now</label></td>
                                         <td><input type="text" class="form-control edu-gpa" name="eduGPA[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><textarea class="form-control edu-Note" name="Note[]" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -162,7 +160,7 @@
             
             var totalError = itsform.find(".error").length;
             if(error && totalError == 0 ){
-                loading_modal_show();
+                loading_page_modal();
                 $("#form-educations")[0].submit();
             }else{
                 alert("Please fill out the field.");
@@ -225,13 +223,13 @@
                     $cloneRow.attr("data-table","employees_educations").attr("data-id",value.ID).attr("data-name",value.instituteName);
                     $cloneRow.find("td:first").text(num);
                     $.each(value,function(k,v){
-                        $cloneRow.find(".edu-"+k).val(v); 
+                        $cloneRow.find(".edu-"+k).val(v);   
                         if(k == "graduation"){
                             if(jQuery.isEmptyObject(v)){
                                 $cloneRow.find(".checkme").prop("checked",true);                                
                                 $cloneRow.find(".edu-graduation").removeClass("required error").removeAttr("required");
                             }
-                        }
+                        } 
                     });
                     
                     $tablename.find("tbody").append($cloneRow);

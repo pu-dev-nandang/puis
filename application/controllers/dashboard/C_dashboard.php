@@ -7,10 +7,15 @@ use ElephantIO\Engine\SocketIO\Version1X;
 
 class C_dashboard extends Globalclass {
 
+    function __construct()
+    {
+        parent::__construct();
+        $this->load->model(array('master/m_master','General_model','General_model','global-informations/Globalinformation_model'));
+    }
     public function temp($content)
     {
         parent::template($content);
-        $this->load->model('master/m_master');
+        $this->load->model(array('master/m_master','General_model','General_model','global-informations/Globalinformation_model'));
     }
 
     public function maintenance(){
@@ -259,11 +264,11 @@ class C_dashboard extends Globalclass {
         parent::__setDepartement($dpt);
     }
 
-    public function profile($username=''){
+    /*public function profile($username=''){
         $data['']=123;
         $content = $this->load->view('dashboard/profile','',true);
         $this->temp($content);
-    }
+    }*/
 
     public function load_data_registration_upload()
     {
@@ -972,5 +977,119 @@ class C_dashboard extends Globalclass {
     }
 
 
+
+    /*ADDED BY FEBRI @ MARCH 2020*/
+    public function tab_menu_new_emp($page,$NIP){
+        
+        if(!empty($_GET['resubmit']) && !empty($_GET['data'])){
+            if($_GET['resubmit'] == 'yes'){
+                $key = "UAP)(*";
+                $data_arr = (array) $this->jwt->decode($_GET['data'],$key);
+                $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP'],"isApproved"=>2))->row();
+                if(!empty($isExist)){
+                    $data['param'] = "?resubmit=".$_GET['resubmit']."&data=".$_GET['data'];
+                    $data['Logs'] = $isExist->Logs;
+                }
+            }
+        }
+        
+        $param[] = array("field"=>"em.NIP","data"=>" = ".$NIP." ","filter"=>"AND",);    
+        $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
+        $getHistoricalJoin = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$NIP),"ID","ASC")->row();
+        $data['employee']->HistoricalJoin = (!empty($getHistoricalJoin) ? $getHistoricalJoin : null);
+        $data['NIP'] = $data['employee']->NIP;
+        $data['page'] = $page;
+        $content = $this->load->view('dashboard/profile/tab_menu_new_emp',$data,true);
+        $this->temp($content);       
+    }
+
+    public function profile(){
+        $myNIP = $this->session->userdata('NIP');
+        $myName = $this->session->userdata('Name');
+        $param[] = array("field"=>"em.NIP","data"=>" = ".$myNIP." ","filter"=>"AND",);    
+        $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
+        $data['NIP'] = $myNIP;
+        $page = $this->load->view('dashboard/profile/personal-data',$data,true);
+        $this->tab_menu_new_emp($page,$myNIP);
+    }
+
+
+    public function additionalInfo($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+            
+            $page = $this->load->view('dashboard/profile/additional-information',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function family($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $data['familytree'] = $this->General_model->fetchData("db_employees.master_family_relations",array("IsActive"=>1))->result();
+            $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $data['myfamily'] = $this->General_model->fetchData("db_employees.employees_family_member",array("NIP"=>$NIP))->result();
+            $page = $this->load->view('dashboard/profile/family',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function educations($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $data['industry'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
+            $page = $this->load->view('dashboard/profile/education',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function training($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $page = $this->load->view('dashboard/profile/training',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function workExperience($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $data['industry'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
+            $page = $this->load->view('dashboard/profile/experience',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function careerLevel($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $data['status'] = $this->General_model->fetchData("db_employees.master_status",array("IsActive"=>1))->result();
+            $data['level'] = $this->General_model->fetchData("db_employees.master_level",array("IsActive"=>1))->result();
+            //$data['division'] = $this->General_model->fetchData("db_employees.sto_temp",array("isMainSTO"=>1, "typeNode"=>1,"isActive"=>1))->result();
+            $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
+            $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+            $data['employees_status'] = $this->General_model->fetchData("db_employees.employees_status","Type != 'lec' and IDStatus != '-2'")->result();
+            $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+            //$data['currComp'] = $this->General_model->fetchData("db_employees.master_company",array("ID"=>1))->row();
+            $page = $this->load->view('dashboard/profile/career-level',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+    /*END ADDED BY FEBRI @ MARCH 2020*/
 
 }

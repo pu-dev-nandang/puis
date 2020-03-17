@@ -113,6 +113,63 @@ class M_hr extends CI_Model {
         $query = $this->db->get();
         return $query;
     }
+
+
+
+    public function fetchEmployee($count=false,$param='',$start='',$limit='',$order=''){
+        $where='';$startDate = date("Y-m-d");
+        if(!empty($param)){
+            $where = 'WHERE ';
+            $counter = 0;
+            foreach ($param as $key => $value) {
+                if($counter==0){
+                    $where = $where.$value['field'].(!empty($value['operate']) ? $value['operate'] :'')." ".$value['data'];
+                }else{
+                    $where = $where.$value['filter'].(!empty($value['operate']) ? $value['operate'] :'')." ".$value['field']." ".$value['data'];
+                }
+
+                if($value['field'] == "lem.AccessedOn"){
+                    $startDate = $value['data'];
+                }
+                $counter++;
+            }
+        }
+
+        $lims="";
+        if($start!="" || $limit!=""){
+            $lims = " LIMIT {$start},{$limit}"; 
+        }
+
+        if($count){
+            $select = "count(*) as Total";
+        }else{
+            $select = "em.*, el.Name as ProdiDegree, el.DescriptionEng as ProdiDegreeEng, ps.NameEng AS ProdiNameEng, es.Description as EmpStatus, r.Religion as EmpReligion, le.Level as EmpLevelEduName, le.Description as EmpLevelDesc, lap.Position as EmpAcaName, d.Division as DivisionMain, p.Position as PositionMain, (case when (DATE_FORMAT(em.DateOfBirth,'%m-%d') = DATE_FORMAT(now(),'%m-%d') ) then 1 else null end ) as isMyBirthday 
+                        , (select a.AccessedOn from db_employees.log_employees a
+                        where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE('".$startDate."')
+                        order by a.AccessedOn asc limit 1) as FirstLoginPortal
+                        , (select a.AccessedOn from db_employees.log_employees a
+                        where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE('".$startDate."')
+                        order by a.AccessedOn desc limit 1) as LastLoginPortal";
+        }
+        $sorted = " order by ".(!empty($order) ? $order : 'lem.AccessedOn asc');
+        
+        $string = "SELECT {$select}
+                   FROM db_employees.employees em
+                   LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                   LEFT JOIN db_academic.education_level el ON (ps.EducationLevelID = el.ID)
+                   LEFT JOIN db_employees.employees_status es ON (es.IDStatus = em.StatusEmployeeID)
+                   LEFT JOIN db_employees.religion r ON (r.IDReligion = em.ReligionID)
+                   LEFT JOIN db_employees.level_education le ON (le.ID = em.LevelEducationID)
+                   LEFT JOIN db_employees.lecturer_academic_position lap ON (lap.ID = em.LecturerAcademicPositionID)
+                   LEFT JOIN db_employees.division d on (d.ID = SUBSTRING_INDEX(em.PositionMain,'.',1) )
+                   LEFT JOIN db_employees.position p on (p.ID = SUBSTRING_INDEX(em.PositionMain,'.',-1) )
+                   LEFT JOIN db_employees.log_employees lem on (lem.NIP = em.NIP)
+                   {$where} GROUP BY em.NIP {$sorted} {$lims} ";
+        
+        $value  = $this->db->query($string);
+        //var_dump($this->db->last_query());
+        return $value;
+    }
     /*END ADDED BY FEBRI @ FEB 2020*/
 
 }

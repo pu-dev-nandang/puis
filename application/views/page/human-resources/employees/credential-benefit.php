@@ -24,6 +24,26 @@
             $("#bpjs-permit").find(".bpjs-IDBpjstk").val(myData.IDBpjstk);
             $("#bpjs-permit").find(".bpjs-IDBpjspensiun").val(myData.IDBpjspensiun);
             $("#bpjs-permit").find(".bpjs-IDBpjskesehatan").val(myData.IDBpjskesehatan);
+            if(!jQuery.isEmptyObject(myData.MyBPJS)){
+                $.each(myData.MyBPJS,function(key,value){
+                    $bpjs = $("#bpjs-permit table > tbody").find("tr.bpjs-"+value.Type);
+                    $.each(value,function(k,v){
+                        $bpjs.find(".bpjs-"+k).val(v);
+                    });
+                });
+                var num=1;
+                $.each(myData.MyAllowance,function(key,value){
+                    $allowance = $("#allowance-permit table ").find("tbody > tr:last").clone();
+                    $allowance.attr("data-table","employees_allowance").attr("data-id",value.ID).attr("data-name",value.Allowance);
+                    $allowance.find("td:first").text(num);
+                    $.each(value,function(k,v){
+                        $allowance.find(".allowance-"+k).val(v);
+                    });
+                    $("#allowance-permit table > tbody").append($allowance);
+                    num++;
+                });
+                $("#allowance-permit table > tbody > tr:first").remove();
+            }
         }
 
         $("#credential-benfit").on("click","#form-multiple-pane .btn-submit",function(){
@@ -87,7 +107,8 @@
                 </div>
 
                 <div id="bpjs-permit">
-                    <form id="form-multiple-pane" action="<?=base_url('human-resources/employees/credential-benefit-bpjs-save')?>" method="post" >
+                    <form id="form-multiple-pane" action="<?=base_url('human-resources/employees/credential-benefit-save')?>" method="post" autocomplete="off" >
+                        <input type="hidden" name="action" value="BPJS">
                         <input type="hidden" name="NIP" value="<?=$NIP?>">
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -108,53 +129,62 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
+                                            <tr class="bpjs-1">
                                                 <td>1</td>
                                                 <td>Ketenagajerjaan</td>
                                                 <td><input type="hidden" name="Type[]" class="form-control required number bpjs-Type" value="1">
-                                                    <input type="text" name="CardNumber[]" class="form-control required number bpjs-IDBpjstk" readonly></td>
+                                                    <input type="text" name="CardNumber[]" class="form-control required number bpjs-IDBpjstk" readonly>
+                                                    <small class="text-danger text-message"></small></td>
                                                 <td><div class="input-group">
-                                                        <input type="text" name="CutsEmployer[]" class="form-control required number" maxlength="3">
+                                                        <input type="text" name="CutsEmployer[]" class="form-control required number bpjs-CutsEmployer" maxlength="3">
+                                                        <small class="text-danger text-message"></small>
                                                         <div class="input-group-addon">%</div>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="input-group">
-                                                        <input type="text" name="CutsEmployee[]" class="form-control required number" maxlength="3">
+                                                        <input type="text" name="CutsEmployee[]" class="form-control required number bpjs-CutsEmployee" maxlength="3">
+                                                        <small class="text-danger text-message"></small>
                                                         <div class="input-group-addon">%</div>
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr class="bpjs-2">
                                                 <td>2</td>
                                                 <td>Pensiun</td>
                                                 <td><input type="hidden" name="Type[]" class="form-control required number bpjs-Type" value="2">
-                                                    <input type="text" name="CardNumber[]" class="form-control required number bpjs-IDBpjspensiun" readonly></td>
+                                                    <input type="text" name="CardNumber[]" class="form-control required number bpjs-IDBpjspensiun" readonly>
+                                                    <small class="text-danger text-message"></small></td>
                                                 <td><div class="input-group">
-                                                        <input type="text" name="CutsEmployer[]" class="form-control required number" maxlength="3">
+                                                        <input type="text" name="CutsEmployer[]" class="form-control required number bpjs-CutsEmployer" maxlength="3">
+                                                        <small class="text-danger text-message"></small>
                                                         <div class="input-group-addon">%</div>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="input-group">
-                                                        <input type="text" name="CutsEmployee[]" class="form-control required number" maxlength="3">
+                                                        <input type="text" name="CutsEmployee[]" class="form-control required number bpjs-CutsEmployee" maxlength="3">
+                                                        <small class="text-danger text-message"></small>
                                                         <div class="input-group-addon">%</div>
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr class="bpjs-3">
                                                 <td>3</td>
                                                 <td>Kesehatan</td>
                                                 <td><input type="hidden" name="Type[]" class="form-control required number bpjs-Type" value="3">
-                                                    <input type="text" name="CardNumber[]" class="form-control required number bpjs-IDBpjskesehatan" readonly></td>
+                                                    <input type="text" name="CardNumber[]" class="form-control required number bpjs-IDBpjskesehatan" readonly>
+                                                    <small class="text-danger text-message"></small></td>
                                                 <td><div class="input-group">
-                                                        <input type="text" name="CutsEmployer[]" class="form-control required number" maxlength="3">
+                                                        <input type="text" name="CutsEmployer[]" class="form-control required number bpjs-CutsEmployer" maxlength="3">
+                                                        <small class="text-danger text-message"></small>
                                                         <div class="input-group-addon">%</div>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="input-group">
-                                                        <input type="text" name="CutsEmployee[]" class="form-control required number" maxlength="3">
+                                                        <input type="text" name="CutsEmployee[]" class="form-control required number bpjs-CutsEmployee" maxlength="3">
+                                                        <small class="text-danger text-message"></small>
                                                         <div class="input-group-addon">%</div>
                                                     </div>
                                                 </td>
@@ -169,7 +199,24 @@
                             </div>
                         </div>
                     </form>
-                </div>               
+                </div>  
+
+                <div id="tax-permit">
+                    <form id="form-multiple-pane" action="<?=base_url('human-resources/employees/credential-benefit-tax-save')?>" method="post" >
+                        <input type="hidden" name="NIP" value="<?=$NIP?>">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    TAX PPH 21
+                                </h4>
+                            </div>
+                            <div class="panel-body"></div>
+                            <div class="panel-footer text-right">
+                                <button class="btn btn-success btn-sm btn-submit" type="button">Save changes</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>             
 
             </div>
             <div class="col-sm-7">
@@ -235,7 +282,8 @@
                 </div>
 
                 <div id="allowance-permit">
-                    <form id="form-multiple-pane" action="<?=base_url('human-resources/employees/credential-benefit-allowance-save')?>" method="post" >
+                    <form id="form-multiple-pane" action="<?=base_url('human-resources/employees/credential-benefit-save')?>" method="post" autocomplete="off" >
+                        <input type="hidden" name="action" value="ALLOWANCE">
                         <input type="hidden" name="NIP" value="<?=$NIP?>">
                         <div class="panel panel-default" id="multiple-field" data-source="allowance">
                             <div class="panel-heading">
@@ -267,13 +315,15 @@
                                         <tbody>
                                             <tr>
                                                 <td>1</td>
-                                                <td><input type="hidden" class="form-control required allowance-ID" name="ID[]" >
-                                                <input type="text" name="name[]" class="form-control required allowance-name"></td>
+                                                <td><input type="hidden" class="form-control allowance-ID" name="ID[]" >
+                                                <input type="text" name="Allowance[]" class="form-control required allowance-Allowance">
+                                                <small class="text-danger text-message"></small></td>
                                                 <td><div class="input-group">
-                                                      <div class="input-group-addon">RP</div>
-                                                        <input type="text" name="price[]" class="form-control required allowance-price number rupiah"></td>
+                                                        <div class="input-group-addon">RP</div>
+                                                        <input type="text" name="Price[]" class="form-control required allowance-Price number rupiah">
+                                                        <small class="text-danger text-message"></small>
                                                     </div>
-                                                <td><textarea class="form-control allowance-note" rows="1" name="note[]"></textarea></td>
+                                                <td><textarea class="form-control allowance-Note" rows="1" name="Note[]"></textarea></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -284,24 +334,7 @@
                             </div>
                         </div>
                     </form>
-                </div>
-
-                <div id="tax-permit">
-                    <form id="form-multiple-pane" action="<?=base_url('human-resources/employees/credential-benefit-tax-save')?>" method="post" >
-                        <input type="hidden" name="NIP" value="<?=$NIP?>">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    TAX PPH 21
-                                </h4>
-                            </div>
-                            <div class="panel-body"></div>
-                            <div class="panel-footer text-right">
-                                <button class="btn btn-success btn-sm btn-submit" type="button">Save changes</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                </div>                
 
             </div>
             
