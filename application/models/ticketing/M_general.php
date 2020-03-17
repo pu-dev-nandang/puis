@@ -71,7 +71,17 @@ class M_general extends CI_Model {
                                 SPLIT_STR(a.PositionOther2, ".", 1) = '.$Division.' or
                                 SPLIT_STR(a.PositionOther3, ".", 1) = '.$Division.'
                                 )
-                        and a.StatusEmployeeID > 0 and SPLIT_STR(a.PositionMain, ".", 2) in(11,12)'; // kabag dan kasubag
+                        and a.StatusEmployeeID > 0 and 
+                            (
+                                SPLIT_STR(a.PositionMain, ".", 2) in(11,12) 
+                                or
+                                SPLIT_STR(a.PositionOther1, ".", 2) in(11,12)
+                                or 
+                                SPLIT_STR(a.PositionOther2, ".", 2) in(11,12) 
+                                or
+                                SPLIT_STR(a.PositionOther3, ".", 2) in(11,12) 
+
+                            )  '; // kabag dan kasubag
                 $query = $this->db->query($sql,array())->result_array();
                 for ($i=0; $i < count($query); $i++) { 
                    if ($query[$i]['NIP'] == $NIP) {
@@ -141,7 +151,10 @@ class M_general extends CI_Model {
             switch ($Explode[0]) {
                 case 'NA':
                     $Division = $Explode[1];
-                    $AddWhere .= ' and SPLIT_STR(a.PositionMain, ".", 1) = '.$Division;
+                    $AddWhere .= ' and (SPLIT_STR(a.PositionMain, ".", 1) = '.$Division;
+                    $AddWhere .= ' or SPLIT_STR(a.PositionOther1, ".", 1) = '.$Division;
+                    $AddWhere .= ' or SPLIT_STR(a.PositionOther2, ".", 1) = '.$Division;
+                    $AddWhere .= ' or SPLIT_STR(a.PositionOther3, ".", 1) = '.$Division.')';
                     break;
                 case 'AC':
                     $ProdiID = $Explode[1];
