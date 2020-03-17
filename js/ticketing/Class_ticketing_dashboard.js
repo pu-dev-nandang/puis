@@ -5,16 +5,11 @@ class Class_ticketing_dashboard {
 	}
 
 
-	LoadDefault = () => {
-		this.LoadTable1();
-		this.LoadTable2();
+	LoadDefault = (selectorTable) => {
+		this.LoadTable(selectorTable);
 	}
 
-	LoadTable1 = () => {
-		let selectorTable = $('#table1').find('table');
+	LoadTable = (selectorTable) => {
+		
 	}
-
-	LoadTable2 = () => {
-		let selectorTable = $('#table2').find('table');
-	}	
 }
