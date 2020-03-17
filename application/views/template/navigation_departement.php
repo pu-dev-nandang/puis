@@ -27,7 +27,7 @@
                 data-dpt="secretariat-rectorate">
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/sec-rec.png'); ?>"></span>
-                    <span class="title">Secretariat Rectorate</span>
+                    <span class="title">Sec Rectorate</span>
                 </a>
             </li>
             <li class="departement <?php if($departement=='academic'){echo 'current';} ?>"
