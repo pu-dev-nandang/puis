@@ -21,7 +21,7 @@ class C_config_jabatan_per_sks extends Globalclass {
 
     public function menu_request($page){
         $data['page'] = $page;
-        $content = $this->load->view('page/rektorat/menu_rektorat',$data,true);
+        $content = $this->load->view('page/secretariat-rectorate/menu_sec-rektorat',$data,true);
         $this->temp($content);
     }
 
