@@ -8,7 +8,7 @@
                     <i class="fa fa-globe"></i> Master Data
                 </a>
             </li>
-            <li class="<?php if($this->uri->segment(1)=='requestdocument'){echo"current";}?>">
+            <li class="<?php if($this->uri->segment(1)=='secretariat-rectorate'){echo"current";}?>">
                 <a href="<?php echo base_url('secretariat-rectorate/legalitas/prodi');?>">
                     <i class="fa fa-university"></i> Legalitas Universitas
                 </a>
