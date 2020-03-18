@@ -124,6 +124,44 @@
 	        var startDate = $("#form-filter input[name=attendance_start]").val();
 	        $("#attendance-temporary .result .panel-title >span").text(startDate).addClass("bg-success");
 	    });
+
+	    $("#table-list-data").on("click",".btn-detail",function(){
+	    	var itsme = $(this);
+	    	var NIP = itsme.data("id");
+	    	var DATE = itsme.data("date");
+	    	if($.trim(NIP).length > 0){
+	    		var data = {
+	                NIP : NIP,
+	                DATE : DATE
+	            };
+	            var token = jwt_encode(data,'UAP)(*');
+	    		$.ajax({
+	                type : 'POST',
+	                url : base_url_js+"my-team/detailActivities",
+	                data: {token:token},
+	                dataType : 'html',
+	                beforeSend :function(){
+	                    itsme.html('<i class="fa fa-spinner fa-pulse fa-fw"></i>');
+	                },error : function(jqXHR){
+	                	itsme.html('<i class="fa fa-folder-open"></i>');
+	                    $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
+	                    $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+	                    $("body #GlobalModal").modal("show");
+	                },success : function(response){
+	                	itsme.html('<i class="fa fa-folder-open"></i>');
+				        $('#GlobalModal .modal-dialog').css({"width":"80%"});       
+	                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+				            '<h4 class="modal-title">Detail attendance </h4>');
+				        $('#GlobalModal .modal-body').html(response);        
+				        $('#GlobalModal').modal({
+				            'show' : true,
+				            'backdrop' : 'static'
+				        });
+	                }
+	            });
+	    	}
+	    	
+	    });
 	});
 </script>
 <div id="my-team-activity">

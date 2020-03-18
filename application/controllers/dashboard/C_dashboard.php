@@ -1578,8 +1578,7 @@ class C_dashboard extends Globalclass {
                 $data['attendance'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) = DATE('".$data_arr['DATE']."')","AccessedOn","asc")->result();
                 $data['employee'] = $isExist;
                 $data['TotalActivity'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) = DATE('".$data_arr['DATE']."')","AccessedOn","asc",null,"AccessedOn")->result();
-                $department = parent::__getDepartement();
-                $this->load->view('page/'.$department.'/attendance-temp/detail',$data);                
+                $this->load->view('dashboard/detailActivities',$data);                
             }else{echo "<h1>Employee not founded</h1>";}
         }else{show_404();}
     }
