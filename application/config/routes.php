@@ -1437,7 +1437,7 @@ $route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
 $route['api2/__getypedocument'] = 'api/c_api/getlistypedocument';
 $route['api2/__getmasrequestdoc'] = 'api/c_api2/getmasterrequestdoc';
 $route['api2/__crudrequestdoc'] = 'api/c_api2/crudrequestdocument';
-$route['secretariat-rectorate/legalitas/identitas'] = 'page/secretariat-rektorate/identitas/c_identitas/list_identitas';
+$route['secretariat-rectorate/legalitas/identitas'] = 'page/secretariat-rectorate/identitas/c_identitas/list_identitas';
 $route['secretariat-rectorate/legalitas/prodi'] = 'page/academic/c_transcript/setting_transcript';
 
 
