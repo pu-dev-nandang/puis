@@ -125,7 +125,7 @@ class C_api4 extends CI_Controller {
 
 
     public function detailEmployeeOBJ(){
-        $this->load->model(array('General_model'));
+        $this->load->model(array('General_model','hr/m_hr'));
         $data = $this->input->post();
         $json = array();
         if($data){
