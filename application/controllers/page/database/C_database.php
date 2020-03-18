@@ -92,7 +92,7 @@ class C_database extends Globalclass {
                     $rejectData = $this->General_model->updateData("db_employees.employees",$dataPost,$conditions);
                     $message = ($rejectData ? "Successfully":"Failed")." saved.";
                 }else if($data_arr['ACT'] == 0){ //for approved
-                    $reqData = $isExist->Logs
+                    $reqData = $isExist->Logs;
                 }else{$message="Unknow request approved.";}
             }
 
