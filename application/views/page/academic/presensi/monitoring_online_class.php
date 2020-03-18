@@ -3,6 +3,15 @@
     #tableTimeTalbesOnline a {
         /*text-decoration: none;*/
     }
+
+
+    .checkbox.checbox-switch label span:before, .checkbox-inline.checbox-switch span:before {
+        left: -7px !important;
+    }
+
+    .checkbox.checbox-switch label > input:checked + span:before, .checkbox-inline.checbox-switch > input:checked + span:before {
+        left: 9px !important;
+    }
 </style>
 
 <div class="row">
@@ -123,7 +132,8 @@
 
         var ScheduleID = $(this).attr('data-schid');
         var Session = $(this).attr('data-session');
-
+        var RangeStart = $(this).attr('data-start');
+        var RangeEnd = $(this).attr('data-end');
         var dataRow = JSON.parse($('#text_'+ScheduleID).val());
 
 
@@ -141,6 +151,32 @@
             $(modalID+' .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
                 '<h4 class="modal-title">'+dataRow.ClassGroup+' - '+dataRow.CourseEng+' | Session '+Session+'</h4>');
 
+
+            var viewSch = '';
+            if(jsonResult.Schedule.length>0){
+                $.each(jsonResult.Schedule,function (i,v) {
+                    var st = v.StartSessions.substr(0,5);
+                    var en = v.EndSessions.substr(0,5);
+                    viewSch = viewSch+'<tr>' +
+                        '<td>'+(i+1)+'</td>' +
+                        '<td>'+v.NameEng+', '+st+' - '+en+'</td>' +
+                        '<td>'+v.Room+'</td>' +
+                        '</tr>'
+                });
+            }
+
+            var tmSch = '<h3 style=""><i class="fa fa-calendar margin-right"></i> Schedule</h3>' +
+                '<table class="table table-striped table-bordered table-centre">' +
+                '    <thead>' +
+                '    <tr style="background: #efefef;">' +
+                '        <th style="width: 1%;">No</th>' +
+                '        <th>Date, time</th>' +
+                '        <th style="width: 25%;">Room</th>' +
+                '    </tr>' +
+                '    </thead>' +
+                '    <tbody>'+viewSch+'</tbody>' +
+                '</table>';
+
             var viewLec = '';
             if(jsonResult.Lecturer.length>0){
                 $.each(jsonResult.Lecturer,function (i,v) {
@@ -151,27 +187,37 @@
                     var Material = (v.Material.length>0)
                         ? '<i class="fa fa-check" style="color: green;"></i> | <span style="font-size: 10px;">'+UploadMaterialBy+'</span>' : '-';
 
+
+                    var check = (parseInt(v.SessionAttend)==parseInt(v.SessionAttendSch)) ? 'checked' : '';
+
+                    var isPresent =  '<div class="checkbox checbox-switch switch-success ">' +
+                        '           <label>' +
+                        '               <input type="checkbox" class="checkAttdLec" '+check+' data-nip="'+v.NIP+'">' +
+                        '               <span></span>' +
+                        '           </label>' +
+                        '       </div>' ;
+
                     viewLec = viewLec+'<tr>' +
                         '<td>'+(i+1)+'</td>' +
                         '<td style="text-align: left;"><b>'+v.Name+'</b><br/>'+v.NIP+'</td>' +
                         '<td>'+Forum+'</td>' +
                         '<td>'+Task+'</td>' +
                         '<td>'+Material+'</td>' +
-                        '<td><button class="btn btn-sm btn-success" disabled>Set Attd.</button></td>' +
+                        '<td>'+isPresent+'</td>' +
                         '</tr>';
                 });
             }
 
-            var tmLec = '<h3>Lecturer</h3>' +
+            var tmLec = '<h3><i class="fa fa-users margin-right"></i> Lecturer</h3>' +
                 '<table class="table table-bordered table-striped table-centre">' +
                 '    <thead>' +
-                '    <tr>' +
+                '    <tr style="background: #efefef;">' +
                 '        <th style="width: 1%;">No</th>' +
                 '        <th>Lecturer</th>' +
                 '        <th style="width: 10%;">Forum</th>' +
                 '        <th style="width: 10%;">Task</th>' +
                 '        <th style="width: 20%;">Material</th>' +
-                '        <th style="width: 7%;"><i class="fa fa-cog"></i></th>' +
+                '        <th style="width: 17%;">Attendance</th>' +
                 '    </tr>' +
                 '    </thead>' +
                 '    <tbody>'+viewLec+'</tbody>' +
@@ -182,31 +228,50 @@
                 $.each(jsonResult.Student,function (i,v) {
                     var Forum = (parseInt(v.TotalComment)>0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
                     var Task = (parseInt(v.TotalTask)>0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
+
+                    var check = (parseInt(v.SessionAttend)==parseInt(v.SessionAttendSch)) ? 'checked' : '';
+
+                    var isPresent =  '<div class="checkbox checbox-switch switch-success ">' +
+                    '           <label>' +
+                    '               <input type="checkbox" class="checkAttdStd" '+check+' data-npm="'+v.NPM+'">' +
+                    '               <span></span>' +
+                    '           </label>' +
+                    '       </div>' ;
+
                     viewStd = viewStd+'<tr>' +
                         '<td>'+(i+1)+'</td>' +
                         '<td style="text-align: left;"><b>'+v.Name+'</b><br/>'+v.NPM+'</td>' +
                         '<td>'+Forum+'</td>' +
                         '<td>'+Task+'</td>' +
-                        '<td><button class="btn btn-sm btn-success" disabled>Set Attd.</button></td>' +
+                        '<td>'+isPresent+'</td>' +
                         '</tr>';
                 });
             }
 
-            var tmStd = '<h3>Student</h3>' +
+            var tmStd = '<h3><i class="fa fa-graduation-cap margin-right"></i> Student</h3>' +
                 '<table class="table table-bordered table-striped table-centre">' +
                 '    <thead>' +
-                '    <tr>' +
+                '    <tr style="background: #efefef;">' +
                 '        <th style="width: 1%;">No</th>' +
                 '        <th>Student</th>' +
                 '        <th style="width: 10%;">Forum</th>' +
                 '        <th style="width: 10%;">Task</th>' +
-                '        <th style="width: 7%;"><i class="fa fa-cog"></i></th>' +
+                '        <th style="width: 17%;">Attendance</th>' +
                 '    </tr>' +
                 '    </thead>' +
                 '    <tbody>'+viewStd+'</tbody>' +
                 '</table>';
 
-            var htmlss = tmLec+tmStd;
+            var viewRangeStart = moment(RangeStart).format('dddd, DD MMMM YYYY');
+            var viewRangeEnd = moment(RangeEnd).format('dddd, DD MMMM YYYY');
+
+            var htmlss = '<div class="alert alert-info" style="text-align: center;"><b>'+viewRangeStart+' - '+viewRangeEnd+'</b></div>' +
+                        '<input class="hide" id="attdModal_ScheduleID" value="'+ScheduleID+'" />' +
+                        '<input class="hide" id="attdModal_RangeStart" value="'+RangeStart+'" />' +
+                        '<input class="hide" id="attdModal_RangeEnd" value="'+RangeEnd+'" />' +
+                        '<input class="hide" id="attdModal_Session" value="'+Session+'" />' +
+                        '<textarea class="hide" id="attdModal_Schedule">'+JSON.stringify(jsonResult.Schedule)+'</textarea>' +
+                        ''+tmSch+tmLec+tmStd;
 
             $(modalID+' .modal-body').html(htmlss);
 
@@ -222,6 +287,89 @@
             });
 
         });
+
+    });
+
+    // Set Attendance Student
+    $(document).on('click','.checkAttdStd',function () {
+
+        var ScheduleID = $('#attdModal_ScheduleID').val();
+        var Session = $('#attdModal_Session').val();
+        var Schedule = $('#attdModal_Schedule').val();
+        var dAttd = JSON.parse(Schedule);
+
+        var arrIDAttd = [];
+        $.each(dAttd,function (i,v) {
+            arrIDAttd.push(v.ID_Attd);
+        });
+
+
+        var NPM = $(this).attr('data-npm');
+
+        var m = ($(this).is(':checked')) ? '1' : '2';
+
+        var data = {
+            action : 'UpdateStudentAttdInOnline',
+            ScheduleID : ScheduleID,
+            ArrIDAttd : arrIDAttd,
+            Meet : Session,
+            Attendance : m,
+            NPM : NPM
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api2/__crudAttendance2';
+
+        $.post(url,{token:token},function (result) {
+
+        });
+
+    });
+
+    // Set Attendance Lecturer
+    $(document).on('click','.checkAttdLec',function () {
+
+        var ScheduleID = $('#attdModal_ScheduleID').val();
+        var RangeStart = $('#attdModal_RangeStart').val();
+        var RangeEnd = $('#attdModal_RangeEnd').val();
+        var Session = $('#attdModal_Session').val();
+        var Schedule = $('#attdModal_Schedule').val();
+        var dAttd = JSON.parse(Schedule);
+        var NIP = $(this).attr('data-nip');
+
+        var IPPublic = localStorage.getItem('IPPublic');
+
+        var arrIDAttd = [];
+        $.each(dAttd,function (i,v) {
+            arrIDAttd.push({
+                ID_Attd : v.ID_Attd,
+                Meet : Session,
+                NIP : NIP,
+                Date : RangeStart,
+                In : v.StartSessions,
+                Out : v.EndSessions,
+                ModifyBy : sessionNIP,
+                ModifyAt : dateTimeNow(),
+                IP_Public : IPPublic,
+                IsOnline : '1'
+            });
+        });
+
+        var m = ($(this).is(':checked')) ? '1' : '2';
+
+        var data = {
+            action : 'UpdateLecturertAttdInOnline',
+            ArrIDAttd : arrIDAttd,
+            Status : m
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api2/__crudAttendance2';
+
+        $.post(url,{token:token},function (result) {
+
+        });
+
 
     });
 

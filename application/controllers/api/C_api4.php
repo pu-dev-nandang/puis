@@ -152,6 +152,16 @@ class C_api4 extends CI_Controller {
 
             $dataLect = $this->m_rest->getAllLecturerByScheduleID($ScheduleID);
 
+            // Get AttdID
+
+            $dataArrAttdID = $this->db->query('SELECT attd.ID AS ID_Attd, d.NameEng, cl.Room, sd.StartSessions, sd.EndSessions 
+                                                    FROM db_academic.attendance attd
+                                                    LEFT JOIN db_academic.schedule_details sd ON (sd.ID = attd.SDID)
+                                                    LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                    WHERE attd.ScheduleID = "'.$ScheduleID.'" 
+                                                    ORDER BY sd.DayID ASC')->result_array();
+
             if(count($dataLect)>0){
 
                 for($i=0;$i<count($dataLect);$i++){
@@ -184,6 +194,22 @@ class C_api4 extends CI_Controller {
                                                                             LEFT JOIN db_employees.employees em ON (em.NIP = sm.UpdateBy)
                                                                             WHERE sm.ScheduleID = "'.$ScheduleID.'"
                                                                              AND sm.Session = "'.$Session.'" ')->result_array();
+
+                    // Cek Attendance
+                    $SessionAttend = 0;
+                    if(count($dataArrAttdID)>0){
+                        $whereAttd = '';
+                        for ($r=0;$r<count($dataArrAttdID);$r++){
+                            $or = ($r!=0) ? ' OR ' : '';
+                            $whereAttd = $whereAttd.$or.' (al.ID_Attd = "'.$dataArrAttdID[$r]['ID_Attd'].'" AND Meet = "'.$Session.'") ';
+                        }
+
+                        $SessionAttend = $this->db->query('SELECT * FROM db_academic.attendance_lecturers al WHERE al.NIP = "'.$d['NIP'].'" AND '.$whereAttd)->result_array();
+                    }
+
+                    $dataLect[$i]['SessionAttend'] = count($SessionAttend);
+                    $dataLect[$i]['SessionAttendDetails'] = $SessionAttend;
+                    $dataLect[$i]['SessionAttendSch'] = count($dataArrAttdID);
                 }
 
             }
@@ -218,10 +244,41 @@ class C_api4 extends CI_Controller {
                                                                      AND st.Session = "'.$Session.'" 
                                                                      AND std.NPM = "'.$d['NPM'].'"')->result_array()[0]['Total'];
 
+
+                    // Attendance
+                    $SessionAttend = [];
+                    $SessionAttendTotal = 0;
+                    if(count($dataArrAttdID)>0){
+                        $whereAttd = '';
+                        for ($r=0;$r<count($dataArrAttdID);$r++){
+                            $or = ($r!=0) ? ' OR ' : '';
+                            $whereAttd = $whereAttd.$or.' al.ID_Attd = "'.$dataArrAttdID[$r]['ID_Attd'].'" ';
+                        }
+
+                        $SessionAttend = $this->db->query('SELECT al.M'.$Session.' FROM db_academic.attendance_students al 
+                                                                WHERE al.NPM = "'.$d['NPM'].'" AND ('.$whereAttd.')')->result_array();
+
+                        if(count($SessionAttend)>0){
+                            for ($s=0;$s<count($SessionAttend);$s++){
+                                $ses = ($SessionAttend[$s]['M'.$Session]!=null && $SessionAttend[$s]['M'.$Session]!=''
+                                    && $SessionAttend[$s]['M'.$Session]!=2 && $SessionAttend[$s]['M'.$Session]!='2') ? 1 : 0;
+                                $SessionAttendTotal = $SessionAttendTotal + $ses;
+                             }
+                        }
+
+
+                    }
+
+                    $dataStd[$i]['SessionAttend'] = $SessionAttendTotal;
+                    $dataStd[$i]['SessionAttendDetails'] = $SessionAttend;
+                    $dataStd[$i]['SessionAttendSch'] = count($dataArrAttdID);
+
+
                 }
             }
 
             $result = array(
+                'Schedule' => $dataArrAttdID,
                 'Lecturer' => $dataLect,
                 'Student' => $dataStd
             );
@@ -318,7 +375,11 @@ class C_api4 extends CI_Controller {
 
                  $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
                                     '.$viewCkTopik.$viewTask.$viewMaterial.'
-                                    <a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" data-session="'.$s.'" class="btnAdmShowAttendance"><div style="font-size: 10px;color: #607d8b;margin-top: 5px;font-weight: bold;">'.$rangeSt.'<br/>'.$rangeEn.'</div>
+                                    <a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" 
+                                    data-session="'.$s.'" data-start="'.$dataSes['RangeStart'].'" 
+                                    data-end="'.$dataSes['RangeEnd'].'" class="btnAdmShowAttendance">
+                                    <div style="font-size: 10px;color: #607d8b;margin-top: 5px;font-weight: bold;">
+                                    '.$rangeSt.'<br/>'.$rangeEn.'</div>
                                     </div></a>';
                  array_push($nestedData,$arr);
             }
