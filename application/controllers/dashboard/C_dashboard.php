@@ -1388,6 +1388,203 @@ class C_dashboard extends Globalclass {
     }
 
 
+    public function myTeamActivities(){
+        $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","IDStatus = 1 or IDStatus = 2","IDStatus","asc")->result();
+        $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
+        $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+        $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
+        $data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+        $this->load->view('dashboard/myactivitiesteam',$data);        
+    }
+
+
+    public function fetchActivitiesEmp(){
+        $reqdata = $this->input->post();
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $param = array();$orderBy=" em.ID DESC ";
+
+            $myNIP = $this->session->userdata('NIP');
+            $myName = $this->session->userdata('Name');
+            $isEmployee = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$myNIP))->row(); 
+
+            if(!empty($isEmployee)){
+                $explodeMain = explode(".", $isEmployee->PositionMain);
+                $param[] = array("field"=>"em.PositionMain","data"=>" like '".$explodeMain[0].".%' ","filter"=>"AND",);
+            }
+
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+
+                $param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);
+                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' ","filter"=>"OR",);
+                $param[] = array("field"=>"em.NIDN","data"=>" like '%".$search."%' )","filter"=>"OR",);
+            }
+            if(!empty($data_arr['Filter'])){
+                $parse = parse_str($data_arr['Filter'],$output);
+
+                //check data emp if lecturers
+                if(!empty($output['isLecturer'])){
+                    $divLect = '14';
+                    $param[] = array("field"=>"(em.PositionMain","data"=>" like'".$divLect.".%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"em.PositionOther1","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther2","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther3","data"=>" like'".$divLect.".%' )","filter"=>"OR",);
+                    if( !empty($output['position'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$divLect.".".$output['position']."' ","filter"=>"AND",);
+                    }
+                    if(!empty($output['status'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['status']) == 1){
+                            $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['status'] as $s) {
+                                $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                    if(!empty($output['study_program'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['study_program']) == 1){
+                            $param[] = array("field"=>"em.ProdiID","data"=>" ='".$output['study_program'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['study_program'] as $s) {
+                                $param[] = array("field"=>"em.ProdiID","data"=>" ='".$s."' ".((($sn < count($output['study_program'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                }
+                //check data for employee
+                else{
+                    if(!empty($output['division'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);
+                    }
+                    if( !empty($output['division']) && !empty($output['position'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);
+                    }
+
+                    if(!empty($output['status'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['status']) == 1){
+                            $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['status'] as $s) {
+                                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                }
+
+                if(!empty($output['staff'])){
+                    $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"ps.NameEng","data"=>" like '%".$output['staff']."%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.Name","data"=>" like '%".$output['staff']."%' )","filter"=>"OR",);
+                }
+                if(!empty($output['religion'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['religion']) == 1){
+                        $param[] = array("field"=>"em.ReligionID","data"=>" ='".$output['religion'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['religion'] as $s) {
+                            $param[] = array("field"=>"em.ReligionID","data"=>" ='".$s."' ".((($sn < count($output['religion'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['gender'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['gender']) == 1){
+                        $param[] = array("field"=>"em.Gender","data"=>" ='".$output['gender'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['gender'] as $s) {
+                            $param[] = array("field"=>"em.Gender","data"=>" ='".$s."' ".((($sn < count($output['gender'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['level_education'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['level_education']) == 1){
+                        $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$output['level_education'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['level_education'] as $s) {
+                            $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$s."' ".((($sn < count($output['level_education'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+
+                if(!empty($output['attendance_start'])){
+                    $param[] = array("field"=>"lem.AccessedOn","operate"=>" = ","data"=>"'".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                }else{
+                    $param[] = array("field"=>"lem.AccessedOn","operate"=>"=","data"=>"'".date("Y-m-d")."' ","filter"=>"AND",);
+                }
+
+                if(!empty($output['sorted'])){
+                    $orderBy = $output['sorted'];
+                }
+            }
+            $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
+            $TotalData = (!empty($totalData) ? $totalData->Total : 0);
+            if(!empty($reqdata['start']) && !empty($reqdata['length'])){
+                $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+            }else{
+                $result = $this->m_hr->fetchEmployee(false,$param)->result();
+            }
+
+            $json_data = array(
+                "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
+                "recordsTotal"    => intval($TotalData),
+                "recordsFiltered" => intval($TotalData),
+                "data"            => (!empty($result) ? $result : 0)
+            );
+
+        }else{$json_data=null;}
+        $response = $json_data;
+        echo json_encode($response);
+    }
+
+
+    public function detailActivitiesEmp(){
+        $data = $this->input->post();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $param[] = array("field"=>"em.NIP","data"=>" = ".$data_arr['NIP'],"filter"=>"AND",);
+            $isExist = $this->m_hr->fetchEmployee(false,$param)->row();
+            if(!empty($isExist)){
+                $data['attendance'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) = DATE('".$data_arr['DATE']."')","AccessedOn","asc")->result();
+                $data['employee'] = $isExist;
+                $data['TotalActivity'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) = DATE('".$data_arr['DATE']."')","AccessedOn","asc",null,"AccessedOn")->result();
+                $department = parent::__getDepartement();
+                $this->load->view('page/'.$department.'/attendance-temp/detail',$data);                
+            }else{echo "<h1>Employee not founded</h1>";}
+        }else{show_404();}
+    }
+
+
     /*END ADDED BY FEBRI @ MARCH 2020*/
 
 }

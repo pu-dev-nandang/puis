@@ -1,22 +1,67 @@
-
-
 <style>
     #tableDataLog td:nth-child(1) {
         border-right: 1px solid #CCCCCC;
         text-align: center;
     }
+    ul.nav > li > a{cursor: pointer;}
 </style>
 
-<div class="row">
-    <div class="col-md-12">
-        <div id="loadTable"></div>
+
+<div id="activities">
+    <div class="nav-tabs">
+        <div class="tabbable tabbable-custom tabbable-full-width" style="margin-bottom:0px">
+            <ul class="nav nav-tabs">
+                <li class="nav-my-act active">
+                    <a href="<?=base_url('my-activities')?>">My Activities</a>
+                </li>
+                <li class="nav-my-team">
+                    <a>Activities Team</a>
+                </li>            
+            </ul>
+        </div>
     </div>
+
+    <div class="tabs-content" style="border:1px solid #ddd;border-top:0px;padding: 30px 10px 10px 10px">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="loadTable"></div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+
+
 
 <script>
 
     $(document).ready(function () {
         getDataLog();
+
+        /*ADDED BY FEBRI @ MARCH 2020*/
+        $(".nav-my-team").click(function(){
+            $("#activities ul.nav > li").removeClass("active");
+            $(this).addClass("active");
+            $("#activities .tabs-content").empty();
+            $.ajax({
+                type : 'POST',
+                url : base_url_js+"my-team",
+                dataType : 'html',
+                beforeSend :function(){
+                    loading_modal_show();
+                },error : function(jqXHR){
+                    loading_modal_hide();
+                    $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
+                    $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                    $("body #GlobalModal").modal("show");
+                },success : function(response){
+                    loading_modal_hide();
+                    $("#activities .tabs-content").html(response);
+                }
+            });
+        });
+        /*END ADDED BY FEBRI @ MARCH 2020*/
     });
 
     function getDataLog() {
