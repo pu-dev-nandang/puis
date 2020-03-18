@@ -92,7 +92,7 @@
             <li class="<?php if($this->uri->segment(1)=='my-activities'){echo 'current';} ?>">
                 <a href="<?php echo base_url('my-activities'); ?>">
                     <i class="fa fa-line-chart"></i>
-                    <span>My Activities</span>
+                    <span>Activities</span>
                 </a>
             </li>
             <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
