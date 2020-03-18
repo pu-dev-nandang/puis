@@ -2,10 +2,10 @@
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
       <li class="<?= ($this->uri->segment(3)=='prodi') ?"active":"";?>">
-          <a href="<?php echo base_url('rectorat/legalitas/prodi'); ?>">Program Study</a>
+          <a href="<?php echo base_url('secretariat-rectorate/legalitas/prodi'); ?>">Program Study</a>
       </li>
        <li class="<?= ($this->uri->segment(3)=='identitas') ?"active":"";?>">
-          <a href="<?php echo base_url('rectorat/legalitas/identitas'); ?>">Identitas Perguruan Tinggi</a>
+          <a href="<?php echo base_url('secretariat-rectorate/legalitas/identitas'); ?>">Identitas Perguruan Tinggi</a>
        </li>
     </ul>
     <div style="border-top: 1px solid #cccccc">

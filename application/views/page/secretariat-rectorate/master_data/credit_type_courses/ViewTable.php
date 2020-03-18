@@ -25,7 +25,7 @@
 		             "processing": true,
 		             "serverSide": false,
 		             "ajax":{
-		                 url : base_url_js+"rectorat/master_data/crud_credit_type_courses", // json datasource
+		                 url : base_url_js+"secretariat-rectorate/master_data/crud_credit_type_courses", // json datasource
 		                 ordering : false,
 		                 type: "post",  // method  , by default get
 		                 data : function(token){

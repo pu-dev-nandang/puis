@@ -1411,14 +1411,14 @@ $route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadS
 
 // Request Document | Bismar
 
-$route['rectorat/master_data/config_jabatan_per_sks'] = 'page/rektorat/c_config_jabatan_per_sks/config_jabatan_per_sks';
+$route['secretariat-rectorate/master_data/config_jabatan_per_sks'] = 'page/secretariat-rectorate/c_config_jabatan_per_sks/config_jabatan_per_sks';
 $route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument';
 $route['rectorat/reqsuratmengajar'] = 'page/request-document/c_requestdocument/list_requestsuratmengajar';
-$route['rectorat/master_data/sk_masuk_mahasiswa'] = 'page/rektorat/c_sk_masuk_mahasiswa/index';
-$route['rectorat/master_data/crud_sk_mhs'] = 'page/rektorat/c_sk_masuk_mahasiswa/crud_sk_mhs';
+$route['secretariat-rectorate/master_data/sk_masuk_mahasiswa'] = 'page/secretariat-rectorate/c_sk_masuk_mahasiswa/index';
+$route['secretariat-rectorate/master_data/crud_sk_mhs'] = 'page/secretariat-rectorate/c_sk_masuk_mahasiswa/crud_sk_mhs';
 
-$route['rectorat/master_data/credit_type_courses'] = 'page/rektorat/c_credit_type_courses/index';
-$route['rectorat/master_data/crud_credit_type_courses'] = 'page/rektorat/c_credit_type_courses/crud_credit_type_courses';
+$route['secretariat-rectorate/master_data/credit_type_courses'] = 'page/secretariat-rectorate/c_credit_type_courses/index';
+$route['secretariat-rectorate/master_data/crud_credit_type_courses'] = 'page/secretariat-rectorate/c_credit_type_courses/crud_credit_type_courses';
 
 //---Document Generator--//
 // $route['rectorat/document-generator'] = 'page/rektorat/document_generator/c_document/document';
@@ -1437,8 +1437,8 @@ $route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
 $route['api2/__getypedocument'] = 'api/c_api/getlistypedocument';
 $route['api2/__getmasrequestdoc'] = 'api/c_api2/getmasterrequestdoc';
 $route['api2/__crudrequestdoc'] = 'api/c_api2/crudrequestdocument';
-$route['rectorat/legalitas/identitas'] = 'page/rektorat/identitas/c_identitas/list_identitas';
-$route['rectorat/legalitas/prodi'] = 'page/academic/c_transcript/setting_transcript';
+$route['secretariat-rectorate/legalitas/identitas'] = 'page/secretariat-rektorate/identitas/c_identitas/list_identitas';
+$route['secretariat-rectorate/legalitas/prodi'] = 'page/academic/c_transcript/setting_transcript';
 
 
 $route['api/__getlistrequestdoc'] = 'api/c_api/getlistrequestdocument';
