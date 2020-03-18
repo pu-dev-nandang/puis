@@ -94,9 +94,7 @@
                 <li class="nv-training" ><a href="<?=site_url('human-resources/employees/training/'.$NIP)?>"><i class="fa fa-list-alt"></i> Training</a></li>
                 <li class="nv-experience" ><a href="<?=site_url('human-resources/employees/work-experience/'.$NIP)?>"><i class="fa fa-briefcase"></i> Work Experience</a></li>
                 <li class="nv-attd" ><a href="<?=site_url('human-resources/employees/attendance/'.$NIP)?>"><i class="fa fa-calendar-check-o"></i> Attendance</a></li>
-                <!--
                 <li class="nv-benefit" ><a href="<?=site_url('human-resources/employees/credential-benefit/'.$NIP)?>"><i class="fa fa-credit-card"></i> Credential Benefit</a></li>
-                -->
               </ul>
             </div>
         </div>
