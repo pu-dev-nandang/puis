@@ -1639,21 +1639,15 @@ class C_employees extends HR_Controler {
                 }
 
                 if(!empty($output['attendance_start'])){
-                    if(!empty($output['attendance_end'])){
-                        $param[] = array("field"=>"(DATE(lem.AccessedOn)","operate"=>" >= ","data"=>"'".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
-                        $param[] = array("field"=>"DATE(lem.AccessedOn)","operate"=>" <= ","data"=>"'".date("Y-m-d",strtotime($output['attendance_end']))."' )","filter"=>"AND",);
-                    }else{
-                        $param[] = array("field"=>"DATE(lem.AccessedOn)","operate"=>" >= ","data"=>"'".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
-                    }
+                    $param[] = array("field"=>"lem.AccessedOn","operate"=>" = ","data"=>"'".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
                 }else{
-                    $param[] = array("field"=>"DATE(lem.AccessedOn)","operate"=>"=","data"=>"'".date("Y-m-d")."' ","filter"=>"AND",);
+                    $param[] = array("field"=>"lem.AccessedOn","operate"=>"=","data"=>"'".date("Y-m-d")."' ","filter"=>"AND",);
                 }
 
                 if(!empty($output['sorted'])){
                     $orderBy = $output['sorted'];
                 }
             }
-
             $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
             if(!empty($reqdata['start']) && !empty($reqdata['length'])){
@@ -1674,6 +1668,47 @@ class C_employees extends HR_Controler {
         echo json_encode($response);
     }
 
+
+    public function detailAttdTempEmp(){
+        $data = $this->input->post();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $param[] = array("field"=>"em.NIP","data"=>" = ".$data_arr['NIP'],"filter"=>"AND",);
+            $isExist = $this->m_hr->fetchEmployee(false,$param)->row();
+            if(!empty($isExist)){
+                $data['attendance'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) = DATE('".$data_arr['DATE']."')","AccessedOn","asc")->result();
+                $data['employee'] = $isExist;
+                $data['TotalActivity'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) = DATE('".$data_arr['DATE']."')","AccessedOn","asc",null,"AccessedOn")->result();
+                $department = parent::__getDepartement();
+                $this->load->view('page/'.$department.'/attendance-temp/detail',$data);                
+            }else{echo "<h1>Employee not founded</h1>";}
+        }else{show_404();}
+    }
+
+
+    public function fetchMemberDepartment(){
+        $json = array();       
+        $data = $this->input->post();
+        if($data){ 
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();
+            if(!empty($isExist)){
+                $explodeMain = explode(".", $isExist->PositionMain);
+                $param[] = array("field"=>"em.PositionMain","data"=>" like '".$explodeMain[0].".%' ","filter"=>"AND");
+                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                $param[] = array("field"=>"em.StatusEmployeeID","data"=>" = 1 ","filter"=>null);
+                $param[] = array("field"=>"em.StatusEmployeeID","data"=>" = 2 ","filter"=>"OR");
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                $json = $this->m_hr->fetchEmployee(false,$param,null,null,"em.PositionMain asc")->result();                
+            }
+        }
+        echo json_encode($json);
+    }
+
+
+    
     /*END ADDED BY FEBI @ FEB 2020*/
 
 }

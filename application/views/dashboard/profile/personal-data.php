@@ -1,5 +1,5 @@
 <div class="personal-data">
-    <form id="form-personal-data" action="<?=base_url('profile/save-changes')?>" method="post" enctype="multipart/form-data" style="margin:0px">
+    <form id="form-personal-data" action="<?=base_url('profile/save-changes/'.$NIP)?>" method="post" enctype="multipart/form-data" style="margin:0px">
         <input class="form-control" name="NIP" type="hidden" value="<?=$NIP?>" />
         <input class="form-control" name="action" type="hidden" value="profile" />
         <div class="panel panel-primary" id="form-employee" style="border-radius:0px 4px 4px 4px">
@@ -359,7 +359,7 @@
 
             var totalError = itsform.find(".error").length;
             if(error && totalError == 0 ){
-                loading_page_modal();
+                loading_modal_show();
                 $formParent[0].submit();
             }else{
                 alert("Please fill out the field.");

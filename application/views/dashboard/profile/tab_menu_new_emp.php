@@ -338,22 +338,22 @@ $(document).ready(function(){
             var token = jwt_encode(data,'UAP)(*');
             $.ajax({
                 type : 'POST',
-                url : base_url_js+"profile/detail-request",
+                url : base_url_js+"profile/detail-request/"+NIP,
                 data : {token:token},
                 dataType : 'html',
                 beforeSend :function(){
-                    loading_page_modal();
+                    loading_modal_show();
                     $(".mailing-list .detailMail").addClass("hidden");
                 },error : function(jqXHR){
-                    loading_page_modal("hide");
-                    $('#globalModalLarge .modal-header').html("Failed Error");
-                    $('#globalModalLarge .modal-body').html(jqXHR.responseText);
-                    $('#globalModalLarge').modal({
+                    loading_modal_hide();
+                    $('#GlobalModalLarge .modal-header').html("Failed Error");
+                    $('#GlobalModalLarge .modal-body').html(jqXHR.responseText);
+                    $('#GlobalModalLarge').modal({
                         'show' : true,
                         'backdrop' : 'static'
                     });
                 },success : function(response){
-                    loading_page_modal("hide");
+                    loading_modal_hide();
                     $(".load-request").html(response);
                 }
             });
@@ -460,14 +460,14 @@ $(document).ready(function(){
                             url : base_url_js+"human-resources/employees/remove-additional",
                             data : {token:token},
                             dataType : 'json',
-                            beforeSend :function(){loading_page_modal();},
+                            beforeSend :function(){loading_modal_show();},
                             error : function(jqXHR){
-                                loading_page_modal("hide");
+                                loading_modal_hide();
                                 $("body #GlobalModal .modal-body").html(jqXHR.responseText);
                                 $("body #GlobalModal").modal("show");
                             },success : function(response){
                                 console.log(response);
-                                loading_page_modal("hide");
+                                loading_modal_hide();
                                 if(jQuery.isEmptyObject(response)){
                                     alert("Data not founded. Try again.");
                                 }else{
@@ -535,7 +535,7 @@ $(document).ready(function(){
                         </div>
                         <div class="col-sm-4">
                             <div class="profile-info">
-                                <h3>Program Study <?=$employee->ProdiNameEng?></h3>
+                                <h3>Department <?=$employee->DivisionMain?></h3>
                                 <h3><?=$employee->PositionMain?></h3>
                                 <h3>Join Date 
                                 <?php if(!empty($employee->HistoricalJoin)){
@@ -560,7 +560,7 @@ $(document).ready(function(){
                                 <?php if($employee->isApproved != 0 && empty($param) ){ ?>
                                 <div class="btn-group" style="margin-top:10px;">
                                     <button class="btn btn-sm btn-<?=($employee->isApproved == 2 ) ? 'danger':'default'?>" type="button" id="btn-detail-req" data-nip="<?=$employee->NIP?>"><i class="fa fa-<?=($employee->isApproved == 2 ) ? 'user-times fa-3x':'hourglass-end fa-spin'?>"></i><br>
-                                        <?=(($employee->isApproved == 3) ? "You've made a data change.":(($employee->isApproved == 1) ? "Your request has been processed successfully and waiting for verification by HR.":"Your request has been rejected.") )?><br><b>Click here to see the detail.</b>
+                                        <?=(($employee->isApproved == 3) ? "You've made a data change.":(($employee->isApproved == 1) ? "Your request has been processed successfully <br>and waiting for verification by HR.":"Your request has been rejected.") )?><br><b>Click here to see the detail.</b>
                                     </button>
                                 </div>
                                 <?php }
@@ -591,7 +591,7 @@ $(document).ready(function(){
                         <li class="nv-edu" ><a href="<?=site_url('profile/educations/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-graduation-cap"></i> Educations</a></li>
                         <li class="nv-training" ><a href="<?=site_url('profile/training/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-list-alt"></i> Training</a></li>
                         <li class="nv-experience" ><a href="<?=site_url('profile/work-experience/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-briefcase"></i> Work Experience</a></li>
-                        <li class="nv-department" ><a href="<?=site_url('profile/department/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-building"></i> Department</a></li>
+                        <li class="nv-department" ><a href="<?=site_url('profile/department/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-building"></i> Department Member</a></li>
                       </ul>
                     </div>
                 </div>

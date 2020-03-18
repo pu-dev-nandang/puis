@@ -16,7 +16,7 @@
 
     });
 </script>
-<form id="form-experience" action="<?=base_url('profile/save-changes')?>" method="post" autocomplete="off" style="margin:0px">
+<form id="form-experience" action="<?=base_url('profile/save-changes/'.$NIP)?>" method="post" autocomplete="off" style="margin:0px">
     <input type="hidden" name="NIP" value="<?=$NIP?>">
     <input class="form-control" name="action" type="hidden" value="work-experience" />
     <div class="panel panel-primary">
@@ -128,7 +128,7 @@
             
             var totalError = itsform.find(".error").length;
             if(error && totalError == 0 ){
-                loading_page_modal();
+                loading_modal_show();
                 $("#form-experience")[0].submit();
             }else{
                 alert("Please fill out the field.");

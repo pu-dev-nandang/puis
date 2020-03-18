@@ -122,15 +122,18 @@ class M_hr extends CI_Model {
             $where = 'WHERE ';
             $counter = 0;
             foreach ($param as $key => $value) {
+                if($value['field'] == "lem.AccessedOn"){
+                    $startDate = preg_replace("/'/", '', $value['data']);
+                    $value['field'] = "DATE(".$value['field'].")";
+                    $value['data'] = $value['data'];
+                }
                 if($counter==0){
                     $where = $where.$value['field'].(!empty($value['operate']) ? $value['operate'] :'')." ".$value['data'];
                 }else{
-                    $where = $where.$value['filter'].(!empty($value['operate']) ? $value['operate'] :'')." ".$value['field']." ".$value['data'];
+                    $where = $where.$value['filter']." ".$value['field']." ".(!empty($value['operate']) ? $value['operate'] :'').$value['data'];
                 }
 
-                if($value['field'] == "lem.AccessedOn"){
-                    $startDate = $value['data'];
-                }
+                
                 $counter++;
             }
         }
@@ -141,15 +144,18 @@ class M_hr extends CI_Model {
         }
 
         if($count){
-            $select = "count(*) as Total";
+            $select = "count(DISTINCT(em.NIP)) as Total";
         }else{
-            $select = "em.*, el.Name as ProdiDegree, el.DescriptionEng as ProdiDegreeEng, ps.NameEng AS ProdiNameEng, es.Description as EmpStatus, r.Religion as EmpReligion, le.Level as EmpLevelEduName, le.Description as EmpLevelDesc, lap.Position as EmpAcaName, d.Division as DivisionMain, p.Position as PositionMain, (case when (DATE_FORMAT(em.DateOfBirth,'%m-%d') = DATE_FORMAT(now(),'%m-%d') ) then 1 else null end ) as isMyBirthday 
+            $select = "em.*, el.Name as ProdiDegree, el.DescriptionEng as ProdiDegreeEng, ps.NameEng AS ProdiNameEng, es.Description as EmpStatus, r.Religion as EmpReligion, le.Level as EmpLevelEduName, le.Description as EmpLevelDesc, lap.Position as EmpAcaName, d.Division as DivisionMain_, p.Position as PositionMain_, (case when (DATE_FORMAT(em.DateOfBirth,'%m-%d') = DATE_FORMAT(now(),'%m-%d') ) then 1 else null end ) as isMyBirthday 
                         , (select a.AccessedOn from db_employees.log_employees a
                         where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE('".$startDate."')
                         order by a.AccessedOn asc limit 1) as FirstLoginPortal
                         , (select a.AccessedOn from db_employees.log_employees a
                         where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE('".$startDate."')
-                        order by a.AccessedOn desc limit 1) as LastLoginPortal";
+                        order by a.AccessedOn desc limit 1) as LastLoginPortal
+                        ,(select COUNT(DISTINCT(a.URL)) as TotalActivity
+                        from db_employees.log_employees a 
+                        where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE('".$startDate."') ) as TotalActivity";
         }
         $sorted = " order by ".(!empty($order) ? $order : 'lem.AccessedOn asc');
         

@@ -10,7 +10,8 @@ class C_dashboard extends Globalclass {
     function __construct()
     {
         parent::__construct();
-        $this->load->model(array('master/m_master','General_model','General_model','global-informations/Globalinformation_model'));
+        $this->load->model(array('master/m_master','General_model','General_model','global-informations/Globalinformation_model','hr/m_hr'));
+        $this->load->helper("General_helper");
     }
     public function temp($content)
     {
@@ -1089,6 +1090,303 @@ class C_dashboard extends Globalclass {
             $this->tab_menu_new_emp($page,$NIP);
         }else{show_404();}
     }
+
+
+    public function departmentMember($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;            
+            $data['detail'] = $isExist;            
+            $page = $this->load->view('dashboard/profile/department-member',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function saveChanges($NIP){
+        $myNIP = $this->session->userdata('NIP');
+        $myName = $this->session->userdata('Name');
+        $data = $this->input->post();
+        if($data){
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data['NIP']))->row();
+            $uri = "profile";$err_msg=""; $action = $data['action']; unset($data['action']);
+            if(!empty($isExist)){                
+                if(!empty($_FILES['userfile']['name'])){                            
+                    $ispic = false;
+                    $file_name = $_FILES['userfile']['name'];
+                    $file_size =$_FILES['userfile']['size'];
+                    $file_tmp =$_FILES['userfile']['tmp_name'];
+                    $file_type=$_FILES['userfile']['type'];
+                    if($file_type == "image/jpeg" || $file_type == "image/png"){
+                        $ispic = true;
+                    }else {
+                        $ispic = false;
+                        $err_msg     .= "Extention image '".$file_name."' doesn't allowed.";
+                    }
+                    if($file_size > 2000000){ //2Mb
+                        $ispic = false;
+                        $err_msg     .= "Size of image '".$file_name."'s too large from 2Mb.";
+                    }else { $ispic = true; }
+
+                    $newFilename = $data['NIP']."-REQ-".date("d.m.Y").".jpg";
+
+                    if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id'){
+                        $pathInPieces = explode('/', $_SERVER['DOCUMENT_ROOT']);
+                        $t = count($pathInPieces) - 1;
+                        $newPath = "";
+                        for ($i=0; $i < $t; $i++) { 
+                            $newPath .= $pathInPieces[$i]."/";
+                        }
+                        $folderPCAM = $newPath.'pcam/';
+                    }else{
+                        $folderPCAM = $_SERVER['DOCUMENT_ROOT'].'/puis/';
+                    }
+                    $folderPCAM = $folderPCAM.'uploads/employees';
+                    if(!file_exists($folderPCAM)){
+                        mkdir($folderPCAM,0777);
+                        $error403 = "<html><head><title>403 Forbidden</title></head><body><p>Directory access is forbidden.</p></body></html>";
+                        file_put_contents($folderPCAM."/index.html", $error403);
+                    }
+                    if($ispic){
+                        $moveimage = move_uploaded_file($file_tmp,$folderPCAM."//".$newFilename);
+                        if(!$moveimage){
+                            $err_msg .= "<b>Failed insert file.</b><br>";
+                        }else{
+                            $data['Photo'] = $newFilename;
+                        }
+                    }
+                }
+
+                $Logs = [];
+                //if(!empty($isExist->Logs)){
+                $Logs = json_decode($isExist->Logs);
+                //var_dump($Logs);
+
+                $Logs->UpdatedBy = $myNIP."/".preg_replace('/\s+/', '-', $myName);
+                if(!empty($data['Photo'])){
+                    $Logs->Photo = (!empty($data['Photo'])? $data['Photo'] : $Logs->Photo);                    
+                }
+                if(!empty($data['bankName'])){
+                    $myBank = array();
+                    for ($b=0; $b < count($data['bankName']); $b++) { 
+                        $myBank[] = array("ID"=>$data['bankID'][$b],"NIP"=>$data['NIP'],"bank"=>$data['bankName'][$b],"accountName"=>$data['bankAccName'][$b],"accountNumber"=>$data['bankAccNum'][$b]);
+                    }
+                    $Logs->MyBank = $myBank;
+                }
+                if(!empty($data['familyrelation'])){
+                    $myFamily = array();
+                    for ($f=0; $f < count($data['familyrelation']); $f++) { 
+                        $myFamily[] = array("ID"=>$data['familyID'][$f],"NIP"=>$data['NIP'],"name"=>$data['familyname'][$f],"relationID"=>$data['familyrelation'][$f],"gender"=>$data['familygender'][$f],"birthdate"=>$data['familybirthdate'][$f],"placeBirth"=>$data['familyplaceBirth'][$f],"lastEduID"=>$data['familylastEdu'][$f]);
+                    }
+                    $Logs->MyFamily = $myFamily;
+                }                      
+                if(!empty($data['eduLevel'])){
+                    $myEdu = array();
+                    for ($e=0; $e < count($data['eduLevel']); $e++) { 
+                        $myEdu[] = array("ID"=>$data['eduID'][$e],"NIP"=>$data['NIP'],"levelEduID"=>$data['eduLevel'][$e],"instituteName"=>$data['eduInstitute'][$e],"location"=>$data['eduCC'][$e],"major"=>$data['eduMajor'][$e],"graduation"=>$data['eduGraduation'][$e],"gpa"=>$data['eduGPA'][$e]);
+                    }
+                    $Logs->MyEducation = $myEdu;
+                }
+                if(!empty($data['nonEduInstitute'])){
+                    $nonEduInstitute = array();
+                    for ($n=0; $n < count($data['nonEduInstitute']); $n++) { 
+                        $nonEduInstitute[] = array("ID"=>$data['nonEduID'][$n],"NIP"=>$data['NIP'],"subject"=>$data['nonEduSubject'][$n],"instituteName"=>$data['nonEduInstitute'][$n],"start_event"=>$data['nonEduStart'][$n],"end_event"=>$data['nonEduEnd'][$n],"location"=>$data['nonEduCC'][$n]);
+                    }
+                    $Logs->MyEducationNonFormal = $nonEduInstitute;
+                }
+                if(!empty($data['trainingTitle'])){
+                    $certificates = array();
+                    for ($k=0; $k < count($data['trainingTitle']); $k++) {                             
+                        if(!empty($_FILES['certificate']['name'][$k])){                            
+                            $ispic = false;
+                            $file_name = $_FILES['certificate']['name'][$k];
+                            $file_size =$_FILES['certificate']['size'][$k];
+                            $file_tmp =$_FILES['certificate']['tmp_name'][$k];
+                            $file_type=$_FILES['certificate']['type'][$k];
+                            if($file_type == "image/jpeg" || $file_type == "image/png"){
+                                $ispic = true;
+                            }else {
+                                $ispic = false;
+                                $err_msg     .= "Extention image '".$file_name."' doesn't allowed.";
+                            }
+                            if($file_size > 2000000){ //2Mb
+                                $ispic = false;
+                                $err_msg     .= "Size of image '".$file_name."'s too large from 2Mb.";
+                            }else { $ispic = true; }
+
+                            $trainingTitleFilename = preg_replace('/\s+/', "_", $data['trainingTitle'][$k]);
+                            $newFilename = $data['NIP']."-TRAINING-".$trainingTitleFilename."-".date('ymd').".jpg";
+
+                            if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id'){
+                                $pathInPieces = explode('/', $_SERVER['DOCUMENT_ROOT']);
+                                $t = count($pathInPieces) - 1;
+                                $newPath = "";
+                                for ($i=0; $i < $t; $i++) { 
+                                    $newPath .= $pathInPieces[$i]."/";
+                                }
+                                $folderPCAM = $newPath.'pcam/uploads/profile/training';
+                            }else{
+                                $folderPCAM = $_SERVER['DOCUMENT_ROOT'].'/puis/uploads/profile/training';
+                            }
+
+                            if(!file_exists($folderPCAM)){
+                                mkdir($folderPCAM,0777);
+                                $error403 = "<html><head><title>403 Forbidden</title></head><body><p>Directory access is forbidden.</p></body></html>";
+                                file_put_contents($folderPCAM."/index.html", $error403);
+                            }
+                            if($ispic){
+                                $moveimage = move_uploaded_file($file_tmp,$folderPCAM."//".$newFilename);
+                                if(!$moveimage){
+                                    $err_msg .= "<b>Failed insert file.</b><br>";
+                                }else{
+                                    $certificateName = $newFilename;
+                                }
+                            }
+                        }else{
+                            $certificateName = null;
+                        }
+                        $certificates[] = array("ID"=>$data['trainingID'][$k],"NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$k],"organizer"=>$data['trainingorganizer'][$k],"start_event"=>$data['trainingStart'][$k].' '.$data['trainingStartTime'][$k].':00',"end_event"=>$data['trainingEnd'][$k].' '.$data['trainingEndTime'][$k].':00',"location"=>$data['trainingLocation'][$k],"category"=>$data['trainingCategory'][$k],"costCompany"=>$data['trainingCostCompany'][$k],"costEmployee"=>$data['trainingCostEmployee'][$k],"certificate"=>$certificateName);                                
+                    }
+                    $Logs->MyEducationTraining = $certificates;
+                }
+
+                if(!empty($data['comName'])){
+                    $comName = array();
+                    for ($c=0; $c < count($data['comName']); $c++) { 
+                        $comName[] = array("ID"=>$data['comID'][$c],"NIP"=>$data['NIP'],"company"=>$data['comName'][$c],"industryID"=>$data['comIndustry'][$c],"start_join"=>$data['comStartJoin'][$c],"end_join"=>$data['comEndJoin'][$c],"jobTitle"=>$data['comJobTitle'][$c],"reason"=>$data['comReason'][$c]);
+                    }
+                    $Logs->MyExperience = $comName;
+                }
+
+                $example = array('An example','Another example','One Example','Last example');
+                $searchword = 'last';
+                $matches = array();
+                foreach($example as $k=>$v) {
+                    if(preg_match("/\b$searchword\b/i", $v)) {
+                        $matches[$k] = $v;
+                    }
+                }
+
+                $execpt = array("bank","edu","family","nonEdu","training","com");
+                foreach ($data as $key => $value) {
+                    foreach ($execpt as $v) {
+                        if(preg_match_all("/$v/", $key)) {
+                            unset($data[$key]);
+                        }
+                    }                    
+                }
+                foreach ($data as $key => $value) {
+                    $Logs->$key = $value;                    
+                }
+                
+                $dataPost = json_encode($Logs);
+                $update = $this->General_model->updateData("db_employees.employees",array("isApproved"=>3,"Logs"=>$dataPost,"UpdatedBy"=>$myNIP."/".preg_replace('/\s+/', '-', $myName)),array("NIP"=>$data['NIP']));
+                $message = (($update) ? "Successfully":"Failed")." updated.".(!empty($err_msg) ? "Failed upload photo. ".$err_msg : '');
+            }else{
+                $message = "Employee doesn't founded.";
+            }
+
+            if($action != 'profile'){
+                $uri = 'profile/'.$action.'/'.$data['NIP'];
+            }else{
+                $uri = $action.'/'.$data['NIP'];
+            }
+
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url($uri));            
+        }
+    }
+
+
+    public function requestDetail($NIP){
+        $data = $this->input->post();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);    
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();                        
+            $subdata = array();
+            if(!empty($isExist)){
+                if(!empty($isExist->Logs)){
+                    $Logs = json_decode($isExist->Logs);
+                    
+                    if(!empty($Logs->ReligionID)){
+                        $Logs->Religion = $this->General_model->fetchData("db_employees.religion",array("IDReligion"=>$Logs->ReligionID))->row();                        
+                    }
+                    if(!empty($Logs->MaritalStatus)){
+                        $Logs->MaritalStatus = $this->General_model->fetchData("db_employees.master_marital_status",array("ID"=>$Logs->MaritalStatus))->row();
+                    }
+                    if(!empty($Logs->CountryID)){
+                        $Logs->Country = $this->General_model->fetchData("db_admission.country",array("ctr_code"=>$Logs->CountryID))->row();                        
+                    }
+                    if(!empty($Logs->ProvinceID)){
+                        $Logs->Province = $this->General_model->fetchData("db_admission.province",array("ProvinceID"=>$Logs->ProvinceID))->row();
+                        if(!empty($Logs->RegionID)){
+                            $Logs->Region = $this->General_model->fetchData("db_admission.region",array("RegionID"=>$Logs->RegionID))->row();
+                        }
+                        if(!empty($Logs->DistrictID)){
+                            $Logs->District = $this->General_model->fetchData("db_admission.district",array("DistrictID"=>$Logs->DistrictID))->row();
+                        }
+                    }
+                    $subdata['detail'] = $Logs;
+                    if(!empty($isExist->NoteApproved)){
+                        $subdata['Note'] = $isExist->NoteApproved;
+                    }
+                    $subdata['isApproved'] = $isExist->isApproved;
+                }
+            }
+            $this->load->view("dashboard/profile/request-detail",$subdata);
+        }else{show_404();}
+    }
+
+
+    public function submitRequest($NIP){
+        $json = array();
+        $data = $this->input->post();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();
+            if(!empty($isExist)){
+                $update = $this->General_model->updateData("db_employees.employees",array("isApproved"=>1),array("NIP"=>$data_arr['NIP']));
+                $message = (($update) ? "Successfully":"Failed")." saved and your request will be forward to HR.";
+                if($update){
+                    //SEND NOTIFICATION
+                    // Send Notif for next approval
+                    $getHRStaff = $this->General_model->fetchData("db_employees.employees","PositionMain like '13.%' ")->result();
+                    $dataNIP = array();
+                    if(!empty($getHRStaff)){
+                        foreach ($getHRStaff as $v) {
+                            $dataNIP[] = $v->NIP;
+                        }
+                    }
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-question-circle margin-right" style="color:blue;"></i>  Approval Lecturer Profile',
+                                        'Description' => 'Request approval Lecturer Profile',
+                                        'URLDirect' => 'human-resources/employees',
+                                        'CreatedBy' => $isExist->NIP,
+                                        'CreatedName' => $isExist->Name,
+                                      ),
+                        'To' => array(
+                                  'NIP' => $dataNIP,
+                                ),
+                        'Email' => 'No', 
+                    );
+
+                    $url = base_url().'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $resultNotif = $this->m_master->apiservertoserver($url,$token);
+                    //END SEND NOTIFICATION
+                }
+            }else{$message = "Data employee not founded.";}
+            $json = array("message"=>$message);
+
+        }
+
+        echo json_encode($json);
+    }
+
 
     /*END ADDED BY FEBRI @ MARCH 2020*/
 

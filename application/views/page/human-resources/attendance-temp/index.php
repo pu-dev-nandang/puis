@@ -7,6 +7,7 @@
     #divDataEmployees #tableEmployees tbody td > a.card-link{text-decoration: none !important}
     #divDataEmployees #tableEmployees tbody td > a.card-link .regular{color: #555}
     #divDataEmployees #tableEmployees tbody td > a.card-link .name{font-weight: bold}
+    
 </style>
 <div id="attendance-temporary">
 	<div class="filtering">
@@ -50,11 +51,7 @@
 		            <div class="col-sm-3">
 		              <div class="form-group">
 		                <label>Attendance Day</label>
-		                <div class="input-group">
-		                  <input type="text" name="attendance_start" id="attendance_start" class="form-control" placeholder="Start date"> 
-		                  <div class="input-group-addon">-</div>
-		                  <input type="text" name="attendance_end" id="attendance_end" class="form-control" placeholder="End date"> 
-		                </div>
+		                <input type="text" name="attendance_start" id="attendance_start" class="form-control" placeholder="dd-mm-yyy"> 		                  
 		              </div>
 		            </div>
 		          </div>
@@ -167,7 +164,7 @@
 		    <div class="col-md-12">
 		      <div class="panel panel-default">
 		        <div class="panel-heading">            
-		          <h4 class="panel-title"><i class="fa fa-bars"></i> List of record home attendances today</h4>
+		          <h4 class="panel-title"><i class="fa fa-bars"></i> List of record home attendances <span>Today (<?= date('d F Y') ?>)</span></h4>
 		        </div>
 		        <div class="panel-body">
 		        	<div id="fetch-data-tables">
@@ -178,10 +175,10 @@
 	                                <th>NIP</th>
 	                                <th>Employee</th>
 	                                <th>Position</th>
-	                                <th>IP Address</th>
+	                                <th>Total Activity</th>
 	                                <th>First Login</th>
 	                                <th>Last Login</th>
-	                                <th>Detail</th>
+	                                <th width="5%">Detail</th>
 	                            </tr>
                             </thead>
                             <tbody>
@@ -236,19 +233,30 @@
             },
             "columns": [
             	{
-            		"data":"NIP"            		
+            		"data":"ID",
+            		render: function (data, type, row, meta) {
+				        return meta.row + meta.settings._iDisplayStart + 1;
+				    }
             	},
             	{
-            		"data":"NIP"            		
+            		"data":"NIP",
+            		"render": function (data, type, row, meta) {
+            			var label = "";
+            			return data;
+            		}
             	},
             	{
             		"data":"Name"            		
             	},
             	{
-            		"data":"DivisionMain"            		
+            		"data":"DivisionMain_",
+            		"render": function (data, type, row, meta) {
+            			var label = data+"-"+row.PositionMain_;
+            			return label;
+            		}            		
             	},
             	{
-            		"data":"NIP"            		
+            		"data":"TotalActivity"            		
             	},
             	{
             		"data":"FirstLoginPortal"            		
@@ -257,9 +265,12 @@
             		"data":"LastLoginPortal"            		
             	},
             	{
-            		"data":"NIP"            		
+            		"data":"NIP",
+            		"render": function (data, type, row, meta) {
+            			var label = '<button class="btn btn-info btn-detail" data-date="'+row.FirstLoginPortal+'" data-id="'+data+'"><i class="fa fa-folder-open"></i></button>';
+            			return label;
+            		}
             	},
-
         	]
         });
 	}
@@ -303,9 +314,50 @@
         alert("Please fill up field Division");
       }
     });
-    $(".btn-filter").click(function(){
+    $("#form-filter .btn-filter").click(function(){
+    	$('body #attendance-temporary #fetch-data-tables #table-list-data').DataTable().destroy();
         fetchAttendance();
+        var startDate = $("#form-filter input[name=attendance_start]").val();
+        $("#attendance-temporary .result .panel-title >span").text(startDate).addClass("bg-success");
     });
+
     fetchAttendance();
+    $("#table-list-data").on("click",".btn-detail",function(){
+    	var itsme = $(this);
+    	var NIP = itsme.data("id");
+    	var DATE = itsme.data("date");
+    	if($.trim(NIP).length > 0){
+    		var data = {
+                NIP : NIP,
+                DATE : DATE
+            };
+            var token = jwt_encode(data,'UAP)(*');
+    		$.ajax({
+                type : 'POST',
+                url : base_url_js+"human-resources/detail-attendance-temp",
+                data: {token:token},
+                dataType : 'html',
+                beforeSend :function(){
+                    itsme.html('<i class="fa fa-spinner fa-pulse fa-fw"></i>');
+                },error : function(jqXHR){
+                	itsme.html('<i class="fa fa-folder-open"></i>');
+                    $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
+                    $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                    $("body #GlobalModal").modal("show");
+                },success : function(response){
+                	itsme.html('<i class="fa fa-folder-open"></i>');
+			        $('#GlobalModal .modal-dialog').css({"width":"80%"});       
+                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+			            '<h4 class="modal-title">Detail attendance </h4>');
+			        $('#GlobalModal .modal-body').html(response);        
+			        $('#GlobalModal').modal({
+			            'show' : true,
+			            'backdrop' : 'static'
+			        });
+                }
+            });
+    	}
+    	
+    });
   });
 </script>
