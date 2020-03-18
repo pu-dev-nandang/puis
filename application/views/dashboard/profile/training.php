@@ -1,7 +1,7 @@
 <script type="text/javascript">
     $(document).ready(function(){
-        $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
-        $("#form-employee .tabulasi-emp > ul > li.nv-training").addClass("active");
+        $("#form-employee .navigation-tabs ul > li").removeClass("active");
+        $("#form-employee .navigation-tabs ul > li.nv-training").addClass("active");
         $("#datePicker-training,#datePickerSD-training").datepicker({
             dateFormat: 'yy-mm-dd',
             changeYear: true,
@@ -14,8 +14,9 @@
         });
     });
 </script>
-<form id="form-training" action="<?=base_url('human-resources/employees/training-save')?>" method="post" autocomplete="off" enctype="multipart/form-data">
+<form id="form-training" action="<?=base_url('profile/save-changes/'.$NIP)?>" method="post" autocomplete="off" enctype="multipart/form-data" style="margin:0px">
     <input type="hidden" name="NIP" value="<?=$NIP?>">
+    <input class="form-control" name="action" type="hidden" value="training" />
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h4 class="panel-title"><i class="fa fa-edit"></i> Please fill up this form with correctly data</h4>
@@ -60,16 +61,16 @@
                                         <td><input type="hidden" class="form-control train-ID" name="trainingID[]">
                                         <input type="text" class="form-control train-name required" name="trainingTitle[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control train-organizer required" name="organizer[]">
+                                        <td><input type="text" class="form-control train-organizer required" name="trainingorganizer[]">
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control datepicker-tmp required train-start_event" id="datePicker-training" name="trainingStart[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td width="5%"><input type="text" class="form-control required train-start_time_event autocomplete" id="autocomplete-start-training" name="trainingStartTime[]" value="00:00">
+                                        <td width="5%"><input type="text" class="form-control required train-start_time_event autocomplete" id="autocomplete-start-training" name="trainingStartTime[]" value="00:00" placeholder="00:00">
                                         <small class="text-danger text-message"></small></td>
 
                                         <td><input type="text" class="form-control datepicker-sd required train-end_event" id="datePickerSD-training" name="trainingEnd[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td width="5%"><input type="text" class="form-control required train-end_time_event autocomplete" id="autocomplete-end-training" name="trainingEndTime[]" value="00:00">
+                                        <td width="5%"><input type="text" class="form-control required train-end_time_event autocomplete" id="autocomplete-end-training" name="trainingEndTime[]" value="00:00" placeholder="00:00">
                                         <small class="text-danger text-message"></small></td>
                                         
                                         <td><input type="text" class="form-control train-location required" name="trainingLocation[]">
@@ -182,7 +183,7 @@
 
                             if(k == "certificate"){
                                 if(v != ""){
-                                    $cloneRow.find(".train-certificate").html('<a href="'+base_url_js+'/uploads/profile/training/'+v+'"  target="_blank" class="btn btn-xs btn-primary" ><i class="fa fa-paperclip"></i> View file</a>');
+                                    $cloneRow.find(".train-certificate").html('<a href="'+base_url_js_server_ws+'uploads/profile/training/'+v+'"  target="_blank" class="btn btn-xs btn-primary" ><i class="fa fa-paperclip"></i> View file</a>');
                                 }
                             }
 

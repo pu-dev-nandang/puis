@@ -2612,4 +2612,19 @@
         })
     }
 
+
+    /*ADDED BY FEBRI @ FEB 2020*/
+    function loadSelectOptionCountry(element,selected) {
+        var url = base_url_js+'api/__getCountry';
+        $.getJSON(url,function (jsonResult) {
+            $(element).append('<option>-- Select Country --</option>');
+            $.each(jsonResult,function (i,v) {
+                var sc = (selected==v.ctr_code) ? 'selected' : '';
+                $(element).append('<option value="'+v.ctr_code+'" '+sc+'>'+v.ctr_name+'</option>');
+            })
+            $(element).select2({'width':'100%'});
+        });
+    }
+    /*END ADDED BY FEBRI @ FEB 2020*/
+
 </script>

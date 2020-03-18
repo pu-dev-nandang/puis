@@ -186,7 +186,6 @@
 									<tr>
 										<th width="2%">No</th>
 										<th width="25%">Employee</th>
-										<th width="15%">Birthdate</th>
 										<th width="8%">Religion</th>
 										<th width="8%">Gender</th>
 										<th width="10%">Last Education</th>
@@ -297,7 +296,7 @@
 
     $(document).ready(function(){
     	fetchingData();
-    	listBday();
+    	//listBday();
     	$("#form-filter .btn-filter").click(function(){
     		$('#fetch-data-tables .table').DataTable().destroy();
     		fetchingData();

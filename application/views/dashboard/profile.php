@@ -1,4 +1,4 @@
-<div class="row hide">
+<div class="row">
 	<!--=== Big Buttons ===-->
 	<div class="col-md-12">
 		<div class="widget">

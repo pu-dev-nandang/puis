@@ -87,6 +87,16 @@ class C_database extends Globalclass {
             $message = ""; $isfinish = false;
             $isExist = $this->General_model->fetchData("db_employees.employees",$conditions)->row();
             if(!empty($isExist)){
+                if($data_arr['ACT'] == 2){ //for rejected
+                    $dataPost = array("isApproved"=>2,"NoteApproved"=>(!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null));                    
+                    $rejectData = $this->General_model->updateData("db_employees.employees",$dataPost,$conditions);
+                    $message = ($rejectData ? "Successfully":"Failed")." saved.";
+                }else if($data_arr['ACT'] == 0){ //for approved
+                    $reqData = $isExist->Logs
+                }else{$message="Unknow request approved.";}
+            }
+
+            /*if(!empty($isExist)){
                 if($data_arr['ACT'] == 1){
                     $getTempEmpyReq = $this->General_model->fetchData("db_employees.tmp_employees",$conditions)->row();
                     $dataAppv = array();
@@ -161,7 +171,7 @@ class C_database extends Globalclass {
                     $message = (($updateTempStd) ? "Successfully":"Failed")." saved." ;
                     $isfinish = $updateTempStd;
                 }
-            }else{$message="Student data is not founded.";}
+            }else{$message="Student data is not founded.";}*/
             $json = array("message"=>$message,"finish"=>$isfinish);
         }
 

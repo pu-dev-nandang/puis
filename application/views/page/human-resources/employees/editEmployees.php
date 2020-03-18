@@ -4,206 +4,346 @@
         $("#form-employee .tabulasi-emp > ul > li.nv-personal").addClass("active");
     });
 </script>
+<style type="text/css">
+    .bg-required{color: red;font-weight: bold;}
+</style>
 
-<div class="row">
-        <div class="col-sm-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading" style="border-radius: 0px;">
-                    <h4 class="panel-title"><i class="fa fa-edit"></i> Edit Employer</h4>
-                </div>
-                <div class="panel-body" style="min-height: 100px;">
+<div class="panel panel-primary" id="form-employee">
+    <div class="panel-heading" style="border-radius: 0px;">
+        <h4 class="panel-title"><i class="fa fa-edit"></i> Please, Fill out this form with correctly data</h4>
+    </div>
+    <div class="panel-body" style="min-height: 100px;">
 
-                    <div class="row">
-                        <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label>NIK / NIP</label>
-                                        <input class="form-control" disabled id="formNIP" value="<?php echo $arrEmp['NIP']; ?>">
-                                    </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title"><i class="fa fa-id-card"></i> Fill out this field based on Identity Card (KTP)
+                        <span class="bg-required pull-right">required</span></h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xs-5">
+                                <div class="form-group">
+                                    <label>Full Name </label>
+                                    <input class="form-control required" id="formName" autocomplete="off"  value="<?php echo $arrEmp['Name']; ?>" />
+                                    <small class="text-danger text-message"></small>
                                 </div>
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label>NUP</label>
-                                        <input class="form-control" id="formNUP" value="<?php echo $arrEmp['NUP']; ?>">
-                                    </div>
+                            </div>
+                            <div class="col-xs-2">
+                                <div class="form-group">
+                                    <label>Title Ahead</label>
+                                    <input class="form-control" id="formTitleAhead" autocomplete="off"  value="<?php echo $arrEmp['TitleAhead']; ?>" />
                                 </div>
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label>NIDN</label>
-                                        <input class="form-control" id="formNIDN" value="<?php echo $arrEmp['NIDN']; ?>">
-                                    </div>
+                            </div>
+                            <div class="col-xs-2">
+                                <div class="form-group">
+                                    <label>Title Behind</label>
+                                    <input class="form-control" id="formTitleBehind" autocomplete="off"  value="<?php echo $arrEmp['TitleBehind']; ?>" />
                                 </div>
-
-                                <div class="col-xs-3">
-                                    <div class="form-group">
-                                        <label>NIDK</label>
-                                        <input class="form-control" id="formNIDK" value="<?php echo $arrEmp['NIDK']; ?>">
-                                    </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <select class="form-control required" id="formGender">
+                                        <option value="">Choose one</option>
+                                        <option value="L">Male</option>
+                                        <option value="P">Female</option>
+                                    </select>
+                                    <small class="text-danger text-message"></small>
                                 </div>
-
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-5">
-                        <div class="form-group">
-                            <label>No KTP *</label>
-                            <input class="form-control" id="formKTP" value="<?php echo $arrEmp['KTP']; ?>" />
+                            </div>
+                            
                         </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Card Number</label>
-                            <input type="text" class="form-control" id="CardNumber" value="<?= $arrEmp['Access_Card_Number']; ?>">
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <div class="form-group">
+                                    <label>Number of ID Card </label>
+                                    <input class="form-control number required" id="formKTP" autocomplete="off"  value="<?php echo $arrEmp['KTP']; ?>" />
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>Religion </label>
+                                    <select class="form-control required" id="formReligion">
+                                        <option value="">Choose one</option>
+                                    </select>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <label>Marital Status</label>
+                                <select class="form-control required" id="formMaritalStatus">
+                                    <option value="">Choose One</option>
+                                </select>
+                                <small class="text-danger text-message"></small>
+                            </div>
+                            <div class="col-xs-2">
+                                <div class="form-group">
+                                    <label>Blood</label>
+                                    <input class="form-control required" id="formBlood" maxlength="3" value="<?php echo $arrEmp['Blood']; ?>" />
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>Religion *</label>
-                            <select class="form-control" id="formReligion"></select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-9">
-                        <div class="form-group">
-                            <label>Name *</label>
-                            <input class="form-control" id="formName" value="<?php echo $arrEmp['Name']; ?>" />
-                        </div>
-                    </div>
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>Gender *</label>
-                            <select class="form-control" id="formGender">
-                                <option value="L">Male</option>
-                                <option value="P">Female</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-6">
-                        <div class="form-group">
-                            <label>Title Ahead</label>
-                            <input class="form-control" id="formTitleAhead" value="<?php echo $arrEmp['TitleAhead']; ?>" />
-                        </div>
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="form-group">
-                            <label>Title Behind</label>
-                            <input class="form-control" id="formTitleBehind" value="<?php echo $arrEmp['TitleBehind']; ?>" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="form-group">
-                            <label>Place Of Birth *</label>
-                            <input class="form-control" id="formPlaceOfBirht" value="<?php echo $arrEmp['PlaceOfBirth']; ?>" />
-                        </div>
-                    </div>
-                    <div class="col-xs-12">
-                        <div class="form-group">
-
-                            <div class="thumbnail" style="padding: 10px;text-align: center;">
-                                <h4>Date Of Birth *</h4>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group" style="margin-bottom:0px">
+                                    <label>Place of Birth</label>
+                                </div>
+                                <div class="form-group">
+                                    <label>Type name of city</label>
+                                    <input class="form-control required" id="formPlaceOfBirht" value="<?php echo $arrEmp['PlaceOfBirth']; ?>" />
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="form-group" style="margin-bottom:0px">
+                                    <label>Date of birth</label>
+                                </div>
                                 <div class="row">
                                     <div class="col-xs-4">
                                         <div class="form-group">
                                             <label>Year</label>
-                                            <select class="form-control" id="formYearBirth"></select>
+                                            <select class="select2-req" id="formYearBirth">
+                                                <option>Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
                                         </div>
                                     </div>
                                     <div class="col-xs-4">
                                         <div class="form-group">
                                             <label>Month</label>
-                                            <select class="form-control" id="formMontBirth"></select>
+                                            <select class="form-control required" id="formMontBirth">
+                                                <option value="">Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
                                         </div>
                                     </div>
                                     <div class="col-xs-4">
                                         <div class="form-group">
                                             <label>Date</label>
-                                            <select class="form-control" id="formDateBirth"></select>
+                                            <select class="form-control required" id="formDateBirth">
+                                                <option value="">Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-6">
-                        <div class="form-group">
-                            <label>Phone</label>
-                            <input class="form-control" id="formPhone" value="<?php echo $arrEmp['Phone']; ?>" />
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <textarea rows="3" class="form-control required" id="formAddress"><?php echo $arrEmp['Address']; ?></textarea>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Mobile</label>
-                            <input class="form-control" id="formMobile" value="<?php echo $arrEmp['HP']; ?>" />
+                        
+                        <div class="row" id="PlaceIDCard">
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>Country</label>
+                                    <select class="com-CountryID select2-req" id="CountryID" name="CountryID"></select>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>Province</label>
+                                    <select class="form-control isrequire com-ProvinceID" id="ProvinceID" name="ProvinceID">
+                                        <option value="">Choose one</option>
+                                    </select>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>Region</label>
+                                    <select class="form-control isrequire com-RegionID" id="RegionID" name="RegionID">
+                                        <option value="">Choose one</option>
+                                    </select>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>District</label>
+                                    <select class="form-control isrequire com-DistrictID" id="DistrictID" name="DistrictID">
+                                        <option value="">Choose one</option>
+                                    </select>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>                            
                         </div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div class="form-group">
-                            <label>Blood</label>
-                            <input class="form-control" id="formBlood" value="<?php echo $arrEmp['Blood']; ?>" />
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="form-group">
-                            <label>Email PU</label>
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <?php $EmailPU = ($arrEmp['EmailPU']!='') ? explode('@',$arrEmp['EmailPU'])[0] : ''; ?>
-                                    <input type="text" class="form-control" id="formEmailPU" value="<?php echo $EmailPU; ?>" disabled />
-                                    <span class="input-group-addon">@podomorouniversity.ac.id</span>
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <div class="form-group">
+                                    <label>Postcode</label>
+                                    <input type="text" class="form-control required number" id="formPostcode" maxlength="5" value="<?php echo $arrEmp['Postcode']; ?>">
+                                    <small class="text-danger text-message"></small>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xs-6">
-                        <div class="form-group">
-                            <label>Email Other</label>
-                            <input class="form-control" id="formEmail" value="<?php echo $arrEmp['Email']; ?>" />
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <label>Marital Status*</label>
-                        <select class="form-control" id="formMaritalStatus">
-                            <option value="">Choose One</option>
-                        </select>
-                    </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="form-group">
-                            <label>Address *</label>
-                            <textarea rows="3" class="form-control" id="formAddress" placeholder="Same as your Address on identity card"><?php echo $arrEmp['Address']; ?></textarea>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <i class="fa fa-id-card"></i> Fill out this field based on Employee Data
+                            <span class="bg-required pull-right">required</span>
+                        </h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>NIK / NIP</label>
+                                            <input class="form-control required number" id="formNIP" value="<?php echo $arrEmp['NIP']; ?>" />
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Access Card Number</label>
+                                            <input type="text" class="form-control number required" id="CardNumber" value="<?= $arrEmp['Access_Card_Number']; ?>">
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label>Status Employees</label>
+                                            <select class="form-control required" id="formStatusEmployee">
+                                                <option value="">Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label>Level of Education</label>
+                                            <select class="form-control required" id="formLevelEducationID">
+                                                <option value="">Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Email Other</label>
+                                            <input class="form-control required" id="formEmail" autocomplete="off" value="<?php echo $arrEmp['Email']; ?>" />
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>  
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Phone</label>
+                                            <input class="form-control number" id="formPhone" autocomplete="off" value="<?php echo $arrEmp['Phone']; ?>" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Mobile</label>
+                                            <input class="form-control number required" id="formMobile" autocomplete="off" value="<?php echo $arrEmp['HP']; ?>" />
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>                                
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group" style="margin-bottom:0px">
+                                            <label>Internal telphone number</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Extension</label>                                            
+                                            <input class="form-control number" id="formExtension" autocomplete="off" maxlength="5" value="<?php echo $arrEmp['Extension']; ?>" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Password Telp</label>                                            
+                                            <input class="form-control number" id="formPassTelp" autocomplete="off" value="<?php echo $arrEmp['PassTelp']; ?>" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label>Email PU</label>
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <?php $EmailPU = ($arrEmp['EmailPU']!='') ? explode('@',$arrEmp['EmailPU'])[0] : ''; ?>
+                                                    <input type="text" class="form-control" id="formEmailPU" disabled value="<?php echo $EmailPU; ?>">
+                                                    <span class="input-group-addon">@podomorouniversity.ac.id</span>
+                                                </div>
+                                                <label> *Email PU Auto Generete by system</label>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                </div>
+                                
+                            </div>
+                            
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Photo</label>
+                                </div>
+                                <div class="form-group">
+                                    <center>
+                                    <?php $imgPr = ($arrEmp['Photo']!='' && $arrEmp['Photo']!=null &&
+                                    file_exists('./uploads/employees/'.$arrEmp['Photo']))
+                                    ? base_url('uploads/employees/'.$arrEmp['Photo'])
+                                    : base_url('images/icon/userfalse.png'); ?>
+                                    <img id="imgThumbnail" src="<?= $imgPr ?>" style="max-width: 100px;width: 100%;">
+                                    </center>
+                                    <form id="fmPhoto" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                                        <input id="formPhoto" class="hide" value="" hidden />
+                                        <div class="form-group">
+                                                <label class="btn btn-sm btn-default btn-default-warning btn-upload" style="width:100%">
+                                                <i class="fa fa-upload margin-right"></i> Upload Photo
+                                                <input type="file" id="filePhoto" name="userfile" class="uploadPhotoEmp" style="display: none;" accept="image/*">
+                                            </label>
+                                            <p style="font-size: 12px;color: #ccc;">*) NIK / NIP must be fill before upload photo</p>
+                                        </div>
+                                    </form>
+                                    <div style="text-align: left;padding-top: 10px;border-top: 1px solid #ccc;margin-top: 0px;">
+                                        Size : <span id="imgSize">0</span> Kb <br/>
+                                        Type : <span id="imgType">-</span>
+                                        <input id="formImgType" class="hide" hidden readonly />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Ijazah (Maksimum Size 8 Mb)</label>
+                                    <form id="fmIjazah" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                                        <input id="formIjazahExt" class="hide" value="" />
+                                        <div class="form-group">
+                                            <label class="btn btn-sm btn-default btn-default-primary btn-upload" style="width:100%">
+                                                <i class="fa fa-upload margin-right"></i> Upload Ijazah (.pdf)
+                                                <input type="file" id="fileIjazah" name="userfile" class="uploadIjazah"
+                                                       style="display: none;" accept="application/pdf">
+                                            </label>
+                                        </div>
+                                    </form>
+                                </div>  
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div class="col-xs-2">
-                        <div class="form-group">
-                            <label>Postcode *</label>
-                            <input type="text" class="form-control" id="formPostcode" value="<?php echo $arrEmp['Postcode']; ?>">
-                        </div>
-                    </div>
-                </div>
-                <p><b>*) Please fill out this field by referring to ID card</b></p>
-
             </div>
 
             <div class="col-md-6">
@@ -217,19 +357,19 @@
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Division</label>
-                                        <select class="form-control" id="form_MainDivision"></select>
+                                        <select class="form-control required" id="form_MainDivision"></select>
+                                        <small class="text-danger text-message"></small>
                                     </div>
                                 </div>
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Position</label>
-                                        <select class="form-control" id="form_MainPosition"></select>
+                                        <select class="form-control required" id="form_MainPosition"></select>
+                                        <small class="text-danger text-message"></small>
                                     </div>
                                 </div>
                             </div>
-                            <div id = "AddingProdi">
-                                
-                            </div>
+                            <div id = "AddingProdi"></div>
                         </div>
                     </div>
                 </div>
@@ -261,7 +401,6 @@
                     <div class="col-xs-12">
                         <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
                             <h4>Position Other 2</h4>
-
                             <div class="row">
                                 <div class="col-xs-6">
                                     <div class="form-group">
@@ -284,7 +423,6 @@
                     <div class="col-xs-12">
                         <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
                             <h4>Position Other 3</h4>
-
                             <div class="row">
                                 <div class="col-xs-6">
                                     <div class="form-group">
@@ -304,166 +442,110 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Status Employee</label>
-                            <select class="form-control" id="formStatusEmployee"></select>
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Status Lecturer</label>
-                            <select class="form-control" id="formStatusLecturer">
-                                <option>* Not Set</option>
-                                <option disabled>------</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-
-                        <label>Status Forlap</label>
-                        <select class="form-control" id="formStatusForlap">
-                            <option>* Not Set</option>
-                            <option disabled>------</option>
-                            <option value="0">NUP (Contract)</option>
-                            <option value="1">NIDN (Permanent)</option>
-                            <option value="2">NIDK (Special)</option>
-                        </select>
-
-
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Programme Study</label>
-                            <select class="form-control" id="formProgrammeStudy"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Profession</label>
-                            <input class="form-control" id="formProfession" value="<?= $arrEmp['Profession']; ?>">
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Level of Education</label>
-                            <select class="form-control" id="formLevelEducationID"></select>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" id="formSerdos" <?= ($arrEmp['Serdos']=='1') ? 'checked' : ''; ?> value="1">
-                                    Certified Dosen (Serdos)
-                                </label>
+                    <div class="col-sm-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <i class="fa fa-id-card"></i> Fill out this field based on Lecturer Data
+                                </h4>
                             </div>
-                            <input type="text" id="formSerdosNumber" class="form-control" <?= ($arrEmp['Serdos']=='1') ? '' : 'disabled'; ?> value="<?= $arrEmp['SerdosNumber']; ?>" placeholder="Serdos Number">
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Academic Position</label>
-                            <select class="form-control" id="formLecturerAcademicPositionID">
-                                <option>* Not Set</option>
-                                <option disabled>------</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" id="formCertified" <?= ($arrEmp['Certified']=='1') ? 'checked' : ''; ?> value="1">
-                                    Certified
-                                </label>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>Status Lecturer</label>
+                                            <select class="form-control" id="formStatusLecturer">
+                                                <option>* Not Set</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>NUP</label>
+                                            <input class="form-control" id="formNUP" value="<?php echo $arrEmp['NUP']; ?>" />
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>NIDN</label>
+                                            <input class="form-control" id="formNIDN" value="<?php echo $arrEmp['NIDN']; ?>" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>NIDK</label>
+                                            <input class="form-control" id="formNIDK" value="<?php echo $arrEmp['NIDK']; ?>" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>Status Forlap</label>
+                                            <select class="form-control" id="formStatusForlap">
+                                                <option>* Not Set</option>
+                                                <option disabled>------</option>
+                                                <option value="0">NUP (Contract)</option>
+                                                <option value="1">NIDN (Permanent)</option>
+                                                <option value="2">NIDK (Special)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>Programme Study</label>
+                                            <select class="form-control" id="formProgrammeStudy"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>Academic Position</label>
+                                            <select class="form-control" id="formLecturerAcademicPositionID">
+                                                <option>* Not Set</option>
+                                                <option disabled>------</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">                        
+                                        <div class="form-group">
+                                            <label>Profession</label>
+                                            <input class="form-control" id="formProfession" value="<?= $arrEmp['Profession']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4">                        
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="formSerdos" <?= ($arrEmp['Serdos']=='1') ? 'checked' : ''; ?> value="1">
+                                                Certified Dosen (Serdos)
+                                            </label>
+                                        </div>
+                                        <input type="text" id="formSerdosNumber" class="form-control" <?= ($arrEmp['Serdos']=='1') ? '' : 'disabled'; ?> value="<?= $arrEmp['SerdosNumber']; ?>" placeholder="Serdos Number">
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <div class="form-group">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" id="formCertified" <?= ($arrEmp['Certified']=='1') ? 'checked' : ''; ?> value="1">
+                                                    Certified
+                                                </label>
+                                            </div>
+                                            <button class="btn btn-sm btn-default" id="btnCertificate"><i class="fa fa-folder margin-right"></i> Certificate</button>
+                                        </div>
+                                    </div>  
+                                </div>
                             </div>
-                            <button class="btn btn-sm btn-default" id="btnCertificate"><i class="fa fa-folder margin-right"></i> Certificate</button>
                         </div>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div class="col-xs-12">
-                        <label>Ijazah</label>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-3" style="text-align: center;border-right: 1px solid #CCCCCC;">
-                        <hr/>
-                        <?php $imgPr = ($arrEmp['Photo']!='' && $arrEmp['Photo']!=null &&
-                            file_exists('./uploads/employees/'.$arrEmp['Photo']))
-                            ? base_url('uploads/employees/'.$arrEmp['Photo'])
-                            : base_url('images/icon/userfalse.png'); ?>
-                        <img id="imgThumbnail" src="<?php echo $imgPr; ?>" style="max-width: 100px;width: 100%;">
-                        <div style="text-align: left;padding-top: 10px;border-top: 1px solid #ccc;margin-top: 10px;">
-                            Size : <span id="imgSize">-</span> Kb <br/>
-                            Type : <span id="imgType">-</span>
-                            <input id="formImgType" class="hide" hidden readonly />
-                        </div>
-                    </div>
-                    <div class="col-xs-9">
-                        <hr/>
-                        <label>Photo</label>
-                        <div class="form-group">
-
-                            <form id="fmPhoto" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
-                                <input id="formPhoto" class="hide" value="" hidden />
-                                <label class="btn btn-sm btn-default btn-default-warning btn-upload">
-                                    <i class="fa fa-upload margin-right"></i> Upload Photo
-                                    <input type="file" id="filePhoto" name="userfile" class="uploadPhotoEmp"
-                                           style="display: none;" accept="image/*">
-                                </label>
-                                <p style="font-size: 12px;color: #ccc;">*) NIK / NIP must be fill before upload photo</p>
-                            </form>
-                        </div>
-
-                        <label>Ijazah (Maksimum Size 8 Mb)</label>
-                        <form id="fmIjazah" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
-                            <input id="formIjazahExt" class="hide" value="" />
-                            <div class="form-group">
-                                <label class="btn btn-sm btn-default btn-default-primary btn-upload">
-                                    <i class="fa fa-upload margin-right"></i> Upload Ijazah (.pdf)
-                                    <input type="file" id="fileIjazah" name="userfile" class="uploadIjazah"
-                                           style="display: none;" accept="application/pdf">
-                                </label>
-                            </div>
-                        </form>
-                    </div>
-
-                </div>
-
             </div>
 
         </div>
-
-        <div class="row">
-            <div class="col-md-12"><hr/></div>
-            <div class="col-md-6">
-                <?php
-                // 2017114 Irfan = Button sementara di munculin untuk Irfan IT dulu
-                $hideDelete = ($this->session->userdata('NIP') == '2017114') ? '' : 'hide'; ?>
-                <div class="<?= $hideDelete ?>">
-                    <?php
-                    $idBtnDelPermananet = ($btnDelPermanent['Status']==0) ? 'id="btnDelPeranentCuy"' : '';
-                    $btnDis = ($btnDelPermanent['Status']==0) ? '' : 'disabled';
-
-                    ?>
-                    <div>
-
-                        <button class="btn btn-warning" <?php echo $btnDis; ?> <?php echo $idBtnDelPermananet; ?>>Permanent Delete</button>
-                        <p style="margin-top: 5px;color: blue;">*) <?php echo $btnDelPermanent['Msg']; ?></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6" style="text-align: right;">
-
-
-                <button class="btn btn-success" id="btnUpdate">Save</button> |
-                <button class="btn btn-danger hide" disabled hidden id="btnDelete">Delete</button>
-            </div>
-        </div>
-
     </div>
+    <div class="panel-footer text-right">
+        <button class="btn btn-success" id="btnSave">Save</button>
+    </div>
+</div>
 
 
 
@@ -488,6 +570,7 @@
         var exDOB = DateOfBirth.split('-');
         loadYearOfBirth('#formYearBirth',exDOB[0].trim());
         loadMonthBirth('#formMontBirth',exDOB[1].trim());
+        $("#formYearBirth").select2({width:'100%'});
 
         loadCountDays(exDOB[0],exDOB[1],'#formDateBirth',exDOB[2]);
 
@@ -566,6 +649,49 @@
         <?php if($arrEmp['StatusForlap']!='' && $arrEmp['StatusForlap']!=null){ ?>
             $('#formStatusForlap').val(<?= $arrEmp['StatusForlap']; ?>);
         <?php } ?>
+
+
+        loadSelectOptionCountry("#CountryID","<?= (!empty($arrEmp['CountryID']) ? $arrEmp['CountryID'] : '001'); ?>");
+        loadSelectOptionLoc_Province('#ProvinceID',"<?=$arrEmp['ProvinceID'] ?>");
+        loadSelectOptionLoc_Regions("<?=$arrEmp['ProvinceID'] ?>",'#RegionID',"<?=$arrEmp['RegionID'] ?>");
+        loadSelectOptionLoc_District("<?=$arrEmp['RegionID'] ?>",'#DistrictID',"<?=$arrEmp['DistrictID'] ?>");
+
+        $('#CountryID').change(function () {
+            var value = $(this).val();
+            if($.isNumeric(value)){
+                if(value == '001'){
+                    $("#form-employee .isrequire").addClass("required").prop("disabled",false);;
+                    loadSelectOptionLoc_Province('#ProvinceID','');
+                }else{
+                    $("#form-employee .isrequire").val("").removeClass("required").prop("disabled",true);
+                }
+            }
+            var ProvinceID = $('#ProvinceID').val();
+            $('#RegionID').html('<option value="">Choose one</option>');
+            $('#DistrictID').html('<option value="">Choose one</option>');
+            if(ProvinceID!='' && ProvinceID!=null){
+                loadSelectOptionLoc_Regions(ProvinceID,'#RegionID','');
+            }
+        });
+
+        
+        $('#ProvinceID').change(function () {
+            var ProvinceID = $('#ProvinceID').val();
+            $('#RegionID').html('<option value="">Choose one</option>');
+            $('#DistrictID').html('<option value="">Choose one</option>');
+            if(ProvinceID!='' && ProvinceID!=null){
+                loadSelectOptionLoc_Regions(ProvinceID,'#RegionID','');
+            }
+        });
+
+
+        $('#RegionID').change(function () {
+            var RegionID = $('#RegionID').val();
+            $('#DistrictID').html('<option value="" disabled selected>-- Select District --</option>');
+            if(RegionID!='' && RegionID!=null){
+                loadSelectOptionLoc_District(RegionID,'#DistrictID','');
+            }
+        });
 
 
     });
@@ -766,6 +892,64 @@
         }
     });
 
+    $('#btnSave').click(function () {
+        /*var NIP = $('#formNIP').val();
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;">' +
+            'Pastikan NIK / NIP yang dimasukan tidak salah. <br/>' +
+            'NIK / NIP : <b>'+NIP+'</b> ' +
+            '<hr/>' +
+            '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
+            '<button type="button" class="btn btn-success" id="btnSubmitEmployees">Submit</button>' +
+            '</div> ');
+
+        $('#NotificationModal').modal({
+            'backdrop' : 'static',
+            'show' : true
+        });*/
+
+        var itsme = $(this);
+        var itsform = itsme.parent().parent();
+        itsform.find(".select2-req").each(function(){
+            var value = $(this).val();
+            if($.isNumeric(value)){
+                if($.trim(value) == ''){
+                    $(this).addClass("error");
+                    $(this).parent().find(".text-message").text("Please fill this field");
+                    error = false;
+                }else{
+                    error = true;
+                    $(this).removeClass("error");
+                    $(this).parent().find(".text-message").text("");
+                }
+            }else{
+                error = false;  
+                $(this).addClass("error");
+                $(this).parent().find(".text-message").text("Please fill this field");
+            }
+        });
+        itsform.find(".required").each(function(){
+            var value = $(this).val();
+            if($.trim(value) == ''){
+                $(this).addClass("error");
+                $(this).parent().find(".text-message").text("Please fill this field");
+                error = false;
+            }else{
+                error = true;
+                $(this).removeClass("error");
+                $(this).parent().find(".text-message").text("");
+            }
+        });
+        
+        var totalError = itsform.find(".error").length;
+        if(error && totalError == 0 ){
+            itsme.prop("disabled",true).text("Loading..");
+            updateEmployees();
+        }else{
+            alert("Please fill out the field.");
+        }
+
+    });
+
     $('#btnUpdate').click(function () {
         updateEmployees();
     });
@@ -818,6 +1002,13 @@
         var formStatusEmployee = $('#formStatusEmployee').val();
         var formProgrammeStudy = $('#formProgrammeStudy').val();
         var Access_Card_Number = $('#CardNumber').val();
+
+        var CountryID = $('#CountryID').val();
+        var ProvinceID = $('#ProvinceID').val();
+        var RegionID = $('#RegionID').val();
+        var DistrictID = $('#DistrictID').val();
+        var formExtension = $('#formExtension').val();
+        var formPassTelp = $('#formPassTelp').val();
 
         var formSerdos = ($('#formSerdos').is(":checked")) ? '1' : '0';
         var formSerdosNumber = $('#formSerdosNumber').val();
@@ -944,7 +1135,13 @@
                     StatusForlap : formStatusForlap,
                     Access_Card_Number : Access_Card_Number,
                     Serdos : formSerdos,
-                    SerdosNumber : formSerdosNumber
+                    SerdosNumber : formSerdosNumber,
+                    CountryID   : CountryID,
+                    ProvinceID  : ProvinceID,
+                    RegionID    : RegionID,
+                    DistrictID  : DistrictID,
+                    Extension   : formExtension,
+                    PassTelp    : formPassTelp
 
                 }
             };

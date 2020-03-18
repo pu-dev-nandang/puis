@@ -1,8 +1,7 @@
-<script type="text/javascript">
-	
+<script type="text/javascript">	
     $(document).ready(function(){
-        $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
-        $("#form-employee .tabulasi-emp > ul > li.nv-experience").addClass("active");
+        $("#form-employee .navigation-tabs ul > li").removeClass("active");
+        $("#form-employee .navigation-tabs ul > li.nv-experience").addClass("active");
         $("#datePicker-experience,#datePickerSD-experience").datepicker({
             dateFormat: 'yy-mm-dd',
             changeYear: true,
@@ -17,8 +16,9 @@
 
     });
 </script>
-<form id="form-experience" action="<?=base_url('human-resources/employees/experience-save')?>" method="post" autocomplete="off">
+<form id="form-experience" action="<?=base_url('profile/save-changes/'.$NIP)?>" method="post" autocomplete="off" style="margin:0px">
     <input type="hidden" name="NIP" value="<?=$NIP?>">
+    <input class="form-control" name="action" type="hidden" value="work-experience" />
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h4 class="panel-title"><i class="fa fa-edit"></i> Please fill up this form with correctly data</h4>
@@ -51,7 +51,6 @@
                                         <th>End Join</th>
                                         <th>Job Title</th>
                                         <th>Reason Exit</th>
-                                        <th>Note</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -60,8 +59,8 @@
                                         <td><input type="hidden" class="form-control exp-ID" name="comID[]">
                                         <input type="text" class="form-control required exp-company autocomplete" required name="comName[]" id="autocomplete-experience">
                                         <small class="text-danger text-message"></small></td>
-                                        <td class="industries"><select class="select2-tmp select2-req exp-industryID" name="comIndustry[]" id="select2-experience">
-                                                <option>Choose one</option>
+                                        <td class="industries"><select class="required exp-industryID form-control" name="comIndustry[]">
+                                                <option value="">Choose one</option>
                                                 <?php if(!empty($industry)){
                                                 foreach ($industry as $in) { 
                                                     echo '<option value="'.$in->ID.'">'.$in->name.'</option>';
@@ -76,7 +75,6 @@
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control exp-reason required" required name="comReason[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><textarea class="form-control exp-Note" name="Note[]" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -148,11 +146,11 @@
                     $cloneRow.find("td:first").text(num);
                     $.each(value,function(k,v){
                         $cloneRow.find(".exp-"+k).val(v);    
-                        if(k=="industryID"){
-                        	var cc = $cloneRow.find(".select2-tmp").attr("id","select2-experience-"+num);
-                        	cc.prev().remove();
-                        	cc.select2({width:'100%'});
-                        }
+                        /*if(k=="industryID"){
+                            var cc = $cloneRow.find(".select2-tmp").attr("id","select2-experience-"+num).select2('destroy');
+                            cc.next().remove();
+                            cc.select2({width:'100%'});
+                        }*/
                         if(k=="start_join"){
                             var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-"+num).removeClass("hasDatepicker");
                             cc.datepicker({
@@ -169,6 +167,7 @@
                                 changeMonth: true
                             });
                         }
+
                     });
                     
                     $tablename.find("tbody").append($cloneRow);

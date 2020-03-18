@@ -175,7 +175,7 @@
 									<tr>
 										<th width="2%">No</th>
 										<th width="30%">Lecturer</th>
-										<th width="20%">Birthdate</th>
+										
 										<th width="8%">Religion</th>
 										<th width="8%">Gender</th>
 										<th width="8%">Last Education</th>

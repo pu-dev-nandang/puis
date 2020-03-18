@@ -508,7 +508,7 @@ class C_api extends CI_Controller {
 
             if(!empty($output['isapprove'])){
                 if($output['isapprove']){
-                    $dataWhere .= "AND (te.isApproval = 1) ";
+                    $dataWhere .= "AND em.isApproved = 1 ";
                 }
             }
 
@@ -602,9 +602,9 @@ class C_api extends CI_Controller {
                           </ul>
                         </div>';
 
-            $isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
+            //$isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
             $needAppv = "";
-            if(!empty($isRequested)){
+            if($row['isApproved'] == 1){
                 if($this->session->userdata('IDdepartementNavigation') == 13){
                     $needAppv = '<p><button class="btn btn-xs btn-info btn-appv" type="button" data-nip="'.$row["NIP"].'" title="Need approving for biodata" ><i class="fa fa-warning"></i> Need Approval</button></p>';
                 }
@@ -640,118 +640,6 @@ class C_api extends CI_Controller {
 
         echo json_encode($json_data);
         /*END UPDATED BY FEBRI @ JAN 2020*/
-
-
-
-
-
-
-        /*OLD*/
-            /*$status = $this->input->get('s');
-            $requestData= $_REQUEST;
-
-            $whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
-            //print_r($status);
-
-            //$totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
-
-
-            /*UPDATED BY FEBRI @ NOV 2019*/
-            /*$sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                    ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
-                    FROM db_employees.employees em
-                    LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                    LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
-                    LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
-                    WHERE em.StatusEmployeeID != -2 '.$whereStatus;
-            if($requestData['isappv'] === 'true'){
-                $sql .= " AND (te.isApproval = 1) ";
-            }
-
-            if( !empty($requestData['search']['value']) ) {
-                $sql.= ' AND ( em.NIP LIKE "'.$requestData['search']['value'].'%" ';
-                $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
-                $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
-                $sql.= ') ORDER BY NIP  ASC';
-            }else {
-                $sql.= 'ORDER BY em.StatusEmployeeID, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-            }*/
-            /*END UPDATED BY FEBRI @ NOV 2019*/
-
-            /*$query = $this->db->query($sql)->result_array();
-            $totalData = count($query);
-            $data = array();
-
-            for($i=0;$i<count($query);$i++){
-                $nestedData=array();
-                $row = $query[$i];
-
-                $jb = explode('.',$row["PositionMain"]);
-                $Division = '';
-                $Position = '';
-
-                if(count($jb)>1){
-                    $dataDivision = $this->db->select('Division')->get_where('db_employees.division',array('ID'=>$jb[0]),1)->result_array()[0];
-                    $dataPosition = $this->db->select('Position')->get_where('db_employees.position',array('ID'=>$jb[1]),1)->result_array()[0];
-                    $Division = $dataDivision['Division'];
-                    $Position = $dataPosition['Position'];
-                }
-
-                $photo = (file_exists('./uploads/employees/'.$row["Photo"]) && $row["Photo"]!='' && $row["Photo"]!=null)
-                    ? base_url('uploads/employees/'.$row["Photo"])
-                    : base_url('images/icon/userfalse.png');
-
-                $nestedData[] = '<div style="text-align: center;"><img src="'.$photo.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
-
-                $emailPU = ($row["EmailPU"]!='' && $row["EmailPU"]!=null) ? '<br/><span style="color: darkred;">'.$row["EmailPU"].'</span>' : '';
-                $nidn = ($row["NIDN"]!='' && $row["NIDN"]!=null) ? '<br/>NIDN : '.$row["NIDN"] : '';
-                */
-
-            /*$isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
-            $needAppv = "";
-            if(!empty($isRequested)){
-                if($this->session->userdata('IDdepartementNavigation') == 13){
-                    $needAppv = '<p><button class="btn btn-xs btn-info btn-appv" type="button" data-nip="'.$row["NIP"].'" title="Need approving for biodata" ><i class="fa fa-warning"></i> Need Approval</button></p>';
-                }
-            }
-
-            $nestedData[] = '<a href="'.base_url('human-resources/employees/edit-employees/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>
-                                '.$emailPU.'
-                                <br/>NIK : '.$row["NIP"].'
-                                '.$nidn.$needAppv;
-//            $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
-            $nestedData[] = $Division.'<br/>'.$Position;
-            $nestedData[] = $row["Address"];
-
-//            $nestedData[] = $row['Description'];
-            $status = '-';
-            if($row['StatusEmployeeID']==1){
-                $status = '<i class="fa fa-circle" style="color: #4CAF50;"></i>';
-            } else if($row['StatusEmployeeID']==2){
-                $status = '<i class="fa fa-circle" style="color: #FF9800;"></i>';
-            } else if($row['StatusEmployeeID']==3){
-                $status = '<i class="fa fa-circle" style="color: #03A9F4;"></i>';
-            } else if($row['StatusEmployeeID']==4){
-                $status = '<i class="fa fa-circle" style="color: #9e9e9e;"></i>';
-            } else if($row['StatusEmployeeID']==-1){
-                $status = '<i class="fa fa-warning" style="color: #F44336;"></i>';
-            }
-            $nestedData[] = '<div style="text-align: center;">'.$status.'</div>';
-
-            $data[] = $nestedData;
-
-        }
-
-        $json_data = array(
-            "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval($totalData),
-            "recordsFiltered" => intval($totalData),
-            "data"            => $data
-        );
-        echo json_encode($json_data);*/
-        /*END OF OLD*/
-
-
     }
 
     public function getStudents(){
@@ -6421,9 +6309,11 @@ class C_api extends CI_Controller {
                     $myNIP = $this->session->userdata('NIP');
                     $myName = $this->session->userdata('Name');
                     $formInsert['EnteredBy'] = $myNIP.'/'.$myName;
+                    $formInsert['isApproved'] = 1;
                     /*END ADDED BY FEBRI @ FEB 2020*/
                     
-                    $this->db->insert('db_employees.employees',$formInsert);
+                    $insert = $this->db->insert('db_employees.employees',$formInsert);
+                    
 
                     //insert career
                     $division = 0; $position=0;
@@ -6434,8 +6324,9 @@ class C_api extends CI_Controller {
                         $position = $splitPositionMain[1];
                     }
                     $currentDate = date("Y-m-d");
-                    $plus1Year = date('Y-m-d', strtotime('+1 years'));
-                    $dataCareer = array("NIP"=>$formInsert['NIP'],"StartJoin"=>$currentDate,"EndJoin"=>$plus1Year,"LevelID"=>1,"DepartmentID"=>$division,"PositionID"=>$position,"StatusID"=>3,"isShowSTO"=>0);
+                    $plus1Year = date('Y-m-d', strtotime('-1 day -1 month +1 years'));
+                    $isStatusID = (($formInsert['StatusEmployeeID'] == 2) ? 3 : (($formInsert['StatusEmployeeID'] == 7) ? 6 : 0) );
+                    $dataCareer = array("NIP"=>$formInsert['NIP'],"StartJoin"=>$currentDate,"EndJoin"=>$plus1Year,"LevelID"=>1,"DepartmentID"=>$division,"PositionID"=>$position,"StatusID"=>$isStatusID,"isShowSTO"=>0);
                     $insertCareer = $this->db->insert('db_employees.employees_career',$dataCareer);
                     $dataJoin = array("NIP"=>$formInsert['NIP'],"JoinDate"=>$currentDate,"StatusEmployeeID"=>$formInsert['StatusEmployeeID']);
                     $insertJoin = $this->db->insert('db_employees.employees_joindate',$dataJoin);
