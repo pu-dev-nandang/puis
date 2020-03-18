@@ -392,6 +392,8 @@
 
         saveLogUser();
 
+        setIPPublic();
+
     });
 
     $('#btnSimpleSearch').click(function () {
@@ -982,7 +984,8 @@
                 });
 
             });
-        } catch (e){
+        }
+        catch (e){
             var dataURL = window.location.href;
 
             var url = base_url_js+'api3/__crudLogging';
@@ -1004,9 +1007,18 @@
             });
         }
 
+     }
 
-
-
+     function setIPPublic(){
+         try {
+             $.getJSON("https://api.ipify.org/?format=json", function(e) {
+                 // e.ip
+                 localStorage.setItem('IPPublic',e.ip);
+             });
+         }
+         catch (e){
+             localStorage.setItem('IPPublic','');
+         }
      }
 
      $(document).off('click', '.BlogAdminUrl').on('click', '.BlogAdminUrl',function(e) {
