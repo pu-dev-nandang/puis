@@ -4,6 +4,9 @@
         <li class="<?php if($this->uri->segment(3)=='' || $this->uri->segment(3)=='details-attendace') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/attendance'); ?>">Attendance</a>
         </li>
+        <li class="<?php if($this->uri->segment(3)=='monitoring-online-class') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/attendance/monitoring-online-class'); ?>">Online Class</a>
+        </li>
         <li class="<?php if($this->uri->segment(3)=='monitoring-attendace-lecturer') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/attendance/monitoring-attendace-lecturer'); ?>">Attd. Lecturer</a>
         </li>

@@ -12,6 +12,7 @@ class C_api4 extends CI_Controller {
         $this->load->model('m_rest');
         $this->load->model('m_search');
         $this->load->model('akademik/m_tahun_akademik');
+        $this->load->model('akademik/m_onlineclass','m_oc');
         $this->load->model('master/m_master');
         $this->load->library('JWT');
         $this->load->library('google');
@@ -33,7 +34,6 @@ class C_api4 extends CI_Controller {
         $token = $this->input->post('token');
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
-        $data_arr = json_decode(json_encode($data_arr),true);
         return $data_arr;
     }
 
@@ -138,6 +138,205 @@ class C_api4 extends CI_Controller {
         {
             echo '{"status":"999","message":"Not Authenfication"}'; 
         }
+    }
+
+    public function crudOnlineClass(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='getMonitoringAttd'){
+
+
+            $ScheduleID = $data_arr['ScheduleID'];
+            $Session = $data_arr['Session'];
+
+            $dataLect = $this->m_rest->getAllLecturerByScheduleID($ScheduleID);
+
+            if(count($dataLect)>0){
+
+                for($i=0;$i<count($dataLect);$i++){
+
+                    $d = $dataLect[$i];
+
+                    // Cek Forum
+                    $dataLect[$i]['Forum'] = $this->db->query('SELECT COUNT(*) AS Total FROM (SELECT ct.ID  
+                                                            FROM db_academic.counseling_topic ct
+                                                            WHERE ct.ScheduleID = "'.$ScheduleID.'" 
+                                                            AND ct.Sessions = "'.$Session.'"
+                                                             AND ct.CreateBy = "'.$d['NIP'].'" 
+                                                             UNION ALL
+                                                             SELECT ct.ID FROM db_academic.counseling_comment cc
+                                                             LEFT JOIN db_academic.counseling_topic ct ON (ct.ID = cc.TopicID)
+                                                            WHERE ct.ScheduleID = "'.$ScheduleID.'" 
+                                                            AND ct.Sessions = "'.$Session.'"
+                                                             AND ct.CreateBy = "'.$d['NIP'].'" ) xx  
+                                                             ')->result_array()[0]['Total'];
+
+                    // Cek Task
+                    $dataLect[$i]['Task'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task st
+                                                                        WHERE st.ScheduleID = "'.$ScheduleID.'" 
+                                                                        AND st.Session = "'.$Session.'"
+                                                                        AND st.EntredBy = "'.$d['NIP'].'" ')
+                                                                ->result_array()[0]['Total'];
+
+                    // Cek Material
+                    $dataLect[$i]['Material'] = $this->db->query('SELECT sm.File, em.NIP, em.Name FROM db_academic.schedule_material sm 
+                                                                            LEFT JOIN db_employees.employees em ON (em.NIP = sm.UpdateBy)
+                                                                            WHERE sm.ScheduleID = "'.$ScheduleID.'"
+                                                                             AND sm.Session = "'.$Session.'" ')->result_array();
+                }
+
+            }
+
+            $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd WHERE attd.ScheduleID = "'.$ScheduleID.'" 
+                                                    GROUP BY attd.ScheduleID')->result_array();
+            $dataStd = [];
+            if(count($dataAttd)>0){
+                $dataStd = $this->db->query('SELECT auth.NPM, auth.Name FROM db_academic.attendance_students ats 
+                                            LEFT JOIN db_academic.auth_students auth ON (auth.NPM = ats.NPM)
+                                            WHERE ats.ID_Attd = "'.$dataAttd[0]['ID'].'" 
+                                            GROUP BY ats.NPM ORDER BY auth.NPM ASC')->result_array();
+            }
+
+
+            if(count($dataStd)>0){
+                for($i=0;$i<count($dataStd);$i++){
+                    $d = $dataStd[$i];
+
+                    // Comment
+                    $dataStd[$i]['TotalComment'] = $this->db->query('SELECT COUNT(*) AS Total 
+                                                    FROM db_academic.counseling_comment cc 
+                                                    LEFT JOIN db_academic.counseling_topic ct ON (ct.ID = cc.TopicID)
+                                                    WHERE ct.ScheduleID = "'.$ScheduleID.'"
+                                                    AND ct.Sessions = "'.$Session.'" 
+                                                    AND cc.UserID = "'.$d['NPM'].'" ')->result_array()[0]['Total'];
+
+                    // Task
+                    $dataStd[$i]['TotalTask'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task_student std
+                                                                    LEFT JOIN db_academic.schedule_task st ON (st.ID = std.IDST)
+                                                                    WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                                     AND st.Session = "'.$Session.'" 
+                                                                     AND std.NPM = "'.$d['NPM'].'"')->result_array()[0]['Total'];
+
+                }
+            }
+
+            $result = array(
+                'Lecturer' => $dataLect,
+                'Student' => $dataStd
+            );
+
+            return print_r(json_encode($result));
+        }
+
+    }
+
+
+    public function getDataOnlineClass(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken2();
+
+        $SemesterID = $data_arr['SemesterID'];
+        $WhereProdi = ($data_arr['ProdiID']!='') ? ' AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" ' : '';
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND (s.ClassGroup LIKE "%'.$search.'%" 
+                                    OR mk.MKCode LIKE "%'.$search.'%" 
+                                    OR mk.NameEng LIKE "%'.$search.'%"
+                                    ) ';
+        }
+
+        $queryDefault = 'SELECT s.ID AS ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng 
+                                    FROM db_academic.schedule s
+                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                    WHERE s.SemesterID = "'.$SemesterID.'" AND s.OnlineLearning = "1" '.$WhereProdi.$dataSearch.'
+                                    
+                                    GROUP BY s.ID ';
+
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT s.ID FROM db_academic.schedule s
+                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                    WHERE s.SemesterID = "'.$SemesterID.'" AND s.OnlineLearning = "1" '.$WhereProdi.$dataSearch.'
+                                    GROUP BY s.ID ) xx';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $dataLect = $this->m_rest->getAllLecturerByScheduleID($row['ScheduleID']);
+            $viewLec = '';
+            if(count($dataLect)>0){
+                for ($t=0;$t<count($dataLect);$t++){
+                    $co = ($t==0) ? ' (Co)' : '';
+                    $viewLec = $viewLec.''.$dataLect[$t]['NIP'].' - '.$dataLect[$t]['Name'].$co;
+                }
+            }
+
+            $nestedData[] = '<div>'.$no.'<textarea class="hide" id="text_'.$row['ScheduleID'].'">'.json_encode($row).'</textarea></div>';
+            $nestedData[] = '<div style="text-align: left;"><b>'.$row['CourseEng'].'</b>
+                                    <div style="font-size: 12px;">Group : '.$row['ClassGroup'].'</div>
+                                    <div>'.$viewLec.'</div>
+                                    </div>';
+//            $nestedData[] = '<div>'.$no.'</div>';
+
+
+            for($s=1;$s<=14;$s++){
+                // Get date
+                $dataSes = $this->m_rest->getRangeDateLearningOnlinePerSession($row['ScheduleID'],$s);
+
+                // Material
+                $viewMaterial = (count($dataSes['dataMaterial']))
+                    ? '<div><a href="'.url_sign_in_lecturers.'uploads/material/'.$dataSes['dataMaterial'][0]['File'].'" target="_blank">
+                                <span class="label label-default"><b>Material</b></span></a></div>'
+                    : '';
+
+                $rangeSt = date('d/M/Y',strtotime($dataSes['RangeStart']));
+                $rangeEn = date('d/M/Y',strtotime($dataSes['RangeEnd']));
+
+                $bg = ($dataSes['Status']=='1' || $dataSes['Status']==1) ? 'background: #ffeb3b42;border: 1px solid #9E9E9E;border-radius: 5px;' : '';
+
+                // Cek Topik
+                $viewCkTopik = ($dataSes['CheckTopik']>0)
+                    ? '<a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" data-session="'.$s.'" class="btnAdmShowForum">
+                            <div><span class="label label-primary"><b>Forum '.$dataSes['TotalComment'].'</b></span></div></a>'
+                    : '';
+
+                // Cek Task
+                $viewTask = ($dataSes['CheckTask']>0)
+                    ? '<a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" data-session="'.$s.'" class="btnAdmShowTask">
+                            <div><span class="label label-success"><b>Task '.$dataSes['TotalTask'].'</b></span></div></a>'
+                    : '';
+
+                 $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
+                                    '.$viewCkTopik.$viewTask.$viewMaterial.'
+                                    <a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" data-session="'.$s.'" class="btnAdmShowAttendance"><div style="font-size: 10px;color: #607d8b;margin-top: 5px;font-weight: bold;">'.$rangeSt.'<br/>'.$rangeEn.'</div>
+                                    </div></a>';
+                 array_push($nestedData,$arr);
+            }
+
+            $no++;
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval( $queryDefaultRow) ,
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+
     }
 
 }
