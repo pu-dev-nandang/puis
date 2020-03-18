@@ -66,6 +66,7 @@ class C_rest_ticketing extends CI_Controller {
         $token = $this->input->post('token');
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
+        $data_arr = json_decode(json_encode($data_arr),true);
         return $data_arr;
     }
 
@@ -388,6 +389,18 @@ class C_rest_ticketing extends CI_Controller {
             break;
           case 'close_ticket':
             $rs = $this->m_ticketing->rest_close_ticket($dataToken);
+            echo json_encode($rs);
+            break;
+          case 'dashboard_ticket_date':
+            $rs = $this->m_ticketing->dashboard_ticket_date($dataToken);
+            echo json_encode($rs);
+            break;
+          case 'dashboard_ticket_all' :
+            $rs = $this->m_ticketing->dashboard_ticket_all($dataToken);
+            echo json_encode($rs);
+            break;
+          case 'detail_dashboard' :
+            $rs = $this->m_ticketing->dashboard_detail($dataToken);
             echo json_encode($rs);
             break;
           default:
