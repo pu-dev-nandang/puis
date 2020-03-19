@@ -72,6 +72,9 @@
 					</div>
 				</div>
 			</div>
+			<div style="padding: 10px;text-align: center;">
+				<h4 style="color: green;"><u>Ticket Today</u></h4>
+			</div>
 			<div id="PageToday">
 				
 			</div>
