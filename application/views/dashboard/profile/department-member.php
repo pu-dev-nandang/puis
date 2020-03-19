@@ -79,7 +79,7 @@
     		 		</div>
     		 		<div class="body">
     		 			<div class="info">
-		 					<p class="nip text-center"></p>
+		 					<p class="nip text-center" style="font-weight:bold"></p>
     		 				<p class="name text-center">-</p>
     		 			</div>
     		 		</div>
