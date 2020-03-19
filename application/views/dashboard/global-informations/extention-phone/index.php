@@ -252,7 +252,7 @@
             			var Photo = $.trim(row.Photo);
             			var elmPhoto = '<img src="'+base_url_js+'uploads/employees/'+Photo+'" class="img-thumbnail" style="width:60px;float:left;margin-right:10px">';
 		              	var exEmpLevelEduName = $.trim(row.EmpLevelEduName);
-		              	return elmPhoto+"<p class='student'><span class='btn btn-xs btn-default pull-right'>"+row.EmpStatus+"</span><span><i class='fa fa-id-card-o'></i> "+row.NIP+"</span><br><span><i class='fa fa-user'></i> "+row.Name+"</span><br><span><i class='fa fa-star'></i> "+row.EmpReligion+"</span> &#183; "+"<span><i class='fa fa-"+((row.Gender == 'L') ? 'mars':'venus')+"'></i> "+((row.Gender == 'L') ? 'Male':'Female')+"</span>  &#183; <span><i class='fa fa-graduation-cap'></i> "+((exEmpLevelEduName.length > 0) ? row.EmpLevelEduName : '-')+"</span></p>";
+		              	return "<p class='student'><span class='btn btn-xs btn-default pull-right'>"+row.EmpStatus+"</span><span><i class='fa fa-id-card-o'></i> "+row.NIP+"</span><br><span><i class='fa fa-user'></i> "+row.Name+"</span><br><span><i class='fa fa-star'></i> "+row.EmpReligion+"</span> &#183; "+"<span><i class='fa fa-"+((row.Gender == 'L') ? 'mars':'venus')+"'></i> "+((row.Gender == 'L') ? 'Male':'Female')+"</span>  &#183; <span><i class='fa fa-graduation-cap'></i> "+((exEmpLevelEduName.length > 0) ? row.EmpLevelEduName : '-')+"</span></p>";
 	              	}
             	},          	
             	{
