@@ -77,12 +77,12 @@
           selector.empty();
           response =  response.data;
           selector.append(
-               '<option value = "'+'%'+'" '+''+' >'+'All'+'</option>'
+               '<option value = "'+'%'+'" '+'selected'+' >'+'All'+'</option>'
            );
           for (var i = 0; i < response.length; i++) {
              var selected = (response[i][1] == selectedata) ? 'selected' : '';
              selector.append(
-                  '<option value = "'+response[i][1]+'" '+selected+' >'+response[i][2]+'</option>'
+                  '<option value = "'+response[i][1]+'" '+''+' >'+response[i][2]+'</option>'
               );
           }
         })
