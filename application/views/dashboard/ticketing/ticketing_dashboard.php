@@ -72,11 +72,18 @@
 					</div>
 				</div>
 			</div>
-			<div style="padding: 10px;text-align: center;">
+			<div style="padding: 10px;margin-top: 70px;text-align: center;">
 				<h4 style="color: green;"><u>Ticket Today</u></h4>
 			</div>
-			<div id="PageToday">
-				
+			<div class="panel panel-primary" style="border-color: #42a4ca;">
+				<div class="panel-heading clearfix" style="background-color: #42a4ca;border-color: #42a4ca;">
+	                <h4 class="panel-title pull-left" style="padding-top: 7.5px;"></h4>
+	            </div>
+	            <div class="panel-body">
+	            	<div id="PageToday">
+	            		
+	            	</div>
+	            </div>
 			</div>
 		</div>
 	</div>
