@@ -1,51 +1,79 @@
 <div id="general-affair">
 	<div class="row">
-		<div class="col-sm-12">
+		<div class="col-sm-4">
 			<form id="form-package-order" action="<?=base_url('general-affair/save-package-order')?>" method="post" autocomplete="off">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h4 class="panel-title">
-						<i class="fa fa-edit"></i>
-						Package Order Form
-					</h4>
-				</div>
-				<div class="panel-body">
-					<div class="table-form">
-						<table class="table table-bordered">
-							<thead>
-								<tr>
-									<th width="2%">No</th>
-									<th width="10%">Expedition Company</th>
-									<th width="10%">Courir Expedition Name</th>
-									<th width="10%">Receiver</th>
-									<th width="10%">Receiver Date</th>
-									<th width="10%">Package Note</th>
-									<th width="10%">Package Receiver</th>
-									<th width="10%">Package Accepted Date</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>1</td>
-									<td><input type="hidden" name="ID[]" class="form-control ID">
-										<input type="text" name="[]" class="form-control required"></td>
-									<td><input type="text" name="[]" class="form-control required"></td>
-									<td><input type="text" name="[]" class="form-control required"></td>
-									<td><input type="text" name="[]" class="form-control required"></td>
-									<td><input type="text" name="[]" class="form-control required"></td>
-									<td><input type="text" name="[]" class="form-control required"></td>
-									<td><input type="text" name="[]" class="form-control required"></td>
-								</tr>
-							</tbody>
-						</table>
+				<input type="hidden" name="ID" class="form-control ID">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title"><i class="fa fa-edit"></i> Package Order Form</h4>
+					</div>
+					<div class="panel-body">
+						<div class="form-group">
+							<label>Courier Expedition</label>
+							<input type="text" name="CourierExpedition" class="form-control required CourierExpedition" placeholder="Kurir Ekspedisi">
+							<small class="text-danger text-message"></small>
+						</div>
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label>Shipper</label>
+									<input type="text" name="Shipper" class="form-control required Shipper" placeholder="Nama Kurir Pengirim">
+									<small class="text-danger text-message"></small>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label>Shipper Date</label>
+									<input type="text" name="DateShipper" class="form-control required DateShipper" id="DateShipper" value="<?=date("Y-m-d")?>">
+									<small class="text-danger text-message"></small>
+								</div>
+							</div>
+						</div>	
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label>Receiver</label>
+									<input type="text" name="Receiver" class="form-control required Receiver" placeholder="Penerima paket" value="<?=(!empty($employee) ? $employee->Name : '')?>">
+									<small class="text-danger text-message"></small>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label>Receiver Date</label>
+									<input type="text" name="DateReceiver" class="form-control required DateReceiver" id="DateReceiver" placeholder="Tgl diterima paket" value="<?=date("Y-m-d")?>">
+									<small class="text-danger text-message"></small>
+								</div>
+							</div>
+						</div>	
+						<div class="form-group">
+							<label>Note</label>
+							<textarea class="form-control PackageNote" name="PackageNote" placeholder="Package Name/Type or Description"></textarea>
+							<small class="text-danger text-message"></small>
+						</div>	
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label>Package Owner</label>
+									<input type="text" name="BelongsTo" class="form-control required BelongsTo" placeholder="Pemilik Paket">
+									<small class="text-danger text-message"></small>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label>Accepted Date</label>
+									<input type="text" name="AcceptedDate" class="form-control AcceptedDate" id="AcceptedDate" placeholder="Tgl paket diserahkan">
+									<small class="text-danger text-message"></small>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="panel-footer text-right">
+						<button class="btn btn-success btn-sm btn-submit" type="button">Save Changes</button>
 					</div>
 				</div>
-			</div>
 			</form>
 		</div>
-	</div>
-	<div class="row">		
-		<div class="col-sm-12">
+		<div class="col-sm-8">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title"><i class="fa fa-bars"></i> List of Package Order</h4>
