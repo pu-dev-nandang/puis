@@ -595,9 +595,24 @@ class C_global_informations extends Globalclass {
 
 
 /*MESSAGE BLAST*/
+    private function getAccessRoleMail(){
+        $NIP = $this->session->userdata("NIP");
+        $detail = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $listPosition = array($detail->PositionMain,(!empty($detail->PositionOther1) ? $detail->PositionOther1:null),(!empty($detail->PositionOther2) ? $detail->PositionOther2 : null),(!empty($detail->PositionOther3) ? $detail->PositionOther3 : null));
+        $access = null;
+        foreach ($listPosition as $l) {
+            if(!empty($l)){
+                $roleMail = $this->General_model->fetchData("db_mail_blast.role_mail",array("PositionMain"=>$l))->row();
+                if(!empty($roleMail)){
+                    $access = $roleMail;
+                }
+            }
+        }
+        return $access;
+    }
+
     public function messageBlast(){
-        $positionMain = $this->session->userdata('PositionMain')['IDDivision'].".".$this->session->userdata('PositionMain')['IDPosition'];
-        $data['access'] = $this->General_model->fetchData("db_mail_blast.role_mail",array("PositionMain"=>$positionMain))->row();
+        $data['access'] = $this->getAccessRoleMail();
         $data['title'] = "Message Blast";
     	$page = $this->load->view('dashboard/global-informations/message-blast/index',$data,true);
         $this->blast_global_informations($page);    	
@@ -605,8 +620,7 @@ class C_global_informations extends Globalclass {
     
 
     public function messageBlastForm(){
-        $positionMain = $this->session->userdata('PositionMain')['IDDivision'].".".$this->session->userdata('PositionMain')['IDPosition'];
-        $data['access'] = $this->General_model->fetchData("db_mail_blast.role_mail",array("PositionMain"=>$positionMain))->row();
+        $data['access'] = $this->getAccessRoleMail();
         $data['title'] = "Create New Message Blast";
         $data['subject'] = $this->General_model->fetchData("db_mail_blast.subject_type",array("IsActive"=>1))->result();
         $data['configmail'] = $this->General_model->fetchData("db_mail_blast.cog_mail",array("isActive"=>1))->row();
@@ -794,6 +808,8 @@ class C_global_informations extends Globalclass {
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
             $positionMain = $this->session->userdata('PositionMain')['IDDivision'].".".$this->session->userdata('PositionMain')['IDPosition'];
+            $positionMain = $this->session->userdata('PositionMain')['IDDivision'].".".$this->session->userdata('PositionMain')['IDPosition'];
+
             $getAccess = $this->General_model->fetchData("db_mail_blast.role_mail",array("PositionMain"=>$positionMain))->row();
             
             if(!empty($getAccess)){
@@ -811,7 +827,7 @@ class C_global_informations extends Globalclass {
                     $sortby = $output['sort_label'];
                 }
             }
-            $data['access'] = $getAccess;
+            $data['access'] = $this->getAccessRoleMail();
             $data['results'] = $this->General_model->fetchData("db_mail_blast.mail_blast",(!empty($conditions) ? $conditions : array() ),$sortby,"desc")->result();
 
             $this->load->view("dashboard/global-informations/message-blast/list",$data);
@@ -1130,5 +1146,13 @@ class C_global_informations extends Globalclass {
     }
 
 /*END ACCESS ROLE */
+
+
+    public function packageOrder(){
+        $data = array();
+        $page = $this->load->view('dashboard/global-informations/package-order/index',$data,true);
+        $this->blast_global_informations($page);
+    }
+
 
 }
