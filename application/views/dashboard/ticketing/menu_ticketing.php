@@ -76,6 +76,9 @@
         AjaxLoadRestTicketing(url,token).then(function(response){
           selector.empty();
           response =  response.data;
+          selector.append(
+               '<option value = "'+'%'+'" '+''+' >'+'All'+'</option>'
+           );
           for (var i = 0; i < response.length; i++) {
              var selected = (response[i][1] == selectedata) ? 'selected' : '';
              selector.append(
