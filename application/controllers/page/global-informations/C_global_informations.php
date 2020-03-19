@@ -1153,6 +1153,18 @@ class C_global_informations extends Globalclass {
         $page = $this->load->view('dashboard/global-informations/package-order/index',$data,true);
         $this->blast_global_informations($page);
     }
+    
+
+    public function extentionPhone(){
+        $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","Type = 'emp' or IDStatus = '-1' ")->result();
+        $data['division'] = $this->General_model->fetchData("db_employees.division",array("StatusDiv"=>1))->result();
+        $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+        $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
+        $data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+        $page = $this->load->view('dashboard/global-informations/extention-phone/index',$data,true);
+        $this->blast_global_informations($page);
+    }
+
 
 
 }

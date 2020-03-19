@@ -46,9 +46,10 @@
             "processing": true,
             "serverSide": true,
             "iDisplayLength" : 10,
+            "ordering" : false,
             "responsive": true,
             "language": {
-                "searchPlaceholder": "Name"
+                "searchPlaceholder": "NIM, Name, Study Program"
             },
             "lengthMenu": [[10, 25, 50], [10, 25, 50]],
             "ajax":{

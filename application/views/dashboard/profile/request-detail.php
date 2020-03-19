@@ -314,8 +314,8 @@
                                             <td><?=$no++?></td>
                                             <td><?=$detail->MyEducationNonFormal[$k]->instituteName?></td>
                                             <td><?=$detail->MyEducationNonFormal[$k]->subject?></td>
-                                            <td><?=date("d F Y",strtotime($detail->MyEducationNonFormal[$k]->start_event))?></td>
-                                            <td><?=date("d F Y",strtotime($detail->MyEducationNonFormal[$k]->end_event))?></td>
+                                            <td><?=(!empty($detail->MyEducationNonFormal[$k]->start_event) ? date("d F Y",strtotime($detail->MyEducationNonFormal[$k]->start_event)): '')?></td>
+                                            <td><?=(!empty($detail->MyEducationNonFormal[$k]->end_event) ? date("d F Y",strtotime($detail->MyEducationNonFormal[$k]->end_event)) : '')?></td>
                                             <td><?=$detail->MyEducationNonFormal[$k]->location?></td>
                                         </tr>
                                     <?php } }else{ ?>

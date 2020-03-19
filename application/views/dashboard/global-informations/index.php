@@ -51,7 +51,23 @@
 							</div>
 							<div class="col-sm-9 col-md-9">
 								<p class="title">Package Order</p>
-								<p class="desc">Service that allows you to easily monitoring your package order from our GA Dept.</p>
+								<p class="desc">Service that allows you to easily monitoring your package order from GA Dept.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-4">
+				<div class="panel panel-default" id="click-me" data-href="global-informations/extention-phone">
+					<div class="panel-body">
+						<div class="row card">
+							<div class="col-sm-3">
+								<p class="icon"><i class="fa fa-phone-square"></i></p>
+							</div>
+							<div class="col-sm-9 col-md-9">
+								<p class="title">Extention Phone</p>
+								<p class="desc">Service that allows you to easily to find employer extenstion phone.</p>
 							</div>
 						</div>
 					</div>
