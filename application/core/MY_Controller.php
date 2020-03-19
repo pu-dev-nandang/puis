@@ -759,6 +759,7 @@ abstract class Ticket_Controler extends Globalclass{
         $data['DepartmentID'] = $this->m_general->getDepartmentNow();
         $data['DepartmentAbbr'] = $this->m_general->DepartmentAbbr($data['DepartmentID']);
         $data['ArrSelectOptionDepartment'] = $this->m_general->getAuthDepartment();
+        $data['authTicketDashboard'] = (count($this->m_master->caribasedprimary('db_ticketing.auth_dashboard','NIP',$this->session->userdata('NIP')))> 0 ) ? '' : 'hide'; 
         $data['page'] = $page;
         $content = $this->load->view('dashboard/ticketing/menu_ticketing',$data,true);
         $this->template($content);

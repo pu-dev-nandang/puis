@@ -5,6 +5,9 @@
         <!--        <li class="--><?php //if($this->uri->segment(3)=='list-student') { echo 'active'; } ?><!--">-->
         <!--            <a href="--><?php //echo base_url('academic/final-project/list-student'); ?><!--">Final Project</a>-->
         <!--        </li>-->
+        <li class="<?php echo $authTicketDashboard ?> <?php if($this->uri->segment(2)=='' || $this->uri->segment(2)=='ticket-dashboard') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('ticket/ticket-dashboard'); ?>">Ticket Dashboard</a>
+        </li>
         <li class="<?php if($this->uri->segment(2)=='' || $this->uri->segment(2)=='ticket-today') { echo 'active'; } ?>">
             <a href="<?php echo base_url('ticket/ticket-today'); ?>">Ticket Today</a>
         </li>

@@ -66,6 +66,7 @@ class C_rest_ticketing extends CI_Controller {
         $token = $this->input->post('token');
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
+        $data_arr = json_decode(json_encode($data_arr),true);
         return $data_arr;
     }
 
@@ -120,6 +121,7 @@ class C_rest_ticketing extends CI_Controller {
     public function CRUDAdmin(){
       try {
         $dataToken = $this->getInputToken();
+        $dataToken = json_decode(json_encode($dataToken),true);
         $action = $dataToken['action'];
         switch ($action) {
           case 'read':
@@ -137,6 +139,28 @@ class C_rest_ticketing extends CI_Controller {
           case 'edit' : 
              $rs = $this->m_setting->ActionTable('edit',$dataToken,'db_ticketing.admin_register');
              echo json_encode($rs);
+            break;
+          case 'read_auth_dashboard' : 
+             $rs = $this->m_setting->LoadDataAuthDashboard($dataToken);
+             echo json_encode($rs);
+            break;
+          case 'auth_dashboard' : 
+             $subdata = $dataToken['subdata'];
+             $actionSubdata = $subdata['action'];
+             switch ($actionSubdata) {
+               case 'edit':
+                 $rs = $this->m_setting->ActionTable('edit',$subdata,'db_ticketing.auth_dashboard');
+                 echo json_encode($rs);
+                 break;
+               case 'add':
+                 $rs = $this->m_setting->ActionTable('add',$subdata,'db_ticketing.auth_dashboard');
+                 echo json_encode($rs);
+                 break;
+                case 'delete' : 
+                   $rs = $this->m_setting->ActionTable('remove',$subdata,'db_ticketing.auth_dashboard');
+                   echo json_encode($rs);
+                  break;
+             }
             break;
         }
         // end switch
@@ -365,6 +389,26 @@ class C_rest_ticketing extends CI_Controller {
             break;
           case 'close_ticket':
             $rs = $this->m_ticketing->rest_close_ticket($dataToken);
+            echo json_encode($rs);
+            break;
+          case 'dashboard_ticket_date':
+            $rs = $this->m_ticketing->dashboard_ticket_date($dataToken);
+            echo json_encode($rs);
+            break;
+          case 'dashboard_ticket_all' :
+            $rs = $this->m_ticketing->dashboard_ticket_all($dataToken);
+            echo json_encode($rs);
+            break;
+          case 'detail_dashboard' :
+            $rs = $this->m_ticketing->dashboard_detail($dataToken);
+            echo json_encode($rs);
+            break;
+          case 'dashboard_graph_ticket_date' :
+            $rs = $this->m_ticketing->dashboard_graph_ticket_date($dataToken);
+            echo json_encode($rs);
+            break;
+          case 'dashboard_graph_ticket_all' :
+            $rs = $this->m_ticketing->dashboard_graph_ticket_all($dataToken);
             echo json_encode($rs);
             break;
           default:

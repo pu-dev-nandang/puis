@@ -1080,6 +1080,7 @@ class M_ticketing extends CI_Model {
                                      )
                  '.$Addwhere3.'
                  ) ';
+              
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
                         qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
@@ -1229,6 +1230,344 @@ class M_ticketing extends CI_Model {
             ];
             $this->db->update('db_ticketing.ticket',$dataSave);
         }
+    }
+
+    public function dashboard_ticket_date($dataToken){
+        $dateGet = $dataToken['dateGet'];
+        $rs = [];
+        // ALL Department
+        $url = url_pas.'api/__getAllDepartementPU';
+        $GetDepartment = $this->m_master->apiservertoserver($url);
+        $data = array();
+        for ($i=0; $i < count($GetDepartment); $i++) { 
+            $nestedData = array();
+            $nestedData[] = $i+1;
+            $nestedData[] = $GetDepartment[$i]['Name1'];
+
+            $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
+                if ($TicketStatus == 3) {
+                    $TicketStatus =  ' (a.TicketStatus = 3 or  a.TicketStatus = 4  ) and';
+                }
+                else
+                {
+                   $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                }
+                
+                return  $this->db->query(    
+                    'select count(*) as total from (
+                        select 1 from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
+                        where '.$TicketStatus.'
+                        a.ID in (
+                            select a.TicketID from db_ticketing.received as a
+                            where a.DepartmentReceivedID = "'.$DepartmentID.'"
+                            and DATE_FORMAT(a.CreatedAt,"%Y-%m-%d") = "'.$dateGet.'"
+                        )
+                    )xx '
+                )->result_array()[0]['total'];
+            };
+
+            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,1);
+            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,2);
+            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,3);
+            $queryGetData = function($DepartmentID,$dateGet,$TicketStatus=''){
+                        if ($TicketStatus == 3) {
+                            $TicketStatus =  'where (a.TicketStatus = 3  or a.TicketStatus = 4 )';
+                        }
+                        else
+                        {
+                             $TicketStatus = ($TicketStatus != '') ? 'where a.TicketStatus = '.$TicketStatus : '';
+                        }
+                       
+                        return '
+                                select a.*,ca.Descriptions as CategoryDescriptions,emp.Name as NameRequested,
+                                 rec.CategoryReceivedID
+                                 from db_ticketing.ticket as a 
+                                join db_employees.employees as emp on emp.NIP = a.RequestedBy
+                                join (
+                                        select rec.* from db_ticketing.received as rec
+                                        where
+                                        rec.DepartmentReceivedID = "'.$DepartmentID.'"
+                                        and DATE_FORMAT(rec.CreatedAt,"%Y-%m-%d") = "'.$dateGet.'"
+                                        group by rec.TicketID,rec.CategoryReceivedID
+                                        order by rec.ID desc
+                                    ) as rec on a.ID = rec.TicketID
+                                join db_ticketing.category as ca on rec.CategoryReceivedID = ca.ID
+                                 '.$TicketStatus.'
+                             ';
+                    };
+            $dataRow = [
+                'tot' => $queryGetData($GetDepartment[$i]['Code'],$dateGet),
+                'Open' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,1),
+                'Progress' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,2),
+                'Closed' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,3),
+            ];
+
+            $nestedData[] = $this->jwt->encode($dataRow,"UAP)(*");
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( 0 ),
+            "recordsTotal"    => intval(count($GetDepartment)),
+            "recordsFiltered" => intval( count($GetDepartment) ),
+            "data"            => $data,
+        );
+
+        return $json_data;
+
+    }
+
+    public function dashboard_ticket_all($dataToken){
+        $dateGet = $dataToken['dateGet'];
+        $rs = [];
+        // ALL Department
+        $url = url_pas.'api/__getAllDepartementPU';
+        $GetDepartment = $this->m_master->apiservertoserver($url);
+        $data = array();
+        for ($i=0; $i < count($GetDepartment); $i++) { 
+            $nestedData = array();
+            $nestedData[] = $i+1;
+            $nestedData[] = $GetDepartment[$i]['Name1'];
+
+            $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
+                if ($TicketStatus == 3) {
+                    $TicketStatus =  ' (a.TicketStatus = 3 or  a.TicketStatus = 4  ) and';
+                }
+                else
+                {
+                    $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                }
+                
+                return  $this->db->query(    
+                    'select count(*) as total from (
+                        select 1 from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
+                        where '.$TicketStatus.'
+                        a.ID in (
+                            select a.TicketID from db_ticketing.received as a
+                            where a.DepartmentReceivedID = "'.$DepartmentID.'"
+                            and DATE_FORMAT(a.CreatedAt,"%Y-%m") = "'.$dateGet.'"
+                        )
+                    )xx '
+                )->result_array()[0]['total'];
+            };
+
+            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,1);
+            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,2);
+            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,3);
+            $queryGetData = function($DepartmentID,$dateGet,$TicketStatus=''){
+                        if ($TicketStatus == 3) {
+                            $TicketStatus =  'where (a.TicketStatus = 3  or a.TicketStatus = 4 )';
+                        }
+                        else
+                        {
+                            $TicketStatus = ($TicketStatus != '') ? 'where a.TicketStatus = '.$TicketStatus : '';
+                        }
+                        
+                        return '
+                                select a.*,ca.Descriptions as CategoryDescriptions,emp.Name as NameRequested,
+                                 rec.CategoryReceivedID
+                                 from db_ticketing.ticket as a 
+                                join db_employees.employees as emp on emp.NIP = a.RequestedBy
+                                join (
+                                        select rec.* from db_ticketing.received as rec
+                                        where
+                                        rec.DepartmentReceivedID = "'.$DepartmentID.'"
+                                        and DATE_FORMAT(rec.CreatedAt,"%Y-%m") = "'.$dateGet.'"
+                                        group by rec.TicketID,rec.CategoryReceivedID
+                                        order by rec.ID desc
+                                    ) as rec on a.ID = rec.TicketID
+                                join db_ticketing.category as ca on rec.CategoryReceivedID = ca.ID
+                                 '.$TicketStatus.'
+                             ';
+                    };
+            $dataRow = [
+                'tot' => $queryGetData($GetDepartment[$i]['Code'],$dateGet),
+                'Open' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,1),
+                'Progress' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,2),
+                'Closed' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,3),
+            ];
+
+            $nestedData[] = $this->jwt->encode($dataRow,"UAP)(*");
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( 0 ),
+            "recordsTotal"    => intval(count($GetDepartment)),
+            "recordsFiltered" => intval( count($GetDepartment) ),
+            "data"            => $data,
+        );
+
+        return $json_data;
+    }
+
+    public function dashboard_detail($dataToken){
+        $rs=[];
+        $subdata = $dataToken['subdata'];
+        $action = $subdata['action'];
+        $dataDecode = $subdata['dataDecode'];
+        $dataTable = [];
+        $graph = [];
+        foreach ($dataDecode as $key => $value) {
+           if ($key == $action) {
+               $dataTable = $this->detail_data_table($value);
+               $graph = $this->detail_graph_category($value);
+               break;
+           }
+        }
+
+        $rs['dataTable'] = $dataTable;
+        $rs['graph'] = $graph;
+        return $rs;
+    }
+
+    private function detail_graph_category($query){
+        $sql = $this->db->query(
+            'select CategoryDescriptions as label,count(*) as data from (
+                '.$query.'
+            ) xx
+            group by CategoryReceivedID
+        '
+        )->result_array();
+        return $sql;
+    }
+
+    private function detail_data_table($query){
+        $query = $this->db->query($query)->result_array();
+        $data = array();
+        if (count($query) > 0) {
+           for ($i=0; $i < count($query); $i++) { 
+               $nestedData = array();
+               $nestedData[] = $i+1;
+               $nestedData[] = $query[$i]['NoTicket'];
+               $nestedData[] = $query[$i]['NameRequested'];
+               $nestedData[] = $query[$i]['CategoryDescriptions'];
+               $data[] = $nestedData;
+           }
+        }
+        
+
+        $json_data = array(
+            "draw"            => intval( 0 ),
+            "recordsTotal"    => intval(count($query)),
+            "recordsFiltered" => intval( count($query) ),
+            "data"            => $data,
+            // "result"          => $query,
+        );
+
+        return $json_data;
+    }
+
+    public function dashboard_graph_ticket_date($dataToken){
+        $rs = [];
+        $url = url_pas.'api/__getAllDepartementPU';
+        $GetDepartment = $this->m_master->apiservertoserver($url);
+        $tot = [];
+        $Open = [];
+        $Progress = [];
+        $Closed = [];
+        $dateGet = $dataToken['dateGet'];
+        $c = 10;
+        for ($i=0; $i < count($GetDepartment); $i++) { 
+            $Abbr = $GetDepartment[$i]['Abbr'];
+            $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
+                $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                return  $this->db->query(    
+                    'select count(*) as total from (
+                        select 1 from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
+                        where '.$TicketStatus.'
+                        a.ID in (
+                            select a.TicketID from db_ticketing.received as a
+                            where a.DepartmentReceivedID = "'.$DepartmentID.'"
+                            and DATE_FORMAT(a.CreatedAt,"%Y-%m-%d") = "'.$dateGet.'"
+                        )
+                    )xx '
+                )->result_array()[0]['total'];
+            };
+
+            $result = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+            if ($result > 0) {
+                $tot[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                $Open[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                $Progress[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                $Closed[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                $Abbreviation[] = $Abbr;
+                $c++;
+            }
+        }
+
+        $rs =[
+            'Total' => $tot,
+            'Open' => $Open,
+            'Progress' => $Progress,
+            'Closed' => $Closed,
+            'Abbreviation' => $Abbreviation,
+        ];
+
+        return $rs;
+
+    }
+
+    public function dashboard_graph_ticket_all($dataToken){
+        $rs = [];
+        $url = url_pas.'api/__getAllDepartementPU';
+        $GetDepartment = $this->m_master->apiservertoserver($url);
+        $tot = [];
+        $Open = [];
+        $Progress = [];
+        $Closed = [];
+        $dateGet = $dataToken['dateGet'];
+        $c = 10;
+        for ($i=0; $i < count($GetDepartment); $i++) { 
+            $Abbr = $GetDepartment[$i]['Abbr'];
+            $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
+                $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                return  $this->db->query(    
+                    'select count(*) as total from (
+                        select 1 from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
+                        where '.$TicketStatus.'
+                        a.ID in (
+                            select a.TicketID from db_ticketing.received as a
+                            where a.DepartmentReceivedID = "'.$DepartmentID.'"
+                            and DATE_FORMAT(a.CreatedAt,"%Y-%m") = "'.$dateGet.'"
+                        )
+                    )xx '
+                )->result_array()[0]['total'];
+            };
+
+            $result = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+            if ($result > 0) {
+                $tot[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                $Open[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                $Progress[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                $Closed[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                $Abbreviation[] = $Abbr;
+                $c++;
+            }
+        }
+
+        $rs =[
+            'Total' => $tot,
+            'Open' => $Open,
+            'Progress' => $Progress,
+            'Closed' => $Closed,
+            'Abbreviation' => $Abbreviation,
+        ];
+
+        return $rs;
+
     }
 
 }
