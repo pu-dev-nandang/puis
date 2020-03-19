@@ -1114,6 +1114,75 @@ class M_ticketing extends CI_Model {
                         )
                     )xx';
                 break;
+            case '%':
+                $AddwhereFor = '';
+                $AddwhereFor2 = 'a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"
+                                     or';
+                $Addwhere3 = '';
+                if (array_key_exists('FilterFor', $dataToken) ) {
+                    if ($dataToken['FilterFor'] == '1') {
+                        $AddwhereFor = 'and a.ID in (
+                                                select ReceivedID from db_ticketing.received_details where Status != "-1" AND NIP = "'.$NIP.'"
+                                             )';
+                        $AddwhereFor2 = '';
+                    }
+
+                    if ($dataToken['FilterFor'] == '99') {
+                       $Addwhere3 .= ' or a.DepartmentTicketID = "'.$DepartmentID.'"';
+                       $AddwhereFor = '
+                           and a.DepartmentTransferToID IS NOT NULL and a.DepartmentTransferToID != ""
+                       ';
+                    }
+                    elseif ($dataToken['FilterFor'] == '-99') {
+                        // $Addwhere3 .= ' or a.DepartmentTicketID != "'.$DepartmentID.'"';
+                        $AddwhereFor = '
+                            and (select count(*) as total from db_ticketing.received_details where ReceivedID = a.ID) > 0
+                        ';
+                        $AddwhereFor2 = '';
+                    }
+
+                    // $AddwhereFor2 = '';
+                }
+
+                $Addwhere = ' Where ( '.$AddwhereFor2.' a.ID in (
+                                         select a.TicketID from db_ticketing.received as a
+                                         where a.DepartmentReceivedID = "'.$dataToken['DepartmentID'].'"
+                                         '.$AddwhereFor.'
+                                     )
+                 '.$Addwhere3.'
+                 ) ';
+                
+                $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+                        b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
+                        qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
+                        from db_ticketing.ticket as a
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        join db_employees.employees as b on a.RequestedBy = b.NIP
+                        join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
+                        '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
+                        '.$Addwhere.'
+                        and (
+                             b.Name LIKE "'.$requestData['search']['value'].'%" or 
+                             a.NoTicket LIKE "'.$requestData['search']['value'].'%"
+                        )
+                        ';
+                // print_r($sql);die();
+                $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                $sqlTotalData = 'select count(*) as total from (
+                        select a.NoTicket
+                        from db_ticketing.ticket as a
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        join db_employees.employees as b on a.RequestedBy = b.NIP
+                        '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
+                        '.$Addwhere.'
+                        and (
+                             b.Name LIKE "'.$requestData['search']['value'].'%" or 
+                             a.NoTicket LIKE "'.$requestData['search']['value'].'%"
+                        )
+                    )xx';
+                break;    
             default:
                 # code...
                 break;
