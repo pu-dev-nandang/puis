@@ -276,7 +276,7 @@
                     <i class="fa fa-caret-down small"></i>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="<?php echo base_url('profile/'.str_replace(' ','-',$this->session->userdata('Name'))); ?>">
+                    <li><a href="<?php echo base_url('profile/'.$this->session->userdata('NIP')); ?>">
                             <i class="fa fa-user"></i>
                             My Profile</a></li>
                     <!--                    <li><a href="pages_calendar.html"><i class="fa fa-calendar"></i> My Calendar</a></li>-->
