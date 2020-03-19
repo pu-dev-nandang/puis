@@ -187,7 +187,7 @@
 		                                <tr>
 											<th width="5%">No</th>
 											<th width="30%">Employee</th>
-											<th width="20%">Study Program</th>
+											<th width="20%">Position</th>
 											<th width="20%">Email</th>
 											<th width="20%">Extension Phone</th>
 		                                </tr>
