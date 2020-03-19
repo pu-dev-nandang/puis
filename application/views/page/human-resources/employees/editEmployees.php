@@ -276,7 +276,7 @@
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>Password Telp</label>                                            
-                                            <input class="form-control number" id="formPassTelp" autocomplete="off" value="<?php echo $arrEmp['PassTelp']; ?>" />
+                                            <input class="form-control" id="formPassTelp" autocomplete="off" value="<?php echo $arrEmp['PassTelp']; ?>" />
                                         </div>
                                     </div>
                                 </div>

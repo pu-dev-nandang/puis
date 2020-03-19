@@ -245,7 +245,7 @@
                     $cloneRow.attr("data-table","employees_educations_non_formal").attr("data-id",value.ID).attr("data-name",value.instituteName);
                     $cloneRow.find("td:first").text(num);
                     $.each(value,function(k,v){
-                        $cloneRow.find(".non-edu-"+k).val(v);    
+                        $cloneRow.find(".non-edu-"+k).val( ($.trim(v).length > 0) ? v : '' );    
                         if(k == "start_event"){
 			        		var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-"+num).removeClass("hasDatepicker");
 			        		cc.datepicker({
