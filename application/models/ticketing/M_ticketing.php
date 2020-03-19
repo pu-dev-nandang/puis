@@ -1548,7 +1548,14 @@ class M_ticketing extends CI_Model {
         for ($i=0; $i < count($GetDepartment); $i++) { 
             $Abbr = $GetDepartment[$i]['Abbr'];
             $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
-                $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                // $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                if ($TicketStatus == 3) {
+                    $TicketStatus =  ' (a.TicketStatus = 3 or  a.TicketStatus = 4  ) and';
+                }
+                else
+                {
+                   $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                }
                 return  $this->db->query(    
                     'select count(*) as total from (
                         select 1 from db_ticketing.ticket as a 
