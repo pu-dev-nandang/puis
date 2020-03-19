@@ -3,9 +3,6 @@
 		<div class="thumbnail">
 			<div class="row">
 				<div class="col-xs-12">
-					<div style="padding: 10px;text-align: center;">
-						<h4 style="color: green;"><u>Ticket All</u></h4>
-					</div>
 					<div class="row">
 						<div class="col-xs-12">
 							<div class="well">
@@ -28,8 +25,8 @@
 										<div class="form-group">
 											<label>Select View</label>
 											<select class="form-control" id = "OpShowAll">
-												<option value="1" selected>Table</option>
-												<option value="2">Graph</option>
+												<option value="1">Table</option>
+												<option value="2" selected>Graph</option>
 											</select>
 										</div>
 									</div>
@@ -37,7 +34,9 @@
 							</div>
 						</div>
 					</div>
-
+					<div style="padding: 10px;text-align: center;">
+						<h4 style="color: green;"><u>Ticket All</u></h4>
+					</div>
 					<div class="row">
 						<div class="col-xs-12">
 							<div class="panel panel-primary" style="border-color: #42a4ca;">
@@ -45,27 +44,7 @@
 					                <h4 class="panel-title pull-left" style="padding-top: 7.5px;"></h4>
 					            </div>
 					            <div class="panel-body" id = "PageDashboardAll">
-					            	<!-- <div class="row">
-					            		<div class="col-xs-12">
-					            			<div class="table-responsive">
-					            				<table class="table table-centre">
-					            					<thead>
-					            						<tr>
-					            							<th>No</th>
-					            							<th>Dept</th>
-					            							<th>Tot</th>
-					            							<th>Open</th>
-					            							<th>Progress</th>
-					            							<th>Closed</th>
-					            						</tr>
-					            					</thead>
-					            					<tbody>
-					            						
-					            					</tbody>
-					            				</table>
-					            			</div>
-					            		</div>
-					            	</div> -->	
+					            	
 					            </div>
 							</div>
 						</div>
@@ -84,8 +63,8 @@
 								<div class="form-group">
 									<label>Select View</label>
 									<select class="form-control" id = "OpShowToday">
-										<option value="1" selected>Table</option>
-										<option value="2">Graph</option>
+										<option value="1">Table</option>
+										<option value="2" selected>Graph</option>
 									</select>
 								</div>
 							</div>
@@ -99,6 +78,16 @@
 		</div>
 	</div>
 </div>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/sparkline/jquery.sparkline.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.tooltip.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.resize.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.time.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.orderBars.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.pie.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.selection.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.growraf.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/easy-pie-chart/jquery.easy-pie-chart.min.js"></script>
 
 <script type="text/javascript" src="<?php echo base_url('js/ticketing/Class_ticketing_dashboard.js'); ?>"></script>
 <script type="text/javascript">
@@ -119,7 +108,18 @@
 
 
 	$(document).off('change','#OpMonth,#OpYear').on('change','#OpMonth,#OpYear',function(e){
-		App_ticketing_dashboard.TableAll.ajax.reload( null, false );
+		if ($('#PageDashboardAll').find('.dataTables_wrapper').length) {
+			App_ticketing_dashboard.TableAll.ajax.reload( null, false );
+		}
+		else
+		{
+			let selectorMonth = $('#OpMonth');
+			let selectorYear = $('#OpYear');
+			let selectorShowAll = $('#OpShowAll');
+			let PageDashboardAll = $('#PageDashboardAll');
+			App_ticketing_dashboard.PageDashboardAll(selectorMonth,selectorYear,selectorShowAll,PageDashboardAll);
+		}
+		
 	})
 
 	$(document).off('click','.aHrefDetailAll').on('click','.aHrefDetailAll',function(e){
@@ -128,7 +128,18 @@
 		let selectorPage = $('#PageDashboardAll');
 		let valueText = $(this).text();
 		let DeptText = $(this).closest('tr').find('td:eq(1)').text();
-		App_ticketing_dashboard.pageDetailAll(selectorPage,action,dataDecode,valueText,DeptText);
+		let pageSet = 'All';
+		App_ticketing_dashboard.pageDetailAll(selectorPage,action,dataDecode,valueText,DeptText,pageSet);
+	})
+
+	$(document).off('click','.aHrefDetailToday').on('click','.aHrefDetailToday',function(e){
+		let action = $(this).attr('action');
+		let dataDecode = jwt_decode($(this).attr('data'));
+		let selectorPage = $('#PageToday');
+		let valueText = $(this).text();
+		let DeptText = $(this).closest('tr').find('td:eq(1)').text();
+		let pageSet = 'Today';
+		App_ticketing_dashboard.pageDetailAll(selectorPage,action,dataDecode,valueText,DeptText,pageSet);
 	})
 
 	$(document).off('click','.btn-back-detail').on('click','.btn-back-detail',function(e){
@@ -142,7 +153,26 @@
 		}
 		else
 		{
-			// App_ticketing_dashboard.TableToday.ajax.reload( null, false );
+			let selectorShowToday = $('#OpShowToday');
+			let PageToday = $('#PageToday');
+			App_ticketing_dashboard.PageToday(selectorShowToday,PageToday);
+
 		}
 	})
+
+	$(document).off('change','#OpShowToday').on('change','#OpShowToday',function(e){
+		let selectorShowToday = $('#OpShowToday');
+		let PageToday = $('#PageToday');
+		App_ticketing_dashboard.PageToday(selectorShowToday,PageToday);
+	})
+
+	$(document).off('change','#OpShowAll').on('change','#OpShowAll',function(e){
+		let selectorMonth = $('#OpMonth');
+		let selectorYear = $('#OpYear');
+		let selectorShowAll = $('#OpShowAll');
+		let PageDashboardAll = $('#PageDashboardAll');
+		App_ticketing_dashboard.PageDashboardAll(selectorMonth,selectorYear,selectorShowAll,PageDashboardAll);;
+	})
+
+	
 </script>

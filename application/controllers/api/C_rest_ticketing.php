@@ -403,6 +403,14 @@ class C_rest_ticketing extends CI_Controller {
             $rs = $this->m_ticketing->dashboard_detail($dataToken);
             echo json_encode($rs);
             break;
+          case 'dashboard_graph_ticket_date' :
+            $rs = $this->m_ticketing->dashboard_graph_ticket_date($dataToken);
+            echo json_encode($rs);
+            break;
+          case 'dashboard_graph_ticket_all' :
+            $rs = $this->m_ticketing->dashboard_graph_ticket_all($dataToken);
+            echo json_encode($rs);
+            break;
           default:
             # code...
             break;

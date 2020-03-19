@@ -1245,7 +1245,14 @@ class M_ticketing extends CI_Model {
             $nestedData[] = $GetDepartment[$i]['Name1'];
 
             $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
-                $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                if ($TicketStatus == 3) {
+                    $TicketStatus =  ' (a.TicketStatus = 3 or  a.TicketStatus = 4  ) and';
+                }
+                else
+                {
+                   $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                }
+                
                 return  $this->db->query(    
                     'select count(*) as total from (
                         select 1 from db_ticketing.ticket as a 
@@ -1266,7 +1273,14 @@ class M_ticketing extends CI_Model {
             $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,2);
             $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,3);
             $queryGetData = function($DepartmentID,$dateGet,$TicketStatus=''){
-                        $TicketStatus = ($TicketStatus != '') ? 'where a.TicketStatus = '.$TicketStatus : '';
+                        if ($TicketStatus == 3) {
+                            $TicketStatus =  'where (a.TicketStatus = 3  or a.TicketStatus = 4 )';
+                        }
+                        else
+                        {
+                             $TicketStatus = ($TicketStatus != '') ? 'where a.TicketStatus = '.$TicketStatus : '';
+                        }
+                       
                         return '
                                 select a.*,ca.Descriptions as CategoryDescriptions,emp.Name as NameRequested,
                                  rec.CategoryReceivedID
@@ -1320,7 +1334,14 @@ class M_ticketing extends CI_Model {
             $nestedData[] = $GetDepartment[$i]['Name1'];
 
             $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
-                $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                if ($TicketStatus == 3) {
+                    $TicketStatus =  ' (a.TicketStatus = 3 or  a.TicketStatus = 4  ) and';
+                }
+                else
+                {
+                    $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                }
+                
                 return  $this->db->query(    
                     'select count(*) as total from (
                         select 1 from db_ticketing.ticket as a 
@@ -1341,7 +1362,14 @@ class M_ticketing extends CI_Model {
             $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,2);
             $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,3);
             $queryGetData = function($DepartmentID,$dateGet,$TicketStatus=''){
-                        $TicketStatus = ($TicketStatus != '') ? 'where a.TicketStatus = '.$TicketStatus : '';
+                        if ($TicketStatus == 3) {
+                            $TicketStatus =  'where (a.TicketStatus = 3  or a.TicketStatus = 4 )';
+                        }
+                        else
+                        {
+                            $TicketStatus = ($TicketStatus != '') ? 'where a.TicketStatus = '.$TicketStatus : '';
+                        }
+                        
                         return '
                                 select a.*,ca.Descriptions as CategoryDescriptions,emp.Name as NameRequested,
                                  rec.CategoryReceivedID
@@ -1436,6 +1464,110 @@ class M_ticketing extends CI_Model {
         );
 
         return $json_data;
+    }
+
+    public function dashboard_graph_ticket_date($dataToken){
+        $rs = [];
+        $url = url_pas.'api/__getAllDepartementPU';
+        $GetDepartment = $this->m_master->apiservertoserver($url);
+        $tot = [];
+        $Open = [];
+        $Progress = [];
+        $Closed = [];
+        $dateGet = $dataToken['dateGet'];
+        $c = 10;
+        for ($i=0; $i < count($GetDepartment); $i++) { 
+            $Abbr = $GetDepartment[$i]['Abbr'];
+            $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
+                $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                return  $this->db->query(    
+                    'select count(*) as total from (
+                        select 1 from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
+                        where '.$TicketStatus.'
+                        a.ID in (
+                            select a.TicketID from db_ticketing.received as a
+                            where a.DepartmentReceivedID = "'.$DepartmentID.'"
+                            and DATE_FORMAT(a.CreatedAt,"%Y-%m-%d") = "'.$dateGet.'"
+                        )
+                    )xx '
+                )->result_array()[0]['total'];
+            };
+
+            $result = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+            if ($result > 0) {
+                $tot[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                $Open[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                $Progress[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                $Closed[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                $Abbreviation[] = $Abbr;
+                $c++;
+            }
+        }
+
+        $rs =[
+            'Total' => $tot,
+            'Open' => $Open,
+            'Progress' => $Progress,
+            'Closed' => $Closed,
+            'Abbreviation' => $Abbreviation,
+        ];
+
+        return $rs;
+
+    }
+
+    public function dashboard_graph_ticket_all($dataToken){
+        $rs = [];
+        $url = url_pas.'api/__getAllDepartementPU';
+        $GetDepartment = $this->m_master->apiservertoserver($url);
+        $tot = [];
+        $Open = [];
+        $Progress = [];
+        $Closed = [];
+        $dateGet = $dataToken['dateGet'];
+        $c = 10;
+        for ($i=0; $i < count($GetDepartment); $i++) { 
+            $Abbr = $GetDepartment[$i]['Abbr'];
+            $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
+                $TicketStatus = ($TicketStatus != '') ? ' a.TicketStatus = '.$TicketStatus.' and' : '';
+                return  $this->db->query(    
+                    'select count(*) as total from (
+                        select 1 from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
+                        where '.$TicketStatus.'
+                        a.ID in (
+                            select a.TicketID from db_ticketing.received as a
+                            where a.DepartmentReceivedID = "'.$DepartmentID.'"
+                            and DATE_FORMAT(a.CreatedAt,"%Y-%m") = "'.$dateGet.'"
+                        )
+                    )xx '
+                )->result_array()[0]['total'];
+            };
+
+            $result = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+            if ($result > 0) {
+                $tot[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                $Open[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                $Progress[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                $Closed[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                $Abbreviation[] = $Abbr;
+                $c++;
+            }
+        }
+
+        $rs =[
+            'Total' => $tot,
+            'Open' => $Open,
+            'Progress' => $Progress,
+            'Closed' => $Closed,
+            'Abbreviation' => $Abbreviation,
+        ];
+
+        return $rs;
+
     }
 
 }

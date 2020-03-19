@@ -22,7 +22,7 @@ class Class_ticketing_dashboard {
 						'<div class="col-xs-12">'+
 							'<div class="table-responsive">'+
 								'<table class="table table-bordered">'+
-									'<caption><h4 style="color: green;"><u>Ticket Today</u></h4></caption>'+
+									// '<caption><h4 style="color: green;"><u>Ticket Today</u></h4></caption>'+
 									'<thead>'+
 										'<tr>'+
 											'<th>No</th>'+
@@ -44,14 +44,107 @@ class Class_ticketing_dashboard {
 				return this;
 	}
 
-	PageToday = (selectorShowToday,PageToday) => {
+	htmlGraphDashboardToday = () => {
+		let html = '<div class = "showGraph chart"></div>';
+        this.Wrhtml = html;
+		return this;
+	}
+
+	PageToday = async (selectorShowToday,PageToday) => {
 		let cls = this;
 		if (selectorShowToday.find('option:selected').val() == 1) {
 			// table
+			PageToday.empty();
 			cls.htmlTableDashboardToday().writeHtml(PageToday).insertJs(() => {
 			  let selectorTableToday = PageToday.find('table');
 		      this.LoadTableToday(selectorTableToday);
 		    });
+		}
+		else
+		{
+			PageToday.empty();
+			cls.htmlGraphDashboardToday().writeHtml(PageToday).insertJs(async() => {
+			  let selectorshowGraph = PageToday.find('.showGraph');
+			  // selectorshowGraph.html('asdsad');
+		      let url = base_url_js+'rest_ticketing/__ticketing_dashboard';
+		      let requestHeader = {
+		      	Hjwtkey : Hjwtkey,
+		      }
+		      let dateToday = moment().format('YYYY-MM-DD').toString();
+		      let dataform = {
+		          action : 'dashboard_graph_ticket_date',
+		          auth : 's3Cr3T-G4N',
+		          dateGet : dateToday,
+		      };
+		      let token = jwt_encode(dataform,'UAP)(*');
+		      const response = await AjaxSubmitFormPromises(url,token,[],Apikey,requestHeader);
+		      var ds = new Array();
+		      ds.push({
+		      	label: "Total",
+		      	data: response['Total'],
+		      	bars: {
+		      		show: true,
+		      		barWidth:  0.1,
+		      		order: 1
+		      	}
+		      });
+
+		      ds.push({
+		      	label: "Open",
+		      	data: response['Open'],
+		      	bars: {
+		      		show: true,
+		      		barWidth:  0.1,
+		      		order: 2
+		      	}
+		      });
+
+		      ds.push({
+		      	label: "Progress",
+		      	data: response['Progress'],
+		      	bars: {
+		      		show: true,
+		      		barWidth:  0.1,
+		      		order: 3
+		      	}
+		      });
+
+		      ds.push({
+		      	label: "Closed",
+		      	data: response['Closed'],
+		      	bars: {
+		      		show: true,
+		      		barWidth:  0.1,
+		      		order: 4
+		      	}
+		      });
+
+		      var xAxis = [];
+		      let c = 10;
+		      for (var i = 0; i < response['Abbreviation'].length; i++) {
+		      	var cd = response['Abbreviation'];
+		      	var taa = cd[i];
+		      	var aa = [c.toString(), taa];
+		      	xAxis.push(aa);
+		      	c++;
+		      }
+
+		      $.plot(selectorshowGraph, ds, $.extend(true, {}, Plugins.getFlotDefaults()	, {	
+		      	series: {
+		      		lines: { show: false },
+		      		points: { show: false }
+		      	},
+		      	grid:{
+		      		hoverable: true
+		      	},
+		      	tooltip: true,
+		      	tooltipOpts: {
+		      		content: '%s: %y'
+		      	},
+		      	xaxis: { ticks:xAxis}
+		      }));
+		    });
+			
 		}
 	}
 
@@ -106,9 +199,95 @@ class Class_ticketing_dashboard {
 		let cls = this;
 		if (selectorShow.find('option:selected').val() == 1) {
 			// table
+			PageDashboardAll.empty();
 			cls.htmlTableDashboardAll().writeHtml(PageDashboardAll).insertJs(() => {
 		      	  let selectorTableToday = PageDashboardAll.find('table');
 		          this.LoadTableAll(selectorMonth,selectorYear,selectorTableToday);
+		    });
+		}
+		else
+		{
+			cls.htmlGraphDashboardToday().writeHtml(PageDashboardAll).insertJs(async() => {
+			  let selectorshowGraph = PageDashboardAll.find('.showGraph');
+			  let dateGet = selectorYear.find('option:selected').val()+'-'+selectorMonth.find('option:selected').val();
+			  // selectorshowGraph.html('asdsad');
+		      let url = base_url_js+'rest_ticketing/__ticketing_dashboard';
+		      let requestHeader = {
+		      	Hjwtkey : Hjwtkey,
+		      }
+		      let dateToday = moment().format('YYYY-MM-DD').toString();
+		      let dataform = {
+		          action : 'dashboard_graph_ticket_all',
+		          auth : 's3Cr3T-G4N',
+		          dateGet : dateGet,
+		      };
+		      let token = jwt_encode(dataform,'UAP)(*');
+		      const response = await AjaxSubmitFormPromises(url,token,[],Apikey,requestHeader);
+		      var ds = new Array();
+		      ds.push({
+		      	label: "Total",
+		      	data: response['Total'],
+		      	bars: {
+		      		show: true,
+		      		barWidth: 0.1,
+		      		order: 1
+		      	}
+		      });
+
+		      ds.push({
+		      	label: "Open",
+		      	data: response['Open'],
+		      	bars: {
+		      		show: true,
+		      		barWidth: 0.1,
+		      		order: 2
+		      	}
+		      });
+
+		      ds.push({
+		      	label: "Progress",
+		      	data: response['Progress'],
+		      	bars: {
+		      		show: true,
+		      		barWidth: 0.1,
+		      		order: 3
+		      	}
+		      });
+
+		      ds.push({
+		      	label: "Closed",
+		      	data: response['Closed'],
+		      	bars: {
+		      		show: true,
+		      		barWidth: 0.1,
+		      		order: 4
+		      	}
+		      });
+
+		      var xAxis = [];
+		      let c = 10;
+		      for (var i = 0; i < response['Abbreviation'].length; i++) {
+		      	var cd = response['Abbreviation'];
+		      	var taa = cd[i];
+		      	var aa = [c.toString(), taa];
+		      	xAxis.push(aa);
+		      	c++;
+		      }
+
+		      $.plot(selectorshowGraph, ds, $.extend(true, {}, Plugins.getFlotDefaults()	, {	
+		      	series: {
+		      		lines: { show: false },
+		      		points: { show: false }
+		      	},
+		      	grid:{
+		      		hoverable: true
+		      	},
+		      	tooltip: true,
+		      	tooltipOpts: {
+		      		content: '%s: %y'
+		      	},
+		      	xaxis: { ticks:xAxis}
+		      }));
 		    });
 		}
 	}
@@ -292,17 +471,46 @@ class Class_ticketing_dashboard {
 		            'orderable': false,
 		            'className': 'dt-body-center',
 		         },
-		         
-		           // {
-		           //    'targets': 2,
-		           //    'searchable': false,
-		           //    'orderable': true,
-		           //    'className': 'dt-body-center',
-		           //    'render': function (data, type, full, meta){
-		           //        let btnAction = '';
-		           //        return btnAction;
-		           //    }
-		           // },
+		         {
+		            'targets': 2,
+		            'searchable': false,
+		            'orderable': true,
+		            'className': 'dt-body-center',
+		            'render': function (data, type, full, meta){
+		                let html = '<a href="javascript:void(0)" data = "'+full[6]+'" action="tot" class = "aHrefDetailToday">'+full[2]+'</a>';
+		                return html;
+		            }
+		         },
+		         {
+		            'targets': 3,
+		            'searchable': false,
+		            'orderable': true,
+		            'className': 'dt-body-center',
+		            'render': function (data, type, full, meta){
+		                let html = '<a href="javascript:void(0)" data = "'+full[6]+'" action="Open" class = "aHrefDetailToday">'+full[3]+'</a>';
+		                return html;
+		            }
+		         },
+		         {
+		            'targets': 4,
+		            'searchable': false,
+		            'orderable': true,
+		            'className': 'dt-body-center',
+		            'render': function (data, type, full, meta){
+		                let html = '<a href="javascript:void(0)" data = "'+full[6]+'" action="Progress" class = "aHrefDetailToday">'+full[4]+'</a>';
+		                return html;
+		            }
+		         },
+		         {
+		            'targets': 5,
+		            'searchable': false,
+		            'orderable': true,
+		            'className': 'dt-body-center',
+		            'render': function (data, type, full, meta){
+		                let html = '<a href="javascript:void(0)" data = "'+full[6]+'" action="Closed" class = "aHrefDetailToday">'+full[5]+'</a>';
+		                return html;
+		            }
+		         },
 		      ],
 		    'createdRow': function( row, data, dataIndex ) {
 		            
@@ -323,7 +531,7 @@ class Class_ticketing_dashboard {
 
 	}
 
-	pageDetailAll = async(selectorPage,action,dataDecode,valueText,DeptText) => {
+	pageDetailAll = async(selectorPage,action,dataDecode,valueText,DeptText,pageSet) => {
 		let cls = this;
 		let url = base_url_js+'rest_ticketing/__ticketing_dashboard';
 		let requestHeader = {
@@ -344,7 +552,7 @@ class Class_ticketing_dashboard {
 		if (response.dataTable.recordsTotal > 0) {
 			selectorPage.empty();
 				// table
-				cls.htmlDetailTable(action,valueText,DeptText).writeHtml(selectorPage).insertJs(() => {
+				cls.htmlDetail(action,valueText,DeptText,pageSet).writeHtml(selectorPage).insertJs(() => {
 					let dt = response.dataTable.data;
 					let selectorTable = selectorPage.find('table');
 			      	selectorTable.DataTable({
@@ -354,8 +562,37 @@ class Class_ticketing_dashboard {
 	      	          
 			      	});
 
+			      	let d_pie = response.graph;
+			      	for (var i=0;i<d_pie.length;i++){
+			      	    d_pie[i].label+=' ('+d_pie[i].data+')'
+			      	}
+			      	// graph
+			      	$.plot(selectorPage.find('.showGraph'), d_pie, $.extend(true, {}, Plugins.getFlotDefaults(), {
+			      		series: {
+			      			pie: {
+			      				show: true,
+			      				radius: 1,
+			      				label: {
+			      					show: true
+			      				}
+			      			},
+			
+			      		},
+			      		grid: {
+			      			hoverable: true
+			      		},
+			      		tooltip: true,
+			      		tooltipOpts: {
+			      			content: '%p.0%, %s', // show percentages, rounding to 2 decimal places
+			      			shifts: {
+			      				x: 20,
+			      				y: 0
+			      			}
+			      		}
+			      	}));
+
 			    });
-			    // graph
+			    
 		}
 		else
 		{
@@ -363,16 +600,29 @@ class Class_ticketing_dashboard {
 		}
 	}
 
-	htmlDetailTable = (action,valueText,DeptText) => {
+	htmlDetail = (action,valueText,DeptText,pageSet) => {
 		action = (action == 'tot') ? 'Total ' : action;
 		let html = '<div class="row">'+
+						'<div class = "col-xs-12">'+
+							'<div style = "padding-left: 5px;">'+
+								'<button class = "btn btn-warning btn-back-detail" action = "'+pageSet+'">Back</button>'+
+							'</div>'+
+							'<div align = "center">'+
+								'<h4 style = "color:green;">Dept '+DeptText+' '+action+' ticket : '+valueText+'</h4>'+
+								'<hr/>'+
+							'</div>'+
+						'</div>'+
+					'</div>'+
+	            	'<div class = "row">'+
+	            		'<div class = "col-xs-12">'+
+	            			'<h4 align ="center" style = "color:#a91c1cd6;">Graph By Category</h4>'+
+	            			'<div class = "showGraph chart"></div>'+
+	            		'</div>'+
+            		'</div>'+
+            		'<hr/>'+
+					'<div class = "row">'+	
 	            		'<div class="col-xs-12">'+
-	            			'<button class = "btn btn-warning btn-back-detail" action = "All">Back</button>'+
-	            			'<br/>'+
-	            			'<br/>'+
-	            			'<div align = "center">'+
-	            				'<h4 style = "color:green;">Dept '+DeptText+' '+action+' ticket : '+valueText+'</h4>'+
-	            			'</div>'+
+	            			'<h4 align ="center" style = "color:#a91c1cd6;">Data</h4>'+
 	            			'<div class="table-responsive">'+
 	            				'<table class="table table-bordered">'+
 	            					'<thead>'+
@@ -389,7 +639,8 @@ class Class_ticketing_dashboard {
 	            				'</table>'+
 	            			'</div>'+
 	            		'</div>'+
-            		'</div>'
+	            	'</div>'
+	            	
         this.Wrhtml = html;
         return this;
 	}
