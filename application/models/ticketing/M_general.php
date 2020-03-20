@@ -210,7 +210,10 @@ class M_general extends CI_Model {
             switch ($Explode[0]) {
                 case 'NA':
                     $Division = $Explode[1];
-                    $AddWhere .= ' and SPLIT_STR(a.PositionMain, ".", 1) = '.$Division;
+                    $AddWhere .= ' and (SPLIT_STR(a.PositionMain, ".", 1) = '.$Division.' or';
+                    $AddWhere .= ' SPLIT_STR(a.PositionOther1, ".", 1) = '.$Division.' or';
+                    $AddWhere .= ' SPLIT_STR(a.PositionOther2, ".", 1) = '.$Division.' or';
+                    $AddWhere .= ' SPLIT_STR(a.PositionOther3, ".", 1) = '.$Division.' )';
                     break;
                 case 'AC':
                     $ProdiID = $Explode[1];
