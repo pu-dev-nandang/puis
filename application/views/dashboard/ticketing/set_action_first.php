@@ -112,11 +112,12 @@
 							'<div class = "form-group">'+
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
-										'<label>'+'Notes'+'</label>'+
+										'<label>'+'Note for worker'+'</label>'+
+										'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
-										 // '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
-										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
+										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 // '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -187,11 +188,12 @@
 							'<div class = "form-group">'+
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
-										'<label>'+'Notes'+'</label>'+
+										'<label>'+'Note for department'+'</label>'+
+										'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
-										 // '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
-										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
+										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 // '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+

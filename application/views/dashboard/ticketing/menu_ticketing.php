@@ -252,8 +252,8 @@
             var row = data_received[i];
             var GetWorker = '';
             var DataReceived_Details = row.DataReceived_Details;
-              GetWorker += '<p style = "color:blue;">Notes :</p>';
-              GetWorker += '<p style = "color:blue;">'+nl2br(row.MessageReceived)+'</p>';
+              // GetWorker += '<p style = "color:blue;">Notes :</p>';
+              // GetWorker += '<p style = "color:blue;">'+nl2br(row.MessageReceived)+'</p>';
             if (DataReceived_Details.length >  0) {
               GetWorker += '<table class = "table" style ="margin-top:15px;">'+
                               '<tr>'+
