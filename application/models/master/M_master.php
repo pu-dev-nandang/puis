@@ -2616,15 +2616,23 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query;
     }
 
+    // public function MasterfileStatus($Colom)
+    // {
+
+    //     $sql = 'SELECT ID FROM db_employees.master_files where NameFiles = "'.$Colom.'" ';
+    //     $query=$this->db->query($sql, array())->result_array();
+    //     return $query;
+
+    // }
     public function MasterfileStatus($Colom)
-    {
+        {
 
-        $sql = 'SELECT ID FROM db_employees.master_files where NameFiles = "'.$Colom.'" ';
-        $query=$this->db->query($sql, array())->result_array();
-        return $query;
+            $sql = 'SELECT ID FROM db_employees.master_files where TypeFiles = "'.$Colom.'" ';
+            
+            $query=$this->db->query($sql, array())->result_array();
+            return $query;
 
-    }
-
+        }
     public function AuthAPI($arr_content)
     {
         $key = 's3Cr3T-G4N';
