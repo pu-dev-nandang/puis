@@ -83,8 +83,26 @@ class C_rest_ticketing extends CI_Controller {
             $rs = $this->m_setting->ActionTable('add',$dataToken,'db_ticketing.category');
             echo json_encode($rs);
             break;
-          case 'delete' : 
-             $rs = $this->m_setting->ActionTable('delete',$dataToken,'db_ticketing.category');
+          case 'delete' :
+             // check ID_category sudah digunakan atau belum
+             $ID = $dataToken['ID'];
+             $sqlChek = $this->db->query(
+              'select count(*) as total from (
+                select 1 from db_ticketing.ticket where CategoryID = '.$ID.'
+                UNION ALL
+                select 1 from db_ticketing.received where CategoryReceivedID = '.$ID.'
+              )xx
+
+              '
+             )->result_array();
+             if ($sqlChek[0]['total'] == 0) {
+               $rs = $this->m_setting->ActionTable('delete',$dataToken,'db_ticketing.category');
+             }
+             else
+             {
+                $rs = ['status' => 0,'msg' => 'Data has been using transaction'];
+             }
+             
              echo json_encode($rs);
             break;
           case 'edit' : 
