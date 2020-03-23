@@ -1,5 +1,13 @@
 <div id="general-affair">
 	<div class="row">
+		<div class="col-sm-12">
+			<div class="btn-group" style="padding: 10px 5px;">
+				<button class="btn btn-info btn-sm btn-freetext" type="button" data-type="1">Form Attention</button>
+				<button class="btn btn-primary btn-sm btn-freetext" type="button" data-type="2">Form Term and conditions</button>
+			</div>
+		</div>
+	</div>
+	<div class="row">
 		<div class="col-sm-4">
 			<form id="form-lost-found" action="<?=base_url('general-affair/save-lost-and-found')?>" method="post" autocomplete="off">
 				<input type="hidden" name="ID" class="form-control ID">
@@ -37,14 +45,6 @@
 						<div class="form-group">
 							<label>Description</label>
 							<textarea class="form-control Description" name="Description"></textarea>
-							<small class="text-danger text-message"></small>
-						</div>	
-						<div class="form-group">
-							<label>Status</label>
-							<select class="form-control required Status" name="Status">
-								<option value="1">Available</option>
-								<option value="2" selected>Unvailable</option>
-							</select>
 							<small class="text-danger text-message"></small>
 						</div>
 						<div class="row">
@@ -248,6 +248,45 @@
 			    	$.each(response,function(k,v){
 			    		$("#form-lost-found").find("."+k).val(v);
 			    	});
+			    }
+			});
+        });
+        $("#general-affair").on("click",".btn-freetext",function(){
+        	var itsme = $(this);
+        	var text = itsme.text();
+        	var TYPE = itsme.data('type');
+        	var data = {
+              TYPE : TYPE,
+          	};
+          	var token = jwt_encode(data,'UAP)(*');
+			$.ajax({
+			    type : 'POST',
+			    url : base_url_js+"general-affair/form-lost-and-found-info",
+			    data : {token:token},
+			    dataType : 'json',
+			    beforeSend :function(){loading_modal_show()},
+	            error : function(jqXHR){
+	            	loading_modal_hide();
+	            	$("body #GlobalModal .modal-body").html(jqXHR.responseText);
+		      	  	$("body #GlobalModal").modal("show");
+			    },success : function(response){
+	            	loading_modal_hide();
+	            	var ID = ""; var Description = "";
+	            	if(!jQuery.isEmptyObject(response)){
+	            		ID = response.ID;
+	            		Description = response.Description;
+	            	}
+	            	var formInformation = '<form action="'+base_url_js+'general-affair/save-lost-and-found" method="post" autocomplete="off">'+
+	            	'<input type="hidden" name="ID" value="'+ID+'">'+
+	            	'<input type="hidden" name="Type" value="'+TYPE+'">'+
+	            	'<input type="hidden" name="action" value="lost-found-info">'+
+	            	'<div class="form-group"><label>Description</label><textarea class="form-control required" required name="Description">'+Description+'</textarea></div>'+
+	            	'<div class="text-right"><button class="btn btn-save btn-sm btn-success">Save changes</button></div>'+
+	            	'</form>';
+	            	$("body #GlobalModal .modal-header").html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">'+text+'</h4>');
+	            	$("body #GlobalModal .modal-body").html(formInformation);
+		      	  	$("body #GlobalModal .modal-footer").addClass("hide");
+		      	  	$("body #GlobalModal").modal("show");
 			    }
 			});
         });

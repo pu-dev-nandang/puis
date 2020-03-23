@@ -25,6 +25,8 @@ class C_general_affair extends Globalclass {
     }
 
     public function fetchPackageOrder(){
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
         $reqdata = $this->input->post();
         if($reqdata){
             $key = "UAP)(*";
@@ -34,9 +36,10 @@ class C_general_affair extends Globalclass {
             if(!empty($reqdata['search']['value']) ) {
                 $search = $reqdata['search']['value'];
 
-                $param[] = array("field"=>"(CourierExpedition","data"=>" like '%".$search."%' ","filter"=>"AND",);
-                $param[] = array("field"=>"Shipper","data"=>" like '%".$search."%' ","filter"=>"OR",);
-                $param[] = array("field"=>"BelongsTo","data"=>" like '%".$search."%' ","filter"=>"OR",);
+                $param[] = array("field"=>"(ExpeditionCourier","data"=>" like '%".$search."%' ","filter"=>"AND",);
+                $param[] = array("field"=>"ExpeditionCom","data"=>" like '%".$search."%' ","filter"=>"OR",);
+                $param[] = array("field"=>"PackageReceiverby","data"=>" like '%".$search."%' ","filter"=>"OR",);
+                $param[] = array("field"=>"PackageOwner","data"=>" like '%".$search."%' ","filter"=>"OR",);
                 $param[] = array("field"=>"Receiver","data"=>" like '%".$search."%' )","filter"=>"OR",);
             }
             $totalData = $this->m_general_affair->fetchPackage(true,$param)->row();
@@ -61,6 +64,8 @@ class C_general_affair extends Globalclass {
 
 
     public function packageSaveChanges(){
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
         $data=$this->input->post();
         $myNIP = $this->session->userdata('NIP');
         $myName = $this->session->userdata('Name');
@@ -162,19 +167,39 @@ class C_general_affair extends Globalclass {
         $myNIP = $this->session->userdata('NIP');
         $myName = $this->session->userdata('Name');
         if($data){
-            if(!empty($data['ID'])){
-                $conditions = array("ID"=>$data['ID']);
-                $isExist = $this->General_model->fetchData("db_general_affair.lost_n_found",$conditions)->row();
-                if(!empty($isExist)){
-                    $data['UpdatedBy'] = $myNIP."/".$myName;
-                    $update = $this->General_model->updateData("db_general_affair.lost_n_found",$data,$conditions);
-                    $message = (($update) ? "Successfully":"Failed")." saved.";
-                }else{$message = "Data not founded.";}
-            }else{
-                $data['CreatedBy'] = $myNIP."/".$myName;
-                $insert = $this->General_model->insertData("db_general_affair.lost_n_found",$data);
-                $message = (($insert) ? "Successfully":"Failed")." saved.";
+        	$message="";
+        	if(!empty($data['action'])){
+        		unset($data['action']);
+        		if(!empty($data['ID'])){
+	                $conditions = array("ID"=>$data['ID']);
+	                $isExist = $this->General_model->fetchData("db_general_affair.lost_n_found_information",$conditions)->row();
+	                if(!empty($isExist)){
+	                    $data['UpdatedBy'] = $myNIP."/".$myName;
+	                    $update = $this->General_model->updateData("db_general_affair.lost_n_found_information",$data,$conditions);
+	                    $message = (($update) ? "Successfully":"Failed")." saved.";
+	                }else{$message = "Data not founded.";}
+	            }else{
+	                $data['CreatedBy'] = $myNIP."/".$myName;
+	                $insert = $this->General_model->insertData("db_general_affair.lost_n_found_information",$data);
+	                $message = (($insert) ? "Successfully":"Failed")." saved.";
+	            }
+        	}else{
+	        	$data['status'] = (!empty($data['Receivedby']) ? 2:1);
+	            if(!empty($data['ID'])){
+	                $conditions = array("ID"=>$data['ID']);
+	                $isExist = $this->General_model->fetchData("db_general_affair.lost_n_found",$conditions)->row();
+	                if(!empty($isExist)){
+	                    $data['UpdatedBy'] = $myNIP."/".$myName;
+	                    $update = $this->General_model->updateData("db_general_affair.lost_n_found",$data,$conditions);
+	                    $message = (($update) ? "Successfully":"Failed")." saved.";
+	                }else{$message = "Data not founded.";}
+	            }else{
+	                $data['CreatedBy'] = $myNIP."/".$myName;
+	                $insert = $this->General_model->insertData("db_general_affair.lost_n_found",$data);
+	                $message = (($insert) ? "Successfully":"Failed")." saved.";
+	            }
             }
+            
             $this->session->set_flashdata("message",$message);
             redirect(site_url('general-affair/lost-and-found'));
         }else{show_404();}
@@ -188,6 +213,19 @@ class C_general_affair extends Globalclass {
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
             $isExist = $this->General_model->fetchData("db_general_affair.lost_n_found",array("ID"=>$data_arr['ID']))->row();
+            $json = $isExist;
+        }
+        echo json_encode($json);
+    }
+
+
+    public function formLostAndFoundInfo(){
+    	$data=$this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist = $this->General_model->fetchData("db_general_affair.lost_n_found_information",array("TYPE"=>$data_arr['TYPE']))->row();
             $json = $isExist;
         }
         echo json_encode($json);
