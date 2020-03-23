@@ -9,18 +9,15 @@
 					<div id="fetch-data-tables">
 						<table class="table table-bordered" id="table-list-data">
 							<thead>
-								<tr>
-									<th width="5%">No</th>
-									<th>Courier Expedition</th>
-									<th>Shipper</th>
-									<th>Shipper Date</th>
-									<th>Receiver</th>
-									<th>Receiver Date</th>
-									<th>Note</th>
-									<th>Package Owner</th>
-									<th>Accepted Date</th>
-								</tr>
-							</thead>
+                                <tr>
+                                    <th width="5%">No</th>
+                                    <th>Expedition</th>
+                                    <th>Receiver</th>
+                                    <th>Package Note</th>
+                                    <th>Package Owner</th>
+                                    <th>Package Received</th>
+                                </tr>
+                            </thead>
 							<tbody>
 								<tr>
 									<td colspan="10">No data available in table</td>
@@ -36,8 +33,8 @@
 
 <script type="text/javascript">
 	function fetchPackageOrder() {
-		//var filtering = $("#form-filter").serialize();		
-		var filtering = null;
+        //var filtering = $("#form-filter").serialize();        
+        var filtering = null;
         var token = jwt_encode({Filter : filtering},'UAP)(*');
 
         var dataTable = $('#fetch-data-tables #table-list-data').DataTable( {
@@ -46,10 +43,9 @@
             "processing": true,
             "serverSide": true,
             "iDisplayLength" : 10,
-            "ordering" : false,
             "responsive": true,
             "language": {
-                "searchPlaceholder": "NIM, Name, Study Program"
+                "searchPlaceholder": "Name"
             },
             "lengthMenu": [[10, 25, 50], [10, 25, 50]],
             "ajax":{
@@ -73,43 +69,47 @@
                 //loading_modal_hide();
             },
             "columns": [
-            	{
-            		"data":"ID",
-            		render: function (data, type, row, meta) {
-				        return meta.row + meta.settings._iDisplayStart + 1;
-				    }
-            	},
-            	{
-            		"data":"CourierExpedition",
-            		"render": function (data, type, row, meta) {
-            			var label = "";
-            			return data;
-            		}
-            	},
-            	{
-            		"data":"Shipper"            		
-            	},
-            	{
-            		"data":"DateShipper"         		
-            	},
-            	{
-            		"data":"Receiver"            		
-            	},
-            	{
-            		"data":"DateReceiver"            		
-            	},
-            	{
-            		"data":"PackageNote"            		
-            	},
-            	{
-            		"data":"BelongsTo"            		
-            	},   
-            	{
-            		"data":"AcceptedDate"            		
-            	}, 
-        	]
+                {
+                    "data":"ID",
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                },
+                {
+                    "data":"ExpeditionCom",
+                    "render": function (data, type, row, meta) {
+                        var label = '<p><span class="company"><i class="fa fa-compass"></i> '+data+'</span><br><span class="courier"><i class="fa fa-user"></i> '+row.ExpeditionCourier+'</span></p>';
+                        return label;
+                    }
+                },
+                {
+                    "data":"Receiver",
+                    "render": function (data, type, row, meta) {
+                        var label = '<p><span class="receiver"><i class="fa fa-user"></i> '+data+'</span><br><span class="date"><i class="fa fa-calendar"></i> '+row.ReceiverDate+'</span></p>';
+                        return label;
+                    }
+                },
+                {
+                    "data":"Note"                   
+                },
+                {
+                    "data":"PackageOwner"                   
+                },
+                {
+                    "data":"PackageReceiverby",
+                    "render": function (data, type, row, meta) {
+                        var label = "";
+                        if(($.trim(row.PackageReceiverby).length > 0) && ($.trim(row.PackageReceiverDate).length > 0)){
+                            label = '<p><span class="received"><i class="fa fa-user"></i> '+data+'</span><br><span class="date"><i class="fa fa-calendar"></i> '+row.PackageReceiverDate+'</span></p>';                         
+                        }else{
+                            label = '<p class="text-center text-danger"><i class="fa fa-exclamation-triangle"></i> Packet has not been taken</p>';
+                        }
+                        return label;
+                    }
+                }
+            ]
         });
-	}
+    }
 	$(document).ready(function(){
 		fetchPackageOrder();
 	});

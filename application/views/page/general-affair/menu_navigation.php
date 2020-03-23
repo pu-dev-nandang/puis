@@ -16,6 +16,13 @@
                     Package Order
                 </a>
             </li>
+            <li class="<?=(($this->uri->segment(2) == 'lost-and-found') ? 'current' :'')?>">
+                <a href="<?=base_url('general-affair/lost-and-found'); ?>">
+                    <i class="fa fa-question-circle-o"></i>
+                    Lost and Found
+                </a>
+            </li>
+
             <!-- END ADDED BY FEBRI @ MARCH 2020 -->
         </ul>
         <div class="sidebar-widget align-center">

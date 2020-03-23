@@ -1,7 +1,7 @@
 <div id="general-affair">
 	<div class="row">
 		<div class="col-sm-4">
-			<form id="form-package-order" action="<?=base_url('general-affair/save-package-order')?>" method="post" autocomplete="off">
+			<form id="form-lost-found" action="<?=base_url('general-affair/save-lost-and-found')?>" method="post" autocomplete="off">
 				<input type="hidden" name="ID" class="form-control ID">
 				<div class="panel panel-default">
 					<div class="panel-heading">
@@ -9,63 +9,61 @@
 					</div>
 					<div class="panel-body">
 						<div class="form-group">
-							<label>Courier Expedition</label>
-							<input type="text" name="CourierExpedition" class="form-control required CourierExpedition" placeholder="Kurir Ekspedisi">
+							<label>Code</label>
+							<input type="text" name="Code" class="form-control required Code" readonly value="<?=$CodeLNF?>">
+							<small class="text-danger text-message"></small>
+						</div>
+						<div class="form-group">
+							<label>Item Name</label>
+							<input type="text" name="Name" class="form-control required Name">
 							<small class="text-danger text-message"></small>
 						</div>
 						<div class="row">
 							<div class="col-sm-6">
 								<div class="form-group">
-									<label>Shipper</label>
-									<input type="text" name="Shipper" class="form-control required Shipper" placeholder="Nama Kurir Pengirim">
+									<label>Location</label>
+									<input type="text" name="Location" class="form-control required Location">
 									<small class="text-danger text-message"></small>
 								</div>
 							</div>
 							<div class="col-sm-6">
 								<div class="form-group">
-									<label>Shipper Date</label>
-									<input type="text" name="DateShipper" class="form-control required DateShipper" id="DateShipper" value="<?=date("Y-m-d")?>">
+									<label>Date Discover</label>
+									<input type="text" name="DateDiscover" class="form-control required DateDiscover" id="DateDiscover" value="<?=date("Y-m-d")?>">
 									<small class="text-danger text-message"></small>
 								</div>
 							</div>
 						</div>	
+						<div class="form-group">
+							<label>Description</label>
+							<textarea class="form-control Description" name="Description"></textarea>
+							<small class="text-danger text-message"></small>
+						</div>	
+						<div class="form-group">
+							<label>Status</label>
+							<select class="form-control required Status" name="Status">
+								<option value="1">Available</option>
+								<option value="2" selected>Unvailable</option>
+							</select>
+							<small class="text-danger text-message"></small>
+						</div>
 						<div class="row">
 							<div class="col-sm-6">
 								<div class="form-group">
 									<label>Receiver</label>
-									<input type="text" name="Receiver" class="form-control required Receiver" placeholder="Penerima paket" value="<?=(!empty($employee) ? $employee->Name : '')?>">
+									<input type="text" name="Receivedby" class="form-control Receivedby">
 									<small class="text-danger text-message"></small>
 								</div>
 							</div>
 							<div class="col-sm-6">
 								<div class="form-group">
 									<label>Receiver Date</label>
-									<input type="text" name="DateReceiver" class="form-control required DateReceiver" id="DateReceiver" placeholder="Tgl diterima paket" value="<?=date("Y-m-d")?>">
+									<input type="text" name="DateReceiver" class="form-control DateReceiver" id="DateReceiver">
 									<small class="text-danger text-message"></small>
 								</div>
 							</div>
 						</div>	
-						<div class="form-group">
-							<label>Note</label>
-							<textarea class="form-control PackageNote" name="PackageNote" placeholder="Package Name/Type or Description"></textarea>
-							<small class="text-danger text-message"></small>
-						</div>	
-						<div class="row">
-							<div class="col-sm-6">
-								<div class="form-group">
-									<label>Package Owner</label>
-									<input type="text" name="BelongsTo" class="form-control required BelongsTo" placeholder="Pemilik Paket">
-									<small class="text-danger text-message"></small>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group">
-									<label>Accepted Date</label>
-									<input type="text" name="AcceptedDate" class="form-control AcceptedDate" id="AcceptedDate" placeholder="Tgl paket diserahkan">
-									<small class="text-danger text-message"></small>
-								</div>
-							</div>
-						</div>
+						
 					</div>
 					<div class="panel-footer text-right">
 						<button class="btn btn-success btn-sm btn-submit" type="button">Save Changes</button>
@@ -84,14 +82,13 @@
 							<thead>
 								<tr>
 									<th width="5%">No</th>
-									<th>Courier Expedition</th>
-									<th>Shipper</th>
-									<th>Shipper Date</th>
-									<th>Receiver</th>
-									<th>Receiver Date</th>
-									<th>Note</th>
-									<th>Package Owner</th>
-									<th>Accepted Date</th>
+									<th>Code</th>
+									<th>Item Name</th>
+									<th>Location</th>
+									<th>Date Discover</th>
+									<th>Description</th>
+									<th>Status</th>
+									<th>Received</th>
 									<th></th>
 								</tr>
 							</thead>
@@ -126,7 +123,7 @@
             },
             "lengthMenu": [[10, 25, 50], [10, 25, 50]],
             "ajax":{
-                url : base_url_js+'general-affair/fetch-package-order', // json datasource
+                url : base_url_js+'general-affair/fetch-lost-and-found', // json datasource
                 ordering : false,
                 data : {token:token},
                 type: "post",  // method  , by default get
@@ -153,33 +150,41 @@
 				    }
             	},
             	{
-            		"data":"CourierExpedition",
-            		"render": function (data, type, row, meta) {
+            		"data":"Code",
+            		/*"render": function (data, type, row, meta) {
             			var label = "";
             			return data;
-            		}
+            		}*/
             	},
             	{
-            		"data":"Shipper"            		
+            		"data":"Name"            		
             	},
             	{
-            		"data":"DateShipper"         		
+            		"data":"Location"         		
             	},
             	{
-            		"data":"Receiver"            		
+            		"data":"DateDiscover"            		
             	},
             	{
-            		"data":"DateReceiver"            		
+            		"data":"Description"            		
             	},
             	{
-            		"data":"PackageNote"            		
+            		"data":"Status",
+            		"render": function (data, type, row, meta) {
+            			var label = (data == 1) ? "Available":"Unvailable";
+            			return label;
+            		}            		
             	},
             	{
-            		"data":"BelongsTo"            		
+            		"data":"Receivedby",
+            		"render": function (data, type, row, meta) {
+            			var label = "";
+            			if($.trim(row.Receivedby).length > 0 && $.trim(row.DateReceiver).length > 0){
+            				label = '<p><span class="received"><i class="fa fa-user"></i> '+data+'</span><br><span class="date"><i class="fa fa-calendar"></i> '+row.DateReceiver+'</span></p>';
+            			}else{label='<p class="text-center text-danger"><i class="fa fa-exclamation-triangle"></i> Things has not been taken</p>';}
+            			return label;
+            		}          		
             	},   
-            	{
-            		"data":"AcceptedDate"            		
-            	},       	
             	{
             		"data":"ID",
             		"render": function (data, type, row, meta) {
@@ -192,12 +197,12 @@
 	}
 	$(document).ready(function(){
 		fetchPackageOrder();
-		$("#DateReceiver,#DateShipper,#AcceptedDate").datepicker({
+		$("#DateDiscover,#DateReceiver").datepicker({
             dateFormat: 'yy-mm-dd',
             changeYear: true,
             changeMonth: true
         });
-		$("#form-package-order .btn-submit").click(function(){
+		$("#form-lost-found .btn-submit").click(function(){
             var itsme = $(this);
             var itsform = itsme.parent().parent().parent();
             itsform.find(".required").each(function(){
@@ -216,7 +221,7 @@
             var totalError = itsform.find(".error").length;
             if(error && totalError == 0 ){
                 loading_modal_show();
-                $("#form-package-order")[0].submit();
+                $("#form-lost-found")[0].submit();
             }else{
                 alert("Please fill out the field.");
             }
@@ -230,7 +235,7 @@
           	var token = jwt_encode(data,'UAP)(*');
 			$.ajax({
 			    type : 'POST',
-			    url : base_url_js+"general-affair/detail-package-order",
+			    url : base_url_js+"general-affair/detail-lost-and-found",
 			    data : {token:token},
 			    dataType : 'json',
 			    beforeSend :function(){loading_modal_show()},
@@ -241,7 +246,7 @@
 			    },success : function(response){
 	            	loading_modal_hide();
 			    	$.each(response,function(k,v){
-			    		$("#form-package-order").find("."+k).val(v);
+			    		$("#form-lost-found").find("."+k).val(v);
 			    	});
 			    }
 			});
