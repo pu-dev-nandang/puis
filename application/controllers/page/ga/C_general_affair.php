@@ -229,5 +229,15 @@ class C_general_affair extends Globalclass {
         echo json_encode($json);
     }
 
+    public function fetcthReceiver(){
+        header('Access-Control-Allow-Origin: *');
+        $json = array();
+        $sql = "select NIP as ID,Name as Name, 'Employee' as Status from db_employees.employees
+                union 
+                select NPM as ID,Name as Name, 'Student' as Status from db_academic.auth_students";
+        $json = $this->General_model->callStoredProcedure($sql)->result();
+        echo json_encode($json);
+    }
+
 }
 
