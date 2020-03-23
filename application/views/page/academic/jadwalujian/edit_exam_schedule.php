@@ -263,6 +263,8 @@
                 var showFile = '';
                 var formNameFileOld = '';
                 var btnRemove = 'hide';
+
+                var IDExamTask = '';
                 if(jsonResult.length>0){
                     var file = (jsonResult[0].File!='' && jsonResult[0].File!=null) ? jsonResult[0].File : '';
                     if(file!=''){
@@ -270,10 +272,8 @@
                             ? '<iframe src="'+base_url_js+'/uploads/task-exam/'+file+'"></iframe>' : '';
                         formNameFileOld = file;
                     }
-
+                    IDExamTask = jsonResult[0].ID;
                     btnRemove = '';
-
-
                 }
 
 
@@ -321,7 +321,7 @@
                 });
 
                 $('#GlobalModal .modal-footer').html('' +
-                    '<button class="btn btn-default '+btnRemove+'" style="color: red;float: left;">Remove Data</button>' +
+                    '<button class="btn btn-default '+btnRemove+'" id="removeExamTask" data-id="'+IDExamTask+'" style="color: red;float: left;">Remove Data</button>' +
                     '<button class="btn btn-success" id="submitSoalExam">Save</button> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
                 $('#GlobalModal').modal({
@@ -369,31 +369,35 @@
             if(formExamID!='' && formExamID!=null &&
                 formDescription!='' && formDescription!=null){
 
-                var formFileSoal = $('#formFileSoal').val();
-                var fileUpload = (formFileSoal!='') ? 1 : 0;
-                var formData = new FormData( $("#formID")[0]);
-                var url = base_url_js+'upload/upload-exam-task?f='+fileUpload;
-                $.ajax({
-                    url : url,  // Controller URL
-                    type : 'POST',
-                    data : formData,
-                    async : false,
-                    cache : false,
-                    contentType : false,
-                    processData : false,
-                    success : function(data) {
-                        var jsonData = data;
 
-                        if(typeof jsonData.success=='undefined'){
-                            alert(jsonData.error);
-                        } else {
-                            toastr.success('Data saved','Success');
-                            $('#GlobalModal').modal('hide');
+                if(confirm('Are you sure?')){
+                    var formFileSoal = $('#formFileSoal').val();
+                    var fileUpload = (formFileSoal!='') ? 1 : 0;
+                    var formData = new FormData( $("#formID")[0]);
+                    var url = base_url_js+'upload/upload-exam-task?f='+fileUpload;
+                    $.ajax({
+                        url : url,  // Controller URL
+                        type : 'POST',
+                        data : formData,
+                        async : false,
+                        cache : false,
+                        contentType : false,
+                        processData : false,
+                        success : function(data) {
+                            var jsonData = data;
+
+                            if(typeof jsonData.success=='undefined'){
+                                alert(jsonData.error);
+                            } else {
+                                toastr.success('Data saved','Success');
+                                $('#GlobalModal').modal('hide');
+                            }
+
+
                         }
+                    });
+                }
 
-
-                    }
-                });
 
             }
             else {
@@ -1286,6 +1290,21 @@
                 loading_modal_hide();
             });
         }
+
+        $(document).on('click','#removeExamTask',function () {
+            if(confirm('Are you sure?')){
+                var ID = $(this).attr('data-id');
+
+                var url = base_url_js+'upload/remove-exam-task/'+ID;
+
+                $.post(url,function (result) {
+
+                    toastr.success('Data removed','Success');
+                    $('#GlobalModal').modal('hide');
+
+                });
+            }
+        })
     </script>
 
 <?php } else {

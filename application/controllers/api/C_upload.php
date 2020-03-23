@@ -195,6 +195,83 @@ class C_upload extends CI_Controller {
 
         }
 
+            
+
+        if($lanjut){
+            $data_insert = array(
+                'ExamID' => $this->input->post('formExamID'),
+                'Description' => $this->input->post('formDescription'),
+                'File' => $file_name,
+                'UpdatedBy' => $this->input->post('formNIP'),
+                'UpdatedAt' => $this->m_rest->getDateTimeNow()
+            );
+
+            // Cek apakah examID sudah ada apa blm jika sudah maka upddate
+            $dataCk = $this->db->get_where('db_academic.exam_task',
+                array('ExamID' => $this->input->post('formExamID')))->result_array();
+
+            if(count($dataCk)<=0){
+                $this->db->insert('db_academic.exam_task',$data_insert);
+                $idInsert = $this->db->insert_id();
+            } else {
+                unset($data_insert['ExamID']);
+                if($f==0 || $f=='0'){
+                    unset($data_insert['File']);
+                }
+                $this->db->where('ExamID', $this->input->post('formExamID'));
+                $this->db->update('db_academic.exam_task',$data_insert);
+                $idInsert = 1;
+            }
+
+            $success['success']['InsertID'] = $idInsert;
+            return print_r(json_encode($success));
+        }
+
+    }
+
+    function remove_exam_task($IDExamTask){
+
+        $data = $this->db->get_where('db_academic.exam_task',array('ID' =>
+            $IDExamTask))->result_array();
+        if(count($data)>0){
+            $d = $data[0];
+            if($d['File']!='' && $d['File']!=null){
+
+                $path = './uploads/task-exam/'.$d['File'];
+                if(file_exists($path)){
+                    unlink($path);
+                }
+            }
+
+                    $this->db->where('ID', $IDExamTask);
+                    $this->db->delete('db_academic.exam_task');
+
+        }
+
+        return print_r(1);
+
+            $unix_name = $this->input->post('formNameFile');
+            $config['upload_path']          = './uploads/task-exam/';
+            $config['allowed_types']        = 'pdf';
+            $config['max_size']             = 8000;
+//        $config['max_width']            = 1024;
+//        $config['max_height']           = 768;
+            $config['file_name'] = $unix_name;
+            $this->load->library('upload', $config);
+            if ( ! $this->upload->do_upload('userfile'))
+            {
+                $error = array('error' => $this->upload->display_errors());
+                $lanjut = false;
+                return print_r(json_encode($error));
+            }
+            else
+            {
+                $success = array('success' => $this->upload->data());
+                $file_name = $success['success']['file_name'];
+            }
+
+        }
+
 
         if($lanjut){
             $data_insert = array(
