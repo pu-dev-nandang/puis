@@ -796,8 +796,7 @@ class C_employees extends HR_Controler {
                                     $Logs->Photo = $currPhoto;
                                 }
                             }                            
-                        }     
-
+                        }
                         if(!empty($Logs->MyBank)){
                             $MyBank = $Logs->MyBank; unset($Logs->MyBank);
                             foreach ($MyBank as $b) {

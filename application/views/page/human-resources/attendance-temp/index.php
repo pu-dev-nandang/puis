@@ -200,17 +200,7 @@
         var token = jwt_encode({Filter : filtering},'UAP)(*');
 
         var dataTable = $('#fetch-data-tables #table-list-data').DataTable( {
-            "destroy": true,
-            "retrieve":true,
-            "processing": true,
-            "serverSide": true,
-            "iDisplayLength" : 10,
-            "ordering" : false,
-            "responsive": true,
-            "language": {
-                "searchPlaceholder": "NIP, or Name"
-            },
-            "lengthMenu": [[10, 25, 50], [10, 25, 50]],
+            
             "ajax":{
                 url : base_url_js+'human-resources/fetch-attendance-temp', // json datasource
                 ordering : false,
