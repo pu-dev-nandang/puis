@@ -205,7 +205,11 @@ class C_upload extends CI_Controller {
                 'UpdatedAt' => $this->m_rest->getDateTimeNow()
             );
 
-            if($act=='add'){
+            // Cek apakah examID sudah ada apa blm jika sudah maka upddate
+            $dataCk = $this->db->get_where('db_academic.exam_task',
+                array('ExamID' => $this->input->post('formExamID')))->result_array();
+
+            if(count($dataCk)<=0){
                 $this->db->insert('db_academic.exam_task',$data_insert);
                 $idInsert = $this->db->insert_id();
 
@@ -223,6 +227,29 @@ class C_upload extends CI_Controller {
             $success['success']['InsertID'] = $idInsert;
             return print_r(json_encode($success));
         }
+
+    }
+
+    function remove_exam_task($IDExamTask){
+
+        $data = $this->db->get_where('db_academic.exam_task',array('ID' =>
+            $IDExamTask))->result_array();
+        if(count($data)>0){
+            $d = $data[0];
+            if($d['File']!='' && $d['File']!=null){
+
+                $path = './uploads/task-exam/'.$d['File'];
+                if(file_exists($path)){
+                    unlink($path);
+                }
+            }
+
+                    $this->db->where('ID', $IDExamTask);
+                    $this->db->delete('db_academic.exam_task');
+
+        }
+
+        return print_r(1);
 
     }
 
