@@ -334,7 +334,7 @@ class C_api4 extends CI_Controller {
             if(count($dataLect)>0){
                 for ($t=0;$t<count($dataLect);$t++){
                     $co = ($t==0) ? ' (Co)' : '';
-                    $viewLec = $viewLec.''.$dataLect[$t]['NIP'].' - '.$dataLect[$t]['Name'].$co;
+                    $viewLec = $viewLec.'<div>'.$dataLect[$t]['NIP'].' - '.$dataLect[$t]['Name'].$co.'</div>';
                 }
             }
 
