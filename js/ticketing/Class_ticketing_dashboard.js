@@ -45,7 +45,8 @@ class Class_ticketing_dashboard {
 	}
 
 	htmlGraphDashboardToday = () => {
-		let html = '<div class = "showGraph chart"></div>';
+		let html = '<div class = "showGraph chart"></div>'+
+		           '<div class = "showGraph2 chart"></div>';
         this.Wrhtml = html;
 		return this;
 	}
@@ -65,6 +66,7 @@ class Class_ticketing_dashboard {
 			PageToday.empty();
 			cls.htmlGraphDashboardToday().writeHtml(PageToday).insertJs(async() => {
 			  let selectorshowGraph = PageToday.find('.showGraph');
+			  let selectorshowGraph2 = PageToday.find('.showGraph2');
 			  // selectorshowGraph.html('asdsad');
 		      let url = base_url_js+'rest_ticketing/__ticketing_dashboard';
 		      let requestHeader = {
@@ -78,71 +80,9 @@ class Class_ticketing_dashboard {
 		      };
 		      let token = jwt_encode(dataform,'UAP)(*');
 		      const response = await AjaxSubmitFormPromises(url,token,[],Apikey,requestHeader);
-		      var ds = new Array();
-		      ds.push({
-		      	label: "Total",
-		      	data: response['Total'],
-		      	bars: {
-		      		show: true,
-		      		barWidth:  0.1,
-		      		order: 1
-		      	}
-		      });
-
-		      ds.push({
-		      	label: "Open",
-		      	data: response['Open'],
-		      	bars: {
-		      		show: true,
-		      		barWidth:  0.1,
-		      		order: 2
-		      	}
-		      });
-
-		      ds.push({
-		      	label: "Progress",
-		      	data: response['Progress'],
-		      	bars: {
-		      		show: true,
-		      		barWidth:  0.1,
-		      		order: 3
-		      	}
-		      });
-
-		      ds.push({
-		      	label: "Closed",
-		      	data: response['Closed'],
-		      	bars: {
-		      		show: true,
-		      		barWidth:  0.1,
-		      		order: 4
-		      	}
-		      });
-
-		      var xAxis = [];
-		      let c = 10;
-		      for (var i = 0; i < response['Abbreviation'].length; i++) {
-		      	var cd = response['Abbreviation'];
-		      	var taa = cd[i];
-		      	var aa = [c.toString(), taa];
-		      	xAxis.push(aa);
-		      	c++;
-		      }
-
-		      $.plot(selectorshowGraph, ds, $.extend(true, {}, Plugins.getFlotDefaults()	, {	
-		      	series: {
-		      		lines: { show: false },
-		      		points: { show: false }
-		      	},
-		      	grid:{
-		      		hoverable: true
-		      	},
-		      	tooltip: true,
-		      	tooltipOpts: {
-		      		content: '%s: %y'
-		      	},
-		      	xaxis: { ticks:xAxis}
-		      }));
+		      this.GraphShowCanvas(selectorshowGraph,response.NonProdi);
+		      this.GraphShowCanvas(selectorshowGraph2,response.Prodi);
+		      
 		    });
 			
 		}
@@ -209,6 +149,7 @@ class Class_ticketing_dashboard {
 		{
 			cls.htmlGraphDashboardToday().writeHtml(PageDashboardAll).insertJs(async() => {
 			  let selectorshowGraph = PageDashboardAll.find('.showGraph');
+			  let selectorshowGraph2 = PageDashboardAll.find('.showGraph2');
 			  let dateGet = selectorYear.find('option:selected').val()+'-'+selectorMonth.find('option:selected').val();
 			  // selectorshowGraph.html('asdsad');
 		      let url = base_url_js+'rest_ticketing/__ticketing_dashboard';
@@ -223,71 +164,8 @@ class Class_ticketing_dashboard {
 		      };
 		      let token = jwt_encode(dataform,'UAP)(*');
 		      const response = await AjaxSubmitFormPromises(url,token,[],Apikey,requestHeader);
-		      var ds = new Array();
-		      ds.push({
-		      	label: "Total",
-		      	data: response['Total'],
-		      	bars: {
-		      		show: true,
-		      		barWidth: 0.1,
-		      		order: 1
-		      	}
-		      });
-
-		      ds.push({
-		      	label: "Open",
-		      	data: response['Open'],
-		      	bars: {
-		      		show: true,
-		      		barWidth: 0.1,
-		      		order: 2
-		      	}
-		      });
-
-		      ds.push({
-		      	label: "Progress",
-		      	data: response['Progress'],
-		      	bars: {
-		      		show: true,
-		      		barWidth: 0.1,
-		      		order: 3
-		      	}
-		      });
-
-		      ds.push({
-		      	label: "Closed",
-		      	data: response['Closed'],
-		      	bars: {
-		      		show: true,
-		      		barWidth: 0.1,
-		      		order: 4
-		      	}
-		      });
-
-		      var xAxis = [];
-		      let c = 10;
-		      for (var i = 0; i < response['Abbreviation'].length; i++) {
-		      	var cd = response['Abbreviation'];
-		      	var taa = cd[i];
-		      	var aa = [c.toString(), taa];
-		      	xAxis.push(aa);
-		      	c++;
-		      }
-
-		      $.plot(selectorshowGraph, ds, $.extend(true, {}, Plugins.getFlotDefaults()	, {	
-		      	series: {
-		      		lines: { show: false },
-		      		points: { show: false }
-		      	},
-		      	grid:{
-		      		hoverable: true
-		      	},
-		      	tooltip: true,
-		      	tooltipOpts: {
-		      		content: '%s: %y'
-		      	},
-		      	xaxis: { ticks:xAxis}
-		      }));
+		      this.GraphShowCanvas(selectorshowGraph,response.NonProdi);
+		      this.GraphShowCanvas(selectorshowGraph2,response.Prodi);
 		    });
 		}
 	}
@@ -643,5 +521,73 @@ class Class_ticketing_dashboard {
 	            	
         this.Wrhtml = html;
         return this;
+	}
+
+	GraphShowCanvas = (selectorshowGraph,response) => {
+		var ds = new Array();
+		ds.push({
+			label: "Total",
+			data: response['Total'],
+			bars: {
+				show: true,
+				barWidth:  0.1,
+				order: 1
+			}
+		});
+
+		ds.push({
+			label: "Open",
+			data: response['Open'],
+			bars: {
+				show: true,
+				barWidth:  0.1,
+				order: 2
+			}
+		});
+
+		ds.push({
+			label: "Progress",
+			data: response['Progress'],
+			bars: {
+				show: true,
+				barWidth:  0.1,
+				order: 3
+			}
+		});
+
+		ds.push({
+			label: "Closed",
+			data: response['Closed'],
+			bars: {
+				show: true,
+				barWidth:  0.1,
+				order: 4
+			}
+		});
+
+		var xAxis = [];
+		let c = 10;
+		for (var i = 0; i < response['Abbreviation'].length; i++) {
+			var cd = response['Abbreviation'];
+			var taa = cd[i];
+			var aa = [c.toString(), taa];
+			xAxis.push(aa);
+			c++;
+		}
+
+		$.plot(selectorshowGraph, ds, $.extend(true, {}, Plugins.getFlotDefaults()	, {	
+			series: {
+				lines: { show: false },
+				points: { show: false }
+			},
+			grid:{
+				hoverable: true
+			},
+			tooltip: true,
+			tooltipOpts: {
+				content: '%s: %y'
+			},
+			xaxis: { ticks:xAxis}
+		}));
 	}
 }
