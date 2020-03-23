@@ -1539,12 +1539,19 @@ class M_ticketing extends CI_Model {
         $rs = [];
         $url = url_pas.'api/__getAllDepartementPU';
         $GetDepartment = $this->m_master->apiservertoserver($url);
-        $tot = [];
-        $Open = [];
-        $Progress = [];
-        $Closed = [];
+        $totNonProdi = [];
+        $OpenNonProdi = [];
+        $ProgressNonProdi = [];
+        $ClosedNonProdi = [];
+        $totProdi = [];
+        $OpenProdi = [];
+        $ProgressProdi = [];
+        $ClosedProdi = [];
+        $AbbreviationProdi = [];
+        $AbbreviationNonProdi = [];
         $dateGet = $dataToken['dateGet'];
-        $c = 10;
+        $cNonProdi = 10;
+        $cProdi = 10;
         for ($i=0; $i < count($GetDepartment); $i++) { 
             $Abbr = $GetDepartment[$i]['Abbr'];
             $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
@@ -1571,23 +1578,54 @@ class M_ticketing extends CI_Model {
                 )->result_array()[0]['total'];
             };
 
-            $result = $queryGet($GetDepartment[$i]['Code'],$dateGet);
-            if ($result > 0) {
-                $tot[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
-                $Open[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
-                $Progress[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
-                $Closed[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
-                $Abbreviation[] = $Abbr;
-                $c++;
+            if (substr($GetDepartment[$i]['Code'], 0,2) == 'NA') {
+                $totNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                $OpenNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                $ProgressNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                $ClosedNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                $AbbreviationNonProdi[] = $Abbr;
+                $cNonProdi++;
             }
+            else
+            {
+                $totProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                $OpenProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                $ProgressProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                $ClosedProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                $AbbreviationProdi[] = $Abbr;
+                $cProdi++;
+            }
+
+            // $result = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+            // if ($result > 0) {
+            //     $tot[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+            //     $Open[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+            //     $Progress[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+            //     $Closed[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+            //     $Abbreviation[] = $Abbr;
+            //     $c++;
+            // }
         }
 
         $rs =[
-            'Total' => $tot,
-            'Open' => $Open,
-            'Progress' => $Progress,
-            'Closed' => $Closed,
-            'Abbreviation' => $Abbreviation,
+
+            'NonProdi' => [
+                'Total' => $totNonProdi,
+                'Open' => $OpenNonProdi,
+                'Progress' => $ProgressNonProdi,
+                'Closed' => $ClosedNonProdi,
+                'Abbreviation' => $AbbreviationNonProdi,
+            ],
+
+            'Prodi' => [
+                'Total' => $totProdi,
+                'Open' => $OpenProdi,
+                'Progress' => $ProgressProdi,
+                'Closed' => $ClosedProdi,
+                'Abbreviation' => $AbbreviationProdi,
+            ],
+
+            
         ];
 
         return $rs;
@@ -1598,12 +1636,19 @@ class M_ticketing extends CI_Model {
         $rs = [];
         $url = url_pas.'api/__getAllDepartementPU';
         $GetDepartment = $this->m_master->apiservertoserver($url);
-        $tot = [];
-        $Open = [];
-        $Progress = [];
-        $Closed = [];
+        $totNonProdi = [];
+        $OpenNonProdi = [];
+        $ProgressNonProdi = [];
+        $ClosedNonProdi = [];
+        $totProdi = [];
+        $OpenProdi = [];
+        $ProgressProdi = [];
+        $ClosedProdi = [];
+        $AbbreviationProdi = [];
+        $AbbreviationNonProdi = [];
         $dateGet = $dataToken['dateGet'];
-        $c = 10;
+        $cNonProdi = 10;
+        $cProdi = 10;
         for ($i=0; $i < count($GetDepartment); $i++) { 
             $Abbr = $GetDepartment[$i]['Abbr'];
             $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
@@ -1629,23 +1674,54 @@ class M_ticketing extends CI_Model {
                 )->result_array()[0]['total'];
             };
 
-            $result = $queryGet($GetDepartment[$i]['Code'],$dateGet);
-            if ($result > 0) {
-                $tot[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
-                $Open[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
-                $Progress[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
-                $Closed[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
-                $Abbreviation[] = $Abbr;
-                $c++;
+            if (substr($GetDepartment[$i]['Code'], 0,2) == 'NA') {
+                $totNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                $OpenNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                $ProgressNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                $ClosedNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                $AbbreviationNonProdi[] = $Abbr;
+                $cNonProdi++;
             }
+            else
+            {
+                $totProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                $OpenProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                $ProgressProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                $ClosedProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                $AbbreviationProdi[] = $Abbr;
+                $cProdi++;
+            }
+
+            // $result = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+            // if ($result > 0) {
+            //     $tot[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+            //     $Open[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+            //     $Progress[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+            //     $Closed[] = [$c,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+            //     $Abbreviation[] = $Abbr;
+            //     $c++;
+            // }
         }
 
         $rs =[
-            'Total' => $tot,
-            'Open' => $Open,
-            'Progress' => $Progress,
-            'Closed' => $Closed,
-            'Abbreviation' => $Abbreviation,
+
+            'NonProdi' => [
+                'Total' => $totNonProdi,
+                'Open' => $OpenNonProdi,
+                'Progress' => $ProgressNonProdi,
+                'Closed' => $ClosedNonProdi,
+                'Abbreviation' => $AbbreviationNonProdi,
+            ],
+
+            'Prodi' => [
+                'Total' => $totProdi,
+                'Open' => $OpenProdi,
+                'Progress' => $ProgressProdi,
+                'Closed' => $ClosedProdi,
+                'Abbreviation' => $AbbreviationProdi,
+            ],
+
+            
         ];
 
         return $rs;
