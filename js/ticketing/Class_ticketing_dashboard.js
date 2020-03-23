@@ -73,15 +73,34 @@ class Class_ticketing_dashboard {
 		      	Hjwtkey : Hjwtkey,
 		      }
 		      let dateToday = moment().format('YYYY-MM-DD').toString();
-		      let dataform = {
-		          action : 'dashboard_graph_ticket_date',
-		          auth : 's3Cr3T-G4N',
-		          dateGet : dateToday,
-		      };
+		      	if (!$('#SelectDepartmentID').length) {
+			      var dataform = {
+			          action : 'dashboard_graph_ticket_date',
+			          auth : 's3Cr3T-G4N',
+			          dateGet : dateToday,
+			      };
+			    }
+			    else
+			    {
+			    	var dataform = {
+			    	    action : 'dashboard_graph_ticket_date',
+			    	    auth : 's3Cr3T-G4N',
+			    	    dateGet : dateToday,
+			    	    Department : $('#SelectDepartmentID').find('option:selected').val(),
+			    	};
+			    }
 		      let token = jwt_encode(dataform,'UAP)(*');
 		      const response = await AjaxSubmitFormPromises(url,token,[],Apikey,requestHeader);
-		      this.GraphShowCanvas(selectorshowGraph,response.NonProdi);
-		      this.GraphShowCanvas(selectorshowGraph2,response.Prodi);
+		      if (!$('#SelectDepartmentID').length) {
+		      	this.GraphShowCanvas(selectorshowGraph,response.NonProdi);
+		      	this.GraphShowCanvas(selectorshowGraph2,response.Prodi);
+		      }
+		      else
+		      {
+		      	this.GraphShowCanvas(selectorshowGraph,response.NonProdi); // for list
+		      	selectorshowGraph2.remove();
+		      }
+		      
 		      
 		    });
 			
@@ -157,15 +176,35 @@ class Class_ticketing_dashboard {
 		      	Hjwtkey : Hjwtkey,
 		      }
 		      let dateToday = moment().format('YYYY-MM-DD').toString();
-		      let dataform = {
-		          action : 'dashboard_graph_ticket_all',
-		          auth : 's3Cr3T-G4N',
-		          dateGet : dateGet,
-		      };
+		      if (!$('#SelectDepartmentID').length) {
+		      	var dataform = {
+		      	    action : 'dashboard_graph_ticket_all',
+		      	    auth : 's3Cr3T-G4N',
+		      	    dateGet : dateGet,
+		      	};
+		      }
+		      else
+		      { // for list
+		      	var dataform = {
+		      	    action : 'dashboard_graph_ticket_all',
+		      	    auth : 's3Cr3T-G4N',
+		      	    dateGet : dateGet,
+		      	    Department : $('#SelectDepartmentID').find('option:selected').val(),
+		      	};
+		      }
+		      
 		      let token = jwt_encode(dataform,'UAP)(*');
 		      const response = await AjaxSubmitFormPromises(url,token,[],Apikey,requestHeader);
-		      this.GraphShowCanvas(selectorshowGraph,response.NonProdi);
-		      this.GraphShowCanvas(selectorshowGraph2,response.Prodi);
+		      if (!$('#SelectDepartmentID').length) {
+		      	this.GraphShowCanvas(selectorshowGraph,response.NonProdi);
+		      	this.GraphShowCanvas(selectorshowGraph2,response.Prodi);
+		      }
+		      else
+		      {
+		      	this.GraphShowCanvas(selectorshowGraph,response.NonProdi); // for list
+		      	selectorshowGraph2.remove();
+		      }
+		      
 		    });
 		}
 	}
@@ -190,11 +229,24 @@ class Class_ticketing_dashboard {
 		        data : function(token){
 		        	let dateGet = selectorYear.find('option:selected').val()+'-'+selectorMonth.find('option:selected').val();
 		              // Read values
-		               let data = {
-		                      action : 'dashboard_ticket_all',
-		                      auth : 's3Cr3T-G4N',
-		                      dateGet : dateGet,
-		                  };
+		              if (!$('#SelectDepartmentID').length) {
+		              	var data = {
+		              	       action : 'dashboard_ticket_all',
+		              	       auth : 's3Cr3T-G4N',
+		              	       dateGet : dateGet,
+		              	   };
+		              }
+		              else
+		              {
+		              	// for list
+		              	var data = {
+		              	       action : 'dashboard_ticket_all',
+		              	       auth : 's3Cr3T-G4N',
+		              	       dateGet : dateGet,
+		              	       Department : $('#SelectDepartmentID').find('option:selected').val(),
+		              	   };
+		              }
+		               
 		              // Append to data
 		              token.token = jwt_encode(data,'UAP)(*');
 		        }                                                                     
@@ -333,11 +385,23 @@ class Class_ticketing_dashboard {
 		        data : function(token){
 		        	let dateToday = moment().format('YYYY-MM-DD').toString();
 		              // Read values
-		               let data = {
-		                      action : 'dashboard_ticket_date',
-		                      auth : 's3Cr3T-G4N',
-		                      dateGet : dateToday,
-		                  };
+		              if (!$('#SelectDepartmentID').length) {
+		              	var data = {
+		              	       action : 'dashboard_ticket_date',
+		              	       auth : 's3Cr3T-G4N',
+		              	       dateGet : dateToday,
+		              	   };
+		              }
+		              else
+		              {
+		              	var data = {
+		              	       action : 'dashboard_ticket_date',
+		              	       auth : 's3Cr3T-G4N',
+		              	       dateGet : dateToday,
+		              	       Department : $('#SelectDepartmentID').find('option:selected').val(),
+		              	   };
+		              }
+		               
 		              // Append to data
 		              token.token = jwt_encode(data,'UAP)(*');
 		        }                                                                     
@@ -437,7 +501,25 @@ class Class_ticketing_dashboard {
 			      	    "processing": true,
 			      	    "serverSide": false,
 			      	    "data" : dt,
-	      	          
+	      	          	'columnDefs': [
+	      	          	   {
+	      	          	      'targets': 0,
+	      	          	      'searchable': false,
+	      	          	      'orderable': false,
+	      	          	      'className': 'dt-body-center',
+	      	          	   },
+	      	          	   
+	      	          	     {
+	      	          	        'targets': 1,
+	      	          	        'searchable': false,
+	      	          	        'orderable': true,
+	      	          	        'className': 'dt-body-center',
+	      	          	        'render': function (data, type, full, meta){
+	      	          	            let html = '<a href="javascript:void(0)" data = "'+full[4]+'" class = "ModalReadMore">'+full[1]+'</a>';
+	      	          	            return html;
+	      	          	        }
+	      	          	     },
+	      	          	],
 			      	});
 
 			      	let d_pie = response.graph;
