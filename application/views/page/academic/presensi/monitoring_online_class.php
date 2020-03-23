@@ -310,7 +310,6 @@
 
         var data = {
             action : 'UpdateStudentAttdInOnline',
-            ScheduleID : ScheduleID,
             ArrIDAttd : arrIDAttd,
             Meet : Session,
             Attendance : m,

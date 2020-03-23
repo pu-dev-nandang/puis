@@ -11,6 +11,7 @@ class C_upload extends CI_Controller {
         $this->load->model('m_api');
         $this->load->model('m_rest');
         $this->load->model('akademik/m_tahun_akademik');
+        $this->load->model('akademik/m_onlineclass');
         $this->load->model('master/m_master');
         $this->load->library('JWT');
         $this->load->library('google');
@@ -285,6 +286,39 @@ class C_upload extends CI_Controller {
 
         if($lanjut){
 
+            // Get ScheduleID & Session
+            $dataSS = $this->db->get_where('schedule_task',
+                array('ID'=>$this->input->post('formIDST')))->result_array();
+
+            $ScheduleID = $dataSS[0]['ScheduleID'];
+            $Session = $dataSS[0]['Session'];
+
+            $NPM = $this->input->post('formNPM');
+
+            // Cek di forum sudah komen blm
+            $dataForum = $this->db->query('SELECT COUNT(*) AS Total FROM (SELECT cc.ID 
+                                            FROM db_academic.counseling_comment cc
+                                            LEFT JOIN db_academic.counseling_topic ct 
+                                            ON (ct.ID = cc.TopicID)
+                                            WHERE ct.ScheduleID = "'.$ScheduleID.'" 
+                                            AND ct.Sessions = "'.$Session.'"
+                                             AND cc.UserID = "'.$NPM.'" ) xx ')
+                                            ->result_array();
+
+            if($dataForum[0]['Total']>0){
+
+                $dataArrAttd = $this->m_onlineclass->getArrIDAttd($ScheduleID);
+
+                $data_arr_attd = array(
+                    'ArrIDAttd' => $dataArrAttd,
+                    'Meet' => $Session,
+                    'Attendance' => '1',
+                    'NPM' => $NPM
+                );
+
+                $this->m_onlineclass->setAttendanceStudent($data_arr_attd);
+
+            }
 
             $data_insert = array(
                 'IDST' => $this->input->post('formIDST'),
