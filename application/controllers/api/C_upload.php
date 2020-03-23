@@ -195,6 +195,7 @@ class C_upload extends CI_Controller {
 
         }
 
+            
 
         if($lanjut){
             $data_insert = array(
@@ -212,8 +213,6 @@ class C_upload extends CI_Controller {
             if(count($dataCk)<=0){
                 $this->db->insert('db_academic.exam_task',$data_insert);
                 $idInsert = $this->db->insert_id();
-
-
             } else {
                 unset($data_insert['ExamID']);
                 if($f==0 || $f=='0'){
@@ -250,6 +249,57 @@ class C_upload extends CI_Controller {
         }
 
         return print_r(1);
+
+            $unix_name = $this->input->post('formNameFile');
+            $config['upload_path']          = './uploads/task-exam/';
+            $config['allowed_types']        = 'pdf';
+            $config['max_size']             = 8000;
+//        $config['max_width']            = 1024;
+//        $config['max_height']           = 768;
+            $config['file_name'] = $unix_name;
+            $this->load->library('upload', $config);
+            if ( ! $this->upload->do_upload('userfile'))
+            {
+                $error = array('error' => $this->upload->display_errors());
+                $lanjut = false;
+                return print_r(json_encode($error));
+            }
+            else
+            {
+                $success = array('success' => $this->upload->data());
+                $file_name = $success['success']['file_name'];
+            }
+
+        }
+
+
+        if($lanjut){
+            $data_insert = array(
+                'ExamID' => $this->input->post('formExamID'),
+                'Description' => $this->input->post('formDescription'),
+                'File' => $file_name,
+                'UpdatedBy' => $this->input->post('formNIP'),
+                'UpdatedAt' => $this->m_rest->getDateTimeNow()
+            );
+
+            if($act=='add'){
+                $this->db->insert('db_academic.exam_task',$data_insert);
+                $idInsert = $this->db->insert_id();
+
+
+            } else {
+                unset($data_insert['ExamID']);
+                if($f==0 || $f=='0'){
+                    unset($data_insert['File']);
+                }
+                $this->db->where('ExamID', $this->input->post('formExamID'));
+                $this->db->update('db_academic.exam_task',$data_insert);
+                $idInsert = 1;
+            }
+
+            $success['success']['InsertID'] = $idInsert;
+            return print_r(json_encode($success));
+        }
 
     }
 

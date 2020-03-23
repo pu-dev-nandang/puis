@@ -263,6 +263,7 @@
                 var showFile = '';
                 var formNameFileOld = '';
                 var btnRemove = 'hide';
+
                 var IDExamTask = '';
                 if(jsonResult.length>0){
                     var file = (jsonResult[0].File!='' && jsonResult[0].File!=null) ? jsonResult[0].File : '';
@@ -273,8 +274,6 @@
                     }
                     IDExamTask = jsonResult[0].ID;
                     btnRemove = '';
-
-
                 }
 
 
@@ -370,6 +369,7 @@
             if(formExamID!='' && formExamID!=null &&
                 formDescription!='' && formDescription!=null){
 
+
                 if(confirm('Are you sure?')){
                     var formFileSoal = $('#formFileSoal').val();
                     var fileUpload = (formFileSoal!='') ? 1 : 0;
@@ -397,6 +397,7 @@
                         }
                     });
                 }
+
 
             }
             else {
