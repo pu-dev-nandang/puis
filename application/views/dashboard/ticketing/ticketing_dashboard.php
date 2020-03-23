@@ -1,3 +1,4 @@
+<?php $this->load->view('dashboard/ticketing/LoadCssTicketToday') ?>
 <div class="row" style="margin-top: 10px;">
 	<div class="col-xs-6">
 		<div class="thumbnail">
@@ -182,6 +183,16 @@
 		let selectorShowAll = $('#OpShowAll');
 		let PageDashboardAll = $('#PageDashboardAll');
 		App_ticketing_dashboard.PageDashboardAll(selectorMonth,selectorYear,selectorShowAll,PageDashboardAll);;
+	})
+
+	$(document).off('click', '.ModalReadMore').on('click', '.ModalReadMore',function(e) {
+	    var selector = $(this);
+	    let data = jwt_decode(selector.attr('data'));
+	    // console.log(data);
+	    var setTicket = '';
+	    var ID = data['ID'];
+	    var token = selector.attr('data')
+	    AppModalDetailTicket.ModalReadMore(ID,setTicket,token);
 	})
 
 	

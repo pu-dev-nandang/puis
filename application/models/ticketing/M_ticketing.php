@@ -434,7 +434,7 @@ class M_ticketing extends CI_Model {
 
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
-                b.Photo as PhotoRequested,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.CategoryID,ca.Descriptions as CategoryDescriptions,a.ID
+                b.Photo as PhotoRequested,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.CategoryID,ca.Descriptions as CategoryDescriptions,b.Photo as Photo,a.TicketStatus,a.ID
                 from db_ticketing.ticket as a
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
@@ -1310,9 +1310,6 @@ class M_ticketing extends CI_Model {
         $data = array();
         for ($i=0; $i < count($GetDepartment); $i++) { 
             $nestedData = array();
-            $nestedData[] = $i+1;
-            $nestedData[] = $GetDepartment[$i]['Name1'];
-
             $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
                 if ($TicketStatus == 3) {
                     $TicketStatus =  ' (a.TicketStatus = 3 or  a.TicketStatus = 4  ) and';
@@ -1337,10 +1334,6 @@ class M_ticketing extends CI_Model {
                 )->result_array()[0]['total'];
             };
 
-            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet);
-            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,1);
-            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,2);
-            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,3);
             $queryGetData = function($DepartmentID,$dateGet,$TicketStatus=''){
                         if ($TicketStatus == 3) {
                             $TicketStatus =  'where (a.TicketStatus = 3  or a.TicketStatus = 4 )';
@@ -1367,15 +1360,46 @@ class M_ticketing extends CI_Model {
                                  '.$TicketStatus.'
                              ';
                     };
-            $dataRow = [
-                'tot' => $queryGetData($GetDepartment[$i]['Code'],$dateGet),
-                'Open' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,1),
-                'Progress' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,2),
-                'Closed' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,3),
-            ];
 
-            $nestedData[] = $this->jwt->encode($dataRow,"UAP)(*");
-            $data[] = $nestedData;
+            if (!array_key_exists('Department', $dataToken)) {
+                $nestedData[] = $i+1;
+                $nestedData[] = $GetDepartment[$i]['Name1'];
+                $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+                $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,1);
+                $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,2);
+                $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,3);
+                
+                $dataRow = [
+                    'tot' => $queryGetData($GetDepartment[$i]['Code'],$dateGet),
+                    'Open' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,1),
+                    'Progress' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,2),
+                    'Closed' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,3),
+                ];
+
+                $nestedData[] = $this->jwt->encode($dataRow,"UAP)(*");
+                $data[] = $nestedData;
+            }
+            else
+            {
+                if ($GetDepartment[$i]['Code'] == $dataToken['Department']) {
+                    $nestedData[] = $i+1;
+                    $nestedData[] = $GetDepartment[$i]['Name1'];
+                    $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+                    $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,1);
+                    $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,2);
+                    $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,3);
+                    
+                    $dataRow = [
+                        'tot' => $queryGetData($GetDepartment[$i]['Code'],$dateGet),
+                        'Open' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,1),
+                        'Progress' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,2),
+                        'Closed' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,3),
+                    ];
+
+                    $nestedData[] = $this->jwt->encode($dataRow,"UAP)(*");
+                    $data[] = $nestedData;
+                }
+            }
 
         }
 
@@ -1399,9 +1423,6 @@ class M_ticketing extends CI_Model {
         $data = array();
         for ($i=0; $i < count($GetDepartment); $i++) { 
             $nestedData = array();
-            $nestedData[] = $i+1;
-            $nestedData[] = $GetDepartment[$i]['Name1'];
-
             $queryGet = function($DepartmentID,$dateGet,$TicketStatus=''){
                 if ($TicketStatus == 3) {
                     $TicketStatus =  ' (a.TicketStatus = 3 or  a.TicketStatus = 4  ) and';
@@ -1426,10 +1447,6 @@ class M_ticketing extends CI_Model {
                 )->result_array()[0]['total'];
             };
 
-            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet);
-            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,1);
-            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,2);
-            $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,3);
             $queryGetData = function($DepartmentID,$dateGet,$TicketStatus=''){
                         if ($TicketStatus == 3) {
                             $TicketStatus =  'where (a.TicketStatus = 3  or a.TicketStatus = 4 )';
@@ -1456,16 +1473,46 @@ class M_ticketing extends CI_Model {
                                  '.$TicketStatus.'
                              ';
                     };
-            $dataRow = [
-                'tot' => $queryGetData($GetDepartment[$i]['Code'],$dateGet),
-                'Open' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,1),
-                'Progress' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,2),
-                'Closed' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,3),
-            ];
 
-            $nestedData[] = $this->jwt->encode($dataRow,"UAP)(*");
-            $data[] = $nestedData;
+            if (!array_key_exists('Department', $dataToken)) {
+                $nestedData[] = $i+1;
+                $nestedData[] = $GetDepartment[$i]['Name1'];
+                $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+                $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,1);
+                $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,2);
+                $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,3);
+                
+                $dataRow = [
+                    'tot' => $queryGetData($GetDepartment[$i]['Code'],$dateGet),
+                    'Open' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,1),
+                    'Progress' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,2),
+                    'Closed' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,3),
+                ];
 
+                $nestedData[] = $this->jwt->encode($dataRow,"UAP)(*");
+                $data[] = $nestedData;
+            }
+            else
+            {
+                if ($GetDepartment[$i]['Code'] == $dataToken['Department']) {
+                    $nestedData[] = $i+1;
+                    $nestedData[] = $GetDepartment[$i]['Name1'];
+                    $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet);
+                    $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,1);
+                    $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,2);
+                    $nestedData[] = $queryGet($GetDepartment[$i]['Code'],$dateGet,3);
+                    
+                    $dataRow = [
+                        'tot' => $queryGetData($GetDepartment[$i]['Code'],$dateGet),
+                        'Open' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,1),
+                        'Progress' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,2),
+                        'Closed' => $queryGetData($GetDepartment[$i]['Code'],$dateGet,3),
+                    ];
+
+                    $nestedData[] = $this->jwt->encode($dataRow,"UAP)(*");
+                    $data[] = $nestedData;
+                }
+            }
         }
 
         $json_data = array(
@@ -1519,6 +1566,10 @@ class M_ticketing extends CI_Model {
                $nestedData[] = $query[$i]['NoTicket'];
                $nestedData[] = $query[$i]['NameRequested'];
                $nestedData[] = $query[$i]['CategoryDescriptions'];
+               $getDataTicketBy = $this->getDataTicketBy(['NoTicket'=>$query[$i]['NoTicket']]);
+               $getDataTicketBy = $this->__ticket_list_set_data($getDataTicketBy,['NIP' => '','DepartmentID' => '']);
+               $token = $this->jwt->encode($getDataTicketBy[0],"UAP)(*");
+               $nestedData[] = $token;
                $data[] = $nestedData;
            }
         }
@@ -1578,22 +1629,35 @@ class M_ticketing extends CI_Model {
                 )->result_array()[0]['total'];
             };
 
-            if (substr($GetDepartment[$i]['Code'], 0,2) == 'NA') {
-                $totNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
-                $OpenNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
-                $ProgressNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
-                $ClosedNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
-                $AbbreviationNonProdi[] = $Abbr;
-                $cNonProdi++;
+            if (!array_key_exists('Department', $dataToken)) {
+                if (substr($GetDepartment[$i]['Code'], 0,2) == 'NA') {
+                    $totNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                    $OpenNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                    $ProgressNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                    $ClosedNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                    $AbbreviationNonProdi[] = $Abbr;
+                    $cNonProdi++;
+                }
+                else
+                {
+                    $totProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                    $OpenProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                    $ProgressProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                    $ClosedProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                    $AbbreviationProdi[] = $Abbr;
+                    $cProdi++;
+                }
             }
             else
             {
-                $totProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
-                $OpenProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
-                $ProgressProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
-                $ClosedProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
-                $AbbreviationProdi[] = $Abbr;
-                $cProdi++;
+                if ($GetDepartment[$i]['Code'] == $dataToken['Department']) {
+                    $totNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                    $OpenNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                    $ProgressNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                    $ClosedNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                    $AbbreviationNonProdi[] = $Abbr;
+                    $cNonProdi++;
+                }
             }
 
             // $result = $queryGet($GetDepartment[$i]['Code'],$dateGet);
@@ -1674,23 +1738,38 @@ class M_ticketing extends CI_Model {
                 )->result_array()[0]['total'];
             };
 
-            if (substr($GetDepartment[$i]['Code'], 0,2) == 'NA') {
-                $totNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
-                $OpenNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
-                $ProgressNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
-                $ClosedNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
-                $AbbreviationNonProdi[] = $Abbr;
-                $cNonProdi++;
+            if (!array_key_exists('Department', $dataToken)) {
+                if (substr($GetDepartment[$i]['Code'], 0,2) == 'NA') {
+                    $totNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                    $OpenNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                    $ProgressNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                    $ClosedNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                    $AbbreviationNonProdi[] = $Abbr;
+                    $cNonProdi++;
+                }
+                else
+                {
+                    $totProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                    $OpenProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                    $ProgressProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                    $ClosedProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                    $AbbreviationProdi[] = $Abbr;
+                    $cProdi++;
+                }
             }
             else
             {
-                $totProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
-                $OpenProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
-                $ProgressProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
-                $ClosedProdi[] = [$cProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
-                $AbbreviationProdi[] = $Abbr;
-                $cProdi++;
+                if ($GetDepartment[$i]['Code'] == $dataToken['Department']) {
+                    $totNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet)];
+                    $OpenNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,1)];
+                    $ProgressNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,2)];
+                    $ClosedNonProdi[] = [$cNonProdi,$queryGet($GetDepartment[$i]['Code'],$dateGet,3)];
+                    $AbbreviationNonProdi[] = $Abbr;
+                    $cNonProdi++;
+                }
             }
+
+            
 
             // $result = $queryGet($GetDepartment[$i]['Code'],$dateGet);
             // if ($result > 0) {
