@@ -50,7 +50,7 @@
 									<td><textarea rows="1" name="Note[]" class="Note form-control" placeholder="Paket deskripsi"></textarea></td>
 									<td><input type="text" name="PackageOwner[]" class="PackageOwner required form-control" placeholder="Nama pemilik paket">
 									<small class="text-danger text-message"></small></td>
-									<td class="hide"><input type="text" name="PackageReceiverby[]" class="PackageReceiverby form-control" placeholder="Nama pengambil paket"></td>
+									<td class="hide"><input type="text" name="PackageReceiverby[]" class="PackageReceiverby form-control autocomplete-user" id="autocomplete-PackageReceiverby" placeholder="Nama pengambil paket"></td>
 									<td class="hide"><input type="text" name="PackageReceiverDate[]" class="PackageReceiverDate datepicker-sd form-control" id="Datepicker-SD" placeholder="Tgl paket diambil"></td>
 								</tr>
 							</tbody>
@@ -194,6 +194,29 @@
         	]
         });
 	}
+
+	function receiverName(){
+		var result = [];
+        $.ajax({
+            type : 'POST',
+            url : base_url_js+"human-resource/fetch-user",
+            dataType : 'json',
+            async: false,
+            error : function(jqXHR){
+                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                $("body #GlobalModal").modal("show");
+            },success : function(response){
+                if(!jQuery.isEmptyObject(response)){
+                    $.each(response,function(k,v){
+                        result.push(v.ID+"/"+v.Name);                    
+                    });
+                }
+            }
+        });
+
+        return result;
+	}
+
 	$(document).ready(function(){
 		fetchPackageOrder();
 		$("#Datepicker-TMP,#Datepicker-SD").datepicker({
@@ -201,6 +224,11 @@
             changeYear: true,
             changeMonth: true
         });
+
+        var receiverTags = receiverName();
+	    $( "#autocomplete-PackageReceiverby" ).autocomplete({
+	      source: receiverTags
+	    });
 
 		$("#form-package-order .btn-submit").click(function(){
             var itsme = $(this);
@@ -237,6 +265,7 @@
 	        //$cloneRow.find("td:nth-child(7),td:last-child").addClass("hide");
 	        $cloneRow.find("td input[type=text].datepicker-tmp").removeClass("hasDatepicker").attr("id","Datepicker-TMP-"+num);
         	$cloneRow.find("td input[type=text].datepicker-sd").removeClass("hasDatepicker").attr("id","Datepicker-SD-"+num);
+        	$cloneRow.find("td input.autocomplete-user").attr("id","autocomplete-PackageReceiverby-"+num);
 
 	        $cloneRow.find("td:first").text(num);
 	        $cloneRow.find(".form-control:not(.Receiver,.ReceiverDate)").val("");
@@ -251,7 +280,11 @@
 	            dateFormat: 'yy-mm-dd',
 	            changeYear: true,
 	            changeMonth: true
-	        });	        
+	        });
+	        var receiverTags = receiverName();
+	        parent.find("#table-list-form-package tbody tr > td #autocomplete-PackageReceiverby-"+num).autocomplete({
+		      source: receiverTags
+		    });	        
     	});
 
     	$("#form-package-order").on("click",".btn-remove",function(){

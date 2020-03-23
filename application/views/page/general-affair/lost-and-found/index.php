@@ -51,7 +51,7 @@
 							<div class="col-sm-6">
 								<div class="form-group">
 									<label>Receiver</label>
-									<input type="text" name="Receivedby" class="form-control Receivedby">
+									<input type="text" name="Receivedby" class="form-control Receivedby" id="autocomplete-received">
 									<small class="text-danger text-message"></small>
 								</div>
 							</div>
@@ -181,7 +181,7 @@
             			var label = "";
             			if($.trim(row.Receivedby).length > 0 && $.trim(row.DateReceiver).length > 0){
             				label = '<p><span class="received"><i class="fa fa-user"></i> '+data+'</span><br><span class="date"><i class="fa fa-calendar"></i> '+row.DateReceiver+'</span></p>';
-            			}else{label='<p class="text-center text-danger"><i class="fa fa-exclamation-triangle"></i> Things has not been taken</p>';}
+            			}else{label='<p class="text-center text-danger"><i class="fa fa-exclamation-triangle"></i> Item has not been taken</p>';}
             			return label;
             		}          		
             	},   
@@ -194,6 +194,28 @@
             	},
         	]
         });
+	}
+
+	function receiverName(){
+		var result = [];
+        $.ajax({
+            type : 'POST',
+            url : base_url_js+"human-resource/fetch-user",
+            dataType : 'json',
+            async: false,
+            error : function(jqXHR){
+                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                $("body #GlobalModal").modal("show");
+            },success : function(response){
+                if(!jQuery.isEmptyObject(response)){
+                    $.each(response,function(k,v){
+                        result.push(v.ID+"/"+v.Name);                    
+                    });
+                }
+            }
+        });
+
+        return result;
 	}
 	$(document).ready(function(){
 		fetchPackageOrder();
@@ -290,5 +312,9 @@
 			    }
 			});
         });
+		var receiverTags = receiverName();
+	    $( "#autocomplete-received" ).autocomplete({
+	      source: receiverTags
+	    });
 	});
 </script>

@@ -1715,6 +1715,15 @@ class C_employees extends HR_Controler {
     }
 
 
+    public function fetcthUser(){
+        header('Access-Control-Allow-Origin: *');
+        $json = array();
+        $sql = "select NIP as ID,Name as Name, 'Employee' as Status from db_employees.employees
+                union 
+                select NPM as ID,Name as Name, 'Student' as Status from db_academic.auth_students";
+        $json = $this->General_model->callStoredProcedure($sql)->result();
+        echo json_encode($json);
+    }
     
     /*END ADDED BY FEBI @ FEB 2020*/
 
