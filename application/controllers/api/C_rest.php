@@ -11,6 +11,7 @@ class C_rest extends CI_Controller {
         $this->load->model('m_api');
         $this->load->model('m_rest');
         $this->load->model('akademik/m_tahun_akademik');
+        $this->load->model('akademik/m_onlineclass');
         $this->load->model('master/m_master');
         $this->load->library('JWT');
         $this->load->library('google');
@@ -1014,6 +1015,47 @@ class C_rest extends CI_Controller {
 
                 $dataForm = (array) $dataToken['dataForm'];
                 $this->db->insert('db_academic.counseling_comment',$dataForm);
+
+                $TopicID = $dataForm['TopicID'];
+                $UserID = $dataForm['UserID'];
+
+                // Cek untuk mendapatkan ScheduleID & Session
+                $dataCk = $this->db->get_where('db_academic.counseling_topic',
+                    array('ID'=>$TopicID))->result_array();
+
+                $ScheduleID = $dataCk[0]['ScheduleID'];
+                $Sessions = $dataCk[0]['Sessions'];
+
+                if($ScheduleID!='' && $ScheduleID!=null &&
+                    $Sessions!='' && $Sessions!=null) {
+
+                    // Cek apakah sudah membuat tugas
+                    $sc_t = $this->db->query('SELECT COUNT(*) AS Total 
+                                        FROM (SELECT stt.ID FROM db_academic.schedule_task_student stt
+                                        LEFT JOIN db_academic.schedule_task st ON (st.ID = stt.IDST)
+                                        WHERE st.ScheduleID = "'.$ScheduleID.'" 
+                                        AND st.Session = "'.$Sessions.'" 
+                                        AND stt.NPM = "'.$UserID.'" ) xx ')->result_array();
+
+                    if($sc_t[0]['Total']>0){
+
+                        $dataArrAttd = $this->m_onlineclass->getArrIDAttd($ScheduleID);
+
+                        $data_arr_attd = array(
+                            'ArrIDAttd' => $dataArrAttd,
+                            'Meet' => $Sessions,
+                            'Attendance' => '1',
+                            'NPM' => $UserID
+                        );
+
+                        $this->m_onlineclass->setAttendanceStudent($data_arr_attd);
+                    }
+
+
+                }
+
+
+
 
                 return print_r(1);
             }
