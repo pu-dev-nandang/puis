@@ -25,8 +25,6 @@ class C_general_affair extends Globalclass {
     }
 
     public function fetchPackageOrder(){
-        header('Access-Control-Allow-Origin: *');
-        header('Content-Type: application/json');
         $reqdata = $this->input->post();
         if($reqdata){
             $key = "UAP)(*";
