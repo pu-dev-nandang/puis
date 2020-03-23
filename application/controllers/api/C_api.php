@@ -3295,7 +3295,8 @@ class C_api extends CI_Controller {
                                  ) ';
         }
 
-        $queryDefault = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room, p1.Name AS P_Name1, p2.Name AS P_Name2,
+        $queryDefault = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, ex.OnlineLearning, cl.Room, p1.Name AS P_Name1, p2.Name AS P_Name2,
+                                et.ID AS ExamTaskID, et.Description, et.File,
                                 p1.NIP AS P_NIP1, p2.NIP AS P_NIP2, em.Name AS InsertByName, ex.InsertAt
                                 FROM db_academic.exam ex
                                 LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
@@ -3303,6 +3304,7 @@ class C_api extends CI_Controller {
                                 LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
                                 LEFT JOIN db_employees.employees em ON (em.NIP = ex.InsertBy)
                                 LEFT JOIN db_academic.days d ON (d.ID = ex.DayID)
+                                LEFT JOIN db_academic.exam_task et ON (et.ExamID = ex.ID)
                                 WHERE ( '.$whereP.' ) '.$dataSearch.' '.$orderBy;
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -3420,7 +3422,13 @@ class C_api extends CI_Controller {
 
             $dateInsert = ($row['InsertAt']!='' && $row['InsertAt']!=null) ? date('l, d M Y h:i',strtotime($row['InsertAt'])) : '-' ;
 
-            $nestedData[] = '<div style="text-align:center;">'.($no++).'</div>';
+            // Cek apakah jadwal online atau bukan
+            $isOnline = ($row['OnlineLearning']==1 || $row['OnlineLearning']=='1') ? '<div><i style="color: green;" class="fa fa-circle"></i></div>' : '';
+            $isOnlineExam = ($row['ExamTaskID']!='' && $row['ExamTaskID']!=null) ? '<div><i style="color: green;" class="fa fa-check-square"></i></div>' : $isOnline;
+
+
+
+            $nestedData[] = '<div style="text-align:center;">'.($no++).$isOnlineExam.'</div>';
             $nestedData[] = $course;
             $nestedData[] = $p;
             $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0);" class="btnShowDetailStdExam" data-examid="'.$row['ID'].'">'.$totalStudent.'</a></div>';
@@ -6051,6 +6059,18 @@ class C_api extends CI_Controller {
 
 
                 return print_r(json_encode($data));
+            }
+
+            else if($data_arr['action']=='getDataExamTask'){
+
+                $ExamID = $data_arr['ExamID'];
+
+                $data= $this->db->get_where('db_academic.exam_task',array(
+                    'ExamID' => $ExamID
+                ))->result_array();
+
+                return print_r(json_encode($data));
+
             }
 
             else if($data_arr['action']=='deleteGroupExam'){
