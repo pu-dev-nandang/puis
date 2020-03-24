@@ -13,7 +13,7 @@
 				<input type="hidden" name="ID" class="form-control ID">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h4 class="panel-title"><i class="fa fa-edit"></i> Package Order Form</h4>
+						<h4 class="panel-title"><i class="fa fa-edit"></i> Lost and Found Form</h4>
 					</div>
 					<div class="panel-body">
 						<div class="form-group">
@@ -74,7 +74,7 @@
 		<div class="col-sm-8">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4 class="panel-title"><i class="fa fa-bars"></i> List of Package Order</h4>
+					<h4 class="panel-title"><i class="fa fa-bars"></i> List of Lost and Found</h4>
 				</div>
 				<div class="panel-body">
 					<div id="fetch-data-tables">
