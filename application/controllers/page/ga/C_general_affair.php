@@ -105,7 +105,7 @@ class C_general_affair extends Globalclass {
 
 
     private function generateCodeLF(){
-    	$code = "PULNF00";
+    	$code = "PULNF000";
     	$getLastData = $this->General_model->fetchData("db_general_affair.lost_n_found",array(),"ID","desc")->row();
     	if(!empty($getLastData)){
     		$explodeCode = explode($code, $getLastData->Code);
