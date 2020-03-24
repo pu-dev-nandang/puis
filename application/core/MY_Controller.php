@@ -728,7 +728,7 @@ abstract class Ga_Controler extends Globalclass{
 
 }
 
-class Cooperation_Controler extends Globalclass{
+abstract class Cooperation_Controler extends Globalclass{
 
     public function __construct()
     {
@@ -834,4 +834,25 @@ abstract class ServiceDocumentGenerator_Controler extends Globalclass{ // for se
         $this->temp($content);
     }
 
+}
+
+abstract class Research_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('research/m_research');
+    }
+
+    public function temp($content)
+    {
+        parent::template($content);
+    }
+
+    public function menu_portal_eksternal($page){
+        $data['page'] = $page;
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/portal_eksternal/menu_portal_eksternal',$data,true);
+        $this->temp($content);
+    }
 }

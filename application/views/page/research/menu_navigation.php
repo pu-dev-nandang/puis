@@ -3,6 +3,12 @@
         <!--=== Navigation ===-->
         <ul id="nav">
             <!-- list menu -->
+            <li class="<?php if($this->uri->segment(2)=='portal-eksternal'){echo"current";}?>">
+                <a href="<?php echo base_url('research/portal-eksternal');?>">
+                    <i class="fa fa-user-circle"></i>
+                    Portal Eksternal
+                </a>
+            </li>
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
