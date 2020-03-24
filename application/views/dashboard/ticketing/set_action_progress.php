@@ -386,7 +386,7 @@
 							'<div class = "form-group">'+
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
-										'<label>'+'Note for worker (not show in user)'+'</label>'+
+										'<label>'+'Note for worker'+'</label>'+
 										'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-9">'+
