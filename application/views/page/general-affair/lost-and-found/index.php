@@ -267,8 +267,18 @@
 		      	  	$("body #GlobalModal").modal("show");
 			    },success : function(response){
 	            	loading_modal_hide();
+	            	console.log(response);
 			    	$.each(response,function(k,v){
 			    		$("#form-lost-found").find("."+k).val(v);
+			    		if(k == 'Receivedby'){
+			    			$("#form-lost-found").find("."+k).addClass("required");
+			    		}
+			    		if(k == 'DateReceiver'){
+			    			$("#form-lost-found").find("."+k).addClass("required");
+			    			if($.trim(v) == "0000-00-00"){
+			    			$("#form-lost-found").find("."+k).val("");			    				
+			    			}
+			    		}
 			    	});
 			    }
 			});
