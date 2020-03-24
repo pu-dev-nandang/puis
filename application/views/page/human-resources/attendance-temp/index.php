@@ -164,6 +164,7 @@
 		    <div class="col-md-12">
 		      <div class="panel panel-default">
 		        <div class="panel-heading">            
+		          <button class="btn hide btn-xs btn-primary btn-download pull-right" type="button"><i class="fa fa-download"></i> Export to excel</button>
 		          <h4 class="panel-title"><i class="fa fa-bars"></i> List of record home attendances <span>Today (<?= date('d F Y') ?>)</span></h4>
 		        </div>
 		        <div class="panel-body">
@@ -271,6 +272,36 @@
         changeYear: true,
         changeMonth: true
     });
+    $(".btn-download").click(function(){
+    	var itsme = $(this);
+    	var filtering = $("#form-filter").serialize();
+		
+        var token = jwt_encode({Filter : filtering},'UAP)(*');
+        $.ajax({
+            type : 'POST',
+            url : base_url_js+"human-resources/download-attendance-temp",
+            data: {token:token},
+            dataType : 'json',
+            beforeSend :function(){
+                itsme.html('<i class="fa fa-spinner fa-pulse fa-fw"></i>');
+            },error : function(jqXHR){
+            	itsme.html('<i class="fa fa-folder-open"></i>');
+                $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
+                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                $("body #GlobalModal").modal("show");
+            },success : function(response){
+            	itsme.html('<i class="fa fa-download"></i> Export to excel');
+		        console.log(response);
+		        var a = document.createElement("a");
+		        a.href = response.file; 
+		        a.download = response.name;
+		        document.body.appendChild(a);
+		        a.click();
+		        a.remove();
+            }
+        });
+    });
+
     $('#form-filter').on('keyup keypress', function(e) {
       var keyCode = e.keyCode || e.which;
       if (keyCode === 13) { 
