@@ -75,10 +75,12 @@ class C_general_affair extends Globalclass {
 						$conditions = array("ID"=>$data['ID'][$i]);
 						$isExist = $this->General_model->fetchData("db_general_affair.package_order",$conditions)->row();
 						if(!empty($isExist)){
-							$update = $this->General_model->updateData("db_general_affair.package_order",$dataPost,$conditions);
+							$data['UpdatedBy'] = $myNIP."/".$myName;
+                            $update = $this->General_model->updateData("db_general_affair.package_order",$dataPost,$conditions);
 							$message = (($update)  ? "Successfully":"Failed")." updated.";
 						}else{$message="Data not founded.";}
         			}else{
+                        $data['CreatedBy'] = $myNIP."/".$myName;
         				$insert = $this->General_model->insertData("db_general_affair.package_order",$dataPost);
         				$message = (($insert) ? "Successfully":"Failed")." saved.";
         			}
@@ -105,11 +107,13 @@ class C_general_affair extends Globalclass {
 
 
     private function generateCodeLF(){
-    	$code = "PULNF000";
+    	$code = "PULNF0000";
     	$getLastData = $this->General_model->fetchData("db_general_affair.lost_n_found",array(),"ID","desc")->row();
     	if(!empty($getLastData)){
     		$explodeCode = explode($code, $getLastData->Code);
-    		$Lastcode = $explodeCode[1] + 1;
+    		if(!empty($explodeCode[1])){
+                $Lastcode = $explodeCode[1] + 1;
+            }else{$Lastcode="1";}
     		$code = $code.$Lastcode;
     	}else{$code = $code."1";}
     	return $code;
