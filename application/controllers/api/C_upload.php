@@ -343,6 +343,69 @@ class C_upload extends CI_Controller {
 
     }
 
+    function upload_exam_task_std()
+    {
+
+        $f = $this->input->get('f');
+
+        $lanjut = true;
+        $file_name = '';
+        if ($f == 1 || $f == '1') {
+
+            $formNameFileOld = $this->input->post('formNameFileOld');
+            $Path = './uploads/task-exam/' . $formNameFileOld;
+
+            if ($formNameFileOld != '' && file_exists($Path)) {
+                unlink($Path);
+            }
+
+
+            $unix_name = $this->input->post('formNameFile');
+            $config['upload_path'] = './uploads/task-exam/';
+            $config['allowed_types'] = 'pdf';
+            $config['max_size'] = 8000;
+//        $config['max_width']            = 1024;
+//        $config['max_height']           = 768;
+            $config['file_name'] = $unix_name;
+            $this->load->library('upload', $config);
+            if (!$this->upload->do_upload('userfile')) {
+                $error = array('error' => $this->upload->display_errors());
+                $lanjut = false;
+                return print_r(json_encode($error));
+            } else {
+                $success = array('success' => $this->upload->data());
+                $file_name = $success['success']['file_name'];
+            }
+
+        }
+
+
+        if ($lanjut) {
+
+            if ($f == 1 || $f == '1') {
+                $data_insert = array(
+                    'Description' => $this->input->post('formDescription'),
+                    'File' => $file_name,
+                    'SavedAt' => $this->m_rest->getDateTimeNow()
+                );
+            } else {
+                $data_insert = array(
+                    'Description' => $this->input->post('formDescription'),
+                    'SavedAt' => $this->m_rest->getDateTimeNow()
+                );
+            }
+
+            $this->db->where('ExamID', $this->input->post('formExamID'));
+            $this->db->update('db_academic.exam_student_online', $data_insert);
+
+
+
+            $success['success']['InsertID'] = $this->input->post('formExamID');
+            return print_r(json_encode($success));
+
+        }
+    }
+
 
 
 }

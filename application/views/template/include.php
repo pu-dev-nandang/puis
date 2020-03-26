@@ -430,6 +430,35 @@
         }
     });
 
+    function loadCoutDown(element,EndSessions,Refreshpage){
+
+        var ens = EndSessions.split(':');
+        var start = moment();
+        var end   = moment().hours(ens[0]).minutes(ens[1]).seconds(ens[2]);
+
+        var en = moment().valueOf();
+        var d = end.diff(start);
+        var fiveSeconds = parseInt(en) + parseInt(d);
+
+
+        $(element)
+            .countdown(fiveSeconds, function(event) {
+                $(this).text(
+                    // event.strftime('%D days %H:%M:%S')
+                    event.strftime('%H:%M:%S')
+                );
+            })
+            .on('finish.countdown', function() {
+
+                alert('Time has run out');
+
+                if(Refreshpage==1){
+                    window.location.href="";
+                }
+
+            });
+    }
+
     toastr.options = {
         "closeButton": true,
         "debug": false,

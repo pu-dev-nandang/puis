@@ -245,7 +245,8 @@ class M_rest extends CI_Model {
     }
 
     public function __getExamScheduleForStudent($db,$SemesterID,$NPM,$ClassOf,$ExamType){
-        $dataSemester = $this->db->query('SELECT s.*, ay.utsStart, ay.utsEnd, ay.uasStart, ay.uasEnd FROM db_academic.semester s 
+        $dataSemester = $this->db->query('SELECT s.*, ay.utsStart, ay.utsEnd, ay.uasStart, ay.uasEnd  
+                                                        FROM db_academic.semester s
                                                         LEFT JOIN db_academic.academic_years ay ON (ay.SemesterID = s.ID)
                                                         WHERE s.ID = '.$SemesterID.' 
                                                         ORDER BY s.ID ASC')->result_array();
@@ -803,19 +804,20 @@ class M_rest extends CI_Model {
     public function getDetailsScheduleExam($db,$NPM,$SemesterID,$ExamType){
         // Get data jadwal
 
-        $q = 'SELECT sc.ID AS ScheduleID, mk.MKCode, mk.Name AS Course, mk.NameEng AS CourseEng, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,  
-                                                                    sc.ClassGroup, sc.Attendance
-                                                                    FROM '.$db.'.study_planning sp
-                                                                    LEFT JOIN db_academic.exam_details exd ON (exd.ScheduleID = sp.ScheduleID AND exd.NPM = sp.NPM)
-                                                                    LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
-                                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
-                                                                    LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
-                                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
-                                                                    WHERE sp.SemesterID = "'.$SemesterID.'" 
-                                                                    AND ex.Type LIKE "'.$ExamType.'"
-                                                                    AND sp.NPM = "'.$NPM.'"
-                                                                    GROUP BY ex.ID
-                                                                    ORDER BY mk.MKCode ASC';
+        $q = 'SELECT sc.ID AS ScheduleID, mk.MKCode, mk.Name AS Course,   
+                       mk.NameEng AS CourseEng, ex.ID AS ExamID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, ex.OnlineLearning,
+                       cl.Room,sc.ClassGroup, sc.Attendance
+                       FROM '.$db.'.study_planning sp
+                       LEFT JOIN db_academic.exam_details exd ON (exd.ScheduleID = sp.ScheduleID AND exd.NPM = sp.NPM)
+                       LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
+                       LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                       LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
+                       LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
+                       WHERE sp.SemesterID = "'.$SemesterID.'" 
+                       AND ex.Type LIKE "'.$ExamType.'"
+                       AND sp.NPM = "'.$NPM.'"
+                       GROUP BY ex.ID
+                       ORDER BY mk.MKCode ASC';
 
         $ExamSchedule = $this->db->query($q)->result_array();
 
@@ -823,6 +825,29 @@ class M_rest extends CI_Model {
             for($g=0;$g<count($ExamSchedule);$g++){
 
                 $examD = $ExamSchedule[$g];
+
+                $btnOnlineExamStart = 0;
+                $rangeTime = 0;
+                // Mengecek persamaan tanggal
+                if($examD['ExamDate']==$this->getDateNow()
+                    && $examD['OnlineLearning']=='1'){
+                    $timeStart = strtotime($examD['ExamStart']);
+                    $timeEnd = strtotime($examD['ExamEnd']);
+                    $time1 = strtotime($this->getTimeNow());
+
+                    if($timeStart<=$time1 && $time1<=$timeEnd){
+                        $btnOnlineExamStart = 1;
+
+                        $to_time=strtotime("2011-01-12 ".$this->getTimeNow());
+                        $from_time=strtotime("2011-01-12 ".$examD['ExamEnd']);
+                        $rangeTime = round(abs($to_time - $from_time) / 60,0)." minute";
+
+                    }
+
+                }
+
+                $ExamSchedule[$g]['btnOnlineExamStart'] = $btnOnlineExamStart;
+                $ExamSchedule[$g]['rangeTime'] = $rangeTime;
 
                 // Get Schedule Detail
                 $dataSD = $this->db->select('ID')->get_where('db_academic.schedule_details',array('ScheduleID' => $examD['ScheduleID']))->result_array();

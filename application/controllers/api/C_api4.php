@@ -427,4 +427,92 @@ class C_api4 extends CI_Controller {
 
     }
 
+    public function crudExamOnline(){
+
+        $data_arr = $this->getInputToken();
+
+        if($data_arr['action']=='insertDateTimeExamOnline'){
+
+            $ExamID = $data_arr['ExamID'];
+            $NPM = $data_arr['NPM'];
+
+            $ck = $this->db->get_where('db_academic.exam_student_online',
+                array(
+                    'ExamID' => $ExamID,
+                    'NPM' => $NPM
+                ))->result_array();
+
+            if(count($ck)<=0){
+                $dataInsert = array(
+                    'ExamID' => $ExamID,
+                    'NPM' => $NPM
+                );
+                $this->db->insert('db_academic.exam_student_online',
+                    $dataInsert);
+
+
+                $this->db->set('Status', '1');
+                $this->db->where($dataInsert);
+                $this->db->update('db_academic.exam_details');
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='loadChatExamOnline'){
+            $ExamID = $data_arr['ExamID'];
+            $data = $this->db->order_by('ID','DESC')->order_by('ID','ASC')
+                ->get_where('db_academic.exam_task_chat',
+                    array('ExamID' => $ExamID))
+                ->result_array();
+
+            if(count($data)>0){
+                for($i=0;$i<count($data);$i++){
+                    $d = $data[$i];
+                    if($d['TypeUser']=='std'){
+                        $Name = $this->db->select('Name')->get_where('db_academic.auth_students',
+                            array('NPM' => $d['UserID']))->result_array()[0]['Name'];
+                    } else {
+                        $Name = $this->db->select('Name')->get_where('db_employees.employees',
+                            array('NIP' => $d['UserID']))->result_array()[0]['Name'];
+                    }
+                    $data[$i]['Name'] = $Name;
+                }
+            }
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='insertChatExamOnline'){
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $this->db->insert('db_academic.exam_task_chat',$dataForm);
+            return print_r(1);
+        }
+        else if($data_arr['action']=='insertInvigilator'){
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $ck = $this->db->get_where('db_academic.exam_employees_online',
+                $dataForm)->result_array();
+
+            if(count($ck)<=0){
+                $this->db->insert('db_academic.exam_employees_online',$dataForm);
+            }
+            return print_r(1);
+        }
+        else if($data_arr['action']=='loadDataExamOnline'){
+            $ExamID = $data_arr['ExamID'];
+            $data = $this->db->query('SELECT eso.*, ats.Name FROM 
+                                                db_academic.exam_student_online eso 
+                                                LEFT JOIN db_academic.auth_students ats ON (ats.NPM = eso.NPM)
+                                                WHERE eso.ExamID = "'.$ExamID.'"
+                                                 ORDER BY eso.StartWorking ASC ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+
+    }
+
+
+
 }
