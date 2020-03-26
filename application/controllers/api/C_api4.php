@@ -443,17 +443,30 @@ class C_api4 extends CI_Controller {
                 ))->result_array();
 
             if(count($ck)<=0){
+
+
                 $dataInsert = array(
                     'ExamID' => $ExamID,
                     'NPM' => $NPM
                 );
                 $this->db->insert('db_academic.exam_student_online',
                     $dataInsert);
+                $this->db->reset_query();
 
 
                 $this->db->set('Status', '1');
                 $this->db->where($dataInsert);
                 $this->db->update('db_academic.exam_details');
+                $this->db->reset_query();
+
+                $this->db->set('Status', '-1');
+                $this->db->where(array(
+                    'ExamID' => $ExamID,
+                    'Status' => '0'
+                ));
+                $this->db->update('db_academic.exam_details');
+
+
             }
 
             return print_r(1);

@@ -7,6 +7,7 @@ class C_jadwal_ujian extends Academic_Controler {
     {
         parent::__construct();
         $this->load->model('akademik/m_jadwal_ujian');
+        $this->load->model('m_rest');
     }
 
 
@@ -49,9 +50,24 @@ class C_jadwal_ujian extends Academic_Controler {
 
     public function edit_exam_schedule($ExamID){
         $data['department'] = parent::__getDepartement();
-        $data['arrExam'] = $this->m_jadwal_ujian->__getExam($ExamID);
-        $page = $this->load->view('page/'.$data['department'].'/jadwalujian/edit_exam_schedule',$data,true);
-        $this->menu_jadwalUjian($page);
+
+        $arrExam = $this->m_jadwal_ujian->__getExam($ExamID);
+
+        if(count($arrExam)>0){
+
+            $data['arrExam'] = $arrExam;
+
+            $dateNow = $this->m_rest->getDateNow();
+            $viewPage = ($dateNow < $arrExam[0]['ExamDate']) ? 1 : 0;
+            $data['ViewPage'] = $viewPage;
+
+            $page = $this->load->view('page/'.$data['department'].'/jadwalujian/edit_exam_schedule',$data,true);
+            $this->menu_jadwalUjian($page);
+        } else {
+            echo "Not authorized";
+        }
+
+
     }
 
 

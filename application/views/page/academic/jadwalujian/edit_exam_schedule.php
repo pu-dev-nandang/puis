@@ -2,6 +2,11 @@
     #tbInput td {
         /*text-align: center;*/
     }
+
+    .form-control[disabled] {
+        color: #333 !important;
+    }
+
     .form-datetime[readonly] {
         background-color: #ffffff;
         color: #333333;
@@ -40,10 +45,18 @@
 
 <?php if(count($arrExam)>0){
     $d = $arrExam[0];
+    $disabled = ($ViewPage==0 || $ViewPage=='0') ? 'disabled' : '';
     ?>
 
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
+
+            <div class="alert alert-danger" style="text-align: center;" role="alert">
+                <i class="fa fa-warning fa-3x"></i>
+                <br/>
+                <b>The exam schedule cannot be changed.</b>
+            </div>
+
             <input value="<?php echo $d['ID']; ?>" id="formExamID" class="hide" hidden readonly>
             <input value="<?php echo $d['SemesterID']; ?>" id="formSemesterID" class="hide" hidden readonly>
             <table class="table" id="tbInput">
@@ -54,14 +67,16 @@
                         <div class="row">
                             <div class="col-xs-3">
                                 <label class="radio-inline">
-                                    <input type="radio" name="formExam" id="formUTS" value="uts" class="formExam form-exam" <?php if($d['Type']=='uts'){echo 'checked'; } ?>> UTS
+                                    <input type="radio" <?= $disabled; ?> name="formExam" id="formUTS" value="uts" class="formExam form-exam" <?php if($d['Type']=='uts'){echo 'checked'; } ?>> UTS
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="formExam" id="formUAS" value="uas" class="formExam form-exam" <?php if($d['Type']=='uas'){echo 'checked'; } ?>> UAS
+                                    <input type="radio" <?= $disabled; ?> name="formExam" id="formUAS" value="uas" class="formExam form-exam" <?php if($d['Type']=='uas'){echo 'checked'; } ?>> UAS
                                 </label>
                             </div>
                             <div class="col-xs-6">
+                                <?php if($ViewPage==1 || $ViewPage=='1') { ?>
                                 <input type="text" id="formDate" readonly class="form-control form-exam form-datetime">
+                                <?php } ?>
                                 <span id="viewDate"></span>
                                 <input id="formInputDate" value="<?php echo $d['ExamDate']; ?>" class="hide" readonly hidden>
                                 <input id="formDayID" value="<?php echo $d['DayID']; ?>" class="hide" readonly hidden>
@@ -74,7 +89,7 @@
                     <th>Promgramme Study</th>
                     <td>:</td>
                     <td>
-                        <select class="form-control" id="formBaseProdi" style="max-width: 350px;"></select>
+                        <select class="form-control" <?= $disabled; ?> id="formBaseProdi" style="max-width: 350px;"></select>
                     </td>
                 </tr>
                 <tr style="background: lightyellow;">
@@ -89,11 +104,12 @@
                                     <button class="btn btn-sm btn-default btn-default-primary btnEditStudent4EditExam" data-no-arr="<?php echo $t; ?>"
                                             data-examid="<?php echo $d['ID']; ?>"
                                             data-id="<?php echo $dc['ScheduleID']; ?>"><span id="viewTextStd<?php echo $t; ?>"><?php echo count($dc['DetailStudent']); ?></span> Student</button> |
-                                    <button class="btn btn-sm btn-default btn-default-danger btnDeleteGroup" data-examid="<?php echo $d['ID']; ?>" data-id="<?php echo $dc['ScheduleID']; ?>"><i class="fa fa-trash"></i></button></li>
+                                    <button class="btn btn-sm btn-default btn-default-danger btnDeleteGroup" <?= $disabled; ?> data-examid="<?php echo $d['ID']; ?>" data-id="<?php echo $dc['ScheduleID']; ?>"><i class="fa fa-trash"></i></button></li>
                             <?php $totalStudent = $totalStudent + count($dc['DetailStudent']); } ?>
                         </ul>
                     </td>
                 </tr>
+                <?php if($ViewPage==1 || $ViewPage=='1') { ?>
                 <tr>
                     <th>Group</th>
                     <td>:</td>
@@ -116,9 +132,8 @@
                         </div>
                     </td>
                 </tr>
-
                 <tbody id="trNewGroup"></tbody>
-
+                <?php } ?>
                 <tr>
                     <th>Waktu</th>
                     <td>:</td>
@@ -126,7 +141,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div id="inputStart" class="input-group">
-                                    <input data-format="hh:mm" type="text" id="formStart" class="form-control form-exam" value="<?php echo substr($d['ExamStart'],0,5); ?>"/>
+                                    <input data-format="hh:mm" <?= $disabled; ?> type="text" id="formStart" class="form-control form-exam" value="<?php echo substr($d['ExamStart'],0,5); ?>"/>
                                     <span class="add-on input-group-addon">
                                 <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
                             </span>
@@ -134,7 +149,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div id="inputEnd" class="input-group">
-                                    <input data-format="hh:mm" type="text" id="formEnd" class="form-control form-exam" value="<?php echo substr($d['ExamEnd'],0,5); ?>"/>
+                                    <input data-format="hh:mm" <?= $disabled; ?> type="text" id="formEnd" class="form-control form-exam" value="<?php echo substr($d['ExamEnd'],0,5); ?>"/>
                                     <span class="add-on input-group-addon">
                                 <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
                             </span>
@@ -147,7 +162,7 @@
                     <th>Room</th>
                     <td>:</td>
                     <td>
-                        <select class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formClassroom">
+                        <select <?= $disabled; ?> class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formClassroom">
                             <option value=""></option>
                         </select>
                     </td>
@@ -156,7 +171,7 @@
                     <th>Pengawas 1</th>
                     <td>:</td>
                     <td style="text-align: left;">
-                        <select class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formPengawas1">
+                        <select <?= $disabled; ?> class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formPengawas1">
                             <option value=""></option>
                         </select>
                     </td>
@@ -165,7 +180,7 @@
                     <th>Pengawas 2</th>
                     <td>:</td>
                     <td style="text-align: left;">
-                        <select class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formPengawas2">
+                        <select <?= $disabled; ?> class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formPengawas2">
                             <option value=""></option>
                         </select>
                     </td>
@@ -176,7 +191,7 @@
                     <td>
                         <div class="checkbox checbox-switch switch-primary" style="margin-top: 0px;">
                             <label>
-                                <input type="checkbox" <?= ($d['OnlineLearning']==1 || $d['OnlineLearning']=='1') ? 'checked' : ''; ?> id="formOnlineLearning">
+                                <input <?= $disabled; ?> type="checkbox" <?= ($d['OnlineLearning']==1 || $d['OnlineLearning']=='1') ? 'checked' : ''; ?> id="formOnlineLearning">
                                 <span></span>
                                 <!--                            <i> | Filter Attendance in UAS (75%)</i>-->
                             </label>
@@ -196,7 +211,9 @@
             <div style="text-align: right;">
                 <input id="viewTotalStudent" class="hide" hidden readonly value="<?php echo $totalStudent; ?>">
                 <a href="<?php echo base_url('academic/exam-schedule'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
+                <?php if($ViewPage==1 || $ViewPage=='1') { ?>
                 <button id="btnSaveEditSchedule" class="btn btn-primary">Save</button>
+                <?php } ?>
             </div>
             <hr/>
 
@@ -321,8 +338,8 @@
                 });
 
                 $('#GlobalModal .modal-footer').html('' +
-                    '<button class="btn btn-default '+btnRemove+'" id="removeExamTask" data-id="'+IDExamTask+'" style="color: red;float: left;">Remove Data</button>' +
-                    '<button class="btn btn-success" id="submitSoalExam">Save</button> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                    '<button class="btn btn-default <?= $disabled; ?> '+btnRemove+'" id="removeExamTask" data-id="'+IDExamTask+'" style="color: red;float: left;">Remove Data</button>' +
+                    '<button class="btn btn-success" <?= $disabled; ?> id="submitSoalExam">Save</button> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
                 $('#GlobalModal').modal({
                     'show' : true,
@@ -1124,7 +1141,7 @@
                     $('#tbEdtiExStd').append('<tr id="trStdmodalEditExam'+ds.ID+'">' +
                         '<td style="text-align: center;">'+no+'</td>' +
                         '<td><b>'+ds.Name+'</b><br/>'+ds.NPM+'</td>' +
-                        '<td style="text-align: center;"><button class="btn btn-block btn-danger btnDelete4EditExamDelStd" data-no-arr="'+no_array+'" data-id="'+ds.ID+'">Delete</button></td>' +
+                        '<td style="text-align: center;"><button class="btn btn-block btn-danger btnDelete4EditExamDelStd" <?= $disabled; ?> data-no-arr="'+no_array+'" data-id="'+ds.ID+'">Delete</button></td>' +
                         '</tr>');
                     no++;
                 }
