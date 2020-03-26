@@ -3950,7 +3950,8 @@ class M_api extends CI_Model {
 
     public function getInvigilatorSch($SemesterID,$Type,$NIP,$dateTimeNow){
         $data = $this->db->query('SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,
-                                          mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup
+                                          mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup,
+                                          ex.OnlineLearning
                                           FROM db_academic.exam ex
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                           LEFT JOIN db_academic.exam_details exd ON (exd.ExamID = ex.ID)
