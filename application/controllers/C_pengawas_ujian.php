@@ -44,7 +44,7 @@ class C_pengawas_ujian extends CI_Controller {
         $this->load->view('template/pengawas_ujian',$data);
     }
 
-    public function invigilator(){
+    public function index(){
         $content = $this->load->view('page/invigilator/invigilator','',true);
         $this->temp($content);
     }
