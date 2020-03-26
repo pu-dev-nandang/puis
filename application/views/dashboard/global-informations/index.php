@@ -66,8 +66,8 @@
 								<p class="icon"><i class="fa fa-phone-square"></i></p>
 							</div>
 							<div class="col-sm-9 col-md-9">
-								<p class="title">Extention Phone</p>
-								<p class="desc">Service that allows you to easily to find employer extenstion phone.</p>
+								<p class="title">Extension Phone</p>
+								<p class="desc">Service that allows you to easily to find employer extension phone.</p>
 							</div>
 						</div>
 					</div>
