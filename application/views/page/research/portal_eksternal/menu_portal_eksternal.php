@@ -26,6 +26,11 @@
 </div>
 
 <script type="text/javascript">
+    const rest_setting_global = <?php echo json_encode($rest_setting_global) ?>;
+    const requestHeader = {
+        Hjwtkey : rest_setting_global[0].Hjwtkey,
+    }
+    const Apikey = rest_setting_global[0].Apikey;
     const App_global_portal_eksternal = new Clas_global_portal_eksternal();
     $(document).ready(function(e){
         const selector1 = $('#boxTotUser');

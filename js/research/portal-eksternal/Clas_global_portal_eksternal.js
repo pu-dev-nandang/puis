@@ -32,16 +32,39 @@ class Clas_global_portal_eksternal {
 	}
 
 	LoadDefault = (selector1,selector2,selector3)  => {
-		this.set_html_box('Total User','cyan').writeHtml(selector1).insertJs(() => {
-				
+		const url = base_url_js+'rest_research/__load_box';
+		let dataform = {
+			auth : 's3Cr3T-G4N',
+		}
+		this.set_html_box('Total User','cyan').writeHtml(selector1).insertJs(async() => {
+			dataform['action'] = 'total_user';
+			let token = jwt_encode(dataform,'UAP)(*');
+			let response = await AjaxSubmitFormPromises(url,token);	
+			if (response['status'] != undefined) {
+				selector1.find('.value').html(response['result']);
+				selector1.find('.moreDetail').attr('data',jwt_encode(response['callback'],'UAP)(*'));
+			}
+			
 		});
 
-		this.set_html_box('Total Login','green').writeHtml(selector2).insertJs(() => {
-					
+		this.set_html_box('Total Login Today','green').writeHtml(selector2).insertJs(async() => {
+			dataform['action'] = 'total_login_today';
+			let token = jwt_encode(dataform,'UAP)(*');
+			let response = await AjaxSubmitFormPromises(url,token);
+			if (response['status'] != undefined) {
+				selector2.find('.value').html(response['result']);
+				selector2.find('.moreDetail').attr('data',jwt_encode(response['callback'],'UAP)(*'));
+			}		
 		});
 
-		this.set_html_box('Total Approval','red').writeHtml(selector3).insertJs(() => {
-					
+		this.set_html_box('Total Approval','red').writeHtml(selector3).insertJs(async() => {
+			dataform['action'] = 'total_approval';
+			let token = jwt_encode(dataform,'UAP)(*');
+			let response = await AjaxSubmitFormPromises(url,token);
+			if (response['status'] != undefined) {
+				selector3.find('.value').html(response['result']);
+				selector3.find('.moreDetail').attr('data',jwt_encode(response['callback'],'UAP)(*'));
+			}		
 		});
 	}
 
@@ -59,8 +82,6 @@ class Clas_global_portal_eksternal {
 
 		return this;
 	}
-
-
 
 
 }

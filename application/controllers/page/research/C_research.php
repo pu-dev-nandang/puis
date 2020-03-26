@@ -6,7 +6,6 @@ class C_research extends Research_Controler {
     function __construct()
     {
         parent::__construct();
-
     }
 
    public function portal_eksternal(){
