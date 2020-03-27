@@ -51,11 +51,15 @@
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
 
+            <?php if($ViewPage==0 || $ViewPage=='0') { ?>
+
             <div class="alert alert-danger" style="text-align: center;" role="alert">
                 <i class="fa fa-warning fa-3x"></i>
                 <br/>
                 <b>The exam schedule cannot be changed.</b>
             </div>
+
+            <?php } ?>
 
             <input value="<?php echo $d['ID']; ?>" id="formExamID" class="hide" hidden readonly>
             <input value="<?php echo $d['SemesterID']; ?>" id="formSemesterID" class="hide" hidden readonly>
