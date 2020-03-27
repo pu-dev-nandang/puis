@@ -1420,7 +1420,8 @@ class M_rest extends CI_Model {
                         'DetailExam' => $dataCourse
                     );
 
-                } else {
+                }
+                else {
                     $result = array(
                         'Status' => -5,
                         'Message' => 'You don\'t have a teaching schedule'

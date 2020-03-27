@@ -3279,6 +3279,8 @@ class C_api extends CI_Controller {
 
         $data_arr = $this->getInputToken();
 
+        $dateNow = $this->m_rest->getDateNow();
+
         $whereP = ($data_arr['ExamDate']!=null && $data_arr['ExamDate']!='')
             ? 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "1" AND ex.ExamDate LIKE "'.$data_arr['ExamDate'].'" '
             : 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "1"' ;
@@ -3405,6 +3407,10 @@ class C_api extends CI_Controller {
 //                    <li><a target="_blank" href="'.base_url('save2pdf/news-event').'">Berita Acara</a></li>
             $re = ($data_arr['Type']=='re_uts' || $data_arr['Type']=='re_uas') ? 'hide' : '';
 
+            $actDelete = ($row['ExamDate']>=$dateNow)
+                ? '<li role="separator" class="divider"></li><li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>'
+                : '';
+
             $act = '<div  style="text-align:center;"><div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
@@ -3414,8 +3420,7 @@ class C_api extends CI_Controller {
                     <li role="separator" class="divider"></li>
                     <li><a target="_blank" href="'.base_url('save2pdf/exam-layout/'.$row['ID']).'">Layout</a></li>
                     <li><a class="btnSave2PDF_Exam" href="javascript:void(0);" data-url="save2pdf/draft_questions_answer_sheet" data-token="'.$tkn_soal_jawaban.'">Draft Questions  & Answer Sheet</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>
+                  '.$actDelete.'  
                   </ul>
                 </div>
                 </div>';
