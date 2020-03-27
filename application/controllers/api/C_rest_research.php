@@ -86,4 +86,28 @@ class C_rest_research extends CI_Controller {
       echo json_encode($rs);
     }
 
+    public function datatable_LoadListUserEskternal(){
+      $dataToken = $this->getInputToken();
+      $rs = $this->m_research->datatable_LoadListUserEskternal($dataToken);
+      echo json_encode($rs);
+    }
+
+    public function CRUDUserEksternal(){
+      $dataToken = $this->getInputToken();
+      $action = $dataToken['action'];
+      $rs = [];
+      switch ($action) {
+        case 'add':
+          $rs = $this->m_research->insert_user_eksternal($dataToken);
+          break;
+        case 'delete':
+          $rs = $this->m_research->delete_user_eksternal($dataToken);
+          break;
+        default:
+          # code...
+          break;
+      }
+      echo json_encode($rs);
+    }
+
 }
