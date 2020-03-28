@@ -265,12 +265,13 @@
                             ? '<button data-id="'+d.ID+'" class="btn btn-primary btnLoadAttendance">Attendance</button>' : '-';
 
                         var btnLayout = (d.ButtonAttendance==1 || d.ButtonAttendance=='1')
-                            ? '<a href="'+base_url_js+'save2pdf/exam-layout/'+filterTypeSemester+'/'+d.ID+'" target="_blank" class="btn btn-default btn-sm btn-default-success"><i class="fa fa-arrows-alt margin-right"></i> Layout</a>' : '-';
+                            ? '<a href="'+base_url_js+'save2pdf/exam-layout/'+filterTypeSemester+'/'+d.ID+'" target="_blank" class="btn btn-default btn-sm btn-default-success"><i class="fa fa-arrows-alt margin-right"></i> Layout</a>'
+                            : '';
 
                         var OnlineLearning = (d.OnlineLearning !== 'undefined' && (d.OnlineLearning==1 || d.OnlineLearning=='1'))
                             ? '<div><span class="label label-success">Online</span></div>' : '';
 
-                        var StartOnlineLearning = (d.OnlineLearning !== 'undefined' && (d.OnlineLearning==1 || d.OnlineLearning=='1'))
+                        var StartOnlineLearning = ((d.ButtonAttendance==1 || d.ButtonAttendance=='1') && (d.OnlineLearning !== 'undefined' && (d.OnlineLearning==1 || d.OnlineLearning=='1')))
                             ? '<td colspan="2"><button class="btn btn-success btnEnterTheClass" data-tkn="'+jwt_encode(d,'s3Cr3T-G4N')+'" >Enter the class</button></td>'
                             : '<td>'+btnAttd+'</td>' +
                             '<td>'+btnLayout+'</td>';
@@ -328,7 +329,7 @@
 
            setTimeout(function () {
                loading_modal_hide();
-               window.open(base_url_js+'invigilator/detail-exam/'+tkn);
+               window.location.replace(base_url_js+'invigilator/detail-exam/'+tkn);
            },500);
 
 
