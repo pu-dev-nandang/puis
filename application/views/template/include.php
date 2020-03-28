@@ -597,9 +597,9 @@
     }
 
     function getTimeNow() {
-        var phpNowDate = '<?= date("H:i:s"); ?>';
+        var phpNowTime = '<?= date("H:i:s"); ?>';
         // return moment().format('YYYY-MM-DD HH:mm:ss');
-        return phpNowDateTime;
+        return phpNowTime;
     }
 
     function ucwords(str) {

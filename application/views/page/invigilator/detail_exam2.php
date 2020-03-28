@@ -2,11 +2,6 @@
 
 <?php if($viewPageExam==1 || $viewPageExam=='1'){ ?>
 
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/7.13.0/firebase-app.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/7.13.0/firebase-database.js"></script>
-
 <style>
     #examHelp {
         border-left: 1px solid #CCCCCC;
@@ -52,7 +47,7 @@
     #examHelp .panel-body
     {
         overflow-y: scroll;
-        height: 550px;
+        height: 400px;
     }
 
     #examHelp .label {
@@ -88,10 +83,7 @@
         <div class="row">
             <div class="col-md-8">
                 <div class="row">
-                    <div class="col-md-8">
-                        <a href="<?= base_url('invigilator'); ?>" class="btn btn-lg btn-warning">Back to Home</a>
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 col-md-offset-8">
                         <div id="examCountDown">Countdown <span id="viewExountDown">00:00:00</span></div>
                     </div>
                 </div>
@@ -131,9 +123,24 @@
 
             </div>
             <div class="col-md-4" id="examHelp">
+                <div class="alert alert-warning" role="alert">
+                    <b style="color: red;">Attention, please!</b>
+                    <br/>
+                    At this time the chat is not processed automatically,
+                    you must wait for <b>3 minutes</b> to refresh the chat or use
+                    the refresh button to refresh the chat manually.
+                    <br/>
+                    <b style="color: green;">For the future our IT team will continue to develop this well</b>
+                </div>
+                <p style="color: #ffffff;">Refresh the chat in <span id="viewChatCountdown"></span></p>
                 <div class="panel panel-primary">
                     <div class="panel-heading" id="accordion">
-                        <span class="fa fa-comment margin-right"></span> Live Chat With Student
+                        <span class="fa fa-comment margin-right"></span> Chat With Invigilator
+                        <div class="btn-group pull-right">
+                            <a type="button" href="javascript:void(0);" id="btnRefreshChat" class="btn btn-default btn-xs">
+                                <span class="fa fa-refresh margin-right"></span> Chat
+                            </a>
+                        </div>
                     </div>
                     <div class="panel-collapse collapse in" aria-expanded="true" id="collapseOne">
                         <div class="panel-body">
@@ -161,25 +168,11 @@
         window.ExamID = "<?= $dataToken['ExamID']; ?>";
         //getCountdw('#showCountdown',"<?//= $dataExamOnline['ExamEnd'] ?>//");
         loadTableExam();
-
+        loadChat();
         loadCoutDownChatTable();
 
         loadCoutDown('#viewExountDown',"<?= $ExamOnline['ExamEnd']; ?>",1);
     });
-
-    // fire base
-    var firebaseConfig = {
-        apiKey: "AIzaSyCj6Wf2ARn_N3Nqsa1YGY5HcRHKoCFQaNA",
-        authDomain: "my-test-6976a.firebaseapp.com",
-        databaseURL: "https://my-test-6976a.firebaseio.com",
-        projectId: "my-test-6976a",
-        storageBucket: "my-test-6976a.appspot.com",
-        messagingSenderId: "964038080180",
-        appId: "1:964038080180:web:ca3fd88deb491a8c7d09e1"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-
 
     function loadTableExam(){
         var data = {
@@ -286,6 +279,30 @@
 
     }
 
+    function loadCoutDownChat(element,EndSessions){
+
+        var ens = EndSessions.split(':');
+        var start = moment();
+        var end   = moment().hours(ens[0]).minutes(ens[1]).seconds(ens[2]);
+
+        var en = moment().valueOf();
+        var d = end.diff(start);
+        var fiveSeconds = parseInt(en) + parseInt(d);
+
+
+        $(element)
+            .countdown(fiveSeconds, function(event) {
+                $(this).text(
+                    // event.strftime('%D days %H:%M:%S')
+                    event.strftime('%H:%M:%S')
+                );
+            })
+            .on('finish.countdown', function() {
+
+                loadChat();
+
+            });
+    }
     function loadCoutDownChatTable(){
 
         var EndSessions = moment().add(3,'minutes').format('H:mm:ss');
@@ -316,67 +333,37 @@
         loadTableExam();
     });
 
-    $('#inputMessage').keyup(function (e) {
+    $('#inputMessage').keyup(function () {
         var inputMessage = $('#inputMessage').val();
         $('#viewChar').html(inputMessage.length);
-
-
-        if (e.keyCode === 13) {
-            var inputMessage = $('#inputMessage').val();
-            if(inputMessage!=''){
-                sendMessage(inputMessage);
-                $('#inputMessage').val('');
-                $('#viewChar').html('0');
-            }
-        }
-
     });
 
+    $('#btnRefreshChat').click(function () {
+        loadChat();
+    });
 
     $('#btnSubmitChat').click(function () {
         var inputMessage = $('#inputMessage').val();
         if(inputMessage!=''){
-            sendMessage(inputMessage);
-            $('#inputMessage').val('');
+            var data = {
+                action : 'insertChatExamOnline',
+                dataForm : {
+                    ExamID : ExamID,
+                    UserID : sessionNIP,
+                    TypeUser : 'emp',
+                    Message : inputMessage
+                }
+            };
+            var token = jwt_encode(data,'s3Cr3T-G4N');
+            var url = base_url_js+'api4/__crudExamOnline';
+            $.post(url,{token:token},function (jsonResult) {
+                $('#inputMessage').val('');
+                $('#viewChar').html('0');
+                loadChat();
+
+            });
         }
     });
-
-    function sendMessage(Message) {
-
-        // Save to DB
-        firebase.database().ref("msg_"+ExamID).push().set({
-            "UserID" : sessionNIP,
-            "Name" : ucwords(sessionName),
-            "Type" : 'emp',
-            "Message" : Message,
-            "EntredAt" : getDateTimeNow()
-        });
-
-
-    }
-
-    // listen a from incoming message
-    firebase.database().ref("msg_<?= $dataToken['ExamID']; ?>").on("child_added",function (snapshot) {
-
-
-        var isMe = (snapshot.val().UserID == sessionNIP) ? '<small class="text-muted label label-warning">Me</small> | ' : '';
-
-        var chatOn = moment(snapshot.val().EntredAt).format('d MMM H:m');
-
-        var divChat = '<li class="clearfix">' +
-            '                                            <div class="chat-body clearfix">' +
-            '                                                <div class="header">' +
-            '                                                    <strong class="primary-font">'+isMe+snapshot.val().Name+' <small class="pull-right text-muted"><span class="glyphicon glyphicon-time"></span>'+chatOn+'</small></strong>' +
-            '                                                        '+
-            '                                                </div>' +
-            '                                                <div class="panel-chat">'+snapshot.val().Message+'</div>' +
-            '                                            </div>' +
-            '                                        </li>';
-
-
-        document.getElementById("viewChat").innerHTML += divChat;
-    });
-
 </script>
 
 <?php } else { ?>
