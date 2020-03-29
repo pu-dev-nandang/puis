@@ -385,7 +385,7 @@
         <div class="row">
             <div class="col-md-10 col-md-offset-1" style="text-align: center;">
                 <div class="alert alert-danger" role="alert">
-                    <h3 style="margin-top: 10px;"><b>I'm sorry the exam time has expired</b></h3>
+                    <h3 style="margin-top: 10px;"><b>The exam has been reached the time duration.</b></h3>
                 </div>
                 <hr/>
                 <a href="<?= base_url('invigilator'); ?>" class="btn btn-lg btn-primary">Back to Home</a>
