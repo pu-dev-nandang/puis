@@ -15,7 +15,8 @@
             <a href="javascript:void(0);"><?= ucwords(str_replace("-"," ",$Segment1)); ?></a>
         </li>
         <?php for($i=1;$i<=count($segment);$i++){
-            if($i!=1) { ?>
+            $stln = strlen($segment[$i]);
+            if($i!=1 && $stln<=30) { ?>
             <li class="current">
                 <a href="javascript:void(0);" title="">
                     <?php echo ucwords(str_replace("-"," ",$segment[$i])); ?>
