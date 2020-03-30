@@ -30,6 +30,24 @@ class C_jadwal_ujian extends Academic_Controler {
         $this->menu_jadwalUjian($page);
     }
 
+    // added by adhi 2020-03-30
+    public function editExamSubmited($token){
+        try {
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($token,$key);
+            $data['department'] = parent::__getDepartement();
+            $data['NPM'] = $data_arr['NPM'];
+            $data['ExamID'] = $data_arr['ExamID'];
+            $data['dataExisting'] = $this->db->query(
+                  'select * from db_academic.exam_student_online where ExamID = '.$data_arr['ExamID'].' and NPM = "'.$data_arr['NPM'].'" '  
+            )->result_array();
+            $page = $this->load->view('page/'.$data['department'].'/jadwalujian/editExamSubmited',$data,true);
+            $this->menu_jadwalUjian($page);
+        } catch (Exception $e) {
+            redirect(base_url().'academic/exam-schedule');
+        }
+    }
+
     public function set_exam_schedule(){
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/jadwalujian/set_exam_schedule',$data,true);
@@ -117,6 +135,58 @@ class C_jadwal_ujian extends Academic_Controler {
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/jadwalujian/exam_barcode',$data,true);
         $this->menu_jadwalUjian($page);
+    }
+
+    public function submiteditExamSubmited(){
+        header('Content-Type: application/json');
+        $dataToken = $this->getInputToken();
+        $dataToken = json_decode(json_encode($dataToken),true);
+        $action = $dataToken['action'];
+        $rs = ['status' => 0,'msg'=>'','callback' => []];
+        switch ($action) {
+            case 'add_or_edit':
+                $dataSave = $dataToken['data'];
+                if (array_key_exists('Files', $_FILES)) {
+                    $filename = str_replace(' ', '_', $_FILES['Files']['name'][0]);
+                    $path = './uploads/task-exam/';
+                    $uploadFile = $this->m_master->uploadDokumenSetFileName($filename,'Files',$path);
+                    $dataSave['File'] = $uploadFile[0];
+                }
+
+                $dataSave['SavedAt'] = date('Y-m-d H:i:s');
+
+                // check add or edit
+                $total = $this->db->query(
+                        'select count(*) as total  from 
+                        (
+                            select 1 from db_academic.exam_student_online where
+                            ExamID = '.$dataToken['ExamID'].' and NPM = "'.$dataToken['NPM'].'"
+                        )xx
+                         
+                        '  
+                    )->row()->total;
+                // print_r($total);die();
+                if ($total > 0) { // edit
+                    $this->db->where('NPM',$dataToken['NPM']);
+                    $this->db->where('ExamID',$dataToken['ExamID']);
+                    $this->db->update('db_academic.exam_student_online',$dataSave);
+                }
+                else
+                {
+                    $dataSave['NPM'] = $dataToken['NPM'];
+                    $dataSave['ExamID'] = $dataToken['ExamID'];
+                    $dataSave['StartWorking'] = $dataSave['SavedAt'];
+                    // print_r($dataSave);die();
+                    $this->db->insert('db_academic.exam_student_online',$dataSave);
+                }
+                $rs['status'] = 1;
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+        echo json_encode($rs);
     }
 
 
