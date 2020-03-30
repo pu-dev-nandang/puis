@@ -106,7 +106,8 @@
 
                                 <div class="row" style="margin-bottom: 15px;">
                                     <div class="col-md-8">
-                                        <div>Refresh the table in <span id="loadTimeTable">00:00:10</span></div>
+<!--                                        <div>Refresh the table in <span id="loadTimeTable">00:00:10</span></div>-->
+                                        <div class="alert alert-info" role="alert">Use the buttons to refresh the students present</div>
                                     </div>
                                     <div class="col-md-4" style="text-align: right;">
                                         <button class="btn btn-info btn-sm" id="btnRefreshTable"><i class="fa fa-refresh"></i> Table</button>
@@ -162,7 +163,7 @@
         //getCountdw('#showCountdown',"<?//= $dataExamOnline['ExamEnd'] ?>//");
         loadTableExam();
 
-        loadCoutDownChatTable();
+        // loadCoutDownChatTable();
 
         loadCoutDown('#viewExountDown',"<?= $ExamOnline['ExamEnd']; ?>",1);
     });
@@ -191,6 +192,8 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
+            console.log(jsonResult);
+
             var Loading = '<tr>' +
                 '<td colspan="4"><h4><i class="fa fa-refresh fa-spin"></i> Loading...</h4></td>' +
                 '</tr>';
@@ -204,7 +207,10 @@
                     var viewSavedAt = (v.SavedAt!='' && v.SavedAt!=null) ? moment(v.SavedAt).format('D MMM H:mm:ss') : '';
                     tr = tr+'<tr>' +
                         '<td>'+(i+1)+'</td>' +
-                        '<td style="text-align: left !important;"><b>'+v.Name+'</b><br/>'+v.NPM+'</td>' +
+                        '<td style="text-align: left !important;"><b>'+v.Name+'</b><br/>'+v.NPM+'' +
+                        '<div style="margin-bottom: 10px;margin-top: 10px;"><a href="'+base_url_js+'uploads/task-exam/'+v.File+'" class="btn btn-sm btn-default">Download file</a></div>' +
+                        '<div><textarea class="form-control" readonly>'+v.Description+'</textarea></div>' +
+                        '</td>' +
                         '<td>'+viewStartWorking+'</td>' +
                         '<td>'+viewSavedAt+'</td>' +
                         '</tr>';
@@ -223,68 +229,14 @@
                 },500);
             }
 
-            loadCoutDownChatTable();
+            // loadCoutDownChatTable();
 
 
 
         });
     }
 
-    function loadChat() {
-        var data = {
-            action : 'loadChatExamOnline',
-            ExamID : ExamID
-        };
-        var token = jwt_encode(data,'s3Cr3T-G4N');
-        var url = base_url_js+'api4/__crudExamOnline';
-        $.post(url,{token:token},function (jsonResult) {
 
-            var loading = '<li class="clearfix" style="text-align: center;"><h4><i class="fa fa-refresh fa-spin margin-right"></i> Loading...</h4></li>';
-            $('#viewChat').html(loading);
-
-
-            if(jsonResult.length>0){
-
-                var divChat = '';
-                $.each(jsonResult,function (i,v) {
-
-
-                    var isMe = (v.UserID == sessionNIP)
-                        ? '<small class="text-muted label label-warning">Me</small> | ' : '';
-
-                    var chatOn = moment(v.EntredAt).format('d MMM H:m');
-
-                    divChat = divChat+'<li class="clearfix">' +
-                        '                                            <div class="chat-body clearfix">' +
-                        '                                                <div class="header">' +
-                        '                                                    <strong class="primary-font">'+isMe+''+v.Name+' <small class="pull-right text-muted"><span class="glyphicon glyphicon-time"></span>'+chatOn+'</small></strong>' +
-                        '                                                        '+
-                        '                                                </div>' +
-                        '                                                <div class="panel-chat">'+v.Message+'</div>' +
-                        '                                            </div>' +
-                        '                                        </li>';
-
-
-                });
-
-                setTimeout(function () {
-                    $('#viewChat').html(divChat);
-                },500);
-            }
-            else {
-                var noData = '<li class="clearfix" style="text-align: center;"><h4>-- No data --</h4></li>';
-
-                setTimeout(function () {
-                    $('#viewChat').html(noData);
-                },500);
-            }
-
-            loadCoutDownChat('#viewChatCountdown',moment().add(3,'minutes').format('H:mm:ss'));
-
-
-        });
-
-    }
 
     function loadCoutDownChatTable(){
 
