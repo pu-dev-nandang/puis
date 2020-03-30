@@ -320,14 +320,19 @@
     firebase.database().ref("msg_<?= $dataToken['ExamID']; ?>").on("child_added",function (snapshot) {
 
 
-        var isMe = (snapshot.val().UserID == sessionNIP) ? '<small class="text-muted label label-warning">Me</small> | ' : '';
+        var isMe = (snapshot.val().UserID == sessionNIP)
+            ? '<small class="text-muted label label-warning">Me</small> | '
+            : '';
+
+        var isASC = (snapshot.val().Type == 'asc')
+            ? '<small class="text-muted label label-danger">ASC</small> | ' : ''
 
         var chatOn = moment(snapshot.val().EntredAt).format('d MMM H:m');
 
         var divChat = '<li class="clearfix">' +
             '                                            <div class="chat-body clearfix">' +
             '                                                <div class="header">' +
-            '                                                    <strong class="primary-font">'+isMe+snapshot.val().Name+' <small class="pull-right text-muted"><span class="glyphicon glyphicon-time"></span>'+chatOn+'</small></strong>' +
+            '                                                    <strong class="primary-font">'+isMe+isASC+snapshot.val().Name+' <small class="pull-right text-muted"><span class="glyphicon glyphicon-time"></span>'+chatOn+'</small></strong>' +
             '                                                        '+
             '                                                </div>' +
             '                                                <div class="panel-chat">'+snapshot.val().Message+'</div>' +

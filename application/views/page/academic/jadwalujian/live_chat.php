@@ -136,7 +136,7 @@
         firebase.database().ref("msg_<?= $ExamID; ?>").push().set({
             "UserID" : sessionNIP,
             "Name" : ucwords(sessionName),
-            "Type" : 'emp',
+            "Type" : 'asc',
             "Message" : Message,
             "EntredAt" : getDateTimeNow()
         });
