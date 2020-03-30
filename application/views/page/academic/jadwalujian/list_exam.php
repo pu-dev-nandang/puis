@@ -150,6 +150,7 @@
                     '        <th colspan="2" style="width: 22">Payment</th>' +
                     '        <th rowspan="2" style="width: 10%;">Exam Attd</th>' +
                     '        <th rowspan="2" style="width: 10%;">Set. Attd</th>' +
+                    '        <th rowspan="2" style="width: 10%;">Exam. Submitted</th>' +
                     '    </tr>' +
                     '    <tr>' +
                     '       <th style="width: 11%">BPP</th>' +
@@ -167,11 +168,11 @@
                     '';
 
 
-                $('#GlobalModal .modal-dialog').css('width','830px');
-                $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                // $('#GlobalModalLarge .modal-dialog').css('width','830px');
+                $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
                     '<h4 class="modal-title">Details Student</h4>');
-                $('#GlobalModal .modal-body').html(dataHtml);
-                $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                $('#GlobalModalLarge .modal-body').html(dataHtml);
+                $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
                 var no_std = 1;
                 var p = 0;
@@ -208,22 +209,34 @@
                        '    <label>' +
                        '      <input type="checkbox" class="checkAttd" data-examid="'+d.ExamID+'" data-id="'+d.ID+'" '+valAttd+'> Present' +
                        '    </label>' +
-                       '  </div>'
+                       '  </div>';
+
+                   var submitted = (d.DetailExam.length>0 && d.DetailExam[0].SavedAt!=null && d.DetailExam[0].SavedAt!='' )
+                       ? '<i style="color: green;" class="fa fa-check"></i>' : '';
+                   var submittedAt = (d.DetailExam.length>0 && d.DetailExam[0].SavedAt!=null && d.DetailExam[0].SavedAt!='' )
+                       ? '<br/>'+moment(d.DetailExam[0].SavedAt).format('DD MMM YYYY HH:mm') : '';
+
+                    var viewFile = (d.DetailExam.length>0 && d.DetailExam[0].File!=null && d.DetailExam[0].File!='' )
+                        ? '<div><a href="'+base_url_js+'uploads/task-exam/'+d.DetailExam[0].File+'" target="_blank" class="btn btn-sm btn-default">Download File</a></div>' : '';
+
+                    var viewDescription = (d.DetailExam.length>0 && d.DetailExam[0].Description!=null && d.DetailExam[0].Description!='' )
+                        ? '<div><textarea class="form-control" readonly>'+d.DetailExam[0].Description+'</textarea></div>' : '';
 
                     $('#dataMHSExam').append('<tr>' +
                         '<td>'+(no_std++)+'</td>' +
-                        '<td style="text-align: left;"><b>'+d.Name+'</b><br/>'+d.NPM+'</td>' +
+                        '<td style="text-align: left;"><b>'+d.Name+'</b><br/>'+d.NPM+viewFile+viewDescription+'</td>' +
                         '<td>'+AttdPercentage.toFixed()+' %</td>' +
                         '<td>'+BPP+'</td>' +
                         '<td>'+Credit+'</td>' +
                         '<td style="background: #f4f4f4" id="td_attd'+d.ID+'" >'+ExamAttd+'</td>' +
                         '<td>'+setAttd+'</td>' +
+                        '<td>'+submitted+submittedAt+'</td>' +
                         '</tr>');
                 }
 
                 $('#viewTotalAttd').html(p+' of '+jsonResult.length);
 
-                $('#GlobalModal').modal({
+                $('#GlobalModalLarge').modal({
                     'show' : true,
                     'backdrop' : 'static'
                 });
