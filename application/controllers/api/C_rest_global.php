@@ -67,4 +67,10 @@ class C_rest_global extends CI_Controller {
       $result = $this->m_rest_global->api_Biodata_MHS($NPM);
       echo json_encode($result);
     }
+
+    public function load_university_or_instansi(){
+      $input = $this->getInputToken();
+      $result = $this->m_rest_global->api_university_or_instansi($input);
+      echo json_encode($result);
+    }
 }

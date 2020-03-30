@@ -34,5 +34,30 @@ class M_rest_global extends CI_Model {
         return $result;
     }
 
+    public function api_university_or_instansi($dataToken){
+        $where='';
+        if (array_key_exists('param', $dataToken)) {
+           $where = 'WHERE ';
+           $param = $dataToken['param'];
+           # Param example
+           // $param = [];
+           // $param[] = array("field"=>"ta.`NPM`","data"=>" = '".$NPM."' ","filter"=>"AND",);
+           $counter = 0;
+           foreach ($param as $key => $value) {
+               if($counter==0){
+                   $where = $where.$value['field']." ".$value['data'];
+               }
+               else{
+                   $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+               }
+               $counter++;
+           } 
+        }
+
+        return $rs = $this->db->query(
+            'select * from db_research.university '.$where
+        )->result_array();
+    }
+
 
 }
