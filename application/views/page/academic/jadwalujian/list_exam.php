@@ -283,7 +283,7 @@
         //   base_url_js+'academic/exam-schedule/editExamSubmited/'+token,
         //   '_blank' // <- This is what makes it open in a new window.
         // );
-        window.location.replace(base_url_js+'academic/exam-schedule/editExamSubmited/'+token);
+        window.open(base_url_js+'academic/exam-schedule/editExamSubmited/'+token);
     })
 
     $(document).on('click','.checkAttd',function () {
