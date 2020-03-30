@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MY_Controller extends CI_Controller {
-
+    public $rest_setting_global = [];
     function __construct()
     {
         parent::__construct();
@@ -19,6 +19,8 @@ class MY_Controller extends CI_Controller {
                 define('VA_secret_key',$getCFGVA[0]['secret_key'] ,true);
                 define('VA_url',$getCFGVA[0]['url'] ,true);
             }
+
+            $this->rest_setting_global = $this->m_master->showData_array('db_it.rest_setting');
 
         } else {
             redirect(base_url());
@@ -728,7 +730,7 @@ abstract class Ga_Controler extends Globalclass{
 
 }
 
-class Cooperation_Controler extends Globalclass{
+abstract class Cooperation_Controler extends Globalclass{
 
     public function __construct()
     {
@@ -834,4 +836,38 @@ abstract class ServiceDocumentGenerator_Controler extends Globalclass{ // for se
         $this->temp($content);
     }
 
+}
+
+abstract class Research_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('research/m_research');
+    }
+
+    // overide function
+    public function template($content)
+    {
+        $data['include'] = $this->load->view('template/include','',true);
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+        $data['ClassContainer'] = 'sidebar-closed';
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+    }
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+    public function menu_portal_eksternal($page){
+        $data['page'] = $page;
+        $data['department'] = parent::__getDepartement();
+        $data['rest_setting_global'] = $this->rest_setting_global;
+        $content = $this->load->view('page/'.$data['department'].'/portal_eksternal/menu_portal_eksternal',$data,true);
+        $this->temp($content);
+    }
 }

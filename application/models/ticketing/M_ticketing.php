@@ -460,7 +460,7 @@ class M_ticketing extends CI_Model {
         $rs = ['bool'=>false,'callback' => [] ];
         $arr_where = [
             'NoTicket' => $NoTicket,
-            'TicketStatus' => ($first == 'yes') ? 1 : 2,
+            //'TicketStatus' => ($first == 'yes') ? 1 : 2,
         ];
         $G_dt = $this->getDataTicketBy($arr_where);
         if (count($G_dt) > 0) {
@@ -856,8 +856,8 @@ class M_ticketing extends CI_Model {
 
         $DataReceived = $this->getDataReceived_worker($arr_where);
         if (count($DataReceived) == 0) {
-            show_404($log_error = TRUE);
-            die();
+            // show_404($log_error = TRUE);
+            // die();
         }
         else
         {
@@ -1225,7 +1225,7 @@ class M_ticketing extends CI_Model {
         return $json_data;
     }
 
-    private function __ticket_list_set_data($query,$dataToken)
+    public function __ticket_list_set_data($query,$dataToken)
     {
         $NIP = $dataToken['NIP'];
         for ($i=0; $i < count($query); $i++) {

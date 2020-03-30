@@ -12,8 +12,8 @@ class C_action extends Ticket_Controler {
         $NIP = $this->session->userdata('NIP');
         $auth = $this->m_ticketing->auth_action_tickets($NoTicket,$NIP,$DepartmentID,$first);
         if (!$auth['bool']) {
-            show_404($log_error = TRUE); 
-            die();
+            // show_404($log_error = TRUE); 
+            // die();
         }
         else{
           return $auth;
@@ -31,12 +31,23 @@ class C_action extends Ticket_Controler {
     public function set_action_first($NoTicket,$EncodeDepartment){
        $DepartmentID = $this->m_general->jwt_decode_department($EncodeDepartment);
        $data['Authent'] = $this->auth($NoTicket,$DepartmentID,'yes'); // return if false 404
-       $data['DataTicket'] = $this->m_ticketing->getDataTicketBy(['NoTicket' => $NoTicket]); // get just data ticket
+       $getDataTicketBy = $this->m_ticketing->getDataTicketBy(['NoTicket'=>$NoTicket]);
+       $getDataTicketBy = $this->m_ticketing->__ticket_list_set_data($getDataTicketBy,['NIP' => '','DepartmentID' => '']);
+       // $data['DataTicket'] = $this->m_ticketing->getDataTicketBy(['NoTicket' => $NoTicket]); // get just data ticket
+       $data['DataTicket'] = $getDataTicketBy; // get just data ticket
        $data['DataCategory'] = $this->getCategory();
        $data['DataEmployees'] = $this->m_general->getAllUserByDepartment(['DepartmentID' => $DepartmentID ]);
        $data['DataReceived'] = $this->m_ticketing->getDataReceived(['TicketID' => $data['DataTicket'][0]['ID'] ]); // get data received
-       $page = $this->load->view('dashboard/ticketing/set_action_first',$data,true);
-       $this->menu_ticket($page);
+       // print_r($getDataTicketBy);die();
+       if ( $getDataTicketBy[0]['TicketStatus'] != 1) {
+         redirect(base_url().'ticket/set_action_progress/'.$NoTicket.'/'.$EncodeDepartment);
+       }
+       else
+       {
+        $page = $this->load->view('dashboard/ticketing/set_action_first',$data,true);
+        $this->menu_ticket($page);
+       }
+       
     }
 
     public function set_action_progress($NoTicket,$EncodeDepartment){
@@ -47,8 +58,13 @@ class C_action extends Ticket_Controler {
         'NIP' => $this->session->userdata('NIP'),
         'DepartmentID' => $DepartmentID,
       ];
-      $data['DataAll'] = $this->m_ticketing->rest_progress_ticket($dataToken,' and a.NoTicket = "'.$NoTicket.'" ')['data']; // get data all ticket
+      // $data['DataAll'] = $this->m_ticketing->rest_progress_ticket($dataToken,' and a.NoTicket = "'.$NoTicket.'" ')['data']; // get data all ticket
+      $getDataTicketBy = $this->m_ticketing->getDataTicketBy(['NoTicket'=>$NoTicket]);
+      $getDataTicketBy = $this->m_ticketing->__ticket_list_set_data($getDataTicketBy,['NIP' => '','DepartmentID' => '']);
+
+      $data['DataAll'] = $getDataTicketBy; // get data all ticket
       $data['DataReceivedSelected'] = $this->m_ticketing->DataReceivedSelected($data['DataTicket'][0]['ID'],$DepartmentID); // receive selected
+      // print_r($data['DataReceivedSelected']);die();
       $data['DataCategory'] = $this->getCategory();
       $data['DataEmployees'] = $this->m_general->getAllUserByDepartment(['DepartmentID' => $DepartmentID ]);
       $page = $this->load->view('dashboard/ticketing/set_action_progress',$data,true);

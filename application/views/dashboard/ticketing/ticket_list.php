@@ -283,7 +283,7 @@ var App_ticket_tikcet_list = {
                 $(row).find('td:eq(3)').html(htmlTicket);
 
                 var htmlAction = '';
-                var DetailAction = '<a href="javascript:void(0)" class ="ModalReadMore" token = "' +
+                var DetailAction = '<a href="javascript:void(0)" class ="ModalReadMore_list" token = "' +
                     data[9] + '" >Detail</a>';
                 var setAction = '';
                 var SelectDepartmentID = $('#SelectDepartmentID option:selected').val();
@@ -402,7 +402,7 @@ $(document).off('change', '#SelectStatusTicketID').on('change',
         oTable.ajax.reload(null, false);
 })
 
-$(document).off('click', '.ModalReadMore').on('click', '.ModalReadMore', function(e) {
+$(document).off('click', '.ModalReadMore_list').on('click', '.ModalReadMore_list', function(e) {
     var token = $(this).attr('token');
     AppModalDetailTicket.ModalReadMore('', '', token);
 })

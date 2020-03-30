@@ -1,5 +1,3 @@
-
-
 <style>
     #tableShowExam>thead>tr>th, #tableExam>tbody>tr>td {
         text-align: center;
@@ -207,7 +205,7 @@
 
                    var setAttd = '<div class="checkbox" style="margin: 0px;">' +
                        '    <label>' +
-                       '      <input type="checkbox" class="checkAttd" data-examid="'+d.ExamID+'" data-id="'+d.ID+'" '+valAttd+'> Present' +
+                       '      <input type="checkbox" class="checkAttd" data-examid="'+d.ExamID+'" data-id="'+d.ID+'" '+valAttd+' npm = "'+d.NPM+'" > Present' +
                        '    </label>' +
                        '  </div>';
 
@@ -241,13 +239,59 @@
                     'backdrop' : 'static'
                 });
 
+                // added by adhi 2020-03-30
+
+                $('#GlobalModalLarge').find('#tableStudent').find('tbody').find('tr').each(function(e){
+                    const tr = $(this);
+                    const chk = tr.find('td:eq(6)').find('.checkAttd');
+                    eventModalDetailStudent.AddbuttonEdit_Detail_student(tr,chk);
+
+                })
+
             }
 
         });
     });
 
-    $(document).on('click','.checkAttd',function () {
+    const eventModalDetailStudent = {
+        AddbuttonEdit_Detail_student : (tr,chk) => {
+            const selectorBtnEdit = tr.find('td:eq(7)').find('.btnEditDetailsStudentModal');
+            if (chk.is(":checked")) {
+                const examID = chk.attr('data-examid');
+                const NPM = chk.attr('npm');
+                
+                if (!selectorBtnEdit.length) {
+                    tr.find('td:eq(7)').append(
+                            '<button class = "btn btn-xs btn-default  btnEditDetailsStudentModal" npm = "'+NPM+'" examID = "'+examID+'" >Edit </button>'
+                        );
+                }
+            }
+            else
+            {
+                selectorBtnEdit.remove();
+            }
+        }
+    }
 
+    $(document).on('click','.btnEditDetailsStudentModal',function(e){
+        const data = {
+            NPM : $(this).attr('npm'),
+            ExamID : $(this).attr('examID'),
+        }
+        const token = jwt_encode(data,'UAP)(*');
+        // window.open(
+        //   base_url_js+'academic/exam-schedule/editExamSubmited/'+token,
+        //   '_blank' // <- This is what makes it open in a new window.
+        // );
+        window.location.replace(base_url_js+'academic/exam-schedule/editExamSubmited/'+token);
+    })
+
+    $(document).on('click','.checkAttd',function () {
+        // added by adhi 2020-03-30
+        const tr = $(this).closest('tr');
+        const chk = $(this);
+
+        // -- //
         var ID = $(this).attr('data-id');
         var ExamID = $(this).attr('data-examid');
 
@@ -271,6 +315,10 @@
         $.post(url,{token:token},function (result) {
             toastr.success('Attendance updated','Success');
             $('#td_attd'+ID).html(ExamAttd);
+
+            // added by adhi 2020-03-30
+           eventModalDetailStudent.AddbuttonEdit_Detail_student(tr,chk);
+
         });
 
     });
