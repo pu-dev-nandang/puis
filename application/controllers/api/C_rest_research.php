@@ -103,6 +103,9 @@ class C_rest_research extends CI_Controller {
         case 'delete':
           $rs = $this->m_research->delete_user_eksternal($dataToken);
           break;
+        case 'edit':
+          $rs = $this->m_research->edit_user_eksternal($dataToken);
+          break;
         default:
           # code...
           break;

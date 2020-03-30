@@ -51,7 +51,9 @@ class Clas_portal_eksternal extends Clas_global_portal_eksternal {
 			let sel = (selected == '') ? 'selected' : '';
 			selector.append('<option value = " " '+sel+'>--No Choose--</option>');
 			for (var i = 0; i < response.length; i++) {
-				selector.append('<option value = "'+response[i].ID+'">'+response[i].Name_University+'</option>');
+				sel = (selected == response[i].ID) ? 'selected' : '';
+				// console.log(selected);
+				selector.append('<option value = "'+response[i].ID+'" '+sel+' >'+response[i].Name_University+'</option>');
 			}
 
 			selector.select2();
@@ -697,6 +699,9 @@ class Clas_portal_eksternal extends Clas_global_portal_eksternal {
 					cls.dataTableList.ajax.reload(null, false);
 					$('.OPtypeUser').trigger('change');
 					toastr.success('Success');
+					$('#pageBiodata').removeClass('hide');
+					$('#btnSaveEksternal').attr('action','add');
+					$('#btnSaveEksternal').attr('data-id',"");
 				}
 				else
 				{
@@ -764,4 +769,125 @@ class Clas_portal_eksternal extends Clas_global_portal_eksternal {
 
 		return true;
 	}
+
+
+	LoadDataEdit = async(data) => {
+		// console.log(data);
+		const TypeUser = data['TypeUser'];
+		$(".OPtypeUser option").filter(function() {
+		   //may want to use $.trim in here
+		   return $(this).val() == TypeUser; 
+		}).prop("selected", true);
+
+		await $('.OPtypeUser').trigger('change');
+		const selectorUniversity = $('#pageBiodata').find('.FrmRegistrasi[name="ID_University"]');
+		await App_portal.__OPUniversity(selectorUniversity,data['ID_University']);
+
+		$('.FrmRegistrasi').not('select').each(function(e){
+			const Name = $(this).attr('name');
+			$(this).val(data[Name]);
+		})
+
+		$(".FrmRegistrasi[name='JK'] option").filter(function() {
+		   //may want to use $.trim in here
+		   return $(this).val() == data['JK']; 
+		}).prop("selected", true);
+
+		// remove password 
+		$('#pageAccess').empty();
+
+		// checkbox
+		$('.FrmRegistrasi[type="checkbox"]').each(function(e){
+			const Name = $(this).attr('name');
+			if (data[Name] == 1) {
+				$(this).prop( "checked", true );
+			}
+		})
+
+		$('#btnSaveEksternal').attr('action','edit');
+		$('#btnSaveEksternal').attr('data-id',data['ID']);
+
+	}
+
+	resetPassword = async(data) => {
+		$('#pageBiodata').addClass('hide');
+		
+		const TypeUser = data['TypeUser'];
+		$(".OPtypeUser option").filter(function() {
+		   //may want to use $.trim in here
+		   return $(this).val() == TypeUser; 
+		}).prop("selected", true);
+
+		await $('.OPtypeUser').trigger('change');
+		const selectorUniversity = $('#pageBiodata').find('.FrmRegistrasi[name="ID_University"]');
+		await App_portal.__OPUniversity(selectorUniversity,data['ID_University']);
+		$('#pageTypeAs').empty();
+		$('.FrmRegistrasi').not('select').each(function(e){
+			const Name = $(this).attr('name');
+			$(this).val(data[Name]);
+		})
+
+		$(".FrmRegistrasi[name='JK'] option").filter(function() {
+		   //may want to use $.trim in here
+		   return $(this).val() == data['JK']; 
+		}).prop("selected", true);
+
+		$('.FrmRegistrasi').not('select').each(function(e){
+			const Name = $(this).attr('name');
+			$(this).val(data[Name]);
+		})
+
+		$('#btnSaveEksternal').attr('action','edit');
+		$('#btnSaveEksternal').attr('data-id',data['ID']);
+	}
+
+	LoadDataDetail = async(data) => {
+		await this.LoadDataEdit(data);
+		$('.OPtypeUser').prop('disabled',true);
+		$('.FrmRegistrasi').prop('disabled',true);
+		$('#btnSaveEksternal').prop('disabled',true);
+	}
+
+	view_more_login_today = (data) => {
+		let htmlss = '';
+		let tbody = '';
+		for (var i = 0; i < data.length; i++) {
+			let email = (data[i].Email != null && data[i].Email != '') ? data[i].Email : '';
+			tbody += '<tr>'+
+						'<td>'+(i+1)+'</td>'+
+						'<td>'+data[i].Nama+'<br/>'+email+'</td>'+
+						'<td>'+data[i].TimeLogin+'</td>'+
+					 '</tr>';
+		}
+		// console.log(data);
+			htmlss += '<div class = "row">'+
+						'<div class = "col-xs-12">'+
+							'<table class = "table">'+
+								'<thead>'+
+									'<tr>'+
+										'<th>No</th>'+	
+										'<th>Name & Email</th>'+	
+										'<th>Login Time</th>'+	
+									'</tr>'+
+								'</thead>'+
+								'<tbody>'+
+									tbody+
+								'</tbody>'+
+							'</table>'+
+						'</div>'+
+					  '</div>';
+		$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+		    '<h4 class="modal-title">'+'Login Today'+'</h4>');
+		$('#GlobalModal .modal-body').html(htmlss);
+
+		$('#GlobalModal .modal-footer').html('' +
+		    '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+		    '');
+
+		$('#GlobalModal').modal({
+		    'show' : true,
+		    'backdrop' : 'static'
+		});
+	}
+	
 }

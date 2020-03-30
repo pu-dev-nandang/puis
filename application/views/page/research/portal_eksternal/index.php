@@ -14,16 +14,23 @@
     	font-size: 11px;
     }
 </style>
-<div id="pageDetailBox">
-	
-</div>
+
 <div class="row">
 	<div class="col-xs-8">
 		<div class="row">
 			<div class="col-xs-12">
 				<div class="panel panel-primary" style="border-color: #42a4ca;">
 					<div class="panel-heading clearfix" style="background-color: #42a4ca;border-color: #42a4ca;">
-						<h4 class="panel-title pull-left" style="padding-top: 7.5px;">Registration</h4>
+						<div class="col-xs-4">
+							<h4 class="panel-title pull-left" style="padding-top: 7.5px;">Registration</h4>
+						</div>
+						<div class="col-xs-4 col-md-offset-4">
+							<div class="pull-right">
+								<button class="btn btn-xs btn-default NewData"><i class="icon-plus"> New</i>
+								</button>
+							</div>
+							
+						</div>
 					</div>
 					<div class="panel-body" id ="pageInput">
 						
@@ -56,7 +63,7 @@
 		App_portal.LoadPageDefault(selectorPageInput,selectorPageList);
 	})
 
-	$(document).off('change','.OPtypeUser').on('change','.OPtypeUser',function(e){
+	$(document).off('change','.OPtypeUser').on('change','.OPtypeUser', async function(e){
 		let v = $(this).find('option:selected').val();
 		if (v == 'Dosen') {
 			$('#pageBiodata').html(App_portal.htmlProfiledosen());
@@ -76,10 +83,13 @@
 		}
 
 		let selectorUniversity = $('#pageBiodata').find('.FrmRegistrasi[name="ID_University"]');
-		App_portal.__OPUniversity(selectorUniversity);
+		await App_portal.__OPUniversity(selectorUniversity);
 		$('.datetimepicker').datetimepicker({
 			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 		});
+
+		$('.OPtypeUser').prop('disabled',false);
+		$('#btnSaveEksternal').prop('disabled',false);
 	})
 
 	$(document).off('change','.FilterOPtypeUser').on('change','.FilterOPtypeUser',function(e){
@@ -109,4 +119,39 @@
 		const ID = decodetoken['ID'];
 		await App_portal.savePortalEksternal(selector,action,ID);
 	})
+
+	$(document).off('click','.btnEditEksternal').on('click','.btnEditEksternal',async function(e){
+		const datadecode = jwt_decode($(this).attr('token'));
+		App_portal.LoadDataEdit(datadecode);
+	})
+
+	$(document).off('click','.btnResetPasswordEksternal').on('click','.btnResetPasswordEksternal',function(e){
+		const datadecode = jwt_decode($(this).attr('token'));
+		App_portal.resetPassword(datadecode);
+	})
+
+	$(document).off('click','.modalDetail').on('click','.modalDetail',async function(e){
+		const datadecode = jwt_decode($(this).attr('token'));
+		App_portal.LoadDataDetail(datadecode);
+	})
+
+	$(document).on('click','.NewData',function(e){
+		const selectorPageInput = $('#pageInput');
+		App_portal.LoadPageInput(selectorPageInput);
+	})
+
+	$(document).on('click','#boxTotUser .moreDetail',async function(e){
+		$(".FilterOPtypeUser option").filter(function() {
+		   //may want to use $.trim in here
+		   return $(this).val() == '%'; 
+		}).prop("selected", true);
+		await App_portal.dataTableList.ajax.reload(null, false);
+		toastr.info('Please see detail in list');
+	})
+
+	$(document).on('click','#boxTotLoginToday .moreDetail',async function(e){
+		const datadecode = jwt_decode($(this).attr('data'));
+		App_portal.view_more_login_today(datadecode);
+	})
+	
 </script>

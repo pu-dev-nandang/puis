@@ -80,15 +80,16 @@ class M_research extends CI_Model {
 
     }
 
-    private function checkDataUserEksternalDuplicate($arr){
+    private function checkDataUserEksternalDuplicate($arr,$ID=''){
     	$bool = true;
+    	$WhereID = ($ID!='') ? 'And ID != '.$ID : '';
     	foreach ($arr as $key => $value) {
     		if ($key = 'TypeUser' && $value == 'Dosen') {
     			$chkQuery = $this->db->query('
     					select count(*) as total from (
     						select 1 from db_research.master_user_research
     						where NIP = "'.$arr['NIP'].'" and NIDN = "'.$arr['NIDN'].'"
-    						and ID_University = "'.$arr['ID_University'].'"
+    						and ID_University = "'.$arr['ID_University'].'" '.$WhereID.'
     					)xx
     				')->row()->total;
     			if ($chkQuery > 0) {
@@ -101,7 +102,7 @@ class M_research extends CI_Model {
     					select count(*) as total from (
     						select 1 from db_research.master_user_research
     						where NIM = "'.$arr['NIM'].'"
-    						and ID_University = "'.$arr['ID_University'].'"
+    						and ID_University = "'.$arr['ID_University'].'" '.$WhereID.'
     					)xx
     				')->row()->total;
     			if ($chkQuery > 0) {
@@ -114,7 +115,7 @@ class M_research extends CI_Model {
     			$chkQuery = $this->db->query('
     					select count(*) as total from (
     						select 1 from db_research.master_user_research
-    						where Email = "'.$arr['Email'].'"
+    						where Email = "'.$arr['Email'].'" '.$WhereID.'
     					)xx
     				')->row()->total;
     			if ($chkQuery > 0) {
@@ -150,6 +151,21 @@ class M_research extends CI_Model {
     	else
     	{
     		return true;
+    	}
+    }
+
+    public function edit_user_eksternal($dataToken){
+    	$dataSave = $dataToken['data'];
+    	$ID = $dataToken['ID'];
+    	$chk = $this->checkDataUserEksternalDuplicate($dataSave,$ID);
+    	if ($chk) {
+    		$this->db->where('ID',$ID);
+    		$this->db->update('db_research.master_user_research',$dataSave);
+    		return ['status' => 1,'msg' => ''];
+    	}
+    	else
+    	{
+    		return ['status' => 0,'msg' => 'Data duplicate, please check'];
     	}
     }
 
