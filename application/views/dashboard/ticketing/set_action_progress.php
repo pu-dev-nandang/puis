@@ -94,6 +94,7 @@
 	var DataReceivedSelected = <?php echo json_encode($DataReceivedSelected) ?>;
 	// console.log(DataReceivedSelected);
 	var Authent = <?php echo json_encode($Authent) ?>;
+	// console.log(Authent);
 	var DataCategory = <?php echo json_encode($DataCategory) ?>;
 	var DataEmployees = <?php echo json_encode($DataEmployees) ?>;
 	var Auth = Authent.callback.Detail;
@@ -107,7 +108,14 @@
 			$('#ShowProgressList').html(htmlGetProgressList);
 			var selector_AssignTo = $('#PageAssignTo');
 			var selector_TransferTo = $('#PageTransferTo');
-			App_AssignTo.DomContentForm(selector_AssignTo);
+			if (DataReceivedSelected.length == 0) {
+				$('.btn-add-transfer_to').remove();
+				selector_AssignTo.html('<p style ="color:red;">Your not authorize in this page, please see status in ticket data</p>');
+			}
+			else
+			{
+				App_AssignTo.DomContentForm(selector_AssignTo);
+			}
 		},
 
 		LoadSelectOptionCategory : function(selector,type="assign_to"){
