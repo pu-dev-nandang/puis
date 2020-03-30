@@ -205,11 +205,20 @@
                 $.each(jsonResult,function (i,v) {
                     var viewStartWorking = moment(v.StartWorking).format('D MMM H:mm:ss');
                     var viewSavedAt = (v.SavedAt!='' && v.SavedAt!=null) ? moment(v.SavedAt).format('D MMM H:mm:ss') : '';
+
+                    var viewDescAnsw = (v.Description!='' && v.Description!=null)
+                        ? '<div><textarea class="form-control" readonly>'+v.Description+'</textarea></div>'
+                        : '';
+
+                    var viewFileAnsw = (v.File!='' && v.File!=null)
+                        ? '<div style="margin-bottom: 10px;margin-top: 10px;"><a href="'+base_url_js+'uploads/task-exam/'+v.File+'" target="_blank" class="btn btn-sm btn-default">Download file</a></div>'
+                        : '';
+
                     tr = tr+'<tr>' +
                         '<td>'+(i+1)+'</td>' +
-                        '<td style="text-align: left !important;"><b>'+v.Name+'</b><br/>'+v.NPM+'' +
-                        '<div style="margin-bottom: 10px;margin-top: 10px;"><a href="'+base_url_js+'uploads/task-exam/'+v.File+'" class="btn btn-sm btn-default">Download file</a></div>' +
-                        '<div><textarea class="form-control" readonly>'+v.Description+'</textarea></div>' +
+                        '<td style="text-align: left !important;"><b>'+v.Name+'</b><br/>'+
+                        v.NPM+
+                        viewFileAnsw+viewDescAnsw+
                         '</td>' +
                         '<td>'+viewStartWorking+'</td>' +
                         '<td>'+viewSavedAt+'</td>' +

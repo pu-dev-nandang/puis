@@ -4038,6 +4038,8 @@ class M_api extends CI_Model {
         if(count($dataExamDetail)>0){
             for($i=0;$i<count($dataExamDetail);$i++){
 
+
+
                 // Cek Semester
                 $dataSemester = $this->m_rest->checkSemesterByClassOf($dataExamDetail[$i]['Year'],$dataExamDetail[$i]['SemesterID']);
 
@@ -4060,6 +4062,13 @@ class M_api extends CI_Model {
 
                 $dataExamDetail[$i]['DetailPayment'] = $dataPayment;
                 $dataExamDetail[$i]['DetailAttendance'] = $dataAttendance;
+
+
+                // Detail Exam Online
+                $dataExamDetail[$i]['DetailExam'] = $this->db->get_where('db_academic.exam_student_online',array(
+                    'ExamID' => $ExamID,
+                    'NPM' => $dataExamDetail[$i]['NPM']
+                ))->result_array();
             }
         }
 

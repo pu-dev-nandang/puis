@@ -395,7 +395,10 @@ class C_upload extends CI_Controller {
                 );
             }
 
-            $this->db->where('ExamID', $this->input->post('formExamID'));
+            $this->db->where(array(
+                'ExamID'=> $this->input->post('formExamID'),
+                'NPM'=> $this->input->post('formNPM')
+            ));
             $this->db->update('db_academic.exam_student_online', $data_insert);
 
 
