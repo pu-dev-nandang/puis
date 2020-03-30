@@ -11,6 +11,12 @@
     #tableStudent tbody tr td {
         text-align: center;
     }
+    .btn-live-chat {
+        padding: 0px 5px;
+        font-size: 10px !important;
+        font-weight: bold;
+        margin-top: 5px;
+    }
 </style>
 
 <div class="row">
@@ -283,7 +289,7 @@
         //   base_url_js+'academic/exam-schedule/editExamSubmited/'+token,
         //   '_blank' // <- This is what makes it open in a new window.
         // );
-        window.location.replace(base_url_js+'academic/exam-schedule/editExamSubmited/'+token);
+        window.open(base_url_js+'academic/exam-schedule/editExamSubmited/'+token);
     })
 
     $(document).on('click','.checkAttd',function () {

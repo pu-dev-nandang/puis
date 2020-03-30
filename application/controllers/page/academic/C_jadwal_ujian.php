@@ -137,6 +137,17 @@ class C_jadwal_ujian extends Academic_Controler {
         $this->menu_jadwalUjian($page);
     }
 
+
+    public function live_chat($ExamID){
+
+        $data['department'] = parent::__getDepartement();
+        $data['ExamID'] = $ExamID;
+
+        $page = $this->load->view('page/'.$data['department'].'/jadwalujian/live_chat',$data,true);
+        $this->menu_jadwalUjian($page);
+
+    }
+
     public function submiteditExamSubmited(){
         header('Content-Type: application/json');
         $dataToken = $this->getInputToken();
