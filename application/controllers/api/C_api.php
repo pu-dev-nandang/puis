@@ -3436,7 +3436,8 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align:center;">'.($no++).$isOnlineExam.'</div>';
             $nestedData[] = $course;
             $nestedData[] = $p;
-            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0);" class="btnShowDetailStdExam" data-examid="'.$row['ID'].'">'.$totalStudent.'</a></div>';
+            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0);" class="btnShowDetailStdExam" data-examid="'.$row['ID'].'">'.$totalStudent.'</a>
+                                <br/><a href="'.base_url('academic/exam-schedule/live-chat/'.$row['ID']).'" target="_blank" class="btn btn-sm btn-success btn-live-chat">Live Chat</a></div>';
             $nestedData[] = $act;
             $nestedData[] = '<div  style="text-align:center;">'.$exam_date.'<br/>'.$exam_time.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$exam_room.'</div>';
