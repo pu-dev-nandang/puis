@@ -1,3 +1,4 @@
+<?php $this->load->view('dashboard/ticketing/LoadCssTicketToday') ?>
 <style type="text/css">
 	.row {
 	    margin-right: 0px;
@@ -50,6 +51,10 @@
 		         </tr>'
 				<?php endif ?>
 			</table>
+			<br/>
+			<div id ="ShowProgressList">
+				
+			</div>
 		</div>
 	</div>
 	<div class="col-md-4">
@@ -57,7 +62,7 @@
 			<div class="panel-heading">
 			    <h4 class="panel-title">Assign To</h4>
 			</div>
-			<div class="panel-body" style="min-height: 100px;">
+			<div class="panel-body" style="min-height: 100px;" id = "PageAssignTo">
 				<span data-smt="" class="btn btn btn-add-assign_to">
                     <i class="icon-plus"></i> Add
                 </span>
@@ -87,6 +92,7 @@
 
 <script type="text/javascript">
 	var Authent = <?php echo json_encode($Authent) ?>;
+	// console.log(Authent);
 	var DataTicket = <?php echo json_encode($DataTicket) ?>;
 	// console.log(DataTicket);
 	var DataCategory = <?php echo json_encode($DataCategory) ?>;
@@ -524,7 +530,20 @@
 		Loaded : function(){
 			this.Styleimgfitter();
 			var selector = $('#FormAssignTo');
-			App_AssignTo.DomContentForm(selector);
+			if (Authent == null) {
+				var selector_AssignTo = $('#PageAssignTo');
+				selector_AssignTo.html('<p style ="color:red;">Your not authorize in this page, please see status in ticket data</p>');
+				$('.btn-add-transfer_to').remove();
+				$('#btnSetAction').remove();
+				var DataGet = DataTicket[0];
+				var htmlGetProgressList =  AppModalDetailTicket.tracking_list_html(DataGet);
+				$('#ShowProgressList').html(htmlGetProgressList);
+			}
+			else
+			{
+				App_AssignTo.DomContentForm(selector);
+			}
+			
 		},
 
 		Styleimgfitter : function(){
