@@ -863,7 +863,7 @@
 
                     var d = dataa[i];
                     var token = jwt_decode(d['Token'],"UAP)(*");
-
+                    console.log(token);
                     var iconNotif = (token['Icon']!='' && token['Icon']!=null && typeof token['Icon'] !== "undefined")
                         ? '<img data-src="'+token['Icon']+'" class="img-fitter-notif" />'
                         : '<img src="'+base_url_js+'images/xx.jpg" class="" />';
