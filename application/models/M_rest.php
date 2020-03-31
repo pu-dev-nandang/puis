@@ -840,7 +840,7 @@ class M_rest extends CI_Model {
 
                         $to_time=strtotime("2011-01-12 ".$this->getTimeNow());
                         $from_time=strtotime("2011-01-12 ".$examD['ExamEnd']);
-                        $rangeTime = round(abs($to_time - $from_time) / 60,0)." minute";
+                        $rangeTime = round(abs($to_time - $from_time) / 60,0);
 
                     }
 
