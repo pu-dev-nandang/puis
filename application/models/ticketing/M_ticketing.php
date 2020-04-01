@@ -418,7 +418,7 @@ class M_ticketing extends CI_Model {
         return $rs;
     }
 
-    public function getDataTicketBy($arr,$customwhere=''){
+    public function getDataTicketBy($arr,$customwhere='',$EncodeFile=''){
         // array by ID or NoTicket
 
         $strWhere = '';
@@ -447,11 +447,14 @@ class M_ticketing extends CI_Model {
            $DateRequest = date('d M Y', strtotime($query[$i]['RequestedAt']));
            $TimeRequest = date('H:i', strtotime($query[$i]['RequestedAt']));
            $query[$i]['RequestedAt'] = $DateRequest.' '.$TimeRequest;
-           if ($query[$i]['Files'] != '' && $query[$i]['Files'] != null) {
-               $token = $this->jwt->encode($query[$i]['Files'],"UAP)(*");
-               $url = url_files."fileGetAnyToken/".$token;
-               $query[$i]['Files'] = $url;
+           if ($EncodeFile == '') { // default encode file
+               if ($query[$i]['Files'] != '' && $query[$i]['Files'] != null) {
+                   $token = $this->jwt->encode($query[$i]['Files'],"UAP)(*");
+                   $url = url_files."fileGetAnyToken/".$token;
+                   $query[$i]['Files'] = $url;
+               }
            }
+           
         }
         return $query;
     }
@@ -1566,7 +1569,7 @@ class M_ticketing extends CI_Model {
                $nestedData[] = $query[$i]['NoTicket'];
                $nestedData[] = $query[$i]['NameRequested'];
                $nestedData[] = $query[$i]['CategoryDescriptions'];
-               $getDataTicketBy = $this->getDataTicketBy(['NoTicket'=>$query[$i]['NoTicket']]);
+               $getDataTicketBy = $this->getDataTicketBy(['NoTicket'=>$query[$i]['NoTicket']],'','no');
                $getDataTicketBy = $this->__ticket_list_set_data($getDataTicketBy,['NIP' => '','DepartmentID' => '']);
                $token = $this->jwt->encode($getDataTicketBy[0],"UAP)(*");
                $nestedData[] = $token;
