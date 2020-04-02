@@ -56,6 +56,17 @@
                                             </div>
                                         </div>
                                         <div class="row">
+                                            <div class="col-xs-6">
+                                                <label class="checkbox-inline">
+                                                    <input type="checkbox" id="dateOP" >
+                                                    <p style="color: red;">Uncheck = all date</p>
+                                                </label>
+                                            </div>
+                                            <div class="col-xs-6" id = "htmlDatetimePicker">
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="row">
                                             <div class="col-md-12">
                                                 <div class="thumbnail" style="padding: 10px;">
                                                     <b>Status : </b><i class="fa fa-circle" style="color:#d8ea8e;"></i> All Worker have been done.
@@ -236,13 +247,27 @@ var App_ticket_tikcet_list = {
                     var TicketStatus = $('#SelectStatusTicketID option:selected').val();
                     var SelectDepartmentID = $('#SelectDepartmentID option:selected').val();
                     var FilterFor = $('#FilterFor option:selected').val();
-                    var data = {
-                        auth: 's3Cr3T-G4N',
-                        TicketStatus: TicketStatus,
-                        DepartmentID: SelectDepartmentID,
-                        NIP: sessionNIP,
-                        FilterFor: FilterFor,
-                    };
+                    if ($('#dateFilter').length) {
+                        var data = {
+                            auth: 's3Cr3T-G4N',
+                            TicketStatus: TicketStatus,
+                            DepartmentID: SelectDepartmentID,
+                            NIP: sessionNIP,
+                            FilterFor: FilterFor,
+                            dateFilter : $('#dateFilter').val(),
+                        };
+                    }
+                    else
+                    {
+                        var data = {
+                            auth: 's3Cr3T-G4N',
+                            TicketStatus: TicketStatus,
+                            DepartmentID: SelectDepartmentID,
+                            NIP: sessionNIP,
+                            FilterFor: FilterFor,
+                        };
+                    }
+                    
                     var get_token = jwt_encode(data, "UAP)(*");
                     token.token = get_token;
                 },
@@ -406,6 +431,39 @@ $(document).off('click', '.ModalReadMore_list').on('click', '.ModalReadMore_list
     var token = $(this).attr('token');
     AppModalDetailTicket.ModalReadMore('', '', token);
 })
+
+$(document).on('click','#dateOP',function(e){
+    // htmlDatetimePicker
+    if ($(this).is(':checked')) {
+        $('#htmlDatetimePicker').html(
+            '<div class="form-group">'+
+                '<label>Choose Date</label>'+
+                '<div class="input-group input-append date datetimepicker" id="datetimepicker6">'+
+                    '<input data-format="yyyy-MM-dd" class="form-control" type="text" readonly="" id = "dateFilter" value = "<?php echo date('Y-m-d') ?>" >'+
+                    '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+                '</div>'+'<br/>'+
+                '<span class = "btn btnSearchDate btn-primary">Search by Date</button>'+
+            '</div>'
+        );
+
+        $('#datetimepicker6').datetimepicker({
+            format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false
+        })
+
+        $('.btnSearchDate').trigger('click');
+    }
+    else
+    {
+        $('#htmlDatetimePicker').empty();
+        oTable.ajax.reload(null, false);
+    }
+    
+})
+
+$(document).on('click','.btnSearchDate',function(e){
+   oTable.ajax.reload(null, false);
+})
+
 </script>
 
 <!-- Graph ticket -->
@@ -530,5 +588,7 @@ $(document).off('click', '.ModalReadMore_list').on('click', '.ModalReadMore_list
             App_ticketing_dashboard.LoadDefault(selectorMonth,selectorYear,selectorShowAll,selectorShowToday,PageToday,PageDashboardAll);
             
     })
+
+    
     
 </script>
