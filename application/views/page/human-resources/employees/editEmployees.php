@@ -206,7 +206,8 @@
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>NIK / NIP</label>
-                                            <input class="form-control required number" id="formNIP" value="<?php echo $arrEmp['NIP']; ?>" />
+                                            <input class="form-control" id="formID" type="hidden" value="<?php echo $arrEmp['ID']; ?>" />
+                                            <input class="form-control required number" id="formNIP" value="<?php echo $arrEmp['NIP']; ?>" readonly />
                                             <small class="text-danger text-message"></small>
                                         </div>
                                     </div>
@@ -955,6 +956,7 @@
     });
 
     function updateEmployees() {
+        var formID = $('#formID').val();
         var formNIP = $('#formNIP').val();
         var formNUP = $('#formNUP').val();
         var formNIDN = $('#formNIDN').val();
@@ -1149,7 +1151,7 @@
             var token = jwt_encode(data, 'UAP)(*');
             var url = base_url_js + 'api/__crudEmployees';
             $.post(url,{token:token},function (result) {
-
+                console.log(result);
                 if(result.status==0 || result.status=='0'){
                     // toastr.error('NIK / NIP is exist','Error');
                     toastr.error(result.msg,'Error');
