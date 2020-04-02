@@ -12110,7 +12110,13 @@ class C_api extends CI_Controller {
 
         if($data_arr['action']=='readLog'){
             $UserID = $data_arr['UserID'];
-            $dataLog = $this->m_log->readDataLog($UserID);
+            //UPDATED BY FEBRI
+            if(!empty($data_arr['StatusRead'])){
+                $dataLog = $this->m_log->readDataLog($UserID,$data_arr['StatusRead']);
+            }else{
+                $dataLog = $this->m_log->readDataLog($UserID);
+            }
+            //END UPDATED
             return print_r(json_encode($dataLog));
         }
         else if($data_arr['action']=='getTotalUnreadLog'){

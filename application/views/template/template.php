@@ -70,8 +70,10 @@
     	var url = base_url_js+'api/__crudLog';
         var data = {
             action : 'readLog',
-            UserID : sessionNIP
+            UserID : sessionNIP,
+            StatusRead : true
         };
+
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token},function(response) {
 			if(!jQuery.isEmptyObject(response)){
@@ -79,12 +81,7 @@
 				if(response.Details.length > 0){
 					var appendList = "";
 					$.each(response.Details,function(k,v){
-						appendList += '<div class="box-notif ntf-'+v.StatusRead+'" onClick="location.href=\''+base_url_js+v.URLDirect+'\'"><img src="'+v.Icon+'" class="picture img-rounded pull-left"><div class="info"><span class="date pull-right"><i class="fa fa-clock-o"></i> '+moment(v.CreatedAt).format('dddd, DD MMM YYYY HH:mm:ss')+'</span><p class="created">'+v.CreatedName+'</p><p class="title">'+v.Title+'</p></div></div>';
-						/*if(v.StatusRead == 1){
-						}else{
-
-						}*/
-
+						appendList += '<div class="box-notif NotificationLinkRead " id_logging_user = "'+v.ID_logging_user+'" onClick="location.href=\''+base_url_js+v.URLDirect+'\'"><img src="'+v.Icon+'" class="picture img-rounded pull-left"><div class="info"><span class="date pull-right"><i class="fa fa-clock-o"></i> '+moment(v.CreatedAt).format('dddd, DD MMM YYYY HH:mm:ss')+'</span><p class="created">'+v.CreatedName+'</p><p class="title">'+v.Title+'</p></div></div>';
 					});
 					$("#GlobalModal .modal-header").html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> <h4 class="modal-title" id="exampleModalLabel">Notifications</h4>');
 					$("#GlobalModal .modal-body").css({"padding":"0px","overflow":"auto","max-height":"200px"}).html(appendList);
