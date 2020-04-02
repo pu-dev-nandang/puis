@@ -942,6 +942,10 @@ class M_ticketing extends CI_Model {
                     }
                 }
 
+                if (array_key_exists('dateFilter', $dataToken)) {
+                    $Addwhere .= ' and DATE_FORMAT(a.RequestedAt,"%Y-%m-%d") = "'.$dataToken['dateFilter'].'" ';
+                }
+
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,ts.Status as NameStatusTicket,qdx.NameDepartment as NameDepartmentTicket
                         from db_ticketing.ticket as a
@@ -1008,6 +1012,10 @@ class M_ticketing extends CI_Model {
                                      )
                         '.$Addwhere3.'
                  ) ';
+
+                 if (array_key_exists('dateFilter', $dataToken)) {
+                     $Addwhere .= ' and DATE_FORMAT(a.RequestedAt,"%Y-%m-%d") = "'.$dataToken['dateFilter'].'" ';
+                 }
 
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
@@ -1083,6 +1091,10 @@ class M_ticketing extends CI_Model {
                                      )
                  '.$Addwhere3.'
                  ) ';
+
+                 if (array_key_exists('dateFilter', $dataToken)) {
+                     $Addwhere .= ' and DATE_FORMAT(a.RequestedAt,"%Y-%m-%d") = "'.$dataToken['dateFilter'].'" ';
+                 }
               
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
@@ -1154,6 +1166,10 @@ class M_ticketing extends CI_Model {
                                      )
                  '.$Addwhere3.'
                  ) ';
+
+                 if (array_key_exists('dateFilter', $dataToken)) {
+                     $Addwhere .= ' and DATE_FORMAT(a.RequestedAt,"%Y-%m-%d") = "'.$dataToken['dateFilter'].'" ';
+                 }
                 
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
