@@ -2,6 +2,11 @@
     #tbInput td {
         /*text-align: center;*/
     }
+
+    .form-control[disabled] {
+        color: #333 !important;
+    }
+
     .form-datetime[readonly] {
         background-color: #ffffff;
         color: #333333;
@@ -40,28 +45,42 @@
 
 <?php if(count($arrExam)>0){
     $d = $arrExam[0];
+    $disabled = ($ViewPage==0 || $ViewPage=='0') ? 'disabled' : '';
     ?>
 
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
+
+            <?php if($ViewPage==0 || $ViewPage=='0') { ?>
+
+            <div class="alert alert-danger" style="text-align: center;" role="alert">
+                <i class="fa fa-warning fa-3x"></i>
+                <br/>
+                <b>The exam schedule cannot be changed.</b>
+            </div>
+
+            <?php } ?>
+
             <input value="<?php echo $d['ID']; ?>" id="formExamID" class="hide" hidden readonly>
             <input value="<?php echo $d['SemesterID']; ?>" id="formSemesterID" class="hide" hidden readonly>
             <table class="table" id="tbInput">
                 <tr>
-                    <th style="width: 10%;">Exam | Date</th>
+                    <th style="width: 15%;">Exam | Date</th>
                     <td style="width: 1%;">:</td>
                     <td style="text-align: left;">
                         <div class="row">
                             <div class="col-xs-3">
                                 <label class="radio-inline">
-                                    <input type="radio" name="formExam" id="formUTS" value="uts" class="formExam form-exam" <?php if($d['Type']=='uts'){echo 'checked'; } ?>> UTS
+                                    <input type="radio" <?= $disabled; ?> name="formExam" id="formUTS" value="uts" class="formExam form-exam" <?php if($d['Type']=='uts'){echo 'checked'; } ?>> UTS
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="formExam" id="formUAS" value="uas" class="formExam form-exam" <?php if($d['Type']=='uas'){echo 'checked'; } ?>> UAS
+                                    <input type="radio" <?= $disabled; ?> name="formExam" id="formUAS" value="uas" class="formExam form-exam" <?php if($d['Type']=='uas'){echo 'checked'; } ?>> UAS
                                 </label>
                             </div>
                             <div class="col-xs-6">
+                                <?php if($ViewPage==1 || $ViewPage=='1') { ?>
                                 <input type="text" id="formDate" readonly class="form-control form-exam form-datetime">
+                                <?php } ?>
                                 <span id="viewDate"></span>
                                 <input id="formInputDate" value="<?php echo $d['ExamDate']; ?>" class="hide" readonly hidden>
                                 <input id="formDayID" value="<?php echo $d['DayID']; ?>" class="hide" readonly hidden>
@@ -74,7 +93,7 @@
                     <th>Promgramme Study</th>
                     <td>:</td>
                     <td>
-                        <select class="form-control" id="formBaseProdi" style="max-width: 350px;"></select>
+                        <select class="form-control" <?= $disabled; ?> id="formBaseProdi" style="max-width: 350px;"></select>
                     </td>
                 </tr>
                 <tr style="background: lightyellow;">
@@ -89,11 +108,12 @@
                                     <button class="btn btn-sm btn-default btn-default-primary btnEditStudent4EditExam" data-no-arr="<?php echo $t; ?>"
                                             data-examid="<?php echo $d['ID']; ?>"
                                             data-id="<?php echo $dc['ScheduleID']; ?>"><span id="viewTextStd<?php echo $t; ?>"><?php echo count($dc['DetailStudent']); ?></span> Student</button> |
-                                    <button class="btn btn-sm btn-default btn-default-danger btnDeleteGroup" data-examid="<?php echo $d['ID']; ?>" data-id="<?php echo $dc['ScheduleID']; ?>"><i class="fa fa-trash"></i></button></li>
+                                    <button class="btn btn-sm btn-default btn-default-danger btnDeleteGroup" <?= $disabled; ?> data-examid="<?php echo $d['ID']; ?>" data-id="<?php echo $dc['ScheduleID']; ?>"><i class="fa fa-trash"></i></button></li>
                             <?php $totalStudent = $totalStudent + count($dc['DetailStudent']); } ?>
                         </ul>
                     </td>
                 </tr>
+                <?php if($ViewPage==1 || $ViewPage=='1') { ?>
                 <tr>
                     <th>Group</th>
                     <td>:</td>
@@ -116,9 +136,8 @@
                         </div>
                     </td>
                 </tr>
-
                 <tbody id="trNewGroup"></tbody>
-
+                <?php } ?>
                 <tr>
                     <th>Waktu</th>
                     <td>:</td>
@@ -126,7 +145,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div id="inputStart" class="input-group">
-                                    <input data-format="hh:mm" type="text" id="formStart" class="form-control form-exam" value="<?php echo substr($d['ExamStart'],0,5); ?>"/>
+                                    <input data-format="hh:mm" <?= $disabled; ?> type="text" id="formStart" class="form-control form-exam" value="<?php echo substr($d['ExamStart'],0,5); ?>"/>
                                     <span class="add-on input-group-addon">
                                 <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
                             </span>
@@ -134,7 +153,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div id="inputEnd" class="input-group">
-                                    <input data-format="hh:mm" type="text" id="formEnd" class="form-control form-exam" value="<?php echo substr($d['ExamEnd'],0,5); ?>"/>
+                                    <input data-format="hh:mm" <?= $disabled; ?> type="text" id="formEnd" class="form-control form-exam" value="<?php echo substr($d['ExamEnd'],0,5); ?>"/>
                                     <span class="add-on input-group-addon">
                                 <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
                             </span>
@@ -147,7 +166,7 @@
                     <th>Room</th>
                     <td>:</td>
                     <td>
-                        <select class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formClassroom">
+                        <select <?= $disabled; ?> class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formClassroom">
                             <option value=""></option>
                         </select>
                     </td>
@@ -156,7 +175,7 @@
                     <th>Pengawas 1</th>
                     <td>:</td>
                     <td style="text-align: left;">
-                        <select class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formPengawas1">
+                        <select <?= $disabled; ?> class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formPengawas1">
                             <option value=""></option>
                         </select>
                     </td>
@@ -165,9 +184,23 @@
                     <th>Pengawas 2</th>
                     <td>:</td>
                     <td style="text-align: left;">
-                        <select class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formPengawas2">
+                        <select <?= $disabled; ?> class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formPengawas2">
                             <option value=""></option>
                         </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Online Exams</th>
+                    <td>:</td>
+                    <td>
+                        <div class="checkbox checbox-switch switch-primary" style="margin-top: 0px;">
+                            <label>
+                                <input <?= $disabled; ?> type="checkbox" <?= ($d['OnlineLearning']==1 || $d['OnlineLearning']=='1') ? 'checked' : ''; ?> id="formOnlineLearning">
+                                <span></span>
+                                <!--                            <i> | Filter Attendance in UAS (75%)</i>-->
+                            </label>
+                        </div>
+                        <button class="btn btn-default" id="uploadSoal">Upload Soal</button>
                     </td>
                 </tr>
                 <tr>
@@ -182,7 +215,9 @@
             <div style="text-align: right;">
                 <input id="viewTotalStudent" class="hide" hidden readonly value="<?php echo $totalStudent; ?>">
                 <a href="<?php echo base_url('academic/exam-schedule'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
+                <?php if($ViewPage==1 || $ViewPage=='1') { ?>
                 <button id="btnSaveEditSchedule" class="btn btn-primary">Save</button>
+                <?php } ?>
             </div>
             <hr/>
 
@@ -193,6 +228,8 @@
 
     <script>
         $(document).ready(function () {
+
+            loading_modal_show();
 
             window.notr = 0;
 
@@ -222,6 +259,175 @@
 
 
         });
+
+        // === Upload Soal Class Online ====
+
+        $('#uploadSoal').click(function () {
+
+            var formExamID = $('#formExamID').val();
+
+            var data = {
+                action : 'getDataExamTask',
+                ExamID : formExamID
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudJadwalUjian';
+
+            $.post(url,{token:token},function (jsonResult) {
+
+
+                var formDescription = (jsonResult.length>0) ? jsonResult[0].Description : '';
+                var formAction = (jsonResult.length>0) ? 'edit' : 'add';
+
+                var formNameFile = formExamID+'_'+moment().unix();
+                var showFile = '';
+                var formNameFileOld = '';
+                var btnRemove = 'hide';
+
+                var IDExamTask = '';
+                if(jsonResult.length>0){
+                    var file = (jsonResult[0].File!='' && jsonResult[0].File!=null) ? jsonResult[0].File : '';
+                    if(file!=''){
+                        showFile = (jsonResult.length>0)
+                            ? '<iframe src="'+base_url_js+'/uploads/task-exam/'+file+'"></iframe>' : '';
+                        formNameFileOld = file;
+                    }
+                    IDExamTask = jsonResult[0].ID;
+                    btnRemove = '';
+                }
+
+
+                $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                    '<h4 class="modal-title">Upload Soal</h4>');
+
+                var htmlss = ' <div class="row">' +
+                    '        <div class="col-md-12">' +
+                    '            <form id="formID" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">' +
+                    '            <div class="form-group">' +
+                    '                <label>Description</label>' +
+                    '                <input class="hide" id="formAction" name="formAction" value="'+formAction+'">' +
+                    '                <input class="hide" id="formExamID" name="formExamID" value="'+formExamID+'">' +
+                    '                <input class="hide" id="formNIP" name="formNIP" value="'+sessionNIP+'">' +
+                    '                <textarea id="formDescription" name="formDescription" class="form-control">'+formDescription+'</textarea>' +
+                    '            </div>' +
+                    '            <div class="form-group">' +
+                    '                <label>File (pdf)</label>' +
+                    '                <input type="file" id="formFileSoal" name="userfile" accept="application/pdf">' +
+                    '                   <input type="text" class="hide" hidden name="formNameFile" id="formNameFile" value="'+formNameFile+'" />' +
+                    '                   <input type="text" class="hide" hidden name="formNameFileOld" id="formNameFileOld" value="'+formNameFileOld+'" />' +
+                    '                   <div id="viewFileSize"></div>' +
+                    '                   <p class="help-block">Maximum file size of 5 mb</p>' +
+                    '            </div>' +
+                    '           <div>'+showFile+'</div>' +
+                    '           </form>' +
+                    '        </div>' +
+                    '    </div>';
+
+                $('#GlobalModal .modal-body').html(htmlss);
+
+                $('#formDescription').summernote({
+                    placeholder: 'Text your description',
+                    tabsize: 2,
+                    height: 200,
+                    toolbar: [
+                        // [groupName, [list of button]]
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['font', ['strikethrough', 'superscript', 'subscript']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['height', ['height']]
+                    ]
+                });
+
+                $('#GlobalModal .modal-footer').html('' +
+                    '<button class="btn btn-default <?= $disabled; ?> '+btnRemove+'" id="removeExamTask" data-id="'+IDExamTask+'" style="color: red;float: left;">Remove Data</button>' +
+                    '<button class="btn btn-success" <?= $disabled; ?> id="submitSoalExam">Save</button> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+                $('#GlobalModal').modal({
+                    'show' : true,
+                    'backdrop' : 'static'
+                });
+
+            });
+
+
+        });
+
+        $(document).on('change','#formFileSoal',function () {
+            readURL(this);
+        });
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+
+                var _size = input.files[0].size;
+                var fSExt = new Array('Bytes', 'KB', 'MB', 'GB'),
+                    i=0;while(_size>900){_size/=1024;i++;}
+                var exactSize = (Math.round(_size*100)/100)+' '+fSExt[i];
+                $('#viewFileSize').html('<div style="color: #034df4;font-size: 12px;margin-top: 10px;">Your file size: '+exactSize+'</div>');
+
+                var fileSize = input.files[0].size;
+                if(fileSize > 5000000){
+                    alert('Maximum file size of 5 mb');
+                    $('#btnSubmitTast').prop('disabled',true);
+                } else {
+                    $('#btnSubmitTast').prop('disabled',false);
+                }
+
+
+            }
+        }
+
+        $(document).on('click','#submitSoalExam',function () {
+
+            var formExamID = $('#formExamID').val();
+            var formDescription = $('#formDescription').val();
+
+
+            if(formExamID!='' && formExamID!=null &&
+                formDescription!='' && formDescription!=null){
+
+
+                if(confirm('Are you sure?')){
+                    var formFileSoal = $('#formFileSoal').val();
+                    var fileUpload = (formFileSoal!='') ? 1 : 0;
+                    var formData = new FormData( $("#formID")[0]);
+                    var url = base_url_js+'upload/upload-exam-task?f='+fileUpload;
+                    $.ajax({
+                        url : url,  // Controller URL
+                        type : 'POST',
+                        data : formData,
+                        async : false,
+                        cache : false,
+                        contentType : false,
+                        processData : false,
+                        success : function(data) {
+                            var jsonData = data;
+
+                            if(typeof jsonData.success=='undefined'){
+                                alert(jsonData.error);
+                            } else {
+                                toastr.success('Data saved','Success');
+                                $('#GlobalModal').modal('hide');
+                            }
+
+
+                        }
+                    });
+                }
+
+
+            }
+            else {
+                toastr.error('Form Are Required','Error!');
+            }
+
+        });
+
+        // ===================
 
         $(document).on('click','.btnDeleteGroup',function () {
 
@@ -546,6 +752,8 @@
                     var viewTotalStudent = $('#viewTotalStudent').val();
                     var totalStudent = parseInt(insert_details.length) + parseInt(viewTotalStudent);
 
+                    var OnlineLearning = ($('#formOnlineLearning').is(':checked')) ? '1' : '0';
+
                     if(totalStudent <= SeatForExam){
                         var ProdiID = formBaseProdi.split('.')[0];
                         var data = {
@@ -561,7 +769,7 @@
                                 ExamEnd : formEnd,
                                 Pengawas1 : formPengawas1,
                                 Pengawas2 : formPengawas2,
-
+                                OnlineLearning : OnlineLearning,
                                 Status : '1',
                                 InsertByProdiID : ProdiID,
                                 UpdateBy : sessionNIP,
@@ -665,6 +873,7 @@
                         var SeatForExam = formClassroom.split('.')[2];
                         var viewTotalStudent = $('#viewTotalStudent').val();
                         var totalStudent = parseInt(insert_details.length) + parseInt(viewTotalStudent);
+                        var OnlineLearning = ($('#formOnlineLearning').is(':checked')) ? '1' : '0';
 
                         if(totalStudent <= SeatForExam){
                             var ProdiID = formBaseProdi.split('.')[0];
@@ -681,7 +890,7 @@
                                     ExamEnd : formEnd,
                                     Pengawas1 : formPengawas1,
                                     Pengawas2 : formPengawas2,
-
+                                    OnlineLearning : OnlineLearning,
                                     Status : '1',
                                     InsertByProdiID : ProdiID,
                                     UpdateBy : sessionNIP,
@@ -764,8 +973,6 @@
 
                         }
                     }
-
-
 
                 } else {
                     $('#divAlertBentrok').html('');
@@ -909,7 +1116,6 @@
 
         });
 
-
         $(document).on('click','.btnEditStudent4EditExam',function () {
 
 
@@ -939,7 +1145,7 @@
                     $('#tbEdtiExStd').append('<tr id="trStdmodalEditExam'+ds.ID+'">' +
                         '<td style="text-align: center;">'+no+'</td>' +
                         '<td><b>'+ds.Name+'</b><br/>'+ds.NPM+'</td>' +
-                        '<td style="text-align: center;"><button class="btn btn-block btn-danger btnDelete4EditExamDelStd" data-no-arr="'+no_array+'" data-id="'+ds.ID+'">Delete</button></td>' +
+                        '<td style="text-align: center;"><button class="btn btn-block btn-danger btnDelete4EditExamDelStd" <?= $disabled; ?> data-no-arr="'+no_array+'" data-id="'+ds.ID+'">Delete</button></td>' +
                         '</tr>');
                     no++;
                 }
@@ -1101,8 +1307,25 @@
                 }
 
                 $('#'+idC).select2({allowClear: true});
+
+                loading_modal_hide();
             });
         }
+
+        $(document).on('click','#removeExamTask',function () {
+            if(confirm('Are you sure?')){
+                var ID = $(this).attr('data-id');
+
+                var url = base_url_js+'upload/remove-exam-task/'+ID;
+
+                $.post(url,function (result) {
+
+                    toastr.success('Data removed','Success');
+                    $('#GlobalModal').modal('hide');
+
+                });
+            }
+        })
     </script>
 
 <?php } else {

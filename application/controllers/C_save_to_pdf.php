@@ -7185,7 +7185,7 @@ Phone: (021) 29200456';
 
                 $pdf->SetFillColor($R, $G, $B);
                 $pdf->SetFont('dinpromedium','',$fontBody_1);
-                $pdf->Cell($midWidth,$h_2,$dataPT['NoSK'],$border,0,'L',true);
+                $pdf->Cell($midWidth,$h_2,$dataPT['NoAkta'],$border,0,'L',true);
                 $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
                 $pdf->Cell($midWidth,$h_2,'Indonesian and English',$border,1,'L',true);
 
@@ -7201,7 +7201,7 @@ Phone: (021) 29200456';
 
                 $pdf->SetFillColor($R, $G, $B);
                 $pdf->SetFont('dinpromedium','',$fontBody_1);
-                $pdf->Cell($midWidth,$h_2,$dataPT['NamaEng'],$border,0,'L',true);
+                $pdf->Cell($midWidth,$h_2,$dataPT['Nama'],$border,0,'L',true);
                 $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
                 $pdf->Cell($midWidth,$h_2,'According to Degree Certificate',$border,1,'L',true);
                 $pdf->Ln($rowSpace);
@@ -7375,6 +7375,25 @@ Phone: (021) 29200456';
 
         }
 
+    }
+
+    public function recapitulation_salaries(){
+
+        $pdf = new FPDF('L','mm','A4');
+        $pdf->SetMargins(5,5,5);
+        $pdf->AddPage();
+
+        $pdf->Image('./images/new_logo_pu.png',5,3,50);
+
+        $pdf->SetFont('Arial','',9);
+
+        $border = 1;
+        $h = 5;
+        $x = $pdf->GetX();
+        $y = $pdf->GetY();
+        $pdf->Cell(40,$h,$x.' - '.$y,$border,0,'L');
+
+        $pdf->Output('SKBP__.pdf','I');
     }
 
 

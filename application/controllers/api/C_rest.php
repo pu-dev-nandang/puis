@@ -11,6 +11,7 @@ class C_rest extends CI_Controller {
         $this->load->model('m_api');
         $this->load->model('m_rest');
         $this->load->model('akademik/m_tahun_akademik');
+        $this->load->model('akademik/m_onlineclass');
         $this->load->model('master/m_master');
         $this->load->library('JWT');
         $this->load->library('google');
@@ -1015,6 +1016,47 @@ class C_rest extends CI_Controller {
                 $dataForm = (array) $dataToken['dataForm'];
                 $this->db->insert('db_academic.counseling_comment',$dataForm);
 
+                $TopicID = $dataForm['TopicID'];
+                $UserID = $dataForm['UserID'];
+
+                // Cek untuk mendapatkan ScheduleID & Session
+                $dataCk = $this->db->get_where('db_academic.counseling_topic',
+                    array('ID'=>$TopicID))->result_array();
+
+                $ScheduleID = $dataCk[0]['ScheduleID'];
+                $Sessions = $dataCk[0]['Sessions'];
+
+                if($ScheduleID!='' && $ScheduleID!=null &&
+                    $Sessions!='' && $Sessions!=null) {
+
+                    // Cek apakah sudah membuat tugas
+                    $sc_t = $this->db->query('SELECT COUNT(*) AS Total 
+                                        FROM (SELECT stt.ID FROM db_academic.schedule_task_student stt
+                                        LEFT JOIN db_academic.schedule_task st ON (st.ID = stt.IDST)
+                                        WHERE st.ScheduleID = "'.$ScheduleID.'" 
+                                        AND st.Session = "'.$Sessions.'" 
+                                        AND stt.NPM = "'.$UserID.'" ) xx ')->result_array();
+
+                    if($sc_t[0]['Total']>0){
+
+                        $dataArrAttd = $this->m_onlineclass->getArrIDAttd($ScheduleID);
+
+                        $data_arr_attd = array(
+                            'ArrIDAttd' => $dataArrAttd,
+                            'Meet' => $Sessions,
+                            'Attendance' => '1',
+                            'NPM' => $UserID
+                        );
+
+                        $this->m_onlineclass->setAttendanceStudent($data_arr_attd);
+                    }
+
+
+                }
+
+
+
+
                 return print_r(1);
             }
             else if($dataToken['action']=='inviteLecturer'){
@@ -1062,7 +1104,14 @@ class C_rest extends CI_Controller {
                 $ScheduleID = $dataToken['ScheduleID'];
 //                $ScheduleID = 393;
 
-                $data = $this->db->query('SELECT ID,Sessions FROM db_academic.counseling_topic WHERE ScheduleID = "'.$ScheduleID.'" ')->result_array();
+                $data = $this->db->query('SELECT ID,Sessions FROM db_academic.counseling_topic 
+                    WHERE ScheduleID = "'.$ScheduleID.'" ')->result_array();
+
+                $dataCkOnline = $this->db->select('OnlineLearning')->get_where('db_academic.schedule',array('ID' => $ScheduleID))->result_array();
+
+                if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+                    $dataOpenDate = $this->m_rest->getRangeDateLearningOnline($ScheduleID);
+                }
 
 
                 $result = [];
@@ -1090,19 +1139,163 @@ class C_rest extends CI_Controller {
                         }
                     }
 
-                    $arr = array(
-                        'Sessions' => $i,
-                        'Status' => $Status,
-                        'TopicID' => $TopicID,
-                        'TotalComment' => $TotalComment
-                    );
+                    if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+
+                        $arr = array(
+                            'Sessions' => ($i),
+                            'Status' => $Status,
+                            'isOnline' => 1,
+                            'TopicID' => $TopicID,
+                            'TotalComment' => $TotalComment,
+                            'StatusOnline' => $dataOpenDate[$i - 1]['Status'],
+                            'RangeStart' => $dataOpenDate[$i - 1]['RangeStart'],
+                            'RangeEnd' => $dataOpenDate[$i - 1]['RangeEnd']
+
+                        );
+
+                    } else {
+                        $arr = array(
+                            'Sessions' => ($i),
+                            'Status' => $Status,
+                            'isOnline' => 0,
+                            'TopicID' => $TopicID,
+                            'TotalComment' => $TotalComment
+                        );
+                    }
+
+
                     array_push($result,$arr);
                 }
+
+                // Cek apakah online atau tidak
+
+
+
+
 
                 return print_r(json_encode($result));
 
             }
 
+        } else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+    }
+
+    public function crudTask(){
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+        if($cekUser){
+            if($dataToken['action']=='checkSessionsToNewTask'){
+
+                $ScheduleID = $dataToken['ScheduleID'];
+
+                $dataCkOnline = $this->db->select('OnlineLearning')->get_where('db_academic.schedule',array('ID' => $ScheduleID))->result_array();
+
+                if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+                    $dataOpenDate = $this->m_rest->getRangeDateLearningOnline($ScheduleID);
+                }
+
+                $result = [];
+                for($i=1;$i<=14;$i++){
+
+
+                    // Cek sudah ada atau blm
+                    $dataCkSession = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task  st
+                                                            WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                             AND st.Session = "'.$i.'" ')->result_array();
+
+                    $Status = ($dataCkSession[0]['Total']>0) ? -1 : 1;
+
+//                    $Status =  1;
+
+
+                    if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+
+                        $arr = array(
+                            'Sessions' => ($i),
+                            'Status' => $Status,
+                            'isOnline' => 1,
+                            'StatusOnline' => $dataOpenDate[$i - 1]['Status'],
+                            'RangeStart' => $dataOpenDate[$i - 1]['RangeStart'],
+                            'RangeEnd' => $dataOpenDate[$i - 1]['RangeEnd']
+
+                        );
+
+                    } else {
+                        $arr = array(
+                            'Sessions' => ($i),
+                            'Status' => $Status,
+                            'isOnline' => 0
+                        );
+                    }
+
+                    array_push($result,$arr);
+
+                }
+
+                return print_r(json_encode($result));
+
+            }
+            else if($dataToken['action']=='checkSessionsInTask'){
+                $ScheduleID = $dataToken['ScheduleID'];
+                $Session = $dataToken['Session'];
+                $NPM = (isset($dataToken['NPM']) && $dataToken['NPM']!='') ? $dataToken['NPM'] : '';
+
+                $dataCkOnline = $this->db->select('OnlineLearning')->get_where('db_academic.schedule',array('ID' => $ScheduleID))->result_array();
+                $isOnline = 0;
+                $RangeStart = '';
+                $RangeEnd = '';
+                $StatusOnline = '';
+                if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+                    $dataOpenDate = $this->m_rest->getRangeDateLearningOnline($ScheduleID);
+                    $isOnline = 1;
+                    for ($i=0;$i<count($dataOpenDate);$i++){
+                        if($dataOpenDate[$i]['Session']==$Session){
+                            $RangeStart = $dataOpenDate[$i]['RangeStart'];
+                            $RangeEnd = $dataOpenDate[$i]['RangeEnd'];
+                            $StatusOnline = $dataOpenDate[$i]['Status'];
+                        }
+                    }
+                }
+
+
+
+                $dataCkSession = $this->db->query('SELECT st.*, em.Name AS Lecturer FROM db_academic.schedule_task  st
+                                                            LEFT JOIN db_employees.employees em ON (em.NIP = st.NIP)
+                                                            WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                             AND st.Session = "'.$Session.'" ')->result_array();
+
+                if(count($dataCkSession)>0){
+                    $d = $dataCkSession[0];
+                    $whereNPM = ($NPM!='') ? ' AND sts.NPM = "'.$NPM.'" ' : '';
+                    $dataCkSession[0]['Details'] = $this->db->query('SELECT sts.*, ats.Name FROM db_academic.schedule_task_student sts 
+                                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sts.NPM)
+                                                                    WHERE sts.IDST = "'.$d['ID'].'" '.$whereNPM)->result_array();
+                }
+
+                $result = array(
+                    'isOnline' => $isOnline,
+                    'RangeStart' => $RangeStart,
+                    'RangeEnd' => $RangeEnd,
+                    'StatusOnline' => $StatusOnline,
+                    'Data' => $dataCkSession
+                );
+
+                return print_r(json_encode($result));
+            }
+            else if($dataToken['action']=='updateScoreTask'){
+
+                $this->db->set('Score', $dataToken['Score']);
+                $this->db->where('ID', $dataToken['ID']);
+                $this->db->update('db_academic.schedule_task_student');
+
+                return print_r(1);
+
+            }
         } else {
             $msg = array(
                 'msg' => 'Error'
@@ -4216,6 +4409,43 @@ class C_rest extends CI_Controller {
         }
 
         return print_r(json_encode($result));
+
+    }
+
+    public function getDetailCourseByIDAttd($ID_Attd){
+
+        $dataDetail = $this->db->query('SELECT attd.ScheduleID, smt.Name AS SemesterName, s.ClassGroup, cd.TotalSKS AS Credit, 
+                                                    mk.Name AS Course, em.Name As CoordinatorName, s.Coordinator, sd.StartSessions, sd.EndSessions, cl.Room, d.Name AS DayName,
+                                                    s.TotalAssigment, gc.Assg1, gc.Assg2, gc.Assg3, gc.Assg4, gc.Assg5, gc.Assigment, gc.UTS, gc.UAS, gc.Status AS StatusSyllabus
+                                                    FROM db_academic.attendance attd
+                                                    LEFT JOIN db_academic.schedule s ON (s.ID = attd.ScheduleID)
+                                                    LEFT JOIN db_academic.grade_course gc ON (gc.SemesterID = attd.SemesterID AND gc.ScheduleID = attd.ScheduleID)
+                                                    LEFT JOIN db_academic.semester smt ON (smt.ID = attd.SemesterID)
+                                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                    WHERE attd.ID = "'.$ID_Attd.'" GROUP BY s.ID ')->result_array();
+
+        if(count($dataDetail)>0){
+            $ScheduleID = $dataDetail[0]['ScheduleID'];
+            $dataDetail[0]['DetailProdi'] = $this->db->query('SELECT ps.Code, ps.Name FROM db_academic.schedule_details_course sdc 
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+                                                WHERE sdc.ScheduleID = "'.$ScheduleID.'" GROUP BY sdc.ProdiID')->result_array();
+
+            $dataDetail[0]['TeamTeaching'] = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.schedule_team_teaching stt 
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                    WHERE stt.ScheduleID = "'.$ScheduleID.'" ORDER BY em.NIP ASC')->result_array();
+
+            $dataDetail[0]['TotalStudent'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.attendance_students 
+                                                            WHERE ID_Attd = "'.$ID_Attd.'" ')->result_array()[0]['Total'];
+
+        }
+
+        return print_r(json_encode($dataDetail[0]));
 
     }
 

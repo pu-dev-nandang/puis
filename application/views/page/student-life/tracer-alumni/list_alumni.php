@@ -30,7 +30,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <select class="form-control" id="filterYear">
-                        <option value="" selected disabled>All graduation year</option>
+                        <option value="" selected>All graduation year</option>
                         <option disabled>----------------</option>
                     </select>
                 </div>
@@ -410,7 +410,7 @@
         loadSelectOptionMonth('#EndMonth','');
 
 
-
+        
         if(Token!=''){
 
             // console.log(dataToken);

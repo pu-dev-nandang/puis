@@ -233,7 +233,7 @@
 
                         <?php if(in_array(11,$rule_service)){ ?>
                             <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='lecturer-performance'){echo 'active';} ?>">
-                                <a href="<?php echo base_url('lecturer-performance/lecturer-list'); ?>"><i class="fa fa-line-chart" aria-hidden="true"></i> Lecturer Performance</a>
+                                <a href="<?php echo base_url('lecturer-performance/lecturer-list'); ?>"><i class="fa fa-line-chart" aria-hidden="true"></i> Lecturers Credit (BKD)</a>
                             </li>
                         <?php } ?>
 
@@ -392,6 +392,8 @@
 
         saveLogUser();
 
+        setIPPublic();
+
     });
 
     $('#btnSimpleSearch').click(function () {
@@ -427,7 +429,7 @@
 
         $('#GlobalModal').on('shown.bs.modal', function () {
             $('#formSimpleSearch').focus();
-        })
+        });
 
         $('#GlobalModal').modal({
             'show' : true,
@@ -982,7 +984,8 @@
                 });
 
             });
-        } catch (e){
+        }
+        catch (e){
             var dataURL = window.location.href;
 
             var url = base_url_js+'api3/__crudLogging';
@@ -1004,9 +1007,18 @@
             });
         }
 
+     }
 
-
-
+     function setIPPublic(){
+         try {
+             $.getJSON("https://api.ipify.org/?format=json", function(e) {
+                 // e.ip
+                 localStorage.setItem('IPPublic',e.ip);
+             });
+         }
+         catch (e){
+             localStorage.setItem('IPPublic','');
+         }
      }
 
      $(document).off('click', '.BlogAdminUrl').on('click', '.BlogAdminUrl',function(e) {
@@ -1021,6 +1033,6 @@
             { name: 'token', value: token },
         ],'');
      });
-     
+
 
 </script>

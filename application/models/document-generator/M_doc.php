@@ -52,6 +52,8 @@ class M_doc extends CI_Model {
 		    if(preg_match_all('/{+(.*?)}/', $v, $matches)){
 		    	for ($z=0; $z < count($matches[1]); $z++) { 
     		        $str = trim($matches[1][$z]);
+                    // $strMatch = $matches[1];
+                    // $str = $this->__filterKeyScript($strMatch);
     		        $ex = explode('.', $str);
     		        if (count($ex) > 0) {
     		        	/*
@@ -194,6 +196,26 @@ class M_doc extends CI_Model {
         return $rs;
     }
 
+    private function __filterKeyScript($matches){
+        $rs = '';
+        $arr_key = [$this->KeySET,$this->KeyUSER,$this->KeyINPUT,$this->KeyGRAB,$this->KeyTABLE,$this->KeyGET];
+        for ($i=0; $i < count($matches); $i++) { 
+            $s = $matches[$i];
+            $ex = explode('.', $s);
+            for ($j=0; $j < count($arr_key); $j++) { 
+                
+                if ($ex[0] == $arr_key[$j]) {
+                    $rs = $ex[0];
+                    break;
+                }
+            }
+            
+
+        }
+
+        return $rs;
+    }
+
     public function preview_template($Input){
     	$this->load->model('document-generator/m_set');
     	$this->load->model('document-generator/m_user');
@@ -207,6 +229,9 @@ class M_doc extends CI_Model {
     	foreach ($line as $v) {
     	    if(preg_match_all('/{+(.*?)}/', $v, $matches)){
     	        $str = trim($matches[1][0]);
+                // $strMatch = $matches[1];
+                // $str = $this->__filterKeyScript($strMatch);
+                // print_r($matches);
     	        $ex = explode('.', $str);
     	        if (count($ex) > 0) {
     	        	switch ($ex[0]) {
@@ -314,6 +339,8 @@ class M_doc extends CI_Model {
     		if(preg_match_all('/{+(.*?)}/', $v, $matches)){
     			for ($z=0; $z < count($matches[1]); $z++) { 
 	    		    $str = trim($matches[1][$z]);
+                    // $strMatch = $matches[1];
+                    // $str = $this->__filterKeyScript($strMatch);
 	    		    $ex = explode('.', $str);
 	    		    $setValue = $str;
 	    		    // print_r($str.'<br/>');
@@ -608,7 +635,7 @@ class M_doc extends CI_Model {
     		$keyApproval = $arrValue[$i]['number'];
 
     		// show signature image or not
-    		if ($arrValue[$i]['verify']['valueVerify'] == 1) {
+    		if ($arrValue[$i]['verify']['valueVerify'] == 1 || $arrValue[$i]['verify']['valueVerify'] == 2) {
     			$img = $arrValue[$i]['verify']['img'];
     			for ($j=0; $j < count($arrKomponen); $j++) {
     				$str = $arrKomponen[$j]; 
@@ -910,6 +937,8 @@ class M_doc extends CI_Model {
     	foreach ($line as $v) {
     	    if(preg_match_all('/{+(.*?)}/', $v, $matches)){
     	        $str = trim($matches[1][0]);
+                // $strMatch = $matches[1];
+                // $str = $this->__filterKeyScript($strMatch);
     	        $ex = explode('.', $str);
     	        if (count($ex) > 0) {
     	        	switch ($ex[0]) {
@@ -1021,15 +1050,17 @@ class M_doc extends CI_Model {
         $rs = [];
         $ID = $dataToken['ID'];
         $G_dt = $this->m_master->caribasedprimary('db_generatordoc.document','ID',$ID);
-
         $FileTemplate    = './uploads/document-generator/template/'.$G_dt[0]['PathTemplate'];
         $line = $this->__readDoc($FileTemplate);
+        // print_r($line);die();
         $Filtering = [];
         $Input = $dataToken['settingTemplate'];
         $DepartmentID = $dataToken['DepartmentID'];
         foreach ($line as $v) {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 $str = trim($matches[1][0]);
+                // $strMatch = $matches[1];
+                // $str = $this->__filterKeyScript($strMatch);
                 $ex = explode('.', $str);
                 if (count($ex) > 0) {
                     switch ($ex[0]) {
@@ -1116,6 +1147,8 @@ class M_doc extends CI_Model {
             }
         }
 
+        // print_r($rs);die();
+
         return $this->__preview_templatebyUserRequest($rs,$FileTemplate);
     }
 
@@ -1125,7 +1158,7 @@ class M_doc extends CI_Model {
             // $keyApproval = $i + 1;
             $keyApproval = $arrValue[$i]['number'];
             // show signature image or not
-            if ($arrValue[$i]['verify']['valueVerify'] == 1) {
+            if ($arrValue[$i]['verify']['valueVerify'] == 1 || $arrValue[$i]['verify']['valueVerify'] == 2) {
                 $img = $arrValue[$i]['verify']['img'];
                 for ($j=0; $j < count($arrKomponen); $j++) {
                     $str = $arrKomponen[$j]; 
@@ -1285,6 +1318,8 @@ class M_doc extends CI_Model {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 for ($z=0; $z < count($matches[1]); $z++) { 
                     $str = trim($matches[1][$z]);
+                    // $strMatch = $matches[1];
+                    // $str = $this->__filterKeyScript($strMatch);
                     $ex = explode('.', $str);
                     $setValue = $str;
                     // print_r($str.'<br/>');
@@ -1405,6 +1440,8 @@ class M_doc extends CI_Model {
         foreach ($line as $v) {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 $str = trim($matches[1][0]);
+                // $strMatch = $matches[1];
+                // $str = $this->__filterKeyScript($strMatch);
                 $ex = explode('.', $str);
                 if (count($ex) > 0) {
                     switch ($ex[0]) {
@@ -1511,9 +1548,14 @@ class M_doc extends CI_Model {
         $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
         
         $dataSave = $this->__saveApproval($dataSave,$rs['SET']['Signature']);
-
         $dataSave = $this->__saveInput($dataSave,$dataToken['settingTemplate']['INPUT']);
-        $getPath = $this->__savebyUserRequest($rs,$FileTemplate,$DocumentName);
+        if ($dataSave['Status'] == 'Approve') {
+            $getPath = $this->__AprrovebyUserRequest($rs,$FileTemplate,$DocumentName);
+        }
+        else{
+            $getPath = $this->__savebyUserRequest($rs,$FileTemplate,$DocumentName);
+        }
+        
         $dataSave['Path'] = $getPath;
         $this->__clearTempFile();
         $this->db->insert('db_generatordoc.document_data',$dataSave);
@@ -1617,6 +1659,8 @@ class M_doc extends CI_Model {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 for ($z=0; $z < count($matches[1]); $z++) { 
                     $str = trim($matches[1][$z]);
+                    // $strMatch = $matches[1];
+                    // $str = $this->__filterKeyScript($strMatch);
                     $ex = explode('.', $str);
                     $setValue = $str;
                     // print_r($str.'<br/>');
@@ -2007,7 +2051,7 @@ class M_doc extends CI_Model {
             }
             else
             {
-                $style = '<span style="color:green;"><i class="fa fa-check-circle"></i> Auto Approve</span>';
+                $style = '<span style="color:green;"><i class="fa fa-check-circle"></i> Approve Manual</span>';
                 if ($row['Approve1'] != '' && $row['Approve1'] != NULL ) {
                     if ($Appr == '') {
                         $Appr .= '<ul style = "margin-left:-25px;">';
@@ -2038,7 +2082,7 @@ class M_doc extends CI_Model {
                 $Appr .= '</ul>';
             }
             $nestedData[] = $Appr;
-            $nestedData[] = ($row['IsManually'] == 0) ? $row['Status'] : 'Auto Approve';
+            $nestedData[] = ($row['IsManually'] == 0) ? $row['Status'] : 'Approve Manual';
             // $nestedData[] = $row['Status'] ;
             $nestedData[] = $row['ID'];
             $token = $this->jwt->encode($row,"UAP)(*");
@@ -2077,6 +2121,8 @@ class M_doc extends CI_Model {
         foreach ($line as $v) {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 $str = trim($matches[1][0]);
+                // $strMatch = $matches[1];
+                // $str = $this->__filterKeyScript($strMatch);
                 $ex = explode('.', $str);
                 if (count($ex) > 0) {
                     switch ($ex[0]) {
@@ -2182,7 +2228,6 @@ class M_doc extends CI_Model {
         $dataSave['UpdatedBy'] = $this->session->userdata('NIP');
         $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
         $dataSave = $this->__saveApproval($dataSave,$rs['SET']['Signature']);
-
         $dataSave = $this->__saveInput($dataSave,$dataToken['settingTemplate']['INPUT']);
         $DefFileName = $G_dt[0]['Path'];
         $getPath = $this->__savebyUserRequest($rs,$FileTemplate,$DocumentName,$DefFileName);
@@ -2351,6 +2396,8 @@ class M_doc extends CI_Model {
         foreach ($line as $v) {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 $str = trim($matches[1][0]);
+                // $strMatch = $matches[1];
+                // $str = $this->__filterKeyScript($strMatch);
                 $ex = explode('.', $str);
                 if (count($ex) > 0) {
                     switch ($ex[0]) {
@@ -2497,6 +2544,8 @@ class M_doc extends CI_Model {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 for ($z=0; $z < count($matches[1]); $z++) { 
                     $str = trim($matches[1][$z]);
+                    // $strMatch = $matches[1];
+                    // $str = $this->__filterKeyScript($strMatch);
                     $ex = explode('.', $str);
                     $setValue = $str;
                     // print_r($str.'<br/>');
@@ -2630,11 +2679,12 @@ class M_doc extends CI_Model {
 
 
     private function __ApproveSETWriteSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue){
+        // print_r($arrValue);die();
         for ($i=0; $i < count($arrValue); $i++) { 
             // $keyApproval = $i + 1;
             $keyApproval = $arrValue[$i]['number'];
             // show signature image or not
-            if ($arrValue[$i]['verify']['valueVerify'] == 1) {
+            if ($arrValue[$i]['verify']['valueVerify'] == 1 || $arrValue[$i]['verify']['valueVerify'] == 2) {
                 $img = $arrValue[$i]['verify']['img'];
                 for ($j=0; $j < count($arrKomponen); $j++) {
                     $str = $arrKomponen[$j]; 
@@ -2645,7 +2695,7 @@ class M_doc extends CI_Model {
                         if (count($exKey2)) {
                             switch ($exKey2[0]) {
                                 case 'Image':
-                                    if ($arrValue[$i]['approve'] == 1) {
+                                    if ($arrValue[$i]['verify']['valueVerify'] == 2 || $arrValue[$i]['approve'] == 1) {
                                        $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
                                        $TemplateProcessor->setImageValue($setValue, 
                                            array('path' => $img, 
@@ -2720,21 +2770,29 @@ class M_doc extends CI_Model {
                         if (count($exKey2)) {
                             switch ($exKey2[0]) {
                                 case 'Cap':
-                                    if ($arrValue[$i]['approve'] == 1) {
-                                        $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
-                                        $TemplateProcessor->setImageValue($setValue, array(
-                                                'path' => $img, 
-                                                // 'width' => 200, 
-                                                'height' => 300,
-                                                'ratio' => true,
-                                            ),'behind'
-                                        );
-                                    }
-                                    else
-                                    {
-                                        $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
-                                        $TemplateProcessor->setValue($setValue,'');
-                                    }
+                                    // if ($arrValue[$i]['approve'] == 1) {
+                                    //     $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
+                                    //     $TemplateProcessor->setImageValue($setValue, array(
+                                    //             'path' => $img, 
+                                    //             // 'width' => 200, 
+                                    //             'height' => 300,
+                                    //             'ratio' => true,
+                                    //         ),'behind'
+                                    //     );
+                                    // }
+                                    // else
+                                    // {
+                                    //     $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
+                                    //     $TemplateProcessor->setValue($setValue,'');
+                                    // }
+                                    $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
+                                    $TemplateProcessor->setImageValue($setValue, array(
+                                            'path' => $img, 
+                                            // 'width' => 200, 
+                                            'height' => 300,
+                                            'ratio' => true,
+                                        ),'behind'
+                                    );
                                     
                                     break;
                                 

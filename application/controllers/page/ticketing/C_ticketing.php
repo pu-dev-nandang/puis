@@ -38,4 +38,10 @@ class C_ticketing extends Ticket_Controler {
         $this->menu_ticket($page);
     }
 
+    public function ticket_dashboard(){
+        $data=[];
+        $page = $this->load->view('dashboard/ticketing/ticketing_dashboard',$data,true);
+        $this->menu_ticket($page);
+    }
+
 }

@@ -239,7 +239,7 @@
                             var totalSesi = 0;
                             $.each(arrDate.details, function(i, e) {
 
-                                var bg =  ''
+                                var bg =  '';
 
                                 if($.inArray(moment(e).format("YYYY-MM-DD"),d_c.Attendance)!=-1){
                                     bg = 'style="background:#4CAF50;font-weight: bold;color:#fff;"';

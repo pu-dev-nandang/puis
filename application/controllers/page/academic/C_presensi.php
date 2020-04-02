@@ -42,6 +42,12 @@ class C_presensi extends Academic_Controler {
 
 
 
+    public function monitoring_online_class(){
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/presensi/monitoring_online_class',$data,true);
+        $this->menu_presensi($content);
+    }
+
     public function monitoring_lecturer(){
         $data['department'] = parent::__getDepartement();
         $content = $this->load->view('page/'.$data['department'].'/presensi/monitoring_lecturer',$data,true);

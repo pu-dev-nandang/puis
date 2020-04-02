@@ -11,6 +11,7 @@ class C_save_to_pdf3 extends CI_Controller {
         $this->load->library('pdf_mc_table');
 
         $this->load->model('m_rest');
+        $this->load->model('m_api');
         $this->load->model('master/m_master');
         $this->load->model('report/m_save_to_pdf');
 
@@ -3576,6 +3577,220 @@ class C_save_to_pdf3 extends CI_Controller {
 
         $fpdf->Output($NIPLecturer.'_BAP_Online_'.$Course['ClassGroup'].'.pdf','I');
 
+    }
+
+    public function score_list(){
+
+        $token = $this->input->post('token');
+
+//        $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhQ291cnNlIjp7Ik5JUCI6IjMxMTUwMDYiLCJOYW1lIjoiVmluY2VudCBTeWx2ZXN0ZXIgTGVld2VsbHluIiwiUHJvZGlJRCI6IjUiLCJDb3Vyc2UiOiJUYXRhIEhpZGFuZyAtIFByYWt0ZWsiLCJDcmVkaXQiOiIyIiwiQ2xhc3NHcm91cCI6IjE4QjEiLCJTZW1lc3Rlck5hbWUiOiIyMDE5LzIwMjAgR2VuYXAiLCJDb29yZGluYXRvciI6IjMxMTUwMDYiLCJDb29yZGluYXRvck5hbWUiOiJWaW5jZW50IFN5bHZlc3RlciBMZWV3ZWxseW4iLCJTdGFydFNlc3Npb25zIjoiMDg6MDAiLCJFbmRTZXNzaW9ucyI6IjExOjIwIiwiUm9vbSI6IlJlc3RhdXJhbnQiLCJEYXlOYW1lIjoiU2VuaW4iLCJUb3RhbFN0dWRlbnQiOiIwIiwiSURfQXR0ZCI6IjEyOTQiLCJEZXRhaWxQcm9kaSI6W3siQ29kZSI6IkhCUCIsIk5hbWUiOiJCaXNuaXMgUGVyaG90ZWxhbiJ9XSwiVGVhbVRlYWNoaW5nIjpbXX0sImRldGFpbHNCQVAiOlt7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifSx7IlByZXNlbnQiOiItIiwiQWJzZW50IjoiLSIsIkxlY3R1cmVyIjpbXSwiQkFQIjpbXSwiU3RhdHVzRWRpdCI6IjEifV19.L-Y8whhQqH1N4X8ck2ou_EdzB8emRdB55x7CWs80AB0';
+        $data_arr = $this->getInputToken($token);
+
+        $SemesterID = $data_arr['SemesterID'];
+        $ScheduleID = $data_arr['ScheduleID'];
+
+        $AssigmentSet = (array) $data_arr['AssigmentSet'];
+
+        $Student = $this->m_api->__getStudentApprovedKRS($SemesterID,$ScheduleID,'Details');
+
+
+        $fpdf = new Pdf_mc_table('P', 'mm', 'A4');
+        $fpdf->AddPage();
+        $fpdf->SetMargins(10,15,10);
+        $fpdf->SetAutoPageBreak(true, 5);
+
+        $b = 0;
+        $h_3 = 3;
+        $h_5 = 5;
+        $h_7 = 7;
+        $h_10 = 10;
+
+        $fpdf->Image('./images/new_logo_pu.png',10,5,41);
+
+
+        $fpdf->SetFont('Arial','',7);
+        $fpdf->Cell(0,$h_3,'FM-UAP/AKD-08-02-REV.01',$b,1,'R');
+
+
+
+        $label_1 = 35;
+        $label_2 = 5;
+        $label_3 = 190 - $label_2 - $label_1;
+        $h_label = 8.5;
+
+        // 200
+
+        $Course = (array) $data_arr['dataCourse'];
+
+        // Maksimal 11 Dosen
+        $totalDosen = count($Course['TeamTeaching']);
+
+        $fpdf->SetFont('Arial','B',15);
+        $fpdf->Cell(0,$h_5,'Nilai Mata Kuliah',$b,1,'C');
+
+        $fpdf->SetFont('Arial','',9);
+        $fpdf->Cell(0,$h_5,'Semester : '.$Course['SemesterName'],$b,1,'C');
+
+        $fpdf->Ln(5);
+
+
+
+        $fpdf->SetLineWidth(0.01);
+        $fpdf->SetDash(0.7,1);
+
+        $fpdf->SetFont('Arial','',9);
+        $b = '0';
+
+        if(count($Course['DetailProdi'])>0){
+            for($p=0;$p<count($Course['DetailProdi']);$p++){
+                if($p==0){
+                    $fpdf->Cell($label_1,$h_label,'Program Studi',$b,0,'L');
+                    $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+                    $fpdf->Cell($label_3,$h_label,$Course['DetailProdi'][$p]->Name,'B',1,'L');
+                } else {
+                    $fpdf->Cell($label_1,$h_label,'',$b,0,'L');
+                    $fpdf->Cell($label_2,$h_label,'',$b,0,'C');
+                    $fpdf->Cell($label_3,$h_label,$Course['DetailProdi'][$p]->Name,'B',1,'L');
+                }
+            }
+        }
+
+
+        $fpdf->Cell($label_1,$h_label,'Mata Kuliah',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_3,$h_label,$Course['Course'],'B',1,'L');
+
+        $fpdf->Cell($label_1,$h_label,'Kelas / Group',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_1,$h_label,$Course['ClassGroup'],'B',0,'L');
+        $fpdf->Cell($label_2,$h_label,'',$b,0,'C');
+        $fpdf->Cell($label_1,$h_label,'Mahasiswa',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell(50,$h_label,$Course['TotalStudent'],'B',1,'L');
+
+        $fpdf->Cell($label_1,$h_label,'SKS',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_1,$h_label,$Course['Credit'],'B',0,'L');
+        $fpdf->Cell($label_2,$h_label,'',$b,0,'C');
+        $fpdf->Cell($label_1,$h_label,'Semester',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell(50,$h_label,'','B',1,'L');
+
+
+
+        $fpdf->Cell($label_1,$h_label,'Jadwal',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_3,$h_label,$Course['DayName'].' | '.$Course['StartSessions'].' - '.$Course['EndSessions'],'B',1,'L');
+
+
+        $fpdf->Cell($label_1,$h_label,'Ruang',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_3,$h_label,$Course['Room'],'B',1,'L');
+
+        $fpdf->Cell($label_1,$h_label,'Dosen Koordinator',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_3,$h_label,$Course['Coordinator'].' - '.ucwords(strtolower($Course['CoordinatorName'])),'B',1,'L');
+
+        for ($t=0;$t<$totalDosen;$t++){
+            if($t==0){
+                $fpdf->Cell($label_1,$h_label,'Tim Dosen',$b,0,'L');
+                $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+                $fpdf->Cell($label_3,$h_label,$Course['TeamTeaching'][$t]->NIP.' - '.ucwords(strtolower($Course['TeamTeaching'][$t]->Name)),'B',1,'L');
+            } else {
+                $fpdf->Cell($label_1,$h_label,'',$b,0,'L');
+                $fpdf->Cell($label_2,$h_label,'',$b,0,'C');
+                $fpdf->Cell($label_3,$h_label,$Course['TeamTeaching'][$t]->NIP.' - '.ucwords(strtolower($Course['TeamTeaching'][$t]->Name)),'B',1,'L');
+            }
+        }
+
+        $fpdf->Cell($label_1,$h_label,'Bobot Nilai',$b,0,'L');
+        $fpdf->Cell($label_2,$h_label,':',$b,0,'C');
+        $fpdf->Cell($label_3,$h_label,'Tugas ('.$AssigmentSet['Assigment'].'%) , UTS ('.$AssigmentSet['UTS'].'%) , UAS ('.$AssigmentSet['UAS'].'%)','B',1,'L');
+
+        $fpdf->Ln(7);
+
+        $fpdf->SetDash();
+        $b = 1;
+        // 200
+
+        $no = 8;
+        $nim = 20;
+        $name = 91;
+        $tugas = 12;
+        $uts = 12;
+        $uas = 12;
+        $nilai_akhir = 18;
+        $nilai_huruf = 18;
+
+        $fpdf->setFillColor(130, 200, 222 );
+        $fpdf->SetFont('Arial','B',9);
+        $fpdf->Cell($no,$h_10,'No',$b,0,'C',true);
+        $fpdf->Cell($nim,$h_10,'NIM',$b,0,'C',true);
+        $fpdf->Cell($name,$h_10,'Nama',$b,0,'C',true);
+        $fpdf->Cell($tugas,$h_10,'Tugas',$b,0,'C',true);
+        $fpdf->Cell($uts,$h_10,'UTS',$b,0,'C',true);
+        $fpdf->Cell($uas,$h_10,'UAS',$b,0,'C',true);
+        $fpdf->Cell($nilai_akhir,$h_10,'Nilai Akhir',$b,0,'C',true);
+        $fpdf->Cell($nilai_huruf,$h_10,'Nilai Huruf',$b,1,'C',true);
+        $fpdf->SetFont('Arial','',9);
+        $fpdf->setFillColor(242, 242, 242);
+
+
+        for ($i=0;$i<count($Student);$i++){
+
+            $d = $Student[$i];
+
+            $colorBg = ($i%2==1) ? false : true;
+
+            $y = $fpdf->GetY();
+
+            if($y>283){
+                $fpdf->setFillColor(130, 200, 222 );
+                $fpdf->SetFont('Arial','B',9);
+                $fpdf->Cell($no,$h_10,'No',$b,0,'C',true);
+                $fpdf->Cell($nim,$h_10,'NIM',$b,0,'C',true);
+                $fpdf->Cell($name,$h_10,'Nama',$b,0,'C',true);
+                $fpdf->Cell($tugas,$h_10,'Tugas',$b,0,'C',true);
+                $fpdf->Cell($uts,$h_10,'UTS',$b,0,'C',true);
+                $fpdf->Cell($uas,$h_10,'UAS',$b,0,'C',true);
+                $fpdf->Cell($nilai_akhir,$h_10,'Nilai Akhir',$b,0,'C',true);
+                $fpdf->Cell($nilai_huruf,$h_10,'Nilai Huruf',$b,1,'C',true);
+                $fpdf->SetFont('Arial','',9);
+                $fpdf->setFillColor(242, 242, 242);
+            }
+
+            // Menghitung rata - rata tugas
+            $TotalAsgValue = 0;
+            for($a=1;$a<= (integer) $AssigmentSet['TotalAssigment'];$a++){
+                $n_AsgValue = ($d['Evaluasi'.$a]!='' && $d['Evaluasi'.$a]!='' && (integer) $d['Evaluasi'.$a]>0)
+                    ? ($d['Evaluasi'.$a]  * ($AssigmentSet['Assg'.$a]/100)) : 0;
+                $TotalAsgValue = $TotalAsgValue + $n_AsgValue;
+            }
+
+            $TotalAsgValue = ( count(explode(',',$TotalAsgValue)) > 1) ? number_format($TotalAsgValue,2,'.','') : $TotalAsgValue;
+            $UTS = ( count(explode('.',$d['UTS'])) > 1) ? number_format($d['UTS'],2,'.','') : $d['UTS'];
+            $UAS = ( count(explode('.',$d['UAS'])) > 1) ? number_format($d['UAS'],2,'.','') : $d['UAS'];
+            $Score = ( count(explode('.',$d['Score'])) > 1) ? number_format($d['Score'],2,'.','') : $d['Score'];
+
+            $fpdf->Cell($no,$h_7,($i + 1),$b,0,'C',$colorBg);
+            $fpdf->Cell($nim,$h_7,$d['NPM'],$b,0,'C',$colorBg);
+            $fpdf->Cell($name,$h_7,ucwords(strtolower($d['Name'])),$b,0,'L',$colorBg);
+            $fpdf->Cell($tugas,$h_7,$TotalAsgValue,$b,0,'C',$colorBg);
+            $fpdf->Cell($uts,$h_7,$UTS,$b,0,'C',$colorBg);
+            $fpdf->Cell($uas,$h_7,$UAS,$b,0,'C',$colorBg);
+            $fpdf->Cell($nilai_akhir,$h_7,$Score,$b,0,'C',$colorBg);
+            $fpdf->Cell($nilai_huruf,$h_7,$d['Grade'],$b,1,'C',$colorBg);
+        }
+
+
+//        $fpdf->SetFont('Arial','',7);
+//        $fpdf->SetTextColor(53, 75, 255);
+//        $fpdf->SetXY(5,200);
+//        $fpdf->Cell(0,$h_5,'Download on : '.date('l, d F Y H:i').' | Podomoro University',0,1,'R');
+//        $fpdf->SetTextColor(0, 0, 0 );
+
+
+        $fpdf->Output('_BAP_Online_'.'.pdf','I');
     }
 
 }

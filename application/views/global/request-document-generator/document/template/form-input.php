@@ -512,15 +512,16 @@
                                     '<div class = "form-group">'+
                                         '<label>Verify</label>'+
                                         '<select class = "form-control Input" field="Signature" name = "verify" key = "SET">'+
-                                            '<option value = "0">Auto Approve</option>'+
-                                            '<option value = "1">Manual Approve</option>'+
+                                            '<option value = "0">Manual Approve</option>'+
+                                            '<option value = "1">Manual Approve by System</option>'+
+                                            '<option value = "2">Auto Approve by System</option>'+
                                         '</select>'+
                                     '</div>'+
                                     '<div class = "form-group">'+
                                         '<label>CAP</label>'+
                                         '<select class = "form-control Input" field="Signature" name = "cap" key = "SET">'+
-                                            '<option value = "0">Auto</option>'+
-                                            '<option value = "1">Manual</option>'+
+                                            '<option value = "0">Manual Cap </option>'+
+                                            '<option value = "1">Auto Cap by System</option>'+
                                         '</select>'+
                                     '</div>'+
                                 '</div>'+
@@ -771,6 +772,7 @@
 
         SelectAPIOPByParams : function(data,paramsChoose){
             var html =  '<select class = "form-control Input" field="PARAMS" name="'+paramsChoose+'" key = "TABLE">';
+             html +=  '<option value = "">'+'--No data choose--'+'</option>';
             for (var i = 0; i < data.length; i++) {
                var selected = (data[i].Selected == 1) ? 'selected'  : ''; 
                html +=  '<option value = "'+data[i].ID+'" '+selected+' >'+data[i].Value+'</option>';
@@ -783,6 +785,7 @@
 
         SelectAPIOPEMP : function(data,paramsChoose){
             var html =  '<select class = "form-control Input" field="PARAMS" name="'+paramsChoose+'" key = "TABLE">';
+            html +=  '<option value = "">'+'--No data choose--'+'</option>';
             for (var i = 0; i < data.length; i++) {
                html +=  '<option value = "'+data[i].NIP+'">'+data[i].Name+'</option>';
             }
@@ -898,7 +901,7 @@
 
         validation : function(){
           var bool = true;
-          $('.Input').each(function(e){
+          $('.Input').not('.Input[key="TABLE"]').each(function(e){
             if ($(this).is('select')) {
               var v = $(this).find('option:selected').val();
             }

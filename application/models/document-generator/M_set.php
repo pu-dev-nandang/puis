@@ -525,7 +525,7 @@ class M_set extends CI_Model {
 								$img = '';
 								
 								$valueVerify = $verify;
-								if ($verify == 1) {
+								if ($verify == 1 || $verify == 2) {
 									$img = './uploads/signature/'.$query[0]['Signatures'];
 									
 								}
@@ -575,7 +575,7 @@ class M_set extends CI_Model {
 								$img = '';
 								
 								$valueVerify = $verify;
-								if ($verify == 1) {
+								if ($verify == 1 || $verify == 2) {
 									$img = './uploads/signature/'.$query[0]['Signatures'];
 									
 								}

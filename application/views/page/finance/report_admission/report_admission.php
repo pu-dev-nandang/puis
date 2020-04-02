@@ -54,7 +54,7 @@
 				          					<select class="select2-select-00 full-width-fix" id="SelectSortBy">
 		                                         <option value="a.No_Ref" selected>No Ref</option>
 		                                         <option value="a.FormulirCode">Form Number</option>
-		                                         <option value="b.DateSale">Date</option>
+		                                         <option value="a.DateSale">Date</option>
 		                                    </select>
 				          				</div>
 				          			</div>

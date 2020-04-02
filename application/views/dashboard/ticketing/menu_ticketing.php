@@ -5,6 +5,9 @@
         <!--        <li class="--><?php //if($this->uri->segment(3)=='list-student') { echo 'active'; } ?><!--">-->
         <!--            <a href="--><?php //echo base_url('academic/final-project/list-student'); ?><!--">Final Project</a>-->
         <!--        </li>-->
+        <li class="<?php echo $authTicketDashboard ?> <?php if($this->uri->segment(2)=='' || $this->uri->segment(2)=='ticket-dashboard') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('ticket/ticket-dashboard'); ?>">Ticket Dashboard</a>
+        </li>
         <li class="<?php if($this->uri->segment(2)=='' || $this->uri->segment(2)=='ticket-today') { echo 'active'; } ?>">
             <a href="<?php echo base_url('ticket/ticket-today'); ?>">Ticket Today</a>
         </li>
@@ -73,10 +76,13 @@
         AjaxLoadRestTicketing(url,token).then(function(response){
           selector.empty();
           response =  response.data;
+          selector.append(
+               '<option value = "'+'%'+'" '+'selected'+' >'+'All'+'</option>'
+           );
           for (var i = 0; i < response.length; i++) {
              var selected = (response[i][1] == selectedata) ? 'selected' : '';
              selector.append(
-                  '<option value = "'+response[i][1]+'" '+selected+' >'+response[i][2]+'</option>'
+                  '<option value = "'+response[i][1]+'" '+''+' >'+response[i][2]+'</option>'
               );
           }
         })
@@ -132,7 +138,7 @@
                 for (var i = 0; i < dataresponse.length; i++) {
                    if (i == 0) { // add empty option value
                     selector.append(
-                         '<option value = "-" '+'selected'+' department = "">'+'--Choose Category--'+'</option>'
+                         '<option value = "-" '+'selected'+' department = "" data = "">'+'--Choose Category--'+'</option>'
                      );
                    }
                    var selected = (CategorySelected == dataresponse[i][3]) ? 'selected' : '';
@@ -140,7 +146,7 @@
                    //  selected = (i==0) ? 'selected' : '';
                    // }
                    selector.append(
-                        '<option value = "'+dataresponse[i][3]+'" '+selected+' department = "'+dataresponse[i][7]+'" >'+dataresponse[i][7]+' - '+dataresponse[i][1]+'</option>'
+                        '<option value = "'+dataresponse[i][3]+'" '+selected+' department = "'+dataresponse[i][7]+'" data ="'+dataresponse[i][10]+'" >'+dataresponse[i][7]+' - '+dataresponse[i][1]+'</option>'
                     );
                 }
 
@@ -210,7 +216,7 @@
              var no = parseInt(count) + 1;
              var name = files[count].name;
              var extension = name.split('.').pop().toLowerCase();
-             if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+             if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf']) == -1)
              {
               msgStr += 'Upload File '+TheName + ' Invalid Type File<br>';
              }
@@ -246,6 +252,8 @@
             var row = data_received[i];
             var GetWorker = '';
             var DataReceived_Details = row.DataReceived_Details;
+              // GetWorker += '<p style = "color:blue;">Notes :</p>';
+              // GetWorker += '<p style = "color:blue;">'+nl2br(row.MessageReceived)+'</p>';
             if (DataReceived_Details.length >  0) {
               GetWorker += '<table class = "table" style ="margin-top:15px;">'+
                               '<tr>'+
@@ -278,8 +286,14 @@
             if (row.Comment != '' && row.Comment != null && row.Comment != undefined ) {
               GetWorker += '<div class = "form-group" style="margin-top:5px;color:#0066ff;">'+
                               '<label>Comment from Handler : </label>'+
-                              '<p>'+br2nl(row.Comment)+'</p>'+
+                              '<p>'+nl2br(row.Comment)+'</p>'+
                             '</div>';  
+            }
+
+            if (row.FileUpload != '' && row.FileUpload != null) {
+              GetWorker += '<div class = "form-group" style="margin-top:5px;color:green;">'+
+                              '<label><a href= "'+row.FileUpload+'" target="_blank">File Close Project<a> </label>'+
+                            '</div>';
             }
             
 
@@ -316,7 +330,6 @@
       { 
         // $('.modal-dialog').attr('style','width:100%;');
         var data = jwt_decode(token);
-        // console.log(data);
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Read More</h4>');
         var tracking_list_html  = this.tracking_list_html(data);

@@ -2348,7 +2348,7 @@ class C_api extends CI_Controller {
 
                 $dataProgram = $this->db->query('SELECT s.ID AS ScheduleID, s.ProgramsCampusID, sem.Name AS SemesterName,
                                                               s.ClassGroup, s.Coordinator, s.TeamTeaching,
-                                                             s.SemesterID, s.Attendance , mk.NameEng AS CourseEng, cd.TotalSKS AS TotalCredit
+                                                             s.SemesterID, s.Attendance, s.OnlineLearning, mk.NameEng AS CourseEng, cd.TotalSKS AS TotalCredit
                                                             FROM db_academic.schedule s
                                                             LEFT JOIN db_academic.semester sem ON (sem.ID = s.SemesterID)
                                                             LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
@@ -3279,6 +3279,8 @@ class C_api extends CI_Controller {
 
         $data_arr = $this->getInputToken();
 
+        $dateNow = $this->m_rest->getDateNow();
+
         $whereP = ($data_arr['ExamDate']!=null && $data_arr['ExamDate']!='')
             ? 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "1" AND ex.ExamDate LIKE "'.$data_arr['ExamDate'].'" '
             : 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "1"' ;
@@ -3295,7 +3297,8 @@ class C_api extends CI_Controller {
                                  ) ';
         }
 
-        $queryDefault = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room, p1.Name AS P_Name1, p2.Name AS P_Name2,
+        $queryDefault = 'SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, ex.OnlineLearning, cl.Room, p1.Name AS P_Name1, p2.Name AS P_Name2,
+                                et.ID AS ExamTaskID, et.Description, et.File,
                                 p1.NIP AS P_NIP1, p2.NIP AS P_NIP2, em.Name AS InsertByName, ex.InsertAt
                                 FROM db_academic.exam ex
                                 LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
@@ -3303,6 +3306,7 @@ class C_api extends CI_Controller {
                                 LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
                                 LEFT JOIN db_employees.employees em ON (em.NIP = ex.InsertBy)
                                 LEFT JOIN db_academic.days d ON (d.ID = ex.DayID)
+                                LEFT JOIN db_academic.exam_task et ON (et.ExamID = ex.ID)
                                 WHERE ( '.$whereP.' ) '.$dataSearch.' '.$orderBy;
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -3403,6 +3407,10 @@ class C_api extends CI_Controller {
 //                    <li><a target="_blank" href="'.base_url('save2pdf/news-event').'">Berita Acara</a></li>
             $re = ($data_arr['Type']=='re_uts' || $data_arr['Type']=='re_uas') ? 'hide' : '';
 
+            $actDelete = ($row['ExamDate']>=$dateNow)
+                ? '<li role="separator" class="divider"></li><li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>'
+                : '';
+
             $act = '<div  style="text-align:center;"><div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
@@ -3412,18 +3420,24 @@ class C_api extends CI_Controller {
                     <li role="separator" class="divider"></li>
                     <li><a target="_blank" href="'.base_url('save2pdf/exam-layout/'.$row['ID']).'">Layout</a></li>
                     <li><a class="btnSave2PDF_Exam" href="javascript:void(0);" data-url="save2pdf/draft_questions_answer_sheet" data-token="'.$tkn_soal_jawaban.'">Draft Questions  & Answer Sheet</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>
+                  '.$actDelete.'  
                   </ul>
                 </div>
                 </div>';
 
             $dateInsert = ($row['InsertAt']!='' && $row['InsertAt']!=null) ? date('l, d M Y h:i',strtotime($row['InsertAt'])) : '-' ;
 
-            $nestedData[] = '<div style="text-align:center;">'.($no++).'</div>';
+            // Cek apakah jadwal online atau bukan
+            $isOnline = ($row['OnlineLearning']==1 || $row['OnlineLearning']=='1') ? '<div><i style="color: green;" class="fa fa-circle"></i></div>' : '';
+            $isOnlineExam = ($row['ExamTaskID']!='' && $row['ExamTaskID']!=null) ? '<div><i style="color: green;" class="fa fa-check-square"></i></div>' : $isOnline;
+
+
+
+            $nestedData[] = '<div style="text-align:center;">'.($no++).$isOnlineExam.'</div>';
             $nestedData[] = $course;
             $nestedData[] = $p;
-            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0);" class="btnShowDetailStdExam" data-examid="'.$row['ID'].'">'.$totalStudent.'</a></div>';
+            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0);" class="btnShowDetailStdExam" data-examid="'.$row['ID'].'">'.$totalStudent.'</a>
+                                <br/><a href="'.base_url('academic/exam-schedule/live-chat/'.$row['ID']).'" target="_blank" class="btn btn-sm btn-success btn-live-chat hide">Live Chat</a></div>';
             $nestedData[] = $act;
             $nestedData[] = '<div  style="text-align:center;">'.$exam_date.'<br/>'.$exam_time.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$exam_room.'</div>';
@@ -6053,6 +6067,18 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
 
+            else if($data_arr['action']=='getDataExamTask'){
+
+                $ExamID = $data_arr['ExamID'];
+
+                $data= $this->db->get_where('db_academic.exam_task',array(
+                    'ExamID' => $ExamID
+                ))->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+
             else if($data_arr['action']=='deleteGroupExam'){
                 $ExamID = $data_arr['ExamID'];
                 $ScheduleID = $data_arr['ScheduleID'];
@@ -6568,6 +6594,13 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+
+            else if($data_arr['action']=='getDataRecapitulation'){
+
+                $data = $this->m_hr->getDataRecapitulation($data_arr);
+
+                return print_r(json_encode($data));
+            }
         }
 
     }
@@ -6943,11 +6976,11 @@ class C_api extends CI_Controller {
                 $IDuser = $this->session->userdata('NIP');
                 $NoDocument = strtoupper($formInsert['NoDocument']);
                 $DateDocument = $formInsert['DateDocument'];
-                $type = $formInsert['type'];
+                $Colom = $formInsert['type'];
                 //$kat_otherfiles = $formInsert['kat_otherfiles'];
                 $DescriptionFile = $formInsert['DescriptionFile'];
                 $fileName = $formInsert['fileName'];
-                $Get_MasterFiles = $this->m_master->MasterfileStatus($type);
+                $Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
                 $dataSave = array(
                     'NIP' => $NIP,
                     'TypeFiles' => $Get_MasterFiles[0]['ID'],
@@ -7084,9 +7117,9 @@ class C_api extends CI_Controller {
 
         else if($data_arr['action']=='update_mster_katother'){
 
-            $typefiles = $data_arr['name_sort'];
             $name_katother = ucwords($data_arr['name_katother']);
-
+            $typefiles = preg_replace('/\s+/', '_', $data_arr['name_sort']);
+            
             $dataAttdS = $this->db->query('SELECT * FROM db_employees.master_files
                                           WHERE TypeFiles = "'.$typefiles.'" OR NameFiles = "'.$name_katother.'" ')->result_array();
 
@@ -9162,13 +9195,18 @@ class C_api extends CI_Controller {
                                         fpc.Cl_Finance, fpc.Cl_Finance_By, fpc.Cl_Finance_At, emp2.Name AS Cl_Finance_Name,
                                         fpc.Cl_Kaprodi, fpc.Cl_Kaprodi_By, fpc.Cl_Kaprodi_At, emp3.Name AS Cl_Kaprodi_Name,
                                         fpc.Cl_Academic, fpc.Cl_Academic_By, fpc.Cl_Academic_At, emp6.Name AS Cl_Academic_Name,
-                                        fpc.Cl_StdLife, fpc.Cl_StdLife_By, fpc.Cl_StdLife_At, emp7.Name AS Cl_StdLife_Name
-
+                                        fpc.Cl_StdLife, fpc.Cl_StdLife_By, fpc.Cl_StdLife_At, emp7.Name AS Cl_StdLife_Name,
+                                        
+                                        fpn.finance AS Finance_Note
+              
                                         FROM db_academic.auth_students ats
                                         LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
                                         LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
                                         LEFT JOIN db_academic.final_project fp ON (ats.NPM = fp.NPM)
+                                        
                                         LEFT JOIN db_academic.final_project_clearance fpc ON (fpc.NPM = ats.NPM)
+                                        LEFT JOIN db_academic.final_project_note fpn ON (fpn.NPM = ats.NPM)
+                                        
 
                                         LEFT JOIN db_employees.employees emp1 ON (fpc.Cl_Library_By = emp1.NIP)
                                         LEFT JOIN db_employees.employees emp2 ON (fpc.Cl_Finance_By = emp2.NIP)
@@ -9263,6 +9301,12 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
 
             }
+            else if($data_arr['action']=='viewCheckStatusDocumentSkripsi'){
+                $NPM = $data_arr['NPM'];
+                $data = $this->db->query('SELECT fpf.Status, fpf.Noted FROM db_academic.final_project_files fpf 
+                                                                WHERE fpf.NPM = "'.$NPM.'"')->result_array();
+                return print_r(json_encode($data));
+            }
             else if($data_arr['action']=='updateDocumentSkripsi'){
 
                 $NPM = $data_arr['NPM'];
@@ -9281,6 +9325,26 @@ class C_api extends CI_Controller {
 
                 return print_r(1);
 
+
+            }
+            else if($data_arr['action']=='updateTitlePlanSkripsi'){
+                $NPM = $data_arr['NPM'];
+                $dataCheckTitle = $this->db->get_where('db_academic.final_project',
+                    array('NPM' => $NPM))->result_array();
+
+                $dataForm = (array) $data_arr['dataForm'];
+                $dataForm['NPM'] = $NPM;
+
+                if(count($dataCheckTitle)>0){
+                    $this->db->where('NPM', $NPM);
+                    $this->db->update('db_academic.final_project',$dataForm);
+                } else {
+                    $this->db->insert('db_academic.final_project',$dataForm);
+                }
+
+//                print_r($dataForm);exit;
+
+                return print_r(1);
 
             }
             else if($data_arr['action']=='viewScheduleStdSeminar'){
@@ -9399,7 +9463,7 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='getAllStdReg'){
 
-                $SemesterID = '15';
+                $SemesterID = $data_arr['SemesterID'];
 
                 $queryDefault = 'SELECT ats.Name, ats.NPM, em4.Name AS Mentor1, em5.Name AS Mentor2
                                         FROM db_academic.std_study_planning ssp
@@ -9407,9 +9471,10 @@ class C_api extends CI_Controller {
                                         LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
 
                                         LEFT JOIN db_employees.employees em4 ON (ats.MentorFP1 = em4.NIP)
-                                        LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
+                                        LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)                                        
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" GROUP BY ats.NPM 
+                                        ORDER BY ats.NPM';
 
-                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" ORDER BY ats.NPM';
 
                 $data = $this->db->query($queryDefault)->result_array();
 
@@ -9439,10 +9504,15 @@ class C_api extends CI_Controller {
                 if(count($data)>0){
                     for($i=0;$i<count($data);$i++){
                         // Get Std
-                        $data[$i]['Student'] = $this->db->query('SELECT sp.*, ats.Name  FROM db_academic.final_project_schedule_student sp
+
+                        $data[$i]['Student'] = $this->db->query('SELECT sp.*, ats.Name, ats.MentorFP1, ats.MentorFP2, em1.Name AS MentorFP1Name, em2.Name AS MentorFP2Name   
+                                                        FROM db_academic.final_project_schedule_student sp
                                                         LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sp.NPM)
+                                                        LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                                        LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
                                                         WHERE sp.FPSID = "'.$data[$i]['ID'].'" ')->result_array();
-                        $data[$i]['Examiner'] = $this->db->query('SELECT sp.*, em.Name  FROM db_academic.final_project_schedule_lecturer sp
+
+                        $data[$i]['Examiner'] = $this->db->query('SELECT sp.*, em.Name  FROM db_academic.final_project_schedule_lecturer sp 
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = sp.NIP)
                                                         WHERE sp.FPSID = "'.$data[$i]['ID'].'" ')->result_array();
                     }
@@ -9516,11 +9586,22 @@ class C_api extends CI_Controller {
                         );
                         $this->db->insert('db_academic.final_project_schedule_student',$arr);
 
-                        // Update Status
-                        $this->db->where('NPM',$Student[$i]);
-                        $this->db->update('db_academic.final_project',array(
-                            'Status' => $data_arr['StatusStd']
-                        ));
+                        // Cek apakah sudah ada di tabel final projek apa blm jika belum maka akan di tambahkan
+                        $ckstd = $this->db->get_where('db_academic.final_project',array('NPM' => $Student[$i]))->result_array();
+
+                        if(count($ckstd)<=0){
+                            $this->db->insert('db_academic.final_project',array(
+                                'NPM' => $Student[$i],
+                                'Status' => $data_arr['StatusStd']
+                            ));
+                        } else {
+                            // Update Status
+                            $this->db->where('NPM',$Student[$i]);
+                            $this->db->update('db_academic.final_project',array(
+                                'Status' => $data_arr['StatusStd']
+                            ));
+                        }
+
                     }
                 }
 
@@ -9569,8 +9650,12 @@ class C_api extends CI_Controller {
                                                                               ORDER BY fpsl.Type DESC ')->result_array();
 
                         // Get Student
-                        $data[$i]['Students'] = $this->db->query('SELECT fpss.*, ats.Name, fp.Status AS StatusFinalProject FROM db_academic.final_project_schedule_student fpss
+
+                        $data[$i]['Students'] = $this->db->query('SELECT fpss.*, ats.Name, fp.Status AS StatusFinalProject, ats.MentorFP1, ats.MentorFP2, em1.Name AS MentorFP1Name, em2.Name AS MentorFP2Name  
+                                                                            FROM db_academic.final_project_schedule_student fpss
                                                                             LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpss.NPM)
+                                                                            LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                                                            LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
                                                                             LEFT JOIN db_academic.final_project fp ON(fp.NPM = fpss.NPM)
                                                                             WHERE fpss.FPSID = "'.$data[$i]['ID'].'"
                                                                             ORDER BY fpss.NPM ASC ')->result_array();
@@ -10039,6 +10124,16 @@ class C_api extends CI_Controller {
                     }
                 }
 
+                // Filter Portal Alumni is active or not
+                if(!empty($output['isPortalAlumi'])){
+                    if ($output['isPortalAlumi'] == 1) {
+                        $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" > 0","filter"=>"AND",); 
+                    }
+                    else if ($output['isPortalAlumi'] == 0) {
+                        $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" = 0","filter"=>"AND",);
+                    }
+                }
+
                 /*SORTING*/
                 if(!empty($output['sortby']) && !empty($output['orderby'])){
                     $orderBy = $output['sortby']." ".$output['orderby'];
@@ -10094,13 +10189,17 @@ class C_api extends CI_Controller {
                                   <ul class="dropdown-menu">
                                     <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
                                     <li><a href="'.base_url('database/students/edit-students/ta_'.$v->ClassOf.'/'.$v->NPM.'/'.$nameS).'">Edit</a></li>';
-
+                    $ActSetAlumni = ($v->StatusStudentID == 1) ? '<li role="separator" class="divider"></li>
+                                    <li><a class = "BtnSetAlumni" href = "javascript:void(0);" data-npm="'.$v->NPM.'" data-alumni = "'.$v->StatusPortalAlumni.'" data-name = "'.$v->Name.'" > Set Portal Alumni </a>
+                                    </li>' : '';
                     $btnAct .=      '<li role="separator" class="divider"></li>
                                     <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$v->EmailPU.'"
                                     data-year="'.$v->ClassOf.'" data-npm="'.$v->NPM.'" data-name="'.ucwords(strtolower($v->Name)).'"
                                     data-statusid="'.$v->StatusStudentID.'">Change Status</a>
                                     </li>
-                                    <li><a class = "PrintIDCard" href="javascript:void(0);" type = "student" data-npm="'.$v->NPM.'" data-name="'.ucwords(strtolower($v->Name)).'" path = '.$srcImg.' email = "'.$v->EmailPU.'">Print ID Card</a></li>
+                                    <li><a class = "PrintIDCard" href="javascript:void(0);" type = "student" data-npm="'.$v->NPM.'" data-name="'.ucwords(strtolower($v->Name)).'" path = '.$srcImg.' email = "'.$v->EmailPU.'">Print ID Card</a>
+                                    </li>
+                                    '.$ActSetAlumni.'
                                   </ul>
                                 </div>';
 
@@ -10149,7 +10248,12 @@ class C_api extends CI_Controller {
                     $nestedData[] = "<p class='text-center'>".(($v->Gender == "L") ? 'Male':'Female')."</p>";
                     $nestedData[] = "<center>".$v->ClassOf."</center>";
                     $nestedData[] = $v->ProdiNameEng;
-                    $nestedData[] = (($v->StatusStudentID == 1) ? $v->StatusStudent."<p>Graduated in ".(!empty($v->GraduationYear) ? $v->GraduationYear : date('Y',strtotime($v->GraduationDate))).", <br><small><i class='fa fa-graduation-cap'></i> ".date('D,d F Y',strtotime($v->GraduationDate))."</small></p>" : $v->StatusStudent);
+
+                    // check Direct Portal ALumni
+                    $PortalAlumniLabel = ($v->StatusPortalAlumni > 0) ? '<p style = "color:blue;">Direct Portal Alumni</p>' : '<p style = "color:blue;">Direct Portal Student</p>';
+                    $nestedData[] = (($v->StatusStudentID == 1) ? $v->StatusStudent."<p>Graduated in ".(!empty($v->GraduationYear) ? $v->GraduationYear : date('Y',strtotime($v->GraduationDate))).", <br><small><i class='fa fa-graduation-cap'></i> ".date('D,d F Y',strtotime($v->GraduationDate))."</small></p>
+                        ".$PortalAlumniLabel."
+                        " : $v->StatusStudent);
                     $nestedData[] = '<div style="text-align:center;">'.$fm.'</div>';
                     $nestedData[] = $btnAct;
                     $nestedData[] = '<div style="text-align:center;"><button class="btn btn-sm btn-default btn-default-primary btnLoginPortalStudents" data-npm="'.$v->NPM.'">Login Portal</button></div>';
@@ -11029,7 +11133,7 @@ class C_api extends CI_Controller {
         }
 
         $queryDefault = 'SELECT s.ID, s.CombinedClasses, s.ClassGroup, s.Coordinator, em.Name AS CoordinatorName,
-                                      s.TeamTeaching, s.SubSesi, s.Attendance, cd.TotalSKS AS Credit,
+                                      s.TeamTeaching, s.SubSesi, s.Attendance, cd.TotalSKS AS Credit, s.OnlineLearning,
                                        mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng,
                                        cd.ID AS CDID
                                       FROM db_academic.schedule s
@@ -11072,6 +11176,7 @@ class C_api extends CI_Controller {
 
             $SubSesi = ($row['SubSesi']=='1') ? '<br/><span class="label label-warning">Sub-Sesi</span>' : '';
             $Attendance = ($row['Attendance']=='0') ? '<br/><span class="label label-danger"><i class="fa fa-filter margin-right"></i> No Attd</span>' : '';
+            $Attendance = ($row['OnlineLearning']=='1') ? '<br/><span class="label label-success">Online</span>' : '';
 
             $dataSchedule = $this->db->query('SELECT cl.Room, d.NameEng AS DayEng, sd.StartSessions, sd.EndSessions, attd.ID AS ID_Attd
                                                                       FROM db_academic.schedule_details sd
@@ -12011,8 +12116,19 @@ class C_api extends CI_Controller {
         else if($data_arr['action']=='getTotalUnreadLog'){
 
             $UserID = $data_arr['UserID'];
-            $data = $this->db->select('ID')->get_where('db_notifikasi.logging_user',
-                array('UserID' => $UserID, "StatusRead" => "0"))->result_array();
+            $where = 'where b.UserID =  "'.$UserID.'" and b.StatusRead  = "0" ';
+            if (array_key_exists('Alumni', $data_arr) && $data_arr['Alumni'] == 'yes' ) {
+                $where .= ' And a.URLDirectAlumni is NOT NULL and a.URLDirectAlumni != ""';
+            }
+
+            $data = $this->db->query('
+                                        select b.ID from db_notifikasi.logging as a
+                                        join db_notifikasi.logging_user as b on a.ID = b.IDLogging
+                                        '.$where.'
+                                    ')->result_array();
+
+            // $data = $this->db->select('ID')->get_where('db_notifikasi.logging_user',
+                // array('UserID' => $UserID, "StatusRead" => "0"))->result_array();
             return print_r(json_encode(count($data)));
         }
         else if($data_arr['action']=='readLogUser'){
@@ -12022,6 +12138,9 @@ class C_api extends CI_Controller {
         elseif ($data_arr['action'] == 'ReadAllLog') {
             $UserID = $data_arr['UserID'];
             $this->db->where('UserID', $UserID);
+            if (array_key_exists('Alumni', $data_arr) && $data_arr['Alumni'] == 'yes' ) {
+                 $this->db->where('IDLogging in (select ID from db_notifikasi.logging where ID = IDLogging ) ');
+            }
             $this->db->update('db_notifikasi.logging_user',array('StatusRead' => '1', 'ShowNotif' => '1'));
             return print_r(json_encode(1));
         }
@@ -12681,7 +12800,6 @@ class C_api extends CI_Controller {
     }
 
     public function getGrossRevenue(){
-
         $data = $this->db->order_by('ID','ASC')->get('db_studentlife.master_range_gross_revenue')->result_array();
         return print_r(json_encode($data));
     }

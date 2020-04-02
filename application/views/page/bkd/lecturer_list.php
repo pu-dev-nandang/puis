@@ -170,31 +170,36 @@
 
                                 var schedule = '';
                                 var totalSKS = 0;
+                                var totalSKS2 = 0;
 
                                 if(v2.Schedule.length>0){
                                     var tr = '';
 
                                     $.each(v2.Schedule,function (i4,s) {
+
+                                      var viewCredit2 = (parseFloat(s.Credit) / v2.Schedule.length);
+
                                         tr = tr+'<tr>' +
                                             '<td>'+s.DayNameEng+'</td>' +
                                             '<td>'+s.StartSessions.substr(0,5)+' - '+s.EndSessions.substr(0,5)+'</td>' +
                                         '<td style="border-right: 1px solid #ccc;">'+s.Room+'</td>' +
-                                        '<td><span style="color: blue;">'+s.Credit+'</span></td>' +
+                                        '<td><span style="color: blue;">'+s.Credit+' | '+viewCredit2+'</span></td>' +
                                         '</tr>';
 
-                                        totalSKS = totalSKS + s.Credit;
+                                        totalSKS = totalSKS + parseFloat(s.Credit);
+                                        totalSKS2 = totalSKS2 + parseFloat(viewCredit2);
                                     });
 
 
 
                                     schedule = '<table class="table" style="margin-bottom: 0px;">' +
-                                        '<tbody>'+tr+'</tbody><tr style="background: #e0f4ff;font-weight: bold;"><td colspan="3" style="border-right: 1px solid #ccc;">Total Credit</td><td>'+totalSKS+'</td></tr></table>';
+                                        '<tbody>'+tr+'</tbody><tr style="background: #e0f4ff;font-weight: bold;"><td colspan="3" style="border-right: 1px solid #ccc;">Total Credit</td><td>'+totalSKS+' | '+totalSKS2+'</td></tr></table>';
                                 }
 
                                 TotalCreditAsli = TotalCreditAsli + parseFloat(v2.CreditMK);
                                 TotalCreditBKD = TotalCreditBKD + parseFloat(v2.CreditBKD);
                                 TotalCreditJadwal = TotalCreditJadwal + parseFloat(totalSKS);
-                                TotalCreditSelisih = TotalCreditSelisih + (totalSKS- parseFloat(v2.CreditMK));
+                                TotalCreditSelisih = TotalCreditSelisih + (totalSKS - parseFloat(v2.CreditMK));
 
 
                                 //var stlBGtr = ( v2.DetailTeam.length>0) ? 'background: #ff000017;' : 'background: #fff;';

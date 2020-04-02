@@ -21,7 +21,8 @@ class M_setting extends CI_Model {
             $AddWhere = ' and a.DepartmentID = "'.$DepartmentID.'"';
         }
 
-        $sql = 'select a.Descriptions,c.Name as NameEmployees,a.ID,a.DepartmentID,a.UpdatedBy,a.UpdatedAt,qdj.NameDepartment,qdj.NameDepartmentIND
+        $sql = 'select a.Descriptions,c.Name as NameEmployees,a.ID,a.DepartmentID,a.UpdatedBy,a.UpdatedAt,qdj.NameDepartment,qdj.NameDepartmentIND,
+                a.TemplateMessage
                 from db_ticketing.category as a '.$this->m_general->QueryDepartmentJoin('a.DepartmentID').'
                 left join db_employees.employees as c on a.UpdatedBy = c.NIP
                 where  a.Active = 1  '.$AddWhere.'
@@ -58,14 +59,15 @@ class M_setting extends CI_Model {
         $AddWhere = '';
         if (array_key_exists('DepartmentID', $dataToken)) {
             $DepartmentID = $dataToken['DepartmentID'];
-            $AddWhere = ' and a.DepartmentID = "'.$DepartmentID.'"';
+            $WhereORAnd = ($AddWhere == '') ? ' Where ' : ' And';
+            $AddWhere = $WhereORAnd.'  a.DepartmentID = "'.$DepartmentID.'"';
         }
 
         $sql = 'select CONCAT(cc.Name," | ",a.NIP) as NameAdmin,a.ID,a.NIP,a.DepartmentID,c.Name as NameUpdatedBy,a.UpdatedBy,a.UpdatedAt,qdj.NameDepartment,qdj.NameDepartmentIND
                 from db_ticketing.admin_register as a '.$this->m_general->QueryDepartmentJoin('a.DepartmentID').'
                 left join db_employees.employees as c on a.UpdatedBy = c.NIP
                 left join db_employees.employees as cc on a.NIP = cc.NIP
-                where a.DepartmentID = "'.$DepartmentID.'"
+                '.$AddWhere.'
                 order by a.ID desc
         ';
         $query = $this->db->query($sql,array())->result_array();
@@ -145,6 +147,40 @@ class M_setting extends CI_Model {
                 # code...
                 break;
         }
+        return $rs;
+    }
+
+    public function LoadDataAuthDashboard($dataToken){
+        $rs = [];
+        $AddWhere = '';
+
+        $sql = 'select CONCAT(cc.Name," | ",a.NIP) as NameAdmin,a.ID,a.NIP,c.Name as NameUpdatedBy,a.UpdatedBy,a.UpdatedAt
+                from db_ticketing.auth_dashboard as a
+                left join db_employees.employees as c on a.UpdatedBy = c.NIP
+                left join db_employees.employees as cc on a.NIP = cc.NIP
+                order by a.ID desc
+        ';
+        $query = $this->db->query($sql,array())->result_array();
+        $data = array();
+        for ($i=0; $i < count($query); $i++) {
+            $nestedData = array();
+            $row = $query[$i]; 
+            $nestedData[] = $i+1;
+            foreach ($row as $key => $value) {
+              $nestedData[] = $value;
+            }
+            $token = $this->jwt->encode($row,"UAP)(*");
+            $nestedData[] = $token;
+            $data[] = $nestedData;
+        }
+
+        $rs = array(
+            "draw"            => intval( 0 ),
+            "recordsTotal"    => intval(count($query)),
+            "recordsFiltered" => intval( count($query) ),
+            "data"            => $data
+        );
+
         return $rs;
     }
   

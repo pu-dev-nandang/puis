@@ -94,6 +94,7 @@
 	var DataReceivedSelected = <?php echo json_encode($DataReceivedSelected) ?>;
 	// console.log(DataReceivedSelected);
 	var Authent = <?php echo json_encode($Authent) ?>;
+	// console.log(Authent);
 	var DataCategory = <?php echo json_encode($DataCategory) ?>;
 	var DataEmployees = <?php echo json_encode($DataEmployees) ?>;
 	var Auth = Authent.callback.Detail;
@@ -107,7 +108,14 @@
 			$('#ShowProgressList').html(htmlGetProgressList);
 			var selector_AssignTo = $('#PageAssignTo');
 			var selector_TransferTo = $('#PageTransferTo');
-			App_AssignTo.DomContentForm(selector_AssignTo);
+			if (DataReceivedSelected.length == 0) {
+				$('.btn-add-transfer_to').remove();
+				selector_AssignTo.html('<p style ="color:red;">Your not authorize in this page, please see status in ticket data</p>');
+			}
+			else
+			{
+				App_AssignTo.DomContentForm(selector_AssignTo);
+			}
 		},
 
 		LoadSelectOptionCategory : function(selector,type="assign_to"){
@@ -159,13 +167,13 @@
 		ActionClosedProject : function(selector){
 			// DataReceivedSelected
 			if (confirm('Are you sure ?')) {
-			    loading_button2(selector);
 			    $('#GlobalModal').find('.CloseModal').prop('disabled',true);
 			    var url = base_url_js+"rest_ticketing/__event_ticketing";
 			    var dataform = {
 			        action : 'close_project',
 			        auth : 's3Cr3T-G4N',
 			        ID : DataReceivedSelected[0].ID,
+			        NoTicket : DataTicket[0].NoTicket,
 			        data : {
 			        	SetAction : "0",
 			        	ReceivedStatus : "1",
@@ -174,7 +182,27 @@
 			    };
 
 				var token = jwt_encode(dataform,'UAP)(*');
-				AjaxSubmitRestTicketing(url,token).then(function(response){
+				var ArrUploadFilesSelector = [];
+				var UploadFile = $('#UploadFile');
+				var valUploadFile = UploadFile.val();
+				if (valUploadFile) {
+				    var NameField = UploadFile.attr('name');
+				    var temp = {
+				        NameField : NameField,
+				        Selector : UploadFile,
+				    };
+				    ArrUploadFilesSelector.push(temp);
+				}
+				if (ArrUploadFilesSelector.length>0) {
+					var selectorfile = ArrUploadFilesSelector[0].Selector
+					var FilesValidation = file_validation_ticketing(selectorfile,'Ticketing');
+					if (FilesValidation != '') {
+					    toastr.info(FilesValidation + "<br>");
+					    return;
+					}
+				}
+				loading_button2(selector);
+				AjaxSubmitRestTicketing(url,token,ArrUploadFilesSelector).then(function(response){
 				    if (response.status == 1) {
 				    	setInterval(function(){
 				    		toastr.success('Success');
@@ -223,9 +251,14 @@
 			else
 			{
 				var htmlComment = '<div class = "form-group">'+
-									'<label>Comment</label>'+
+									'<label>Comment for user</label>'+
 									'<textarea class="form-control" rows="4" name="Comment" id = "CommentCloseProject"></textarea>'	+
-								  '</div>';
+								  '</div>'+
+								  '<div class = "form-group">'+
+	  								  '<label>File Upload</label>'+
+	  									'<div><label class = "btn btn-primary"><input type="file" name = "Files" id = "UploadFile" style = "display:none;"> Browse</label></div>'+
+	  								   '<p style = "color:red">(jpg,png) Max 2mb'+	
+  								  '</div>';
 				var htmlButton = '<button type="button" class="btn btn-success" id="btnModalCloseProject">Submit</button> ' +
             '<button type="button" class="btn btn-default CloseModal" data-dismiss="modal">Close</button>'; 
             	$('#GlobalModal .modal-header').html('' +
@@ -361,10 +394,12 @@
 							'<div class = "form-group">'+
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
-										'<label>'+'Message'+'</label>'+
+										'<label>'+'Note for worker'+'</label>'+
+										'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-9">'+
 										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived" '+dis+' >'+valTextArea+'</textarea>'+
+										 // '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived" '+dis+' >'+''+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -660,10 +695,12 @@
 							'<div class = "form-group">'+
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
-										'<label>'+'Message'+'</label>'+
+										'<label>'+' Note for department'+'</label>'+
+										'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
 										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 // '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+

@@ -78,7 +78,6 @@ class M_hr extends CI_Model {
         return $data;
     }
 
-
     /*ADDED BY FEBRI @ FEB 2020*/
     public function getMemberSTO($data){
         $this->db->select("a.ID as CareerID,a.StartJoin,a.EndJoin,a.LevelID,a.DepartmentID,a.PositionID,a.JobTitle,a.Superior,a.StatusID,a.Remarks, e.*");
@@ -177,5 +176,142 @@ class M_hr extends CI_Model {
         return $value;
     }
     /*END ADDED BY FEBRI @ FEB 2020*/
+
+    public function getDataRecapitulation($data_arr){
+
+        $SemesterID = $data_arr['SemesterID'];
+        $ProdiID = ($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null && isset($data_arr['ProdiID']))
+            ? ' AND em.ProdiID = "'.$data_arr['ProdiID'].'" ' : '';
+        $StatusLecturerID = $data_arr['StatusLecturerID'];
+
+        $dateStart = $data_arr['RangeStart'];
+        $dateEnd = $data_arr['RangeEnd'];
+
+
+
+        $data = $this->db->query('SELECT em.NIP, em.Name, ps.Code AS ProdiCode FROM db_employees.employees em 
+                                           LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                                           WHERE em.StatusLecturerID = "'.$StatusLecturerID.'" 
+                                             '.$ProdiID.' ORDER BY em.ProdiID, em.NIP ASC ' )->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $NIP = $data[$i]['NIP'];
+                $arrID_Attd = [];
+
+                $dataSchedule = $this->db->query('SELECT s.ID AS ScheduleID, s.Coordinator AS NIP, mk.NameEng AS Course, cd.TotalSKS AS Credit, csl.Money AS Fee_SKS,   
+                                                    csl.Allowance AS Fee_Tunjangan, csl.Allowance_NIDN AS Fee_NIDN
+                                                    FROM db_academic.schedule s
+                                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                    LEFT JOIN db_employees.credit_salary_lecturer csl ON (csl.NIP = s.Coordinator AND csl.SemesterID = s.SemesterID)
+                                                    WHERE s.SemesterID = "'.$SemesterID.'" AND s.Coordinator = "'.$NIP.'" GROUP BY s.ID
+                                                    UNION ALL 
+                                                    SELECT s.ID AS ScheduleID, stt.NIP, mk.NameEng AS Course, cd.TotalSKS AS Credit, csl.Money AS Fee_SKS, 
+                                                    csl.Allowance AS Fee_Tunjangan, csl.Allowance_NIDN AS Fee_NIDN 
+                                                    FROM db_academic.schedule_team_teaching stt 
+                                                    LEFT JOIN db_academic.schedule s ON (s.ID = stt.ScheduleID) 
+                                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                    LEFT JOIN db_employees.credit_salary_lecturer csl ON (csl.NIP = stt.NIP AND csl.SemesterID = s.SemesterID)
+                                                    WHERE s.SemesterID = "'.$SemesterID.'" AND stt.NIP = "'.$NIP.'"  GROUP BY s.ID')->result_array();
+
+                // Get Schedule Details dan ID Attd
+                if(count($dataSchedule)>0){
+                    for($s=0;$s<count($dataSchedule);$s++){
+
+                        // Get total dosen
+                        $dataTotalDosen = $this->db->query('SELECT s.Coordinator AS NIP, em.Name FROM db_academic.schedule s 
+                                                                    LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                                    WHERE s.ID = "'.$dataSchedule[$s]['ScheduleID'].'"
+                                                                     UNION ALL 
+                                                                     SELECT stt.NIP, em.Name 
+                                                                     FROM db_academic.schedule_team_teaching stt 
+                                                                      LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                                      WHERE stt.ScheduleID = "'.$dataSchedule[$s]['ScheduleID'].'"')->result_array();
+                        $dataSchedule[$s]['TotalLecturer'] = count($dataTotalDosen);
+                        $dataSchedule[$s]['TotalLecturer_Details'] = $dataTotalDosen;
+
+
+                        $dataAttdID = $this->db->query('SELECT sd.ScheduleID, sd.ID AS SDID, attd.ID AS ID_Attd FROM db_academic.schedule_details sd 
+                                                                        LEFT JOIN db_academic.attendance attd ON (attd.ScheduleID = sd.ScheduleID AND attd.SDID = sd.ID)
+                                                                        WHERE sd.ScheduleID = "'.$dataSchedule[$s]['ScheduleID'].'" ')->result_array();
+
+
+                        $Attending = 0;
+
+                        if(count($dataAttdID)>0){
+
+                            $dataArrDetail = [];
+
+                            for($a=0;$a<count($dataAttdID);$a++){
+
+                                $dataDetail = $this->db->query('SELECT attdl.* FROM db_academic.attendance_lecturers attdl 
+                                                                            WHERE attdl.ID_Attd = "'.$dataAttdID[$a]['ID_Attd'].'"
+                                                                             AND attdl.Date >= "'.$dateStart.'"
+                                                                              AND attdl.Date <= "'.$dateEnd.'"
+                                                                              AND attdl.NIP = "'.$NIP.'" 
+                                                                              ORDER BY attdl.Date')->result_array();
+
+                                // Mendapatkan attending dengan hari yang sama
+
+                                array_push($arrID_Attd,$dataAttdID[$a]['ID_Attd']);
+
+                                if(count($dataDetail)>0){
+                                    for($ab=0;$ab<count($dataDetail);$ab++){
+                                        array_push($dataArrDetail,$dataDetail[$ab]);
+                                    }
+                                }
+
+
+                            }
+
+                            usort($dataArrDetail, function($a, $b) {
+                                return strtotime($a['Date']) - strtotime($b['Date']);
+                            });
+
+                            $Attending = count($dataArrDetail);
+                            $dataSchedule[$s]['Attending_Details'] = $dataArrDetail;
+
+
+                        }
+
+
+
+                        $dataSchedule[$s]['Attending'] = $Attending;
+                    }
+
+                    $querySameDate = '';
+                    if(count($arrID_Attd)>0){
+                        for($att=0;$att<count($arrID_Attd);$att++){
+                            $ckOR = ($att!=0) ? ' OR ' : '';
+                            $querySameDate = $querySameDate.$ckOR.'attdl.ID_Attd = "'.$arrID_Attd[$att].'" ';
+                        }
+                    }
+
+                    $dataDetail_sameDate = $this->db->query('SELECT attdl.Date FROM db_academic.attendance_lecturers attdl 
+                                                                            WHERE  attdl.Date >= "'.$dateStart.'"
+                                                                              AND attdl.Date <= "'.$dateEnd.'"
+                                                                              AND attdl.NIP = "'.$NIP.'" 
+                                                                              AND ('.$querySameDate.') GROUP BY attdl.Date ORDER BY attdl.Date')->result_array();
+
+                    $AttendingSameDate = count($dataDetail_sameDate);
+                    $data[$i]['AttendingSameDate_Details'] = $dataDetail_sameDate;
+                    $data[$i]['AttendingSameDate'] = $AttendingSameDate;
+
+                }
+
+
+                $data[$i]['Schedule'] = $dataSchedule;
+
+            }
+        }
+
+
+        return $data;
+
+    }
 
 }

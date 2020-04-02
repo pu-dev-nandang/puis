@@ -15,7 +15,7 @@
                                             <select class="form-control" id="typefiles">
                                                 <?php for ($i=0; $i < count($G_TypeFiles); $i++): ?>
                                                     <?php if ($G_TypeFiles[$i]['Type'] == 1 ): ?>
-                                                     <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['NameFiles'] ?></option>  
+                                                     <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['TypeFiles'] ?></option>  
                                                     <?php endif ?>
                                                 <?php endfor ?>
                                             </select>
@@ -341,7 +341,7 @@ $(document).ready(function () {
                         '                        <option id="'+response[i]['TypeFiles']+'" disabled selected>'+response[i]['NameFiles']+'</option>'+
                         '                        <?php for ($i=0; $i < count($G_TypeFiles); $i++): ?>       '+
                         '                            <?php if ($G_TypeFiles[$i]['Type'] == 1): ?>           '+
-                        '                               <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['NameFiles'] ?></option>   '+ 
+                        '                               <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['TypeFiles'] ?></option>   '+ 
                         '                            <?php endif ?>                                         '+
                         '                        <?php endfor ?>                                            '+
                         '                    </select>                                                      '+

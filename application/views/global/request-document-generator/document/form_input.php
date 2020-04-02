@@ -370,7 +370,7 @@
 			                        '</div>';
 			var paramsChoose = dt['API']['paramsChoose'];
 			var paramsUser = dt['paramsUser'];
-			// console.log(dt);
+			console.log(dt);
 			for (var i = 0; i < paramsUser.length; i++) {
 				var arr = paramsUser[i];
 				for (key in arr){
@@ -378,7 +378,7 @@
 					  var dtRowEmp = dt['API']['selectEmployees'];
 					  var htmlOPEMP = App_input.SelectAPIOPEMP(dtRowEmp,key);
 					  html  += '<div class = "form-group" keyindex = "'+i+'">'+
-					              '<label>Choose Parameter '+params[key]+'</label>'+
+					              '<label>Choose Parameter '+paramsChoose[key]+'</label>'+
 					              htmlOPEMP+
 					          '</div>';
 					}
@@ -425,6 +425,7 @@
 
 		SelectAPIOPEMP : function(data,paramsChoose){
 		    var html =  '<select class = "form-control Input" field="PARAMS" name="'+paramsChoose+'" key = "TABLE">';
+		    html +=  '<option value = "">'+'--No data choose--'+'</option>';
 		    for (var i = 0; i < data.length; i++) {
 		       html +=  '<option value = "'+data[i].NIP+'">'+data[i].Name+'</option>';
 		    }
@@ -485,7 +486,10 @@
 							bool = true;
 							html += '<ul>';
 						}
-						var textVerify = (dt[i].verify == 1) ? 'Manual Approve by System' : 'Auto Approve';
+						var textVerify = (dt[i].verify == 1) ? 'Manual Approve by System' : 'Manual Approve';
+						if (dt[i].verify == 2) {
+							textVerify = 'Auto Approve by System'
+						}
 						html += '<li style = "margin-left : -20px;">Approval '+(i+1)+' : '+'<span style="color:green;">'+selectChoose[j].Value+'</span>'+'<br/>'+'<label>'+textVerify+'</label>'+'</li>';
 						break;
 					}

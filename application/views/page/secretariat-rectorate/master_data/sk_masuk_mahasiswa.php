@@ -115,7 +115,7 @@
                      "processing": true,
                      "serverSide": false,
                      "ajax":{
-                         url : base_url_js+"rectorat/master_data/crud_sk_mhs", // json datasource
+                         url : base_url_js+"secretariat-rectorate/master_data/crud_sk_mhs", // json datasource
                          ordering : false,
                          type: "post",  // method  , by default get
                          data : {token : token}                                    
@@ -200,7 +200,7 @@
             }
             if (confirm('Are you sure ?')) {
                 loading_button2(selector);
-                var url = base_url_js + "rectorat/master_data/crud_sk_mhs";
+                var url = base_url_js + "secretariat-rectorate/master_data/crud_sk_mhs";
                         $.ajax({
                           type:"POST",
                           url:url,

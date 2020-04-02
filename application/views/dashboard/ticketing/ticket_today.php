@@ -564,7 +564,6 @@ var App_ticket_ticket_today = {
 
                     department_handle = data_received[0].NameDepartmentDestination;
                     var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
-                    
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
@@ -988,6 +987,8 @@ $(document).off('change', '#SelectDepartmentID').on('change', '#SelectDepartment
 $(document).off('change', '.input_form[name="CategoryID"]').on('change', '.input_form[name="CategoryID"]',function(e) {
     var ToDepartmentSelected = $(this).find('option:selected').attr('department');
     $('.lblDepartment').html(ToDepartmentSelected);
+    let dataDecode = jwt_decode($(this).find('option:selected').attr('data'));
+    $('.input_form[name="Message"]').val(dataDecode['TemplateMessage']);
 })
 
 

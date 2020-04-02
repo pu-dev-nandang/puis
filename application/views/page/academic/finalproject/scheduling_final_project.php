@@ -13,7 +13,7 @@
 
 
 <div class="row" style="margin-top: 30px;">
-    <div class="col-md-6 col-md-offset-3">
+    <div class="col-md-8 col-md-offset-2">
         <div class="well">
             <div class="form-group">
                 <div class="row">
@@ -71,17 +71,17 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Coordinator Penguji</label>
+                <label>Examiner Coordinator</label>
                 <select class="form-exam" style="width: 100%;" size="5" id="formCOPenguji">
                     <option value=""></option>
                 </select>
             </div>
             <div class="form-group">
-                <label>Team Penguji</label>
+                <label>Examiner Team</label>
                 <select class="form-exam" multiple style="width: 100%;" size="5" id="formTeamPenguji"></select>
             </div>
             <div class="form-group">
-                <label>Student</label>
+                <label>Students who already have a mentor</label>
                 <div id="viewDataStd"></div>
             </div>
             <div id="viewTableStudent"></div>
@@ -172,7 +172,7 @@
 
                 var Student = v.Student;
                 if(Student.length>0){
-                    console.log(Student);
+
                     $.each(Student,function (i,v) {
 
                         var Mentor1 = (v.MentorFP1_Name!='' && v.MentorFP1_Name!=null) ? '<div>- '+v.MentorFP1_Name+'</div>' : '';
@@ -192,10 +192,10 @@
 
 
                 if(v.Type=='1' || v.Type==1){
-                    loadSelectOptionStudentYudisium('#formStudent','','1');
+                    loadSelectOptionStudentYudisium('#formStudent','','1',v.SemesterID);
                     $('#formStudent').select2({allowClear: true});
                 } else {
-                    loadSelectOptionStudentYudisium('#formStudent','','3');
+                    loadSelectOptionStudentYudisium('#formStudent','','3',v.SemesterID);
                     $('#formStudent').select2({allowClear: true});
                 }
 
@@ -252,30 +252,51 @@
         $('#formCOPenguji,#formClassroom,#formTeamPenguji').select2({allowClear: true});
 
 
-        loadStudent();
+        var firsLoad = setInterval(function () {
+            var filterSemester = $('#filterSemester').val();
+            if(filterSemester!='' && filterSemester!=null){
+                loadStudent();
+                clearInterval(firsLoad);
+            }
+        },1000);
+
+        setTimeout(function () {
+            clearInterval(firsLoad);
+        },5000);
+
 
     }
 
-    $('#formType').change(function () {
+    $('#formType,#filterSemester').change(function () {
         loadStudent();
     });
 
     function loadStudent() {
-        $('#viewDataStd').html('<select class="form-exam" multiple style="width: 100%;" size="5" id="formStudent"></select>');
-        var formType = $('#formType').val();
-        if(formType==1){
-            loadSelectOptionStudentYudisium('#formStudent','','1');
-            $('#formStudent').select2({allowClear: true});
-        } else if(formType==2) {
-            loadSelectOptionStudentYudisium('#formStudent','','3');
-            $('#formStudent').select2({allowClear: true});
-        } else if(formType==3) {
-            loadSelectOptionStudentYudisium('#formStudent','','-3');
-            $('#formStudent').select2({allowClear: true});
-        } else if(formType==4) {
-            loadSelectOptionStudentYudisium('#formStudent','','-5');
-            $('#formStudent').select2({allowClear: true});
+
+        var filterSemester = $('#filterSemester').val();
+
+        if(filterSemester!='' && filterSemester!=null) {
+
+            var SemesterID = filterSemester.split('.')[0];
+
+            $('#viewDataStd').html('<select class="form-exam" multiple style="width: 100%;" size="5" id="formStudent"></select>');
+            var formType = $('#formType').val();
+            if(formType==1){
+                loadSelectOptionStudentYudisium('#formStudent','','1',SemesterID);
+                $('#formStudent').select2({allowClear: true});
+            } else if(formType==2) {
+                loadSelectOptionStudentYudisium('#formStudent','','3',SemesterID);
+                $('#formStudent').select2({allowClear: true});
+            } else if(formType==3) {
+                loadSelectOptionStudentYudisium('#formStudent','','-3',SemesterID);
+                $('#formStudent').select2({allowClear: true});
+            } else if(formType==4) {
+                loadSelectOptionStudentYudisium('#formStudent','','-5',SemesterID);
+                $('#formStudent').select2({allowClear: true});
+            }
         }
+
+
     }
 
     $('#btnSaveSch').click(function () {

@@ -1,5 +1,3 @@
-
-
 <style>
     #tableShowExam>thead>tr>th, #tableExam>tbody>tr>td {
         text-align: center;
@@ -12,6 +10,12 @@
     }
     #tableStudent tbody tr td {
         text-align: center;
+    }
+    .btn-live-chat {
+        padding: 0px 5px;
+        font-size: 10px !important;
+        font-weight: bold;
+        margin-top: 5px;
     }
 </style>
 
@@ -150,6 +154,7 @@
                     '        <th colspan="2" style="width: 22">Payment</th>' +
                     '        <th rowspan="2" style="width: 10%;">Exam Attd</th>' +
                     '        <th rowspan="2" style="width: 10%;">Set. Attd</th>' +
+                    '        <th rowspan="2" style="width: 10%;">Exam. Submitted</th>' +
                     '    </tr>' +
                     '    <tr>' +
                     '       <th style="width: 11%">BPP</th>' +
@@ -167,11 +172,11 @@
                     '';
 
 
-                $('#GlobalModal .modal-dialog').css('width','830px');
-                $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                // $('#GlobalModalLarge .modal-dialog').css('width','830px');
+                $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
                     '<h4 class="modal-title">Details Student</h4>');
-                $('#GlobalModal .modal-body').html(dataHtml);
-                $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                $('#GlobalModalLarge .modal-body').html(dataHtml);
+                $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
                 var no_std = 1;
                 var p = 0;
@@ -206,35 +211,93 @@
 
                    var setAttd = '<div class="checkbox" style="margin: 0px;">' +
                        '    <label>' +
-                       '      <input type="checkbox" class="checkAttd" data-examid="'+d.ExamID+'" data-id="'+d.ID+'" '+valAttd+'> Present' +
+                       '      <input type="checkbox" class="checkAttd" data-examid="'+d.ExamID+'" data-id="'+d.ID+'" '+valAttd+' npm = "'+d.NPM+'" > Present' +
                        '    </label>' +
-                       '  </div>'
+                       '  </div>';
+
+                   var submitted = (d.DetailExam.length>0 && d.DetailExam[0].SavedAt!=null && d.DetailExam[0].SavedAt!='' )
+                       ? '<i style="color: green;" class="fa fa-check"></i>' : '';
+                   var submittedAt = (d.DetailExam.length>0 && d.DetailExam[0].SavedAt!=null && d.DetailExam[0].SavedAt!='' )
+                       ? '<br/>'+moment(d.DetailExam[0].SavedAt).format('DD MMM YYYY HH:mm') : '';
+
+                    var viewFile = (d.DetailExam.length>0 && d.DetailExam[0].File!=null && d.DetailExam[0].File!='' )
+                        ? '<div><a href="'+base_url_js+'uploads/task-exam/'+d.DetailExam[0].File+'" target="_blank" class="btn btn-sm btn-default">Download File</a></div>' : '';
+
+                    var viewDescription = (d.DetailExam.length>0 && d.DetailExam[0].Description!=null && d.DetailExam[0].Description!='' )
+                        ? '<div><textarea class="form-control" readonly>'+d.DetailExam[0].Description+'</textarea></div>' : '';
 
                     $('#dataMHSExam').append('<tr>' +
                         '<td>'+(no_std++)+'</td>' +
-                        '<td style="text-align: left;"><b>'+d.Name+'</b><br/>'+d.NPM+'</td>' +
+                        '<td style="text-align: left;"><b>'+d.Name+'</b><br/>'+d.NPM+viewFile+viewDescription+'</td>' +
                         '<td>'+AttdPercentage.toFixed()+' %</td>' +
                         '<td>'+BPP+'</td>' +
                         '<td>'+Credit+'</td>' +
                         '<td style="background: #f4f4f4" id="td_attd'+d.ID+'" >'+ExamAttd+'</td>' +
                         '<td>'+setAttd+'</td>' +
+                        '<td>'+submitted+submittedAt+'</td>' +
                         '</tr>');
                 }
 
                 $('#viewTotalAttd').html(p+' of '+jsonResult.length);
 
-                $('#GlobalModal').modal({
+                $('#GlobalModalLarge').modal({
                     'show' : true,
                     'backdrop' : 'static'
                 });
+
+                // added by adhi 2020-03-30
+
+                $('#GlobalModalLarge').find('#tableStudent').find('tbody').find('tr').each(function(e){
+                    const tr = $(this);
+                    const chk = tr.find('td:eq(6)').find('.checkAttd');
+                    eventModalDetailStudent.AddbuttonEdit_Detail_student(tr,chk);
+
+                })
 
             }
 
         });
     });
 
-    $(document).on('click','.checkAttd',function () {
+    const eventModalDetailStudent = {
+        AddbuttonEdit_Detail_student : (tr,chk) => {
+            const selectorBtnEdit = tr.find('td:eq(7)').find('.btnEditDetailsStudentModal');
+            if (chk.is(":checked")) {
+                const examID = chk.attr('data-examid');
+                const NPM = chk.attr('npm');
+                
+                if (!selectorBtnEdit.length) {
+                    tr.find('td:eq(7)').append(
+                            '<button class = "btn btn-xs btn-default  btnEditDetailsStudentModal" npm = "'+NPM+'" examID = "'+examID+'" >Edit </button>'
+                        );
+                }
+            }
+            else
+            {
+                selectorBtnEdit.remove();
+            }
+        }
+    }
 
+    $(document).on('click','.btnEditDetailsStudentModal',function(e){
+        const data = {
+            NPM : $(this).attr('npm'),
+            ExamID : $(this).attr('examID'),
+        }
+        const token = jwt_encode(data,'UAP)(*');
+        // window.open(
+        //   base_url_js+'academic/exam-schedule/editExamSubmited/'+token,
+        //   '_blank' // <- This is what makes it open in a new window.
+        // );
+        window.open(base_url_js+'academic/exam-schedule/editExamSubmited/'+token);
+    })
+
+    $(document).on('click','.checkAttd',function () {
+        // added by adhi 2020-03-30
+        const tr = $(this).closest('tr');
+        const chk = $(this);
+
+        // -- //
         var ID = $(this).attr('data-id');
         var ExamID = $(this).attr('data-examid');
 
@@ -258,6 +321,10 @@
         $.post(url,{token:token},function (result) {
             toastr.success('Attendance updated','Success');
             $('#td_attd'+ID).html(ExamAttd);
+
+            // added by adhi 2020-03-30
+           eventModalDetailStudent.AddbuttonEdit_Detail_student(tr,chk);
+
         });
 
     });

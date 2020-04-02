@@ -9,6 +9,12 @@
         <li class="<?php if($this->uri->segment(3)=='form-accreditation') { echo 'active'; } ?>">
             <a href="<?php echo base_url('student-life/tracer-alumni/form-accreditation'); ?>">Graduation User Satisfaction</a>
         </li>
+        <li class="<?php if($this->uri->segment(3)=='forum') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('student-life/tracer-alumni/forum'); ?>">Forum Alumni</a>
+        </li>
+        <li class="<?php if($this->uri->segment(3)=='testimony') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('student-life/tracer-alumni/testimony'); ?>">Testimony Alumni</a>
+        </li>
         <!--        <li class="--><?php //if($this->uri->segment(3)=='permanent-lecturer') { echo 'active'; } ?><!--">-->
         <!--            <a href="--><?php //echo base_url('human-resources/monitoring-attendance/permanent-lecturer'); ?><!--">Resume (Coming Soon)</a>-->
         <!--        </li>-->

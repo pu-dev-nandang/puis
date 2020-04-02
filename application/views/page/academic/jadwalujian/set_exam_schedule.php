@@ -18,7 +18,7 @@
     <div class="col-md-10 col-md-offset-1">
         <table class="table table-hover" id="tbInput">
             <tr>
-                <th style="width: 10%;">Exam | Date</th>
+                <th style="width: 15%;">Exam | Date</th>
                 <td style="width: 1%;">:</td>
                 <td style="text-align: left;">
                     <div class="row">
@@ -126,6 +126,19 @@
                     <select class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formPengawas2">
                         <option value=""></option>
                     </select>
+                </td>
+            </tr>
+            <tr>
+                <th>Online Exams</th>
+                <td>:</td>
+                <td>
+                    <div class="checkbox checbox-switch switch-primary" style="margin-top: 0px;">
+                        <label>
+                            <input type="checkbox" id="formOnlineLearning">
+                            <span></span>
+                            <!--                            <i> | Filter Attendance in UAS (75%)</i>-->
+                        </label>
+                    </div>
                 </td>
             </tr>
             <tr>
@@ -406,6 +419,8 @@
                 var SeatForExam =  formClassroom.split('.')[2];
                 var TotalStudent = insert_details.length;
 
+                var OnlineLearning = ($('#formOnlineLearning').is(':checked')) ? '1' : '0';
+
                 if(parseInt(TotalStudent) <= parseInt(SeatForExam)){
                     var ProdiID = formBaseProdi.split('.')[0];
                     var data = {
@@ -420,7 +435,7 @@
                             ExamEnd : formEnd,
                             Pengawas1 : formPengawas1,
                             Pengawas2 : formPengawas2,
-
+                            OnlineLearning : OnlineLearning,
                             Status : '1',
                             InsertByProdiID : ProdiID,
                             InsertBy : sessionNIP,
@@ -532,6 +547,8 @@
                     var SeatForExam =  formClassroom.split('.')[2];
                     var TotalStudent = insert_details.length;
 
+                    var OnlineLearning = ($('#formOnlineLearning').is(':checked')) ? '1' : '0';
+
                     if(parseInt(TotalStudent) <= parseInt(SeatForExam)){
                         var ProdiID = formBaseProdi.split('.')[0];
                         var data = {
@@ -546,7 +563,7 @@
                                 ExamEnd : formEnd,
                                 Pengawas1 : formPengawas1,
                                 Pengawas2 : formPengawas2,
-
+                                OnlineLearning : OnlineLearning,
                                 Status : '1',
                                 InsertByProdiID : ProdiID,
                                 InsertBy : sessionNIP,
