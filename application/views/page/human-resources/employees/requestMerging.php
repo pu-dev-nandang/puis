@@ -476,7 +476,7 @@
 					                                    <td><?=$origin->MyFamily[$j]->name?></td>
 					                                    <td><?=$origin->MyFamily[$j]->placeBirth?></td>
 					                                    <td><?=date("d F Y",strtotime($origin->MyFamily[$j]->birthdate))?></td>
-					                                    <td><?=labelProfileDB("db_employees.level_education",array("ID"=>$origin->MyFamily[$j]->lastEduID))->Level?></td>
+					                                    <td><?=(!empty($origin->MyFamily[$j]->lastEduID) ? labelProfileDB("db_employees.level_education",array("ID"=>$origin->MyFamily[$j]->lastEduID))->Level : '')?></td>
 					                                </tr>
 					                            <?php } }else{ ?>
 					                                <tr>
