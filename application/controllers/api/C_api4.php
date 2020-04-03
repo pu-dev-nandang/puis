@@ -223,7 +223,6 @@ class C_api4 extends CI_Controller {
                                                                              AND sm.Session = "'.$Session.'" ')->result_array();
 
                     // Cek Attendance
-                    $SessionAttend = 0;
                     if(count($dataArrAttdID)>0){
                         $whereAttd = '';
                         for ($r=0;$r<count($dataArrAttdID);$r++){
@@ -231,7 +230,10 @@ class C_api4 extends CI_Controller {
                             $whereAttd = $whereAttd.$or.' (al.ID_Attd = "'.$dataArrAttdID[$r]['ID_Attd'].'" AND Meet = "'.$Session.'") ';
                         }
 
-                        $SessionAttend = $this->db->query('SELECT * FROM db_academic.attendance_lecturers al WHERE al.NIP = "'.$d['NIP'].'" AND '.$whereAttd)->result_array();
+                        $SessionAttend = $this->db->query('SELECT * 
+                                                                    FROM db_academic.attendance_lecturers al 
+                                                                    WHERE al.NIP = "'.$d['NIP'].'" 
+                                                                    AND ( '.$whereAttd.') GROUP BY al.ID_Attd')->result_array();
                     }
 
                     $dataLect[$i]['SessionAttend'] = count($SessionAttend);
