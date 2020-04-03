@@ -158,18 +158,29 @@
             </div>
             <div class="row" style="padding: 10px;">
                 <div style="padding: 10px;text-align: center;">
-                    <h4 style="color: green;"><u>Incoming Ticket Today</u></h4>
+                    <h4 style="color: green;"><u>Incoming Ticket by Date</u></h4>
                 </div>
-                <div class="col-md-6 col-md-offset-3">
+                <div class="col-md-12">
                     <div class="well">
                         <div class="row">
-                            <div class="col-xs-12">
+                            <div class="col-xs-6">
                                 <div class="form-group">
                                     <label>Select View</label>
                                     <select class="form-control" id = "OpShowToday">
                                         <option value="1">Table</option>
                                         <option value="2" selected>Graph</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="form-group">
+                                    <label>Date</label>
+                                    <div class="input-group input-append date datetimepicker" id="datetimepickerFilterDashboard">
+                                        <input data-format="yyyy-MM-dd" class="form-control" type="text" readonly="" id = "dateFilterDashboard" value = "<?php echo date('Y-m-d') ?>" >
+                                        <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+                                    </div>
+                                    <br/>
+                                    <span class = "btn btnSearchDateDashboard btn-primary">Search by Date</button>
                                 </div>
                             </div>
                         </div>
