@@ -803,6 +803,7 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_bank_account",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
                                     $insertChild = $this->General_model->insertData("db_employees.employees_bank_account",$b);
@@ -815,6 +816,7 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_family_member",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
                                     $insertChild = $this->General_model->insertData("db_employees.employees_family_member",$b);
@@ -827,6 +829,7 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_educations",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
                                     $insertChild = $this->General_model->insertData("db_employees.employees_educations",$b);
@@ -839,9 +842,12 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_educations_non_formal",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
-                                    $insertChild = $this->General_model->insertData("db_employees.employees_educations_non_formal",$b);
+                                    if($b->instituteName != ''){
+                                        $insertChild = $this->General_model->insertData("db_employees.employees_educations_non_formal",$b);
+                                    }
                                 }
                             }
                         }
@@ -851,6 +857,7 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_educations_training",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
                                     $insertChild = $this->General_model->insertData("db_employees.employees_educations_training",$b);
@@ -863,6 +870,7 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_experience",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
                                     $insertChild = $this->General_model->insertData("db_employees.employees_experience",$b);
@@ -872,11 +880,13 @@ class C_employees extends HR_Controler {
 
                         $Logs->Logs = null;
                         $Logs->isApproved = null;
+                        $Logs->NoteApproved = null;
                         $Logs->UpdatedAt = $myNIP."/".$myName;
+                        
+                        if(!empty($conditions['ID'])){unset($conditions['ID']);}
                         $updatedPersonalData = $this->General_model->updateData("db_employees.employees",$Logs,$conditions);
                         $message = (($updatedPersonalData) ? "Successfully":"Failed")." saved.";
                         $isfinish = $updatedPersonalData;
-
                     }else{$message = "No data requested.";}
                 }else{$message="Unknow request approved.";}
             }else{$message="Student data is not founded.";}

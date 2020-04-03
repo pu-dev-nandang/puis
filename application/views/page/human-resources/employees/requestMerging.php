@@ -520,7 +520,7 @@
 					                                    <td><?=$request->MyFamily[$j]->name?></td>
 					                                    <td><?=$request->MyFamily[$j]->placeBirth?></td>
 					                                    <td><?=date("d F Y",strtotime($request->MyFamily[$j]->birthdate))?></td>
-					                                    <td><?=labelProfileDB("db_employees.level_education",array("ID"=>$request->MyFamily[$j]->lastEduID))->Level?></td>
+					                                    <td><?=(!empty($request->MyFamily[$j]->lastEduID ) ? labelProfileDB("db_employees.level_education",array("ID"=>$request->MyFamily[$j]->lastEduID))->Level : '')?></td>
 					                                </tr>
 					                            <?php } }else{ ?>
 					                                <tr>
