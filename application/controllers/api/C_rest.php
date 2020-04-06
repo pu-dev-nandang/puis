@@ -1104,6 +1104,7 @@ class C_rest extends CI_Controller {
                 $ScheduleID = $dataToken['ScheduleID'];
 //                $ScheduleID = 393;
 
+
                 $data = $this->db->query('SELECT ID,Sessions FROM db_academic.counseling_topic 
                     WHERE ScheduleID = "'.$ScheduleID.'" ')->result_array();
 
@@ -1149,7 +1150,8 @@ class C_rest extends CI_Controller {
                             'TotalComment' => $TotalComment,
                             'StatusOnline' => $dataOpenDate[$i - 1]['Status'],
                             'RangeStart' => $dataOpenDate[$i - 1]['RangeStart'],
-                            'RangeEnd' => $dataOpenDate[$i - 1]['RangeEnd']
+                            'RangeEnd' => $dataOpenDate[$i - 1]['RangeEnd'],
+                            'isUTS' => $dataOpenDate[$i - 1]['isUTS']
 
                         );
 
@@ -1221,7 +1223,8 @@ class C_rest extends CI_Controller {
                             'isOnline' => 1,
                             'StatusOnline' => $dataOpenDate[$i - 1]['Status'],
                             'RangeStart' => $dataOpenDate[$i - 1]['RangeStart'],
-                            'RangeEnd' => $dataOpenDate[$i - 1]['RangeEnd']
+                            'RangeEnd' => $dataOpenDate[$i - 1]['RangeEnd'],
+                            'isUTS' => $dataOpenDate[$i - 1]['isUTS']
 
                         );
 
