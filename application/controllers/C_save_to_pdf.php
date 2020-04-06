@@ -354,10 +354,10 @@ class C_save_to_pdf extends CI_Controller {
         }
 
 
-
-
         $pdf->Output('I','Schedule_Exchange.pdf');
     }
+
+
 
     // ++++++++++++++++++++++++++++++++++
 
@@ -6064,6 +6064,140 @@ Phone: (021) 29200456';
 
         $pdf->Output('I','Monitoring_Attendance_Lecturer.pdf');
     }
+
+
+    public function view_format_laporan($token){
+
+        $data_arr = $this->getInputToken($token);
+
+        $listID = $data_arr['listID'];
+        $stat_id = $data_arr['stat_id'];
+
+        $dataLaporan = $this->db->query('SELECT a.Isi_laporan, b.Nama_format
+                   FROM db_research.litabmas_isi_laporan AS a
+                   LEFT JOIN db_research.master_format_laporan AS b ON (a.Jenis_format = b.ID)
+                   WHERE a.ID = "'.$listID.'" AND a.Csf = "'.$stat_id.'" ')->result_array();
+
+        if($stat_id = "2") {
+
+            if(count($dataLaporan)>0){
+
+                $d = $dataLaporan[0];
+
+                $pdf = new FPDF('P','mm','A4');
+                $pdf->AddPage();
+
+                $pdf->Ln(7);
+                $pdf->SetFont('Arial','',14);
+                $pdf->Cell(0,5,$d['Nama_format'],0,1,'C');
+                
+                $pdf->Ln(15);
+                $pdf->SetFont('Arial','',12);
+                $pdf->Cell(0,5,$d['Isi_laporan']);
+
+                $pdf->SetAutoPageBreak(true, 0);
+                $pdf->Output('I','preview_format_laporan.pdf');
+        
+            } 
+            else {
+                echo 'data not yet';
+            }
+        }
+        else {
+      
+            if(count($dataLaporan)>0){
+
+                $d = $dataLaporan[0];
+
+                $pdf = new FPDF('P','mm','A4');
+                $pdf->AddPage();
+
+                $pdf->Ln(7);
+                $pdf->SetFont('Arial','',14);
+                $pdf->Cell(0,5,$d['Nama_format'],0,1,'C');
+
+                $pdf->Ln(15);
+                $pdf->SetFont('Arial','',12);
+                $pdf->Cell(0,5,$d['Isi_laporan']);
+
+                $pdf->SetAutoPageBreak(true, 0);
+                $pdf->Output('I','preview_format_laporan.pdf');
+        
+            } 
+            else {
+                echo 'data not yet';
+            }
+
+        }
+
+    }
+
+    public function view_format_laporan_pkm($token){
+
+        $data_arr = $this->getInputToken($token);
+
+        $listID = $data_arr['listID'];
+        $stat_id = $data_arr['stat_id'];
+
+        $dataLaporan = $this->db->query('SELECT a.Isi_laporan, b.Nama_format
+                   FROM db_research.pengabdian_masyarakat_isi_laporan AS a
+                   LEFT JOIN db_research.master_format_laporan AS b ON (a.Jenis_format = b.ID)
+                   WHERE a.ID = "'.$listID.'" AND a.Csf = "'.$stat_id.'" ')->result_array();
+
+        if($stat_id = "2") {
+
+            if(count($dataLaporan)>0){
+
+                $d = $dataLaporan[0];
+
+                $pdf = new FPDF('P','mm','A4');
+                $pdf->AddPage();
+
+                $pdf->Ln(7);
+                $pdf->SetFont('Arial','',14);
+                $pdf->Cell(0,5,$d['Nama_format'],0,1,'C');
+                
+                $pdf->Ln(15);
+                $pdf->SetFont('Arial','',12);
+                $pdf->Cell(0,5,$d['Isi_laporan']);
+
+                $pdf->SetAutoPageBreak(true, 0);
+                $pdf->Output('I','preview_format_laporan.pdf');
+        
+            } 
+            else {
+                echo 'data not yet';
+            }
+        }
+        else {
+      
+            if(count($dataLaporan)>0){
+
+                $d = $dataLaporan[0];
+
+                $pdf = new FPDF('P','mm','A4');
+                $pdf->AddPage();
+
+                $pdf->Ln(7);
+                $pdf->SetFont('Arial','',14);
+                $pdf->Cell(0,5,$d['Nama_format'],0,1,'C');
+
+                $pdf->Ln(15);
+                $pdf->SetFont('Arial','',12);
+                $pdf->Cell(0,5,$d['Isi_laporan']);
+
+                $pdf->SetAutoPageBreak(true, 0);
+                $pdf->Output('I','preview_format_laporan.pdf');
+        
+            } 
+            else {
+                echo 'data not yet';
+            }
+
+        }
+
+    }
+
 
     public function suratMengajar($token){
 
