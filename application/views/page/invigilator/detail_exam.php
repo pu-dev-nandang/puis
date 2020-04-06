@@ -327,7 +327,7 @@
         var isASC = (snapshot.val().Type == 'asc')
             ? '<small class="text-muted label label-danger">ASC</small> | ' : ''
 
-        var chatOn = moment(snapshot.val().EntredAt).format('d MMM H:m');
+        var chatOn = moment(snapshot.val().EntredAt).format('d MMM HH:mm');
 
         var divChat = '<li class="clearfix">' +
             '                                            <div class="chat-body clearfix">' +
