@@ -350,7 +350,8 @@
     	$('body #attendance-temporary #fetch-data-tables #table-list-data').DataTable().destroy();
         fetchAttendance();
         var startDate = $("#form-filter input[name=attendance_start]").val();
-        $("#attendance-temporary .result .panel-title >span").text(startDate).addClass("bg-success");
+        var endDate = $("#form-filter input[name=attendance_end]").val();
+        $("#attendance-temporary .result .panel-title >span").text(startDate+(($.trim(endDate).length > 0) ? '-'+endDate:'') ).addClass("bg-success");
     });
 
     fetchAttendance();

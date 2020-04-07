@@ -122,7 +122,7 @@
 	    	$('body #my-team-activity #fetch-data-tables #table-list-data').DataTable().destroy();
 	        fetchActivities();
 	        var startDate = $("#form-filter input[name=attendance_start]").val();
-	        $("#attendance-temporary .result .panel-title >span").text(startDate).addClass("bg-success");
+	        $("#activity-team .panel-title >span").text(startDate).addClass("bg-success");
 	    });
 
 	    $("#table-list-data").on("click",".btn-detail",function(){
@@ -293,7 +293,7 @@
 	<div class="result">
 		<div class="row">
 			<div class="col-md-12">
-		      <div class="panel panel-default">
+		      <div class="panel panel-default" id="activity-team">
 		        <div class="panel-heading">            
 		          <h4 class="panel-title"><i class="fa fa-bars"></i> List of record activities your team <span>Today (<?= date('d F Y') ?>)</span></h4>
 		        </div>
