@@ -50,10 +50,17 @@
 		            </div>
 		            <div class="col-sm-3">
 		              <div class="form-group">
-		                <label>Attendance Day</label>
+		                <label>Attendance Start Day</label>
 		                <input type="text" name="attendance_start" id="attendance_start" class="form-control" placeholder="dd-mm-yyy"> 		                  
 		              </div>
 		            </div>
+		            <div class="col-sm-3">
+		              <div class="form-group">
+		                <label>Attendance End Day</label>
+		                <input type="text" name="attendance_end" id="attendance_end" class="form-control" placeholder="dd-mm-yyy"> 		                  
+		              </div>
+		            </div>
+		            
 		          </div>
 		          <div class="row">
 		            <div class="col-sm-2">
@@ -164,7 +171,7 @@
 		    <div class="col-md-12">
 		      <div class="panel panel-default">
 		        <div class="panel-heading">            
-		          <button class="btn hide btn-xs btn-primary btn-download pull-right" type="button"><i class="fa fa-download"></i> Export to excel</button>
+		          <button class="btn btn-xs btn-primary btn-download pull-right" type="button"><i class="fa fa-download"></i> Export to excel</button>
 		          <h4 class="panel-title"><i class="fa fa-bars"></i> List of record home attendances <span>Today (<?= date('d F Y') ?>)</span></h4>
 		        </div>
 		        <div class="panel-body">
@@ -258,7 +265,7 @@
             	{
             		"data":"NIP",
             		"render": function (data, type, row, meta) {
-            			var label = '<button class="btn btn-info btn-detail" data-date="'+row.FirstLoginPortal+'" data-id="'+data+'"><i class="fa fa-folder-open"></i></button>';
+            			var label = '<button class="btn btn-info btn-detail" data-date="'+row.FirstLoginPortal+'" data-dateend="'+row.LastLoginPortal+'" data-id="'+data+'"><i class="fa fa-folder-open"></i></button>';
             			return label;
             		}
             	},
@@ -277,21 +284,25 @@
     	var filtering = $("#form-filter").serialize();
 		
         var token = jwt_encode({Filter : filtering},'UAP)(*');
-        $.ajax({
+        var urld = base_url_js+"human-resources/download-attendance-temp";
+        $("#form-filter").attr("action",urld);
+        $("#form-filter")[0].submit();
+        /*$.ajax({
             type : 'POST',
-            url : base_url_js+"human-resources/download-attendance-temp",
+            url : urld,
             data: {token:token},
-            dataType : 'json',
+            //dataType : 'json',
             beforeSend :function(){
                 itsme.html('<i class="fa fa-spinner fa-pulse fa-fw"></i>');
             },error : function(jqXHR){
-            	itsme.html('<i class="fa fa-folder-open"></i>');
+            	itsme.html('<i class="fa fa-download"></i> Export to excel');
                 $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
                 $("body #GlobalModal .modal-body").html(jqXHR.responseText);
                 $("body #GlobalModal").modal("show");
             },success : function(response){
             	itsme.html('<i class="fa fa-download"></i> Export to excel');
 		        console.log(response);
+		        window.location = urld;
 		        var a = document.createElement("a");
 		        a.href = response.file; 
 		        a.download = response.name;
@@ -299,7 +310,7 @@
 		        a.click();
 		        a.remove();
             }
-        });
+        }); */
     });
 
     $('#form-filter').on('keyup keypress', function(e) {
@@ -347,10 +358,12 @@
     	var itsme = $(this);
     	var NIP = itsme.data("id");
     	var DATE = itsme.data("date");
+    	var DATEEND = itsme.data("dateend");
     	if($.trim(NIP).length > 0){
     		var data = {
                 NIP : NIP,
-                DATE : DATE
+                DATE : DATE,
+                DATEEND : DATEEND
             };
             var token = jwt_encode(data,'UAP)(*');
     		$.ajax({
