@@ -126,7 +126,7 @@ class M_hr extends CI_Model {
                     //$startDate = preg_replace("/'/", '', $value['data']);
                     $value['field'] = "DATE(".$value['field'].")";
                     $value['data'] = $value['data'];
-                    $conditionDate = " and "."DATE(a.AccessedOn)" ." ".$value['data'];
+                    //$conditionDate = " and "."DATE(a.AccessedOn)" ." ".$value['data'];
                 }
 
                 if($counter==0){
@@ -149,17 +149,15 @@ class M_hr extends CI_Model {
             $select = "count(DISTINCT(em.NIP)) as Total";
         }else{
             $select = "em.*, el.Name as ProdiDegree, el.DescriptionEng as ProdiDegreeEng, ps.NameEng AS ProdiNameEng, es.Description as EmpStatus, r.Religion as EmpReligion, le.Level as EmpLevelEduName, le.Description as EmpLevelDesc, lap.Position as EmpAcaName, d.Division as DivisionMain_, p.Position as PositionMain_, (case when (DATE_FORMAT(em.DateOfBirth,'%m-%d') = DATE_FORMAT(now(),'%m-%d') ) then 1 else null end ) as isMyBirthday 
+                        , lem.AccessedOn as FirstLoginPortal
                         , (select a.AccessedOn from db_employees.log_employees a
-                        where a.NIP = em.NIP ".$conditionDate."
-                        order by a.AccessedOn asc limit 1) as FirstLoginPortal
-                        , (select a.AccessedOn from db_employees.log_employees a
-                        where a.NIP = em.NIP ".$conditionDate."
+                        where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE(lem.AccessedOn)
                         order by a.AccessedOn desc limit 1) as LastLoginPortal
                         ,(select COUNT(DISTINCT(a.URL)) as TotalActivity
                         from db_employees.log_employees a 
-                        where a.NIP = em.NIP ".$conditionDate." ) as TotalActivity";
+                        where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE(lem.AccessedOn) ) as TotalActivity";
         }
-        $sorted = " order by ".(!empty($order) ? $order : 'lem.AccessedOn asc');
+        $sorted = " order by ".(!empty($order) ? $order : 'em.Name, lem.AccessedOn asc');
         
         $string = "SELECT {$select}
                    FROM db_employees.employees em
@@ -172,7 +170,7 @@ class M_hr extends CI_Model {
                    LEFT JOIN db_employees.division d on (d.ID = SUBSTRING_INDEX(em.PositionMain,'.',1) )
                    LEFT JOIN db_employees.position p on (p.ID = SUBSTRING_INDEX(em.PositionMain,'.',-1) )
                    LEFT JOIN db_employees.log_employees lem on (lem.NIP = em.NIP)
-                   {$where} GROUP BY em.NIP {$sorted} {$lims} ";
+                   {$where} GROUP BY em.NIP, DATE(lem.AccessedOn) {$sorted} {$lims} ";
         
         $value  = $this->db->query($string);
         //var_dump($this->db->last_query());

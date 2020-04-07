@@ -1536,8 +1536,12 @@ class C_dashboard extends Globalclass {
                     $param[] = array("field"=>")","data"=>null,"filter"=>null);
                 }
 
-                if(!empty($reqdata['attendance_start'])){
-                    $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d",strtotime($reqdata['attendance_start']))."' ","filter"=>"AND",);
+                if(!empty($output['attendance_start'])){
+                    if(!empty($output['attendance_end'])){
+                        $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."' ","filter"=>"AND",);
+                    }else{
+                        $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                    }
                 }else{
                     $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
                 }

@@ -14,7 +14,7 @@
           source: employeeTags
         });
 
-        $("#form-additional-info .btn-submit").click(function(){
+        $("#form-career-level .btn-submit").click(function(){
             var itsme = $(this);
             var itsform = itsme.parent().parent().parent();
             itsform.find(".select2-req").each(function(){
@@ -51,7 +51,7 @@
             var totalError = itsform.find(".error").length;
             if(error && totalError == 0 ){
                 loading_modal_show();
-                $("#form-additional-info")[0].submit();
+                $("#form-career-level")[0].submit();
             }else{
                 alert("Please fill out the field.");
             }
@@ -146,7 +146,7 @@
             }
         }
 
-        $("#form-additional-info").on("change",".join-StatusEmployeeID",function(){
+        $("#form-career-level").on("change",".join-StatusEmployeeID",function(){
             var itsme = $(this);
             var value = itsme.val();
             var resignField = itsme.parent().parent().find(".join-ResignDate");
@@ -160,7 +160,7 @@
         });
 
 
-        $("#form-additional-info").on("change",".career-DepartmentID",function(){
+        $("#form-career-level").on("change",".career-DepartmentID",function(){
             var itsme = $(this);
             var value = itsme.val();
             var position = itsme.parent().parent().find(".career-PositionID");
@@ -177,7 +177,7 @@
             }
         });
 
-        $("#form-additional-info").on("change",".career-StatusID",function(){
+        $("#form-career-level").on("change",".career-StatusID",function(){
             var itsme = $(this);
             var value = itsme.val();
             var parent = itsme.parent().parent();
@@ -194,7 +194,7 @@
             }
         });
 
-        $("#form-additional-info").on("change",".career-PositionID",function(){
+        $("#form-career-level").on("change",".career-PositionID",function(){
             var itsme = $(this);
             var value = itsme.val();
             var parent = itsme.parent().parent();
@@ -310,7 +310,7 @@
         <?php } } ?>
     });
 </script>
-<div id="form-additional-info" action="<?=base_url('human-resources/employees/career-level-save')?>" method="post" autocomplete="off">
+<form id="form-career-level" action="<?=base_url('human-resources/employees/career-level-save')?>" method="post" autocomplete="off">
     <input type="hidden" name="NIP" value="<?=$NIP?>">
     <div class="panel panel-primary">
         <div class="panel-heading">
@@ -433,7 +433,7 @@
                                             <?php } } ?>
                                         </select>
         								<small class="text-danger text-message"></small></td>
-        								<td><input type="text" name="jobTitle[]" class="form-control required career-JobTitle" required></td>
+        								<td><input type="text" name="jobTitle[]" class="form-control career-JobTitle" required></td>
         								<td><input type="text" name="superior[]" required class="form-control required career-Superior autocomplete" id="autocomplete-career"><small class="text-danger text-message"></small></td>
         								<td><select class="form-control required career-StatusID" name="statusID[]" required>
         									<option value="">Choose Status</option>
@@ -453,5 +453,8 @@
         		</div>
         	</div>
         </div>
+        <div class="panel-footer text-right">
+            <button class="btn btn-success btn-submit" type="button">Save changes</button>
+        </div>
     </div>
-</div>
+</form>
