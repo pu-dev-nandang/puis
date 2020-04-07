@@ -48,15 +48,15 @@
 		                </select>               
 		              </div>
 		            </div>
-		            <div class="col-sm-3">
+		            <div class="col-sm-2">
 		              <div class="form-group">
-		                <label>Attendance Start Day</label>
+		                <label>Attendance Start From</label>
 		                <input type="text" name="attendance_start" id="attendance_start" class="form-control" placeholder="dd-mm-yyy"> 		                  
 		              </div>
 		            </div>
-		            <div class="col-sm-3">
+		            <div class="col-sm-2">
 		              <div class="form-group">
-		                <label>Attendance End Day</label>
+		                <label>Until</label>
 		                <input type="text" name="attendance_end" id="attendance_end" class="form-control" placeholder="dd-mm-yyy"> 		                  
 		              </div>
 		            </div>
