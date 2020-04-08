@@ -83,7 +83,7 @@
             		"data":"NIP",
             		"render": function (data, type, row, meta) {
             			var label = '<button class="btn btn-info btn-detail" data-date="'+row.FirstLoginPortal+'" data-id="'+data+'"><i class="fa fa-folder-open"></i></button>';
-            			return label;
+            			return '-';
             		}
             	},
         	]
