@@ -155,9 +155,7 @@ class M_hr extends CI_Model {
                         , (select a.AccessedOn from db_employees.log_employees a
                         where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE(lem.AccessedOn)
                         order by a.AccessedOn desc limit 1) as LastLoginPortal
-                        ,(select COUNT(DISTINCT(a.URL)) as TotalActivity
-                        from db_employees.log_employees a 
-                        where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE(lem.AccessedOn) ) as TotalActivity";
+                        ,'0' as TotalActivity";
         }
         $sorted = " order by ".(!empty($order) ? $order : 'em.Name, lem.AccessedOn asc');
         
