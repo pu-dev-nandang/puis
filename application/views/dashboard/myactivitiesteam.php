@@ -5,16 +5,12 @@
         var token = jwt_encode({Filter : filtering},'UAP)(*');
         var dataTable = $('#fetch-data-tables #table-list-data').DataTable( {
             "destroy": true,
+            "ordering" : false,
             "retrieve":true,
             "processing": true,
             "serverSide": true,
-            "iDisplayLength" : 10,
-            "ordering" : false,
+            "iDisplayLength" : 5,
             "responsive": true,
-            "language": {
-                "searchPlaceholder": "NIP, or Name"
-            },
-            "lengthMenu": [[10, 25, 50], [10, 25, 50]],
             "ajax":{
                 url : base_url_js+'my-team/fetchActivities', // json datasource
                 ordering : false,
@@ -69,9 +65,6 @@
             			
             			return label;
             		}            		
-            	},
-            	{
-            		"data":"TotalActivity"            		
             	},
             	{
             		"data":"FirstLoginPortal"            		
@@ -342,7 +335,6 @@
 	                                <th>NIP</th>
 	                                <th>Employee</th>
 	                                <th>Position</th>
-	                                <th>Total Activity</th>
 	                                <th>First Login</th>
 	                                <th>Last Login</th>
 	                                <th width="5%">Detail</th>

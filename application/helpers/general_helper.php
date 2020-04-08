@@ -64,3 +64,11 @@ function labelProfileDB($table,$data){
 	return $results;
 }
 
+
+function lastLogin($data){
+	$CI = & get_instance();
+	$CI->load->model('General_model');
+	$results = $CI->General_model->fetchData("db_employees.log_employees a",$data,"a.ID","desc","0#1")->row();
+	//var_dump($CI->db->last_query());die();
+	return $results;
+}
