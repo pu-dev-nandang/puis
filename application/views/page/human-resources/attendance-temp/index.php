@@ -183,7 +183,6 @@
 	                                <th>NIP</th>
 	                                <th>Employee</th>
 	                                <th>Position</th>
-	                                <th>Total Activity</th>
 	                                <th>First Login</th>
 	                                <th>Last Login</th>
 	                                <th width="5%">Detail</th>
@@ -208,7 +207,13 @@
         var token = jwt_encode({Filter : filtering},'UAP)(*');
 
         var dataTable = $('#fetch-data-tables #table-list-data').DataTable( {
-            
+            "destroy": true,
+            "ordering" : false,
+            "retrieve":true,
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 5,
+            "responsive": true,
             "ajax":{
                 url : base_url_js+'human-resources/fetch-attendance-temp', // json datasource
                 ordering : false,
@@ -266,13 +271,13 @@
             		}            		
             	},
             	{
-            		"data":"TotalActivity"            		
-            	},
-            	{
             		"data":"FirstLoginPortal"            		
             	},
             	{
-            		"data":"LastLoginPortal"            		
+            		"data":"LastLoginPortal",
+            		"render": function(data, type, row, meta){
+            			return data;
+            		}            		
             	},
             	{
             		"data":"NIP",
@@ -286,10 +291,14 @@
 	}
 
   $(document).ready(function(){
-    
+    $("#attendance_start,#attendance_end").datepicker({
+	  dateFormat: 'dd-mm-yy',
+      changeYear: true,
+      changeMonth: true,
+  	});
 
     var attdMin="", attdMax="";
-    $("#attendance_start").datepicker({
+    /*$("#attendance_start").datepicker({
 	  dateFormat: 'dd-mm-yy',
       changeYear: true,
       changeMonth: true,
@@ -323,16 +332,17 @@
 	    //fromDate = ConvertDateToShortDateString(fromDate);
 	    //toDate = ConvertDateToShortDateString(toDate);
 	  }
-	});
+	}); */
 
     $(".btn-download").click(function(){
     	var itsme = $(this);
     	var filtering = $("#form-filter").serialize();
-		
+		//itsme.prop("disabled",true).html("loading");
         var token = jwt_encode({Filter : filtering},'UAP)(*');
         var urld = base_url_js+"human-resources/download-attendance-temp";
         $("#form-filter").attr("action",urld);
         $("#form-filter")[0].submit();
+
     });
 
     $('#form-filter').on('keyup keypress', function(e) {

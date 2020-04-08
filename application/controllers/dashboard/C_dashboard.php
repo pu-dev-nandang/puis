@@ -1442,8 +1442,7 @@ class C_dashboard extends Globalclass {
                 $search = $reqdata['search']['value'];
 
                 $param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);
-                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' ","filter"=>"OR",);
-                $param[] = array("field"=>"em.NIDN","data"=>" like '%".$search."%' )","filter"=>"OR",);
+                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' )","filter"=>"OR",);
             }
             if(!empty($data_arr['Filter'])){
                 $parse = parse_str($data_arr['Filter'],$output);
@@ -1528,7 +1527,6 @@ class C_dashboard extends Globalclass {
 
                 if(!empty($output['staff'])){
                     $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
-                    $param[] = array("field"=>"ps.NameEng","data"=>" like '%".$output['staff']."%' ","filter"=>"OR",);
                     $param[] = array("field"=>"em.Name","data"=>" like '%".$output['staff']."%' )","filter"=>"OR",);
                 }
                 if(!empty($output['religion'])){
@@ -1591,10 +1589,21 @@ class C_dashboard extends Globalclass {
             $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
             if(!empty($reqdata['length']) ){
-                $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+                $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'])->result();
             }else{
                 $result = $this->m_hr->fetchEmployee(false,$param)->result();
             }
+
+            if(!empty($result)){
+                $rs = array();
+                foreach ($result as $r) {
+                    $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                    $r->LastLoginPortal = lastLogin($conditions)->AccessedOn;
+                    $rs[] = $r;
+                }
+                $result = $rs;
+            }
+
             //var_dump($this->db->last_query());
             $json_data = array(
                 "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),

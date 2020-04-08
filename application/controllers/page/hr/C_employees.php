@@ -1528,18 +1528,18 @@ class C_employees extends HR_Controler {
 
     public function fetchAttdTempEmp(){
         set_time_limit(0);
+        $this->load->helper("General_helper");
         $reqdata = $this->input->post();
         if($reqdata){
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
-            $param = array();$orderBy=" em.ID DESC ";
+            $param = array();$orderBy=" lem.ID DESC ";
 
             if(!empty($reqdata['search']['value']) ) {
                 $search = $reqdata['search']['value'];
 
                 $param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);
-                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' ","filter"=>"OR",);
-                $param[] = array("field"=>"em.NIDN","data"=>" like '%".$search."%' )","filter"=>"OR",);
+                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' )","filter"=>"OR",);
             }
             if(!empty($data_arr['Filter'])){
                 $parse = parse_str($data_arr['Filter'],$output);
@@ -1618,7 +1618,6 @@ class C_employees extends HR_Controler {
 
                 if(!empty($output['staff'])){
                     $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
-                    $param[] = array("field"=>"ps.NameEng","data"=>" like '%".$output['staff']."%' ","filter"=>"OR",);
                     $param[] = array("field"=>"em.Name","data"=>" like '%".$output['staff']."%' )","filter"=>"OR",);
                 }
                 if(!empty($output['religion'])){
@@ -1678,12 +1677,25 @@ class C_employees extends HR_Controler {
             }
             $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
-            if(!empty($reqdata['start']) && !empty($reqdata['length'])){
-                $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+            //var_dump($this->db->last_query());
+            //var_dump($totalData);die();
+            if(!empty($reqdata['length'])){
+                $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'])->result();
             }else{
                 $result = $this->m_hr->fetchEmployee(false,$param)->result();
             }
-            //var_dump($this->db->last_query());
+
+            if(!empty($result)){
+                $rs = array();
+                foreach ($result as $r) {
+                    $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                    $r->LastLoginPortal = lastLogin($conditions)->AccessedOn;
+                    $rs[] = $r;
+                }
+                $result = $rs;
+            }
+
+            
             $json_data = array(
                 "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
                 "recordsTotal"    => intval($TotalData),
@@ -1748,9 +1760,10 @@ class C_employees extends HR_Controler {
 
 
     public function downloadAttendanceTemp(){
+        set_time_limit(0);
         $reqdata = $this->input->post();
         if($reqdata){
-
+            $this->load->helper("General_helper");
             $param = array();$orderBy=" em.ID DESC ";
 
             if(!empty($reqdata['division'])){
@@ -1784,7 +1797,6 @@ class C_employees extends HR_Controler {
 
             if(!empty($reqdata['staff'])){
                 $param[] = array("field"=>"(em.NIP","data"=>" like '%".$reqdata['staff']."%' ","filter"=>"AND",);
-                $param[] = array("field"=>"ps.NameEng","data"=>" like '%".$reqdata['staff']."%' ","filter"=>"OR",);
                 $param[] = array("field"=>"em.Name","data"=>" like '%".$reqdata['staff']."%' )","filter"=>"OR",);
             }
             if(!empty($reqdata['religion'])){
@@ -1844,15 +1856,23 @@ class C_employees extends HR_Controler {
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
             $result = $this->m_hr->fetchEmployee(false,$param)->result();
 
-            $now = gmdate("D, d M Y H:i:s");
-            
+            if(!empty($result)){
+                $rs = array();
+                foreach ($result as $r) {
+                    $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                    $r->LastLoginPortal = lastLogin($conditions)->AccessedOn;
+                    $rs[] = $r;
+                }
+                $result = $rs;
+            }
+
             // disposition / encoding on response body
             header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
             header("Content-Disposition: attachment; filename=Attendance-Temporary-DownloadAT.xls");  //File name extension was wrong
             header("Expires: 0");
             header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
             header("Cache-Control: private",false);
-            $table = '<table border="1"><thead><tr><th>No</th><th>NIP</th><th>Employee</th><th>Division/Position</th><th>Total Activity</th><th>First Login</th><th>Last Login</th></tr></thead><tbody>';
+            $table = '<table border="1"><thead><tr><th>No</th><th>NIP</th><th>Employee</th><th>Division/Position</th><th>First Login</th><th>Last Login</th></tr></thead><tbody>';
             if(!empty($result)){
                 $num=1;
                 foreach ($result as $v) {
@@ -1864,7 +1884,6 @@ class C_employees extends HR_Controler {
                               (!empty($v->PositionOther2) ? '<br>'.$v->PositionOther2 : '').
                               (!empty($v->PositionOther3) ? '<br>'.$v->PositionOther3 : '').
                               '</td>
-                              <td>'.$v->TotalActivity.'</td>
                               <td>'.date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal)).'</td>
                               <td>'.date('d-F-Y H:i:s',strtotime($v->LastLoginPortal)).'</td>
                           </tr>';
