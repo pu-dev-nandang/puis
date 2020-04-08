@@ -945,17 +945,23 @@
         });
 
         //only for lecturer
-        var prody = $("body #formProgrammeStudy").val();
-        console.log(prody);
-        if($.trim(prody).length > 1){
-            var statusLecturer = itsform.find("#formStatusLecturer").val();
-            if($.trim(statusLecturer).length > 1){
-                itsform.find("#formStatusLecturer").addClass("required");
-                itsform.find("#formStatusLecturer").parent().find(".text-message").text("Please fill this field");
-                error=false;
-            }
-            
-        }else{error=true;}
+        var prody = $("body #formProgrammeStudy > option:selected");
+        var attr = prody.attr("value");
+        if (typeof attr !== typeof undefined && attr !== false) {
+            var value = prody.val();
+            if($.trim(value).length > 0){
+                var statusLecturer = itsform.find("#formStatusLecturer").val();
+                console.log(statusLecturer);
+                if($.trim(statusLecturer).length > 0){
+                    itsform.find("#formStatusLecturer").addClass("required");
+                    itsform.find("#formStatusLecturer").parent().find(".text-message").text("Please fill this field");
+                    error=false;
+                }
+                
+            }else{error=true;}
+        }
+        
+        
         
         var totalError = itsform.find(".error").length;
         if(error && totalError == 0 ){
