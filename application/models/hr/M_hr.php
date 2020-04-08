@@ -149,6 +149,9 @@ class M_hr extends CI_Model {
             $select = "count(DISTINCT(em.NIP)) as Total";
         }else{
             $select = "em.*, el.Name as ProdiDegree, el.DescriptionEng as ProdiDegreeEng, ps.NameEng AS ProdiNameEng, es.Description as EmpStatus, r.Religion as EmpReligion, le.Level as EmpLevelEduName, le.Description as EmpLevelDesc, lap.Position as EmpAcaName, d.Division as DivisionMain_, p.Position as PositionMain_, (case when (DATE_FORMAT(em.DateOfBirth,'%m-%d') = DATE_FORMAT(now(),'%m-%d') ) then 1 else null end ) as isMyBirthday 
+                        ,concat(d1.Division,'-',p1.Position ) as PositionOther1
+                        ,concat(d2.Division,'-',p2.Position ) as PositionOther2
+                        ,concat(d3.Division,'-',p3.Position ) as PositionOther3
                         , lem.AccessedOn as FirstLoginPortal
                         , (select a.AccessedOn from db_employees.log_employees a
                         where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE(lem.AccessedOn)
@@ -169,6 +172,12 @@ class M_hr extends CI_Model {
                    LEFT JOIN db_employees.lecturer_academic_position lap ON (lap.ID = em.LecturerAcademicPositionID)
                    LEFT JOIN db_employees.division d on (d.ID = SUBSTRING_INDEX(em.PositionMain,'.',1) )
                    LEFT JOIN db_employees.position p on (p.ID = SUBSTRING_INDEX(em.PositionMain,'.',-1) )
+                    LEFT JOIN db_employees.division d1 on (d1.ID = SUBSTRING_INDEX(em.PositionOther1,'.',1) ) 
+                    LEFT JOIN db_employees.position p1 on (p1.ID = SUBSTRING_INDEX(em.PositionOther1,'.',-1) ) 
+                    LEFT JOIN db_employees.division d2 on (d2.ID = SUBSTRING_INDEX(em.PositionOther2,'.',1) ) 
+                    LEFT JOIN db_employees.position p2 on (p2.ID = SUBSTRING_INDEX(em.PositionOther2,'.',-1) ) 
+                    LEFT JOIN db_employees.division d3 on (d3.ID = SUBSTRING_INDEX(em.PositionOther3,'.',1) ) 
+                    LEFT JOIN db_employees.position p3 on (p3.ID = SUBSTRING_INDEX(em.PositionOther3,'.',-1) ) 
                    LEFT JOIN db_employees.log_employees lem on (lem.NIP = em.NIP)
                    {$where} GROUP BY em.NIP, DATE(lem.AccessedOn) {$sorted} {$lims} ";
         

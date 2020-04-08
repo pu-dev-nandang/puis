@@ -1519,6 +1519,7 @@ class C_employees extends HR_Controler {
 
 
     public function fetchAttdTempEmp(){
+        set_time_limit(0);
         $reqdata = $this->input->post();
         if($reqdata){
             $key = "UAP)(*";
@@ -1576,13 +1577,6 @@ class C_employees extends HR_Controler {
                 }
                 //check data for employee
                 else{
-                    if(!empty($output['division'])){
-                        $param[] = array("field"=>"em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);
-                    }
-                    if( !empty($output['division']) && !empty($output['position'])){
-                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);
-                    }
-
                     if(!empty($output['status'])){
                         $sn = 1;
                         $dataArrStatus = array();
@@ -1598,6 +1592,21 @@ class C_employees extends HR_Controler {
                         $param[] = array("field"=>")","data"=>null,"filter"=>null);
                     }
                 }
+
+                if(!empty($output['division'])){
+                    if(!empty($output['position'])){
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther1","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther2","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$output['division'].".".$output['position']."' ) ","filter"=>"AND",);
+                    }else{
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther1","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$output['division'].".%' ) ","filter"=>"AND",);
+                    }
+                }
+                
 
                 if(!empty($output['staff'])){
                     $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
@@ -1646,7 +1655,6 @@ class C_employees extends HR_Controler {
                     }
                     $param[] = array("field"=>")","data"=>null,"filter"=>null);
                 }
-
                 if(!empty($output['attendance_start'])){
                     if(!empty($output['attendance_end'])){
                         $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."' ","filter"=>"AND",);
@@ -1656,7 +1664,6 @@ class C_employees extends HR_Controler {
                 }else{
                     $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
                 }
-
                 if(!empty($output['sorted'])){
                     $orderBy = $output['sorted'];
                 }
@@ -1739,10 +1746,17 @@ class C_employees extends HR_Controler {
             $param = array();$orderBy=" em.ID DESC ";
 
             if(!empty($reqdata['division'])){
-                $param[] = array("field"=>"em.PositionMain","data"=>" like '".$reqdata['division'].".%' ","filter"=>"AND",);
-            }
-            if( !empty($reqdata['division']) && !empty($reqdata['position'])){
-                $param[] = array("field"=>"em.PositionMain","data"=>" = '".$reqdata['division'].".".$reqdata['position']."' ","filter"=>"AND",);
+                if(!empty($reqdata['position'])){
+                    $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$reqdata['division'].".".$reqdata['position']."' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther1","data"=>" = '".$reqdata['division'].".".$reqdata['position']."' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther2","data"=>" = '".$reqdata['division'].".".$reqdata['position']."' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$reqdata['division'].".".$reqdata['position']."' ) ","filter"=>"AND",);
+                }else{
+                    $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$reqdata['division'].".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther1","data"=>" like '".$reqdata['division'].".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$reqdata['division'].".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$reqdata['division'].".%' ) ","filter"=>"AND",);
+                }
             }
 
             if(!empty($reqdata['status'])){
@@ -1837,7 +1851,11 @@ class C_employees extends HR_Controler {
                 $table .= '<tr><td>'.$num++.'</td>
                               <td>'.$v->NIP.'</td>
                               <td>'.$v->Name.'</td>
-                              <td>'.$v->DivisionMain_.'-'.$v->PositionMain_.'</td>
+                              <td>'.$v->DivisionMain_.'-'.$v->PositionMain_.
+                              (!empty($v->PositionOther1) ? '<br>'.$v->PositionOther1 : '').
+                              (!empty($v->PositionOther2) ? '<br>'.$v->PositionOther2 : '').
+                              (!empty($v->PositionOther3) ? '<br>'.$v->PositionOther3 : '').
+                              '</td>
                               <td>'.$v->TotalActivity.'</td>
                               <td>'.date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal)).'</td>
                               <td>'.date('d-F-Y H:i:s',strtotime($v->LastLoginPortal)).'</td>

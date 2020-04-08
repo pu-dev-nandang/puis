@@ -56,6 +56,17 @@
             		"data":"DivisionMain_",
             		"render": function (data, type, row, meta) {
             			var label = data+"-"+row.PositionMain_;
+            			if($.trim(row.PositionOther1).length > 0){
+            				label += '<br>'+row.PositionOther1;
+            			}
+            			if($.trim(row.PositionOther2).length > 0){
+            				label += '<br>'+row.PositionOther2;
+            			}
+            			if($.trim(row.PositionOther3).length > 0){
+            				label += '<br>'+row.PositionOther3;
+            			}
+
+            			
             			return label;
             		}            		
             	},
@@ -181,6 +192,31 @@
 		                <input type="text" class="form-control" name="staff" placeholder="NIP or Name">               
 		              </div>
 		            </div>
+		            <?php if(!empty($division)){ ?>
+		            <div class="col-sm-3">
+		              <div class="form-group">
+		                <label>Division</label>               
+		                <select class="form-control" name="division">
+		                  <option value="">-Choose one-</option>
+		                  <?php foreach ($division as $d) {
+		                  echo '<option value="'.$d->ID.'">'.$d->Division.'</option>';
+		                  } ?>
+		                </select>
+		              </div>
+		            </div>
+		            <div class="col-sm-3">
+		              <div class="form-group">
+		                <label>Position</label>               
+		                <select class="form-control" name="position" disabled>
+		                  <option value="">-Choose one-</option>
+		                  <?php foreach ($position as $p) {
+		                  echo '<option value="'.$p->ID.'">'.$p->Description.'</option>';
+		                  } ?>
+		                </select>               
+		              </div>
+		            </div>
+		            <?php } ?>
+
 		            <div class="col-sm-3">
 		              <div class="form-group">
 		                <label>Attendance Day</label>
