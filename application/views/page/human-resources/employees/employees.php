@@ -269,7 +269,7 @@
                 '                <th style="width: 10%;">Birthdate</th>' +
                 '                <th style="width: 8%;">Position</th>' +
                 '                <th style="width: 15%;">Address</th>' +
-                '                <th style="width: 7%;">Action</th>' +
+                '                <th style="width: 7%;">Status</th>' +
                 '            </tr>' +
                 '            </thead>' +
                 '        </table>');
