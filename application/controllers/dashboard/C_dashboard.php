@@ -1390,8 +1390,32 @@ class C_dashboard extends Globalclass {
 
     public function myTeamActivities(){
         $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","IDStatus = 1 or IDStatus = 2","IDStatus","asc")->result();
-        $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
-        $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+        $myNIP = $this->session->userdata('NIP');
+        if(!empty($this->session->userdata('PositionOther1')['IDDivisionOther1']) || 
+            !empty($this->session->userdata('PositionOther2')['IDDivisionOther2']) ||
+            !empty($this->session->userdata('PositionOther3')['IDDivisionOther3'])){
+            $paramDivision = "";
+        }else{$paramDivision = array();}
+        
+        //var_dump($this->session->userdata());
+        if(!empty($this->session->userdata('PositionOther1')['IDDivisionOther1'])){
+            $paramDivision .= 'ID = '.$this->session->userdata('PositionOther1')['IDDivisionOther1'];
+        }
+        if(!empty($this->session->userdata('PositionOther2')['IDDivisionOther2'])){
+            $paramDivision .= 'or ID = '.$this->session->userdata('PositionOther2')['IDDivisionOther2'];
+        }
+        if(!empty($this->session->userdata('PositionOther3')['IDDivisionOther3'])){
+            $paramDivision .= 'or ID = '.$this->session->userdata('PositionOther3')['IDDivisionOther3'];
+        }
+
+
+        //var_dump($this->session->userdata);
+        if(!empty($this->session->userdata('PositionOther1')['IDDivisionOther1']) || 
+            !empty($this->session->userdata('PositionOther2')['IDDivisionOther2']) ||
+            !empty($this->session->userdata('PositionOther3')['IDDivisionOther3'])){
+            $data['division'] = $this->General_model->fetchData("db_employees.division",$paramDivision)->result();
+            $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+        }
         $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
         $data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
         $this->load->view('dashboard/myactivitiesteam',$data);        
@@ -1488,6 +1512,20 @@ class C_dashboard extends Globalclass {
                     }
                 }
 
+                if(!empty($output['division'])){
+                    if(!empty($output['position'])){
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther1","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther2","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$output['division'].".".$output['position']."' ) ","filter"=>"AND",);
+                    }else{
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther1","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$output['division'].".%' ) ","filter"=>"AND",);
+                    }
+                }
+
                 if(!empty($output['staff'])){
                     $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
                     $param[] = array("field"=>"ps.NameEng","data"=>" like '%".$output['staff']."%' ","filter"=>"OR",);
@@ -1552,12 +1590,12 @@ class C_dashboard extends Globalclass {
             }
             $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
-            if(!empty($reqdata['start']) && !empty($reqdata['length'])){
+            if(!empty($reqdata['length']) ){
                 $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
             }else{
                 $result = $this->m_hr->fetchEmployee(false,$param)->result();
             }
-
+            //var_dump($this->db->last_query());
             $json_data = array(
                 "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
                 "recordsTotal"    => intval($TotalData),

@@ -171,7 +171,7 @@
 		    <div class="col-md-12">
 		      <div class="panel panel-default">
 		        <div class="panel-heading">            
-		          <button class="btn btn-xs btn-primary btn-download pull-right" type="button"><i class="fa fa-download"></i> Export to excel</button>
+		          <button class="btn btn-xs btn-primary btn-download pull-right" disabled type="button"><i class="fa fa-download"></i> Export to excel</button>
 		          <h4 class="panel-title"><i class="fa fa-bars"></i> List of record home attendances <span>Today (<?= date('d F Y') ?>)</span></h4>
 		        </div>
 		        <div class="panel-body">
@@ -228,6 +228,7 @@
             },
             "initComplete": function(settings, json) {
                 //loading_modal_hide();
+                $(".btn-download").prop("disabled",false);
             },
             "columns": [
             	{
@@ -250,6 +251,17 @@
             		"data":"DivisionMain_",
             		"render": function (data, type, row, meta) {
             			var label = data+"-"+row.PositionMain_;
+            			if($.trim(row.PositionOther1).length > 0){
+            				label += '<br>'+row.PositionOther1;
+            			}
+            			if($.trim(row.PositionOther2).length > 0){
+            				label += '<br>'+row.PositionOther2;
+            			}
+            			if($.trim(row.PositionOther3).length > 0){
+            				label += '<br>'+row.PositionOther3;
+            			}
+
+            			
             			return label;
             		}            		
             	},
@@ -274,11 +286,45 @@
 	}
 
   $(document).ready(function(){
-    $("#attendance_start,#attendance_end").datepicker({
-        dateFormat: 'dd-mm-yy',
-        changeYear: true,
-        changeMonth: true
-    });
+    
+
+    var attdMin="", attdMax="";
+    $("#attendance_start").datepicker({
+	  dateFormat: 'dd-mm-yy',
+      changeYear: true,
+      changeMonth: true,
+	  //defaultDate: new Date(),
+	  //minDate: new Date(),
+	  //beforeShowDay: $.datepicker.noWeekends,
+	  onSelect: function(dateStr)
+	  {
+	      attdMin = dateStr;
+	      $("#attendance_end").val(dateStr);
+	        var date = $(this).datepicker('getDate');
+	        console.log(dateStr);
+	        console.log(date);
+	        var endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + 1);//6
+	      	console.log(endDate);
+	      	attdMax = new Date(endDate);
+	      $( "#attendance_end" ).datepicker("option",{minDate: endDate, maxDate:new Date(dateStr)});
+	      
+	  }
+	});
+
+	$('#attendance_end').datepicker({
+	  dateFormat: 'dd-mm-yy',
+      changeYear: true,
+      changeMonth: true,
+      //defaultDate: new Date(),
+	  //beforeShowDay: $.datepicker.noWeekends,
+	  onSelect: function(dateStr) {
+	  	console.log(dateStr);
+	    toDate = new Date(dateStr);
+	    //fromDate = ConvertDateToShortDateString(fromDate);
+	    //toDate = ConvertDateToShortDateString(toDate);
+	  }
+	});
+
     $(".btn-download").click(function(){
     	var itsme = $(this);
     	var filtering = $("#form-filter").serialize();
@@ -287,30 +333,6 @@
         var urld = base_url_js+"human-resources/download-attendance-temp";
         $("#form-filter").attr("action",urld);
         $("#form-filter")[0].submit();
-        /*$.ajax({
-            type : 'POST',
-            url : urld,
-            data: {token:token},
-            //dataType : 'json',
-            beforeSend :function(){
-                itsme.html('<i class="fa fa-spinner fa-pulse fa-fw"></i>');
-            },error : function(jqXHR){
-            	itsme.html('<i class="fa fa-download"></i> Export to excel');
-                $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
-                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
-                $("body #GlobalModal").modal("show");
-            },success : function(response){
-            	itsme.html('<i class="fa fa-download"></i> Export to excel');
-		        console.log(response);
-		        window.location = urld;
-		        var a = document.createElement("a");
-		        a.href = response.file; 
-		        a.download = response.name;
-		        document.body.appendChild(a);
-		        a.click();
-		        a.remove();
-            }
-        }); */
     });
 
     $('#form-filter').on('keyup keypress', function(e) {
@@ -351,7 +373,7 @@
         fetchAttendance();
         var startDate = $("#form-filter input[name=attendance_start]").val();
         var endDate = $("#form-filter input[name=attendance_end]").val();
-        $("#attendance-temporary .result .panel-title >span").text(startDate+(($.trim(endDate).length > 0) ? '-'+endDate:'') ).addClass("bg-success");
+        $("#attendance-temporary .result .panel-title >span").text(startDate+(($.trim(endDate).length > 0) ? ' until '+endDate:'') ).addClass("bg-success");
     });
 
     fetchAttendance();
