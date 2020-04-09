@@ -7,7 +7,9 @@
     #divDataEmployees #tableEmployees tbody td > a.card-link{text-decoration: none !important}
     #divDataEmployees #tableEmployees tbody td > a.card-link .regular{color: #555}
     #divDataEmployees #tableEmployees tbody td > a.card-link .name{font-weight: bold}
-    
+    .day-week{background: yellow;padding: 5px;border-radius: 5px;}
+    .day-week.bg-danger{background: #51a351;color:#fff;}
+    .day-week.bg-success{background: #dd5600;color:#fff;}
 </style>
 <div id="attendance-temporary">
 	<div class="filtering">
@@ -183,6 +185,7 @@
 	                                <th>NIP</th>
 	                                <th>Employee</th>
 	                                <th>Position</th>
+	                                <th>Day</th>
 	                                <th>First Login</th>
 	                                <th>Last Login</th>
 	                                <th width="5%">Detail</th>
@@ -271,13 +274,17 @@
             		}            		
             	},
             	{
-            		"data":"FirstLoginPortal"            		
+            		"data":"FirstLoginPortalDay",
+            		"render": function(data, type, row, meta){
+            			var label = '<span class="day-week bg-'+((row.FirstLoginPortalDayNum > 5) ? 'success':'danger')+'">'+data+'</span>';
+            			return label;
+            		}
             	},
             	{
-            		"data":"LastLoginPortal",
-            		"render": function(data, type, row, meta){
-            			return data;
-            		}            		
+            		"data":"FirstLoginPortal"          		
+            	},
+            	{
+            		"data":"LastLoginPortal"            		
             	},
             	{
             		"data":"NIP",

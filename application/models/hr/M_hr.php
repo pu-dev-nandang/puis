@@ -154,9 +154,9 @@ class M_hr extends CI_Model {
                         ,concat(d1.Division,'-',p1.Position ) as PositionOther1
                         ,concat(d2.Division,'-',p2.Position ) as PositionOther2
                         ,concat(d3.Division,'-',p3.Position ) as PositionOther3
-                        , lem.AccessedOn as FirstLoginPortal
-                        #,(select a.AccessedOn from db_employees.log_employees a where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE(lem.AccessedOn) order by a.ID desc limit 1) as LastLoginPortal ,(select a.AccessedOn from db_employees.log_employees a where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE(lem.AccessedOn) order by a.ID desc limit 1) as LastLoginPortal ,(select a.AccessedOn from db_employees.log_employees a where a.NIP = em.NIP and DATE(a.AccessedOn) = DATE(lem.AccessedOn) order by a.ID desc limit 1) as LastLoginPortal
-                        , '-' as LastLoginPortal ";
+                        , DATE_FORMAT(lem.AccessedOn, '%d-%M-%Y %H:%i:%s') as FirstLoginPortal
+                        ,DAYNAME(lem.AccessedOn) as FirstLoginPortalDay
+                        ,WEEKDAY(lem.AccessedOn) as FirstLoginPortalDayNum ";
             $groupby = 'GROUP BY em.NIP, DATE(lem.AccessedOn)';
             $sorted = " order by ".(!empty($order) ? $order : 'FirstLoginPortal asc');
         }
