@@ -1013,13 +1013,20 @@
         
         
         if(isLecturer){
-            var statusLecturer = itsform.find("#formStatusLecturer").val();
-            console.log(statusLecturer);
-            if($.trim(statusLecturer).length > 0){
-                itsform.find("#formStatusLecturer").addClass("required");
-                itsform.find("#formStatusLecturer").parent().find(".text-message").text("Please fill this field");
-                error=false;
+            var statusLecturerVA = itsform.find("#formStatusLecturer > option:selected").attr("value");
+            var statusLecturer = itsform.find("#formStatusLecturer > option:selected").val();
+                console.log("c:"+statusLecturer);
+            if(typeof statusLecturerVA !== typeof undefined && statusLecturerVA !== false){
+                console.log("v:"+statusLecturerVA);
+                  error=true;
+            }else{
+                if($.trim(statusLecturer).length > 0){
+                    itsform.find("#formStatusLecturer").addClass("required");
+                    itsform.find("#formStatusLecturer").parent().find(".text-message").text("Please fill this field");
+                    error=false;
+                }    
             }
+            
         }
         
         
