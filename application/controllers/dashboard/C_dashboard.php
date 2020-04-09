@@ -1598,7 +1598,7 @@ class C_dashboard extends Globalclass {
                 $rs = array();
                 foreach ($result as $r) {
                     $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
-                    $r->LastLoginPortal = lastLogin($conditions)->AccessedOn;
+                    $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
                     $rs[] = $r;
                 }
                 $result = $rs;

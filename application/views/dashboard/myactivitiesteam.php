@@ -1,3 +1,6 @@
+<style>.day-week{background: yellow;padding: 5px;border-radius: 5px;}
+    .day-week.bg-danger{background: #51a351;color:#fff;}
+    .day-week.bg-success{background: #dd5600;color:#fff;}</style>
 <script type="text/javascript">
 	function fetchActivities() {
 		var filtering = $("#form-filter").serialize();		
@@ -65,6 +68,13 @@
             			
             			return label;
             		}            		
+            	},
+            	{
+            		"data":"FirstLoginPortalDay",
+            		"render": function(data, type, row, meta){
+            			var label = '<span class="day-week bg-'+((row.FirstLoginPortalDayNum > 5) ? 'success':'danger')+'">'+data+'</span>';
+            			return label;
+            		}
             	},
             	{
             		"data":"FirstLoginPortal"            		
@@ -335,6 +345,7 @@
 	                                <th>NIP</th>
 	                                <th>Employee</th>
 	                                <th>Position</th>
+	                                <th>Day</th>
 	                                <th>First Login</th>
 	                                <th>Last Login</th>
 	                                <th width="5%">Detail</th>
