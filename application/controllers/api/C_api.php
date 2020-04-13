@@ -3407,9 +3407,11 @@ class C_api extends CI_Controller {
 //                    <li><a target="_blank" href="'.base_url('save2pdf/news-event').'">Berita Acara</a></li>
             $re = ($data_arr['Type']=='re_uts' || $data_arr['Type']=='re_uas') ? 'hide' : '';
 
-            $actDelete = ($row['ExamDate']>=$dateNow)
+            $actDelete = ($row['ExamDate']>$dateNow)
                 ? '<li role="separator" class="divider"></li><li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>'
                 : '';
+
+            $actUploadTask = ($row['ExamDate']>$dateNow) ? '1' : '0';
 
             $act = '<div  style="text-align:center;"><div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -3417,6 +3419,7 @@ class C_api extends CI_Controller {
                   </button>
                   <ul class="dropdown-menu">
                     <li class="'.$re.'"><a href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Edit</a></li>
+                    <li><a href="javascript:void(0);" class="uploadSoal" data-id="'.$row['ID'].'" data-act="'.$actUploadTask.'">Upload Exam Task</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a target="_blank" href="'.base_url('save2pdf/exam-layout/'.$row['ID']).'">Layout</a></li>
                     <li><a class="btnSave2PDF_Exam" href="javascript:void(0);" data-url="save2pdf/draft_questions_answer_sheet" data-token="'.$tkn_soal_jawaban.'">Draft Questions  & Answer Sheet</a></li>
@@ -5884,7 +5887,6 @@ class C_api extends CI_Controller {
 
                 return print_r(1);
 
-//                $data = $this->m_api->
             }
             else if($data_arr['action']=='readSchedule'){
 
@@ -5964,6 +5966,19 @@ class C_api extends CI_Controller {
 
                 $this->db->where('ExamID', $ExamID);
                 $this->db->delete(array('db_academic.exam_group','db_academic.exam_details'));
+
+                // Remove file
+                $dataFl = $this->db->get_where('exam_task',
+                    array('ExamID'=> $ExamID))->result_array();
+
+                if(count($dataFl)>0){
+                    $path = './uploads/task-exam/'.$dataFl[0]['File'];
+                    if(file_exists($path)){
+                        unlink($path);
+                    }
+                    $this->db->where('ExamID', $ExamID);
+                    $this->db->delete('exam_task');
+                }
 
                 return print_r(1);
             }

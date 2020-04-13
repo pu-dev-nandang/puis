@@ -704,4 +704,191 @@
 
 
     }
+
+    // Upload exam task
+    $(document).on('click','.uploadSoal',function () {
+
+        var formExamID = $(this).attr('data-id');
+        var actTask = $(this).attr('data-act');
+
+        var data = {
+            action : 'getDataExamTask',
+            ExamID : formExamID
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudJadwalUjian';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+
+            var formDescription = (jsonResult.length>0) ? jsonResult[0].Description : '';
+            var formAction = (jsonResult.length>0) ? 'edit' : 'add';
+
+            var formNameFile = formExamID+'_'+moment().unix();
+            var showFile = '';
+            var formNameFileOld = '';
+            var btnRemove = 'hide';
+
+            var IDExamTask = '';
+            if(jsonResult.length>0){
+                var file = (jsonResult[0].File!='' && jsonResult[0].File!=null) ? jsonResult[0].File : '';
+                if(file!=''){
+                    showFile = (jsonResult.length>0)
+                        ? '<iframe src="'+base_url_js+'/uploads/task-exam/'+file+'"></iframe>' : '';
+                    formNameFileOld = file;
+                }
+                IDExamTask = jsonResult[0].ID;
+                btnRemove = '';
+            }
+
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Upload Soal</h4>');
+
+            var htmlss = ' <div class="row">' +
+                '        <div class="col-md-12">' +
+                '            <form id="formID" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">' +
+                '            <div class="form-group">' +
+                '                <label>Description</label>' +
+                '                <input class="hide" id="formAction" name="formAction" value="'+formAction+'">' +
+                '                <input class="hide" id="formExamID" name="formExamID" value="'+formExamID+'">' +
+                '                <input class="hide" id="formNIP" name="formNIP" value="'+sessionNIP+'">' +
+                '                <textarea id="formDescription" name="formDescription" class="form-control">'+formDescription+'</textarea>' +
+                '            </div>' +
+                '            <div class="form-group">' +
+                '                <label>File (pdf)</label>' +
+                '                <input type="file" id="formFileSoal" name="userfile" accept="application/pdf">' +
+                '                   <input type="text" class="hide" hidden name="formNameFile" id="formNameFile" value="'+formNameFile+'" />' +
+                '                   <input type="text" class="hide" hidden name="formNameFileOld" id="formNameFileOld" value="'+formNameFileOld+'" />' +
+                '                   <div id="viewFileSize"></div>' +
+                '                   <p class="help-block">Maximum file size of 5 mb</p>' +
+                '            </div>' +
+                '           <div>'+showFile+'</div>' +
+                '           </form>' +
+                '        </div>' +
+                '    </div>';
+
+            $('#GlobalModal .modal-body').html(htmlss);
+
+            $('#formDescription').summernote({
+                placeholder: 'Text your description',
+                tabsize: 2,
+                height: 200,
+                toolbar: [
+                    // [groupName, [list of button]]
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']]
+                ]
+            });
+
+            var btnAct = (parseInt(actTask)==1)
+                ? '<button class="btn btn-default '+btnRemove+'" id="removeExamTask" data-id="'+IDExamTask+'" style="color: red;float: left;">Remove Data</button>' +
+                '<button class="btn btn-success" id="submitSoalExam">Save</button> '
+                : '';
+
+            $('#GlobalModal .modal-footer').html(btnAct+'<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+
+        });
+
+    });
+
+    $(document).on('change','#formFileSoal',function () {
+        readURL(this);
+    });
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+
+            var _size = input.files[0].size;
+            var fSExt = new Array('Bytes', 'KB', 'MB', 'GB'),
+                i=0;while(_size>900){_size/=1024;i++;}
+            var exactSize = (Math.round(_size*100)/100)+' '+fSExt[i];
+            $('#viewFileSize').html('<div style="color: #034df4;font-size: 12px;margin-top: 10px;">Your file size: '+exactSize+'</div>');
+
+            var fileSize = input.files[0].size;
+            if(fileSize > 5000000){
+                alert('Maximum file size of 5 mb');
+                $('#btnSubmitTast').prop('disabled',true);
+            } else {
+                $('#btnSubmitTast').prop('disabled',false);
+            }
+
+
+        }
+    }
+
+    $(document).on('click','#removeExamTask',function () {
+        if(confirm('Are you sure?')){
+            var ID = $(this).attr('data-id');
+
+            var url = base_url_js+'upload/remove-exam-task/'+ID;
+
+            $.post(url,function (result) {
+
+                load__DateExam();
+
+                toastr.success('Data removed','Success');
+                $('#GlobalModal').modal('hide');
+
+            });
+        }
+    });
+
+    $(document).on('click','#submitSoalExam',function () {
+
+        var formExamID = $('#formExamID').val();
+        var formDescription = $('#formDescription').val();
+
+
+        if(formExamID!='' && formExamID!=null &&
+            formDescription!='' && formDescription!=null){
+
+
+            if(confirm('Are you sure?')){
+                var formFileSoal = $('#formFileSoal').val();
+                var fileUpload = (formFileSoal!='') ? 1 : 0;
+                var formData = new FormData( $("#formID")[0]);
+                var url = base_url_js+'upload/upload-exam-task?f='+fileUpload;
+                $.ajax({
+                    url : url,  // Controller URL
+                    type : 'POST',
+                    data : formData,
+                    async : false,
+                    cache : false,
+                    contentType : false,
+                    processData : false,
+                    success : function(data) {
+                        var jsonData = data;
+
+                        if(typeof jsonData.success=='undefined'){
+                            alert(jsonData.error);
+                        } else {
+                            load__DateExam();
+                            toastr.success('Data saved','Success');
+                            $('#GlobalModal').modal('hide');
+                        }
+
+
+                    }
+                });
+            }
+
+
+        }
+        else {
+            toastr.error('Form Are Required','Error!');
+        }
+
+    });
 </script>
