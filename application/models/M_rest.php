@@ -2182,7 +2182,14 @@ class M_rest extends CI_Model {
         for($s=0;$s<7;$s++){
             $RangeEnd = date("Y-m-d", strtotime($newStartDate." +6 days"));
 
-            $Status = ($newStartDate <= $dateNow && $RangeEnd >= $dateNow) ? 1 : 0;
+            $Status = 0;
+            if($newStartDate <= $dateNow && $RangeEnd >= $dateNow){
+                $Status = 1;
+            } else if($RangeEnd <= $dateNow){
+                $Status = 2;
+            }
+
+
 
             $arr = array(
                 'Session' => ($s+1),
