@@ -25,40 +25,132 @@ class C_dashboard extends Globalclass {
 
     public function index()
     {
-        // $G_dt = $this->m_master->showData_array('db_prodi.cfg_sub_menu');
-        // for ($i=0; $i < count($G_dt); $i++) { 
+        // ---- master ---  //
+        // $db_live = $this->load->database('server_live', TRUE);
+        // $query = $db_live->query(
+        //    'select * from db_research.master_anggota_publikasi'     
+        // )->result_array();
+
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $Luar_internal = $query[$i]['Luar_internal'];
+        //     $Type_anggota = $query[$i]['Type_anggota'];
+        //     $Status_aktif = $query[$i]['Status_aktif'];
+        //     $User_create = $query[$i]['User_create'];
+        //     $Date_create = $query[$i]['Date_create'];
+        //     $ID = $query[$i]['ID'];
+
+        //     $NIP = $query[$i]['NIP'];
+        //     $NIM = $query[$i]['NIM'];
+
+        //     if ($Luar_internal == '1') {
+        //         // internal
+        //         if (!empty($NIP)) {
+        //             $ID_user = 'dsn.'.$NIP;  
+        //         }
+        //         else
+        //         {
+        //             $ID_user = 'mhs.'.$NIM;   
+        //         }
+        //     }
+        //     else
+        //     {
+        //         $Nama = $query[$i]['Nama'];
+        //         $se = $db_live->query(
+        //             'select * from db_research.master_user_research where Nama = "'.$Nama.'" '
+        //         )->result_array();
+        //         // $se = $this->m_master->caribasedprimary('db_research.master_user_research','Nama',$Nama);
+        //         if (count($se) > 0) {
+        //             $ID_user = 'ekd.'.$se[0]['ID'];  
+        //         }
+        //         else
+        //         {
+        //             // $ID_user = 'ekd.0';  
+        //             $Nama2 = $query[$i]['Nama'];
+        //             $NIP2 = $query[$i]['NIP'];
+        //             $NIDN2 = $query[$i]['NIDN'];
+        //             $NIM2 = $query[$i]['NIM'];
+        //             $TypeUser = (empty($NIM2)) ? 'Dosen' : 'Mahasiswa';
+
+        //             if ($Type_anggota == 'MHS') {
+        //                 $F_kolaborasi = 1;
+        //                 $F_dosen = 0;
+        //                 $F_mhs = 1;
+        //                 $F_reviewer = 1;
+        //             }
+        //             else
+        //             {
+        //                 $F_kolaborasi = 1;
+        //                 $F_dosen = 1;
+        //                 $F_mhs = 0;
+        //                 $F_reviewer = 1;
+        //             }
+
+        //             $dataSave2 = [
+        //                 'Nama' => $Nama2,
+        //                 'NIP' => $NIP2,
+        //                 'NIDN' => $NIDN2,
+        //                 'NIM' => $NIM2,
+        //                 'TypeUser' => $TypeUser,
+        //                 'F_kolaborasi' => $F_kolaborasi,
+        //                 'F_dosen' => $F_dosen,
+        //                 'F_mhs' => $F_mhs,
+        //                 'F_reviewer' => $F_reviewer,
+        //             ];
+
+        //             $db_live->insert('db_research.master_user_research',$dataSave2);
+        //             $ID_user = 'ekd.'.$db_live->insert_id();
+        //         }
+        //     }
+
         //     $dataSave = [
-        //         'cfg_group_user' => 1,
-        //         'ID_cfg_sub_menu' => $G_dt[$i]['ID'],
-        //         'read' => 1,
-        //         'write' => 1,
-        //         'update' => 1,
-        //         'delete' => 1,
+        //         'Luar_internal' => $Luar_internal,
+        //         'Type_anggota' => $Type_anggota,
+        //         'Status_aktif' => $Status_aktif,
+        //         'User_create' => $User_create,
+        //         'Date_create' => $Date_create,
+        //         'ID_user' => $ID_user,
+        //         'ID' => $ID,
         //     ];
 
-        //     $this->db->insert('db_prodi.cfg_rule_g_user',$dataSave);
+        //     $this->db->insert('db_research.master_anggota_publikasi',$dataSave);
         // }
-        // die();
+        // ---- end master ---  //
 
-        // $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
-        // $G_it = $this->m_master->getEmployeeByDepartment(12);
-        // for ($i=0; $i < count($G_prodi); $i++) { 
-        //     $ProdiID = $G_prodi[$i]['ID'];
-        //     for ($k=0; $k < count($G_it); $k++) { 
-        //         $NIPIT = $G_it[$k]['NIP'];
-        //         $dataSave = [
-        //             'NIP' => $NIPIT,
-        //             'G_user' => 1,
-        //             'ProdiID' => $ProdiID,
-        //         ];
+        // --List Anggota -- //
+        // $db_live = $this->load->database('server_live', TRUE);
+        // $query = $db_live->query(
+        //    'select * from db_research.list_anggota_pkm where ID > 192'     
+        // )->result_array();
 
-        //         $this->db->insert('db_prodi.previleges_guser',$dataSave);
-        //     }
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $ID_anggota = $query[$i]['ID_anggota'];
+        //     $ID_PKM = $query[$i]['ID_PKM'];
+        //     $Peran = $query[$i]['Peran'];
+        //     $User_create = $query[$i]['User_create'];
+        //     $Date_create = $query[$i]['Date_create'];
+        //     $Csf = $query[$i]['Csf'];
+        //     $Disabled = $query[$i]['Disabled'];
+        //     $ID = $query[$i]['ID'];
+
+        //     $dataSave = [
+        //         'ID_anggota' => $ID_anggota,
+        //         'ID_PKM' => $ID_PKM,
+        //         'Peran' => $Peran,
+        //         'User_create' => $User_create,
+        //         'Date_create' => $Date_create,
+        //         'Csf' => $Csf,
+        //         'Disabled' => $Disabled,
+        //         'ID' => $ID,
+        //     ];
+
+        //     $this->db->insert('db_research.list_anggota_pkm',$dataSave);
+
         // }
+        // --End List Anggota -- //
+
+        // echo 'finish';
         // die();
-        // $rs = $this->m_master->DeleteFileToNas("http://localhost",'admission/45.png');
-        // print_r($rs);
-        // die();
+        
         $data['showNotif']=true;
         $data['department'] = parent::__getDepartement();
         $dpt = $this->session->userdata('IDdepartementNavigation');
