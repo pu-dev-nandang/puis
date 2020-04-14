@@ -528,6 +528,79 @@ class C_api4 extends CI_Controller {
 
     }
 
+    public function crudBlockStudent(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='EditingDateBlock'){
+
+            $ID = $data_arr['ID'];
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!=''){
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('block',$dataForm);
+                $this->db->reset_query();
+                $insert_id = $ID;
+            } else {
+                $dataForm['CreatedBy'] = $this->session->userdata('NIP');
+                $dataForm['CreatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->insert('block',$dataForm);
+                $insert_id = $this->db->insert_id();
+                $this->db->reset_query();
+            }
+
+            $this->db->where('IDBlock',$insert_id);
+            $this->db->delete('db_academic.block_student');
+            $this->db->reset_query();
+            for($i=0;$i<count($data_arr['dataStudent']);$i++){
+                $d = (array) $data_arr['dataStudent'][$i];
+                $arrIns = array(
+                    'IDBlock' => $insert_id,
+                    'NPM' => $d['NPM']
+                );
+                $this->db->insert('db_academic.block_student',$arrIns);
+            }
+
+            return print_r(1);
+
+        }
+
+        else if($data_arr['action']=='getDataBlock'){
+            $data = $this->db->query('SELECT b.*, em.Name AS CreatedByName, em2.Name AS UpdatedByName FROM db_academic.block b 
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = b.CreatedBy)
+                                                LEFT JOIN db_employees.employees em2 ON (em2.NIP = b.UpdatedBy) ')->result_array();
+
+            if(count($data)>0){
+
+                for($i=0;$i<count($data);$i++){
+                    $data[$i]['Students'] = $this->db->query('SELECT ats.NPM, ats.Name FROM db_academic.block_student bs 
+                                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = bs.NPM)
+                                                                    WHERE bs.IDBlock = "'.$data[$i]['ID'].'" ')->result_array();
+                }
+
+            }
+
+            return print_r(json_encode($data));
+        }
+
+        else if($data_arr['action']=='removeDateBlock'){
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_academic.block');
+            $this->db->reset_query();
+
+            $this->db->where('IDBlock', $ID);
+            $this->db->delete('db_academic.block_student');
+            $this->db->reset_query();
+
+            return print_r(1);
+        }
+
+    }
+
 
 
 }
