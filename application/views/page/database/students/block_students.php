@@ -100,7 +100,7 @@
                         '                            <td>'+v.Message+'</td>' +
                         '                        </tr>' +
                         '                        <tr>' +
-                        '                            <td>Students</td>' +
+                        '                            <td>Students ('+v.Students.length+') </td>' +
                         '                            <td>:</td>' +
                         '                            <td><div>'+viewStudent+'</div></td>' +
                         '                        </tr>' +
