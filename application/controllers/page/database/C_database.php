@@ -352,6 +352,15 @@ class C_database extends Globalclass {
 
 
     // === Students ===
+
+    public function menu_student($page){
+
+        $data['page'] = $page;
+        $content = $this->load->view('page/database/students/menu_student',$data,true);
+        $this->temp($content);
+
+    }
+
     public function students()
     {
         /*UPDATED BY FEBRI @ JAN 2020*/
@@ -363,12 +372,19 @@ class C_database extends Globalclass {
         // Updated by Adhi 19-02-2020
         $data['rest_setting_alumni'] = $this->m_master->showData_array('db_alumni.rest_setting');
         // END by Adhi 19-02-2020
-        $content = $this->load->view('page/database/students',$data,true);
+        $page = $this->load->view('page/database/students/list_students',$data,true);
         /*END UPDATED BY FEBRI @ JAN 2020*/
 
+        $this->menu_student($page);
 
+    }
 
-        $this->temp($content);
+    public function block_students(){
+
+        $data = '';
+        $page = $this->load->view('page/database/students/block_students',$data,true);
+        $this->menu_student($page);
+
     }
 
     public function students_group()
