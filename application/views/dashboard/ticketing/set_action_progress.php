@@ -257,7 +257,7 @@
 								  '<div class = "form-group">'+
 	  								  '<label>File Upload</label>'+
 	  									'<div><label class = "btn btn-primary"><input type="file" name = "Files" id = "UploadFile" style = "display:none;"> Browse</label></div>'+
-	  								   '<p style = "color:red">(jpg,png) Max 2mb'+	
+	  								   '<p style = "color:red">(pdf,jpg,png) Max 2mb'+	
   								  '</div>';
 				var htmlButton = '<button type="button" class="btn btn-success" id="btnModalCloseProject">Submit</button> ' +
             '<button type="button" class="btn btn-default CloseModal" data-dismiss="modal">Close</button>'; 
