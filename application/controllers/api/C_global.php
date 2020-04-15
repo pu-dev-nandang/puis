@@ -146,12 +146,15 @@ class C_global extends CI_Controller {
 
     private function showFile2($file)
     {
-        header("Content-type: application/pdf");
-        header("Content-disposition: inline;     
-        filename=".basename('uploads/'.$file));
+        header("Content-type:application/pdf");
+
+        // It will be called downloaded.pdf
+        header("Content-Disposition:inline;filename=".$file);
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        $filePath = readfile('uploads/'.$file);
+
+        // The PDF source is in original.pdf
+        readfile('uploads/'.$file);
     }
 
     public function download_template($file)
@@ -190,12 +193,7 @@ class C_global extends CI_Controller {
 
     private function showFile($file)
     {
-        header("Content-type: application/pdf");
-        header("Content-disposition: inline;     
-        filename=".basename('document/'.$file));
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        $filePath = readfile('document/'.$file);
+        $this->showFile2($file);
     }
 
     public function get_detail_cicilan_fee_admisi()
