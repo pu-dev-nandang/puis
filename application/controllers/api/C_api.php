@@ -10584,7 +10584,7 @@ class C_api extends CI_Controller {
 
             $totalData = $this->Globalinformation_model->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
-            if(!empty($reqdata['start']) && !empty($reqdata['length'])){
+            if(!empty($reqdata['length'])){
                 $result = $this->Globalinformation_model->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
             }else{
                 $result = $this->Globalinformation_model->fetchEmployee(false,$param)->result();

@@ -1687,10 +1687,14 @@ class C_employees extends HR_Controler {
 
             if(!empty($result)){
                 $rs = array();
+                $sort = array();
+                $index=0;
+                
                 foreach ($result as $r) {
                     $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
                     $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
                     $rs[] = $r;
+                    $index++;
                 }
                 $result = $rs;
             }
@@ -1736,12 +1740,16 @@ class C_employees extends HR_Controler {
             $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();
             if(!empty($isExist)){
                 $explodeMain = explode(".", $isExist->PositionMain);
-                $param[] = array("field"=>"em.PositionMain","data"=>" like '".$explodeMain[0].".%' ","filter"=>"AND");
-                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                $param[] = array("field"=>"em.StatusEmployeeID","data"=>" = 1 ","filter"=>null);
-                $param[] = array("field"=>"em.StatusEmployeeID","data"=>" = 2 ","filter"=>"OR");
-                $param[] = array("field"=>")","data"=>null,"filter"=>null);
-                $json = $this->m_hr->fetchEmployee(false,$param,null,null,"em.PositionMain asc")->result();                
+                $explodeOth1 = explode(".", $isExist->PositionOther1);
+                $explodeOth2 = explode(".", $isExist->PositionOther2);
+                $explodeOth3 = explode(".", $isExist->PositionOther3);
+                $param = "(em.StatusEmployeeID = 1 or em.StatusEmployeeID = 2) and ";
+                $param .= "(em.PositionMain like '".$explodeMain[0].".%' or ";
+                $param .= "em.PositionOther1 like '".$explodeOth1[0].".%' or ";
+                $param .= "em.PositionOther2 like '".$explodeOth2[0].".%' or ";
+                $param .= "em.PositionOther3 like '".$explodeOth3[0].".%' ) ";
+                $json = $this->m_hr->fetchMemberOFDepartpent($param)->result(); 
+                //var_dump($this->db->last_query());               
             }
         }
         echo json_encode($json);

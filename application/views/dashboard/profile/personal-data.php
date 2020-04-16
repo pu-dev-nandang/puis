@@ -260,7 +260,7 @@
                                                     <img class="img-thumbnail" id="imgThumbnail" src="<?php echo base_url('images/icon/userfalse.png'); ?>" style="max-width: 100px;width: 100%;">
                                                     </center>
                                                     <div class="form-group">
-                                                            <label class="btn btn-sm btn-default btn-default-warning btn-upload" style="width:100%">
+                                                        <label class="btn btn-sm btn-default btn-default-warning btn-upload" style="width:100%">
                                                             <i class="fa fa-upload margin-right"></i> Upload Photo
                                                             <input type="file" id="filePhoto" name="userfile" class="uploadPhotoEmp" style="display: none;" accept="image/png, image/jpeg">
                                                         </label>                                                                

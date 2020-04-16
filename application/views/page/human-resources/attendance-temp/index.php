@@ -186,7 +186,16 @@
 	                                <th>Employee</th>
 	                                <th>Position</th>
 	                                <th>Day</th>
-	                                <th>First Login</th>
+	                                <th width="20%">First Login 
+	                                <div class="btn-group pull-right">
+	                                	<button class="btn btn-xs btn-default btn-sort" type="button" data-id="FirstLoginPortal" data-order="asc" title="sort ascending">
+	                                		<i class="fa fa-arrow-circle-up"></i>
+                                		</button>
+                                		<button class="btn btn-xs btn-default btn-sort" type="button" data-id="FirstLoginPortal" data-order="desc" title="sort ascending">
+	                                		<i class="fa fa-arrow-circle-down"></i>
+                                		</button>
+                            		</div>
+                            		</th>
 	                                <th>Last Login</th>
 	                                <th width="5%">Detail</th>
 	                            </tr>
@@ -343,13 +352,18 @@
 
     $(".btn-download").click(function(){
     	var itsme = $(this);
-    	var filtering = $("#form-filter").serialize();
-		//itsme.prop("disabled",true).html("loading");
-        var token = jwt_encode({Filter : filtering},'UAP)(*');
-        var urld = base_url_js+"human-resources/download-attendance-temp";
-        $("#form-filter").attr("action",urld);
-        $("#form-filter")[0].submit();
-
+    	var division = $("#form-filter select[name=division]").val();
+    	var attendance_start = $("#form-filter input[name=attendance_start]").val();
+    	division = $.trim(division);
+    	attendance_start = $.trim(attendance_start);
+    	if((division.length > 0) && (attendance_start.length > 0)){
+    		var filtering = $("#form-filter").serialize();
+			//itsme.prop("disabled",true).html("loading");
+	        var token = jwt_encode({Filter : filtering},'UAP)(*');
+	        var urld = base_url_js+"human-resources/download-attendance-temp";
+	        $("#form-filter").attr("action",urld);
+	        $("#form-filter")[0].submit();
+    	}else{alert("Please select DIVISION and Attendance Day");}
     });
 
     $('#form-filter').on('keyup keypress', function(e) {
