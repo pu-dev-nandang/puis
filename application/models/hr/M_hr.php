@@ -185,6 +185,30 @@ class M_hr extends CI_Model {
         //var_dump($this->db->last_query());
         return $value;
     }
+
+
+    public function fetchMemberOFDepartpent($data){
+        $this->db->select('em.*,d.Division as DivisionMainName, p.Position as PositionMainName
+                            ,( case when (em.PositionOther1 is null or em.PositionOther1 = "") then "" else ( concat(d1.Division,"-",p1.Position ) ) end ) as PositionOtherName1
+                            ,( case when (em.PositionOther2 is null or em.PositionOther2 = "") then "" else ( concat(d2.Division,"-",p2.Position ) ) end ) as PositionOtherName2
+                            ,( case when (em.PositionOther3 is null or em.PositionOther3 = "") then "" else ( concat(d3.Division,"-",p3.Position ) ) end ) as PositionOtherName3 ');
+        $this->db->from('db_employees.employees em');
+        $this->db->join('db_employees.division d','(d.ID = SUBSTRING_INDEX(em.PositionMain,".",1) )','left');
+        $this->db->join('db_employees.position p','(p.ID = SUBSTRING_INDEX(em.PositionMain,".",-1) )','left');
+        
+        $this->db->join('db_employees.division d1','(d1.ID = SUBSTRING_INDEX(em.PositionOther1,".",1) )','left');
+        $this->db->join('db_employees.position p1','(p1.ID = SUBSTRING_INDEX(em.PositionOther1,".",-1) )','left');
+        
+        $this->db->join('db_employees.division d2','(d2.ID = SUBSTRING_INDEX(em.PositionOther2,".",1) )','left');
+        $this->db->join('db_employees.position p2','(p2.ID = SUBSTRING_INDEX(em.PositionOther2,".",-1) )','left');
+        
+        $this->db->join('db_employees.division d3','(d3.ID = SUBSTRING_INDEX(em.PositionOther3,".",1) )','left');
+        $this->db->join('db_employees.position p3','(p3.ID = SUBSTRING_INDEX(em.PositionOther3,".",-1) )','left');
+        $this->db->where($data);
+        $this->db->order_by('em.PositionMain','asc');
+        $query = $this->db->get();
+        return $query;
+    }
     /*END ADDED BY FEBRI @ FEB 2020*/
 
 }
