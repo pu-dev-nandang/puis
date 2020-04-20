@@ -765,6 +765,7 @@
 						CreatedBy : sessionNIP,
 						NoTicket : DataTicket[0].NoTicket,
 					}
+					transfer_to.push(postreceived);
 					// if (received.length == 0) {
 					// 	var postreceived = {
 					// 		ID : DataReceivedSelected[0].ID,
