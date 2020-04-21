@@ -5662,8 +5662,6 @@ class C_api3 extends CI_Controller {
             $nestedData = array();
             $row = $query[$i];
 
-
-
             $LoginAsLecturer = ($row['LoginAsLec']!='' && $row['LoginAsLec']!=null)
                 ? '<span class="label label-danger">Remote Lecturer</span><div style="color: #3f51b5;margin-top: 10px;">'.$row['LoginAsLec'].'</div>' : '';
             $LoginAsStudent = ($row['LoginAsStd']!='' && $row['LoginAsStd']!=null)
@@ -5705,7 +5703,15 @@ class C_api3 extends CI_Controller {
                 $nestedData[] = '<div style="text-align: left;"><b>' . $row['Name'] . '</b>' . $dataIP . '</div>';
 
             }
-            $nestedData[] = '<div style="text-align: left;">'.$LoginAsLecturer.$LoginAsStudent.'<div style="color: #FF5722;">'.date('d M Y H:i:s',strtotime($row['AccessedOn'])).'</div></div>';
+
+            // Cek apakah today
+            $viewDate = explode(' ',$row['AccessedOn'])[0];
+            $labelToday =
+                ($this->m_rest->getDateNow()==$viewDate)
+                ? '<span style="margin-left: 10px;" class="label label-success"><i class="fa fa-check-circle" style="margin-right: 3px;"></i> Today</span>'
+                : '';
+
+            $nestedData[] = '<div style="text-align: left;">'.$LoginAsLecturer.$LoginAsStudent.'<div style="color: #FF5722;">'.date('d M Y H:i:s',strtotime($row['AccessedOn'])).$labelToday.'</div></div>';
             $nestedData[] = '<div style="text-align: left;">'.$viewLink.$tokenText.'</div>';
 
             $data[] = $nestedData;
