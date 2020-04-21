@@ -100,7 +100,7 @@
     }
 
     function getDataLog() {
-        $('#loadTable').html('<div style="text-align:right;margin-bottom20px;"><button onclick="reconfirmAttd()" class="btn btn-lg btn-success">Reconfirm attendance</button></div><table class="table table-striped" id="tableDataLog">' +
+        $('#loadTable').html('<div style="text-align:right;margin-bottom:20px;"><button onclick="reconfirmAttd()" class="btn btn-lg btn-success">Reconfirm attendance</button></div><table class="table table-striped" id="tableDataLog">' +
             '            <thead>' +
             '            <tr>' +
             '                <th style="width: 1%;">No</th>' +
