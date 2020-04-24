@@ -206,7 +206,7 @@ class C_api4 extends CI_Controller {
                                                              LEFT JOIN db_academic.counseling_topic ct ON (ct.ID = cc.TopicID)
                                                             WHERE ct.ScheduleID = "'.$ScheduleID.'" 
                                                             AND ct.Sessions = "'.$Session.'"
-                                                             AND ct.CreateBy = "'.$d['NIP'].'" ) xx  
+                                                             AND cc.UserID = "'.$d['NIP'].'" ) xx  
                                                              ')->result_array()[0]['Total'];
 
                     // Cek Task
