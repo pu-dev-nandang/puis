@@ -119,7 +119,7 @@
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
 										'<label>'+'Note for worker'+'</label>'+
-										'<p style = "color:red;">(not show in user)</p>'+
+										//'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
 										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
@@ -195,7 +195,7 @@
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
 										'<label>'+'Note for department'+'</label>'+
-										'<p style = "color:red;">(not show in user)</p>'+
+										//'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
 										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
