@@ -16,7 +16,9 @@
         <li class="<?php if($this->uri->segment(2)=='ticket-list') { echo 'active'; } ?>">
             <a href="<?php echo base_url('ticket/ticket-list'); ?>">Ticket List</a>
         </li>
-
+        <li class="<?php if($this->uri->segment(2)=='ticket-report') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('ticket/ticket-report'); ?>">Ticket Report</a>
+        </li>
         <li class="<?php if($this->uri->segment(2)=='setting') { echo 'active'; } ?>">
             <a href="<?php echo base_url('ticket/setting'); ?>">Setting</a>
         </li>
