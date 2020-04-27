@@ -68,7 +68,7 @@
         }
     }
 
-    function LoadSelectOptionStatusTicket(selector,selectedata=2){
+    function LoadSelectOptionStatusTicket(selector,selectedata=2,report=0){
         var url =base_url_js+"rest_ticketing/__CRUDStatusTicket";
         var dataform = {
             action : 'read',
@@ -78,13 +78,19 @@
         AjaxLoadRestTicketing(url,token).then(function(response){
           selector.empty();
           response =  response.data;
-          selector.append(
-               '<option value = "'+'%'+'" '+'selected'+' >'+'All'+'</option>'
-           );
+          if (report == 0) {
+            selector.append(
+                 '<option value = "'+'%'+'" '+'selected'+' >'+'All'+'</option>'
+             );
+          }
+          
           for (var i = 0; i < response.length; i++) {
              var selected = (response[i][1] == selectedata) ? 'selected' : '';
+             if (report == 1 && response[i][1] == 4) {
+              continue;
+             }
              selector.append(
-                  '<option value = "'+response[i][1]+'" '+''+' >'+response[i][2]+'</option>'
+                  '<option value = "'+response[i][1]+'" '+selected+' >'+response[i][2]+'</option>'
               );
           }
         })

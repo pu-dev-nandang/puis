@@ -2641,6 +2641,10 @@
         })
     }
 
+    function timeout(ms){ // promises
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
 
     /*ADDED BY FEBRI @ FEB 2020*/
     function loadSelectOptionCountry(element,selected) {

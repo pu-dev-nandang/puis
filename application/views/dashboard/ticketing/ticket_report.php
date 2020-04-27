@@ -1,3 +1,4 @@
+<?php $this->load->view('dashboard/ticketing/LoadCssTicketToday') ?>
 <div class="row" style="margin-top: 30px;">
 	<div class="col-md-4 col-md-offset-4">
 		<div class="well">
@@ -21,7 +22,7 @@
             </div>
             <div class="panel-body">
             	<div class="row">
-            		<div class="col-xs-3 pageFilter">
+            		<div class="col-xs-12 pageFilter">
             			<div class="well">
             				<div class="row">
             					<div class="col-md-12">
@@ -35,26 +36,27 @@
 									</div>
 									<div class="form-group">
 									    <label>Status</label>
-									    <select class="form-control" id="SelectStatusTicketID"></select>
+									    <select class="form-control SelectStatusTicketID" id="SelectStatusTicketID"></select>
 									</div>
             					</div>
             				</div>
             			</div>
             		</div>
-            		<div class="col-xs-9 pagePieChartCategory">
+            		<div class="col-xs-12 pagePieChartCategory">
             			<div class="thumbnail">
             				<div class="row">
             					<div style="padding: 10px;text-align: center;">
             						<h4 style="color: green;"><u>By Category</u></h4>
             					</div>
-            					<div class="col-md-7">
-            						<div class="chart" id = "ShowPieChartByCategory">
-            							pagePieChartCategory
+            					<div class="col-md-12">
+            						<div class="chart chart-large" id = "ShowPieChartByCategory">
+            							
             						</div>
             					</div>
-            					<div class="col-md-5">
-            						<div class="table-responsive" id = "ShowTblByCategory">
-            							pageTableCategory
+                                          <br/>
+            					<div class="col-md-12">
+            						<div class="" id = "ShowTblByCategory">
+            							
             						</div>
             					</div>
             				</div>
@@ -69,7 +71,7 @@
             					<div style="padding: 10px;text-align: center;">
             						<h4 style="color: green;"><u>By Worker</u></h4>
             					</div>
-            					<div class="col-xs-3 pageFilterStatusWorker">
+            					<div class="col-xs-12 pageFilterStatusWorker">
             						<div class="well">
             							<div class="row">
             								<div class="col-md-12">
@@ -85,13 +87,14 @@
             							</div>
             						</div>
             					</div>
-            					<div class="col-xs-9">
+            					<div class="col-xs-12">
             						<div class="thumbnail">
             							<div class="row">
-            								<div class="col-md-6 pagePieChartWorker">
+            								<div class="col-md-12 pagePieChartWorker">
             									pageFilterStatusWorker
             								</div>
-            								<div class="col-md-6 pageTableWorker">
+                                                            <br/>
+            								<div class="col-md-12 pageTableWorker">
             									pageTableWorker
             								</div>
             							</div>
@@ -111,13 +114,13 @@
             </div>
             <div class="panel-body">
             	<div class="row">
-            		<div class="col-xs-3 pageFilter">
+            		<div class="col-xs-12 pageFilter">
             			<div class="well">
             				<div class="row">
             					<div class="col-md-12" style="padding-left: 0px !important;padding-right: 0px !important; ">
             						<div class="form-group">
             						    <label>Status</label>
-            						    <select class="form-control" id="SelectStatusTicketID"></select>
+            						    <select class="form-control SelectStatusTicketID" id="SelectStatusTicketID"></select>
             						</div>
 			            			<div class="form-group">
 			            				<label>Date</label>
@@ -132,18 +135,19 @@
             				</div>
             			</div>
             		</div>
-            		<div class="col-xs-9 pagePieChartCategory">
+            		<div class="col-xs-12 pagePieChartCategory">
             			<div class="thumbnail">
             				<div class="row">
             					<div style="padding: 10px;text-align: center;">
             						<h4 style="color: green;"><u>By Category</u></h4>
             					</div>
-            					<div class="col-md-7">
+            					<div class="col-md-12">
             						<div class="chart" id = "ShowPieChartByCategory">
             							pagePieChartCategory
             						</div>
             					</div>
-            					<div class="col-md-5">
+                                          <br/>
+            					<div class="col-md-12">
             						<div class="table-responsive" id = "ShowTblByCategory">
             							pageTableCategory
             						</div>
@@ -160,7 +164,7 @@
             					<div style="padding: 10px;text-align: center;">
             						<h4 style="color: green;"><u>By Worker</u></h4>
             					</div>
-            					<div class="col-xs-3 pageFilterStatusWorker">
+            					<div class="col-xs-12 pageFilterStatusWorker">
             						<div class="well">
             							<div class="row">
             								<div class="col-md-12">
@@ -176,13 +180,14 @@
             							</div>
             						</div>
             					</div>
-            					<div class="col-xs-9">
+            					<div class="col-xs-12">
             						<div class="thumbnail">
             							<div class="row">
-            								<div class="col-md-6 pagePieChartWorker">
+            								<div class="col-md-12 pagePieChartWorker">
             									pageFilterStatusWorker
             								</div>
-            								<div class="col-md-6 pageTableWorker">
+                                                            <br/>
+            								<div class="col-md-12 pageTableWorker">
             									pageTableWorker
             								</div>
             							</div>
@@ -196,10 +201,48 @@
 		</div>
 	</div>
 </div>
+<!-- graph-->
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/sparkline/jquery.sparkline.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.tooltip.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.resize.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.time.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.orderBars.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.pie.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.selection.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.growraf.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/easy-pie-chart/jquery.easy-pie-chart.min.js"></script>
+<!-- graph-->
+
+<script type="text/javascript" src="<?php echo base_url('js/ticketing/Class_ticketing_dashboard.js'); ?>"></script>
+<script type="text/javascript" src="<?php echo base_url('js/ticketing/Class_ticketing_report.js'); ?>"></script>
 
 <script type="text/javascript">
-	$(document).ready(function(e){
-		const selectorDepartment = $('#SelectDepartmentID');
-		LoadSelectOptionDepartmentFiltered(selectorDepartment);
-	})
+      let App_ticketing_dashboard;
+      let requestHeader;
+      $(document).ready(function(e){
+            // loadingStart();
+            requestHeader = {
+                  Hjwtkey : Hjwtkey,
+            }
+            App_ticketing_dashboard = new Class_ticketing_dashboard();
+            App_ticketing_report = new Class_ticketing_report();
+      	const selectorDepartment = $('#SelectDepartmentID');
+      	LoadSelectOptionDepartmentFiltered(selectorDepartment);
+            const selectorMonth = $('#OpMonth');
+            const selectorYear = $('#OpYear');
+            const selectorStatus1 = $('#Monthly').find('.SelectStatusTicketID');
+            App_ticketing_report.LoadMonthly(selectorMonth,selectorYear,selectorStatus1);
+
+      })
+
+      $(document).off('click', '.ModalReadMore').on('click', '.ModalReadMore',function(e) {
+          var selector = $(this);
+          let data = jwt_decode(selector.attr('data'));
+          // console.log(data);
+          var setTicket = '';
+          var ID = data['ID'];
+          var token = selector.attr('data')
+          AppModalDetailTicket.ModalReadMore(ID,setTicket,token);
+      })
 </script>

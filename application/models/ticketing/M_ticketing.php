@@ -1826,4 +1826,59 @@ class M_ticketing extends CI_Model {
 
     }
 
+    public function report_category($dataToken){
+        $rs = [];
+        $type = $dataToken['type'];
+        $param = $dataToken['param'];
+        $dateGet = $param['dateGet'];
+        switch ($type) {
+            case 'Monthly':
+                $AddWhereTime = 'and DATE_FORMAT(rec.CreatedAt,"%Y-%m") = "'.$dateGet.'"';
+                break;
+            case 'Daily':
+                $AddWhereTime = 'and DATE_FORMAT(rec.CreatedAt,"%Y-%m-%d") = "'.$dateGet.'"';
+                break;
+            
+        }
+
+        $TicketStatus = $param['Status'];
+        if ($TicketStatus == 3) {
+            $TicketStatus =  'where (a.TicketStatus = 3  or a.TicketStatus = 4 )';
+        }
+        else
+        {
+            $TicketStatus = ($TicketStatus != '') ? 'where a.TicketStatus = '.$TicketStatus : '';
+        }
+
+        $DepartmentID = $param['Department'];
+
+        $sql = '
+                select a.*,ca.Descriptions as CategoryDescriptions,emp.Name as NameRequested,
+                 rec.CategoryReceivedID
+                 from db_ticketing.ticket as a 
+                join db_employees.employees as emp on emp.NIP = a.RequestedBy
+                join (
+                        select rec.* from db_ticketing.received as rec
+                        where
+                        rec.DepartmentReceivedID = "'.$DepartmentID.'"
+                        '.$AddWhereTime.'
+                        group by rec.TicketID,rec.CategoryReceivedID
+                        order by rec.ID desc
+                    ) as rec on a.ID = rec.TicketID
+                join db_ticketing.category as ca on rec.CategoryReceivedID = ca.ID
+                 '.$TicketStatus.'
+             ';
+
+        $dataTable = $this->detail_data_table($sql);
+        $graph = $this->detail_graph_category($sql);
+
+        $rs['dataTable'] = $dataTable;
+        $rs['graph'] = $graph;
+        return $rs;
+    }
+
+    public function report_worker($dataToken){
+        
+    }
+
 }
