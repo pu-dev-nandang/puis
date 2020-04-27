@@ -135,6 +135,7 @@
             				</div>
             			</div>
             		</div>
+                        <br/>
             		<div class="col-xs-12 pagePieChartCategory">
             			<div class="thumbnail">
             				<div class="row">
@@ -148,7 +149,7 @@
             					</div>
                                           <br/>
             					<div class="col-md-12">
-            						<div class="table-responsive" id = "ShowTblByCategory">
+            						<div class="" id = "ShowTblByCategory">
             							pageTableCategory
             						</div>
             					</div>
@@ -184,11 +185,11 @@
             						<div class="thumbnail">
             							<div class="row">
             								<div class="col-md-12 pagePieChartWorker">
-            									pageFilterStatusWorker
+            									
             								</div>
                                                             <br/>
             								<div class="col-md-12 pageTableWorker">
-            									pageTableWorker
+            									
             								</div>
             							</div>
             						</div>	
@@ -233,6 +234,9 @@
             const selectorYear = $('#OpYear');
             const selectorStatus1 = $('#Monthly').find('.SelectStatusTicketID');
             App_ticketing_report.LoadMonthly(selectorMonth,selectorYear,selectorStatus1);
+            const selectorStatus2 = $('#Daily').find('.SelectStatusTicketID');
+            const selectorDateFilter = $('#Daily').find('#dateFilterReport');
+            App_ticketing_report.LoadDaily(selectorDateFilter,selectorStatus2);
 
       })
 
@@ -244,5 +248,105 @@
           var ID = data['ID'];
           var token = selector.attr('data')
           AppModalDetailTicket.ModalReadMore(ID,setTicket,token);
+      })
+
+      $(document).on('click','.btnSearchDateReport',async function(e){
+          const selectorStatus2 = $('#Daily').find('.SelectStatusTicketID');
+          const selectorDateFilter = $('#Daily').find('#dateFilterReport');
+          
+          const cls = App_ticketing_report;
+          const selectorChart =  $('#Daily').find('#ShowPieChartByCategory');
+          const selectorTable =  $('#Daily').find('#ShowTblByCategory');
+          cls.loading_page(selectorChart);
+          cls.loading_page(selectorTable);
+
+          const selectorChartWorker = $('#Daily').find('.pagePieChartWorker');
+          const selectorTableWorker = $('#Daily').find('.pageTableWorker');
+          cls.loading_page(selectorChartWorker);
+          cls.loading_page(selectorTableWorker);
+          
+          let Daily = [];
+          Daily[0] = await cls.D_Category(selectorDateFilter,selectorStatus2);
+          cls.makeDomCategory(Daily[0],selectorChart,selectorTable);
+          Daily[1] = await cls.D_Worker(selectorDateFilter,selectorStatus2);
+          cls.makeDomWorker(Daily[1],selectorChartWorker,selectorTableWorker); 
+      })
+
+      $(document).on('change','#Daily .SelectStatusTicketID',async function(e){
+            const selectorStatus2 = $('#Daily').find('.SelectStatusTicketID');
+            const selectorDateFilter = $('#Daily').find('#dateFilterReport');
+            
+            const cls = App_ticketing_report;
+            const selectorChart =  $('#Daily').find('#ShowPieChartByCategory');
+            const selectorTable =  $('#Daily').find('#ShowTblByCategory');
+            cls.loading_page(selectorChart);
+            cls.loading_page(selectorTable);
+
+            const selectorChartWorker = $('#Daily').find('.pagePieChartWorker');
+            const selectorTableWorker = $('#Daily').find('.pageTableWorker');
+            cls.loading_page(selectorChartWorker);
+            cls.loading_page(selectorTableWorker);
+            
+            let Daily = [];
+            Daily[0] = await cls.D_Category(selectorDateFilter,selectorStatus2);
+            cls.makeDomCategory(Daily[0],selectorChart,selectorTable);
+            Daily[1] = await cls.D_Worker(selectorDateFilter,selectorStatus2);
+            cls.makeDomWorker(Daily[1],selectorChartWorker,selectorTableWorker); 
+      })
+
+      $(document).on('change','#Daily .SelectStatusWorker',async function(e){
+            const selectorChartWorker = $('#Daily').find('.pagePieChartWorker');
+            const selectorTableWorker = $('#Daily').find('.pageTableWorker');
+            App_ticketing_report.loading_page(selectorChartWorker);
+            App_ticketing_report.loading_page(selectorTableWorker);
+            const selectorStatus2 = $('#Daily').find('.SelectStatusTicketID');
+            const selectorDateFilter = $('#Daily').find('#dateFilterReport');
+            let Daily = await App_ticketing_report.D_Worker(selectorDateFilter,selectorStatus2);
+            App_ticketing_report.makeDomWorker(Daily,selectorChartWorker,selectorTableWorker);
+      })
+
+      $(document).on('change','#Monthly #OpMonth,#Monthly #OpYear,#Monthly .SelectStatusTicketID',async function(e){
+            const selectorMonth = $('#OpMonth');
+            const selectorYear = $('#OpYear');
+            const selectorStatus1 = $('#Monthly').find('.SelectStatusTicketID');
+            const cls = App_ticketing_report;
+            const selectorChartMonthly =  $('#Monthly').find('#ShowPieChartByCategory');
+            const selectorTableMonthly =  $('#Monthly').find('#ShowTblByCategory');
+            cls.loading_page(selectorChartMonthly);
+            cls.loading_page(selectorTableMonthly);
+
+            const selectorChartWorkerMonthly = $('#Monthly').find('.pagePieChartWorker');
+            const selectorTableWorkerMonthly = $('#Monthly').find('.pageTableWorker');
+            cls.loading_page(selectorChartWorkerMonthly);
+            cls.loading_page(selectorTableWorkerMonthly);
+            
+            let Monthly = [];
+            Monthly[0] = await cls.M_Category(selectorMonth,selectorYear,selectorStatus1);
+            cls.makeDomCategory(Monthly[0],selectorChartMonthly,selectorTableMonthly);
+            
+            Monthly[1] = await cls.M_Worker(selectorMonth,selectorYear,selectorStatus1);
+            cls.makeDomWorker(Monthly[1],selectorChartWorkerMonthly,selectorTableWorkerMonthly);
+      })
+
+      $(document).on('change','#Monthly .SelectStatusWorker',async function(e){
+            const selectorChartWorker = $('#Monthly').find('.pagePieChartWorker');
+            const selectorTableWorker = $('#Monthly').find('.pageTableWorker');
+            App_ticketing_report.loading_page(selectorChartWorker);
+            App_ticketing_report.loading_page(selectorTableWorker);
+            const selectorMonth = $('#OpMonth');
+            const selectorYear = $('#OpYear');
+            const selectorStatus1 = $('#Monthly').find('.SelectStatusTicketID');
+            let Monthly = await App_ticketing_report.M_Worker(selectorMonth,selectorYear,selectorStatus1);
+            App_ticketing_report.makeDomWorker(Monthly,selectorChartWorker,selectorTableWorker);
+      })
+
+      $(document).on('change','#SelectDepartmentID',function(e){
+            const selectorMonth = $('#OpMonth');
+            const selectorYear = $('#OpYear');
+            const selectorStatus1 = $('#Monthly').find('.SelectStatusTicketID');
+            App_ticketing_report.LoadMonthly(selectorMonth,selectorYear,selectorStatus1);
+            const selectorStatus2 = $('#Daily').find('.SelectStatusTicketID');
+            const selectorDateFilter = $('#Daily').find('#dateFilterReport');
+            App_ticketing_report.LoadDaily(selectorDateFilter,selectorStatus2);
       })
 </script>
