@@ -1874,6 +1874,7 @@ class C_employees extends HR_Controler {
                 $result = $rs;
             }
 
+            /*
             // disposition / encoding on response body
             header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
             header("Content-Disposition: attachment; filename=Attendance-Temporary-DownloadAT.xls");  //File name extension was wrong
@@ -1898,7 +1899,113 @@ class C_employees extends HR_Controler {
                 }
             }
             $table .= '</tbody></table>';
-            echo $table;
+            echo $table; 
+            */
+
+            
+            include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+            ini_set('memory_limit', '-1');
+            ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+
+            // Panggil class PHPExcel nya
+            $excel = new PHPExcel();
+
+            $pr = strtoupper('Attendance Temporary - By Portal');
+
+            // Settingan awal fil excel
+            $excel->getProperties()->setCreator('IT PU')
+                ->setLastModifiedBy('IT PU')
+                ->setTitle($pr)
+                ->setSubject($pr)
+                ->setDescription($pr)
+                ->setKeywords($pr);
+
+            $excel->setActiveSheetIndex(0)->setCellValue('A1', $pr);
+            $excel->getActiveSheet()->mergeCells('A1:F1');
+            $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
+            
+            $header= [array("cell"=>"A","val"=>"No"),
+                    array("cell"=>"B","val"=>"NIP"),
+                    array("cell"=>"C","val"=>"Employee"),
+                    array("cell"=>"D","val"=>"Division/Position"),
+                    array("cell"=>"E","val"=>"First Login"),
+                    array("cell"=>"F","val"=>"Last Login")
+            ];
+
+            $styleColHeader = array(
+                'font' => array('bold' => true), // Set font nya jadi bold
+                'alignment' => array(
+                    'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+                ),
+                'borders' => array(
+                    'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                    'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                    'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                    'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+                )
+            );
+            $numRow = 3;
+            foreach ($header as $k=>$v) {
+                $excel->setActiveSheetIndex(0)->setCellValue($v['cell'].$numRow, $v['val']);
+                $excel->getActiveSheet()->getStyle($v['cell'].$numRow)->applyFromArray($styleColHeader);
+            }
+
+            $numRow = $numRow+1;
+            
+            if(!empty($result)){
+                $styleCell = array(
+                    'borders' => array(
+                        'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                        'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                        'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                        'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+                    )
+                );
+                $no=1;
+                foreach ($result as $v) {
+                    $excel->setActiveSheetIndex(0)->setCellValue('A'.$numRow, $no);
+                    $excel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('A'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('B'.$numRow, $v->NIP);
+                    $excel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('B'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('C'.$numRow, $v->Name);
+                    $excel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('C'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('D'.$numRow, $v->DivisionMain_.'/'.$v->PositionMain_);
+                    $excel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('D'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('E'.$numRow, date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal)));
+                    $excel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('E'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('F'.$numRow, date('d-F-Y H:i:s',strtotime($v->LastLoginPortal)));
+                    $excel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('F'.$numRow)->applyFromArray($styleCell);
+                    
+                    $no++;
+                    $numRow++;
+                }
+            }
+
+            // Proses file excel
+            $filename = "Attendance-Temp-Download.xlsx";
+            //$FILEpath = "./dokument/".$filename;
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename='.$filename); // Set nama file excel nya
+            header('Cache-Control: max-age=0');
+
+            $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+            $write->save('php://output');
+    
         }else{
             show_404();
         }
