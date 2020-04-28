@@ -157,6 +157,8 @@
 		            </div>
 		          </div>
 		          <div class="form-group" style="padding-top:22px">
+		          	<button class="btn btn-sm btn-primary btn-download pull-right" disabled type="button"><i class="fa fa-download"></i> Export to excel</button>
+
 		            <button class="btn btn-primary btn-filter" type="button"><i class="fa fa-search"></i> Search</button>
 		            <a class="btn btn-default" href="">Clear Filter</a>
 		          </div>		          
@@ -173,7 +175,6 @@
 		    <div class="col-md-12">
 		      <div class="panel panel-default">
 		        <div class="panel-heading">            
-		          <button class="btn btn-xs btn-primary btn-download pull-right" disabled type="button"><i class="fa fa-download"></i> Export to excel</button>
 		          <h4 class="panel-title"><i class="fa fa-bars"></i> List of record home attendances <span>Today (<?= date('d F Y') ?>)</span></h4>
 		        </div>
 		        <div class="panel-body">
