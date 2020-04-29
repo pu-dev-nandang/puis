@@ -77,6 +77,7 @@ class C_rest3 extends CI_Controller {
 
     public function APS_CrudAgregatorTB3()
     {
+       $this->load->model('research/m_research');
         $dataToken = $this->data['dataToken'];
         $mode = $dataToken['mode'];
         switch ($mode) {
@@ -124,8 +125,9 @@ class C_rest3 extends CI_Controller {
                                                 ';
                                         $query=$this->db->query($sql, array($ID_sumberdana,$Y,$ProdiID))->result_array();
                                         for ($lt=0; $lt < count($query); $lt++) { 
-                                          $sqlGetAnggota = 'select b.Nama from db_research.list_anggota_penelitian as a
+                                          $sqlGetAnggota = 'select usrr.Nama from db_research.list_anggota_penelitian as a
                                                             join db_research.master_anggota_penelitian as b on a.ID_anggota = b.ID
+                                                            '.$this->m_research->QueryUserReserachJoin('b.ID_user').'
                                                             where a.ID_Litabmas = '.$query[$lt]['ID_litabmas'].'
                                            ';
                                            $dataAnggota = $this->db->query($sqlGetAnggota,array())->result_array();
@@ -159,8 +161,9 @@ class C_rest3 extends CI_Controller {
                                                ';
                                        $query=$this->db->query($sql, array($ID_sumberdana,$Y,$ProdiID))->result_array();
                                        for ($lt=0; $lt < count($query); $lt++) { 
-                                         $sqlGetAnggota = 'select b.Nama from db_research.list_anggota_pkm as a
+                                         $sqlGetAnggota = 'select usrr.Nama from db_research.list_anggota_pkm as a
                                                            join db_research.master_anggota_pkm as b on a.ID_anggota = b.ID
+                                                           '.$this->m_research->QueryUserReserachJoin('b.ID_user').'
                                                            where a.ID_PKM = '.$query[$lt]['ID_PKM'].'
                                           ';
                                           $dataAnggota = $this->db->query($sqlGetAnggota,array())->result_array();
@@ -1108,7 +1111,8 @@ class C_rest3 extends CI_Controller {
                           from db_research.publikasi as a 
                           join db_research.list_anggota_publikasi as b on a.ID_publikasi = b.ID_publikasi
                           join db_research.master_anggota_publikasi as c on b.ID_anggota = c.ID
-                          join db_employees.employees as d on c.NIP = d.NIP
+                           '.$this->m_research->QueryUserReserachJoin('c.ID_user').'
+                          join db_employees.employees as d on usrr.NIPorNPM = d.NIP
                            where d.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
                            and c.Type_anggota = "DSN"
                          ';
@@ -1151,8 +1155,9 @@ class C_rest3 extends CI_Controller {
                       ';
                     $query = $this->db->query($sql,array())->result_array();
                     for ($lt=0; $lt < count($query); $lt++) { 
-                      $sqlGetAnggota = 'select b.Nama from db_research.list_anggota_publikasi as a
+                      $sqlGetAnggota = 'select usrr.Nama from db_research.list_anggota_publikasi as a
                                         join db_research.master_anggota_publikasi as b on a.ID_anggota = b.ID
+                                        '.$this->m_research->QueryUserReserachJoin('b.ID_user').'
                                         where a.ID_publikasi = '.$query[$lt]['ID_publikasi'].' and b.Type_anggota  != "MHS"
                        ';
                        $dataAnggota = $this->db->query($sqlGetAnggota,array())->result_array();
@@ -1191,7 +1196,7 @@ class C_rest3 extends CI_Controller {
                   join db_employees.employees as b on a.NIP = b.NIP
                   #join db_research.list_anggota_pkm as c on c.ID_PKM = a.ID_PKM
                   #join db_research.master_anggota_pkm as d on d.ID = c.ID_anggota
-                  where b.ProdiID = 4
+                  where b.ProdiID = '.$ProdiID.'
                   group by a.NIP, a.ID_PKM
                  ';
           $query = $this->db->query($sql,array())->result_array();
@@ -1204,8 +1209,9 @@ class C_rest3 extends CI_Controller {
             $nestedData[] = $i+1;
             $nestedData[] = $row['NamaDosen'];
             $nestedData[] = $row['RoadMap'];
-            $sql_MHS = 'select b.Nama as Name_mahasiswa from db_research.list_anggota_pkm as a
+            $sql_MHS = 'select usrr.Nama as Name_mahasiswa from db_research.list_anggota_pkm as a
                          join db_research.master_anggota_pkm as b on a.ID_anggota = b.ID
+                         '.$this->m_research->QueryUserReserachJoin('b.ID_user').'
                          where a.ID_PKM = '.$query[$i]['ID_PKM'].' and b.Type_anggota = "MHS"
                                           ';
             $q_MHS = $this->db->query($sql_MHS,array())->result_array();
@@ -1240,6 +1246,7 @@ class C_rest3 extends CI_Controller {
 
     public function APS_CrudAgregatorTB6()
     {
+      $this->load->model('research/m_research');
       $dataToken = $this->data['dataToken'];
       $mode = $dataToken['mode'];
       switch ($mode) {
@@ -1270,8 +1277,9 @@ class C_rest3 extends CI_Controller {
             $nestedData[] = $i+1;
             $nestedData[] = $row['NamaDosen'];
             $nestedData[] = $row['RoadMap'];
-            $sql_MHS = 'select b.Nama as Name_mahasiswa from db_research.list_anggota_penelitian as a
+            $sql_MHS = 'select usrr.Nama as Name_mahasiswa from db_research.list_anggota_penelitian as a
                         join db_research.master_anggota_penelitian as b on a.ID_anggota = b.ID
+                        '.$this->m_research->QueryUserReserachJoin('b.ID_user').'
                         where a.ID_Litabmas = '.$query[$i]['ID_litabmas'].' and b.Type_anggota = "MHS"
                   
                   ';
@@ -1307,6 +1315,7 @@ class C_rest3 extends CI_Controller {
 
     public function APS_CrudAgregatorTB8()
     {
+      $this->load->model('research/m_research');
       $dataToken = $this->data['dataToken'];
       $mode = $dataToken['mode'];
       switch ($mode) {
@@ -1340,11 +1349,12 @@ class C_rest3 extends CI_Controller {
             //         join db_academic.auth_students as d on c.NIM = d.NPM
             //          where d.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
             //        ';
-            $sql = 'select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket,c.Nama
+            $sql = 'select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket,usrr.Nama
                     from db_research.publikasi as a 
                     join db_research.list_anggota_publikasi as b on a.ID_publikasi = b.ID_publikasi
                     join db_research.master_anggota_publikasi as c on b.ID_anggota = c.ID
-                    join db_academic.auth_students as d on c.NIM = d.NPM
+                    '.$this->m_research->QueryUserReserachJoin('c.ID_user').'
+                    join db_academic.auth_students as d on usrr.NIPorNPM = d.NPM
                      where d.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].' and c.Type_anggota = "MHS"
                    '; 
             $query = $this->db->query($sql,array())->result_array();
@@ -1783,8 +1793,9 @@ class C_rest3 extends CI_Controller {
 
               $query = $this->db->query($sql,array())->result_array();
               for ($lt=0; $lt < count($query); $lt++) { 
-                $sqlGetAnggota = 'select b.Nama from db_research.list_anggota_publikasi as a
+                $sqlGetAnggota = 'select usrr.Nama from db_research.list_anggota_publikasi as a
                                   join db_research.master_anggota_publikasi as b on a.ID_anggota = b.ID
+                                  '.$this->m_research->QueryUserReserachJoin('b.ID_user').'
                                   where a.ID_publikasi = '.$query[$lt]['ID_publikasi'].' and b.Type_anggota = "MHS"
                  ';
                  $dataAnggota = $this->db->query($sqlGetAnggota,array())->result_array();
