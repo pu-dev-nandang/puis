@@ -78,6 +78,10 @@
             "processing": true,
             "destroy": true,
             "serverSide": true,
+            "lengthMenu": [
+                    [10,25,50,100],
+                    [10,25,50,100]
+                ],
             "iDisplayLength" : 10,
             "ordering" : false,
             "ajax":{
