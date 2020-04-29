@@ -18,7 +18,7 @@
 	<div class="col-sm-6" id="Monthly">
 		<div class="panel panel-primary" style="border-color: #42a4ca;">
 			<div class="panel-heading clearfix" style="background-color: #42a4ca;border-color: #42a4ca;">
-                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Monthly</h4>
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Data Monthly</h4>
             </div>
             <div class="panel-body">
             	<div class="row">
@@ -35,7 +35,7 @@
 										<select class="form-control" id = "OpYear"></select>
 									</div>
 									<div class="form-group">
-									    <label>Status</label>
+									    <label>Ticket Status</label>
 									    <select class="form-control SelectStatusTicketID" id="SelectStatusTicketID"></select>
 									</div>
             					</div>
@@ -46,7 +46,7 @@
             			<div class="thumbnail">
             				<div class="row">
             					<div style="padding: 10px;text-align: center;">
-            						<h4 style="color: green;"><u>By Category</u></h4>
+            						<h4 style="color: green;"><u>By Ticket Category</u></h4>
             					</div>
             					<div class="col-md-12">
             						<div class="chart chart-large" id = "ShowPieChartByCategory">
@@ -76,7 +76,7 @@
             							<div class="row">
             								<div class="col-md-12">
             									<div class="form-group">
-            									    <label>Worker</label>
+            									    <label>Worker Status</label>
             									    <select class="form-control SelectStatusWorker" id="">
             									    	<option value="2" selected>Close</option>
             									    	<option value="1">Working</option>
@@ -119,7 +119,7 @@
             				<div class="row">
             					<div class="col-md-12" style="padding-left: 0px !important;padding-right: 0px !important; ">
             						<div class="form-group">
-            						    <label>Status</label>
+            						    <label>Ticket Status </label>
             						    <select class="form-control SelectStatusTicketID" id="SelectStatusTicketID"></select>
             						</div>
 			            			<div class="form-group">
@@ -140,7 +140,7 @@
             			<div class="thumbnail">
             				<div class="row">
             					<div style="padding: 10px;text-align: center;">
-            						<h4 style="color: green;"><u>By Category</u></h4>
+            						<h4 style="color: green;"><u>By Ticket Category </u></h4>
             					</div>
             					<div class="col-md-12">
             						<div class="chart" id = "ShowPieChartByCategory">
@@ -170,7 +170,7 @@
             							<div class="row">
             								<div class="col-md-12">
             									<div class="form-group">
-            									    <label>Worker</label>
+            									    <label>Worker Status</label>
             									    <select class="form-control SelectStatusWorker" id="">
             									    	<option value="2" selected>Close</option>
             									    	<option value="1">Working</option>
