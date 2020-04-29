@@ -167,28 +167,28 @@ class M_prodi extends CI_Model {
     public function auth($ProdiID = NULL)
     {
         $PositionMain = $this->session->userdata('PositionMain');
-        $DivisionID = $PositionMain['IDDivision'];
-        $IDPosition = $PositionMain['IDPosition'];
+        $DivisionID = (int)$PositionMain['IDDivision'];
+        $IDPosition = (int)$PositionMain['IDPosition'];
 
         // Position Other 1
         $PositionOther1 = $this->session->userdata('PositionOther1');
-        $DivisionIDOther1 = $PositionOther1['IDDivisionOther1'];
-        $IDPositionOther1 = $PositionOther1['IDPositionOther1'];
+        $DivisionIDOther1 = (int)$PositionOther1['IDDivisionOther1'];
+        $IDPositionOther1 = (int)$PositionOther1['IDPositionOther1'];
 
         // Position Other 2
         $PositionOther2 = $this->session->userdata('PositionOther2');
-        $DivisionIDOther2 = $PositionOther2['IDDivisionOther2'];
-        $IDPositionOther2 = $PositionOther2['IDPositionOther2'];
+        $DivisionIDOther2 = (int)$PositionOther2['IDDivisionOther2'];
+        $IDPositionOther2 = (int)$PositionOther2['IDPositionOther2'];
 
 
         // Position Other 3
         $PositionOther3 = $this->session->userdata('PositionOther3');
-        $DivisionIDOther3 = $PositionOther3['IDDivisionOther3'];
-        $IDPositionOther3 = $PositionOther3['IDPositionOther3'];
+        $DivisionIDOther3 = (int)$PositionOther3['IDDivisionOther3'];
+        $IDPositionOther3 = (int)$PositionOther3['IDPositionOther3'];
 
         // get prodi
-        $GetProdi = (  ($DivisionID == 12  || $DivisionIDOther1 == 12 || $DivisionIDOther2 == 12 || $DivisionIDOther3 == 12  ) || ($IDPosition < 5  || $IDPositionOther1 < 5 || $IDPositionOther2 < 5 || $IDPositionOther3 < 5 )  ) ?  $this->m_master->caribasedprimary('db_academic.program_study','Status',1):array();
-
+        $GetProdi = (  ($DivisionID == 12  || $DivisionIDOther1 == 12 || $DivisionIDOther2 == 12 || $DivisionIDOther3 == 12  ) || ( ($IDPosition < 5 && $IDPosition >0 ) || ($IDPositionOther1 < 5 && $IDPositionOther1 > 0 ) || ($IDPositionOther2 < 5 && $IDPositionOther2 > 0 ) || ( $IDPositionOther3 < 5 && $IDPositionOther3 > 0 ) )  ) ?  $this->m_master->caribasedprimary('db_academic.program_study','Status',1):array();
+     
         // check Prodi
         $NIP = $this->session->userdata('NIP');
         $a_ID = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$NIP);
@@ -224,7 +224,7 @@ class M_prodi extends CI_Model {
             }
             else
             {
-                if (  ($DivisionID == 12 || $DivisionIDOther1 == 12 || $DivisionIDOther2 == 12 || $DivisionIDOther3 == 12  ) || ($IDPosition < 5 ||  $IDPositionOther1 < 5 || $IDPositionOther2 < 5 || $IDPositionOther3 < 5  )  ) {
+                if (  ($DivisionID == 12  || $DivisionIDOther1 == 12 || $DivisionIDOther2 == 12 || $DivisionIDOther3 == 12  ) || ( ($IDPosition < 5 && $IDPosition >0 ) || ($IDPositionOther1 < 5 && $IDPositionOther1 > 0 ) || ($IDPositionOther2 < 5 && $IDPositionOther2 > 0 ) || ( $IDPositionOther3 < 5 && $IDPositionOther3 > 0 ) )  ) {
                    $GetProdi= $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
                 }
                 else

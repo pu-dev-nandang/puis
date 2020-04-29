@@ -19,6 +19,7 @@ class C_api2 extends CI_Controller {
         $this->load->model('hr/m_hr');
         $this->load->model('vreservation/m_reservation');
         $this->load->model('akademik/m_tahun_akademik');
+        $this->load->model('akademik/m_onlineclass');
         $this->load->model('notification/m_log');
         $this->load->library('JWT');
         $this->load->library('google');
@@ -1498,6 +1499,41 @@ class C_api2 extends CI_Controller {
 
                 return print_r(1);
 
+
+            }
+            else if($data_arr['action']=='UpdateStudentAttdInOnline'){
+
+                $this->m_onlineclass->setAttendanceStudent($data_arr);
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='UpdateLecturertAttdInOnline'){
+
+                $ArrIDAttd = $data_arr['ArrIDAttd'];
+
+                if(count($ArrIDAttd)>0){
+                    for($i=0;$i<count($ArrIDAttd);$i++){
+                        $dataInsert = (array) $ArrIDAttd[$i];
+                        if($data_arr['Status']=='1'){
+                            $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+                            $dataInsert['IP_Private'] = $hostname;
+                            $this->db->insert('db_academic.attendance_lecturers', $dataInsert);
+                        } else {
+                            $this->db->where(array(
+                                'ID_Attd' => $dataInsert['ID_Attd'],
+                                'Meet' => $dataInsert['Meet'],
+                                'NIP' => $dataInsert['NIP']
+                            ));
+                            $this->db->delete('db_academic.attendance_lecturers');
+                        }
+
+                    }
+                }
+
+
+
+                return print_r(1);
 
             }
             else if($data_arr['action']=='loadBAP'){

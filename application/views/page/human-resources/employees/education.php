@@ -45,6 +45,7 @@
                                         <td>Major</td>
                                         <td>Graduation Year</td>
                                         <td>GPA</td>
+                                        <td>Note</td>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -66,10 +67,13 @@
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control edu-major" name="eduMajor[]">
                                         <small class="text-danger text-message"></small></td>
-                                        <td><input type="text" class="form-control required number edu-graduation" required name="eduGraduation[]" maxlength="4">
-                                        <small class="text-danger text-message"></small></td>
+                                        <td><input type="text" class="form-control required number edu-graduation" name="eduGraduation[]" maxlength="4">
+                                        <small class="text-danger text-message"></small>
+                                        <label><input type="checkbox" class="checkme"> until now</label>
+                                        </td>
                                         <td><input type="text" class="form-control edu-gpa" name="eduGPA[]">
                                         <small class="text-danger text-message"></small></td>
+                                        <td><textarea class="form-control edu-Note" name="Note[]" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -190,6 +194,27 @@
             }
         });
 
+        $("#form-educations").on("change",".checkme",function(){
+            var itsme = $(this);
+            $graduate = itsme.parent().parent().find('.edu-graduation');
+            if(itsme.is(':checked')){
+                $graduate.removeClass("required error").val("");
+            }else{
+                $graduate.addClass("required");                
+            }
+        });
+        $("#form-educations").on("keyup",".edu-graduation",function(){
+            var value = $(this).val();
+            $checkbox = $(this).next().next().find("input[type=checkbox]");
+            if($.trim(value).length > 0){
+                $(this).addClass("required");
+                $checkbox.prop("checked",false);
+            }else{
+                $(this).removeClass("required");
+                $checkbox.prop("checked",true);                
+            }
+        });
+
 
 		var myData = fetchAdditionalData("<?=$NIP?>");
         if(!jQuery.isEmptyObject(myData)){
@@ -200,7 +225,13 @@
                     $cloneRow.attr("data-table","employees_educations").attr("data-id",value.ID).attr("data-name",value.instituteName);
                     $cloneRow.find("td:first").text(num);
                     $.each(value,function(k,v){
-                        $cloneRow.find(".edu-"+k).val(v);    
+                        $cloneRow.find(".edu-"+k).val(v); 
+                        if(k == "graduation"){
+                            if(jQuery.isEmptyObject(v)){
+                                $cloneRow.find(".checkme").prop("checked",true);                                
+                                $cloneRow.find(".edu-graduation").removeClass("required error").removeAttr("required");
+                            }
+                        }
                     });
                     
                     $tablename.find("tbody").append($cloneRow);

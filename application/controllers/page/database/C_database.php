@@ -87,6 +87,16 @@ class C_database extends Globalclass {
             $message = ""; $isfinish = false;
             $isExist = $this->General_model->fetchData("db_employees.employees",$conditions)->row();
             if(!empty($isExist)){
+                if($data_arr['ACT'] == 2){ //for rejected
+                    $dataPost = array("isApproved"=>2,"NoteApproved"=>(!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null));                    
+                    $rejectData = $this->General_model->updateData("db_employees.employees",$dataPost,$conditions);
+                    $message = ($rejectData ? "Successfully":"Failed")." saved.";
+                }else if($data_arr['ACT'] == 0){ //for approved
+                    $reqData = $isExist->Logs;
+                }else{$message="Unknow request approved.";}
+            }
+
+            /*if(!empty($isExist)){
                 if($data_arr['ACT'] == 1){
                     $getTempEmpyReq = $this->General_model->fetchData("db_employees.tmp_employees",$conditions)->row();
                     $dataAppv = array();
@@ -161,7 +171,7 @@ class C_database extends Globalclass {
                     $message = (($updateTempStd) ? "Successfully":"Failed")." saved." ;
                     $isfinish = $updateTempStd;
                 }
-            }else{$message="Student data is not founded.";}
+            }else{$message="Student data is not founded.";}*/
             $json = array("message"=>$message,"finish"=>$isfinish);
         }
 
@@ -342,6 +352,15 @@ class C_database extends Globalclass {
 
 
     // === Students ===
+
+    public function menu_student($page){
+
+        $data['page'] = $page;
+        $content = $this->load->view('page/database/students/menu_student',$data,true);
+        $this->temp($content);
+
+    }
+
     public function students()
     {
         /*UPDATED BY FEBRI @ JAN 2020*/
@@ -353,12 +372,19 @@ class C_database extends Globalclass {
         // Updated by Adhi 19-02-2020
         $data['rest_setting_alumni'] = $this->m_master->showData_array('db_alumni.rest_setting');
         // END by Adhi 19-02-2020
-        $content = $this->load->view('page/database/students',$data,true);
+        $page = $this->load->view('page/database/students/list_students',$data,true);
         /*END UPDATED BY FEBRI @ JAN 2020*/
 
+        $this->menu_student($page);
 
+    }
 
-        $this->temp($content);
+    public function block_students(){
+
+        $data = '';
+        $page = $this->load->view('page/database/students/block_students',$data,true);
+        $this->menu_student($page);
+
     }
 
     public function students_group()

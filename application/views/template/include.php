@@ -430,6 +430,35 @@
         }
     });
 
+    function loadCoutDown(element,EndSessions,Refreshpage){
+
+        var ens = EndSessions.split(':');
+        var start = moment();
+        var end   = moment().hours(ens[0]).minutes(ens[1]).seconds(ens[2]);
+
+        var en = moment().valueOf();
+        var d = end.diff(start);
+        var fiveSeconds = parseInt(en) + parseInt(d);
+
+
+        $(element)
+            .countdown(fiveSeconds, function(event) {
+                $(this).text(
+                    // event.strftime('%D days %H:%M:%S')
+                    event.strftime('%H:%M:%S')
+                );
+            })
+            .on('finish.countdown', function() {
+
+                alert('Time has run out');
+
+                if(Refreshpage==1){
+                    window.location.href="";
+                }
+
+            });
+    }
+
     toastr.options = {
         "closeButton": true,
         "debug": false,
@@ -568,9 +597,9 @@
     }
 
     function getTimeNow() {
-        var phpNowDate = '<?= date("H:i:s"); ?>';
+        var phpNowTime = '<?= date("H:i:s"); ?>';
         // return moment().format('YYYY-MM-DD HH:mm:ss');
-        return phpNowDateTime;
+        return phpNowTime;
     }
 
     function ucwords(str) {
@@ -2584,7 +2613,7 @@
                   }
               }
            }
-
+          
            $.ajax({
              type:"POST",
              // url:url+'?apikey='+Apikey,
@@ -2611,5 +2640,24 @@
            })
         })
     }
+
+    function timeout(ms){ // promises
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+
+    /*ADDED BY FEBRI @ FEB 2020*/
+    function loadSelectOptionCountry(element,selected) {
+        var url = base_url_js+'api/__getCountry';
+        $.getJSON(url,function (jsonResult) {
+            $(element).append('<option>-- Select Country --</option>');
+            $.each(jsonResult,function (i,v) {
+                var sc = (selected==v.ctr_code) ? 'selected' : '';
+                $(element).append('<option value="'+v.ctr_code+'" '+sc+'>'+v.ctr_name+'</option>');
+            })
+            $(element).select2({'width':'100%'});
+        });
+    }
+    /*END ADDED BY FEBRI @ FEB 2020*/
 
 </script>

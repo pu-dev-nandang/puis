@@ -3950,7 +3950,8 @@ class M_api extends CI_Model {
 
     public function getInvigilatorSch($SemesterID,$Type,$NIP,$dateTimeNow){
         $data = $this->db->query('SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,
-                                          mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup
+                                          mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup,
+                                          ex.OnlineLearning
                                           FROM db_academic.exam ex
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                           LEFT JOIN db_academic.exam_details exd ON (exd.ExamID = ex.ID)
@@ -4037,6 +4038,8 @@ class M_api extends CI_Model {
         if(count($dataExamDetail)>0){
             for($i=0;$i<count($dataExamDetail);$i++){
 
+
+
                 // Cek Semester
                 $dataSemester = $this->m_rest->checkSemesterByClassOf($dataExamDetail[$i]['Year'],$dataExamDetail[$i]['SemesterID']);
 
@@ -4059,6 +4062,13 @@ class M_api extends CI_Model {
 
                 $dataExamDetail[$i]['DetailPayment'] = $dataPayment;
                 $dataExamDetail[$i]['DetailAttendance'] = $dataAttendance;
+
+
+                // Detail Exam Online
+                $dataExamDetail[$i]['DetailExam'] = $this->db->get_where('db_academic.exam_student_online',array(
+                    'ExamID' => $ExamID,
+                    'NPM' => $dataExamDetail[$i]['NPM']
+                ))->result_array();
             }
         }
 

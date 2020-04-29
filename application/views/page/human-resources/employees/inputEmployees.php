@@ -1,201 +1,324 @@
+<style type="text/css">
+    .bg-required{color: red;font-weight: bold;}
+</style>
 <!-- OLD FORM -->
-<div class="panel panel-primary">
+<div class="panel panel-primary" id="form-employee">
     <div class="panel-heading" style="border-radius: 0px;">
         <h4 class="panel-title"><i class="fa fa-edit"></i> Please, Fill out this form with correctly data</h4>
     </div>
     <div class="panel-body" style="min-height: 100px;">
 
         <div class="row">
-            <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
-                <div class="row">
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>NIK / NIP *</label>
-                            <input class="form-control" id="formNIP" />
-                        </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title"><i class="fa fa-id-card"></i> Fill out this field based on Identity Card (KTP)
+                        <span class="bg-required pull-right">required</span></h4>
                     </div>
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>NUP</label>
-                            <input class="form-control" id="formNUP" />
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xs-5">
+                                <div class="form-group">
+                                    <label>Full Name </label>
+                                    <input class="form-control required" id="formName" autocomplete="off"/>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-xs-2">
+                                <div class="form-group">
+                                    <label>Title Ahead</label>
+                                    <input class="form-control" id="formTitleAhead" autocomplete="off" />
+                                </div>
+                            </div>
+                            <div class="col-xs-2">
+                                <div class="form-group">
+                                    <label>Title Behind</label>
+                                    <input class="form-control" id="formTitleBehind" autocomplete="off" />
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <select class="form-control required" id="formGender">
+                                        <option value="">Choose one</option>
+                                        <option value="L">Male</option>
+                                        <option value="P">Female</option>
+                                    </select>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            
                         </div>
-                    </div>
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>NIDN</label>
-                            <input class="form-control" id="formNIDN" />
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <div class="form-group">
+                                    <label>Number of ID Card </label>
+                                    <input class="form-control number required" id="formKTP" autocomplete="off" />
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>Religion </label>
+                                    <select class="form-control required" id="formReligion">
+                                        <option value="">Choose one</option>
+                                    </select>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <label>Marital Status</label>
+                                <select class="form-control required" id="formMaritalStatus">
+                                    <option value="">Choose One</option>
+                                </select>
+                                <small class="text-danger text-message"></small>
+                            </div>
+                            <div class="col-xs-2">
+                                <div class="form-group">
+                                    <label>Blood</label>
+                                    <input class="form-control required" id="formBlood" maxlength="3" />
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>NIDK</label>
-                            <input class="form-control" id="formNIDK" />
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-5">
-                        <div class="form-group">
-                            <label>No KTP *</label>
-                            <input class="form-control" id="formKTP" />
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Access Card Number</label>
-                            <input type="text" class="form-control" id="CardNumber">
-                        </div>
-                    </div>
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>Religion *</label>
-                            <select class="form-control" id="formReligion"></select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-9">
-                        <div class="form-group">
-                            <label>Name *</label>
-                            <input class="form-control" id="formName"/>
-                        </div>
-                    </div>
-                    <div class="col-xs-3">
-                        <div class="form-group">
-                            <label>Gender *</label>
-                            <select class="form-control" id="formGender">
-                                <option value="L">Male</option>
-                                <option value="P">Female</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-6">
-                        <div class="form-group">
-                            <label>Title Ahead</label>
-                            <input class="form-control" id="formTitleAhead" />
-                        </div>
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="form-group">
-                            <label>Title Behind</label>
-                            <input class="form-control" id="formTitleBehind" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="form-group">
-                            <label>Place Of Birth *</label>
-                            <input class="form-control" id="formPlaceOfBirht" />
-                        </div>
-                    </div>
-                    <div class="col-xs-12">
-                        <div class="form-group">
-
-                            <div class="thumbnail" style="padding: 10px;text-align: center;">
-                                <h4>Date Of Birth *</h4>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group" style="margin-bottom:0px">
+                                    <label>Place of Birth</label>
+                                </div>
+                                <div class="form-group">
+                                    <label>Type name of city</label>
+                                    <input class="form-control required" id="formPlaceOfBirht" />
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="form-group" style="margin-bottom:0px">
+                                    <label>Date of birth</label>
+                                </div>
                                 <div class="row">
                                     <div class="col-xs-4">
                                         <div class="form-group">
                                             <label>Year</label>
-                                            <select class="form-control" id="formYearBirth"></select>
+                                            <select class="select2-req" id="formYearBirth">
+                                                <option>Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
                                         </div>
                                     </div>
                                     <div class="col-xs-4">
                                         <div class="form-group">
-                                            <label>Mont</label>
-                                            <select class="form-control" id="formMontBirth"></select>
+                                            <label>Month</label>
+                                            <select class="form-control required" id="formMontBirth">
+                                                <option value="">Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
                                         </div>
                                     </div>
                                     <div class="col-xs-4">
                                         <div class="form-group">
                                             <label>Date</label>
-                                            <select class="form-control" id="formDateBirth"></select>
+                                            <select class="form-control required" id="formDateBirth">
+                                                <option value="">Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-6">
-                        <div class="form-group">
-                            <label>Phone</label>
-                            <input class="form-control" id="formPhone" />
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Mobile</label>
-                            <input class="form-control" id="formMobile" />
-                        </div>
-                    </div>
-                    <div class="col-xs-2">
-                        <div class="form-group">
-                            <label>Blood</label>
-                            <input class="form-control" id="formBlood" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="form-group">
-                            <label>Email PU</label>
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="formEmailPU" disabled>
-                                    <span class="input-group-addon">@podomorouniversity.ac.id</span>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <textarea rows="3" class="form-control required" id="formAddress"></textarea>
+                                    <small class="text-danger text-message"></small>
                                 </div>
-                                <label> *Email PU Auto Generete by system</label>
+                            </div>
+                        </div>
+                        
+                        <div class="row" id="PlaceIDCard">
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>Country</label>
+                                    <select class="com-CountryID select2-req" id="CountryID" name="CountryID"></select>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>Province</label>
+                                    <select class="form-control isrequire com-ProvinceID" id="ProvinceID" name="ProvinceID">
+                                        <option value="">Choose one</option>
+                                    </select>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>Region</label>
+                                    <select class="form-control isrequire com-RegionID" id="RegionID" name="RegionID">
+                                        <option value="">Choose one</option>
+                                    </select>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label>District</label>
+                                    <select class="form-control isrequire com-DistrictID" id="DistrictID" name="DistrictID">
+                                        <option value="">Choose one</option>
+                                    </select>
+                                    <small class="text-danger text-message"></small>
+                                </div>
+                            </div>                            
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <div class="form-group">
+                                    <label>Postcode</label>
+                                    <input type="text" class="form-control required number" id="formPostcode" maxlength="5">
+                                    <small class="text-danger text-message"></small>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xs-6">
-                        <div class="form-group">
-                            <label>Email Other</label>
-                            <input class="form-control" id="formEmail" />
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <label>Marital Status*</label>
-                        <select class="form-control" id="formMaritalStatus">
-                            <option value="">Choose One</option>
-                        </select>
-                    </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="form-group">
-                            <label>Address *</label>
-                            <textarea rows="3" class="form-control" id="formAddress"></textarea>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <i class="fa fa-id-card"></i> Fill out this field based on Employee Data
+                            <span class="bg-required pull-right">required</span>
+                        </h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>NIK / NIP</label>
+                                            <input class="form-control required number" id="formNIP" />
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Access Card Number</label>
+                                            <input type="text" class="form-control number required" id="CardNumber">
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label>Status Employees</label>
+                                            <select class="form-control required" id="formStatusEmployee">
+                                                <option value="">Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label>Level of Education</label>
+                                            <select class="form-control required" id="formLevelEducationID">
+                                                <option value="">Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Email Other</label>
+                                            <input class="form-control required" id="formEmail" autocomplete="off" />
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>  
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Phone</label>
+                                            <input class="form-control number" id="formPhone"  autocomplete="off" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Mobile</label>
+                                            <input class="form-control number required" id="formMobile" autocomplete="off" />
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>                                
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group" style="margin-bottom:0px">
+                                            <label>Internal telphone number</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Extension</label>                                            
+                                            <input class="form-control number" id="formExtension" autocomplete="off" maxlength="5" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Password Telp</label>                                            
+                                            <input class="form-control number" id="formPassTelp" autocomplete="off" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label>Email PU</label>
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="formEmailPU" disabled>
+                                                    <span class="input-group-addon">@podomorouniversity.ac.id</span>
+                                                </div>
+                                                <label> *Email PU Auto Generete by system</label>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                </div>
+                                
+                            </div>
+                            
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Photo</label>
+                                </div>
+                                <div class="form-group">
+                                    <center>
+                                    <img id="imgThumbnail" src="<?php echo base_url('images/icon/userfalse.png'); ?>" style="max-width: 100px;width: 100%;">
+                                    </center>
+                                    <form id="fmPhoto" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                                        <input id="formPhoto" class="hide" value="" hidden />
+                                        <div class="form-group">
+                                                <label class="btn btn-sm btn-default btn-default-warning btn-upload" style="width:100%">
+                                                <i class="fa fa-upload margin-right"></i> Upload Photo
+                                                <input type="file" id="filePhoto" name="userfile" class="uploadPhotoEmp" style="display: none;" accept="image/*">
+                                            </label>
+                                            <p style="font-size: 12px;color: #ccc;">*) NIK / NIP must be fill before upload photo</p>
+                                        </div>
+                                    </form>
+                                    <div style="text-align: left;padding-top: 10px;border-top: 1px solid #ccc;margin-top: 0px;">
+                                        Size : <span id="imgSize">0</span> Kb <br/>
+                                        Type : <span id="imgType">-</span>
+                                        <input id="formImgType" class="hide" hidden readonly />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="row">
-                    <div class="col-xs-2">
-                        <div class="form-group">
-                            <label>Postcode *</label>
-                            <input type="text" class="form-control" id="formPostcode" maxlength="5">
-                        </div>
-                    </div>
-                </div>
-                <p><b>*) Please fill out this field by referring to ID card</b></p>
-
-
             </div>
 
             <div class="col-md-6">
@@ -209,19 +332,19 @@
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Division</label>
-                                        <select class="form-control" id="form_MainDivision"></select>
+                                        <select class="form-control required" id="form_MainDivision"></select>
+                                        <small class="text-danger text-message"></small>
                                     </div>
                                 </div>
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Position</label>
-                                        <select class="form-control" id="form_MainPosition"></select>
+                                        <select class="form-control required" id="form_MainPosition"></select>
+                                        <small class="text-danger text-message"></small>
                                     </div>
                                 </div>
                             </div>
-                            <div id = "AddingProdi">
-                                
-                            </div>
+                            <div id = "AddingProdi"></div>
                         </div>
                     </div>
                 </div>
@@ -253,7 +376,6 @@
                     <div class="col-xs-12">
                         <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
                             <h4>Position Other 2</h4>
-
                             <div class="row">
                                 <div class="col-xs-6">
                                     <div class="form-group">
@@ -276,7 +398,6 @@
                     <div class="col-xs-12">
                         <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
                             <h4>Position Other 3</h4>
-
                             <div class="row">
                                 <div class="col-xs-6">
                                     <div class="form-group">
@@ -296,112 +417,98 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Status Employees</label>
-                            <select class="form-control" id="formStatusEmployee"></select>
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Status Lecturer</label>
-                            <select class="form-control" id="formStatusLecturer">
-                                <option>* Not Set</option>
-                                <option disabled>------</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Status Forlap</label>
-                            <select class="form-control" id="formStatusForlap">
-                                <option>* Not Set</option>
-                                <option disabled>------</option>
-                                <option value="0">NUP (Contract)</option>
-                                <option value="1">NIDN (Permanent)</option>
-                                <option value="2">NIDK (Special)</option>
-                            </select>
-                        </div>
-                    </div>
+                    <div class="col-sm-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <i class="fa fa-id-card"></i> Fill out this field based on Lecturer Data
+                                </h4>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>Status Lecturer</label>
+                                            <select class="form-control" id="formStatusLecturer">
+                                                <option>* Not Set</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>NUP</label>
+                                            <input class="form-control" id="formNUP" />
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>NIDN</label>
+                                            <input class="form-control" id="formNIDN" />
+                                        </div>
+                                    </div>
 
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Programme Study</label>
-                            <select class="form-control" id="formProgrammeStudy"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Profession</label>
-                            <input class="form-control" id="formProfession">
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Level of Education</label>
-                            <select class="form-control" id="formLevelEducationID"></select>
-                        </div>
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" id="formSerdos" value="1">
-                                Certified Dosen (Serdos)
-                            </label>
-                        </div>
-                        <input type="text" id="formSerdosNumber" class="form-control" disabled placeholder="Serdos Number">
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Academic Position</label>
-                            <select class="form-control" id="formLecturerAcademicPositionID">
-                                <option>* Not Set</option>
-                                <option disabled>------</option>
-                            </select>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-3" style="text-align: center;border-right: 1px solid #CCCCCC;">
-                        <hr/>
-                        <img id="imgThumbnail" src="<?php echo base_url('images/icon/userfalse.png'); ?>" style="max-width: 100px;width: 100%;">
-                        <div style="text-align: left;padding-top: 10px;border-top: 1px solid #ccc;margin-top: 10px;">
-                            Size : <span id="imgSize">0</span> Kb <br/>
-                            Type : <span id="imgType">-</span>
-                            <input id="formImgType" class="hide" hidden readonly />
-                        </div>
-                    </div>
-                    <div class="col-xs-9">
-                        <hr/>
-                        <div class="form-group">
-                            <label>Photo</label>
-                            <form id="fmPhoto" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
-                                <input id="formPhoto" class="hide" value="" hidden />
-                                <div class="form-group"><label class="btn btn-sm btn-default btn-default-warning btn-upload">
-                                        <i class="fa fa-upload margin-right"></i> Upload Photo
-                                        <input type="file" id="filePhoto" name="userfile" class="uploadPhotoEmp"
-                                               style="display: none;" accept="image/*">
-                                    </label>
-                                    <p style="font-size: 12px;color: #ccc;">*) NIK / NIP must be fill before upload photo</p>
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>NIDK</label>
+                                            <input class="form-control" id="formNIDK" />
+                                        </div>
+                                    </div>
                                 </div>
-                            </form>
-
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>Status Forlap</label>
+                                            <select class="form-control" id="formStatusForlap">
+                                                <option>* Not Set</option>
+                                                <option disabled>------</option>
+                                                <option value="0">NUP (Contract)</option>
+                                                <option value="1">NIDN (Permanent)</option>
+                                                <option value="2">NIDK (Special)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>Programme Study</label>
+                                            <select class="form-control" id="formProgrammeStudy"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label>Academic Position</label>
+                                            <select class="form-control" id="formLecturerAcademicPositionID">
+                                                <option>* Not Set</option>
+                                                <option disabled>------</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-3">                        
+                                        <div class="form-group">
+                                            <label>Profession</label>
+                                            <input class="form-control" id="formProfession">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4">                        
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="formSerdos" value="1">
+                                                Certified Dosen (Serdos)
+                                            </label>
+                                        </div>
+                                        <input type="text" id="formSerdosNumber" class="form-control" disabled placeholder="Serdos Number">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
         </div>
-
-        <div class="row">
-            <div class="col-md-12" style="text-align: right;">
-                <hr/>
-                <button class="btn btn-success" id="btnSave">Save</button>
-            </div>
-        </div>
-
+    </div>
+    <div class="panel-footer text-right">
+        <button class="btn btn-success" id="btnSave">Save and Next</button>
     </div>
 </div>
 
@@ -414,9 +521,12 @@
           split++;
     }
     $(document).ready(function () {
+        $("#formYearBirth").select2({width:'100%'});
         loadSelectOptionMaritalStatus('#formMaritalStatus');
         loadYearOfBirth('#formYearBirth');
         loadMonthBirth('#formMontBirth');
+
+        loadSelectOptionCountry("#CountryID",'');
 
         // Division
         loadSelectOptionDivision('#form_MainDivision','');
@@ -451,6 +561,54 @@
 
         loadSelectOptionLevelEducation('#formLevelEducationID','');
         loadSelectOptionLecturerAcademicPosition('#formLecturerAcademicPositionID','');
+
+
+        $('#CountryID').change(function () {
+            var value = $(this).val();
+            if($.isNumeric(value)){
+                if(value == '001'){
+                    $("#form-employee .isrequire").addClass("required").prop("disabled",false);;
+                    loadSelectOptionLoc_Province('#ProvinceID','');
+                }else{
+                    $("#form-employee .isrequire").val("").removeClass("required").prop("disabled",true);
+                }
+            }
+            var ProvinceID = $('#ProvinceID').val();
+            $('#RegionID').html('<option value="">Choose one</option>');
+            $('#DistrictID').html('<option value="">Choose one</option>');
+            if(ProvinceID!='' && ProvinceID!=null){
+                loadSelectOptionLoc_Regions(ProvinceID,'#RegionID','');
+            }
+        });
+
+        
+        $('#ProvinceID').change(function () {
+            var ProvinceID = $('#ProvinceID').val();
+            $('#RegionID').html('<option value="">Choose one</option>');
+            $('#DistrictID').html('<option value="">Choose one</option>');
+            if(ProvinceID!='' && ProvinceID!=null){
+                loadSelectOptionLoc_Regions(ProvinceID,'#RegionID','');
+            }
+        });
+
+
+        $('#RegionID').change(function () {
+            var RegionID = $('#RegionID').val();
+            $('#DistrictID').html('<option value="" disabled selected>-- Select District --</option>');
+            if(RegionID!='' && RegionID!=null){
+                loadSelectOptionLoc_District(RegionID,'#DistrictID','');
+            }
+        });
+
+        $("body #form-employee").on("keyup keydown",".number",function(){
+            this.value = this.value.replace(/[^0-9\.]/g,'');
+        });
+
+        $('#formBlood').keyup(function(){
+            var value = $(this).val();
+            $(this).val(value.toUpperCase());
+        });
+
     });
 
     // SerDOS
@@ -521,23 +679,69 @@
     });
 
     $('#btnSave').click(function () {
-        var NIP = $('#formNIP').val();
-        $('#NotificationModal .modal-body').html('<div style="text-align: center;">' +
-            'Pastikan NIK / NIP yang dimasukan tidak salah. <br/>' +
-            'NIK / NIP : <b>'+NIP+'</b> ' +
-            '<hr/>' +
-            '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
-            '<button type="button" class="btn btn-success" id="btnSubmitEmployees">Submit</button>' +
-            '</div> ');
-
-        $('#NotificationModal').modal({
-            'backdrop' : 'static',
-            'show' : true
+        var itsme = $(this);
+        var itsform = itsme.parent().parent();
+        
+        itsform.find(".select2-req").each(function(){
+            var value = $(this).val();
+            if($.isNumeric(value)){
+                if($.trim(value) == ''){
+                    $(this).addClass("error");
+                    $(this).parent().find(".text-message").text("Please fill this field");
+                    error = false;
+                }else{
+                    error = true;
+                    $(this).removeClass("error");
+                    $(this).parent().find(".text-message").text("");
+                }
+            }else{
+                error = false;  
+                $(this).addClass("error");
+                $(this).parent().find(".text-message").text("Please fill this field");
+            }
         });
+        itsform.find(".required").each(function(){
+            var value = $(this).val();
+            if($.trim(value) == ''){
+                $(this).addClass("error");
+                $(this).parent().find(".text-message").text("Please fill this field");
+                error = false;
+            }else{
+                error = true;
+                $(this).removeClass("error");
+                $(this).parent().find(".text-message").text("");
+            }
+        });
+
+        //only for lecturer
+        var prody = $("body #formProgrammeStudy > option:selected");
+        var attr = prody.attr("value");
+        if (typeof attr !== typeof undefined && attr !== false) {
+            var value = prody.val();
+            if($.trim(value).length > 0){
+                var statusLecturer = itsform.find("#formStatusLecturer").val();
+                console.log(statusLecturer);
+                if($.trim(statusLecturer).length > 0){
+                    itsform.find("#formStatusLecturer").addClass("required");
+                    itsform.find("#formStatusLecturer").parent().find(".text-message").text("Please fill this field");
+                    error=false;
+                }
+                
+            }else{error=true;}
+        }
+        
+        var totalError = itsform.find(".error").length;
+        if(error && totalError == 0 ){
+            itsme.prop("disabled",true).text("Loading..");
+            saveEmployees();        
+        }else{
+            alert("Please fill out the field.");
+        }
+
     });
 
     $(document).on('click','#btnSubmitEmployees',function () {
-        saveEmployees();
+        //saveEmployees();        
     });
 
     function saveEmployees() {
@@ -589,6 +793,13 @@
         var formStatusEmployee = $('#formStatusEmployee').val();
         var formProgrammeStudy = $('#formProgrammeStudy').val();
         var Access_Card_Number = $('#CardNumber').val();
+        
+        var CountryID = $('#CountryID').val();
+        var ProvinceID = $('#ProvinceID').val();
+        var RegionID = $('#RegionID').val();
+        var DistrictID = $('#DistrictID').val();
+        var formExtension = $('#formExtension').val();
+        var formPassTelp = $('#formPassTelp').val();
 
         var formSerdos = ($('#formSerdos').is(":checked")) ? '1' : '0';
         var formSerdosNumber = $('#formSerdosNumber').val();
@@ -656,7 +867,6 @@
 
             var formProfession = $('#formProfession').val();
 
-
             var data = {
                 arr_Prodi : arr_Prodi,
                 action : 'addEmployees',
@@ -667,9 +877,7 @@
 
                     LevelEducationID: formLevelEducationID,
                     LecturerAcademicPositionID: formLecturerAcademicPositionID,
-                    // CityID : formProgrammeStudy,
-                    // ProvinceID : formProgrammeStudy,
-
+                    
                     NIP : formNIP,
                     NUP : formNUP,
                     NIDN : formNIDN,
@@ -701,14 +909,21 @@
                     Status : '-1',
                     Access_Card_Number : Access_Card_Number,
                     Serdos : formSerdos,
-                    SerdosNumber : formSerdosNumber
+                    SerdosNumber : formSerdosNumber,
+                    CountryID   : CountryID,
+                    ProvinceID  : ProvinceID,
+                    RegionID    : RegionID,
+                    DistrictID  : DistrictID,
+                    Extension   : formExtension,
+                    PassTelp    : formPassTelp
                 }
             };
 
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudEmployees';
+            console.log(data);
             $.post(url,{token:token},function (result) {
-
+                console.log(result);
                 if(result.status==0 || result.status=='0'){
                     // toastr.error('NIK / NIP is exist','Error');
                     toastr.error(result.msg,'Error');
@@ -790,12 +1005,11 @@
 
                     toastr.success('Employees Saved','Success');
 
-                    // setTimeout(function () {
-                    //     $('#NotificationModal').modal('hide');
-                    //     window.location.href = '';
-                    // },1000);
+                    setTimeout(function () {
+                        $(location).attr("href",base_url_js+"human-resources/employees/career-level/"+formNIP+"?next=Y");
+                    },2000);
 
-                    $('input').val('');
+                    //$('input').val('');
 
                 }
 

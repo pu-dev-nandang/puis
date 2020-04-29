@@ -112,6 +112,102 @@ class M_hr extends CI_Model {
         $query = $this->db->get();
         return $query;
     }
+
+
+
+    public function fetchEmployee($count=false,$param='',$start='',$limit='',$order=''){
+        $where='';$startDate = date("Y-m-d");
+        if(!empty($param)){
+            $where = 'WHERE '; $conditionDate = '';
+            $counter = 0;
+            foreach ($param as $key => $value) {
+                if($value['field'] == "lem.AccessedOn"){
+                    //$startDate = preg_replace("/'/", '', $value['data']);
+                    $value['field'] = "DATE(".$value['field'].")";
+                    $value['data'] = $value['data'];
+                    //$conditionDate = " and "."DATE(a.AccessedOn)" ." ".$value['data'];
+                }
+
+                if($counter==0){
+                    $where = $where.$value['field']." ".$value['data'];
+                }else{ 
+                    $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                }
+
+                
+                $counter++;
+            }
+        }
+
+        $lims="";
+        if($start!="" || $limit!=""){
+            $lims = " LIMIT {$start},{$limit}"; 
+        }
+
+        $groupby = '';
+        $sorted = '';
+        if($count){
+            $select = "count(DISTINCT em.NIP, DATE(lem.AccessedOn) ) as Total";
+        }else{
+            $select = "em.*
+                        ,d.Division as DivisionMain_, p.Position as PositionMain_
+                        ,concat(d1.Division,'-',p1.Position ) as PositionOther1
+                        ,concat(d2.Division,'-',p2.Position ) as PositionOther2
+                        ,concat(d3.Division,'-',p3.Position ) as PositionOther3
+                        , DATE_FORMAT(lem.AccessedOn, '%d-%M-%Y %H:%i:%s') as FirstLoginPortal
+                        ,DAYNAME(lem.AccessedOn) as FirstLoginPortalDay
+                        ,WEEKDAY(lem.AccessedOn) as FirstLoginPortalDayNum ";
+            $groupby = 'GROUP BY em.NIP, DATE(lem.AccessedOn)';
+            $sorted = " order by ".(!empty($order) ? $order : 'FirstLoginPortal asc');
+        }
+        
+        
+        $string = "SELECT {$select}
+                   FROM db_employees.log_employees lem
+                   LEFT JOIN db_employees.employees em on (em.NIP = lem.NIP)
+                   
+                    LEFT JOIN db_employees.division d on (d.ID = SUBSTRING_INDEX(em.PositionMain,'.',1) ) 
+                    LEFT JOIN db_employees.position p on (p.ID = SUBSTRING_INDEX(em.PositionMain,'.',-1) ) 
+
+                    LEFT JOIN db_employees.division d1 on (d1.ID = SUBSTRING_INDEX(em.PositionOther1,'.',1) ) 
+                    LEFT JOIN db_employees.position p1 on (p1.ID = SUBSTRING_INDEX(em.PositionOther1,'.',-1) ) 
+
+                    LEFT JOIN db_employees.division d2 on (d2.ID = SUBSTRING_INDEX(em.PositionOther2,'.',1) ) 
+                    LEFT JOIN db_employees.position p2 on (p2.ID = SUBSTRING_INDEX(em.PositionOther2,'.',-1) ) 
+
+                    LEFT JOIN db_employees.division d3 on (d3.ID = SUBSTRING_INDEX(em.PositionOther3,'.',1) ) 
+                    LEFT JOIN db_employees.position p3 on (p3.ID = SUBSTRING_INDEX(em.PositionOther3,'.',-1) ) 
+                    
+                    {$where} {$groupby} {$sorted} {$lims} ";
+        
+        $value  = $this->db->query($string);
+        //var_dump($this->db->last_query());
+        return $value;
+    }
+
+
+    public function fetchMemberOFDepartpent($data){
+        $this->db->select('em.*,d.Division as DivisionMainName, p.Position as PositionMainName
+                            ,( case when (em.PositionOther1 is null or em.PositionOther1 = "") then "" else ( concat(d1.Division,"-",p1.Position ) ) end ) as PositionOtherName1
+                            ,( case when (em.PositionOther2 is null or em.PositionOther2 = "") then "" else ( concat(d2.Division,"-",p2.Position ) ) end ) as PositionOtherName2
+                            ,( case when (em.PositionOther3 is null or em.PositionOther3 = "") then "" else ( concat(d3.Division,"-",p3.Position ) ) end ) as PositionOtherName3 ');
+        $this->db->from('db_employees.employees em');
+        $this->db->join('db_employees.division d','(d.ID = SUBSTRING_INDEX(em.PositionMain,".",1) )','left');
+        $this->db->join('db_employees.position p','(p.ID = SUBSTRING_INDEX(em.PositionMain,".",-1) )','left');
+        
+        $this->db->join('db_employees.division d1','(d1.ID = SUBSTRING_INDEX(em.PositionOther1,".",1) )','left');
+        $this->db->join('db_employees.position p1','(p1.ID = SUBSTRING_INDEX(em.PositionOther1,".",-1) )','left');
+        
+        $this->db->join('db_employees.division d2','(d2.ID = SUBSTRING_INDEX(em.PositionOther2,".",1) )','left');
+        $this->db->join('db_employees.position p2','(p2.ID = SUBSTRING_INDEX(em.PositionOther2,".",-1) )','left');
+        
+        $this->db->join('db_employees.division d3','(d3.ID = SUBSTRING_INDEX(em.PositionOther3,".",1) )','left');
+        $this->db->join('db_employees.position p3','(p3.ID = SUBSTRING_INDEX(em.PositionOther3,".",-1) )','left');
+        $this->db->where($data);
+        $this->db->order_by('em.PositionMain','asc');
+        $query = $this->db->get();
+        return $query;
+    }
     /*END ADDED BY FEBRI @ FEB 2020*/
 
     public function getDataRecapitulation($data_arr){

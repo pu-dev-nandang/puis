@@ -1,3 +1,4 @@
+<?php $this->load->view('dashboard/ticketing/LoadCssTicketToday') ?>
 <style type="text/css">
 	.row {
 	    margin-right: 0px;
@@ -50,6 +51,10 @@
 		         </tr>'
 				<?php endif ?>
 			</table>
+			<br/>
+			<div id ="ShowProgressList">
+				
+			</div>
 		</div>
 	</div>
 	<div class="col-md-4">
@@ -57,7 +62,7 @@
 			<div class="panel-heading">
 			    <h4 class="panel-title">Assign To</h4>
 			</div>
-			<div class="panel-body" style="min-height: 100px;">
+			<div class="panel-body" style="min-height: 100px;" id = "PageAssignTo">
 				<span data-smt="" class="btn btn btn-add-assign_to">
                     <i class="icon-plus"></i> Add
                 </span>
@@ -87,6 +92,7 @@
 
 <script type="text/javascript">
 	var Authent = <?php echo json_encode($Authent) ?>;
+	// console.log(Authent);
 	var DataTicket = <?php echo json_encode($DataTicket) ?>;
 	// console.log(DataTicket);
 	var DataCategory = <?php echo json_encode($DataCategory) ?>;
@@ -112,10 +118,12 @@
 							'<div class = "form-group">'+
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
-										'<label>'+'Message'+'</label>'+
+										'<label>'+'Note for worker'+'</label>'+
+										//'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
 										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 // '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -186,10 +194,12 @@
 							'<div class = "form-group">'+
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
-										'<label>'+'Message'+'</label>'+
+										'<label>'+'Note for department'+'</label>'+
+										//'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
 										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 // '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -489,7 +499,8 @@
 				var MessageReceived =  itsme.find('.input_assign_to[name="MessageReceived"]').val();
 				var DueDate =  itsme.find('.input_assign_to[name="DueDate"]').val();
 				var NIP =  itsme.find('.input_assign_to[name="NIP"]').val();
-				if (MessageReceived == '' ||  MessageReceived == undefined || NIP == null || NIP == undefined ) {
+				// if (MessageReceived == '' ||  MessageReceived == undefined || NIP == null || NIP == undefined ) {
+				if (NIP == null || NIP == undefined ) {
 					// toastr.info('Please check input Assign To on index of '+Index);
 					toastr.info('Please check input Assign To');
 					bool = false;
@@ -519,7 +530,20 @@
 		Loaded : function(){
 			this.Styleimgfitter();
 			var selector = $('#FormAssignTo');
-			App_AssignTo.DomContentForm(selector);
+			if (Authent == null) {
+				var selector_AssignTo = $('#PageAssignTo');
+				selector_AssignTo.html('<p style ="color:red;">Your not authorize in this page, please see status in ticket data</p>');
+				$('.btn-add-transfer_to').remove();
+				$('#btnSetAction').remove();
+				var DataGet = DataTicket[0];
+				var htmlGetProgressList =  AppModalDetailTicket.tracking_list_html(DataGet);
+				$('#ShowProgressList').html(htmlGetProgressList);
+			}
+			else
+			{
+				App_AssignTo.DomContentForm(selector);
+			}
+			
 		},
 
 		Styleimgfitter : function(){

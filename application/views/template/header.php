@@ -92,7 +92,7 @@
             <li class="<?php if($this->uri->segment(1)=='my-activities'){echo 'current';} ?>">
                 <a href="<?php echo base_url('my-activities'); ?>">
                     <i class="fa fa-line-chart"></i>
-                    <span>My Activities</span>
+                    <span>Activities</span>
                 </a>
             </li>
             <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
@@ -276,7 +276,7 @@
                     <i class="fa fa-caret-down small"></i>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="<?php echo base_url('profile/'.str_replace(' ','-',$this->session->userdata('Name'))); ?>">
+                    <li><a href="<?php echo base_url('profile/'.$this->session->userdata('NIP')); ?>">
                             <i class="fa fa-user"></i>
                             My Profile</a></li>
                     <!--                    <li><a href="pages_calendar.html"><i class="fa fa-calendar"></i> My Calendar</a></li>-->
@@ -392,6 +392,8 @@
 
         saveLogUser();
 
+        setIPPublic();
+
     });
 
     $('#btnSimpleSearch').click(function () {
@@ -427,7 +429,7 @@
 
         $('#GlobalModal').on('shown.bs.modal', function () {
             $('#formSimpleSearch').focus();
-        })
+        });
 
         $('#GlobalModal').modal({
             'show' : true,
@@ -863,7 +865,7 @@
 
                     var d = dataa[i];
                     var token = jwt_decode(d['Token'],"UAP)(*");
-
+                    console.log(token);
                     var iconNotif = (token['Icon']!='' && token['Icon']!=null && typeof token['Icon'] !== "undefined")
                         ? '<img data-src="'+token['Icon']+'" class="img-fitter-notif" />'
                         : '<img src="'+base_url_js+'images/xx.jpg" class="" />';
@@ -982,7 +984,8 @@
                 });
 
             });
-        } catch (e){
+        }
+        catch (e){
             var dataURL = window.location.href;
 
             var url = base_url_js+'api3/__crudLogging';
@@ -1004,9 +1007,18 @@
             });
         }
 
+     }
 
-
-
+     function setIPPublic(){
+         try {
+             $.getJSON("https://api.ipify.org/?format=json", function(e) {
+                 // e.ip
+                 localStorage.setItem('IPPublic',e.ip);
+             });
+         }
+         catch (e){
+             localStorage.setItem('IPPublic','');
+         }
      }
 
      $(document).off('click', '.BlogAdminUrl').on('click', '.BlogAdminUrl',function(e) {

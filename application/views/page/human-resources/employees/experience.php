@@ -51,6 +51,7 @@
                                         <th>End Join</th>
                                         <th>Job Title</th>
                                         <th>Reason Exit</th>
+                                        <th>Note</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -75,6 +76,7 @@
                                         <small class="text-danger text-message"></small></td>
                                         <td><input type="text" class="form-control exp-reason required" required name="comReason[]">
                                         <small class="text-danger text-message"></small></td>
+                                        <td><textarea class="form-control exp-Note" name="Note[]" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -150,6 +152,22 @@
                         	var cc = $cloneRow.find(".select2-tmp").attr("id","select2-experience-"+num);
                         	cc.prev().remove();
                         	cc.select2({width:'100%'});
+                        }
+                        if(k=="start_join"){
+                            var cc = $cloneRow.find(".datepicker-tmp").attr("id","datePicker-"+num).removeClass("hasDatepicker");
+                            cc.datepicker({
+                                dateFormat: 'yy-mm-dd',
+                                changeYear: true,
+                                changeMonth: true
+                            });
+                        }
+                        if(k=="end_join"){
+                            var cc = $cloneRow.find(".datepicker-sd").attr("id","datePicker-"+num).removeClass("hasDatepicker");
+                            cc.datepicker({
+                                dateFormat: 'yy-mm-dd',
+                                changeYear: true,
+                                changeMonth: true
+                            });
                         }
                     });
                     

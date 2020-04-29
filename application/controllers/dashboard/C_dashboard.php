@@ -7,10 +7,16 @@ use ElephantIO\Engine\SocketIO\Version1X;
 
 class C_dashboard extends Globalclass {
 
+    function __construct()
+    {
+        parent::__construct();
+        $this->load->model(array('master/m_master','General_model','General_model','global-informations/Globalinformation_model','hr/m_hr'));
+        $this->load->helper("General_helper");
+    }
     public function temp($content)
     {
         parent::template($content);
-        $this->load->model('master/m_master');
+        $this->load->model(array('master/m_master','General_model','General_model','global-informations/Globalinformation_model'));
     }
 
     public function maintenance(){
@@ -19,41 +25,133 @@ class C_dashboard extends Globalclass {
 
     public function index()
     {
-        // $G_dt = $this->m_master->showData_array('db_prodi.cfg_sub_menu');
-        // for ($i=0; $i < count($G_dt); $i++) { 
+        // ---- master ---  //
+        // $db_live = $this->load->database('server_live', TRUE);
+        // $query = $db_live->query(
+        //    'select * from db_research.master_anggota_publikasi'     
+        // )->result_array();
+
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $Luar_internal = $query[$i]['Luar_internal'];
+        //     $Type_anggota = $query[$i]['Type_anggota'];
+        //     $Status_aktif = $query[$i]['Status_aktif'];
+        //     $User_create = $query[$i]['User_create'];
+        //     $Date_create = $query[$i]['Date_create'];
+        //     $ID = $query[$i]['ID'];
+
+        //     $NIP = $query[$i]['NIP'];
+        //     $NIM = $query[$i]['NIM'];
+
+        //     if ($Luar_internal == '1') {
+        //         // internal
+        //         if (!empty($NIP)) {
+        //             $ID_user = 'dsn.'.$NIP;  
+        //         }
+        //         else
+        //         {
+        //             $ID_user = 'mhs.'.$NIM;   
+        //         }
+        //     }
+        //     else
+        //     {
+        //         $Nama = $query[$i]['Nama'];
+        //         $se = $db_live->query(
+        //             'select * from db_research.master_user_research where Nama = "'.$Nama.'" '
+        //         )->result_array();
+        //         // $se = $this->m_master->caribasedprimary('db_research.master_user_research','Nama',$Nama);
+        //         if (count($se) > 0) {
+        //             $ID_user = 'ekd.'.$se[0]['ID'];  
+        //         }
+        //         else
+        //         {
+        //             // $ID_user = 'ekd.0';  
+        //             $Nama2 = $query[$i]['Nama'];
+        //             $NIP2 = $query[$i]['NIP'];
+        //             $NIDN2 = $query[$i]['NIDN'];
+        //             $NIM2 = $query[$i]['NIM'];
+        //             $TypeUser = (empty($NIM2)) ? 'Dosen' : 'Mahasiswa';
+
+        //             if ($Type_anggota == 'MHS') {
+        //                 $F_kolaborasi = 1;
+        //                 $F_dosen = 0;
+        //                 $F_mhs = 1;
+        //                 $F_reviewer = 1;
+        //             }
+        //             else
+        //             {
+        //                 $F_kolaborasi = 1;
+        //                 $F_dosen = 1;
+        //                 $F_mhs = 0;
+        //                 $F_reviewer = 1;
+        //             }
+
+        //             $dataSave2 = [
+        //                 'Nama' => $Nama2,
+        //                 'NIP' => $NIP2,
+        //                 'NIDN' => $NIDN2,
+        //                 'NIM' => $NIM2,
+        //                 'TypeUser' => $TypeUser,
+        //                 'F_kolaborasi' => $F_kolaborasi,
+        //                 'F_dosen' => $F_dosen,
+        //                 'F_mhs' => $F_mhs,
+        //                 'F_reviewer' => $F_reviewer,
+        //             ];
+
+        //             $db_live->insert('db_research.master_user_research',$dataSave2);
+        //             $ID_user = 'ekd.'.$db_live->insert_id();
+        //         }
+        //     }
+
         //     $dataSave = [
-        //         'cfg_group_user' => 1,
-        //         'ID_cfg_sub_menu' => $G_dt[$i]['ID'],
-        //         'read' => 1,
-        //         'write' => 1,
-        //         'update' => 1,
-        //         'delete' => 1,
+        //         'Luar_internal' => $Luar_internal,
+        //         'Type_anggota' => $Type_anggota,
+        //         'Status_aktif' => $Status_aktif,
+        //         'User_create' => $User_create,
+        //         'Date_create' => $Date_create,
+        //         'ID_user' => $ID_user,
+        //         'ID' => $ID,
         //     ];
 
-        //     $this->db->insert('db_prodi.cfg_rule_g_user',$dataSave);
+        //     $this->db->insert('db_research.master_anggota_publikasi',$dataSave);
         // }
-        // die();
+        // ---- end master ---  //
 
-        // $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
-        // $G_it = $this->m_master->getEmployeeByDepartment(12);
-        // for ($i=0; $i < count($G_prodi); $i++) { 
-        //     $ProdiID = $G_prodi[$i]['ID'];
-        //     for ($k=0; $k < count($G_it); $k++) { 
-        //         $NIPIT = $G_it[$k]['NIP'];
-        //         $dataSave = [
-        //             'NIP' => $NIPIT,
-        //             'G_user' => 1,
-        //             'ProdiID' => $ProdiID,
-        //         ];
+        // --List Anggota -- //
+        // $db_live = $this->load->database('server_live', TRUE);
+        // $query = $db_live->query(
+        //    'select * from db_research.list_anggota_pkm where ID > 192'     
+        // )->result_array();
 
-        //         $this->db->insert('db_prodi.previleges_guser',$dataSave);
-        //     }
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $ID_anggota = $query[$i]['ID_anggota'];
+        //     $ID_PKM = $query[$i]['ID_PKM'];
+        //     $Peran = $query[$i]['Peran'];
+        //     $User_create = $query[$i]['User_create'];
+        //     $Date_create = $query[$i]['Date_create'];
+        //     $Csf = $query[$i]['Csf'];
+        //     $Disabled = $query[$i]['Disabled'];
+        //     $ID = $query[$i]['ID'];
+
+        //     $dataSave = [
+        //         'ID_anggota' => $ID_anggota,
+        //         'ID_PKM' => $ID_PKM,
+        //         'Peran' => $Peran,
+        //         'User_create' => $User_create,
+        //         'Date_create' => $Date_create,
+        //         'Csf' => $Csf,
+        //         'Disabled' => $Disabled,
+        //         'ID' => $ID,
+        //     ];
+
+        //     $this->db->insert('db_research.list_anggota_pkm',$dataSave);
+
         // }
-        // die();
-        // $rs = $this->m_master->DeleteFileToNas("http://localhost",'admission/45.png');
-        // print_r($rs);
-        // die();
+        // --End List Anggota -- //
 
+        // echo 'finish';
+        // die();
+        
+        $data['showNotif']=true;
         $data['department'] = parent::__getDepartement();
         $dpt = $this->session->userdata('IDdepartementNavigation');
 
@@ -259,11 +357,11 @@ class C_dashboard extends Globalclass {
         parent::__setDepartement($dpt);
     }
 
-    public function profile($username=''){
+    /*public function profile($username=''){
         $data['']=123;
         $content = $this->load->view('dashboard/profile','',true);
         $this->temp($content);
-    }
+    }*/
 
     public function load_data_registration_upload()
     {
@@ -972,5 +1070,663 @@ class C_dashboard extends Globalclass {
     }
 
 
+
+    /*ADDED BY FEBRI @ MARCH 2020*/
+    public function tab_menu_new_emp($page,$NIP){
+        
+        if(!empty($_GET['resubmit']) && !empty($_GET['data'])){
+            if($_GET['resubmit'] == 'yes'){
+                $key = "UAP)(*";
+                $data_arr = (array) $this->jwt->decode($_GET['data'],$key);
+                $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP'],"isApproved"=>2))->row();
+                if(!empty($isExist)){
+                    $data['param'] = "?resubmit=".$_GET['resubmit']."&data=".$_GET['data'];
+                    $data['Logs'] = $isExist->Logs;
+                }
+            }
+        }
+        
+        $param[] = array("field"=>"em.NIP","data"=>" = ".$NIP." ","filter"=>"AND",);    
+        $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
+        $getHistoricalJoin = $this->General_model->fetchData("db_employees.employees_joindate",array("NIP"=>$NIP),"ID","ASC")->row();
+        $data['employee']->HistoricalJoin = (!empty($getHistoricalJoin) ? $getHistoricalJoin : null);
+        $data['NIP'] = $data['employee']->NIP;
+        $data['page'] = $page;
+        $content = $this->load->view('dashboard/profile/tab_menu_new_emp',$data,true);
+        $this->temp($content);       
+    }
+
+    public function profile(){
+        $myNIP = $this->session->userdata('NIP');
+        $myName = $this->session->userdata('Name');
+        $param[] = array("field"=>"em.NIP","data"=>" = ".$myNIP." ","filter"=>"AND",);    
+        $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
+        $data['NIP'] = $myNIP;
+        $page = $this->load->view('dashboard/profile/personal-data',$data,true);
+        $this->tab_menu_new_emp($page,$myNIP);
+    }
+
+
+    public function additionalInfo($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+            
+            $page = $this->load->view('dashboard/profile/additional-information',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function family($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $data['familytree'] = $this->General_model->fetchData("db_employees.master_family_relations",array("IsActive"=>1))->result();
+            $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $data['myfamily'] = $this->General_model->fetchData("db_employees.employees_family_member",array("NIP"=>$NIP))->result();
+            $page = $this->load->view('dashboard/profile/family',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function educations($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $data['industry'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
+            $page = $this->load->view('dashboard/profile/education',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function training($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $page = $this->load->view('dashboard/profile/training',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function workExperience($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+            $data['industry'] = $this->General_model->fetchData("db_employees.master_industry_type",array("IsActive"=>1))->result();
+            $page = $this->load->view('dashboard/profile/experience',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function careerLevel($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $data['status'] = $this->General_model->fetchData("db_employees.master_status",array("IsActive"=>1))->result();
+            $data['level'] = $this->General_model->fetchData("db_employees.master_level",array("IsActive"=>1))->result();
+            //$data['division'] = $this->General_model->fetchData("db_employees.sto_temp",array("isMainSTO"=>1, "typeNode"=>1,"isActive"=>1))->result();
+            $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
+            $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+            $data['employees_status'] = $this->General_model->fetchData("db_employees.employees_status","Type != 'lec' and IDStatus != '-2'")->result();
+            $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+            //$data['currComp'] = $this->General_model->fetchData("db_employees.master_company",array("ID"=>1))->row();
+            $page = $this->load->view('dashboard/profile/career-level',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function departmentMember($NIP){
+        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;            
+            $data['detail'] = $isExist;            
+            $page = $this->load->view('dashboard/profile/department-member',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function saveChanges($NIP){
+        $myNIP = $this->session->userdata('NIP');
+        $myName = $this->session->userdata('Name');
+        $data = $this->input->post();
+        if($data){
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data['NIP']))->row();
+            $uri = "profile";$err_msg=""; $action = $data['action']; unset($data['action']);
+            if(!empty($isExist)){                
+                if(!empty($_FILES['userfile']['name'])){                            
+                    $ispic = false;
+                    $file_name = $_FILES['userfile']['name'];
+                    $file_size =$_FILES['userfile']['size'];
+                    $file_tmp =$_FILES['userfile']['tmp_name'];
+                    $file_type=$_FILES['userfile']['type'];
+                    if($file_type == "image/jpeg" || $file_type == "image/png"){
+                        $ispic = true;
+                    }else {
+                        $ispic = false;
+                        $err_msg     .= "Extention image '".$file_name."' doesn't allowed.";
+                    }
+                    if($file_size > 2000000){ //2Mb
+                        $ispic = false;
+                        $err_msg     .= "Size of image '".$file_name."'s too large from 2Mb.";
+                    }else { $ispic = true; }
+
+                    $newFilename = $data['NIP']."-REQ-".date("d.m.Y").".jpg";
+
+                    if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id'){
+                        $pathInPieces = explode('/', $_SERVER['DOCUMENT_ROOT']);
+                        $t = count($pathInPieces) - 1;
+                        $newPath = "";
+                        for ($i=0; $i < $t; $i++) { 
+                            $newPath .= $pathInPieces[$i]."/";
+                        }
+                        $folderPCAM = $newPath.'pcam/';
+                    }else{
+                        $folderPCAM = $_SERVER['DOCUMENT_ROOT'].'/puis/';
+                    }
+                    $folderPCAM = $folderPCAM.'uploads/employees';
+                    if(!file_exists($folderPCAM)){
+                        mkdir($folderPCAM,0777);
+                        $error403 = "<html><head><title>403 Forbidden</title></head><body><p>Directory access is forbidden.</p></body></html>";
+                        file_put_contents($folderPCAM."/index.html", $error403);
+                    }
+                    if($ispic){
+                        $moveimage = move_uploaded_file($file_tmp,$folderPCAM."//".$newFilename);
+                        if(!$moveimage){
+                            $err_msg .= "<b>Failed insert file.</b><br>";
+                        }else{
+                            $data['Photo'] = $newFilename;
+                        }
+                    }
+                }
+
+                $Logs = [];
+                //if(!empty($isExist->Logs)){
+                $Logs = json_decode($isExist->Logs);
+                //var_dump($Logs);
+
+                $Logs->UpdatedBy = $myNIP."/".preg_replace('/\s+/', '-', $myName);
+                if(!empty($data['Photo'])){
+                    $Logs->Photo = (!empty($data['Photo'])? $data['Photo'] : $Logs->Photo);                    
+                }
+                if(!empty($data['bankName'])){
+                    $myBank = array();
+                    for ($b=0; $b < count($data['bankName']); $b++) { 
+                        $myBank[] = array("ID"=>$data['bankID'][$b],"NIP"=>$data['NIP'],"bank"=>$data['bankName'][$b],"accountName"=>$data['bankAccName'][$b],"accountNumber"=>$data['bankAccNum'][$b]);
+                    }
+                    $Logs->MyBank = $myBank;
+                }
+                if(!empty($data['familyrelation'])){
+                    $myFamily = array();
+                    for ($f=0; $f < count($data['familyrelation']); $f++) { 
+                        $myFamily[] = array("ID"=>$data['familyID'][$f],"NIP"=>$data['NIP'],"name"=>$data['familyname'][$f],"relationID"=>$data['familyrelation'][$f],"gender"=>$data['familygender'][$f],"birthdate"=>$data['familybirthdate'][$f],"placeBirth"=>$data['familyplaceBirth'][$f],"lastEduID"=>$data['familylastEdu'][$f]);
+                    }
+                    $Logs->MyFamily = $myFamily;
+                }                      
+                if(!empty($data['eduLevel'])){
+                    $myEdu = array();
+                    for ($e=0; $e < count($data['eduLevel']); $e++) { 
+                        $myEdu[] = array("ID"=>$data['eduID'][$e],"NIP"=>$data['NIP'],"levelEduID"=>$data['eduLevel'][$e],"instituteName"=>$data['eduInstitute'][$e],"location"=>$data['eduCC'][$e],"major"=>$data['eduMajor'][$e],"graduation"=>$data['eduGraduation'][$e],"gpa"=>$data['eduGPA'][$e]);
+                    }
+                    $Logs->MyEducation = $myEdu;
+                }
+                if(!empty($data['nonEduInstitute'])){
+                    $nonEduInstitute = array();
+                    for ($n=0; $n < count($data['nonEduInstitute']); $n++) { 
+                        $nonEduInstitute[] = array("ID"=>$data['nonEduID'][$n],"NIP"=>$data['NIP'],"subject"=>$data['nonEduSubject'][$n],"instituteName"=>$data['nonEduInstitute'][$n],"start_event"=>$data['nonEduStart'][$n],"end_event"=>$data['nonEduEnd'][$n],"location"=>$data['nonEduCC'][$n]);
+                    }
+                    $Logs->MyEducationNonFormal = $nonEduInstitute;
+                }
+                if(!empty($data['trainingTitle'])){
+                    $certificates = array();
+                    for ($k=0; $k < count($data['trainingTitle']); $k++) {                             
+                        if(!empty($_FILES['certificate']['name'][$k])){                            
+                            $ispic = false;
+                            $file_name = $_FILES['certificate']['name'][$k];
+                            $file_size =$_FILES['certificate']['size'][$k];
+                            $file_tmp =$_FILES['certificate']['tmp_name'][$k];
+                            $file_type=$_FILES['certificate']['type'][$k];
+                            if($file_type == "image/jpeg" || $file_type == "image/png"){
+                                $ispic = true;
+                            }else {
+                                $ispic = false;
+                                $err_msg     .= "Extention image '".$file_name."' doesn't allowed.";
+                            }
+                            if($file_size > 2000000){ //2Mb
+                                $ispic = false;
+                                $err_msg     .= "Size of image '".$file_name."'s too large from 2Mb.";
+                            }else { $ispic = true; }
+
+                            $trainingTitleFilename = preg_replace('/\s+/', "_", $data['trainingTitle'][$k]);
+                            $newFilename = $data['NIP']."-TRAINING-".$trainingTitleFilename."-".date('ymd').".jpg";
+
+                            if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id'){
+                                $pathInPieces = explode('/', $_SERVER['DOCUMENT_ROOT']);
+                                $t = count($pathInPieces) - 1;
+                                $newPath = "";
+                                for ($i=0; $i < $t; $i++) { 
+                                    $newPath .= $pathInPieces[$i]."/";
+                                }
+                                $folderPCAM = $newPath.'pcam/uploads/profile/training';
+                            }else{
+                                $folderPCAM = $_SERVER['DOCUMENT_ROOT'].'/puis/uploads/profile/training';
+                            }
+
+                            if(!file_exists($folderPCAM)){
+                                mkdir($folderPCAM,0777);
+                                $error403 = "<html><head><title>403 Forbidden</title></head><body><p>Directory access is forbidden.</p></body></html>";
+                                file_put_contents($folderPCAM."/index.html", $error403);
+                            }
+                            if($ispic){
+                                $moveimage = move_uploaded_file($file_tmp,$folderPCAM."//".$newFilename);
+                                if(!$moveimage){
+                                    $err_msg .= "<b>Failed insert file.</b><br>";
+                                }else{
+                                    $certificateName = $newFilename;
+                                }
+                            }
+                        }else{
+                            $certificateName = null;
+                        }
+                        $certificates[] = array("ID"=>$data['trainingID'][$k],"NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$k],"organizer"=>$data['trainingorganizer'][$k],"start_event"=>$data['trainingStart'][$k].' '.$data['trainingStartTime'][$k].':00',"end_event"=>$data['trainingEnd'][$k].' '.$data['trainingEndTime'][$k].':00',"location"=>$data['trainingLocation'][$k],"category"=>$data['trainingCategory'][$k],"costCompany"=>$data['trainingCostCompany'][$k],"costEmployee"=>$data['trainingCostEmployee'][$k],"certificate"=>$certificateName);                                
+                    }
+                    $Logs->MyEducationTraining = $certificates;
+                }
+
+                if(!empty($data['comName'])){
+                    $comName = array();
+                    for ($c=0; $c < count($data['comName']); $c++) { 
+                        $comName[] = array("ID"=>$data['comID'][$c],"NIP"=>$data['NIP'],"company"=>$data['comName'][$c],"industryID"=>$data['comIndustry'][$c],"start_join"=>$data['comStartJoin'][$c],"end_join"=>$data['comEndJoin'][$c],"jobTitle"=>$data['comJobTitle'][$c],"reason"=>$data['comReason'][$c]);
+                    }
+                    $Logs->MyExperience = $comName;
+                }
+
+                $example = array('An example','Another example','One Example','Last example');
+                $searchword = 'last';
+                $matches = array();
+                foreach($example as $k=>$v) {
+                    if(preg_match("/\b$searchword\b/i", $v)) {
+                        $matches[$k] = $v;
+                    }
+                }
+
+                $execpt = array("bank","edu","family","nonEdu","training","com");
+                foreach ($data as $key => $value) {
+                    foreach ($execpt as $v) {
+                        if(preg_match_all("/$v/", $key)) {
+                            unset($data[$key]);
+                        }
+                    }                    
+                }
+                foreach ($data as $key => $value) {
+                    $Logs->$key = $value;                    
+                }
+                
+                $dataPost = json_encode($Logs);
+                $update = $this->General_model->updateData("db_employees.employees",array("isApproved"=>3,"Logs"=>$dataPost,"UpdatedBy"=>$myNIP."/".preg_replace('/\s+/', '-', $myName)),array("NIP"=>$data['NIP']));
+                $message = (($update) ? "Successfully":"Failed")." updated.".(!empty($err_msg) ? "Failed upload photo. ".$err_msg : '');
+            }else{
+                $message = "Employee doesn't founded.";
+            }
+
+            if($action != 'profile'){
+                $uri = 'profile/'.$action.'/'.$data['NIP'];
+            }else{
+                $uri = $action.'/'.$data['NIP'];
+            }
+
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url($uri));            
+        }
+    }
+
+
+    public function requestDetail($NIP){
+        $data = $this->input->post();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);    
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();                        
+            $subdata = array();
+            if(!empty($isExist)){
+                if(!empty($isExist->Logs)){
+                    $Logs = json_decode($isExist->Logs);
+                    
+                    if(!empty($Logs->ReligionID)){
+                        $Logs->Religion = $this->General_model->fetchData("db_employees.religion",array("IDReligion"=>$Logs->ReligionID))->row();                        
+                    }
+                    if(!empty($Logs->MaritalStatus)){
+                        $Logs->MaritalStatus = $this->General_model->fetchData("db_employees.master_marital_status",array("ID"=>$Logs->MaritalStatus))->row();
+                    }
+                    if(!empty($Logs->CountryID)){
+                        $Logs->Country = $this->General_model->fetchData("db_admission.country",array("ctr_code"=>$Logs->CountryID))->row();                        
+                    }
+                    if(!empty($Logs->ProvinceID)){
+                        $Logs->Province = $this->General_model->fetchData("db_admission.province",array("ProvinceID"=>$Logs->ProvinceID))->row();
+                        if(!empty($Logs->RegionID)){
+                            $Logs->Region = $this->General_model->fetchData("db_admission.region",array("RegionID"=>$Logs->RegionID))->row();
+                        }
+                        if(!empty($Logs->DistrictID)){
+                            $Logs->District = $this->General_model->fetchData("db_admission.district",array("DistrictID"=>$Logs->DistrictID))->row();
+                        }
+                    }
+                    $subdata['detail'] = $Logs;
+                    if(!empty($isExist->NoteApproved)){
+                        $subdata['Note'] = $isExist->NoteApproved;
+                    }
+                    $subdata['isApproved'] = $isExist->isApproved;
+                }
+            }
+            $this->load->view("dashboard/profile/request-detail",$subdata);
+        }else{show_404();}
+    }
+
+
+    public function submitRequest($NIP){
+        $json = array();
+        $data = $this->input->post();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();
+            if(!empty($isExist)){
+                $update = $this->General_model->updateData("db_employees.employees",array("isApproved"=>1),array("NIP"=>$data_arr['NIP']));
+                $message = (($update) ? "Successfully":"Failed")." saved and your request will be forward to HR.";
+                if($update){
+                    //SEND NOTIFICATION
+                    // Send Notif for next approval
+                    $getHRStaff = $this->General_model->fetchData("db_employees.employees","PositionMain like '13.%' ")->result();
+                    $dataNIP = array();
+                    if(!empty($getHRStaff)){
+                        foreach ($getHRStaff as $v) {
+                            $dataNIP[] = $v->NIP;
+                        }
+                    }
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-question-circle margin-right" style="color:blue;"></i>  Approval Lecturer Profile',
+                                        'Description' => 'Request approval Lecturer Profile',
+                                        'URLDirect' => 'human-resources/employees',
+                                        'CreatedBy' => $isExist->NIP,
+                                        'CreatedName' => $isExist->Name,
+                                      ),
+                        'To' => array(
+                                  'NIP' => $dataNIP,
+                                ),
+                        'Email' => 'No', 
+                    );
+
+                    $url = base_url().'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $resultNotif = $this->m_master->apiservertoserver($url,$token);
+                    //END SEND NOTIFICATION
+                }
+            }else{$message = "Data employee not founded.";}
+            $json = array("message"=>$message);
+
+        }
+
+        echo json_encode($json);
+    }
+
+
+    public function myTeamActivities(){
+        $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","IDStatus = 1 or IDStatus = 2","IDStatus","asc")->result();
+        $myNIP = $this->session->userdata('NIP');
+        if(!empty($this->session->userdata('PositionOther1')['IDDivisionOther1']) || 
+            !empty($this->session->userdata('PositionOther2')['IDDivisionOther2']) ||
+            !empty($this->session->userdata('PositionOther3')['IDDivisionOther3'])){
+            $paramDivision = "";
+        }else{$paramDivision = array();}
+        
+        //var_dump($this->session->userdata());
+        if(!empty($this->session->userdata('PositionOther1')['IDDivisionOther1'])){
+            $paramDivision .= 'ID = '.$this->session->userdata('PositionOther1')['IDDivisionOther1'];
+        }
+        if(!empty($this->session->userdata('PositionOther2')['IDDivisionOther2'])){
+            $paramDivision .= 'or ID = '.$this->session->userdata('PositionOther2')['IDDivisionOther2'];
+        }
+        if(!empty($this->session->userdata('PositionOther3')['IDDivisionOther3'])){
+            $paramDivision .= 'or ID = '.$this->session->userdata('PositionOther3')['IDDivisionOther3'];
+        }
+
+
+        //var_dump($this->session->userdata);
+        if(!empty($this->session->userdata('PositionOther1')['IDDivisionOther1']) || 
+            !empty($this->session->userdata('PositionOther2')['IDDivisionOther2']) ||
+            !empty($this->session->userdata('PositionOther3')['IDDivisionOther3'])){
+            $data['division'] = $this->General_model->fetchData("db_employees.division",$paramDivision)->result();
+            $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+        }
+        $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
+        $data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+        $this->load->view('dashboard/myactivitiesteam',$data);        
+    }
+
+
+    public function fetchActivitiesEmp(){
+        $reqdata = $this->input->post();
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $param = array();$orderBy=" em.ID DESC ";
+
+            $myNIP = $this->session->userdata('NIP');
+            $myName = $this->session->userdata('Name');
+            $isEmployee = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$myNIP))->row(); 
+
+            if(!empty($isEmployee)){
+                $explodeMain = explode(".", $isEmployee->PositionMain);
+                $param[] = array("field"=>"em.PositionMain","data"=>" like '".$explodeMain[0].".%' ","filter"=>"AND",);
+            }
+
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+
+                $param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);
+                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' )","filter"=>"OR",);
+            }
+            if(!empty($data_arr['Filter'])){
+                $parse = parse_str($data_arr['Filter'],$output);
+
+                //check data emp if lecturers
+                if(!empty($output['isLecturer'])){
+                    $divLect = '14';
+                    $param[] = array("field"=>"(em.PositionMain","data"=>" like'".$divLect.".%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"em.PositionOther1","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther2","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther3","data"=>" like'".$divLect.".%' )","filter"=>"OR",);
+                    if( !empty($output['position'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$divLect.".".$output['position']."' ","filter"=>"AND",);
+                    }
+                    if(!empty($output['status'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['status']) == 1){
+                            $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['status'] as $s) {
+                                $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                    if(!empty($output['study_program'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['study_program']) == 1){
+                            $param[] = array("field"=>"em.ProdiID","data"=>" ='".$output['study_program'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['study_program'] as $s) {
+                                $param[] = array("field"=>"em.ProdiID","data"=>" ='".$s."' ".((($sn < count($output['study_program'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                }
+                //check data for employee
+                else{
+                    if(!empty($output['division'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);
+                    }
+                    if( !empty($output['division']) && !empty($output['position'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);
+                    }
+
+                    if(!empty($output['status'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['status']) == 1){
+                            $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['status'] as $s) {
+                                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                }
+
+                if(!empty($output['division'])){
+                    if(!empty($output['position'])){
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther1","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther2","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$output['division'].".".$output['position']."' ) ","filter"=>"AND",);
+                    }else{
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther1","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$output['division'].".%' ) ","filter"=>"AND",);
+                    }
+                }
+
+                if(!empty($output['staff'])){
+                    $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"em.Name","data"=>" like '%".$output['staff']."%' )","filter"=>"OR",);
+                }
+                if(!empty($output['religion'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['religion']) == 1){
+                        $param[] = array("field"=>"em.ReligionID","data"=>" ='".$output['religion'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['religion'] as $s) {
+                            $param[] = array("field"=>"em.ReligionID","data"=>" ='".$s."' ".((($sn < count($output['religion'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['gender'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['gender']) == 1){
+                        $param[] = array("field"=>"em.Gender","data"=>" ='".$output['gender'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['gender'] as $s) {
+                            $param[] = array("field"=>"em.Gender","data"=>" ='".$s."' ".((($sn < count($output['gender'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['level_education'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['level_education']) == 1){
+                        $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$output['level_education'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['level_education'] as $s) {
+                            $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$s."' ".((($sn < count($output['level_education'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+
+                if(!empty($output['attendance_start'])){
+                    if(!empty($output['attendance_end'])){
+                        $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."' ","filter"=>"AND",);
+                    }else{
+                        $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                    }
+                }else{
+                    $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
+                }
+
+                if(!empty($output['sorted'])){
+                    $orderBy = $output['sorted'];
+                }
+            }
+            $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
+            $TotalData = (!empty($totalData) ? $totalData->Total : 0);
+            if(!empty($reqdata['length']) ){
+                $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'])->result();
+            }else{
+                $result = $this->m_hr->fetchEmployee(false,$param)->result();
+            }
+
+            if(!empty($result)){
+                $rs = array();
+                foreach ($result as $r) {
+                    $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                    $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
+                    $rs[] = $r;
+                }
+                $result = $rs;
+            }
+
+            //var_dump($this->db->last_query());
+            $json_data = array(
+                "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
+                "recordsTotal"    => intval($TotalData),
+                "recordsFiltered" => intval($TotalData),
+                "data"            => (!empty($result) ? $result : 0)
+            );
+
+        }else{$json_data=null;}
+        $response = $json_data;
+        echo json_encode($response);
+    }
+
+
+    public function detailActivitiesEmp(){
+        $data = $this->input->post();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $param[] = array("field"=>"em.NIP","data"=>" = ".$data_arr['NIP'],"filter"=>"AND",);
+            $isExist = $this->m_hr->fetchEmployee(false,$param)->row();
+            if(!empty($isExist)){
+                $data['attendance'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) = DATE('".$data_arr['DATE']."')","AccessedOn","asc")->result();
+                $data['employee'] = $isExist;
+                $data['TotalActivity'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) = DATE('".$data_arr['DATE']."')","AccessedOn","asc",null,"AccessedOn")->result();
+                $this->load->view('dashboard/detailActivities',$data);                
+            }else{echo "<h1>Employee not founded</h1>";}
+        }else{show_404();}
+    }
+
+
+    /*END ADDED BY FEBRI @ MARCH 2020*/
 
 }

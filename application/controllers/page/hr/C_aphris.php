@@ -534,6 +534,7 @@ class C_aphris extends HR_Controler {
 
 
     public function fetchDivision(){
+        header('Access-Control-Allow-Origin: *');
         $data = $this->input->post();
         if($data){
             $response = $this->General_model->fetchData("db_employees.sto_temp","title like '%".$data['term']."%' and typeNode = 1  and isActive=1")->result();
@@ -543,6 +544,7 @@ class C_aphris extends HR_Controler {
     
 
     public function fetchPosition(){
+        header('Access-Control-Allow-Origin: *');
         $data = $this->input->post();
         if($data){
             $response = $this->General_model->fetchData("db_employees.sto_temp","title like '%".$data['term']."%' and isActive=1 and parentID = ".$data['id'])->result();
@@ -551,6 +553,7 @@ class C_aphris extends HR_Controler {
     }
 
     public function fetcthSuperior(){
+        header('Access-Control-Allow-Origin: *');
         $data = $this->input->post();
         $json = array();
         if($data){
@@ -564,6 +567,7 @@ class C_aphris extends HR_Controler {
 
 
     public function fetchCompany(){
+        header('Access-Control-Allow-Origin: *');
         $json = array();
         $json = $this->General_model->fetchData("db_studentlife.master_company",array())->result();
         echo json_encode($json);
@@ -571,6 +575,7 @@ class C_aphris extends HR_Controler {
     
 
     public function fetchCompanyBank(){
+        header('Access-Control-Allow-Origin: *');
         $json = array();
         $json = $this->General_model->fetchData("db_finance.bank",array("Status"=>1))->result();
         echo json_encode($json);
@@ -578,6 +583,7 @@ class C_aphris extends HR_Controler {
 
 
     public function fetcthUniversity(){
+        header('Access-Control-Allow-Origin: *');
         $json = array();
         $json = $this->General_model->fetchData("db_research.university",array())->result();
         echo json_encode($json);
@@ -585,11 +591,42 @@ class C_aphris extends HR_Controler {
     
     
     public function fetcthMajor(){
+        header('Access-Control-Allow-Origin: *');
         $json = array();
         $json = $this->General_model->fetchData("db_employees.major_programstudy_employees",array())->result();
         echo json_encode($json);
     }
 
+
+    public function scheduleApproval(){
+        $data= array();
+        $department = parent::__getDepartement();
+        $data['result'] = $this->General_model->fetchData("db_employees.schedule_approval",array())->row();
+        $page = $this->load->view('page/'.$department.'/aphris/schedule-approval',$data,true);
+        $this->temp($page);
+    }
+
+
+    public function scheduleApprovalSave(){
+        $data = $this->input->post();
+        if($data){
+            $execute = false;
+            if(!empty($data['ID'])){
+                $conditions = array("ID"=>$data['ID']);
+                $isExist = $this->General_model->fetchData("db_employees.schedule_approval",$conditions)->row();
+                if(!empty($isExist)){
+                    $data['UpdatedBy'] = $this->session->userdata('NIP');
+                    $execute = $this->General_model->updateData("db_employees.schedule_approval",$data,$conditions);                    
+                }else{$message = "Data not founded.";}
+            }else{
+                $data['CreatedBy'] = $this->session->userdata('NIP');
+                $execute = $this->General_model->insertData("db_employees.schedule_approval",$data);
+            }
+            $message = (($execute) ? "Successfully":"Failed")." saved.";
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('human-resources/master-aphris/schedule-approval'));
+        }else{show_404();}
+    }
 
 
 

@@ -13,12 +13,21 @@
 
     <div id="frame">
         <ul class="project-list">
-            <li class="departement <?php if($departement=='admission'){echo 'current';} ?>"
-                division="10"
-                data-dpt="admission">
+            <li class="departement <?php if($departement=='rektorat'){echo 'current';} ?>"
+                division="2"
+                data-dpt="rektorat">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/admission.png'); ?>"></span>
-                    <span class="title">Admission</span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/rectorat.png'); ?>"></span>
+                    <span class="title">Rektorat</span>
+                </a>
+            </li>
+
+            <li class="departement <?php if($departement=='secretariat-rectorate'){echo 'current';} ?>"
+                division="41"
+                data-dpt="secretariat-rectorate">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/sec-rec.png'); ?>"></span>
+                    <span class="title">Sec Rectorate</span>
                 </a>
             </li>
             <li class="departement <?php if($departement=='academic'){echo 'current';} ?>"
@@ -27,6 +36,22 @@
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/academic.png'); ?>"></span>
                     <span class="title">Academic</span>
+                </a>
+            </li>
+            <li class="departement <?php if($departement=='admission'){echo 'current';} ?>"
+                division="10"
+                data-dpt="admission">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/admission.png'); ?>"></span>
+                    <span class="title">Admission</span>
+                </a>
+            </li>
+            <li class="departement <?php if($departement=='it'){echo 'current';} ?>"
+                division="12"
+                data-dpt="it">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/it.png'); ?>"></span>
+                    <span class="title">IT</span>
                 </a>
             </li>
             <li class="departement <?php if($departement=='finance'){echo 'current';} ?>"
@@ -89,14 +114,7 @@
                     <span class="title">Purchasing</span>
                 </a>
             </li>   
-            <li class="departement <?php if($departement=='it'){echo 'current';} ?>"
-                division="12"
-                data-dpt="it">
-                <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/it.png'); ?>"></span>
-                    <span class="title">IT</span>
-                </a>
-            </li>
+            
             <li class="departement <?php if($departement=='admin-prodi'){echo 'current';} ?>"
                 division="15"
                 data-dpt="admin-prodi">
@@ -105,14 +123,7 @@
                     <span class="title">Prodi</span>
                 </a>
             </li>
-            <li class="departement <?php if($departement=='rektorat'){echo 'current';} ?>"
-                division="2"
-                data-dpt="rektorat">
-                <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/rectorat.png'); ?>"></span>
-                    <span class="title">Rektorat</span>
-                </a>
-            </li>
+            
             <li class="departement <?php if($departement=='library'){echo 'current';} ?>"
                 division="11"
                 data-dpt="library">
@@ -193,7 +204,6 @@
                     <span class="title">PU Press</span>
                 </a>
             </li>
-
             <li class="departement <?php if($departement=='other-division'){echo 'current';} ?>"
                 division="36"
                 data-dpt="other-division">

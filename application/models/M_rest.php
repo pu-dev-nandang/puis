@@ -143,7 +143,7 @@ class M_rest extends CI_Model {
 
                 $data = $this->db->query('SELECT sp.ScheduleID,sp.TypeSchedule,mk.MKCode,mk.Name AS MKName,mk.nameEng AS MKNameEng,cd.TotalSKS AS Credit,
                                                 sp.StatusSystem,sc.ClassGroup, sc.TeamTeaching,
-                                                em.NIP,em.Name,em.TitleAhead, em.TitleBehind, em.EmailPU, sp.TransferCourse
+                                                em.NIP,em.Name,em.TitleAhead, em.TitleBehind, em.EmailPU, sp.TransferCourse, sc.OnlineLearning
                                                 FROM '.$db.'.study_planning sp
                                                 LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
                                                 LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
@@ -245,7 +245,8 @@ class M_rest extends CI_Model {
     }
 
     public function __getExamScheduleForStudent($db,$SemesterID,$NPM,$ClassOf,$ExamType){
-        $dataSemester = $this->db->query('SELECT s.*, ay.utsStart, ay.utsEnd, ay.uasStart, ay.uasEnd FROM db_academic.semester s 
+        $dataSemester = $this->db->query('SELECT s.*, ay.utsStart, ay.utsEnd, ay.uasStart, ay.uasEnd  
+                                                        FROM db_academic.semester s
                                                         LEFT JOIN db_academic.academic_years ay ON (ay.SemesterID = s.ID)
                                                         WHERE s.ID = '.$SemesterID.' 
                                                         ORDER BY s.ID ASC')->result_array();
@@ -803,19 +804,20 @@ class M_rest extends CI_Model {
     public function getDetailsScheduleExam($db,$NPM,$SemesterID,$ExamType){
         // Get data jadwal
 
-        $q = 'SELECT sc.ID AS ScheduleID, mk.MKCode, mk.Name AS Course, mk.NameEng AS CourseEng, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,  
-                                                                    sc.ClassGroup, sc.Attendance
-                                                                    FROM '.$db.'.study_planning sp
-                                                                    LEFT JOIN db_academic.exam_details exd ON (exd.ScheduleID = sp.ScheduleID AND exd.NPM = sp.NPM)
-                                                                    LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
-                                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
-                                                                    LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
-                                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
-                                                                    WHERE sp.SemesterID = "'.$SemesterID.'" 
-                                                                    AND ex.Type LIKE "'.$ExamType.'"
-                                                                    AND sp.NPM = "'.$NPM.'"
-                                                                    GROUP BY ex.ID
-                                                                    ORDER BY mk.MKCode ASC';
+        $q = 'SELECT sc.ID AS ScheduleID, mk.MKCode, mk.Name AS Course,   
+                       mk.NameEng AS CourseEng, ex.ID AS ExamID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, ex.OnlineLearning,
+                       cl.Room,sc.ClassGroup, sc.Attendance
+                       FROM '.$db.'.study_planning sp
+                       LEFT JOIN db_academic.exam_details exd ON (exd.ScheduleID = sp.ScheduleID AND exd.NPM = sp.NPM)
+                       LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
+                       LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
+                       LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
+                       LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
+                       WHERE sp.SemesterID = "'.$SemesterID.'" 
+                       AND ex.Type LIKE "'.$ExamType.'"
+                       AND sp.NPM = "'.$NPM.'"
+                       GROUP BY ex.ID
+                       ORDER BY mk.MKCode ASC';
 
         $ExamSchedule = $this->db->query($q)->result_array();
 
@@ -823,6 +825,29 @@ class M_rest extends CI_Model {
             for($g=0;$g<count($ExamSchedule);$g++){
 
                 $examD = $ExamSchedule[$g];
+
+                $btnOnlineExamStart = 0;
+                $rangeTime = 0;
+                // Mengecek persamaan tanggal
+                if($examD['ExamDate']==$this->getDateNow()
+                    && $examD['OnlineLearning']=='1'){
+                    $timeStart = strtotime($examD['ExamStart']);
+                    $timeEnd = strtotime($examD['ExamEnd']);
+                    $time1 = strtotime($this->getTimeNow());
+
+                    if($timeStart<=$time1 && $time1<=$timeEnd){
+                        $btnOnlineExamStart = 1;
+
+                        $to_time=strtotime("2011-01-12 ".$this->getTimeNow());
+                        $from_time=strtotime("2011-01-12 ".$examD['ExamEnd']);
+                        $rangeTime = round(abs($to_time - $from_time) / 60,0);
+
+                    }
+
+                }
+
+                $ExamSchedule[$g]['btnOnlineExamStart'] = $btnOnlineExamStart;
+                $ExamSchedule[$g]['rangeTime'] = $rangeTime;
 
                 // Get Schedule Detail
                 $dataSD = $this->db->select('ID')->get_where('db_academic.schedule_details',array('ScheduleID' => $examD['ScheduleID']))->result_array();
@@ -1395,7 +1420,8 @@ class M_rest extends CI_Model {
                         'DetailExam' => $dataCourse
                     );
 
-                } else {
+                }
+                else {
                     $result = array(
                         'Status' => -5,
                         'Message' => 'You don\'t have a teaching schedule'
@@ -2056,6 +2082,154 @@ class M_rest extends CI_Model {
         }
 
         return $data;
+    }
+
+
+    public function getRangeDateLearningOnlinePerSession($ScheduleID,$Session){
+
+        $data = $this->getRangeDateLearningOnline($ScheduleID);
+
+        $result = [];
+        for($i=0;$i<count($data);$i++){
+            if($data[$i]['Session']==$Session){
+
+                // Comment
+                $data[$i]['TotalComment'] = $this->db->query('SELECT COUNT(*) AS Total 
+                                                    FROM db_academic.counseling_comment cc 
+                                                    LEFT JOIN db_academic.counseling_topic ct ON (ct.ID = cc.TopicID)
+                                                    WHERE ct.ScheduleID = "'.$ScheduleID.'"
+                                                    AND ct.Sessions = "'.$Session.'" ')->result_array()[0]['Total'];
+
+                // cek apakah topik sudah dibuat atau blm
+                $data[$i]['CheckTopik'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.counseling_topic ct 
+                                                                        WHERE ct.ScheduleID = "'.$ScheduleID.'"
+                                                                        AND ct.Sessions = "'.$Session.'" ')->result_array()[0]['Total'];
+
+                // Task
+                $data[$i]['TotalTask'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task_student std
+                                                                    LEFT JOIN db_academic.schedule_task st ON (st.ID = std.IDST)
+                                                                    WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                                     AND st.Session = "'.$Session.'" ')->result_array()[0]['Total'];
+
+                // cek apakah task sudah dibuat atau blm
+                $data[$i]['CheckTask'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task st
+                                                                    WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                                     AND st.Session = "'.$Session.'" ')->result_array()[0]['Total'];
+
+                // Material
+                $data[$i]['dataMaterial'] = $this->db->query('SELECT sm.File FROM db_academic.schedule_material sm 
+                                                                    WHERE sm.ScheduleID = "'.$ScheduleID.'"
+                                                                     AND sm.Session = "'.$Session.'" ')->result_array();
+
+
+                $result = $data[$i];
+
+                break;
+            }
+        }
+
+        return $result;
+
+    }
+
+    public function getRangeDateLearningOnline($ScheduleID){
+
+        $dataSch = $this->db->query('SELECT d.NumberOfDay, ay.kuliahStart , ay.utsEnd FROM db_academic.schedule_details sd 
+                                        LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                        LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
+                                        LEFT JOIN db_academic.academic_years ay ON (ay.SemesterID = s.SemesterID)
+                                        WHERE sd.ScheduleID = "'.$ScheduleID.'"
+                                         ORDER BY sd.DayID ASC LIMIT 1 ')->result_array();
+
+
+        $Day = $dataSch[0]['NumberOfDay'];
+
+
+
+        $dateRangeStart = $dataSch[0]['kuliahStart']; // Start kuliah
+        $dateRangeStart_AfterUTS = $dataSch[0]['utsEnd']; // End of UTS
+
+
+        $dateStart = $this->getFirstDatelearningOnline($dateRangeStart,$Day);
+        $f = $this->getRangeDateMidSemester($dateStart);
+
+        $dateStart_AfterUTS = $this->getFirstDatelearningOnline($dateRangeStart_AfterUTS,$Day);
+        $f2 = $this->getRangeDateMidSemester($dateStart_AfterUTS);
+        if(count($f2)>0){
+            for($i=0;$i<count($f2);$i++){
+                $f2[$i]['Session'] = $i+8;
+                array_push($f,$f2[$i]);
+            }
+        }
+
+        return $f;
+
+    }
+
+    public function getRangeDateMidSemester($dateStart){
+
+        // Cek apakah sedang dalam Ujian Atau tidak
+        $isUTS = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.academic_years ay 
+                                                            LEFT JOIN db_academic.semester s 
+                                                            ON (s.ID = ay.SemesterID) 
+                                                            WHERE s.Status = 1 AND 
+                                                            (CURDATE() BETWEEN ay.utsStart AND ay.utsEnd)')
+                            ->result_array()[0]['Total'];
+
+        $dateNow = date('Y-m-d');
+        $newStartDate = $dateStart;
+        $arrResult = [];
+        for($s=0;$s<7;$s++){
+            $RangeEnd = date("Y-m-d", strtotime($newStartDate." +6 days"));
+
+            $Status = 0;
+            if($newStartDate <= $dateNow && $RangeEnd >= $dateNow){
+                $Status = 1;
+            } else if($RangeEnd <= $dateNow){
+                $Status = 2;
+            }
+
+
+
+            $arr = array(
+                'Session' => ($s+1),
+                'RangeStart' => $newStartDate,
+                'RangeEnd' => $RangeEnd,
+                'Status' => $Status,
+                'isUTS' => $isUTS
+            );
+            $newStartDate = date("Y-m-d", strtotime($RangeEnd." +1 days"));
+            array_push($arrResult,$arr);
+        }
+        return $arrResult;
+    }
+
+    public function getFirstDatelearningOnline($StartDate,$DayNumber){
+        $result = '';
+        for($i=0;$i<=7;$i++){
+            $dtNow = date("Y-m-d", strtotime($StartDate." +".$i." days"));
+            $dtNumber = date("N", strtotime($StartDate." +".$i." days"));
+            if($DayNumber==$dtNumber){
+                $result = $dtNow;
+                break;
+            }
+        }
+        return $result;
+    }
+
+    public function getAllLecturerByScheduleID($ScheuldeID){
+
+        $data = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.schedule s 
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                            WHERE s.ID = "'.$ScheuldeID.'"
+                                             UNION ALL 
+                                             SELECT em.NIP, em.Name FROM db_academic.schedule_team_teaching stt
+                                             LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                             WHERE stt.ScheduleID = "'.$ScheuldeID.'"
+                                             ')->result_array();
+
+        return $data;
+
     }
 
 }

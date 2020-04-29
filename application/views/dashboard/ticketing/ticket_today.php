@@ -96,7 +96,7 @@ var App_ticket_ticket_today = {
             '        <td>:</td>' +
             '        <td>' +
             '            <input type="file" name = "Files" id = "UploadFile">' +
-            '            <p style = "color:red">(jpg,png) Max 2mb                                                    ' +
+            '            <p style = "color:red">(pdf,jpg,png) Max 2mb                                                    ' +
             '        </td>' +
             '    </tr>' +
             '    <tr class="hide" id = "tr_ticket_number">' +
