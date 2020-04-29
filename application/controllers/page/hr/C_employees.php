@@ -571,7 +571,8 @@ class C_employees extends HR_Controler {
                 $this->load->library('upload', $config);
                 if ( ! $this->upload->do_upload('userfile')){
                     $error = array('error' => $this->upload->display_errors());
-                    return print_r(json_encode($error));
+                    return json_encode($error);
+                    //return print_r(json_encode($error));
                 }
                 else {
                     
@@ -580,7 +581,7 @@ class C_employees extends HR_Controler {
 
                     //$Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
                    
-                    return print_r(json_encode($success));
+                    return json_encode($success);
                 }
 
 
