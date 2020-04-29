@@ -89,8 +89,15 @@ $(document).ready(function () {
 
     $('#fileOther').change(function (event) {
         $('#element1').empty();
-        var file = URL.createObjectURL(event.target.files[0]);
-        $('#element1').append('<br/><iframe src="' + file + '" style="width:250px; height:100;" frameborder="0"></iframe>' );
+        var sizeFile = event.target.files[0].size;
+        if(sizeFile < 5000000){
+            var file = URL.createObjectURL(event.target.files[0]);
+            $('#element1').append('<br/><iframe src="' + file + '" style="width:250px; height:100;" frameborder="0"></iframe>' );
+            $(".btnSaveFiles").prop("disabled",false);
+        }else{
+            alert("Size of this file is too large. ");
+            $(".btnSaveFiles").prop("disabled",true);
+        }
     });
 
 

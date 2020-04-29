@@ -1339,7 +1339,7 @@ function uploadfile_transcripts3(fileName_Transcript) {
         var max=999;  
         var random =Math.floor(Math.random() * (+max - +min)) + +min; 
         var ext = 'PDF';
-        var fileName = type+'_'+NIP+'_'+random+'.'+ext;
+        var fileName = type.replace(/_/g, "")+'_'+NIP+'_'+random+'.'+ext;
         var oFile = document.getElementById("fileOther").files[0]; 
 
         if(formNIP!=null && formNIP!=''
@@ -1372,6 +1372,8 @@ function uploadfile_transcripts3(fileName_Transcript) {
                             toastr.error('NIK / NIP is exist','Error');
                         } else {  //if success save data
                 
+                            var msgLength = 0;
+                            var msgUpload = "";
                             if ($('#fileOther').get(0).files.length === 0) {
                                 } else {
                                     var formData = new FormData( $("#tagFM_OtherFile")[0]);
@@ -1387,10 +1389,18 @@ function uploadfile_transcripts3(fileName_Transcript) {
                                         contentType : false,
                                         processData : false,
                                         success : function(data) {
-                                    }
-                                });   
+                                            console.log(data);
+                                            msgLength = data.length;
+                                            msgUpload = data;
+                                        }
+                                    });   
                             }
-                                toastr.success('Other Data Saved','Success');
+                                var message_ = (msgLength > 0) ? "Error Failed Upload Images.\n"+msgUpload : "Success saved." ;
+                                if(msgLength > 0){
+                                    toastr.error(message_,'Failed Upload File');
+                                }else{
+                                    toastr.success(message_,'Info');
+                                }
                                 // loadFilesDetails();
                                 // loadformsotherfiles();
                         }
@@ -1398,7 +1408,7 @@ function uploadfile_transcripts3(fileName_Transcript) {
                                 $('#NotificationModal').modal('hide');
                                 $('.menuDetails[data-page="otherfiles"]').trigger('click');
                                 //window.location.href = '';
-                            },1000);
+                            },1000); 
 
                         });
                 }
