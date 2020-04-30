@@ -1339,9 +1339,10 @@ function uploadfile_transcripts3(fileName_Transcript) {
         var max=999;  
         var random =Math.floor(Math.random() * (+max - +min)) + +min; 
         var ext = 'PDF';
-        var fileName = type.replace(/_/g, "")+'_'+NIP+'_'+random+'.'+ext;
+        var fileName = type.replace(/[^a-zA-Z0-9_-]/g,'')+'_'+NIP+'_'+random+'.'+ext;
         var oFile = document.getElementById("fileOther").files[0]; 
 
+        
         if(formNIP!=null && formNIP!=''
                     && NoDocument!='' && NoDocument!=null
                     && DescriptionFile!='' && DescriptionFile!=null
@@ -1417,6 +1418,7 @@ function uploadfile_transcripts3(fileName_Transcript) {
                 $('#NotificationModal').modal('hide');
                 return;
             }
+        
     }
                              
 </script>
