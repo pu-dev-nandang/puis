@@ -122,7 +122,7 @@ class M_statistik extends CI_Model {
                             (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
                             (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
                             from db_admission.register as a 
-                            join db_admission.school as b on a.SchoolID = b.ID 
+                            left join db_admission.school as b on a.SchoolID = b.ID 
                             LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
                             LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID 
                             LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified 
@@ -168,7 +168,7 @@ class M_statistik extends CI_Model {
                     (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
                     (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
                     from db_admission.register as a 
-                    join db_admission.school as b on a.SchoolID = b.ID 
+                    left join db_admission.school as b on a.SchoolID = b.ID 
                     LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
                     LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID 
                     LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified 
@@ -362,7 +362,7 @@ class M_statistik extends CI_Model {
         $sql = 'select  DISTINCT(Discount) as total from (
                 select f.Discount
                 from db_admission.register as a 
-                join db_admission.school as b on a.SchoolID = b.ID 
+                left join db_admission.school as b on a.SchoolID = b.ID 
                 LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
                 LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID 
                 LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified 
@@ -403,7 +403,7 @@ class M_statistik extends CI_Model {
                         (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
                         (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
                         from db_admission.register as a 
-                        join db_admission.school as b on a.SchoolID = b.ID 
+                        left join db_admission.school as b on a.SchoolID = b.ID 
                         LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
                         LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID 
                         LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified 
@@ -486,7 +486,7 @@ class M_statistik extends CI_Model {
                                         (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
                                         (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
                                         from db_admission.register as a 
-                                        join db_admission.school as b on a.SchoolID = b.ID 
+                                        left join db_admission.school as b on a.SchoolID = b.ID 
                                         LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
                                         LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID 
                                         LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified 
@@ -512,7 +512,7 @@ class M_statistik extends CI_Model {
                                                       (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
                                                       (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
                                                       from db_admission.register as a 
-                                                      join db_admission.school as b on a.SchoolID = b.ID 
+                                                      left join db_admission.school as b on a.SchoolID = b.ID 
                                                       LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
                                                       LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID 
                                                       LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified 
