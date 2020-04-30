@@ -778,48 +778,12 @@ class C_api extends CI_Controller {
 
         }
 
-        // $totalData = $this->db->get_where($db_.'.students',$arryWhere
-        // )->result_array();
-        $sqlTotalData = 'select count(*) as total  FROM '.$db_.'.students s
-                                                      LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
-                                                      LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
-                                                      LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)
-                                                      LEFT JOIN db_admission.to_be_mhs asx ON (ast.NPM = asx.NPM)
-                                                      LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
-
-                        ';
-
-        if( !empty($requestData['search']['value']) ) {
-            if ($dataWhere == '') {
-                $dataWhere = ' where ';
-            }
-            else
-            {
-                $dataWhere .= ' AND ';
-            }
-            $sqlTotalData.= '  '.$dataWhere.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
-            $sqlTotalData.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
-            $sqlTotalData.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
-            $sqlTotalData.= ' OR asx.FormulirCode LIKE "'.$requestData['search']['value'].'%" ';
-            $sqlTotalData.= ' OR emp.Name LIKE "'.$requestData['search']['value'].'%" )';
-            $sqlTotalData.= ' ORDER BY s.NPM, s.ProdiID ASC';
-        }
-        else {
-            $sqlTotalData.= '';
-        }
-
-        // print_r($sqlTotalData);
-
-        $query = $this->db->query($sqlTotalData)->result_array();
-        $totalData = $query[0]['total'];
-        // )->result_array();
-
-
         // -------------total data---------- //
-
-        $sql = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, ps.Name AS ProdiNameInd,s.StatusStudentID,
+        $sqlSelectData  = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, ps.Name AS ProdiNameInd,s.StatusStudentID,
                           ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth,
-                          ast.EmailPU,asx.GeneratedBy,emp.Name as NameGeneratedBy,asx.No_Ref
+                          ast.EmailPU,asx.GeneratedBy,emp.Name as NameGeneratedBy,asx.No_Ref';
+        $sqlSelectTotal = 'select 1';
+        $sql = '
                           FROM '.$db_.'.students s
                           LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
                           LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
@@ -835,15 +799,7 @@ class C_api extends CI_Controller {
                           ) as asx on ast.NPM = asx.NPM
                           LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
                           ';
-
         if( !empty($requestData['search']['value']) ) {
-            // if ($dataWhere == '') {
-            //     $dataWhere = ' where ';
-            // }
-            // else
-            // {
-            //     $dataWhere .= ' AND ';
-            // }
             $sql.= '  '.$dataWhere.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
@@ -853,12 +809,21 @@ class C_api extends CI_Controller {
             $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
         }
         else {
-            $sql.= ' '.$dataWhere.' ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            $sql.= ' '.$dataWhere;
         }
+
+        $OrderLimit = ' ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         // print_r($sql);die();
 
-        $query = $this->db->query($sql)->result_array();
+        $query = $this->db->query($sqlSelectData.$sql.$OrderLimit)->result_array();
+
+        $totalData = $this->db->query(
+            'select count(*) as total from (
+                '.$sqlSelectTotal.$sql.'
+            )xx
+             '
+        )->row()->total;
 
         $data = array();
         for($i=0;$i<count($query);$i++){
@@ -888,19 +853,6 @@ class C_api extends CI_Controller {
             $nestedData[] = '<a href="javascript:void(0);" data-npm="'.$row["NPM"].'" data-ta="'.$row["ClassOf"].'" class="btnDetailStudent"><b>'.$row["Name"].'</b></a><br/>'.$row["NPM"];
             $nestedData[] = '<div style="text-align: center;"><button class="btn btn-inverse btn-notification btn-show" NPM="'.$row["NPM"].'" Name = "'.$row["Name"].'">Show</button></div>';
             $nestedData[] = '<div style="text-align: center;">'.$Gender.'</div>';
-            // $nestedData[] = '<div class="dropdown">
-            //                       <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            //                         <i class="fa fa-pencil-square-o"></i>
-            //                         <span class="caret"></span>
-            //                       </button>
-            //                       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            //                         <li><a href="javascript:void(0);" class="btn-edit-student " data-npm="'.$row["NPM"].'" ta = "'.$db_.'">Edit Student</a></li>
-            //                         <li role="separator" class="divider"></li>
-            //                         <li><a href="javascript:void(0);" class="btn-reset-password " data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Reset Password</a></li>
-            //                         <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row["EmailPU"].'" data-year="'.$dataYear.'" data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Change Status</a></li>
-
-            //                       </ul>
-            //                     </div>';
             $nestedData[] = $row["ProdiNameInd"];
             $nestedData[] = '<div style="text-align: center;"><i class="fa fa-circle" '.$label.'></i></div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["NameGeneratedBy"].'</div>';
