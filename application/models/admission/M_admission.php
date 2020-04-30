@@ -3959,6 +3959,7 @@ class M_admission extends CI_Model {
        // get date last year
        $DateFiltering2  = explode('-', $DateFiltering);
        $DateFiltering2 = ($DateFiltering2[0] - 1).'-'.($DateFiltering2[1]).'-'.($DateFiltering2[2]);
+       $DateFiltering2Write = $this->m_master->getIndoBulan($DateFiltering2);
        // print_r($DateFiltering2);die();
        for ($i=0; $i < count($G_Faculty); $i++) {
          $FacultyID = $G_Faculty[$i]['FacultyID'];
@@ -3966,7 +3967,7 @@ class M_admission extends CI_Model {
          $temp['Prodi'] = array();
          $temp['Value'] = array(
             array(
-              'Label'=> 'Intake Tahun Akademik '.($Year-1),
+              'Label'=> 'Intake Tahun Akademik '.($Year-1).' ('.$DateFiltering2Write.')',
               'Detail' => array(),
             ),
             array(

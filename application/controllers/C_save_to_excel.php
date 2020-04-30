@@ -2955,6 +2955,7 @@ class C_save_to_excel extends CI_Controller
     {
         $GetDateNow = date('Y-m-d');
         $this->load->model('master/m_master');
+        $this->load->model('statistik/m_statistik');
         $GetDateNow = ($datechoose == null) ? $this->m_master->getIndoBulan($GetDateNow) : $this->m_master->getIndoBulan($datechoose) ;
          // print_r($GetDateNow);die();
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
@@ -3133,9 +3134,26 @@ class C_save_to_excel extends CI_Controller
             $excel3->mergeCells('B'.$r.':'.'D'.$r);
             $excel3->setCellValue('B'.$r, 'Total')->getStyle('B'.$r.':'.'D'.$r)->applyFromArray($style_row2);
             $st = 4;
+
+            // add arr_total intake tahun sebelumnya for ALL date
+            $ChkTblExist = $this->m_statistik->table_Exist('rekapintakeadm_'.($Year-1));
+            $TotalIntakeMin1 = 0;
+            if ($ChkTblExist) {
+                $TotalIntakeMin1 = $this->db->query(
+                    'select sum(Total) as total from '.'db_statistik.rekapintakeadm_'.($Year-1)
+                )->row()->total;
+            }
+
             for ($i=0; $i < count($arr_total); $i++) {
                 $huruf = $this->m_master->HurufColExcelNumber($st);
-                $excel3->setCellValue($huruf.$r, $arr_total[$i])->getStyle($huruf.$r)->applyFromArray($style_row2);
+                if ($i == 0) {
+                    $excel3->setCellValue($huruf.$r, $arr_total[$i].'/'.$TotalIntakeMin1)->getStyle($huruf.$r)->applyFromArray($style_row2);
+                }
+                else
+                {
+                    $excel3->setCellValue($huruf.$r, $arr_total[$i])->getStyle($huruf.$r)->applyFromArray($style_row2);
+                }
+                
                 $st++;
             }
 
