@@ -422,6 +422,13 @@ $(document).ready(function () {
     $(document).on('click','.btnSubmitKatOtherFiles', function () {
         var name_katother = $('#name_kat_otherfiles').val();
         var name_sort = $('#name_sort').val();
+        var pattern =new RegExp("[!@#%&=+$^/]");
+
+        if(pattern.test(name_sort)){
+          toastr.error('Sorry, name sort cannot input symbols!','Error');
+          
+        }
+        else {
 
         if(name_sort!='' && name_sort!=null
             && name_katother!='' && name_katother!=null
@@ -460,6 +467,7 @@ $(document).ready(function () {
             } else {
                 toastr.warning('All form is required','Warning');
             }
+        }
     });
    
 $('#btnSaveEditFiles').click(function () {  
