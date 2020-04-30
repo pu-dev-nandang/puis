@@ -196,4 +196,21 @@ class M_research extends CI_Model {
     	}
     }
 
+    public function QueryUserReserachJoin($IDJoin,$aliasTable = 'usrr'){
+      $sql = ' left join (
+            select * from (
+            select CONCAT("ekm.",ID) as ID_user,Nama,NIDN,NIP as NIPorNPM,Email from db_research.master_user_research
+            where TypeUser = "Mahasiswa"
+            UNION ALL
+            select CONCAT("ekd.",ID) as ID_user,Nama,NIDN,NIP as NIPorNPM,Email from db_research.master_user_research
+            where TypeUser != "Mahasiswa"
+            UNION ALL
+            select CONCAT("mhs.",NPM) as ID_user,Name as Nama,"",NPM as NIPorNPM,EmailPU from
+            db_academic.auth_students
+            UNION ALL
+            select CONCAT("dsn.",NIP) as ID_user,Name as Nama,NIDN,NIP as NIPorNPM,EmailPU from db_employees.employees
+        )'.$aliasTable.')'.$aliasTable.' on '.$IDJoin.'='.$aliasTable.'.ID_user';
+      return $sql;
+    }
+
 }    
