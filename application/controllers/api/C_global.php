@@ -131,15 +131,25 @@ class C_global extends CI_Controller {
         }
         else
         {
-            if (file_exists('./uploads/'.$file)) {
-                $imageData = base64_encode(file_get_contents(FCPATH.'uploads/'.$path));
-                echo '<img src="data:image/jpeg;base64,'.$imageData.'">';
-                
-            }
-            else
-            {
-                show_404($log_error = TRUE);
-            }
+            
+                $extensions = array('jpg', 'jpeg', 'png');
+                if (in_array($ext, $extensions)) {
+                    if (file_exists('./uploads/'.$file)) {
+                        $imageData = base64_encode(file_get_contents(FCPATH.'uploads/'.$path));
+                        echo '<img src="data:image/jpeg;base64,'.$imageData.'">';
+                        
+                    }
+                    else
+                    {
+                        show_404($log_error = TRUE);
+                    }   
+                }
+               else{
+                $this->load->helper('download');
+                $data   = file_get_contents('./uploads/'.$file);
+                $name   = $file;
+                force_download($name, $data); // script download file
+               }
             
         }
     }
