@@ -31,9 +31,11 @@ class C_score extends Academic_Controler {
         $this->menu_score($page);
     }
 
-    public function inputScore(){
-        $data_arr = $this->getInputToken();
-        $this->load->view('page/academic/score/inputScore',$data_arr);
+    public function inputScore($token){
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+        $page = $this->load->view('page/academic/score/inputScore',$data_arr,true);
+        $this->menu_score($page);
     }
 
     public function monitoring_score(){

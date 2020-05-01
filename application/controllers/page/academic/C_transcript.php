@@ -29,6 +29,12 @@ class C_transcript extends Academic_Controler {
         $this->menu_transcript($page);
     }
 
+    public function ijazah(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/transcript/ijazah',$data,true);
+        $this->menu_transcript($page);
+    }
+
     public function setting_transcript(){
         $data['TempTranscript'] = $this->db->get('db_academic.setting_temp_transcript')->result_array()[0];
         $data['Transcript'] = $this->db->get('db_academic.setting_transcript')->result_array()[0];

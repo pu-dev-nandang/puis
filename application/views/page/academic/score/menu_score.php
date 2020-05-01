@@ -1,7 +1,7 @@
 
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
-        <li class="<?php if($this->uri->segment(2)=='score' && $this->uri->segment(3)=='') { echo 'active'; } ?>">
+        <li class="<?php if($this->uri->segment(3)=='score' || $this->uri->segment(3)=='inputScore' || $this->uri->segment(3)=='') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/score'); ?>">Score</a>
         </li>
         <li class="<?php if($this->uri->segment(3)=='monitoring-score') { echo 'active'; } ?>">

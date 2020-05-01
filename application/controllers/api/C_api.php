@@ -8679,10 +8679,25 @@ class C_api extends CI_Controller {
                                           LEFT JOIN db_academic.record_input_score ris_uas ON (ris_uas.ScheduleID = sc.ID AND ris_uas.Type="uas")
                                         WHERE ('.$whereP.' ) '.$whereType.' '.$dataSearch.' '.$orderBy.' ';
 
+
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT sdc.ID
+                                                                FROM db_academic.schedule_details_course sdc
+                                                                LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
+                                                                LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
+                                                                LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                                LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                                LEFT JOIN db_academic.grade_course gc
+                                                                ON (gc.SemesterID = sc.SemesterID AND gc.ScheduleID = sc.ID)
+                                                                LEFT JOIN db_academic.record_input_score ris_uts 
+                                                                ON (ris_uts.ScheduleID = sc.ID AND ris_uts.Type="uts")
+                                                                LEFT JOIN db_academic.record_input_score ris_uas 
+                                                                ON (ris_uas.ScheduleID = sc.ID AND ris_uas.Type="uas")
+                                                                WHERE ('.$whereP.' ) '.$whereType.' '.$dataSearch.') xx';
+
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
         $no = $requestData['start'] + 1;
         $data = array();
@@ -8701,9 +8716,19 @@ class C_api extends CI_Controller {
                 $StatusGrade = '<i class="fa fa-times-circle" style="color: darkred;"></i>';
             }
 
+            $data_input_score = array(
+                'NIP' => $row['Coordinator'],
+                'SemesterID' => $data_arr['SemesterID'],
+                'ScheduleID' => $row['ScheduleID'],
+
+            );
+
+            $tkn = $this->jwt->encode($data_input_score,'UAP)(*');
+            $url_input_score = base_url().'academic/score/inputScore/'.$tkn;
+
             $btnAct = '<div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="caret"></span></button>
                 <ul class="dropdown-menu">
-                <li><a href="javascript:void(0);" class="btnInputScore" data-nip="'.$row['Coordinator'].'" data-smt="'.$data_arr['SemesterID'].'" data-id="'.$row['ScheduleID'].'">Input Score</a></li>
+                <li><a href="'.$url_input_score.'" target="_blank">Input Score</a></li>
                 <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'.$row['ClassGroup'].'" data-id="'.$row['ScheduleID'].'">Approval - Score Weighted</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'.$no.'" data-id="">Cetak Report UTS</a></li>
@@ -8741,8 +8766,8 @@ class C_api extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefaultRow)),
-            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval($queryDefaultRow),
             "data"            => $data
         );
         echo json_encode($json_data);
