@@ -575,7 +575,6 @@ class C_employees extends HR_Controler {
                     //return print_r(json_encode($error));
                 }
                 else {
-                    
                     $success = array('success' => $this->upload->data());
                     $success['success']['formGrade'] = 0;
 
@@ -782,6 +781,7 @@ class C_employees extends HR_Controler {
             if(!empty($isExist)){
                 if($data_arr['ACT'] == 2){ //for rejected
                     $dataPost = array("isApproved"=>2,"NoteApproved"=>(!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null));                    
+                    $dataPost['UpdatedBy'] = $myNIP."/".$myName;
                     $rejectData = $this->General_model->updateData("db_employees.employees",$dataPost,$conditions);
                     $message = ($rejectData ? "Successfully":"Failed")." saved.";
                 }else if($data_arr['ACT'] == 0){ //for approved
@@ -882,7 +882,7 @@ class C_employees extends HR_Controler {
                         $Logs->Logs = null;
                         $Logs->isApproved = null;
                         $Logs->NoteApproved = null;
-                        $Logs->UpdatedAt = $myNIP."/".$myName;
+                        $Logs->UpdatedBy = $myNIP."/".$myName;
                         
                         if(!empty($conditions['ID'])){unset($conditions['ID']);}
                         $updatedPersonalData = $this->General_model->updateData("db_employees.employees",$Logs,$conditions);
