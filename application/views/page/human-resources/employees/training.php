@@ -181,7 +181,8 @@
                             }
 
                             if(k == "certificate"){
-                                if(v != ""){
+                                if(v == "" || v == null || $.trim(v).length == 0){
+                                }else{
                                     $cloneRow.find(".train-certificate").html('<a href="'+base_url_js+'/uploads/profile/training/'+v+'"  target="_blank" class="btn btn-xs btn-primary" ><i class="fa fa-paperclip"></i> View file</a>');
                                 }
                             }

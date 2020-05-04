@@ -92,26 +92,32 @@
 					                                    <div class="col-sm-6">
 					                                        <div class="form-group">
 					                                            <label>Country</label>
-					                                            <p><?=labelProfileDB("db_admission.country",array("ctr_code"=>$origin->CountryID))->ctr_name?></p>
+					                                            <p><?=(!empty($origin->CountryID)) ? labelProfileDB("db_admission.country",array("ctr_code"=>$origin->CountryID))->ctr_name : '-'?></p>
 					                                        </div>
 					                                    </div>
 					                                    <?php if(!empty($origin->ProvinceID)){ ?>
 					                                    <div class="col-sm-6">
 					                                        <div class="form-group">
 					                                            <label>Province</label>
-					                                            <p><?=labelProfileDB("db_admission.province",array("ProvinceID"=>$origin->ProvinceID))->ProvinceName?></p>
+					                                            <?php $ProvinceName = '-';
+					                                            if(!empty($origin->ProvinceID)){
+					                                            	$Province = labelProfileDB("db_admission.province",array("ProvinceID"=>$origin->ProvinceID));
+					                                            	$ProvinceName = (!empty($Province) ? $Province->ProvinceName : '-');
+					                                            }
+					                                            ?>
+					                                            <p><?=$ProvinceName?></p>
 					                                        </div>
 					                                    </div>
 					                                    <div class="col-sm-6">
 					                                        <div class="form-group">
 					                                            <label>Region</label>
-					                                            <p><?=labelProfileDB("db_admission.region",array("RegionID"=>$origin->RegionID))->RegionName?></p>
+					                                            <p><?=($origin->RegionID) ? labelProfileDB("db_admission.region",array("RegionID"=>$origin->RegionID))->RegionName : '-'?></p>
 					                                        </div>
 					                                    </div>
 					                                    <div class="col-sm-6">
 					                                        <div class="form-group">
 					                                            <label>District</label>
-					                                            <p><?=labelProfileDB("db_admission.district",array("DistrictID"=>$origin->DistrictID))->DistrictName?></p>
+					                                            <p><?=(!empty($origin->DistrictID)) ? labelProfileDB("db_admission.district",array("DistrictID"=>$origin->DistrictID))->DistrictName : '-'?></p>
 					                                        </div>
 					                                    </div>
 
@@ -360,13 +366,13 @@
 					                                                    <td><?=$origin->MyBank[$i]->accountNumber?></td>
 					                                                </tr>
 					                                            <?php } }else{ ?>
+					                                            </tbody>
+					                                        </table>
+					                                    </div>
 					                                                <tr>
 					                                                    <td colspan="4">Empty data</td>
 					                                                </tr>
 					                                            <?php } ?>
-					                                            </tbody>
-					                                        </table>
-					                                    </div>
 					                                </div>
 					                            </div>                            
 					                        </div>                        
