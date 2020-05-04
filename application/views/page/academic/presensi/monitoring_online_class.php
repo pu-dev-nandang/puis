@@ -227,7 +227,10 @@
             if(jsonResult.Student.length>0){
                 $.each(jsonResult.Student,function (i,v) {
                     var Forum = (parseInt(v.TotalComment)>0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
-                    var Task = (parseInt(v.TotalTask)>0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
+                    var Task = (v.TotalTask.length>0)
+                        ? '<div id="viewTask_'+v.TotalTask[0].ID+'"><i class="fa fa-check" style="color: green;"></i>' +
+                            '<a href="javascript:void(0);" class="btnRemoveTask" data-id="'+v.TotalTask[0].ID+'">Remove</a></div>'
+                        : '-';
 
                     var check = (parseInt(v.SessionAttend)==parseInt(v.SessionAttendSch)) ? 'checked' : '';
 
@@ -370,6 +373,26 @@
         });
 
 
+    });
+
+    // Remove task student
+    $(document).on('click','.btnRemoveTask',function () {
+       if(confirm('Are you sure?')){
+           var ID = $(this).attr('data-id');
+           var data = {
+               action : 'removeTaskStudent',
+               ID : ID
+           };
+           var token = jwt_encode(data,'UAP)(*');
+           var url = base_url_js+'api4/__crudOnlineClass';
+
+           $.post(url,{token:token},function (result) {
+               toastr.success('Task removed','Success');
+               setTimeout(function () {
+                   $('#viewTask_'+ID).html('-');
+               },500);
+           });
+       }
     });
 
 </script>

@@ -267,11 +267,11 @@ class C_api4 extends CI_Controller {
                                                     AND cc.UserID = "'.$d['NPM'].'" ')->result_array()[0]['Total'];
 
                     // Task
-                    $dataStd[$i]['TotalTask'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task_student std
+                    $dataStd[$i]['TotalTask'] = $this->db->query('SELECT std.ID FROM db_academic.schedule_task_student std
                                                                     LEFT JOIN db_academic.schedule_task st ON (st.ID = std.IDST)
                                                                     WHERE st.ScheduleID = "'.$ScheduleID.'"
                                                                      AND st.Session = "'.$Session.'" 
-                                                                     AND std.NPM = "'.$d['NPM'].'"')->result_array()[0]['Total'];
+                                                                     AND std.NPM = "'.$d['NPM'].'"')->result_array();
 
 
                     // Attendance
@@ -313,6 +313,31 @@ class C_api4 extends CI_Controller {
             );
 
             return print_r(json_encode($result));
+        }
+        else if($data_arr['action']=='removeTaskStudent'){
+
+            $ID = $data_arr['ID'];
+
+            $dataCk = $this->db->get_where('db_academic.schedule_task_student',
+                array('ID' => $ID))->result_array();
+
+            if(count($dataCk)>0){
+                $d = $dataCk[0];
+                // Cek apakah file ada atau tidak
+                if($d['File']!='' && $d['File']!=null){
+                    $Path = './uploads/task/'.$d['File'];
+                    if(file_exists($Path)){
+                        unlink($Path);
+                    }
+                }
+
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_academic.schedule_task_student');
+
+            }
+
+            return print_r(1);
+
         }
 
     }
