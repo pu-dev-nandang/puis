@@ -83,7 +83,7 @@ $(document).ready(function(){
                             </div>
                             <?php if(!empty($employee->Signature)){ ?>
                             <div class="text-right" style="margin-top:15px">
-                                <img src="<?=$employee->Signature?>" class="img-thumbnail" width="100px" title="<?=$employee->Name?> signature's">
+                                <img src="<?=base_url('./uploads/signature/'.$employee->Signature)?>" class="img-thumbnail" width="100px" title="<?=$employee->Name?> signature's">
                             </div>
                             <?php } ?>
                         </div>

@@ -879,6 +879,17 @@ class C_employees extends HR_Controler {
                             }
                         }
 
+                        if(!empty($Logs->Signature)){
+                            $data = $Logs->Signature;
+
+                            list($type, $data) = explode(';', $data);
+                            list(, $data)      = explode(',', $data);
+                            $data = base64_decode($data);
+                            $filenameSignature = $data_arr['NIP'].'.png';
+                            file_put_contents('./uploads/signature/'.$filenameSignature, $data);
+                            $Logs->Signature= $filenameSignature;
+                        }
+
                         $Logs->Logs = null;
                         $Logs->isApproved = null;
                         $Logs->NoteApproved = null;

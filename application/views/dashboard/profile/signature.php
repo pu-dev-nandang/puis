@@ -89,28 +89,18 @@
 	});
 
 	(function( $ ) {
-		/**
-		* Private variables
-		**/
 		var isDragged		= false,
 			startPoint		= { x:0, y:0 },
 			templates 		= {
 								container 		: $('<div id="bcPaint-container"></div>'),
-								header 			: $('<div id="bcPaint-header"></div>'),
-								palette 		: $('<div id="bcPaint-palette"></div>'),
 								color 			: $('<div class="bcPaint-palette-color"></div>'),
 								canvasContainer : $('<div id="bcPaint-canvas-container"></div>'),
 								canvasPane 		: $('<canvas id="bcPaintCanvas"></canvas>'),
-								bottom 			: $('<div id="bcPaint-bottom"></div>'),
-								buttonReset 	: $('<button id="bcPaint-reset" type="button">Reset</button>'),
-								buttonSave		: $('<button id="bcPaint-export" type="button">Export</button>')
+								bottom 			: $('<div id="bcPaint-bottom"></div>')
 							},
 			paintCanvas,
 			paintContext;
 
-		/**
-		* Assembly and initialize plugin
-		**/
 		$.fn.bcPaint = function (options) {
 
 			return this.each(function () {
@@ -118,24 +108,16 @@
 					colorSet		= $.extend({}, $.fn.bcPaint.defaults, options),
 					defaultColor	= (rootElement.val().length > 0) ? rootElement.val() : colorSet.defaultColor,
 					container 		= templates.container.clone(),
-					header 			= templates.header.clone(),
-					palette 		= templates.palette.clone(),
 					canvasContainer = templates.canvasContainer.clone(),
 					canvasPane 		= templates.canvasPane.clone(),
 					bottom 			= templates.bottom.clone(),
-					buttonReset 	= templates.buttonReset.clone(),
-					buttonSave 		= templates.buttonSave.clone(),
 					color;
 
 				// assembly pane
 				rootElement.append(container);
-				//container.append(header);
 				container.append(canvasContainer);
 				container.append(bottom);
-				//header.append(palette);
 				canvasContainer.append(canvasPane);
-				//bottom.append(buttonReset);
-				//bottom.append(buttonSave);
 
 				// assembly color palette
 				$.each(colorSet.colors, function (i) {
@@ -192,14 +174,8 @@
 			});
 		}
 
-		/**
-		* Extend plugin
-		**/
 		$.extend(true, $.fn.bcPaint, {
 
-			/**
-			* Dispatch mouse event
-			*/
 			dispatchMouseEvent : function(e, mouseAction){
 				var touch = e.touches[0];
 				if(touch == undefined){
@@ -212,16 +188,10 @@
 				paintCanvas.dispatchEvent(mouseEvent);
 			},
 
-			/**
-			* Remove pane
-			*/
 			clearCanvas : function(){
 				paintCanvas.width = paintCanvas.width;
 			},
 
-			/**
-			* On mouse down
-			**/
 			onMouseDown : function(e){
 				isDragged = true;
 				// get mouse x and y coordinates
@@ -232,16 +202,10 @@
 				paintContext.moveTo(startPoint.x, startPoint.y);
 			},
 
-			/**
-			* On mouse up
-			**/
 			onMouseUp : function() {
 			    isDragged = false;
 			},
 
-			/**
-			* On mouse move
-			**/
 			onMouseMove : function(e){
 				if(isDragged){
 					paintContext.lineTo(e.offsetX, e.offsetY);
@@ -249,16 +213,10 @@
 				}
 			},
 
-			/**
-			* Set selected color
-			**/
 			setColor : function(color){
 				paintContext.strokeStyle = $.fn.bcPaint.toHex(color);
 			},
 
-			/**
-			*
-			*/
 			export : function(){
 				var imgData = paintCanvas.toDataURL('image/png');
 				var windowOpen = window.open('about:blank', 'Image');
@@ -271,9 +229,6 @@
 			},
 
 
-			/**
-			* Convert color to HEX value
-			**/
 			toHex : function(color) {
 			    // check if color is standard hex value
 			    if (color.match(/[0-9A-F]{6}|[0-9A-F]{3}$/i)) {
@@ -303,21 +258,12 @@
 
 		});
 
-		/**
-		* Default color set
-		**/
 		$.fn.bcPaint.defaults = {
 	        // default color
 	        defaultColor : '000000',
 
 	        // default color set
-	        colors : [
-						'000000', '444444', '999999', 'DDDDDD', '6B0100', 'AD0200',
-						'6B5E00', 'FFE000', '007A22', '00E53F', '000884', '000FFF'
-	        ],
-
-	        // extend default set
-	        addColors : [],
+	        colors : [],
 	    };
 
 	})(jQuery);
@@ -381,7 +327,7 @@
         if(!jQuery.isEmptyObject(myData)){
         	if(!jQuery.isEmptyObject(myData.Signature)){
         		$("#fetch-signature").removeClass("hidden");
-        		$("body #load-my-signature").attr("src",myData.Signature);
+        		$("body #load-my-signature").attr("src",base_url_js+"./uploads/signature/"+myData.Signature);
         	}
         }
     });
