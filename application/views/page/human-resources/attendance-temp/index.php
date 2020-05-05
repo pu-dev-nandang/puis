@@ -187,16 +187,7 @@
 	                                <th>Employee</th>
 	                                <th>Position</th>
 	                                <th>Day</th>
-	                                <th width="20%">First Login 
-	                                <div class="btn-group pull-right">
-	                                	<button class="btn btn-xs btn-default btn-sort" type="button" data-id="FirstLoginPortal" data-order="asc" title="sort ascending">
-	                                		<i class="fa fa-arrow-circle-up"></i>
-                                		</button>
-                                		<button class="btn btn-xs btn-default btn-sort" type="button" data-id="FirstLoginPortal" data-order="desc" title="sort ascending">
-	                                		<i class="fa fa-arrow-circle-down"></i>
-                                		</button>
-                            		</div>
-                            		</th>
+	                                <th width="20%">First Login</th>
 	                                <th>Last Login</th>
 	                                <th width="5%">Detail</th>
 	                            </tr>
