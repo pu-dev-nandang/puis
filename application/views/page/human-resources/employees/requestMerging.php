@@ -15,6 +15,7 @@
                 <li role="presentation"><a href="#educations" aria-controls="educations" role="tab" data-toggle="tab">Educations</a></li>
                 <li role="presentation"><a href="#training" aria-controls="training" role="tab" data-toggle="tab">Training</a></li>
                 <li role="presentation"><a href="#work-experience" aria-controls="work-experience" role="tab" data-toggle="tab">Work experience</a></li>
+                <li role="presentation"><a href="#signature" aria-controls="signature" role="tab" data-toggle="tab">Signature</a></li>
 		  	</ul>
       	</div>
       	<div class="content" style="overflow-y:auto;overflow-x:hidden;max-height:400px;padding:15px;border:1px solid #ddd;border-top:0px">
@@ -240,7 +241,9 @@
 					                                    <div class="col-sm-6">
 					                                        <div class="form-group">
 					                                            <label>Country</label>
+					                                            <?php if(!empty($request->CountryID)){ ?>
 					                                            <p><?=labelProfileDB("db_admission.country",array("ctr_code"=>$request->CountryID))->ctr_name?></p>
+					                                            <?php } ?>
 					                                        </div>
 					                                    </div>
 					                                    <?php if(!empty($request->ProvinceID)){ ?>
@@ -915,6 +918,34 @@
 			    			</div>
 			    		</div>
 			    	</div>			    	
+			    </div>
+			    <div role="tabpanel" class="tab-pane" id="signature">
+			    	<div class="row">
+			    	<div class="col-sm-6">
+			    		<div class="panel panel-default">
+				    		<div class="panel-heading">
+				    			<h4 class="panel-title">Original Data</h4>
+				    		</div>
+				    		<div class="panel-body">
+				    			<?php if(!empty($origin->Signature)){?>
+				    			<img src="<?=$origin->Signature?>" width="200px" class="img-thumbnail" >
+				    			<?php } ?>
+				    		</div>
+				    	</div>
+			    	</div>
+			    	<div class="col-sm-6">
+			    		<div class="panel panel-default">
+				    		<div class="panel-heading">
+				    			<h4 class="panel-title">Request Data</h4>
+				    		</div>
+				    		<div class="panel-body">
+				    			<?php if(!empty($request->Signature)){?>
+				    			<img src="<?=$request->Signature?>" width="200px" class="img-thumbnail" >
+				    			<?php } ?>
+				    		</div>
+				    	</div>
+			    	</div>
+			    	</div>
 			    </div>
 			  </div>
       	</div>

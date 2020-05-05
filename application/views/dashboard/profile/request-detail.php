@@ -18,6 +18,7 @@
                 <li role="presentation"><a href="#educations" aria-controls="educations" role="tab" data-toggle="tab">Educations</a></li>
                 <li role="presentation"><a href="#training" aria-controls="training" role="tab" data-toggle="tab">Training</a></li>
                 <li role="presentation"><a href="#work-experience" aria-controls="work-experience" role="tab" data-toggle="tab">Work experience</a></li>
+                <li role="presentation"><a href="#signature" aria-controls="signature" role="tab" data-toggle="tab">Signature</a></li>
             </ul>
             <div class="tab-content" style="overflow:auto;max-height:400px;border:1px solid #ddd;border-top:0px">
                 <div role="tabpanel" class="tab-pane active" id="personal-data">
@@ -414,6 +415,13 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="signature">
+                <?php if(!empty($detail->Signature)){?>
+                    <div class="text-center" style="padding:20px">
+                        <img class="img-thumbnail" src="<?=$detail->Signature?>" width="250px">
+                    </div>
+                <?php } ?>
                 </div>
             </div>
         </div>
