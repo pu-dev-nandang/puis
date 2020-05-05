@@ -12,6 +12,7 @@ class MY_Controller extends CI_Controller {
             $this->load->model('master/m_master');
             $this->load->model('m_menu');
             $this->load->model('m_menu2');
+            $this->load->model('m_menu3lpmi');
             // define config Virtual Account
             if (!defined('VA_client_id')) {
                 $getCFGVA = $this->m_master->showData_array('db_va.cfg_bank');
@@ -216,10 +217,12 @@ abstract class Student_Life extends Globalclass{
     }
 }
 
-abstract class Lpmi extends Globalclass{
+abstract class Lpmi_Controler extends Globalclass{
     public function __construct()
     {
         parent::__construct();
+        // $this->load->model('lpmi/m_lpmi');
+        $this->m_menu3lpmi->set_model('lpmi_sess','auth_lpmi_sess','menu_lpmi_sess','menu_lpmi_grouping','db_lpmi');
     }
 }
 
@@ -242,7 +245,7 @@ abstract class Admission_Controler extends Globalclass{
         $this->GetNameMenu();
     }
 
-    public $path_upload_regOnline = path_register_online.'document/';
+    // public $path_upload_regOnline = path_register_online.'document/';
 
     private function GetNameMenu()
     {
