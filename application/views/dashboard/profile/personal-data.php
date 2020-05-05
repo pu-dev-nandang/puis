@@ -266,7 +266,7 @@
                                                         </label>                                                                
                                                     </div>
                                                     <div class="alert alert-info">
-                                                        Dimention of this picture must 4x6 cm (472x709 pixels or 1,5x2,2 inches) and Maximum size 2MB
+                                                        Dimension of this picture must 4x6 cm (472x709 pixels or 1,5x2,2 inches) and Maximum size 2MB
                                                     </div>
                                                 </div>
                                             </div>
