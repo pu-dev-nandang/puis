@@ -1,3 +1,8 @@
+<script type="text/javascript">
+$(document).ready(function(){
+    $("body #container.fixed-header").addClass("sidebar-closed");
+});
+</script>
 <?php $message = $this->session->flashdata('message');
     if(!empty($message)){ ?>
     <script type="text/javascript">
@@ -76,6 +81,11 @@
                                 <i class="fa fa-handshake-o"></i> <?=strtoupper($employee->EmpStatus)?>
                                 </span>
                             </div>
+                            <?php if(!empty($employee->Signature)){ ?>
+                            <div class="text-right" style="margin-top:15px">
+                                <img src="<?=$employee->Signature?>" class="img-thumbnail" width="100px" title="<?=$employee->Name?> signature's">
+                            </div>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>

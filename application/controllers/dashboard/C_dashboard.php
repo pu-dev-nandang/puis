@@ -1072,6 +1072,18 @@ class C_dashboard extends Globalclass {
 
 
     /*ADDED BY FEBRI @ MARCH 2020*/
+    private function isItRealMe($NIP){
+        $myNIP = $this->session->userdata('NIP');
+        if($NIP == $myNIP){
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+            if(!empty($isExist)){
+                return $isExist;
+            }
+        }
+
+        return null;
+    }
+
     public function tab_menu_new_emp($page,$NIP){
         
         if(!empty($_GET['resubmit']) && !empty($_GET['data'])){
@@ -1096,19 +1108,22 @@ class C_dashboard extends Globalclass {
         $this->temp($content);       
     }
 
-    public function profile(){
-        $myNIP = $this->session->userdata('NIP');
-        $myName = $this->session->userdata('Name');
-        $param[] = array("field"=>"em.NIP","data"=>" = ".$myNIP." ","filter"=>"AND",);    
-        $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
-        $data['NIP'] = $myNIP;
-        $page = $this->load->view('dashboard/profile/personal-data',$data,true);
-        $this->tab_menu_new_emp($page,$myNIP);
+    public function profile($NIP){
+        $isExist = $this->isItRealMe($NIP);
+        if(!empty($isExist)){
+            $myNIP = $this->session->userdata('NIP');
+            $myName = $this->session->userdata('Name');
+            $param[] = array("field"=>"em.NIP","data"=>" = ".$myNIP." ","filter"=>"AND",);    
+            $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
+            $data['NIP'] = $myNIP;
+            $page = $this->load->view('dashboard/profile/personal-data',$data,true);
+            $this->tab_menu_new_emp($page,$myNIP);
+        }else{show_404();}
     }
 
 
     public function additionalInfo($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
@@ -1120,7 +1135,7 @@ class C_dashboard extends Globalclass {
 
 
     public function family($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $data['familytree'] = $this->General_model->fetchData("db_employees.master_family_relations",array("IsActive"=>1))->result();
@@ -1133,7 +1148,7 @@ class C_dashboard extends Globalclass {
 
 
     public function educations($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
@@ -1145,7 +1160,7 @@ class C_dashboard extends Globalclass {
 
 
     public function training($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $page = $this->load->view('dashboard/profile/training',$data,true);
@@ -1155,7 +1170,7 @@ class C_dashboard extends Globalclass {
 
 
     public function workExperience($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
@@ -1167,7 +1182,7 @@ class C_dashboard extends Globalclass {
 
 
     public function careerLevel($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $data['status'] = $this->General_model->fetchData("db_employees.master_status",array("IsActive"=>1))->result();
@@ -1185,11 +1200,22 @@ class C_dashboard extends Globalclass {
 
 
     public function departmentMember($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;            
             $data['detail'] = $isExist;            
             $page = $this->load->view('dashboard/profile/department-member',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function signature($NIP){
+        $isExist = $this->isItRealMe($NIP);
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;            
+            $data['detail'] = $isExist;            
+            $page = $this->load->view('dashboard/profile/signature',$data,true);
             $this->tab_menu_new_emp($page,$NIP);
         }else{show_404();}
     }
