@@ -1,5 +1,6 @@
 <style type="text/css">
     .my-request .data{padding: 15px}
+    .different{background: #10efc6;}
 </style>
 <div class="modal fade" id="modalReqProfile" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog modal-lg" role="document" style="width:80%">
@@ -9,7 +10,8 @@
         <h4 class="modal-title" id="myModalLabel">Detail Requested</h4>
       </div>
       <div class="modal-body">
-        <?php if(!empty($detail)){ ?>
+        <?php 
+        if(!empty($detail)){ ?>
         <div class="my-request">            
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active"><a href="#personal-data" aria-controls="personal-data" role="tab" data-toggle="tab">Personal data</a></li>
@@ -37,45 +39,45 @@
                             <div class="col-sm-3">                                
                                 <div class="form-group">
                                     <label>Number of ID Card</label>
-                                    <p><?=(!empty($detail->KTP) ? $detail->KTP : '-')?></p>
+                                    <p class="<?=(($origin->KTP != $detail->KTP) ? 'different':'')?>" ><?=(!empty($detail->KTP) ? $detail->KTP : '-')?></p>
                                 </div>
                                 <div class="form-group">
                                     <label>Gender</label>
-                                    <p><?=(!empty($detail->Gender) ? (($detail->Gender == 'L') ? 'Male':'Female') : '-' )?></p>
+                                    <p class="<?=(($origin->Gender != $detail->Gender) ? 'different':'')?>"><?=(!empty($detail->Gender) ? (($detail->Gender == 'L') ? 'Male':'Female') : '-' )?></p>
                                 </div>
                                 <div class="form-group">
                                     <label>Religion</label>
-                                    <p><?=(!empty($detail->Religion) ? $detail->Religion->Religion : '-')?></p>
+                                    <p class="<?=(!empty($detail->Religion) ? (($origin->ReligionID != $detail->Religion->IDReligion) ? 'different':'') : '')?>"><?=(!empty($detail->Religion) ? $detail->Religion->Religion : '-')?></p>
                                 </div>
                             </div>
                             <div class="col-sm-3">
                                 <?php if(!empty($detail->MaritalStatus)){ ?>
                                 <div class="form-group">
                                     <label>Marital </label>
-                                    <p><?=$detail->MaritalStatus->name?></p>
+                                    <p  class="<?=(!empty($detail->MaritalStatus) ? (($origin->MaritalStatus != $detail->MaritalStatus->ID) ? 'different':'') : '')?> ><?=$detail->MaritalStatus->name?></p>
                                 </div>
                                 <?php } ?>
                                 <div class="form-group">
                                     <label>Blood</label>
-                                    <p><?=(!empty($detail->Blood) ? $detail->Blood : '-')?></p>
+                                    <p class="<?=(($origin->Blood != $detail->Blood) ? 'different':'')?>" ><?=(!empty($detail->Blood) ? $detail->Blood : '-')?></p>
                                 </div>
                                 <div class="form-group">
                                     <label>Place of Birthdate</label>
-                                    <p><?=(!empty($detail->PlaceOfBirth) ? $detail->PlaceOfBirth : '-')?></p>
+                                    <p class="<?=(($origin->PlaceOfBirth != $detail->PlaceOfBirth) ? 'different':'')?>" ><?=(!empty($detail->PlaceOfBirth) ? $detail->PlaceOfBirth : '-')?></p>
                                 </div>                                
                             </div>
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label>Access Card Number</label>
-                                    <p><?=(!empty($detail->Access_Card_Number) ? $detail->Access_Card_Number : '-')?></p>
+                                    <p class="<?=(($origin->Access_Card_Number != $detail->Access_Card_Number) ? 'different':'')?>" ><?=(!empty($detail->Access_Card_Number) ? $detail->Access_Card_Number : '-')?></p>
                                 </div> 
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <p><?=(!empty($detail->Email) ? $detail->Email : '-')?></p>
+                                    <p class="<?=(($origin->Email != $detail->Email) ? 'different':'')?>"><?=(!empty($detail->Email) ? $detail->Email : '-')?></p>
                                 </div>                       
                                 <div class="form-group">
                                     <label>Mobile</label>
-                                    <p><?=(!empty($detail->HP) ? $detail->HP : '-')?></p>
+                                    <p  class="<?=(($origin->HP != $detail->HP) ? 'different':'')?>" ><?=(!empty($detail->HP) ? $detail->HP : '-')?></p>
                                 </div>                       
 
                             </div>
@@ -87,7 +89,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <label>Address</label>
-                                            <p><?=(!empty($detail->Address) ? $detail->Address : '-')?></p>
+                                            <p class="<?=(($origin->Address != $detail->Address) ? 'different':'')?>" ><?=(!empty($detail->Address) ? $detail->Address : '-')?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -95,39 +97,42 @@
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>Country</label>
-                                            <p><?=(!empty($detail->Country) ? $detail->Country->ctr_name : '-')?></p>
+                                            <p class="<?=(!empty($detail->Country) ? (($origin->CountryID != $detail->Country->ctr_code) ? 'different':'') : '')?>" >
+                                            <?=(!empty($detail->Country) ? $detail->Country->ctr_name : '-')?></p>
                                         </div>
                                     </div>
                                     <?php if(!empty($detail->Province)){ ?>
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>Province</label>
-                                            <p><?=$detail->Province->ProvinceName?></p>
+                                            <p class="<?=(!empty($detail->Province) ? (($origin->ProvinceID != $detail->Province->ProvinceID) ? 'different':'') : '')?>" >
+                                            <?=$detail->Province->ProvinceName?></p>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>Region</label>
-                                            <p><?=(!empty($detail->Region) ? $detail->Region->RegionName : '-')?></p>
+                                            <p class="<?=(!empty($detail->Region) ? (($origin->RegionID != $detail->Region->RegionID) ? 'different':'') : '')?>" >
+                                            <?=(!empty($detail->Region) ? $detail->Region->RegionName : '-')?></p>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>District</label>
-                                            <p><?=(!empty($detail->District) ? $detail->District->DistrictName : '-')?></p>
+                                            <p class="<?=(!empty($detail->District) ? (($origin->DistrictID != $detail->District->DistrictID) ? 'different':'') : '')?>" ><?=(!empty($detail->District) ? $detail->District->DistrictName : '-')?></p>
                                         </div>
                                     </div>
                                     <?php } ?>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Post Code</label>
-                                            <p><?=(!empty($detail->Postcode) ? $detail->Postcode : '-')?></p>
+                                            <p class="<?=(($origin->Postcode != $detail->Postcode) ? 'different':'')?>" ><?=(!empty($detail->Postcode) ? $detail->Postcode : '-')?></p>
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Phone</label>
-                                            <p><?=(!empty($detail->Phone) ? $detail->Phone : '-')?></p>
+                                            <p class="<?=(($origin->Phone != $detail->Phone) ? 'different':'')?>"><?=(!empty($detail->Phone) ? $detail->Phone : '-')?></p>
                                         </div>
                                     </div>
 
@@ -139,7 +144,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <label>Address</label>
-                                            <p><?=(!empty($detail->CurrAddress) ? $detail->CurrAddress : '-')?></p>
+                                            <p class="<?=(($origin->CurrAddress != $detail->CurrAddress) ? 'different':'')?>" ><?=(!empty($detail->CurrAddress) ? $detail->CurrAddress : '-')?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -147,13 +152,13 @@
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Post Code</label>
-                                            <p><?=(!empty($detail->CurrPostCode) ? $detail->CurrPostCode : '-')?></p>
+                                            <p class="<?=(($origin->CurrPostCode != $detail->CurrPostCode) ? 'different':'')?>" ><?=(!empty($detail->CurrPostCode) ? $detail->CurrPostCode : '-')?></p>
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Phone</label>
-                                            <p><?=(!empty($detail->CurrPhone) ? $detail->CurrPhone : '-')?></p>
+                                            <p class="<?=(($origin->CurrPhone != $detail->CurrPhone) ? 'different':'')?>" ><?=(!empty($detail->CurrPhone) ? $detail->CurrPhone : '-')?></p>
                                         </div>
                                     </div>
 
@@ -512,34 +517,7 @@
             });
         });
 
-        /*$("#modalReqProfile").on("click",".data-resubmit",function(){
-            var itsme = $(this);
-            var NIP = itsme.data("nip");
-            var data = {
-                NIP : NIP
-            };
-            var token = jwt_encode(data,'UAP)(*');
-            $.ajax({
-                type : 'POST',
-                url : base_url_js+"profile/resubmit-request",
-                data: {token:token},
-                dataType : 'json',
-                beforeSend :function(){
-                    itsme.prop("disabled",true);
-                },error : function(jqXHR){
-                    $("body #globalModal .modal-header").html("<h1>Error notification</h1>");
-                    $("body #globalModal .modal-body").html(jqXHR.responseText);
-                    $("body #globalModal").modal("show");
-                },success : function(response){
-                    toastr.success(response.message,'Info!');
-                    if(response.finish){
-                        loadRequest(NIP);
-                        $(".modal").modal("hide");
-                    }
-                }
-            });
-        });*/
-    
+
         $("#modalReqProfile").on("click",".data-resubmit",function(){
             loading_modal_show();
             var data = {
@@ -548,6 +526,7 @@
             $(this).prop("disabled","disabled");
             $(location).attr('href', base_url_js+'profile/'+window.sessionNIP+'?resubmit=yes&data='+jwt_encode(data,'UAP)(*'));
         });
+
 
         $("#modalReqProfile").on("click",".data-submit",function(){
             var itsme = $(this);
