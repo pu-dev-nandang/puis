@@ -928,7 +928,7 @@
 				    		</div>
 				    		<div class="panel-body">
 				    			<?php if(!empty($origin->Signature)){?>
-				    			<img src="<?=$origin->Signature?>" width="200px" class="img-thumbnail" >
+				    			<img src="<?=base_url('./uploads/signature/'.$origin->Signature)?>" width="200px" class="img-thumbnail" >
 				    			<?php } ?>
 				    		</div>
 				    	</div>
