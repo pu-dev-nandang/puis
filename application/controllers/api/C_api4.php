@@ -243,7 +243,8 @@ class C_api4 extends CI_Controller {
 
             }
 
-            $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd WHERE attd.ScheduleID = "'.$ScheduleID.'" 
+            $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd WHERE 
+                                                    attd.ScheduleID = "'.$ScheduleID.'" 
                                                     GROUP BY attd.ScheduleID')->result_array();
             $dataStd = [];
             if(count($dataAttd)>0){
@@ -272,6 +273,20 @@ class C_api4 extends CI_Controller {
                                                                     WHERE st.ScheduleID = "'.$ScheduleID.'"
                                                                      AND st.Session = "'.$Session.'" 
                                                                      AND std.NPM = "'.$d['NPM'].'"')->result_array();
+
+                    $dataStd[$i]['TotalTaskRevisi'] = $this->db->query('SELECT stsr.EntredAt, em.Name 
+                                                                                FROM db_academic.schedule_task_student_remove stsr 
+                                                                                LEFT JOIN db_academic.schedule_task st 
+                                                                                ON (st.ID = stsr.IDST)
+                                                                                LEFT JOIN db_employees.employees em 
+                                                                                ON (em.NIP = stsr.EntredBy) 
+                                                                                WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                                                AND st.Session = "'.$Session.'"
+                                                                                AND stsr.NPM = "'.$d['NPM'].'"
+                                                                                 ORDER BY stsr.ID ASC')
+                                                            ->result_array();
+
+
 
 
                     // Attendance
@@ -306,10 +321,18 @@ class C_api4 extends CI_Controller {
                 }
             }
 
+
+            $ScheduleTask = $this->db->get_where('db_academic.schedule_task',
+                array(
+                    'ScheduleID' => $ScheduleID,
+                    'Session' => $Session
+                ))->result_array();
+
             $result = array(
                 'Schedule' => $dataArrAttdID,
                 'Lecturer' => $dataLect,
-                'Student' => $dataStd
+                'Student' => $dataStd,
+                'ScheduleTask' => $ScheduleTask
             );
 
             return print_r(json_encode($result));
@@ -323,6 +346,17 @@ class C_api4 extends CI_Controller {
 
             if(count($dataCk)>0){
                 $d = $dataCk[0];
+
+                // Insert ke table remove
+                $data_arrIns = array(
+                    'IDST' => $d['IDST'],
+                    'NPM' => $d['NPM'],
+                    'EntredBy' => $data_arr['NIP']
+                );
+
+                $this->db->insert('db_academic.schedule_task_student_remove',$data_arrIns);
+                $this->db->reset_query();
+
                 // Cek apakah file ada atau tidak
                 if($d['File']!='' && $d['File']!=null){
                     $Path = './uploads/task/'.$d['File'];
@@ -413,7 +447,8 @@ class C_api4 extends CI_Controller {
                 $rangeSt = date('d/M/Y',strtotime($dataSes['RangeStart']));
                 $rangeEn = date('d/M/Y',strtotime($dataSes['RangeEnd']));
 
-                $bg = ($dataSes['Status']=='1' || $dataSes['Status']==1) ? 'background: #ffeb3b42;border: 1px solid #9E9E9E;border-radius: 5px;' : '';
+                $bg = ($dataSes['Status']=='1' || $dataSes['Status']==1)
+                    ? 'background: #ffeb3b42;border: 1px solid #9E9E9E;border-radius: 5px;' : '';
 
                 // Cek Topik
                 $viewCkTopik = ($dataSes['CheckTopik']>0)
@@ -429,7 +464,7 @@ class C_api4 extends CI_Controller {
 
                  $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
                                     '.$viewCkTopik.$viewTask.$viewMaterial.'
-                                    <a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" 
+                                    <a href="javascript:void(0);" data-active="'.$dataSes['Status'].'" data-schid="'.$row['ScheduleID'].'" 
                                     data-session="'.$s.'" data-start="'.$dataSes['RangeStart'].'" 
                                     data-end="'.$dataSes['RangeEnd'].'" class="btnAdmShowAttendance">
                                     <div style="font-size: 10px;color: #607d8b;margin-top: 5px;font-weight: bold;">
