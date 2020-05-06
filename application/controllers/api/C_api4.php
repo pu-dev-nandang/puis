@@ -413,7 +413,8 @@ class C_api4 extends CI_Controller {
                 $rangeSt = date('d/M/Y',strtotime($dataSes['RangeStart']));
                 $rangeEn = date('d/M/Y',strtotime($dataSes['RangeEnd']));
 
-                $bg = ($dataSes['Status']=='1' || $dataSes['Status']==1) ? 'background: #ffeb3b42;border: 1px solid #9E9E9E;border-radius: 5px;' : '';
+                $bg = ($dataSes['Status']=='1' || $dataSes['Status']==1)
+                    ? 'background: #ffeb3b42;border: 1px solid #9E9E9E;border-radius: 5px;' : '';
 
                 // Cek Topik
                 $viewCkTopik = ($dataSes['CheckTopik']>0)
@@ -429,7 +430,7 @@ class C_api4 extends CI_Controller {
 
                  $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
                                     '.$viewCkTopik.$viewTask.$viewMaterial.'
-                                    <a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" 
+                                    <a href="javascript:void(0);" data-active="'.$dataSes['Status'].'" data-schid="'.$row['ScheduleID'].'" 
                                     data-session="'.$s.'" data-start="'.$dataSes['RangeStart'].'" 
                                     data-end="'.$dataSes['RangeEnd'].'" class="btnAdmShowAttendance">
                                     <div style="font-size: 10px;color: #607d8b;margin-top: 5px;font-weight: bold;">

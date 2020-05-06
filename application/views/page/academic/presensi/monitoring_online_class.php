@@ -135,6 +135,8 @@
         var RangeStart = $(this).attr('data-start');
         var RangeEnd = $(this).attr('data-end');
         var dataRow = JSON.parse($('#text_'+ScheduleID).val());
+        var PanelActive = $(this).attr('data-active');
+
 
 
         var data = {
@@ -227,9 +229,14 @@
             if(jsonResult.Student.length>0){
                 $.each(jsonResult.Student,function (i,v) {
                     var Forum = (parseInt(v.TotalComment)>0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
+
+                    var btnRemoveTask = (parseInt(PanelActive)==1 && v.TotalTask.length>0)
+                        ? '<a href="javascript:void(0);" class="btnRemoveTask" data-id="'+v.TotalTask[0].ID+'">Remove</a></div>'
+                        : '';
+
                     var Task = (v.TotalTask.length>0)
                         ? '<div id="viewTask_'+v.TotalTask[0].ID+'"><i class="fa fa-check" style="color: green;"></i>' +
-                            '<a href="javascript:void(0);" class="btnRemoveTask" data-id="'+v.TotalTask[0].ID+'">Remove</a></div>'
+                            btnRemoveTask
                         : '-';
 
                     var check = (parseInt(v.SessionAttend)==parseInt(v.SessionAttendSch)) ? 'checked' : '';
