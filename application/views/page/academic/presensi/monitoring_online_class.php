@@ -12,6 +12,12 @@
     .checkbox.checbox-switch label > input:checked + span:before, .checkbox-inline.checbox-switch > input:checked + span:before {
         left: 9px !important;
     }
+
+    .btnTaskRevisi {
+        padding: 0px 5px;
+        border-radius: 8px;
+        font-size: 10px !important;
+    }
 </style>
 
 <div class="row">
@@ -130,6 +136,8 @@
 
     $(document).on('click','.btnAdmShowAttendance',function () {
 
+        loading_modal_show();
+
         var ScheduleID = $(this).attr('data-schid');
         var Session = $(this).attr('data-session');
         var RangeStart = $(this).attr('data-start');
@@ -148,6 +156,8 @@
         var url = base_url_js+'api4/__crudOnlineClass';
 
         $.post(url,{token:token},function (jsonResult) {
+
+            var ScheduleTask = jsonResult.ScheduleTask;
 
             var modalID = '#GlobalModal';
             $(modalID+' .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -248,9 +258,31 @@
                     '           </label>' +
                     '       </div>' ;
 
+                    var IDST = (ScheduleTask.length>0) ? ScheduleTask[0].ID : 0;
+                    var viewRevisiTask = '';
+                    if(v.TotalTaskRevisi.length>0){
+
+                        var viewDetailRevisi = '';
+                        $.each(v.TotalTaskRevisi,function (ir,vr) {
+                            var tm = moment(vr.EntredAt).format('DD MMM YYYY HH:mm');
+                            viewDetailRevisi = viewDetailRevisi+'<li style="text-align: left;font-size: 10px;"> Allowed revisions by <span style="color: blue;">'+vr.Name+' '+tm+'</span></li>';
+                        });
+
+                        viewRevisiTask = '<div style="float: right;"><button data-idst="'+IDST+'" data-toggle="collapse" data-target="#collapseExample_'+IDST+'" class="btn btn-danger btnTaskRevisi">Task revision '+v.TotalTaskRevisi.length+'</button></div>' +
+                            '<div class="collapse" id="collapseExample_'+IDST+'"><div class="well" style="padding-left: 0px;padding-right: 0px;">' +
+                            '<ol style="-webkit-padding-start:15px;">'+viewDetailRevisi+'</ol>' +
+                            '</div></div>';
+                    }
+
+
+
+
+
                     viewStd = viewStd+'<tr>' +
                         '<td>'+(i+1)+'</td>' +
-                        '<td style="text-align: left;"><b>'+v.Name+'</b><br/>'+v.NPM+'</td>' +
+                        '<td style="text-align: left;">'+viewRevisiTask+'<b>'+v.Name+'</b><br/>'+v.NPM+'' +
+                        '' +
+                        '</td>' +
                         '<td>'+Forum+'</td>' +
                         '<td>'+Task+'</td>' +
                         '<td>'+isPresent+'</td>' +
@@ -295,6 +327,8 @@
                 'show' : true,
                 'backdrop' : 'static'
             });
+
+            loading_modal_hide();
 
         });
 
@@ -388,7 +422,8 @@
            var ID = $(this).attr('data-id');
            var data = {
                action : 'removeTaskStudent',
-               ID : ID
+               ID : ID,
+               NIP : sessionNIP
            };
            var token = jwt_encode(data,'UAP)(*');
            var url = base_url_js+'api4/__crudOnlineClass';
