@@ -1108,6 +1108,7 @@ class C_dashboard extends Globalclass {
         $this->temp($content);       
     }
 
+
     public function profile($NIP){
         $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
@@ -1425,7 +1426,7 @@ class C_dashboard extends Globalclass {
             $subdata = array();
             if(!empty($isExist)){
                 if(!empty($isExist->Logs)){
-                    $Logs = json_decode($isExist->Logs);
+                    $Logs = json_decode($isExist->Logs); unset($isExist->Logs);
                     
                     if(!empty($Logs->ReligionID)){
                         $Logs->Religion = $this->General_model->fetchData("db_employees.religion",array("IDReligion"=>$Logs->ReligionID))->row();                        
@@ -1445,6 +1446,7 @@ class C_dashboard extends Globalclass {
                             $Logs->District = $this->General_model->fetchData("db_admission.district",array("DistrictID"=>$Logs->DistrictID))->row();
                         }
                     }
+                    $subdata['origin'] = $isExist;
                     $subdata['detail'] = $Logs;
                     if(!empty($isExist->NoteApproved)){
                         $subdata['Note'] = $isExist->NoteApproved;
