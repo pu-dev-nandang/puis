@@ -131,7 +131,7 @@
                                         <tbody>
                                             <tr class="bpjs-1">
                                                 <td>1</td>
-                                                <td>Ketenagajerjaan</td>
+                                                <td>Ketenagakerjaan</td>
                                                 <td><input type="hidden" name="Type[]" class="form-control required number bpjs-Type" value="1">
                                                     <input type="text" name="CardNumber[]" class="form-control required number bpjs-IDBpjstk" readonly>
                                                     <small class="text-danger text-message"></small></td>
