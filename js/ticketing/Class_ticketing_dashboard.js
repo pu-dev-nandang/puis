@@ -11,6 +11,9 @@ class Class_ticketing_dashboard {
 
 	LoadDefault = async (selectorMonth,selectorYear,selectorShow,selectorShowToday,PageToday,PageDashboardAll) => {
 		let cls = this;
+		$('#datetimepickerFilterDashboard').datetimepicker({
+		    format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false
+		});
 		(await (cls.LoadMonth(selectorMonth))).LoadYear(selectorYear);
 		
 		this.PageToday(selectorShowToday,PageToday);
@@ -73,6 +76,10 @@ class Class_ticketing_dashboard {
 		      	Hjwtkey : Hjwtkey,
 		      }
 		      let dateToday = moment().format('YYYY-MM-DD').toString();
+		      if ($('#dateFilterDashboard').length) {
+		      	dateToday = $('#dateFilterDashboard').val();
+		      }
+		      
 		      	if (!$('#SelectDepartmentID').length) {
 			      var dataform = {
 			          action : 'dashboard_graph_ticket_date',
@@ -384,6 +391,9 @@ class Class_ticketing_dashboard {
 		        },
 		        data : function(token){
 		        	let dateToday = moment().format('YYYY-MM-DD').toString();
+		        	if ($('#dateFilterDashboard').length) {
+		        		dateToday = $('#dateFilterDashboard').val();
+		        	}
 		              // Read values
 		              if (!$('#SelectDepartmentID').length) {
 		              	var data = {
@@ -673,3 +683,9 @@ class Class_ticketing_dashboard {
 		}));
 	}
 }
+
+$(document).on('click','.btnSearchDateDashboard',function(e){
+	let selectorShowToday = $('#OpShowToday');
+	let PageToday = $('#PageToday');
+	App_ticketing_dashboard.PageToday(selectorShowToday,PageToday);
+})

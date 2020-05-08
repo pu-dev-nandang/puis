@@ -1,3 +1,6 @@
+<style>.day-week{background: yellow;padding: 5px;border-radius: 5px;}
+    .day-week.bg-danger{background: #51a351;color:#fff;}
+    .day-week.bg-success{background: #dd5600;color:#fff;}</style>
 <script type="text/javascript">
 	function fetchActivities() {
 		var filtering = $("#form-filter").serialize();		
@@ -5,16 +8,12 @@
         var token = jwt_encode({Filter : filtering},'UAP)(*');
         var dataTable = $('#fetch-data-tables #table-list-data').DataTable( {
             "destroy": true,
+            "ordering" : false,
             "retrieve":true,
             "processing": true,
             "serverSide": true,
-            "iDisplayLength" : 10,
-            "ordering" : false,
+            "iDisplayLength" : 5,
             "responsive": true,
-            "language": {
-                "searchPlaceholder": "NIP, or Name"
-            },
-            "lengthMenu": [[10, 25, 50], [10, 25, 50]],
             "ajax":{
                 url : base_url_js+'my-team/fetchActivities', // json datasource
                 ordering : false,
@@ -56,11 +55,26 @@
             		"data":"DivisionMain_",
             		"render": function (data, type, row, meta) {
             			var label = data+"-"+row.PositionMain_;
+            			if($.trim(row.PositionOther1).length > 0){
+            				label += '<br>'+row.PositionOther1;
+            			}
+            			if($.trim(row.PositionOther2).length > 0){
+            				label += '<br>'+row.PositionOther2;
+            			}
+            			if($.trim(row.PositionOther3).length > 0){
+            				label += '<br>'+row.PositionOther3;
+            			}
+
+            			
             			return label;
             		}            		
             	},
             	{
-            		"data":"TotalActivity"            		
+            		"data":"FirstLoginPortalDay",
+            		"render": function(data, type, row, meta){
+            			var label = '<span class="day-week bg-'+((row.FirstLoginPortalDayNum > 5) ? 'success':'danger')+'">'+data+'</span>';
+            			return label;
+            		}
             	},
             	{
             		"data":"FirstLoginPortal"            		
@@ -72,7 +86,7 @@
             		"data":"NIP",
             		"render": function (data, type, row, meta) {
             			var label = '<button class="btn btn-info btn-detail" data-date="'+row.FirstLoginPortal+'" data-id="'+data+'"><i class="fa fa-folder-open"></i></button>';
-            			return label;
+            			return '-';
             		}
             	},
         	]
@@ -122,7 +136,7 @@
 	    	$('body #my-team-activity #fetch-data-tables #table-list-data').DataTable().destroy();
 	        fetchActivities();
 	        var startDate = $("#form-filter input[name=attendance_start]").val();
-	        $("#attendance-temporary .result .panel-title >span").text(startDate).addClass("bg-success");
+	        $("#activity-team .panel-title >span").text(startDate).addClass("bg-success");
 	    });
 
 	    $("#table-list-data").on("click",".btn-detail",function(){
@@ -181,6 +195,31 @@
 		                <input type="text" class="form-control" name="staff" placeholder="NIP or Name">               
 		              </div>
 		            </div>
+		            <?php if(!empty($division)){ ?>
+		            <div class="col-sm-3">
+		              <div class="form-group">
+		                <label>Division</label>               
+		                <select class="form-control" name="division">
+		                  <option value="">-Choose one-</option>
+		                  <?php foreach ($division as $d) {
+		                  echo '<option value="'.$d->ID.'">'.$d->Division.'</option>';
+		                  } ?>
+		                </select>
+		              </div>
+		            </div>
+		            <div class="col-sm-3">
+		              <div class="form-group">
+		                <label>Position</label>               
+		                <select class="form-control" name="position" disabled>
+		                  <option value="">-Choose one-</option>
+		                  <?php foreach ($position as $p) {
+		                  echo '<option value="'.$p->ID.'">'.$p->Description.'</option>';
+		                  } ?>
+		                </select>               
+		              </div>
+		            </div>
+		            <?php } ?>
+
 		            <div class="col-sm-3">
 		              <div class="form-group">
 		                <label>Attendance Day</label>
@@ -293,7 +332,7 @@
 	<div class="result">
 		<div class="row">
 			<div class="col-md-12">
-		      <div class="panel panel-default">
+		      <div class="panel panel-default" id="activity-team">
 		        <div class="panel-heading">            
 		          <h4 class="panel-title"><i class="fa fa-bars"></i> List of record activities your team <span>Today (<?= date('d F Y') ?>)</span></h4>
 		        </div>
@@ -306,7 +345,7 @@
 	                                <th>NIP</th>
 	                                <th>Employee</th>
 	                                <th>Position</th>
-	                                <th>Total Activity</th>
+	                                <th>Day</th>
 	                                <th>First Login</th>
 	                                <th>Last Login</th>
 	                                <th width="5%">Detail</th>

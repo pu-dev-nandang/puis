@@ -458,6 +458,7 @@
                                             <select class="form-control" id="formStatusLecturer">
                                                 <option>* Not Set</option>
                                             </select>
+                                            <small class="text-danger text-message"></small>
                                         </div>
                                     </div>
                                     <div class="col-xs-3">
@@ -910,6 +911,8 @@
 
         var itsme = $(this);
         var itsform = itsme.parent().parent();
+        var error=false;
+        
         itsform.find(".select2-req").each(function(){
             var value = $(this).val();
             if($.isNumeric(value)){
@@ -940,6 +943,93 @@
                 $(this).parent().find(".text-message").text("");
             }
         });
+
+        //only for lecturer
+        var isLecturer = false;
+        var PositionDM = $("body #form_MainDivision > option:selected");
+        var attr = PositionDM.attr("value");
+        var PositionPM = $("body #form_MainPosition > option:selected");
+        var attr2 = PositionPM.attr("value");
+
+        if ((typeof attr !== typeof undefined && attr !== false) && (typeof attr2 !== typeof undefined && attr2 !== false) ) {
+            var value = PositionDM.val();
+            var value2 = PositionPM.val();
+            if(($.trim(value).length > 0) && ($.trim(value2).length > 0) ){
+                if(value == '14' && value2 == '7'){
+                    isLecturer = true;
+                }
+            }
+        }
+
+        //Position Other
+        var PositionOTH1DM = $("body #form_Other1Division > option:selected");
+        var attrOTH1 = PositionOTH1DM.attr("value");
+        var PositionOTH1PM = $("body #form_Other1Position > option:selected");
+        var attrOTH12 = PositionOTH1PM.attr("value");
+
+        if ((typeof attrOTH1 !== typeof undefined && attrOTH1 !== false) && (typeof attrOTH12 !== typeof undefined && attrOTH12 !== false) ) {
+            var valueOTH1 = PositionOTH1DM.val();
+            var valueOTH12 = PositionOTH1PM.val();
+            if(($.trim(valueOTH1).length > 0) && ($.trim(valueOTH12).length > 0) ){
+                if(valueOTH1 == '14' && valueOTH12 == '7'){
+                    isLecturer = true;
+                }
+            }
+        }
+
+
+        var PositionOTH2DM = $("body #form_Other2Division > option:selected");
+        var attrOTH2 = PositionOTH2DM.attr("value");
+        var PositionOTH2PM = $("body #form_Other2Position > option:selected");
+        var attrOTH22 = PositionOTH2PM.attr("value");
+
+        if ((typeof attrOTH2 !== typeof undefined && attrOTH2 !== false) && (typeof attrOTH22 !== typeof undefined && attrOTH22 !== false) ) {
+            var valueOTH2 = PositionOTH2DM.val();
+            var valueOTH22 = PositionOTH2PM.val();
+            if(($.trim(valueOTH2).length > 0) && ($.trim(valueOTH22).length > 0) ){
+                if(valueOTH2 == '14' && valueOTH22 == '7'){
+                    isLecturer = true;
+                }
+            }
+        }
+
+
+
+        var PositionOTH3DM = $("body #form_Other3Division > option:selected");
+        var attrOTH3 = PositionOTH3DM.attr("value");
+        var PositionOTH3PM = $("body #form_Other3Position > option:selected");
+        var attrOTH32 = PositionOTH3PM.attr("value");
+
+        if ((typeof attrOTH3 !== typeof undefined && attrOTH3 !== false) && (typeof attrOTH32 !== typeof undefined && attrOTH32 !== false) ) {
+            var valueOTH3 = PositionOTH3DM.val();
+            var valueOTH32 = PositionOTH3PM.val();
+            if(($.trim(valueOTH3).length > 0) && ($.trim(valueOTH32).length > 0) ){
+                if(valueOTH3 == '14' && valueOTH32 == '7'){
+                    isLecturer = true;
+                }
+            }
+        }
+        
+        
+        
+        if(isLecturer){
+            var statusLecturerVA = itsform.find("#formStatusLecturer > option:selected").attr("value");
+            var statusLecturer = itsform.find("#formStatusLecturer > option:selected").val();
+                console.log("c:"+statusLecturer);
+            if(typeof statusLecturerVA !== typeof undefined && statusLecturerVA !== false){
+                console.log("v:"+statusLecturerVA);
+                  error=true;
+            }else{
+                if($.trim(statusLecturer).length > 0){
+                    itsform.find("#formStatusLecturer").addClass("required");
+                    itsform.find("#formStatusLecturer").parent().find(".text-message").text("Please fill this field");
+                    error=false;
+                }    
+            }
+            
+        }
+        
+        
         
         var totalError = itsform.find(".error").length;
         if(error && totalError == 0 ){
@@ -947,8 +1037,9 @@
             updateEmployees();
         }else{
             alert("Please fill out the field.");
-        }
-
+        } 
+        
+        
     });
 
     $('#btnUpdate').click(function () {

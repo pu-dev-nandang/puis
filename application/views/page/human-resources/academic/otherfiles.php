@@ -89,8 +89,15 @@ $(document).ready(function () {
 
     $('#fileOther').change(function (event) {
         $('#element1').empty();
-        var file = URL.createObjectURL(event.target.files[0]);
-        $('#element1').append('<br/><iframe src="' + file + '" style="width:250px; height:100;" frameborder="0"></iframe>' );
+        var sizeFile = event.target.files[0].size;
+        if(sizeFile < 5000000){
+            var file = URL.createObjectURL(event.target.files[0]);
+            $('#element1').append('<br/><iframe src="' + file + '" style="width:250px; height:100;" frameborder="0"></iframe>' );
+            $(".btnSaveFiles").prop("disabled",false);
+        }else{
+            alert("Size of this file is too large. ");
+            $(".btnSaveFiles").prop("disabled",true);
+        }
     });
 
 
@@ -415,6 +422,13 @@ $(document).ready(function () {
     $(document).on('click','.btnSubmitKatOtherFiles', function () {
         var name_katother = $('#name_kat_otherfiles').val();
         var name_sort = $('#name_sort').val();
+        var pattern =new RegExp("[!@#%&=+$^/]");
+
+        if(pattern.test(name_sort)){
+          toastr.error('Sorry, name sort cannot input symbols!','Error');
+          
+        }
+        else {
 
         if(name_sort!='' && name_sort!=null
             && name_katother!='' && name_katother!=null
@@ -453,6 +467,7 @@ $(document).ready(function () {
             } else {
                 toastr.warning('All form is required','Warning');
             }
+        }
     });
    
 $('#btnSaveEditFiles').click(function () {  

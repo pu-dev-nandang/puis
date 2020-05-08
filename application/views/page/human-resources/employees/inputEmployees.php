@@ -432,6 +432,7 @@
                                             <select class="form-control" id="formStatusLecturer">
                                                 <option>* Not Set</option>
                                             </select>
+                                            <small class="text-danger text-message"></small>
                                         </div>
                                     </div>
                                     <div class="col-xs-3">
@@ -680,6 +681,7 @@
     $('#btnSave').click(function () {
         var itsme = $(this);
         var itsform = itsme.parent().parent();
+        
         itsform.find(".select2-req").each(function(){
             var value = $(this).val();
             if($.isNumeric(value)){
@@ -710,6 +712,23 @@
                 $(this).parent().find(".text-message").text("");
             }
         });
+
+        //only for lecturer
+        var prody = $("body #formProgrammeStudy > option:selected");
+        var attr = prody.attr("value");
+        if (typeof attr !== typeof undefined && attr !== false) {
+            var value = prody.val();
+            if($.trim(value).length > 0){
+                var statusLecturer = itsform.find("#formStatusLecturer").val();
+                console.log(statusLecturer);
+                if($.trim(statusLecturer).length > 0){
+                    itsform.find("#formStatusLecturer").addClass("required");
+                    itsform.find("#formStatusLecturer").parent().find(".text-message").text("Please fill this field");
+                    error=false;
+                }
+                
+            }else{error=true;}
+        }
         
         var totalError = itsform.find(".error").length;
         if(error && totalError == 0 ){

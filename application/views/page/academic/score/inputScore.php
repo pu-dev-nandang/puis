@@ -85,20 +85,21 @@
                 '        <div class="table-responsive">'+
                 '            <table id="tableScore" class="table table-striped table-bordered table-hover">'+
                 '                <thead><tr>'+
-                '                    <th rowspan="2">No</th>'+
-                '                    <th rowspan="2">Students</th>'+
+                '                    <th rowspan="2" style="width: 1%;">No</th>'+
+                '                    <th rowspan="2" style="width: 10%;">Students</th>'+
                 '                    <th colspan="5">Assigment ( '+Grade_Assigment+' % )</th>'+
-                '                    <th rowspan="2" style="width: 10%;">UTS<br/>( '+Grade_UTS+' % )</th>'+
-                '                    <th rowspan="2" style="width: 10%;">UAS<br/>( '+Grade_UAS+' % )</th>'+
-                '                    <th rowspan="2" style="width: 10%;">Score</th>'+
-                '                    <th rowspan="2" style="width: 10%;">Grade</th>'+
+                '                    <th rowspan="2" style="width: 7%;">UTS<br/>( '+Grade_UTS+' % )</th>'+
+                '                    <th rowspan="2" style="width: 7%;">UAS<br/>( '+Grade_UAS+' % )</th>'+
+                '                    <th rowspan="2" style="width: 7%;">Score</th>'+
+                '                    <th rowspan="2">Grade</th>'+
+                '                    <th rowspan="2" style="width: 20%;">Status</th>'+
                 '                </tr>' +
                 '<tr>' +
-                '                    <td style="width: 10%;">Assg 1 : ('+Grade_Assig1+' %)</td>'+
-                '                    <td style="width: 10%;">Assg 2 : ('+Grade_Assig2+' %)</td>'+
-                '                    <td style="width: 10%;">Assg 3 : ('+Grade_Assig3+' %)</td>'+
-                '                    <td style="width: 10%;">Assg 4 : ('+Grade_Assig4+' %)</td>'+
-                '                    <td style="width: 10%;">Assg 5 : ('+Grade_Assig5+' %)</td>'+
+                '                    <td style="width: 7%;">Assg 1 : ('+Grade_Assig1+' %)</td>'+
+                '                    <td style="width: 7%;">Assg 2 : ('+Grade_Assig2+' %)</td>'+
+                '                    <td style="width: 7%;">Assg 3 : ('+Grade_Assig3+' %)</td>'+
+                '                    <td style="width: 7%;">Assg 4 : ('+Grade_Assig4+' %)</td>'+
+                '                    <td style="width: 7%;">Assg 5 : ('+Grade_Assig5+' %)</td>'+
                 '</tr>' +
                 '</thead>'+
                 '                <tbody id="dtRow"></tbody>'+
@@ -108,7 +109,7 @@
                 ''+
                 '    <div style="text-align: right;margin-bottom: 15px;">'+
                 '        <hr/>' +
-                '<button class="btn btn-warning btn-bg" id="btnBackFromInputScore">Back</button>'+
+                '<button class="btn btn-warning btn-bg hide" id="btnBackFromInputScore">Back</button>'+
                 '        <button class="btn btn-bg btn-success" id="btnSaveScore">Save</button>'+
                 '    </div>');
 
@@ -160,6 +161,12 @@
                 var viewScore = (dtsc.Score!=null) ? '<b>'+dtsc.Score+'</b>' : '-';
                 var viewGrade = (dtsc.Grade!=null) ? '<b '+color+'>'+dtsc.Grade+'</b>' : '-';
 
+                var optStatus = '<select class="form-control" id="formStatus'+dtsc.NPM+'" data-id="'+dtsc.NPM+'">' +
+                    '<option value="0">UTS Need Approval</option>' +
+                    '<option value="1">UTS Approved</option>' +
+                    '<option value="2">UAS Approved</option>' +
+                    '</select>';
+
                 tr.append('<tr>' +
                     '<th>'+(no++)+'</th>' +
                     '<th style="font-weight: normal;text-align: left;"><b>'+nameStd+'</b> ' +
@@ -179,7 +186,13 @@
                     '                               <input class="hide" hidden readonly id="formGrade'+dtsc.NPM+'" value="'+formGrade+'" />' +
                     '                               <input class="hide" hidden readonly id="formGradeValue'+dtsc.NPM+'" value="'+formGradeValue+'" />' +
                     '                       </td>' +
+                    '                       <td>'+optStatus+'</td>' +
                     '                    </tr>');
+
+                if(dtsc.Approval!=null && dtsc.Approval!='') {
+                    $('#formStatus'+dtsc.NPM).val(dtsc.Approval);
+                }
+
 
                 dataIDStudyPlanning.push(dtsc.NPM);
             }
@@ -188,5 +201,154 @@
             disabledAssigment(parseInt(dataMK.TotalAssigment));
         });
         
+    }
+</script>
+
+<script>
+    $(document).on('change','#formTotalAsg',function () {
+        var valu = $('#formTotalAsg').val();
+
+        disabledAssigment(valu);
+    });
+
+    function disabledAssigment(valu) {
+        $('.formAsg').prop('disabled',false);
+        for(var d=(parseInt(valu)+1); d<=5;d++ ){
+            $('.formAsg'+d).val(0).prop('disabled',true);
+        }
+        for(var i=0;i<dataIDStudyPlanning.length;i++){
+            countScore(dataIDStudyPlanning[i]);
+        }
+    }
+
+
+    $(document).on('keyup','.formScore',function () {
+        var ID = $(this).attr('data-id');
+        if($(this).val()>100){
+            $(this).val(100);
+        } else if($(this).val()<0){
+            $(this).val(0);
+        }
+        countScore(ID);
+
+    });
+    $(document).on('change','.formScore',function () {
+        var ID = $(this).attr('data-id');
+        if($(this).val()>100){
+            $(this).val(100);
+        } else if($(this).val()<0){
+            $(this).val(0);
+        }
+        countScore(ID);
+    });
+    $(document).on('blur','.formScore',function () {
+        var ID = $(this).attr('data-id');
+        if($(this).val()==''){
+            $(this).val(0);
+        }
+        if($(this).val()>100){
+            $(this).val(100);
+        } else if($(this).val()<0){
+            $(this).val(0);
+        }
+        countScore(ID);
+    });
+
+    $(document).on('click','#btnSaveScore',function () {
+
+        loading_buttonSm('#btnSaveScore');
+        $('#btnBackFromInputScore').prop('disabled',true);
+
+        loading_modal_show();
+
+        var formUpdate = [];
+        for(var i=0;i<dataIDStudyPlanning.length;i++){
+            var da = {
+                DB_Student : $('#db_student'+dataIDStudyPlanning[i]).val(),
+                ID : $('#db_student_ID'+dataIDStudyPlanning[i]).val(),
+                dataForm : {
+                    Evaluasi1 : $('#formAsg1'+dataIDStudyPlanning[i]).val(),
+                    Evaluasi2 : $('#formAsg2'+dataIDStudyPlanning[i]).val(),
+                    Evaluasi3 : $('#formAsg3'+dataIDStudyPlanning[i]).val(),
+                    Evaluasi4 : $('#formAsg4'+dataIDStudyPlanning[i]).val(),
+                    Evaluasi5 : $('#formAsg5'+dataIDStudyPlanning[i]).val(),
+                    UTS : $('#formUTS'+dataIDStudyPlanning[i]).val(),
+                    UAS : $('#formUAS'+dataIDStudyPlanning[i]).val(),
+                    Score : $('#formScoreValue'+dataIDStudyPlanning[i]).val(),
+                    Grade : $('#formGrade'+dataIDStudyPlanning[i]).val(),
+                    GradeValue : $('#formGradeValue'+dataIDStudyPlanning[i]).val(),
+                    Approval : $('#formStatus'+dataIDStudyPlanning[i]).val()
+                }
+
+            };
+
+            formUpdate.push(da);
+        }
+
+        var ScheduleID = $('#formScheduleID').val();
+        var TotalAssigment = $('#formTotalAsg').val();
+
+        var url = base_url_js+'api/__crudScore';
+        var token = jwt_encode({action:'update',ScheduleID:ScheduleID,TotalAssigment:TotalAssigment,formUpdate:formUpdate},'UAP)(*');
+        $.post(url,{token:token},function (resultJson) {
+            toastr.success('Score Saved','Success!');
+            $('#btnSaveScore').prop('disabled',false).html('Save');
+            $('#btnBackFromInputScore').prop('disabled',false);
+            setTimeout(function () {
+                loading_modal_hide();
+            },1000);
+
+        });
+
+    });
+
+    function countScore(ID) {
+        var TotalAsg = $('#formTotalAsg').val();
+
+        var TotalAsgValue = 0;
+        var arryAssg = [Grade_Assig1,Grade_Assig2,Grade_Assig3,Grade_Assig4,Grade_Assig5];
+        var arS = 0;
+        for(var a=1;a<=TotalAsg;a++){
+            var n = ($('#formAsg'+a+''+ID).val()!='') ? $('#formAsg'+a+''+ID).val() * (arryAssg[arS]/100) : 0;
+            TotalAsgValue = TotalAsgValue + parseFloat(n);
+            arS++;
+        }
+
+        // Misal => tugas 30%, UTS 35%, UAS 35%
+
+        // var AvgAsg = (parseFloat(TotalAsgValue) / parseInt(TotalAsg)) * (Grade_Assigment/100);
+        var AvgAsg = (parseFloat(TotalAsgValue)) * (Grade_Assigment/100);
+        var AvgUTS = parseFloat($('#formUTS'+ID).val()) * (Grade_UTS/100);
+        var AvgUAS = parseFloat($('#formUAS'+ID).val()) * (Grade_UAS/100);
+
+        var TotalScore = AvgAsg + AvgUTS + AvgUAS;
+        var Score = parseFloat(TotalScore).toFixed(2);
+        $('#score'+ID).html('<b>'+Score+'</b>');
+        $('#formScoreValue'+ID).val(Score);
+
+        var url = base_url_js+'api/__crudScore';
+        var token = jwt_encode({action:'grade',Score:Score},'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+
+            var color = '';
+            if(jsonResult.Grade=='A' || jsonResult.Grade=='A-') {
+                color = 'style="color:green;"';
+            }
+            else if(jsonResult.Grade=='B+' || jsonResult.Grade=='B' || jsonResult.Grade=='B-'){
+                color = 'style="color:blue;"';
+            }
+            else if(jsonResult.Grade=='C+' || jsonResult.Grade=='C'){
+                color = 'style="color:#dc8300;"';
+            }
+            else if(jsonResult.Grade=='D' || jsonResult.Grade=='E'){
+                color = 'style="color:red;"';
+            }
+
+            $('#grade'+ID).html('<b '+color+'>'+jsonResult.Grade+'</b>');
+            $('#formGrade'+ID).val(jsonResult.Grade);
+            $('#formGradeValue'+ID).val(jsonResult.Score);
+
+        });
+
     }
 </script>

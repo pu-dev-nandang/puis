@@ -778,48 +778,12 @@ class C_api extends CI_Controller {
 
         }
 
-        // $totalData = $this->db->get_where($db_.'.students',$arryWhere
-        // )->result_array();
-        $sqlTotalData = 'select count(*) as total  FROM '.$db_.'.students s
-                                                      LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
-                                                      LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
-                                                      LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)
-                                                      LEFT JOIN db_admission.to_be_mhs asx ON (ast.NPM = asx.NPM)
-                                                      LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
-
-                        ';
-
-        if( !empty($requestData['search']['value']) ) {
-            if ($dataWhere == '') {
-                $dataWhere = ' where ';
-            }
-            else
-            {
-                $dataWhere .= ' AND ';
-            }
-            $sqlTotalData.= '  '.$dataWhere.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
-            $sqlTotalData.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
-            $sqlTotalData.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
-            $sqlTotalData.= ' OR asx.FormulirCode LIKE "'.$requestData['search']['value'].'%" ';
-            $sqlTotalData.= ' OR emp.Name LIKE "'.$requestData['search']['value'].'%" )';
-            $sqlTotalData.= ' ORDER BY s.NPM, s.ProdiID ASC';
-        }
-        else {
-            $sqlTotalData.= '';
-        }
-
-        // print_r($sqlTotalData);
-
-        $query = $this->db->query($sqlTotalData)->result_array();
-        $totalData = $query[0]['total'];
-        // )->result_array();
-
-
         // -------------total data---------- //
-
-        $sql = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, ps.Name AS ProdiNameInd,s.StatusStudentID,
+        $sqlSelectData  = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, ps.Name AS ProdiNameInd,s.StatusStudentID,
                           ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth,
-                          ast.EmailPU,asx.GeneratedBy,emp.Name as NameGeneratedBy,asx.No_Ref
+                          ast.EmailPU,asx.GeneratedBy,emp.Name as NameGeneratedBy,asx.No_Ref';
+        $sqlSelectTotal = 'select 1';
+        $sql = '
                           FROM '.$db_.'.students s
                           LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
                           LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
@@ -835,15 +799,7 @@ class C_api extends CI_Controller {
                           ) as asx on ast.NPM = asx.NPM
                           LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
                           ';
-
         if( !empty($requestData['search']['value']) ) {
-            // if ($dataWhere == '') {
-            //     $dataWhere = ' where ';
-            // }
-            // else
-            // {
-            //     $dataWhere .= ' AND ';
-            // }
             $sql.= '  '.$dataWhere.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
@@ -853,12 +809,21 @@ class C_api extends CI_Controller {
             $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
         }
         else {
-            $sql.= ' '.$dataWhere.' ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            $sql.= ' '.$dataWhere;
         }
+
+        $OrderLimit = ' ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         // print_r($sql);die();
 
-        $query = $this->db->query($sql)->result_array();
+        $query = $this->db->query($sqlSelectData.$sql.$OrderLimit)->result_array();
+
+        $totalData = $this->db->query(
+            'select count(*) as total from (
+                '.$sqlSelectTotal.$sql.'
+            )xx
+             '
+        )->row()->total;
 
         $data = array();
         for($i=0;$i<count($query);$i++){
@@ -888,19 +853,6 @@ class C_api extends CI_Controller {
             $nestedData[] = '<a href="javascript:void(0);" data-npm="'.$row["NPM"].'" data-ta="'.$row["ClassOf"].'" class="btnDetailStudent"><b>'.$row["Name"].'</b></a><br/>'.$row["NPM"];
             $nestedData[] = '<div style="text-align: center;"><button class="btn btn-inverse btn-notification btn-show" NPM="'.$row["NPM"].'" Name = "'.$row["Name"].'">Show</button></div>';
             $nestedData[] = '<div style="text-align: center;">'.$Gender.'</div>';
-            // $nestedData[] = '<div class="dropdown">
-            //                       <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            //                         <i class="fa fa-pencil-square-o"></i>
-            //                         <span class="caret"></span>
-            //                       </button>
-            //                       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            //                         <li><a href="javascript:void(0);" class="btn-edit-student " data-npm="'.$row["NPM"].'" ta = "'.$db_.'">Edit Student</a></li>
-            //                         <li role="separator" class="divider"></li>
-            //                         <li><a href="javascript:void(0);" class="btn-reset-password " data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Reset Password</a></li>
-            //                         <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row["EmailPU"].'" data-year="'.$dataYear.'" data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Change Status</a></li>
-
-            //                       </ul>
-            //                     </div>';
             $nestedData[] = $row["ProdiNameInd"];
             $nestedData[] = '<div style="text-align: center;"><i class="fa fa-circle" '.$label.'></i></div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["NameGeneratedBy"].'</div>';
@@ -3407,9 +3359,11 @@ class C_api extends CI_Controller {
 //                    <li><a target="_blank" href="'.base_url('save2pdf/news-event').'">Berita Acara</a></li>
             $re = ($data_arr['Type']=='re_uts' || $data_arr['Type']=='re_uas') ? 'hide' : '';
 
-            $actDelete = ($row['ExamDate']>=$dateNow)
+            $actDelete = ($row['ExamDate']>$dateNow)
                 ? '<li role="separator" class="divider"></li><li><a class="btnDeleteExam" data-id="'.$row['ID'].'" href="javascript:void(0);" style="color: red;">Delete</a></li>'
                 : '';
+
+            $actUploadTask = ($row['ExamDate']>$dateNow) ? '1' : '0';
 
             $act = '<div  style="text-align:center;"><div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -3417,6 +3371,7 @@ class C_api extends CI_Controller {
                   </button>
                   <ul class="dropdown-menu">
                     <li class="'.$re.'"><a href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Edit</a></li>
+                    <li><a href="javascript:void(0);" class="uploadSoal" data-id="'.$row['ID'].'" data-act="'.$actUploadTask.'">Upload Exam Task</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a target="_blank" href="'.base_url('save2pdf/exam-layout/'.$row['ID']).'">Layout</a></li>
                     <li><a class="btnSave2PDF_Exam" href="javascript:void(0);" data-url="save2pdf/draft_questions_answer_sheet" data-token="'.$tkn_soal_jawaban.'">Draft Questions  & Answer Sheet</a></li>
@@ -5884,7 +5839,6 @@ class C_api extends CI_Controller {
 
                 return print_r(1);
 
-//                $data = $this->m_api->
             }
             else if($data_arr['action']=='readSchedule'){
 
@@ -5964,6 +5918,19 @@ class C_api extends CI_Controller {
 
                 $this->db->where('ExamID', $ExamID);
                 $this->db->delete(array('db_academic.exam_group','db_academic.exam_details'));
+
+                // Remove file
+                $dataFl = $this->db->get_where('exam_task',
+                    array('ExamID'=> $ExamID))->result_array();
+
+                if(count($dataFl)>0){
+                    $path = './uploads/task-exam/'.$dataFl[0]['File'];
+                    if(file_exists($path)){
+                        unlink($path);
+                    }
+                    $this->db->where('ExamID', $ExamID);
+                    $this->db->delete('exam_task');
+                }
 
                 return print_r(1);
             }
@@ -8712,10 +8679,25 @@ class C_api extends CI_Controller {
                                           LEFT JOIN db_academic.record_input_score ris_uas ON (ris_uas.ScheduleID = sc.ID AND ris_uas.Type="uas")
                                         WHERE ('.$whereP.' ) '.$whereType.' '.$dataSearch.' '.$orderBy.' ';
 
+
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT sdc.ID
+                                                                FROM db_academic.schedule_details_course sdc
+                                                                LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
+                                                                LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
+                                                                LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                                LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                                LEFT JOIN db_academic.grade_course gc
+                                                                ON (gc.SemesterID = sc.SemesterID AND gc.ScheduleID = sc.ID)
+                                                                LEFT JOIN db_academic.record_input_score ris_uts 
+                                                                ON (ris_uts.ScheduleID = sc.ID AND ris_uts.Type="uts")
+                                                                LEFT JOIN db_academic.record_input_score ris_uas 
+                                                                ON (ris_uas.ScheduleID = sc.ID AND ris_uas.Type="uas")
+                                                                WHERE ('.$whereP.' ) '.$whereType.' '.$dataSearch.') xx';
+
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
         $no = $requestData['start'] + 1;
         $data = array();
@@ -8734,9 +8716,19 @@ class C_api extends CI_Controller {
                 $StatusGrade = '<i class="fa fa-times-circle" style="color: darkred;"></i>';
             }
 
+            $data_input_score = array(
+                'NIP' => $row['Coordinator'],
+                'SemesterID' => $data_arr['SemesterID'],
+                'ScheduleID' => $row['ScheduleID'],
+
+            );
+
+            $tkn = $this->jwt->encode($data_input_score,'UAP)(*');
+            $url_input_score = base_url().'academic/score/inputScore/'.$tkn;
+
             $btnAct = '<div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="caret"></span></button>
                 <ul class="dropdown-menu">
-                <li><a href="javascript:void(0);" class="btnInputScore" data-nip="'.$row['Coordinator'].'" data-smt="'.$data_arr['SemesterID'].'" data-id="'.$row['ScheduleID'].'">Input Score</a></li>
+                <li><a href="'.$url_input_score.'" target="_blank">Input Score</a></li>
                 <li><a href="javascript:void(0);" class="btnGrade" data-page="InputGrade1" data-group="'.$row['ClassGroup'].'" data-id="'.$row['ScheduleID'].'">Approval - Score Weighted</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="javascript:void(0);" class="inputScheduleExchange" data-no="'.$no.'" data-id="">Cetak Report UTS</a></li>
@@ -8774,8 +8766,8 @@ class C_api extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefaultRow)),
-            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval($queryDefaultRow),
             "data"            => $data
         );
         echo json_encode($json_data);
@@ -10569,7 +10561,7 @@ class C_api extends CI_Controller {
 
             $totalData = $this->Globalinformation_model->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
-            if(!empty($reqdata['start']) && !empty($reqdata['length'])){
+            if(!empty($reqdata['length'])){
                 $result = $this->Globalinformation_model->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
             }else{
                 $result = $this->Globalinformation_model->fetchEmployee(false,$param)->result();

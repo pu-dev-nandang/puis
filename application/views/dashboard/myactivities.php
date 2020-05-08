@@ -63,9 +63,44 @@
         });
         /*END ADDED BY FEBRI @ MARCH 2020*/
     });
+	
+	function reconfirmAttd() {
+        if(confirm('Are you sure?')) {
+            loading_modal_show();
+
+            var dataURL = window.location.href;
+
+            var url = base_url_js+'api3/__crudLogging';
+
+            var data = {
+                action : 'insertLog',
+                dataForm : {
+                    NIP : sessionNIP,
+                    UserID : sessionNIP,
+                    IPPublic : '',
+                    URL : dataURL
+                }
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+
+            $.post(url,{token:token},function (result) {
+                getDataLog();
+                toastr.success('Data saved', 'Success');
+
+
+                setTimeout(function () {
+                    loading_modal_hide();
+                }, 1000);
+            });
+
+
+
+        }
+    }
 
     function getDataLog() {
-        $('#loadTable').html('<table class="table table-striped" id="tableDataLog">' +
+        $('#loadTable').html('<div style="text-align:right;margin-bottom:20px;"><button onclick="reconfirmAttd()" class="btn btn-lg btn-success">Reconfirm attendance</button></div><table class="table table-striped" id="tableDataLog">' +
             '            <thead>' +
             '            <tr>' +
             '                <th style="width: 1%;">No</th>' +

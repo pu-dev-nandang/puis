@@ -322,6 +322,7 @@ $(document).ready(function(){
     }
 
     $(document).ready(function(){
+        $("body #container.fixed-header").addClass("sidebar-closed");
         $("body").on("keyup keydown",".number",function(){
             this.value = this.value.replace(/[^0-9\.]/g,'');
         });
@@ -592,6 +593,7 @@ $(document).ready(function(){
                         <li class="nv-training" ><a href="<?=site_url('profile/training/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-list-alt"></i> Training</a></li>
                         <li class="nv-experience" ><a href="<?=site_url('profile/work-experience/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-briefcase"></i> Work Experience</a></li>
                         <li class="nv-department" ><a href="<?=site_url('profile/department/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-building"></i> Department Member</a></li>
+                        <li class="nv-signature" ><a href="<?=site_url('profile/signature/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-pencil-square-o"></i> Signature</a></li>
                       </ul>
                     </div>
                 </div>

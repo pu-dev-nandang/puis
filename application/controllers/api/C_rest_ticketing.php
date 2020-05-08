@@ -468,4 +468,27 @@ class C_rest_ticketing extends CI_Controller {
       echo json_encode($rs);
     }
 
+    public function load_ticketing_report(){
+      try {
+        $rs = [];
+        $dataToken = $this->getInputToken();
+        $action = $dataToken['action'];
+        switch ($action) {
+          case 'category':
+            $rs = $this->m_ticketing->report_category($dataToken);
+            echo json_encode($rs);
+            break;
+          case 'worker' : 
+            $rs = $this->m_ticketing->report_worker($dataToken);
+            echo json_encode($rs);
+            break;
+          default:
+            # code...
+            break;
+        }
+      } catch (Exception $e) {
+        echo json_encode($e);
+      }
+    }
+
 }

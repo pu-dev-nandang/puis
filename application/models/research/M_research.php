@@ -196,4 +196,117 @@ class M_research extends CI_Model {
     	}
     }
 
+    public function QueryUserReserachJoin($IDJoin,$aliasTable = 'usrr'){
+      $sql = ' left join (
+            select * from (
+            select CONCAT("ekm.",ID) as ID_user,Nama,NIDN,NIP as NIPorNPM,Email from db_research.master_user_research
+            where TypeUser = "Mahasiswa"
+            UNION ALL
+            select CONCAT("ekd.",ID) as ID_user,Nama,NIDN,NIP as NIPorNPM,Email from db_research.master_user_research
+            where TypeUser != "Mahasiswa"
+            UNION ALL
+            select CONCAT("mhs.",NPM) as ID_user,Name as Nama,"",NPM as NIPorNPM,EmailPU from
+            db_academic.auth_students
+            UNION ALL
+            select CONCAT("dsn.",NIP) as ID_user,Name as Nama,NIDN,NIP as NIPorNPM,EmailPU from db_employees.employees
+        )'.$aliasTable.')'.$aliasTable.' on '.$IDJoin.'='.$aliasTable.'.ID_user';
+      return $sql;
+    }
+
+    public function dtSrvSide_research_eksternal($parameter){
+        $requestData = $parameter['request'];
+        $ID_user = $parameter['ID_user'];
+        $AddwherePost = [];
+        $where='';
+        if(!empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $AddwherePost[] = array('field'=>'(a.`'.'Judul_litabmas'.'`','data'=>' like "%'.$search.'%"' ,'filter' =>' AND ');     
+            $AddwherePost[] = array('field'=>'c.`'.'Nama'.'`','data'=>' like "'.$search.'%" )' ,'filter' =>' OR ');     
+        }
+
+        if (array_key_exists('filter', $parameter) ) {
+            $filter  = $parameter['filter'];
+            foreach ($filter as $row => $v) {
+                if ($row == 'status' && $v != 'all') {
+                    $AddwherePost[] = array('field'=>'c.`'.'Reviewer_confirm'.'`','data'=>' = "'.$v.'"' ,'filter' =>' And '); 
+                }
+            }
+            
+        }
+
+        if(!empty($AddwherePost)){
+          $where = ' WHERE ';
+          $counter = 0;
+          foreach ($AddwherePost as $key => $value) {
+              if($counter==0){
+                  $where = $where.$value['field']." ".$value['data'];
+              }
+              else{
+                  $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+              }
+              $counter++;
+          }
+        }
+
+        $select1 = 'select 1';
+        $selectdata = 'SELECT a.ID_litabmas, a.Judul_litabmas, a.ID_thn_usulan, a.ID_thn_laks,  a.ID_skim, b.Nm_skim, a.Lama_kegiatan, a.Last_update, a.Status_data, xx.Name, a.Jenis_usulan,c.Reviewer_confirm,c.Nama as NamaReviewer,c.ID_list_anggota';
+
+        $fromData = ' FROM db_research.litabmas AS a 
+                    left JOIN db_research.skim_kegiatan AS b ON (b.Kd_skim = a.ID_skim)
+                    JOIN db_employees.employees AS xx ON (xx.NIP = a.NIP)
+                    JOIN (
+                            select lap.ID_litabmas,lap.ID_anggota,lap.Reviewer_confirm,map.ID_user,map.Type_anggota,map.Luar_internal,usr.Nama,lap.ID as ID_list_anggota
+                            from db_research.list_anggota_penelitian as lap,
+                            db_research.master_anggota_penelitian as map
+                            '.$this->QueryUserReserachJoin('map.ID_user','usr').' 
+                            where
+                            lap.ID_anggota = map.ID
+                            AND map.ID_user = "'.$ID_user.'" 
+                            AND map.Type_anggota = "REV" and Luar_internal = "0"
+                        ) as c on a.ID_litabmas = c.ID_litabmas ';
+
+        $addSql = ' LIMIT
+            '.$requestData['start'].' , '.$requestData['length'];
+
+
+        $totalData = $this->db->query(
+            'select count(*) as total from 
+            (
+               '.$select1.' '.$fromData.' '.$where.' 
+            )xx
+
+            '
+        )->row()->total;
+
+        $queryData = $this->db->query(
+            $selectdata.' '.$fromData.' '.$where.' '.$addSql
+        )->result_array();
+
+        // print_r($this->db->last_query());die();
+
+        $No = (int)$requestData['start'] + 1;
+        $data = array();
+        for ($i=0; $i < count($queryData); $i++) { 
+          $row = $queryData[$i];
+          $nestedData = array();
+          $nestedData[] = $No;
+          foreach ($row as $key => $value) {
+            $nestedData[] = $value;
+          }
+          $tokenRow = $this->jwt->encode($row,"UAP)(*");
+          $nestedData['data'] = $tokenRow;
+          $data[] = $nestedData;
+          $No++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData ),
+            "recordsFiltered" => intval( $totalData ),
+            "data"            => $data,
+        );
+
+        return $json_data;
+    }
+
 }    

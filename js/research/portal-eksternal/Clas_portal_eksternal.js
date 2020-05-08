@@ -25,7 +25,7 @@ class Clas_portal_eksternal extends Clas_global_portal_eksternal {
 									'<thead>'+
 										'<tr>'+
 											'<th style ="width:3%">No</th>'+
-											'<th style = "width:30%;">Nama & Email,</br>NIP & NIDN</th>'+
+											'<th style = "width:30%;">Nama,Email,ID Master</th>'+
 											'<th style = "width:30%;">Type As</th>'+
 											'<th>Action</th>'+
 										'</tr>'+
@@ -563,15 +563,15 @@ class Clas_portal_eksternal extends Clas_global_portal_eksternal {
 		            	const Email = (decodedata['Email'] != '' && decodedata['Email'] != null) ? decodedata['Email'] : '-';
 		            	let NIP = '-';
 		            	let NIDN = '-';
+		            	let ID = decodedata['ID'];
 		            	if (decodedata['TypeUser'] == 'Dosen') {
-		            		NIP = (decodedata['NIP'] != '' && decodedata['NIP'] != null) ? decodedata['NIP'] : '-';
-		            		NIDN = (decodedata['NIDN'] != '' && decodedata['NIDN'] != null) ? decodedata['NIDN'] : '-';
+		            		ID = 'ekd.'+ID;
 		            	}
 		            	else if(decodedata['TypeUser'] == 'Mahasiswa'){
-		            		NIP = (decodedata['NIM'] != '' && decodedata['NIM'] != null) ? decodedata['NIM'] : '-';
+		            		ID = 'ekm.'+ID;
 		            	}
 		            	
-		                let html = '<label>'+Nama+'</label><br/><span style="color :blue">'+Email+'</span><br/><span style="color:green">'+NIP+'</span> & <span>'+NIDN+'</span>';
+		                let html = '<label>'+Nama+'</label><br/><span style="color :blue">'+Email+'</span><br/><span style="color:red">'+ID+'</span>';
 		                return html;
 		            }
 		        },

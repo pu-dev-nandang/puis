@@ -16,7 +16,9 @@
         <li class="<?php if($this->uri->segment(2)=='ticket-list') { echo 'active'; } ?>">
             <a href="<?php echo base_url('ticket/ticket-list'); ?>">Ticket List</a>
         </li>
-
+        <li class="<?php if($this->uri->segment(2)=='ticket-report') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('ticket/ticket-report'); ?>">Ticket Report</a>
+        </li>
         <li class="<?php if($this->uri->segment(2)=='setting') { echo 'active'; } ?>">
             <a href="<?php echo base_url('ticket/setting'); ?>">Setting</a>
         </li>
@@ -66,7 +68,7 @@
         }
     }
 
-    function LoadSelectOptionStatusTicket(selector,selectedata=2){
+    function LoadSelectOptionStatusTicket(selector,selectedata=2,report=0){
         var url =base_url_js+"rest_ticketing/__CRUDStatusTicket";
         var dataform = {
             action : 'read',
@@ -76,13 +78,19 @@
         AjaxLoadRestTicketing(url,token).then(function(response){
           selector.empty();
           response =  response.data;
-          selector.append(
-               '<option value = "'+'%'+'" '+'selected'+' >'+'All'+'</option>'
-           );
+          if (report == 0) {
+            selector.append(
+                 '<option value = "'+'%'+'" '+'selected'+' >'+'All'+'</option>'
+             );
+          }
+          
           for (var i = 0; i < response.length; i++) {
              var selected = (response[i][1] == selectedata) ? 'selected' : '';
+             if (report == 1 && response[i][1] == 4) {
+              continue;
+             }
              selector.append(
-                  '<option value = "'+response[i][1]+'" '+''+' >'+response[i][2]+'</option>'
+                  '<option value = "'+response[i][1]+'" '+selected+' >'+response[i][2]+'</option>'
               );
           }
         })
@@ -252,8 +260,10 @@
             var row = data_received[i];
             var GetWorker = '';
             var DataReceived_Details = row.DataReceived_Details;
-              // GetWorker += '<p style = "color:blue;">Notes :</p>';
-              // GetWorker += '<p style = "color:blue;">'+nl2br(row.MessageReceived)+'</p>';
+              GetWorker += '<div class = "thumbnail" style = "padding:10px;background-color:antiquewhite;">';
+              GetWorker += '<p style = "color:blue;">Note for worker  :</p>';
+              GetWorker += '<p style = "color:blue;">'+nl2br(row.MessageReceived)+'</p>';
+              GetWorker += '</div>';
             if (DataReceived_Details.length >  0) {
               GetWorker += '<table class = "table" style ="margin-top:15px;">'+
                               '<tr>'+

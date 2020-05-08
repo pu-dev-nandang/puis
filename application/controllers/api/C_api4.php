@@ -206,7 +206,7 @@ class C_api4 extends CI_Controller {
                                                              LEFT JOIN db_academic.counseling_topic ct ON (ct.ID = cc.TopicID)
                                                             WHERE ct.ScheduleID = "'.$ScheduleID.'" 
                                                             AND ct.Sessions = "'.$Session.'"
-                                                             AND ct.CreateBy = "'.$d['NIP'].'" ) xx  
+                                                             AND cc.UserID = "'.$d['NIP'].'" ) xx  
                                                              ')->result_array()[0]['Total'];
 
                     // Cek Task
@@ -223,7 +223,6 @@ class C_api4 extends CI_Controller {
                                                                              AND sm.Session = "'.$Session.'" ')->result_array();
 
                     // Cek Attendance
-                    $SessionAttend = 0;
                     if(count($dataArrAttdID)>0){
                         $whereAttd = '';
                         for ($r=0;$r<count($dataArrAttdID);$r++){
@@ -231,7 +230,10 @@ class C_api4 extends CI_Controller {
                             $whereAttd = $whereAttd.$or.' (al.ID_Attd = "'.$dataArrAttdID[$r]['ID_Attd'].'" AND Meet = "'.$Session.'") ';
                         }
 
-                        $SessionAttend = $this->db->query('SELECT * FROM db_academic.attendance_lecturers al WHERE al.NIP = "'.$d['NIP'].'" AND '.$whereAttd)->result_array();
+                        $SessionAttend = $this->db->query('SELECT * 
+                                                                    FROM db_academic.attendance_lecturers al 
+                                                                    WHERE al.NIP = "'.$d['NIP'].'" 
+                                                                    AND ( '.$whereAttd.') GROUP BY al.ID_Attd')->result_array();
                     }
 
                     $dataLect[$i]['SessionAttend'] = count($SessionAttend);
@@ -241,7 +243,8 @@ class C_api4 extends CI_Controller {
 
             }
 
-            $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd WHERE attd.ScheduleID = "'.$ScheduleID.'" 
+            $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd WHERE 
+                                                    attd.ScheduleID = "'.$ScheduleID.'" 
                                                     GROUP BY attd.ScheduleID')->result_array();
             $dataStd = [];
             if(count($dataAttd)>0){
@@ -265,11 +268,25 @@ class C_api4 extends CI_Controller {
                                                     AND cc.UserID = "'.$d['NPM'].'" ')->result_array()[0]['Total'];
 
                     // Task
-                    $dataStd[$i]['TotalTask'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task_student std
+                    $dataStd[$i]['TotalTask'] = $this->db->query('SELECT std.ID FROM db_academic.schedule_task_student std
                                                                     LEFT JOIN db_academic.schedule_task st ON (st.ID = std.IDST)
                                                                     WHERE st.ScheduleID = "'.$ScheduleID.'"
                                                                      AND st.Session = "'.$Session.'" 
-                                                                     AND std.NPM = "'.$d['NPM'].'"')->result_array()[0]['Total'];
+                                                                     AND std.NPM = "'.$d['NPM'].'"')->result_array();
+
+                    $dataStd[$i]['TotalTaskRevisi'] = $this->db->query('SELECT stsr.EntredAt, em.Name 
+                                                                                FROM db_academic.schedule_task_student_remove stsr 
+                                                                                LEFT JOIN db_academic.schedule_task st 
+                                                                                ON (st.ID = stsr.IDST)
+                                                                                LEFT JOIN db_employees.employees em 
+                                                                                ON (em.NIP = stsr.EntredBy) 
+                                                                                WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                                                AND st.Session = "'.$Session.'"
+                                                                                AND stsr.NPM = "'.$d['NPM'].'"
+                                                                                 ORDER BY stsr.ID ASC')
+                                                            ->result_array();
+
+
 
 
                     // Attendance
@@ -304,13 +321,57 @@ class C_api4 extends CI_Controller {
                 }
             }
 
+
+            $ScheduleTask = $this->db->get_where('db_academic.schedule_task',
+                array(
+                    'ScheduleID' => $ScheduleID,
+                    'Session' => $Session
+                ))->result_array();
+
             $result = array(
                 'Schedule' => $dataArrAttdID,
                 'Lecturer' => $dataLect,
-                'Student' => $dataStd
+                'Student' => $dataStd,
+                'ScheduleTask' => $ScheduleTask
             );
 
             return print_r(json_encode($result));
+        }
+        else if($data_arr['action']=='removeTaskStudent'){
+
+            $ID = $data_arr['ID'];
+
+            $dataCk = $this->db->get_where('db_academic.schedule_task_student',
+                array('ID' => $ID))->result_array();
+
+            if(count($dataCk)>0){
+                $d = $dataCk[0];
+
+                // Insert ke table remove
+                $data_arrIns = array(
+                    'IDST' => $d['IDST'],
+                    'NPM' => $d['NPM'],
+                    'EntredBy' => $data_arr['NIP']
+                );
+
+                $this->db->insert('db_academic.schedule_task_student_remove',$data_arrIns);
+                $this->db->reset_query();
+
+                // Cek apakah file ada atau tidak
+                if($d['File']!='' && $d['File']!=null){
+                    $Path = './uploads/task/'.$d['File'];
+                    if(file_exists($Path)){
+                        unlink($Path);
+                    }
+                }
+
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_academic.schedule_task_student');
+
+            }
+
+            return print_r(1);
+
         }
 
     }
@@ -386,7 +447,8 @@ class C_api4 extends CI_Controller {
                 $rangeSt = date('d/M/Y',strtotime($dataSes['RangeStart']));
                 $rangeEn = date('d/M/Y',strtotime($dataSes['RangeEnd']));
 
-                $bg = ($dataSes['Status']=='1' || $dataSes['Status']==1) ? 'background: #ffeb3b42;border: 1px solid #9E9E9E;border-radius: 5px;' : '';
+                $bg = ($dataSes['Status']=='1' || $dataSes['Status']==1)
+                    ? 'background: #ffeb3b42;border: 1px solid #9E9E9E;border-radius: 5px;' : '';
 
                 // Cek Topik
                 $viewCkTopik = ($dataSes['CheckTopik']>0)
@@ -402,7 +464,7 @@ class C_api4 extends CI_Controller {
 
                  $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
                                     '.$viewCkTopik.$viewTask.$viewMaterial.'
-                                    <a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" 
+                                    <a href="javascript:void(0);" data-active="'.$dataSes['Status'].'" data-schid="'.$row['ScheduleID'].'" 
                                     data-session="'.$s.'" data-start="'.$dataSes['RangeStart'].'" 
                                     data-end="'.$dataSes['RangeEnd'].'" class="btnAdmShowAttendance">
                                     <div style="font-size: 10px;color: #607d8b;margin-top: 5px;font-weight: bold;">
@@ -522,6 +584,79 @@ class C_api4 extends CI_Controller {
 
             return print_r(json_encode($data));
 
+        }
+
+    }
+
+    public function crudBlockStudent(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='EditingDateBlock'){
+
+            $ID = $data_arr['ID'];
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!=''){
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('block',$dataForm);
+                $this->db->reset_query();
+                $insert_id = $ID;
+            } else {
+                $dataForm['CreatedBy'] = $this->session->userdata('NIP');
+                $dataForm['CreatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->insert('block',$dataForm);
+                $insert_id = $this->db->insert_id();
+                $this->db->reset_query();
+            }
+
+            $this->db->where('IDBlock',$insert_id);
+            $this->db->delete('db_academic.block_student');
+            $this->db->reset_query();
+            for($i=0;$i<count($data_arr['dataStudent']);$i++){
+                $d = (array) $data_arr['dataStudent'][$i];
+                $arrIns = array(
+                    'IDBlock' => $insert_id,
+                    'NPM' => $d['NPM']
+                );
+                $this->db->insert('db_academic.block_student',$arrIns);
+            }
+
+            return print_r(1);
+
+        }
+
+        else if($data_arr['action']=='getDataBlock'){
+            $data = $this->db->query('SELECT b.*, em.Name AS CreatedByName, em2.Name AS UpdatedByName FROM db_academic.block b 
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = b.CreatedBy)
+                                                LEFT JOIN db_employees.employees em2 ON (em2.NIP = b.UpdatedBy) ')->result_array();
+
+            if(count($data)>0){
+
+                for($i=0;$i<count($data);$i++){
+                    $data[$i]['Students'] = $this->db->query('SELECT ats.NPM, ats.Name FROM db_academic.block_student bs 
+                                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = bs.NPM)
+                                                                    WHERE bs.IDBlock = "'.$data[$i]['ID'].'" ')->result_array();
+                }
+
+            }
+
+            return print_r(json_encode($data));
+        }
+
+        else if($data_arr['action']=='removeDateBlock'){
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_academic.block');
+            $this->db->reset_query();
+
+            $this->db->where('IDBlock', $ID);
+            $this->db->delete('db_academic.block_student');
+            $this->db->reset_query();
+
+            return print_r(1);
         }
 
     }

@@ -257,7 +257,7 @@
 								  '<div class = "form-group">'+
 	  								  '<label>File Upload</label>'+
 	  									'<div><label class = "btn btn-primary"><input type="file" name = "Files" id = "UploadFile" style = "display:none;"> Browse</label></div>'+
-	  								   '<p style = "color:red">(jpg,png) Max 2mb'+	
+	  								   '<p style = "color:red">(pdf,jpg,png) Max 2mb'+	
   								  '</div>';
 				var htmlButton = '<button type="button" class="btn btn-success" id="btnModalCloseProject">Submit</button> ' +
             '<button type="button" class="btn btn-default CloseModal" data-dismiss="modal">Close</button>'; 
@@ -395,7 +395,7 @@
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
 										'<label>'+'Note for worker'+'</label>'+
-										'<p style = "color:red;">(not show in user)</p>'+
+										//'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-9">'+
 										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived" '+dis+' >'+valTextArea+'</textarea>'+
@@ -696,7 +696,7 @@
 								'<div class = "row">'+
 									'<div class = "col-xs-3">'+
 										'<label>'+' Note for department'+'</label>'+
-										'<p style = "color:red;">(not show in user)</p>'+
+										//'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
 										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
@@ -765,6 +765,7 @@
 						CreatedBy : sessionNIP,
 						NoTicket : DataTicket[0].NoTicket,
 					}
+					transfer_to.push(postreceived);
 					// if (received.length == 0) {
 					// 	var postreceived = {
 					// 		ID : DataReceivedSelected[0].ID,

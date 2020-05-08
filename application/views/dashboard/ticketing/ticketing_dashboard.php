@@ -57,10 +57,10 @@
 	<div class="col-xs-6" id = "tableDashboardToday">
 		<div class="thumbnail">
 			<div class="row">
-				<div class="col-md-4 col-md-offset-4">
+				<div class="col-md-8 col-md-offset-2">
 					<div class="well">
 						<div class="row">
-							<div class="col-xs-12">
+							<div class="col-xs-6">
 								<div class="form-group">
 									<label>Select View</label>
 									<select class="form-control" id = "OpShowToday">
@@ -69,12 +69,23 @@
 									</select>
 								</div>
 							</div>
+							<div class="col-xs-6">
+								<div class="form-group">
+									<label>Date</label>
+									<div class="input-group input-append date datetimepicker" id="datetimepickerFilterDashboard">
+									    <input data-format="yyyy-MM-dd" class="form-control" type="text" readonly="" id = "dateFilterDashboard" value = "<?php echo date('Y-m-d') ?>" >
+									    <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+									</div>
+									<br/>
+									<span class = "btn btnSearchDateDashboard btn-primary">Search by Date</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div style="padding: 10px;margin-top: 70px;text-align: center;">
-				<h4 style="color: green;"><u>Ticket Today</u></h4>
+			<div style="padding: 10px;margin-top: 20px;text-align: center;">
+				<h4 style="color: green;"><u>Ticket by Date</u></h4>
 			</div>
 			<div class="panel panel-primary" style="border-color: #42a4ca;">
 				<div class="panel-heading clearfix" style="background-color: #42a4ca;border-color: #42a4ca;">

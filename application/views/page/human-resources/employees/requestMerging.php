@@ -15,6 +15,7 @@
                 <li role="presentation"><a href="#educations" aria-controls="educations" role="tab" data-toggle="tab">Educations</a></li>
                 <li role="presentation"><a href="#training" aria-controls="training" role="tab" data-toggle="tab">Training</a></li>
                 <li role="presentation"><a href="#work-experience" aria-controls="work-experience" role="tab" data-toggle="tab">Work experience</a></li>
+                <li role="presentation"><a href="#signature" aria-controls="signature" role="tab" data-toggle="tab">Signature</a></li>
 		  	</ul>
       	</div>
       	<div class="content" style="overflow-y:auto;overflow-x:hidden;max-height:400px;padding:15px;border:1px solid #ddd;border-top:0px">
@@ -92,26 +93,32 @@
 					                                    <div class="col-sm-6">
 					                                        <div class="form-group">
 					                                            <label>Country</label>
-					                                            <p><?=labelProfileDB("db_admission.country",array("ctr_code"=>$origin->CountryID))->ctr_name?></p>
+					                                            <p><?=(!empty($origin->CountryID)) ? labelProfileDB("db_admission.country",array("ctr_code"=>$origin->CountryID))->ctr_name : '-'?></p>
 					                                        </div>
 					                                    </div>
 					                                    <?php if(!empty($origin->ProvinceID)){ ?>
 					                                    <div class="col-sm-6">
 					                                        <div class="form-group">
 					                                            <label>Province</label>
-					                                            <p><?=labelProfileDB("db_admission.province",array("ProvinceID"=>$origin->ProvinceID))->ProvinceName?></p>
+					                                            <?php $ProvinceName = '-';
+					                                            if(!empty($origin->ProvinceID)){
+					                                            	$Province = labelProfileDB("db_admission.province",array("ProvinceID"=>$origin->ProvinceID));
+					                                            	$ProvinceName = (!empty($Province) ? $Province->ProvinceName : '-');
+					                                            }
+					                                            ?>
+					                                            <p><?=$ProvinceName?></p>
 					                                        </div>
 					                                    </div>
 					                                    <div class="col-sm-6">
 					                                        <div class="form-group">
 					                                            <label>Region</label>
-					                                            <p><?=labelProfileDB("db_admission.region",array("RegionID"=>$origin->RegionID))->RegionName?></p>
+					                                            <p><?=($origin->RegionID) ? labelProfileDB("db_admission.region",array("RegionID"=>$origin->RegionID))->RegionName : '-'?></p>
 					                                        </div>
 					                                    </div>
 					                                    <div class="col-sm-6">
 					                                        <div class="form-group">
 					                                            <label>District</label>
-					                                            <p><?=labelProfileDB("db_admission.district",array("DistrictID"=>$origin->DistrictID))->DistrictName?></p>
+					                                            <p><?=(!empty($origin->DistrictID)) ? labelProfileDB("db_admission.district",array("DistrictID"=>$origin->DistrictID))->DistrictName : '-'?></p>
 					                                        </div>
 					                                    </div>
 
@@ -234,7 +241,9 @@
 					                                    <div class="col-sm-6">
 					                                        <div class="form-group">
 					                                            <label>Country</label>
+					                                            <?php if(!empty($request->CountryID)){ ?>
 					                                            <p><?=labelProfileDB("db_admission.country",array("ctr_code"=>$request->CountryID))->ctr_name?></p>
+					                                            <?php } ?>
 					                                        </div>
 					                                    </div>
 					                                    <?php if(!empty($request->ProvinceID)){ ?>
@@ -360,13 +369,13 @@
 					                                                    <td><?=$origin->MyBank[$i]->accountNumber?></td>
 					                                                </tr>
 					                                            <?php } }else{ ?>
+					                                            </tbody>
+					                                        </table>
+					                                    </div>
 					                                                <tr>
 					                                                    <td colspan="4">Empty data</td>
 					                                                </tr>
 					                                            <?php } ?>
-					                                            </tbody>
-					                                        </table>
-					                                    </div>
 					                                </div>
 					                            </div>                            
 					                        </div>                        
@@ -476,7 +485,7 @@
 					                                    <td><?=$origin->MyFamily[$j]->name?></td>
 					                                    <td><?=$origin->MyFamily[$j]->placeBirth?></td>
 					                                    <td><?=date("d F Y",strtotime($origin->MyFamily[$j]->birthdate))?></td>
-					                                    <td><?=labelProfileDB("db_employees.level_education",array("ID"=>$origin->MyFamily[$j]->lastEduID))->Level?></td>
+					                                    <td><?=(!empty($origin->MyFamily[$j]->lastEduID) ? labelProfileDB("db_employees.level_education",array("ID"=>$origin->MyFamily[$j]->lastEduID))->Level : '')?></td>
 					                                </tr>
 					                            <?php } }else{ ?>
 					                                <tr>
@@ -520,7 +529,7 @@
 					                                    <td><?=$request->MyFamily[$j]->name?></td>
 					                                    <td><?=$request->MyFamily[$j]->placeBirth?></td>
 					                                    <td><?=date("d F Y",strtotime($request->MyFamily[$j]->birthdate))?></td>
-					                                    <td><?=labelProfileDB("db_employees.level_education",array("ID"=>$request->MyFamily[$j]->lastEduID))->Level?></td>
+					                                    <td><?=(!empty($request->MyFamily[$j]->lastEduID ) ? labelProfileDB("db_employees.level_education",array("ID"=>$request->MyFamily[$j]->lastEduID))->Level : '')?></td>
 					                                </tr>
 					                            <?php } }else{ ?>
 					                                <tr>
@@ -909,6 +918,34 @@
 			    			</div>
 			    		</div>
 			    	</div>			    	
+			    </div>
+			    <div role="tabpanel" class="tab-pane" id="signature">
+			    	<div class="row">
+			    	<div class="col-sm-6">
+			    		<div class="panel panel-default">
+				    		<div class="panel-heading">
+				    			<h4 class="panel-title">Original Data</h4>
+				    		</div>
+				    		<div class="panel-body">
+				    			<?php if(!empty($origin->Signature)){?>
+				    			<img src="<?=base_url('./uploads/signature/'.$origin->Signature)?>" width="200px" class="img-thumbnail" >
+				    			<?php } ?>
+				    		</div>
+				    	</div>
+			    	</div>
+			    	<div class="col-sm-6">
+			    		<div class="panel panel-default">
+				    		<div class="panel-heading">
+				    			<h4 class="panel-title">Request Data</h4>
+				    		</div>
+				    		<div class="panel-body">
+				    			<?php if(!empty($request->Signature)){?>
+				    			<img src="<?=$request->Signature?>" width="200px" class="img-thumbnail" >
+				    			<?php } ?>
+				    		</div>
+				    	</div>
+			    	</div>
+			    	</div>
 			    </div>
 			  </div>
       	</div>

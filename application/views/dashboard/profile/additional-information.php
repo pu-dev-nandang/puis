@@ -31,7 +31,7 @@
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label>Passport</label>
-                                        <input type="text" class="form-control required number profile-IDPassport" required name="IDPassport" value="<?=(!empty($detail) ? $detail->IDPassport : null)?>">
+                                        <input type="text" class="form-control profile-IDPassport" required name="IDPassport" value="<?=(!empty($detail) ? $detail->IDPassport : null)?>">
                                         <small class="text-danger text-message"></small>
                                     </div>
                                 </div>

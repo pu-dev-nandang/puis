@@ -2168,19 +2168,35 @@ class M_rest extends CI_Model {
 
     public function getRangeDateMidSemester($dateStart){
 
+        // Cek apakah sedang dalam Ujian Atau tidak
+        $isUTS = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.academic_years ay 
+                                                            LEFT JOIN db_academic.semester s 
+                                                            ON (s.ID = ay.SemesterID) 
+                                                            WHERE s.Status = 1 AND 
+                                                            (CURDATE() BETWEEN ay.utsStart AND ay.utsEnd)')
+                            ->result_array()[0]['Total'];
+
         $dateNow = date('Y-m-d');
         $newStartDate = $dateStart;
         $arrResult = [];
         for($s=0;$s<7;$s++){
             $RangeEnd = date("Y-m-d", strtotime($newStartDate." +6 days"));
 
-            $Status = ($newStartDate <= $dateNow && $RangeEnd >= $dateNow) ? 1 : 0;
+            $Status = 0;
+            if($newStartDate <= $dateNow && $RangeEnd >= $dateNow){
+                $Status = 1;
+            } else if($RangeEnd <= $dateNow){
+                $Status = 2;
+            }
+
+
 
             $arr = array(
                 'Session' => ($s+1),
                 'RangeStart' => $newStartDate,
                 'RangeEnd' => $RangeEnd,
-                'Status' => $Status
+                'Status' => $Status,
+                'isUTS' => $isUTS
             );
             $newStartDate = date("Y-m-d", strtotime($RangeEnd." +1 days"));
             array_push($arrResult,$arr);

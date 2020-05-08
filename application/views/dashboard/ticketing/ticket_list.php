@@ -21,7 +21,7 @@
 </style>
 <?php $this->load->view('dashboard/ticketing/LoadCssTicketToday') ?>
 <div class="row" style="margin-top: 5px;">
-    <div class="col-xs-8">
+    <div class="col-xs-12">
         <div class="thumbnail">
             <div class="row">
                 <div class="col-xs-12">
@@ -103,7 +103,7 @@
             </div>
         </div>
     </div>
-    <div class="col-xs-4">
+    <!-- <div class="col-xs-4">
         <div class="thumbnail">
             <div class="row" style="padding: 10px;">
                 <div class="col-xs-12">
@@ -158,18 +158,29 @@
             </div>
             <div class="row" style="padding: 10px;">
                 <div style="padding: 10px;text-align: center;">
-                    <h4 style="color: green;"><u>Incoming Ticket Today</u></h4>
+                    <h4 style="color: green;"><u>Incoming Ticket by Date</u></h4>
                 </div>
-                <div class="col-md-6 col-md-offset-3">
+                <div class="col-md-12">
                     <div class="well">
                         <div class="row">
-                            <div class="col-xs-12">
+                            <div class="col-xs-6">
                                 <div class="form-group">
                                     <label>Select View</label>
                                     <select class="form-control" id = "OpShowToday">
                                         <option value="1">Table</option>
                                         <option value="2" selected>Graph</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="form-group">
+                                    <label>Date</label>
+                                    <div class="input-group input-append date datetimepicker" id="datetimepickerFilterDashboard">
+                                        <input data-format="yyyy-MM-dd" class="form-control" type="text" readonly="" id = "dateFilterDashboard" value = "<?php echo date('Y-m-d') ?>" >
+                                        <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+                                    </div>
+                                    <br/>
+                                    <span class = "btn btnSearchDateDashboard btn-primary">Search by Date</button>
                                 </div>
                             </div>
                         </div>
@@ -189,285 +200,285 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </div>
 
 <script type="text/javascript">
-var oTable;
+    var oTable;
 
-var App_ticket_tikcet_list = {
-    Loaded: function() {
-        var selectorDepartment = $('#SelectDepartmentID');
-        LoadSelectOptionDepartmentFiltered(selectorDepartment);
-        var selectorStatus = $('#SelectStatusTicketID');
-        LoadSelectOptionStatusTicket(selectorStatus);
-        var firstLoad = setInterval(function() {
-            var SelectDepartmentID = $('#SelectDepartmentID').val();
-            var selectStatus = $('#SelectStatusTicketID').val();
-            if (SelectDepartmentID != '' && SelectDepartmentID != null && selectStatus != '' &&
-                selectStatus != null) {
-                /*
-                    LoadAction
-                */
-                App_ticket_tikcet_list.LoadTicketList();
+    var App_ticket_tikcet_list = {
+        Loaded: function() {
+            var selectorDepartment = $('#SelectDepartmentID');
+            LoadSelectOptionDepartmentFiltered(selectorDepartment);
+            var selectorStatus = $('#SelectStatusTicketID');
+            LoadSelectOptionStatusTicket(selectorStatus);
+            var firstLoad = setInterval(function() {
+                var SelectDepartmentID = $('#SelectDepartmentID').val();
+                var selectStatus = $('#SelectStatusTicketID').val();
+                if (SelectDepartmentID != '' && SelectDepartmentID != null && selectStatus != '' &&
+                    selectStatus != null) {
+                    /*
+                        LoadAction
+                    */
+                    App_ticket_tikcet_list.LoadTicketList();
+                    clearInterval(firstLoad);
+                }
+            }, 1000);
+            setTimeout(function() {
                 clearInterval(firstLoad);
-            }
-        }, 1000);
-        setTimeout(function() {
-            clearInterval(firstLoad);
-        }, 5000);
-    },
+            }, 5000);
+        },
 
-    LoadTicketList: function() {
-        $('#tableTicket tbody').empty();
-        var table = $('#tableTicket').DataTable({
-            "fixedHeader": true,
-            "processing": true,
-            "destroy": true,
-            "serverSide": true,
-            "lengthMenu": [
-                [5, 10],
-                [5, 10]
-            ],
-            "iDisplayLength": 5,
-            "ordering": false,
-            "language": {
-                "searchPlaceholder": "Search",
-            },
-            "ajax": {
-                url: base_url_js + "rest_ticketing/__LoadTicketList" + '?apikey=' +
-                    Apikey, // json datasource
-                ordering: false,
-                type: "post", // method  , by default get
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader("Hjwtkey", Hjwtkey);
+        LoadTicketList: function() {
+            $('#tableTicket tbody').empty();
+            var table = $('#tableTicket').DataTable({
+                "fixedHeader": true,
+                "processing": true,
+                "destroy": true,
+                "serverSide": true,
+                "lengthMenu": [
+                    [5, 10],
+                    [5, 10]
+                ],
+                "iDisplayLength": 5,
+                "ordering": false,
+                "language": {
+                    "searchPlaceholder": "Search",
                 },
-                data: function(token) {
-                    // Read values
+                "ajax": {
+                    url: base_url_js + "rest_ticketing/__LoadTicketList" + '?apikey=' +
+                        Apikey, // json datasource
+                    ordering: false,
+                    type: "post", // method  , by default get
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader("Hjwtkey", Hjwtkey);
+                    },
+                    data: function(token) {
+                        // Read values
+                        var TicketStatus = $('#SelectStatusTicketID option:selected').val();
+                        var SelectDepartmentID = $('#SelectDepartmentID option:selected').val();
+                        var FilterFor = $('#FilterFor option:selected').val();
+                        if ($('#dateFilter').length) {
+                            var data = {
+                                auth: 's3Cr3T-G4N',
+                                TicketStatus: TicketStatus,
+                                DepartmentID: SelectDepartmentID,
+                                NIP: sessionNIP,
+                                FilterFor: FilterFor,
+                                dateFilter : $('#dateFilter').val(),
+                            };
+                        }
+                        else
+                        {
+                            var data = {
+                                auth: 's3Cr3T-G4N',
+                                TicketStatus: TicketStatus,
+                                DepartmentID: SelectDepartmentID,
+                                NIP: sessionNIP,
+                                FilterFor: FilterFor,
+                            };
+                        }
+                        
+                        var get_token = jwt_encode(data, "UAP)(*");
+                        token.token = get_token;
+                    },
+                    error: function() { // error handling
+                        $(".employee-grid-error").html("");
+                        $("#employee-grid").append(
+                            '<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>'
+                        );
+                        $("#employee-grid_processing").css("display", "none");
+                    }
+                },
+                'createdRow': function(row, data, dataIndex) {
                     var TicketStatus = $('#SelectStatusTicketID option:selected').val();
                     var SelectDepartmentID = $('#SelectDepartmentID option:selected').val();
-                    var FilterFor = $('#FilterFor option:selected').val();
-                    if ($('#dateFilter').length) {
-                        var data = {
-                            auth: 's3Cr3T-G4N',
-                            TicketStatus: TicketStatus,
-                            DepartmentID: SelectDepartmentID,
-                            NIP: sessionNIP,
-                            FilterFor: FilterFor,
-                            dateFilter : $('#dateFilter').val(),
-                        };
+                    var stylerow = (App_ticket_tikcet_list.cekCloseWorker(jwt_decode(data[9]),SelectDepartmentID) &&
+                        TicketStatus == '2') ? 'background-color: #d8ea8e;' : '';
+                    $(row).attr('style', stylerow);
+
+                    var htmlNoticket = '<div class = "ticket-number-table">' + data[1] + '</div>';
+                    $(row).find('td:eq(1)').html(htmlNoticket);
+
+                    var htmlRequestedBy = '<div class = "row">';
+                    htmlRequestedBy +=
+                        '<div class ="col-xs-1"><i class="fa fa-user margin-right"></i>' +
+                        '</div>' +
+                        '<div class ="col-xs-10"><b>' + data[2] + '<br/>' + ' from ' + '<br/>' + data[
+                            12] + '</b>' + '</div>';
+                    htmlRequestedBy += '</div>';
+                    $(row).find('td:eq(2)').html(htmlRequestedBy);
+
+                    var htmlTicket = '';
+                    var FileUpload = (data[10] != null && data[10] != undefined && data[10] != '') ?
+                        '<p><a href= "' + data[10] + '" target="_blank">Files Upload<a></p>' : '';
+                    htmlTicket += '<h3 style = "margin-top:0px;">' + '<b>' + data[3] + '</b>' +
+                        '</h3>' +
+                        '<p>' + nl2br(data[4]) + '</p>' +
+                        FileUpload;
+                    $(row).find('td:eq(3)').html(htmlTicket);
+
+                    var htmlAction = '';
+                    var DetailAction = '<a href="javascript:void(0)" class ="ModalReadMore_list" token = "' +
+                        data[9] + '" >Detail</a>';
+                    var setAction = '';
+                    var SelectDepartmentID = $('#SelectDepartmentID option:selected').val();
+                    var EncodeDepartment = jwt_encode(SelectDepartmentID, 'UAP)(*');
+                    if (data[8] == 1 && data[11] == 'write') {
+                        var hrefActionTicket = base_url_js + 'ticket' + '/set_action_first/' + data[1] +
+                            '/' + EncodeDepartment;
+                        setAction = '<a href="' + hrefActionTicket + '">Set Action</a>';
+                    } else if (data[8] == 2 && data[11] == 'write') {
+                        var cekPageAction = (App_ticket_tikcet_list.cekPageAction(jwt_decode(data[9]),SelectDepartmentID));
+                            if (cekPageAction) {
+                                var hrefActionTicket = base_url_js + 'ticket' + '/set_action_progress/' + data[
+                                    1] + '/' + EncodeDepartment
+                                setAction = '<a href="' + hrefActionTicket + '">Set Action</a>';
+                            }
+
                     }
-                    else
-                    {
-                        var data = {
-                            auth: 's3Cr3T-G4N',
-                            TicketStatus: TicketStatus,
-                            DepartmentID: SelectDepartmentID,
-                            NIP: sessionNIP,
-                            FilterFor: FilterFor,
-                        };
+                    htmlAction += '<div class="btn-group">' +
+                        '<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                        '<i class="fa fa-edit"></i> <span class="caret"></span>' +
+                        '</button>' +
+                        '<ul class="dropdown-menu">' +
+                        '<li>' + DetailAction + '</li>' +
+                        '<li role="separator" class="divider"></li>' +
+                        ' <li>' + setAction + '</li>' +
+                        '</ul>' +
+                        '</div>';
+                    $(row).find('td:eq(4)').html(htmlAction);
+
+                    $(row).find('td:eq(5)').html('<label class="text-primary">' + data[6] + '</label>');
+
+                    var styleSt = '';
+                    if (data[7] == 'Close' || data[7] == 'Has Given Rate') {
+                        styleSt = 'style = "color:green;"';
                     }
-                    
-                    var get_token = jwt_encode(data, "UAP)(*");
-                    token.token = get_token;
+                    $(row).find('td:eq(6)').html('<span ' + styleSt + '>' + data[7] + '</span>');
                 },
-                error: function() { // error handling
-                    $(".employee-grid-error").html("");
-                    $("#employee-grid").append(
-                        '<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>'
-                    );
-                    $("#employee-grid_processing").css("display", "none");
+                dom: 'l<"toolbar">frtip',
+                "initComplete": function(settings, json) {
+
                 }
-            },
-            'createdRow': function(row, data, dataIndex) {
-                var TicketStatus = $('#SelectStatusTicketID option:selected').val();
-                var SelectDepartmentID = $('#SelectDepartmentID option:selected').val();
-                var stylerow = (App_ticket_tikcet_list.cekCloseWorker(jwt_decode(data[9]),SelectDepartmentID) &&
-                    TicketStatus == '2') ? 'background-color: #d8ea8e;' : '';
-                $(row).attr('style', stylerow);
+            });
 
-                var htmlNoticket = '<div class = "ticket-number-table">' + data[1] + '</div>';
-                $(row).find('td:eq(1)').html(htmlNoticket);
+            oTable = table;
+        },
 
-                var htmlRequestedBy = '<div class = "row">';
-                htmlRequestedBy +=
-                    '<div class ="col-xs-1"><i class="fa fa-user margin-right"></i>' +
-                    '</div>' +
-                    '<div class ="col-xs-10"><b>' + data[2] + '<br/>' + ' from ' + '<br/>' + data[
-                        12] + '</b>' + '</div>';
-                htmlRequestedBy += '</div>';
-                $(row).find('td:eq(2)').html(htmlRequestedBy);
+        cekPageAction(data,SelectDepartmentID){
+            var data_received = data.data_received;
+            var bool = false;
+            for (let index = 0; index < data_received.length; index++) {
+                var DataReceived_Details = data_received[index].DataReceived_Details;
+                if (data_received[index].DepartmentReceivedID==SelectDepartmentID && data_received[index].ReceivedStatus == "0") {
+                    bool = true;
+                    break;
+                }
+            }
+            return bool;
+        },
 
-                var htmlTicket = '';
-                var FileUpload = (data[10] != null && data[10] != undefined && data[10] != '') ?
-                    '<p><a href= "' + data[10] + '" target="_blank">Files Upload<a></p>' : '';
-                htmlTicket += '<h3 style = "margin-top:0px;">' + '<b>' + data[3] + '</b>' +
-                    '</h3>' +
-                    '<p>' + nl2br(data[4]) + '</p>' +
-                    FileUpload;
-                $(row).find('td:eq(3)').html(htmlTicket);
+        cekCloseWorker: function(data,SelectDepartmentID) {
+            var data_received = data.data_received;
+            var bool = true;
+            for (let index = 0; index < data_received.length; index++) {
+                var DataReceived_Details = data_received[index].DataReceived_Details;
+                if (DataReceived_Details.length == 0 && data_received[index].DepartmentReceivedID==SelectDepartmentID) {
+                    bool = false;
+                }
+                else
+                {
+                    if (DataReceived_Details.length > 0 && data_received[index].DepartmentReceivedID==SelectDepartmentID) {
+                        for (let j = 0; j < DataReceived_Details.length; j++) {
+                            if (DataReceived_Details[j].Status == "1") {
+                                bool = false;
+                                break;
+                            }
 
-                var htmlAction = '';
-                var DetailAction = '<a href="javascript:void(0)" class ="ModalReadMore_list" token = "' +
-                    data[9] + '" >Detail</a>';
-                var setAction = '';
-                var SelectDepartmentID = $('#SelectDepartmentID option:selected').val();
-                var EncodeDepartment = jwt_encode(SelectDepartmentID, 'UAP)(*');
-                if (data[8] == 1 && data[11] == 'write') {
-                    var hrefActionTicket = base_url_js + 'ticket' + '/set_action_first/' + data[1] +
-                        '/' + EncodeDepartment;
-                    setAction = '<a href="' + hrefActionTicket + '">Set Action</a>';
-                } else if (data[8] == 2 && data[11] == 'write') {
-                    var cekPageAction = (App_ticket_tikcet_list.cekPageAction(jwt_decode(data[9]),SelectDepartmentID));
-                        if (cekPageAction) {
-                            var hrefActionTicket = base_url_js + 'ticket' + '/set_action_progress/' + data[
-                                1] + '/' + EncodeDepartment
-                            setAction = '<a href="' + hrefActionTicket + '">Set Action</a>';
                         }
-
-                }
-                htmlAction += '<div class="btn-group">' +
-                    '<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                    '<i class="fa fa-edit"></i> <span class="caret"></span>' +
-                    '</button>' +
-                    '<ul class="dropdown-menu">' +
-                    '<li>' + DetailAction + '</li>' +
-                    '<li role="separator" class="divider"></li>' +
-                    ' <li>' + setAction + '</li>' +
-                    '</ul>' +
-                    '</div>';
-                $(row).find('td:eq(4)').html(htmlAction);
-
-                $(row).find('td:eq(5)').html('<label class="text-primary">' + data[6] + '</label>');
-
-                var styleSt = '';
-                if (data[7] == 'Close' || data[7] == 'Has Given Rate') {
-                    styleSt = 'style = "color:green;"';
-                }
-                $(row).find('td:eq(6)').html('<span ' + styleSt + '>' + data[7] + '</span>');
-            },
-            dom: 'l<"toolbar">frtip',
-            "initComplete": function(settings, json) {
-
-            }
-        });
-
-        oTable = table;
-    },
-
-    cekPageAction(data,SelectDepartmentID){
-        var data_received = data.data_received;
-        var bool = false;
-        for (let index = 0; index < data_received.length; index++) {
-            var DataReceived_Details = data_received[index].DataReceived_Details;
-            if (data_received[index].DepartmentReceivedID==SelectDepartmentID && data_received[index].ReceivedStatus == "0") {
-                bool = true;
-                break;
-            }
-        }
-        return bool;
-    },
-
-    cekCloseWorker: function(data,SelectDepartmentID) {
-        var data_received = data.data_received;
-        var bool = true;
-        for (let index = 0; index < data_received.length; index++) {
-            var DataReceived_Details = data_received[index].DataReceived_Details;
-            if (DataReceived_Details.length == 0 && data_received[index].DepartmentReceivedID==SelectDepartmentID) {
-                bool = false;
-            }
-            else
-            {
-                if (DataReceived_Details.length > 0 && data_received[index].DepartmentReceivedID==SelectDepartmentID) {
-                    for (let j = 0; j < DataReceived_Details.length; j++) {
-                        if (DataReceived_Details[j].Status == "1") {
-                            bool = false;
-                            break;
-                        }
-
                     }
+
                 }
 
+                if (!bool) {
+                    break;
+                }
             }
+            return bool;
 
-            if (!bool) {
-                break;
-            }
         }
-        return bool;
-
-    }
 
 
-};
+    };
 
-$(document).ready(function() {
-    App_ticket_tikcet_list.Loaded();
-})
+    $(document).ready(function() {
+        App_ticket_tikcet_list.Loaded();
+    })
 
-$(document).off('change', '#FilterFor').on('change',
-    '#FilterFor',
-    function(e) {
-        oTable.ajax.reload(null, false);
-})
+    $(document).off('change', '#FilterFor').on('change',
+        '#FilterFor',
+        function(e) {
+            oTable.ajax.reload(null, false);
+    })
 
-$(document).off('change', '#SelectStatusTicketID').on('change',
-    '#SelectStatusTicketID',
-    function(e) {
-      var v = $('#SelectStatusTicketID option:selected').val();
-      if (v ==1) {
-        $('#FilterFor').find('option[value="1"]').prop('disabled',true);
-        $('#FilterFor').find('option[value="99"]').prop('disabled',true);
-      }
-      else {
-        $('#FilterFor').find('option[value="1"]').prop('disabled',false);
-      $('#FilterFor').find('option[value="99"]').prop('disabled',false);
-      }
+    $(document).off('change', '#SelectStatusTicketID').on('change',
+        '#SelectStatusTicketID',
+        function(e) {
+          var v = $('#SelectStatusTicketID option:selected').val();
+          if (v ==1) {
+            $('#FilterFor').find('option[value="1"]').prop('disabled',true);
+            $('#FilterFor').find('option[value="99"]').prop('disabled',true);
+          }
+          else {
+            $('#FilterFor').find('option[value="1"]').prop('disabled',false);
+          $('#FilterFor').find('option[value="99"]').prop('disabled',false);
+          }
 
-        oTable.ajax.reload(null, false);
-})
+            oTable.ajax.reload(null, false);
+    })
 
-$(document).off('click', '.ModalReadMore_list').on('click', '.ModalReadMore_list', function(e) {
-    var token = $(this).attr('token');
-    AppModalDetailTicket.ModalReadMore('', '', token);
-})
+    $(document).off('click', '.ModalReadMore_list').on('click', '.ModalReadMore_list', function(e) {
+        var token = $(this).attr('token');
+        AppModalDetailTicket.ModalReadMore('', '', token);
+    })
 
-$(document).on('click','#dateOP',function(e){
-    // htmlDatetimePicker
-    if ($(this).is(':checked')) {
-        $('#htmlDatetimePicker').html(
-            '<div class="form-group">'+
-                '<label>Choose Date</label>'+
-                '<div class="input-group input-append date datetimepicker" id="datetimepicker6">'+
-                    '<input data-format="yyyy-MM-dd" class="form-control" type="text" readonly="" id = "dateFilter" value = "<?php echo date('Y-m-d') ?>" >'+
-                    '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
-                '</div>'+'<br/>'+
-                '<span class = "btn btnSearchDate btn-primary">Search by Date</button>'+
-            '</div>'
-        );
+    $(document).on('click','#dateOP',function(e){
+        // htmlDatetimePicker
+        if ($(this).is(':checked')) {
+            $('#htmlDatetimePicker').html(
+                '<div class="form-group">'+
+                    '<label>Choose Date</label>'+
+                    '<div class="input-group input-append date datetimepicker" id="datetimepicker6">'+
+                        '<input data-format="yyyy-MM-dd" class="form-control" type="text" readonly="" id = "dateFilter" value = "<?php echo date('Y-m-d') ?>" >'+
+                        '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+                    '</div>'+'<br/>'+
+                    '<span class = "btn btnSearchDate btn-primary">Search by Date</button>'+
+                '</div>'
+            );
 
-        $('#datetimepicker6').datetimepicker({
-            format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false
-        })
+            $('#datetimepicker6').datetimepicker({
+                format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false
+            })
 
-        $('.btnSearchDate').trigger('click');
-    }
-    else
-    {
-        $('#htmlDatetimePicker').empty();
-        oTable.ajax.reload(null, false);
-    }
-    
-})
+            $('.btnSearchDate').trigger('click');
+        }
+        else
+        {
+            $('#htmlDatetimePicker').empty();
+            oTable.ajax.reload(null, false);
+        }
+        
+    })
 
-$(document).on('click','.btnSearchDate',function(e){
-   oTable.ajax.reload(null, false);
-})
+    $(document).on('click','.btnSearchDate',function(e){
+       oTable.ajax.reload(null, false);
+    })
 
 </script>
 
 <!-- Graph ticket -->
-<script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/sparkline/jquery.sparkline.min.js"></script>
+<!-- <script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/sparkline/jquery.sparkline.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.tooltip.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/');?>plugins/flot/jquery.flot.resize.min.js"></script>
@@ -591,4 +602,4 @@ $(document).on('click','.btnSearchDate',function(e){
 
     
     
-</script>
+</script> -->

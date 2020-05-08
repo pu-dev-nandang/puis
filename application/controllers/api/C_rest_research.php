@@ -113,4 +113,22 @@ class C_rest_research extends CI_Controller {
       echo json_encode($rs);
     }
 
+    public function research_eksternal(){
+      $dataToken = $this->getInputToken();
+      $action = $dataToken['action'];
+      $rs = [];
+      switch ($action) {
+        case 'datatable_server_side':
+          $data = $dataToken['data'];
+          $rs =  $this->m_research->dtSrvSide_research_eksternal($data);
+          break;
+        
+        default:
+          # code...
+          break;
+      }
+
+      echo json_encode($rs);
+    }
+
 }

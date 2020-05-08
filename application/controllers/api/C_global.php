@@ -131,27 +131,40 @@ class C_global extends CI_Controller {
         }
         else
         {
-            if (file_exists('./uploads/'.$file)) {
-                $imageData = base64_encode(file_get_contents(FCPATH.'uploads/'.$path));
-                echo '<img src="data:image/jpeg;base64,'.$imageData.'">';
-                
-            }
-            else
-            {
-                show_404($log_error = TRUE);
-            }
+            
+                $extensions = array('jpg', 'jpeg', 'png');
+                if (in_array($ext, $extensions)) {
+                    if (file_exists('./uploads/'.$file)) {
+                        $imageData = base64_encode(file_get_contents(FCPATH.'uploads/'.$path));
+                        echo '<img src="data:image/jpeg;base64,'.$imageData.'">';
+                        
+                    }
+                    else
+                    {
+                        show_404($log_error = TRUE);
+                    }   
+                }
+               else{
+                $this->load->helper('download');
+                $data   = file_get_contents('./uploads/'.$file);
+                $name   = $file;
+                force_download($name, $data); // script download file
+               }
             
         }
     }
 
     private function showFile2($file)
     {
-        header("Content-type: application/pdf");
-        header("Content-disposition: inline;     
-        filename=".basename('uploads/'.$file));
+        header("Content-type:application/pdf");
+
+        // It will be called downloaded.pdf
+        header("Content-Disposition:inline;filename=".$file);
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        $filePath = readfile('uploads/'.$file);
+
+        // The PDF source is in original.pdf
+        readfile('uploads/'.$file);
     }
 
     public function download_template($file)
@@ -190,12 +203,7 @@ class C_global extends CI_Controller {
 
     private function showFile($file)
     {
-        header("Content-type: application/pdf");
-        header("Content-disposition: inline;     
-        filename=".basename('document/'.$file));
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        $filePath = readfile('document/'.$file);
+        $this->showFile2($file);
     }
 
     public function get_detail_cicilan_fee_admisi()

@@ -571,16 +571,16 @@ class C_employees extends HR_Controler {
                 $this->load->library('upload', $config);
                 if ( ! $this->upload->do_upload('userfile')){
                     $error = array('error' => $this->upload->display_errors());
-                    return print_r(json_encode($error));
+                    return json_encode($error);
+                    //return print_r(json_encode($error));
                 }
                 else {
-                    
                     $success = array('success' => $this->upload->data());
                     $success['success']['formGrade'] = 0;
 
                     //$Get_MasterFiles = $this->m_master->MasterfileStatus($Colom);
                    
-                    return print_r(json_encode($success));
+                    return json_encode($success);
                 }
 
 
@@ -781,6 +781,7 @@ class C_employees extends HR_Controler {
             if(!empty($isExist)){
                 if($data_arr['ACT'] == 2){ //for rejected
                     $dataPost = array("isApproved"=>2,"NoteApproved"=>(!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null));                    
+                    $dataPost['UpdatedBy'] = $myNIP."/".$myName;
                     $rejectData = $this->General_model->updateData("db_employees.employees",$dataPost,$conditions);
                     $message = ($rejectData ? "Successfully":"Failed")." saved.";
                 }else if($data_arr['ACT'] == 0){ //for approved
@@ -803,6 +804,7 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_bank_account",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
                                     $insertChild = $this->General_model->insertData("db_employees.employees_bank_account",$b);
@@ -815,6 +817,7 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_family_member",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
                                     $insertChild = $this->General_model->insertData("db_employees.employees_family_member",$b);
@@ -827,6 +830,7 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_educations",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
                                     $insertChild = $this->General_model->insertData("db_employees.employees_educations",$b);
@@ -839,9 +843,12 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_educations_non_formal",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
-                                    $insertChild = $this->General_model->insertData("db_employees.employees_educations_non_formal",$b);
+                                    if($b->instituteName != ''){
+                                        $insertChild = $this->General_model->insertData("db_employees.employees_educations_non_formal",$b);
+                                    }
                                 }
                             }
                         }
@@ -851,6 +858,7 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_educations_training",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
                                     $insertChild = $this->General_model->insertData("db_employees.employees_educations_training",$b);
@@ -863,6 +871,7 @@ class C_employees extends HR_Controler {
                                 if(!empty($b->ID)){
                                     $conditions['ID'] = $b->ID;
                                     $updateChild = $this->General_model->updateData("db_employees.employees_experience",$b,$conditions);
+                                    unset($conditions['ID']);
                                 }else{
                                     unset($b->ID);
                                     $insertChild = $this->General_model->insertData("db_employees.employees_experience",$b);
@@ -870,13 +879,26 @@ class C_employees extends HR_Controler {
                             }
                         }
 
+                        if(!empty($Logs->Signature)){
+                            $data = $Logs->Signature;
+
+                            list($type, $data) = explode(';', $data);
+                            list(, $data)      = explode(',', $data);
+                            $data = base64_decode($data);
+                            $filenameSignature = $data_arr['NIP'].'.png';
+                            file_put_contents('./uploads/signature/'.$filenameSignature, $data);
+                            $Logs->Signature= $filenameSignature;
+                        }
+
                         $Logs->Logs = null;
                         $Logs->isApproved = null;
-                        $Logs->UpdatedAt = $myNIP."/".$myName;
+                        $Logs->NoteApproved = null;
+                        $Logs->UpdatedBy = $myNIP."/".$myName;
+                        
+                        if(!empty($conditions['ID'])){unset($conditions['ID']);}
                         $updatedPersonalData = $this->General_model->updateData("db_employees.employees",$Logs,$conditions);
                         $message = (($updatedPersonalData) ? "Successfully":"Failed")." saved.";
                         $isfinish = $updatedPersonalData;
-
                     }else{$message = "No data requested.";}
                 }else{$message="Unknow request approved.";}
             }else{$message="Student data is not founded.";}
@@ -1517,18 +1539,19 @@ class C_employees extends HR_Controler {
 
 
     public function fetchAttdTempEmp(){
+        set_time_limit(0);
+        $this->load->helper("General_helper");
         $reqdata = $this->input->post();
         if($reqdata){
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
-            $param = array();$orderBy=" em.ID DESC ";
+            $param = array();$orderBy=" lem.ID DESC ";
 
             if(!empty($reqdata['search']['value']) ) {
                 $search = $reqdata['search']['value'];
 
                 $param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);
-                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' ","filter"=>"OR",);
-                $param[] = array("field"=>"em.NIDN","data"=>" like '%".$search."%' )","filter"=>"OR",);
+                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' )","filter"=>"OR",);
             }
             if(!empty($data_arr['Filter'])){
                 $parse = parse_str($data_arr['Filter'],$output);
@@ -1574,13 +1597,6 @@ class C_employees extends HR_Controler {
                 }
                 //check data for employee
                 else{
-                    if(!empty($output['division'])){
-                        $param[] = array("field"=>"em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);
-                    }
-                    if( !empty($output['division']) && !empty($output['position'])){
-                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);
-                    }
-
                     if(!empty($output['status'])){
                         $sn = 1;
                         $dataArrStatus = array();
@@ -1597,9 +1613,23 @@ class C_employees extends HR_Controler {
                     }
                 }
 
+                if(!empty($output['division'])){
+                    if(!empty($output['position'])){
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther1","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther2","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$output['division'].".".$output['position']."' ) ","filter"=>"AND",);
+                    }else{
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther1","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$output['division'].".%' ) ","filter"=>"AND",);
+                    }
+                }
+                
+
                 if(!empty($output['staff'])){
                     $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
-                    $param[] = array("field"=>"ps.NameEng","data"=>" like '%".$output['staff']."%' ","filter"=>"OR",);
                     $param[] = array("field"=>"em.Name","data"=>" like '%".$output['staff']."%' )","filter"=>"OR",);
                 }
                 if(!empty($output['religion'])){
@@ -1644,25 +1674,44 @@ class C_employees extends HR_Controler {
                     }
                     $param[] = array("field"=>")","data"=>null,"filter"=>null);
                 }
-
                 if(!empty($output['attendance_start'])){
-                    $param[] = array("field"=>"lem.AccessedOn","operate"=>" = ","data"=>"'".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                    if(!empty($output['attendance_end'])){
+                        $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."' ","filter"=>"AND",);
+                    }else{
+                        $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                    }
                 }else{
-                    $param[] = array("field"=>"lem.AccessedOn","operate"=>"=","data"=>"'".date("Y-m-d")."' ","filter"=>"AND",);
+                    $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
                 }
-
                 if(!empty($output['sorted'])){
                     $orderBy = $output['sorted'];
                 }
             }
             $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
-            if(!empty($reqdata['start']) && !empty($reqdata['length'])){
-                $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+            //var_dump($this->db->last_query());
+            //var_dump($totalData);die();
+            if(!empty($reqdata['length'])){
+                $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'])->result();
             }else{
                 $result = $this->m_hr->fetchEmployee(false,$param)->result();
             }
 
+            if(!empty($result)){
+                $rs = array();
+                $sort = array();
+                $index=0;
+                
+                foreach ($result as $r) {
+                    $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                    $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
+                    $rs[] = $r;
+                    $index++;
+                }
+                $result = $rs;
+            }
+
+            
             $json_data = array(
                 "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
                 "recordsTotal"    => intval($TotalData),
@@ -1684,9 +1733,9 @@ class C_employees extends HR_Controler {
             $param[] = array("field"=>"em.NIP","data"=>" = ".$data_arr['NIP'],"filter"=>"AND",);
             $isExist = $this->m_hr->fetchEmployee(false,$param)->row();
             if(!empty($isExist)){
-                $data['attendance'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) = DATE('".$data_arr['DATE']."')","AccessedOn","asc")->result();
+                $data['attendance'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) between DATE('".$data_arr['DATE']."') and DATE('".$data_arr['DATEEND']."')","AccessedOn","asc")->result();
                 $data['employee'] = $isExist;
-                $data['TotalActivity'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) = DATE('".$data_arr['DATE']."')","AccessedOn","asc",null,"AccessedOn")->result();
+                $data['TotalActivity'] = $this->General_model->fetchData("db_employees.log_employees","NIP = ".$data_arr['NIP']." and DATE(AccessedOn) between DATE('".$data_arr['DATE']."') and DATE('".$data_arr['DATEEND']."')","AccessedOn","asc",null,"AccessedOn")->result();
                 $department = parent::__getDepartement();
                 $this->load->view('page/'.$department.'/attendance-temp/detail',$data);                
             }else{echo "<h1>Employee not founded</h1>";}
@@ -1703,12 +1752,16 @@ class C_employees extends HR_Controler {
             $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$data_arr['NIP']))->row();
             if(!empty($isExist)){
                 $explodeMain = explode(".", $isExist->PositionMain);
-                $param[] = array("field"=>"em.PositionMain","data"=>" like '".$explodeMain[0].".%' ","filter"=>"AND");
-                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                $param[] = array("field"=>"em.StatusEmployeeID","data"=>" = 1 ","filter"=>null);
-                $param[] = array("field"=>"em.StatusEmployeeID","data"=>" = 2 ","filter"=>"OR");
-                $param[] = array("field"=>")","data"=>null,"filter"=>null);
-                $json = $this->m_hr->fetchEmployee(false,$param,null,null,"em.PositionMain asc")->result();                
+                $explodeOth1 = explode(".", $isExist->PositionOther1);
+                $explodeOth2 = explode(".", $isExist->PositionOther2);
+                $explodeOth3 = explode(".", $isExist->PositionOther3);
+                $param = "(em.StatusEmployeeID = 1 or em.StatusEmployeeID = 2) and ";
+                $param .= "(em.PositionMain like '".$explodeMain[0].".%' or ";
+                $param .= "em.PositionOther1 like '".$explodeOth1[0].".%' or ";
+                $param .= "em.PositionOther2 like '".$explodeOth2[0].".%' or ";
+                $param .= "em.PositionOther3 like '".$explodeOth3[0].".%' ) ";
+                $json = $this->m_hr->fetchMemberOFDepartpent($param)->result(); 
+                //var_dump($this->db->last_query());               
             }
         }
         echo json_encode($json);
@@ -1727,182 +1780,246 @@ class C_employees extends HR_Controler {
 
 
     public function downloadAttendanceTemp(){
+        set_time_limit(0);
         $reqdata = $this->input->post();
         if($reqdata){
-            $key = "UAP)(*";
-            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $this->load->helper("General_helper");
             $param = array();$orderBy=" em.ID DESC ";
 
-            if(!empty($reqdata['search']['value']) ) {
-                $search = $reqdata['search']['value'];
-
-                $param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);
-                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' ","filter"=>"OR",);
-                $param[] = array("field"=>"em.NIDN","data"=>" like '%".$search."%' )","filter"=>"OR",);
-            }
-            if(!empty($data_arr['Filter'])){
-                $parse = parse_str($data_arr['Filter'],$output);
-
-                //check data emp if lecturers
-                if(!empty($output['isLecturer'])){
-                    $divLect = '14';
-                    $param[] = array("field"=>"(em.PositionMain","data"=>" like'".$divLect.".%' ","filter"=>"AND",);
-                    $param[] = array("field"=>"em.PositionOther1","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
-                    $param[] = array("field"=>"em.PositionOther2","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
-                    $param[] = array("field"=>"em.PositionOther3","data"=>" like'".$divLect.".%' )","filter"=>"OR",);
-                    if( !empty($output['position'])){
-                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$divLect.".".$output['position']."' ","filter"=>"AND",);
-                    }
-                    if(!empty($output['status'])){
-                        $sn = 1;
-                        $dataArrStatus = array();
-                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                        if(count($output['status']) == 1){
-                            $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
-                        }else{
-                            foreach ($output['status'] as $s) {
-                                $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
-                                $sn++;
-                            }
-                        }
-                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
-                    }
-                    if(!empty($output['study_program'])){
-                        $sn = 1;
-                        $dataArrStatus = array();
-                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                        if(count($output['study_program']) == 1){
-                            $param[] = array("field"=>"em.ProdiID","data"=>" ='".$output['study_program'][0]."' ","filter"=> "" );
-                        }else{
-                            foreach ($output['study_program'] as $s) {
-                                $param[] = array("field"=>"em.ProdiID","data"=>" ='".$s."' ".((($sn < count($output['study_program'])) ? ' OR ':'')) ,"filter"=> null );
-                                $sn++;
-                            }
-                        }
-                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
-                    }
-                }
-                //check data for employee
-                else{
-                    if(!empty($output['division'])){
-                        $param[] = array("field"=>"em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);
-                    }
-                    if( !empty($output['division']) && !empty($output['position'])){
-                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);
-                    }
-
-                    if(!empty($output['status'])){
-                        $sn = 1;
-                        $dataArrStatus = array();
-                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                        if(count($output['status']) == 1){
-                            $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
-                        }else{
-                            foreach ($output['status'] as $s) {
-                                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
-                                $sn++;
-                            }
-                        }
-                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
-                    }
-                }
-
-                if(!empty($output['staff'])){
-                    $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
-                    $param[] = array("field"=>"ps.NameEng","data"=>" like '%".$output['staff']."%' ","filter"=>"OR",);
-                    $param[] = array("field"=>"em.Name","data"=>" like '%".$output['staff']."%' )","filter"=>"OR",);
-                }
-                if(!empty($output['religion'])){
-                    $sn = 1;
-                    $dataArrStatus = array();
-                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                    if(count($output['religion']) == 1){
-                        $param[] = array("field"=>"em.ReligionID","data"=>" ='".$output['religion'][0]."' ","filter"=> "" );
-                    }else{
-                        foreach ($output['religion'] as $s) {
-                            $param[] = array("field"=>"em.ReligionID","data"=>" ='".$s."' ".((($sn < count($output['religion'])) ? ' OR ':'')) ,"filter"=> null );
-                            $sn++;
-                        }
-                    }
-                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
-                }
-                if(!empty($output['gender'])){
-                    $sn = 1;
-                    $dataArrStatus = array();
-                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                    if(count($output['gender']) == 1){
-                        $param[] = array("field"=>"em.Gender","data"=>" ='".$output['gender'][0]."' ","filter"=> "" );
-                    }else{
-                        foreach ($output['gender'] as $s) {
-                            $param[] = array("field"=>"em.Gender","data"=>" ='".$s."' ".((($sn < count($output['gender'])) ? ' OR ':'')) ,"filter"=> null );
-                            $sn++;
-                        }
-                    }
-                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
-                }
-                if(!empty($output['level_education'])){
-                    $sn = 1;
-                    $dataArrStatus = array();
-                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                    if(count($output['level_education']) == 1){
-                        $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$output['level_education'][0]."' ","filter"=> "" );
-                    }else{
-                        foreach ($output['level_education'] as $s) {
-                            $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$s."' ".((($sn < count($output['level_education'])) ? ' OR ':'')) ,"filter"=> null );
-                            $sn++;
-                        }
-                    }
-                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
-                }
-
-                if(!empty($output['attendance_start'])){
-                    $param[] = array("field"=>"lem.AccessedOn","operate"=>" = ","data"=>"'".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+            if(!empty($reqdata['division'])){
+                if(!empty($reqdata['position'])){
+                    $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$reqdata['division'].".".$reqdata['position']."' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther1","data"=>" = '".$reqdata['division'].".".$reqdata['position']."' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther2","data"=>" = '".$reqdata['division'].".".$reqdata['position']."' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$reqdata['division'].".".$reqdata['position']."' ) ","filter"=>"AND",);
                 }else{
-                    $param[] = array("field"=>"lem.AccessedOn","operate"=>"=","data"=>"'".date("Y-m-d")."' ","filter"=>"AND",);
-                }
-
-                if(!empty($output['sorted'])){
-                    $orderBy = $output['sorted'];
+                    $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$reqdata['division'].".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther1","data"=>" like '".$reqdata['division'].".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$reqdata['division'].".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$reqdata['division'].".%' ) ","filter"=>"AND",);
                 }
             }
+
+            if(!empty($reqdata['status'])){
+                $sn = 1;
+                $dataArrStatus = array();
+                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                if(count($reqdata['status']) == 1){
+                    $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$reqdata['status'][0]."' ","filter"=> "" );
+                }else{
+                    foreach ($reqdata['status'] as $s) {
+                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($reqdata['status'])) ? ' OR ':'')) ,"filter"=> null );
+                        $sn++;
+                    }
+                }
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);
+            }
+
+            if(!empty($reqdata['staff'])){
+                $param[] = array("field"=>"(em.NIP","data"=>" like '%".$reqdata['staff']."%' ","filter"=>"AND",);
+                $param[] = array("field"=>"em.Name","data"=>" like '%".$reqdata['staff']."%' )","filter"=>"OR",);
+            }
+            if(!empty($reqdata['religion'])){
+                $sn = 1;
+                $dataArrStatus = array();
+                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                if(count($reqdata['religion']) == 1){
+                    $param[] = array("field"=>"em.ReligionID","data"=>" ='".$reqdata['religion'][0]."' ","filter"=> "" );
+                }else{
+                    foreach ($reqdata['religion'] as $s) {
+                        $param[] = array("field"=>"em.ReligionID","data"=>" ='".$s."' ".((($sn < count($reqdata['religion'])) ? ' OR ':'')) ,"filter"=> null );
+                        $sn++;
+                    }
+                }
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);
+            }
+            if(!empty($reqdata['gender'])){
+                $sn = 1;
+                $dataArrStatus = array();
+                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                if(count($reqdata['gender']) == 1){
+                    $param[] = array("field"=>"em.Gender","data"=>" ='".$reqdata['gender'][0]."' ","filter"=> "" );
+                }else{
+                    foreach ($reqdata['gender'] as $s) {
+                        $param[] = array("field"=>"em.Gender","data"=>" ='".$s."' ".((($sn < count($reqdata['gender'])) ? ' OR ':'')) ,"filter"=> null );
+                        $sn++;
+                    }
+                }
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);
+            }
+            if(!empty($reqdata['level_education'])){
+                $sn = 1;
+                $dataArrStatus = array();
+                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                if(count($reqdata['level_education']) == 1){
+                    $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$reqdata['level_education'][0]."' ","filter"=> "" );
+                }else{
+                    foreach ($reqdata['level_education'] as $s) {
+                        $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$s."' ".((($sn < count($reqdata['level_education'])) ? ' OR ':'')) ,"filter"=> null );
+                        $sn++;
+                    }
+                }
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);
+            }
+
+            if(!empty($reqdata['attendance_start'])){
+                if(!empty($reqdata['attendance_end'])){
+                    $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($reqdata['attendance_start']))."' and '".date("Y-m-d",strtotime($reqdata['attendance_end']))."' ","filter"=>"AND",);
+                }else{
+                    $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d",strtotime($reqdata['attendance_start']))."' ","filter"=>"AND",);
+                }
+            }else{
+                $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
+            }
+
             $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
             $result = $this->m_hr->fetchEmployee(false,$param)->result();
 
-            $now = gmdate("D, d M Y H:i:s");
-            header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
-            header("Last-Modified: {$now} GMT");
+            if(!empty($result)){
+                $rs = array();
+                foreach ($result as $r) {
+                    $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                    $r->LastLoginPortal = lastLogin($conditions)->AccessedOn;
+                    $rs[] = $r;
+                }
+                $result = $rs;
+            }
 
-            // force download  
-            header("Content-Type: application/force-download");
-            header("Content-Type: application/octet-stream");
-            header("Content-Type: application/download");
-
+            /*
             // disposition / encoding on response body
-            header("Content-Disposition: attachment;filename=Attendance-Temporary");
-            header("Content-Transfer-Encoding: binary");
-            $table = '<table border="1"><thead><tr><th>No</th><th>NIP</th><th>Emploeer</th><th>Division/Position</th><th>First Login</th><th>Last Login</th></tr></thead><tbody>';
+            header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
+            header("Content-Disposition: attachment; filename=Attendance-Temporary-DownloadAT.xls");  //File name extension was wrong
+            header("Expires: 0");
+            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+            header("Cache-Control: private",false);
+            $table = '<table border="1"><thead><tr><th>No</th><th>NIP</th><th>Employee</th><th>Division/Position</th><th>First Login</th><th>Last Login</th></tr></thead><tbody>';
             if(!empty($result)){
                 $num=1;
                 foreach ($result as $v) {
                 $table .= '<tr><td>'.$num++.'</td>
                               <td>'.$v->NIP.'</td>
                               <td>'.$v->Name.'</td>
-                              <td>'.$v->DivisionMain_.'-'.$v->PositionMain_.'</td>
-                              <td>'.$v->FirstLoginPortal.'</td>
-                              <td>'.$v->LastLoginPortal.'</td>
+                              <td>'.$v->DivisionMain_.'-'.$v->PositionMain_.
+                              (!empty($v->PositionOther1) ? '<br>'.$v->PositionOther1 : '').
+                              (!empty($v->PositionOther2) ? '<br>'.$v->PositionOther2 : '').
+                              (!empty($v->PositionOther3) ? '<br>'.$v->PositionOther3 : '').
+                              '</td>
+                              <td>'.date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal)).'</td>
+                              <td>'.date('d-F-Y H:i:s',strtotime($v->LastLoginPortal)).'</td>
                           </tr>';
                 }
             }
             $table .= '</tbody></table>';
+            echo $table; 
+            */
 
-            $response =  array(
-               'name' => "filename", //no extention needed
-               'file' => "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,".base64_encode($result) //mime type of used format
+            
+            include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+            ini_set('memory_limit', '-1');
+            ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+
+            // Panggil class PHPExcel nya
+            $excel = new PHPExcel();
+
+            $pr = strtoupper('Attendance Temporary - By Portal');
+
+            // Settingan awal fil excel
+            $excel->getProperties()->setCreator('IT PU')
+                ->setLastModifiedBy('IT PU')
+                ->setTitle($pr)
+                ->setSubject($pr)
+                ->setDescription($pr)
+                ->setKeywords($pr);
+
+            $excel->setActiveSheetIndex(0)->setCellValue('A1', $pr);
+            $excel->getActiveSheet()->mergeCells('A1:F1');
+            $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
+            
+            $header= [array("cell"=>"A","val"=>"No"),
+                    array("cell"=>"B","val"=>"NIP"),
+                    array("cell"=>"C","val"=>"Employee"),
+                    array("cell"=>"D","val"=>"Division/Position"),
+                    array("cell"=>"E","val"=>"First Login"),
+                    array("cell"=>"F","val"=>"Last Login")
+            ];
+
+            $styleColHeader = array(
+                'font' => array('bold' => true), // Set font nya jadi bold
+                'alignment' => array(
+                    'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+                ),
+                'borders' => array(
+                    'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                    'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                    'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                    'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+                )
             );
-            echo json_encode($response);
+            $numRow = 3;
+            foreach ($header as $k=>$v) {
+                $excel->setActiveSheetIndex(0)->setCellValue($v['cell'].$numRow, $v['val']);
+                $excel->getActiveSheet()->getStyle($v['cell'].$numRow)->applyFromArray($styleColHeader);
+            }
+
+            $numRow = $numRow+1;
+            
+            if(!empty($result)){
+                $styleCell = array(
+                    'borders' => array(
+                        'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                        'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                        'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                        'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+                    )
+                );
+                $no=1;
+                foreach ($result as $v) {
+                    $excel->setActiveSheetIndex(0)->setCellValue('A'.$numRow, $no);
+                    $excel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('A'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('B'.$numRow, $v->NIP);
+                    $excel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('B'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('C'.$numRow, $v->Name);
+                    $excel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('C'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('D'.$numRow, $v->DivisionMain_.'/'.$v->PositionMain_);
+                    $excel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('D'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('E'.$numRow, date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal)));
+                    $excel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('E'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('F'.$numRow, date('d-F-Y H:i:s',strtotime($v->LastLoginPortal)));
+                    $excel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('F'.$numRow)->applyFromArray($styleCell);
+                    
+                    $no++;
+                    $numRow++;
+                }
+            }
+
+            // Proses file excel
+            $filename = "Attendance-Temp-Download.xlsx";
+            //$FILEpath = "./dokument/".$filename;
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename='.$filename); // Set nama file excel nya
+            header('Cache-Control: max-age=0');
+
+            $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+            $write->save('php://output');
+    
         }else{
-            echo "heumm";
+            show_404();
         }
         
 

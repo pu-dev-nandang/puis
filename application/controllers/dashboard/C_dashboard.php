@@ -25,40 +25,132 @@ class C_dashboard extends Globalclass {
 
     public function index()
     {
-        // $G_dt = $this->m_master->showData_array('db_prodi.cfg_sub_menu');
-        // for ($i=0; $i < count($G_dt); $i++) { 
+        // ---- master ---  //
+        // $db_live = $this->load->database('server_live', TRUE);
+        // $query = $db_live->query(
+        //    'select * from db_research.master_anggota_publikasi'     
+        // )->result_array();
+
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $Luar_internal = $query[$i]['Luar_internal'];
+        //     $Type_anggota = $query[$i]['Type_anggota'];
+        //     $Status_aktif = $query[$i]['Status_aktif'];
+        //     $User_create = $query[$i]['User_create'];
+        //     $Date_create = $query[$i]['Date_create'];
+        //     $ID = $query[$i]['ID'];
+
+        //     $NIP = $query[$i]['NIP'];
+        //     $NIM = $query[$i]['NIM'];
+
+        //     if ($Luar_internal == '1') {
+        //         // internal
+        //         if (!empty($NIP)) {
+        //             $ID_user = 'dsn.'.$NIP;  
+        //         }
+        //         else
+        //         {
+        //             $ID_user = 'mhs.'.$NIM;   
+        //         }
+        //     }
+        //     else
+        //     {
+        //         $Nama = $query[$i]['Nama'];
+        //         $se = $db_live->query(
+        //             'select * from db_research.master_user_research where Nama = "'.$Nama.'" '
+        //         )->result_array();
+        //         // $se = $this->m_master->caribasedprimary('db_research.master_user_research','Nama',$Nama);
+        //         if (count($se) > 0) {
+        //             $ID_user = 'ekd.'.$se[0]['ID'];  
+        //         }
+        //         else
+        //         {
+        //             // $ID_user = 'ekd.0';  
+        //             $Nama2 = $query[$i]['Nama'];
+        //             $NIP2 = $query[$i]['NIP'];
+        //             $NIDN2 = $query[$i]['NIDN'];
+        //             $NIM2 = $query[$i]['NIM'];
+        //             $TypeUser = (empty($NIM2)) ? 'Dosen' : 'Mahasiswa';
+
+        //             if ($Type_anggota == 'MHS') {
+        //                 $F_kolaborasi = 1;
+        //                 $F_dosen = 0;
+        //                 $F_mhs = 1;
+        //                 $F_reviewer = 1;
+        //             }
+        //             else
+        //             {
+        //                 $F_kolaborasi = 1;
+        //                 $F_dosen = 1;
+        //                 $F_mhs = 0;
+        //                 $F_reviewer = 1;
+        //             }
+
+        //             $dataSave2 = [
+        //                 'Nama' => $Nama2,
+        //                 'NIP' => $NIP2,
+        //                 'NIDN' => $NIDN2,
+        //                 'NIM' => $NIM2,
+        //                 'TypeUser' => $TypeUser,
+        //                 'F_kolaborasi' => $F_kolaborasi,
+        //                 'F_dosen' => $F_dosen,
+        //                 'F_mhs' => $F_mhs,
+        //                 'F_reviewer' => $F_reviewer,
+        //             ];
+
+        //             $db_live->insert('db_research.master_user_research',$dataSave2);
+        //             $ID_user = 'ekd.'.$db_live->insert_id();
+        //         }
+        //     }
+
         //     $dataSave = [
-        //         'cfg_group_user' => 1,
-        //         'ID_cfg_sub_menu' => $G_dt[$i]['ID'],
-        //         'read' => 1,
-        //         'write' => 1,
-        //         'update' => 1,
-        //         'delete' => 1,
+        //         'Luar_internal' => $Luar_internal,
+        //         'Type_anggota' => $Type_anggota,
+        //         'Status_aktif' => $Status_aktif,
+        //         'User_create' => $User_create,
+        //         'Date_create' => $Date_create,
+        //         'ID_user' => $ID_user,
+        //         'ID' => $ID,
         //     ];
 
-        //     $this->db->insert('db_prodi.cfg_rule_g_user',$dataSave);
+        //     $this->db->insert('db_research.master_anggota_publikasi',$dataSave);
         // }
-        // die();
+        // ---- end master ---  //
 
-        // $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
-        // $G_it = $this->m_master->getEmployeeByDepartment(12);
-        // for ($i=0; $i < count($G_prodi); $i++) { 
-        //     $ProdiID = $G_prodi[$i]['ID'];
-        //     for ($k=0; $k < count($G_it); $k++) { 
-        //         $NIPIT = $G_it[$k]['NIP'];
-        //         $dataSave = [
-        //             'NIP' => $NIPIT,
-        //             'G_user' => 1,
-        //             'ProdiID' => $ProdiID,
-        //         ];
+        // --List Anggota -- //
+        // $db_live = $this->load->database('server_live', TRUE);
+        // $query = $db_live->query(
+        //    'select * from db_research.list_anggota_pkm where ID > 192'     
+        // )->result_array();
 
-        //         $this->db->insert('db_prodi.previleges_guser',$dataSave);
-        //     }
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $ID_anggota = $query[$i]['ID_anggota'];
+        //     $ID_PKM = $query[$i]['ID_PKM'];
+        //     $Peran = $query[$i]['Peran'];
+        //     $User_create = $query[$i]['User_create'];
+        //     $Date_create = $query[$i]['Date_create'];
+        //     $Csf = $query[$i]['Csf'];
+        //     $Disabled = $query[$i]['Disabled'];
+        //     $ID = $query[$i]['ID'];
+
+        //     $dataSave = [
+        //         'ID_anggota' => $ID_anggota,
+        //         'ID_PKM' => $ID_PKM,
+        //         'Peran' => $Peran,
+        //         'User_create' => $User_create,
+        //         'Date_create' => $Date_create,
+        //         'Csf' => $Csf,
+        //         'Disabled' => $Disabled,
+        //         'ID' => $ID,
+        //     ];
+
+        //     $this->db->insert('db_research.list_anggota_pkm',$dataSave);
+
         // }
+        // --End List Anggota -- //
+
+        // echo 'finish';
         // die();
-        // $rs = $this->m_master->DeleteFileToNas("http://localhost",'admission/45.png');
-        // print_r($rs);
-        // die();
+        
         $data['showNotif']=true;
         $data['department'] = parent::__getDepartement();
         $dpt = $this->session->userdata('IDdepartementNavigation');
@@ -980,6 +1072,18 @@ class C_dashboard extends Globalclass {
 
 
     /*ADDED BY FEBRI @ MARCH 2020*/
+    private function isItRealMe($NIP){
+        $myNIP = $this->session->userdata('NIP');
+        if($NIP == $myNIP){
+            $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+            if(!empty($isExist)){
+                return $isExist;
+            }
+        }
+
+        return null;
+    }
+
     public function tab_menu_new_emp($page,$NIP){
         
         if(!empty($_GET['resubmit']) && !empty($_GET['data'])){
@@ -1004,19 +1108,23 @@ class C_dashboard extends Globalclass {
         $this->temp($content);       
     }
 
-    public function profile(){
-        $myNIP = $this->session->userdata('NIP');
-        $myName = $this->session->userdata('Name');
-        $param[] = array("field"=>"em.NIP","data"=>" = ".$myNIP." ","filter"=>"AND",);    
-        $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
-        $data['NIP'] = $myNIP;
-        $page = $this->load->view('dashboard/profile/personal-data',$data,true);
-        $this->tab_menu_new_emp($page,$myNIP);
+
+    public function profile($NIP){
+        $isExist = $this->isItRealMe($NIP);
+        if(!empty($isExist)){
+            $myNIP = $this->session->userdata('NIP');
+            $myName = $this->session->userdata('Name');
+            $param[] = array("field"=>"em.NIP","data"=>" = ".$myNIP." ","filter"=>"AND",);    
+            $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
+            $data['NIP'] = $myNIP;
+            $page = $this->load->view('dashboard/profile/personal-data',$data,true);
+            $this->tab_menu_new_emp($page,$myNIP);
+        }else{show_404();}
     }
 
 
     public function additionalInfo($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
@@ -1028,7 +1136,7 @@ class C_dashboard extends Globalclass {
 
 
     public function family($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $data['familytree'] = $this->General_model->fetchData("db_employees.master_family_relations",array("IsActive"=>1))->result();
@@ -1041,7 +1149,7 @@ class C_dashboard extends Globalclass {
 
 
     public function educations($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
@@ -1053,7 +1161,7 @@ class C_dashboard extends Globalclass {
 
 
     public function training($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $page = $this->load->view('dashboard/profile/training',$data,true);
@@ -1063,7 +1171,7 @@ class C_dashboard extends Globalclass {
 
 
     public function workExperience($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $data['educationLevel'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
@@ -1075,7 +1183,7 @@ class C_dashboard extends Globalclass {
 
 
     public function careerLevel($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;
             $data['status'] = $this->General_model->fetchData("db_employees.master_status",array("IsActive"=>1))->result();
@@ -1093,11 +1201,22 @@ class C_dashboard extends Globalclass {
 
 
     public function departmentMember($NIP){
-        $isExist = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+        $isExist = $this->isItRealMe($NIP);
         if(!empty($isExist)){
             $data['NIP'] = $NIP;            
             $data['detail'] = $isExist;            
             $page = $this->load->view('dashboard/profile/department-member',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+
+    public function signature($NIP){
+        $isExist = $this->isItRealMe($NIP);
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;            
+            $data['detail'] = $isExist;            
+            $page = $this->load->view('dashboard/profile/signature',$data,true);
             $this->tab_menu_new_emp($page,$NIP);
         }else{show_404();}
     }
@@ -1307,7 +1426,7 @@ class C_dashboard extends Globalclass {
             $subdata = array();
             if(!empty($isExist)){
                 if(!empty($isExist->Logs)){
-                    $Logs = json_decode($isExist->Logs);
+                    $Logs = json_decode($isExist->Logs); unset($isExist->Logs);
                     
                     if(!empty($Logs->ReligionID)){
                         $Logs->Religion = $this->General_model->fetchData("db_employees.religion",array("IDReligion"=>$Logs->ReligionID))->row();                        
@@ -1327,6 +1446,7 @@ class C_dashboard extends Globalclass {
                             $Logs->District = $this->General_model->fetchData("db_admission.district",array("DistrictID"=>$Logs->DistrictID))->row();
                         }
                     }
+                    $subdata['origin'] = $isExist;
                     $subdata['detail'] = $Logs;
                     if(!empty($isExist->NoteApproved)){
                         $subdata['Note'] = $isExist->NoteApproved;
@@ -1390,8 +1510,32 @@ class C_dashboard extends Globalclass {
 
     public function myTeamActivities(){
         $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","IDStatus = 1 or IDStatus = 2","IDStatus","asc")->result();
-        $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
-        $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+        $myNIP = $this->session->userdata('NIP');
+        if(!empty($this->session->userdata('PositionOther1')['IDDivisionOther1']) || 
+            !empty($this->session->userdata('PositionOther2')['IDDivisionOther2']) ||
+            !empty($this->session->userdata('PositionOther3')['IDDivisionOther3'])){
+            $paramDivision = "";
+        }else{$paramDivision = array();}
+        
+        //var_dump($this->session->userdata());
+        if(!empty($this->session->userdata('PositionOther1')['IDDivisionOther1'])){
+            $paramDivision .= 'ID = '.$this->session->userdata('PositionOther1')['IDDivisionOther1'];
+        }
+        if(!empty($this->session->userdata('PositionOther2')['IDDivisionOther2'])){
+            $paramDivision .= 'or ID = '.$this->session->userdata('PositionOther2')['IDDivisionOther2'];
+        }
+        if(!empty($this->session->userdata('PositionOther3')['IDDivisionOther3'])){
+            $paramDivision .= 'or ID = '.$this->session->userdata('PositionOther3')['IDDivisionOther3'];
+        }
+
+
+        //var_dump($this->session->userdata);
+        if(!empty($this->session->userdata('PositionOther1')['IDDivisionOther1']) || 
+            !empty($this->session->userdata('PositionOther2')['IDDivisionOther2']) ||
+            !empty($this->session->userdata('PositionOther3')['IDDivisionOther3'])){
+            $data['division'] = $this->General_model->fetchData("db_employees.division",$paramDivision)->result();
+            $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+        }
         $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
         $data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
         $this->load->view('dashboard/myactivitiesteam',$data);        
@@ -1418,8 +1562,7 @@ class C_dashboard extends Globalclass {
                 $search = $reqdata['search']['value'];
 
                 $param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);
-                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' ","filter"=>"OR",);
-                $param[] = array("field"=>"em.NIDN","data"=>" like '%".$search."%' )","filter"=>"OR",);
+                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' )","filter"=>"OR",);
             }
             if(!empty($data_arr['Filter'])){
                 $parse = parse_str($data_arr['Filter'],$output);
@@ -1488,9 +1631,22 @@ class C_dashboard extends Globalclass {
                     }
                 }
 
+                if(!empty($output['division'])){
+                    if(!empty($output['position'])){
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther1","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther2","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$output['division'].".".$output['position']."' ) ","filter"=>"AND",);
+                    }else{
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther1","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$output['division'].".%' ) ","filter"=>"AND",);
+                    }
+                }
+
                 if(!empty($output['staff'])){
                     $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
-                    $param[] = array("field"=>"ps.NameEng","data"=>" like '%".$output['staff']."%' ","filter"=>"OR",);
                     $param[] = array("field"=>"em.Name","data"=>" like '%".$output['staff']."%' )","filter"=>"OR",);
                 }
                 if(!empty($output['religion'])){
@@ -1537,9 +1693,13 @@ class C_dashboard extends Globalclass {
                 }
 
                 if(!empty($output['attendance_start'])){
-                    $param[] = array("field"=>"lem.AccessedOn","operate"=>" = ","data"=>"'".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                    if(!empty($output['attendance_end'])){
+                        $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."' ","filter"=>"AND",);
+                    }else{
+                        $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                    }
                 }else{
-                    $param[] = array("field"=>"lem.AccessedOn","operate"=>"=","data"=>"'".date("Y-m-d")."' ","filter"=>"AND",);
+                    $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
                 }
 
                 if(!empty($output['sorted'])){
@@ -1548,12 +1708,23 @@ class C_dashboard extends Globalclass {
             }
             $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
-            if(!empty($reqdata['start']) && !empty($reqdata['length'])){
-                $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+            if(!empty($reqdata['length']) ){
+                $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'])->result();
             }else{
                 $result = $this->m_hr->fetchEmployee(false,$param)->result();
             }
 
+            if(!empty($result)){
+                $rs = array();
+                foreach ($result as $r) {
+                    $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                    $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
+                    $rs[] = $r;
+                }
+                $result = $rs;
+            }
+
+            //var_dump($this->db->last_query());
             $json_data = array(
                 "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
                 "recordsTotal"    => intval($TotalData),
