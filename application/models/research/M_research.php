@@ -293,6 +293,7 @@ class M_research extends CI_Model {
           foreach ($row as $key => $value) {
             $nestedData[] = $value;
           }
+          $row['DataDetail'] = $this->detail_litabmas($row['ID_list_anggota']);
           $tokenRow = $this->jwt->encode($row,"UAP)(*");
           $nestedData['data'] = $tokenRow;
           $data[] = $nestedData;
@@ -307,6 +308,62 @@ class M_research extends CI_Model {
         );
 
         return $json_data;
+    }
+
+    public function detail_litabmas($ID_list_anggota){
+        $rs = [];
+        $query = 'SELECT a.ID_Litabmas, a.User_create
+                  FROM db_research.list_anggota_penelitian AS a
+                  LEFT JOIN db_research.master_anggota_penelitian AS b ON (a.ID_anggota = b.ID)
+                  WHERE a.ID = "'.$ID_list_anggota.'" LIMIT 1 ';
+        $datas=$this->db->query($query, array())->result_array(); 
+        // print_r($query); exit();
+        
+        if(count($datas)>0) {
+
+            $sql = 'SELECT a.*,  b.Nm_skim, c.Nm_kel_bidang, d.Name_University, a.Judul_litabmas, e.Judul_litabmas AS judul_lanjutan, f.SumberDana, g.NameEng, h.Name AS NamaSemester, j.Name AS NmThn_akademik
+            FROM db_research.litabmas AS a 
+            LEFT JOIN db_research.skim_kegiatan AS b ON (b.Kd_skim = a.ID_skim)
+            LEFT JOIN db_research.kelompok_bidang AS c ON (c.Kode_kel_bidang = a.ID_kel_bidang)
+            LEFT JOIN db_research.university AS d ON (d.ID = a.ID_lemb_iptek)
+            LEFT JOIN db_research.litabmas e ON (e.ID_litabmas = a.ID_lanjutan_litabmas)
+            LEFT JOIN db_agregator.sumber_dana f ON (f.ID = a.ID_sumberdana)
+            LEFT JOIN db_academic.mata_kuliah g ON (g.MKCode = a.MKCode)
+            LEFT JOIN db_academic.semester h ON (h.ID = a.SemesterID)
+            LEFT JOIN db_academic.semester j ON (j.ID = a.Tahun_akademik)
+            WHERE a.ID_litabmas = "'.$datas[0]['ID_Litabmas'].'" AND a.NIP = "'.$datas[0]['User_create'].'" AND a.Stat_aktif= 1 ';
+            $rs = $this->db->query($sql, array())->result_array();   
+        }
+
+        return $rs; 
+    }
+
+    public function getProposal_research($parameter){
+        // print_r($parameter);die();
+        $ID_Litabmas = $parameter['ID_Litabmas'];
+        $NIP = $parameter['NIP'];
+        $G_format_laporan = $this->m_master->showData_array('db_research.master_format_laporan');
+        $rs = [];
+        for ($i=0; $i < count($G_format_laporan); $i++) { 
+            $ID = $G_format_laporan[$i]['ID'];
+            $sbj = $G_format_laporan[$i]['Nama_format'];
+            $rs[$i]=[
+                'subject' => $sbj,
+            ];
+
+            $query = $this->db->query(
+                'select * from db_research.litabmas_isi_laporan
+                where   ID_litabmas = '.$ID_Litabmas.'
+                and User_create = "'.$NIP.'"
+                and Jenis_format = '.$ID.'
+                '
+            )->result_array();
+
+            $rs[$i]['content'] = (count($query)>0) ? $query[0]['Isi_laporan'] : '';
+        }
+
+        return $rs;
+
     }
 
 }    
