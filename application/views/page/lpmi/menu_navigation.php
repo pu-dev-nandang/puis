@@ -234,7 +234,7 @@
                     News
                 </a>
             </li>
-            <li class="<?php if($this->uri->segment(2)==''){echo"current";}?>">
+            <li class="">
                 <a href="#">
                     <i class="fa fa-folder"></i>
                     Document

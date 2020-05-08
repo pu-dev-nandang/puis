@@ -230,7 +230,8 @@
 	 
 	        "processing": true, //Feature control the processing indicator.
 	        "serverSide": true, //Feature control DataTables' server-side processing mode.
-	        "order": [], //Initial no order.
+	        "ordering": true, // Set true agar bisa di sorting
+            "order": [[ 0, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
 	 
 	        // Load data for the table's content from an Ajax source
 	        "ajax": {	        	
@@ -240,9 +241,22 @@
 		                data.type = '<?= $Segment1 ?>';		                
 		            }
 	        },	 
+	        "deferRender": true,
+            "aLengthMenu": [[5, 10, 50],[ 5, 10, 50]], // Combobox Limit
+	        // 	Tambahkan bagian ini:
+			// "columns": [
+			// 	{data: 'Title'},
+			// 	{data: 'Published'},
+			// 	{data: 'UpdatedAT'},
+			// 	{data: 'Lang'},
+			// 	{data: 'Action'},
+
+			// ],
+	
 	        //Set column definition initialisation properties.
 	        "columnDefs": [
 			        { 
+			        	"searchable": false,
 			            "targets": [ 0 ], //first column / numbering column
 			            "orderable": false, //set not orderable
 			        },
