@@ -206,8 +206,8 @@ class C_lpmi extends Lpmi_Controler {
              
             //delete file
             $lpmi = $this->m_lpmi->get_by_id($this->input->post('id'));
-            if(file_exists('./uploads/lpmi/'.$lpmi->file) && $lpmi->file)
-                unlink('./uploads/lpmi/'.$lpmi->file);
+            if(file_exists('./uploads/lpmi/'.$lpmi->File) && $lpmi->File)
+                unlink('./uploads/lpmi/'.$lpmi->File);
  
             $data['File'] = $upload;
         }
