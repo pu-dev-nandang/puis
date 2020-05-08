@@ -125,7 +125,16 @@ class C_rest_research extends CI_Controller {
         case 'getProposal':
           $data = $dataToken['data'];
           $rs =  $this->m_research->getProposal_research($data);
-        break;
+          break;
+        case 'getLog':
+          $data = $dataToken['data'];
+          $rs =  $this->db->query(
+            'select appr.*,usr.Nama from db_research.appr_reviewer_penelitian as appr
+              '.$this->m_research->QueryUserReserachJoin('appr.By','usr','join').'
+              where appr.ID_list_anggota_penelitian = '.$data['ID_list_anggota'].'
+            '
+          )->result_array();
+          break;
         default:
           # code...
           break;
