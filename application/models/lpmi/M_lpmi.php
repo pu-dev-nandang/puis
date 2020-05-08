@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  
 class M_lpmi extends CI_Model {
  
-    var $table = 'content';
+    var $table = 'db_lpmi.content';
     var $column_order = array('Title','Description','Status',null); //set column field database for datatable orderable
     var $column_search = array('Title','Description','Status'); //set column field database for datatable searchable just firstname , lastname , address are searchable
     var $order = array('ID' => 'desc'); // default order 
