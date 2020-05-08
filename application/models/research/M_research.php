@@ -196,8 +196,8 @@ class M_research extends CI_Model {
     	}
     }
 
-    public function QueryUserReserachJoin($IDJoin,$aliasTable = 'usrr'){
-      $sql = ' left join (
+    public function QueryUserReserachJoin($IDJoin,$aliasTable = 'usrr',$join='left join'){
+      $sql = ' '.$join.' (
             select * from (
             select CONCAT("ekm.",ID) as ID_user,Nama,NIDN,NIP as NIPorNPM,Email from db_research.master_user_research
             where TypeUser = "Mahasiswa"
