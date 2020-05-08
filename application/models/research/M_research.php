@@ -338,4 +338,32 @@ class M_research extends CI_Model {
         return $rs; 
     }
 
+    public function getProposal_research($parameter){
+        // print_r($parameter);die();
+        $ID_Litabmas = $parameter['ID_Litabmas'];
+        $NIP = $parameter['NIP'];
+        $G_format_laporan = $this->m_master->showData_array('db_research.master_format_laporan');
+        $rs = [];
+        for ($i=0; $i < count($G_format_laporan); $i++) { 
+            $ID = $G_format_laporan[$i]['ID'];
+            $sbj = $G_format_laporan[$i]['Nama_format'];
+            $rs[$i]=[
+                'subject' => $sbj,
+            ];
+
+            $query = $this->db->query(
+                'select * from db_research.litabmas_isi_laporan
+                where   ID_litabmas = '.$ID_Litabmas.'
+                and User_create = "'.$NIP.'"
+                and Jenis_format = '.$ID.'
+                '
+            )->result_array();
+
+            $rs[$i]['content'] = (count($query)>0) ? $query[0]['Isi_laporan'] : '';
+        }
+
+        return $rs;
+
+    }
+
 }    

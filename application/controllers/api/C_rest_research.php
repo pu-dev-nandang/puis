@@ -122,7 +122,10 @@ class C_rest_research extends CI_Controller {
           $data = $dataToken['data'];
           $rs =  $this->m_research->dtSrvSide_research_eksternal($data);
           break;
-        
+        case 'getProposal':
+          $data = $dataToken['data'];
+          $rs =  $this->m_research->getProposal_research($data);
+        break;
         default:
           # code...
           break;

@@ -6069,7 +6069,7 @@ Phone: (021) 29200456';
     public function view_format_laporan($token){
 
         $data_arr = $this->getInputToken($token);
-
+        
         $listID = $data_arr['listID'];
         $stat_id = $data_arr['stat_id'];
 
