@@ -373,6 +373,73 @@ class C_api4 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='getDataAttdOnlineStudent'){
+            $ScheduleID = $data_arr['ScheduleID'];
+            $NPM = $data_arr['NPM'];
+
+            $result = [];
+
+            for($i=1;$i<=14;$i++){
+
+                // Task
+                $dataTask = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task_student sts 
+                                                        LEFT JOIN  db_academic.schedule_task st
+                                                        ON (sts.IDST = st.ID)
+                                                        WHERE sts.NPM = "'.$NPM.'" AND 
+                                                        st.ScheduleID = "'.$ScheduleID.'" AND
+                                                        st.Session = "'.$i.'"
+                                                           ')->result_array()[0]['Total'];
+
+
+                // Forum
+                $dataForum = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.counseling_comment cc
+                                                        LEFT JOIN db_academic.counseling_topic ct 
+                                                        ON (ct.ID = cc.TopicID)
+                                                        WHERE cc.UserID = "'.$NPM.'" 
+                                                        AND ct.ScheduleID = "'.$ScheduleID.'"
+                                                         AND ct.Sessions = "'.$i.'" ')->result_array()[0]['Total'];
+
+                // Attendance
+                $dataAttd = $this->db->query('SELECT ID FROM db_academic.attendance 
+                                                    WHERE ScheduleID = "'.$ScheduleID.'" ')->result_array();
+                $dataPresent = 0;
+                $dataAbsen = 0;
+                if(count($dataAttd)>0){
+                    for($a=0;$a<count($dataAttd);$a++){
+
+                        $ID_Attd = $dataAttd[$a]['ID'];
+
+                        $dt = $this->db->query('SELECT ast.M'.$i.' FROM db_academic.attendance_students ast 
+                                                            WHERE 
+                                                            ast.ID_Attd = "'.$ID_Attd.'" 
+                                                            AND ast.NPM = "'.$NPM.'"
+                                                             ')->result_array()[0]['M'.$i];
+
+                        if($dt=='1'){
+                            $dataPresent = $dataPresent + 1;
+                        } else if($dt=='2') {
+                            $dataAbsen = $dataAbsen + 1;
+                        }
+                    }
+                }
+
+
+
+                $result[$i-1] = array(
+                    'Session' => $i,
+                    'Task' => $dataTask,
+                    'Forum' => $dataForum,
+                    'AttdID' => count($dataAttd),
+                    'Present' => $dataPresent,
+                    'Present' => $dataPresent,
+                    'Absen' => $dataAbsen
+                );
+
+            }
+
+            return print_r(json_encode($result));
+
+        }
 
     }
 
