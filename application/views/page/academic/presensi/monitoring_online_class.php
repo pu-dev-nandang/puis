@@ -269,7 +269,7 @@
                         });
 
                         viewRevisiTask = '<div style="float: right;"><button data-idst="'+IDST+'" data-toggle="collapse" data-target="#collapseExample_'+IDST+'" class="btn btn-danger btnTaskRevisi">Task revision '+v.TotalTaskRevisi.length+'</button></div>' +
-                            '<div class="collapse" id="collapseExample_'+IDST+'"><div class="well" style="padding-left: 0px;padding-right: 0px;">' +
+                            '<div class="collapse" id="collapseExample_'+IDST+'"><div class="well" style="padding-left: 5px;padding-right: 5px;">' +
                             '<ol style="-webkit-padding-start:15px;">'+viewDetailRevisi+'</ol>' +
                             '</div></div>';
                     }

@@ -8913,10 +8913,16 @@ class C_api extends CI_Controller {
                                       LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
                                       WHERE ( '.$dataWhere.' ) '.$dataSearch.' ORDER BY aut_s.NPM ASC ';
 
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT aut_s.ID 
+                                                        FROM db_academic.auth_students aut_s
+                                                        LEFT JOIN db_academic.program_study ps 
+                                                        ON (ps.ID = aut_s.ProdiID)
+                                                        WHERE ( '.$dataWhere.' ) '.$dataSearch.') xx';
+
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
-        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
         $no = $requestData['start'] + 1;
         $data = array();
@@ -9011,8 +9017,8 @@ class C_api extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($queryDefaultRow)),
-            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval($queryDefaultRow),
             "data"            => $data
         );
 
@@ -12815,5 +12821,69 @@ class C_api extends CI_Controller {
     }
 
     /*END ADDED BY FEBRI @ FEB 2020*/
+
+    public function getIjazah(){
+
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
+
+        $dataWhereProdi = ($data_arr['ProdiID']!='') ? 'AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
+        $dataWhere = ' AND aut_s.Year = "'.$data_arr['Year'].'" '.$dataWhereProdi;
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%"
+                           OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" )';
+        }
+
+        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng 
+                                      FROM db_academic.auth_students aut_s
+                                      LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
+                                      WHERE aut_s.StatusStudentID = 1 '.$dataWhere.' '.$dataSearch.' ORDER BY aut_s.NPM ASC ';
+
+//        print_r($queryDefault);exit;
+
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT aut_s.ID 
+                                                        FROM db_academic.auth_students aut_s
+                                                        LEFT JOIN db_academic.program_study ps 
+                                                        ON (ps.ID = aut_s.ProdiID)
+                                                        WHERE aut_s.StatusStudentID = 1 '.$dataWhere.' '.$dataSearch.') xx';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['Name'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+
+            $no++;
+
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval($queryDefaultRow),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+
+
+    }
 
 }
