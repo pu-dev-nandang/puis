@@ -135,6 +135,25 @@ class C_rest_research extends CI_Controller {
             '
           )->result_array();
           break;
+        case 'sbmt_reject':
+        case 'sbmt_accept':
+          // print_r($dataToken);die();
+          $rs['status'] = 0;
+          $rs['msg'] = 'something wrong';
+          $dataSave = $dataToken['data'];
+          $dataSave['Date'] = date('Y-m-d');
+          $this->db->insert('db_research.appr_reviewer_penelitian',$dataSave);
+
+          $this->db->where('ID',$dataSave['ID_list_anggota_penelitian']);
+          $this->db->update(
+            'db_research.list_anggota_penelitian',
+            [
+              'Reviewer_confirm' => ($action == 'sbmt_reject') ? '-1' : '1',
+            ]
+          );
+          $rs['status'] = 1;
+          $rs['msg'] = '';
+          break;
         default:
           # code...
           break;

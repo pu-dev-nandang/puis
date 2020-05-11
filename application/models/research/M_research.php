@@ -263,9 +263,14 @@ class M_research extends CI_Model {
                             lap.ID_anggota = map.ID
                             AND map.ID_user = "'.$ID_user.'" 
                             AND map.Type_anggota = "REV" and Luar_internal = "0"
-                        ) as c on a.ID_litabmas = c.ID_litabmas ';
+                        ) as c on a.ID_litabmas = c.ID_litabmas 
+                    left join (
+                        select * from db_research.appr_reviewer_penelitian
+                        group by ID_list_anggota_penelitian order by ID desc
+                    ) as log on log.ID_list_anggota_penelitian =  c.ID_list_anggota   
+                        ';
 
-        $addSql = ' LIMIT
+        $addSql = ' order by log.ID desc LIMIT
             '.$requestData['start'].' , '.$requestData['length'];
 
 
