@@ -52,7 +52,11 @@ class M_set extends CI_Model {
 	public function PolaNoSurat($params){
 		// example :  041/UAP/R/SKU/X/2019
 		$ex = explode('.', $params);
-		$sql = 'select * from db_generatordoc.category_document where Active = 1';
+		// add 2020-05-12
+		$DepartmentID = $this->session->userdata('DepartmentIDDocument');
+		$sql = 'select * from db_generatordoc.category_document where Active = 1
+			and Department = "'.$DepartmentID.'"
+			';
 		$query = $this->db->query($sql,array())->result_array();
 		if (count($ex) > 0 && count($ex) == 1 ) {
 			return array(
