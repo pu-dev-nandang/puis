@@ -78,6 +78,14 @@
                     <span class="title">GA</span>
                 </a>
             </li>
+            <li class="departement <?php if($departement=='warehouse'){echo 'current';} ?>"
+                division="42"
+                data-dpt="warehouse">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/warehouse.png'); ?>"></span>
+                    <span class="title">Warehouse</span>
+                </a>
+            </li>
             <li class="departement <?php if($departement=='cooperation'){echo 'current';} ?>"
                 division="7"
                 data-dpt="cooperation">
