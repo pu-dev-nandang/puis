@@ -2986,7 +2986,7 @@ class M_doc extends CI_Model {
             $AddWhere = ' where a.Active = "'.$Active.'"';
         }
 
-        $WhereOrAnd = ($AddWhere == '') ? ' Where' : ' And';
+        $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
         $AddWhere .= $WhereOrAnd.' c.Department = "'.$DepartmentID.'"';
 
         $sql = 'select a.*,b.Name from db_generatordoc.document as a join db_employees.employees as b on a.UpdatedBy = b.NIP
@@ -3031,6 +3031,9 @@ class M_doc extends CI_Model {
                 $AddWhere .= ' where a.Active = "'.$Active.'"';
             }
         }
+
+        $AndOrWhere = ($AddWhere == '') ? ' where ' : ' And';
+        $AddWhere .= $AndOrWhere.' a.Department = "'.$DepartmentID.'"';
 
         $sql = 'select a.*,qdx.NameDepartment,b.Name as NameUpdated
                 from db_generatordoc.category_document as a 
