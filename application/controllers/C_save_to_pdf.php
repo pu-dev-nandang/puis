@@ -876,6 +876,9 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_ttd,$h,'Wakil Rektor I',1,1,'C');
 
 
+        $pdf->Ln(5);
+        $pdf->SetFont('Times','B',10);
+        $pdf->Cell(190, 7, '*This document was issued electronically and is therefore valid without signature.', 0, 1, 'L');
 
         $pdf->Ln(5);
         $pdf->SetFont('Times','I',7);
@@ -6069,7 +6072,7 @@ Phone: (021) 29200456';
     public function view_format_laporan($token){
 
         $data_arr = $this->getInputToken($token);
-        
+
         $listID = $data_arr['listID'];
         $stat_id = $data_arr['stat_id'];
 
@@ -6090,21 +6093,21 @@ Phone: (021) 29200456';
                 $pdf->Ln(7);
                 $pdf->SetFont('Arial','',14);
                 $pdf->Cell(0,5,$d['Nama_format'],0,1,'C');
-                
+
                 $pdf->Ln(15);
                 $pdf->SetFont('Arial','',12);
                 $pdf->Cell(0,5,$d['Isi_laporan']);
 
                 $pdf->SetAutoPageBreak(true, 0);
                 $pdf->Output('I','preview_format_laporan.pdf');
-        
-            } 
+
+            }
             else {
                 echo 'data not yet';
             }
         }
         else {
-      
+
             if(count($dataLaporan)>0){
 
                 $d = $dataLaporan[0];
@@ -6122,8 +6125,8 @@ Phone: (021) 29200456';
 
                 $pdf->SetAutoPageBreak(true, 0);
                 $pdf->Output('I','preview_format_laporan.pdf');
-        
-            } 
+
+            }
             else {
                 echo 'data not yet';
             }
@@ -6156,21 +6159,21 @@ Phone: (021) 29200456';
                 $pdf->Ln(7);
                 $pdf->SetFont('Arial','',14);
                 $pdf->Cell(0,5,$d['Nama_format'],0,1,'C');
-                
+
                 $pdf->Ln(15);
                 $pdf->SetFont('Arial','',12);
                 $pdf->Cell(0,5,$d['Isi_laporan']);
 
                 $pdf->SetAutoPageBreak(true, 0);
                 $pdf->Output('I','preview_format_laporan.pdf');
-        
-            } 
+
+            }
             else {
                 echo 'data not yet';
             }
         }
         else {
-      
+
             if(count($dataLaporan)>0){
 
                 $d = $dataLaporan[0];
@@ -6188,8 +6191,8 @@ Phone: (021) 29200456';
 
                 $pdf->SetAutoPageBreak(true, 0);
                 $pdf->Output('I','preview_format_laporan.pdf');
-        
-            } 
+
+            }
             else {
                 echo 'data not yet';
             }
