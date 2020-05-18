@@ -184,7 +184,7 @@
                     Home Banner
                 </a>
             </li>
-            <li class="<?php if($this->uri->segment(2)=='list-lecturer'){echo"current";}?>">
+            <li class="<?php if($this->uri->segment(2)=='vision' || $this->uri->segment(2)=='mission' || $this->uri->segment(2)=='target' || $this->uri->segment(2)=='program' || $this->uri->segment(2)=='event'){echo"current";}?>">
                 <a href="">
                     <i class="fa fa-home"></i>
                     About
@@ -202,15 +202,15 @@
                             Mission
                         </a>
                     </li>
-                    <li class="<?php if($this->uri->segment(2)=='committee'){echo"current";}?>">
+                    <!-- <li class="<?php if($this->uri->segment(2)=='committee'){echo"current";}?>">
                         <a href="<?php echo base_url('lpmi/committee');?>">
                             <i class="fa fa-group"></i>
                             SPMI Committee
                         </a>
-                    </li>
+                    </li> -->
                     <li class="<?php if($this->uri->segment(2)=='target'){echo"current";}?>">
                         <a href="<?php echo base_url('lpmi/target');?>">
-                            <i class="fa fa-hand-grab-o"></i>
+                            <i class="fa fa-bolt"></i>
                             Traget
                         </a>
                     </li>
@@ -230,11 +230,11 @@
             </li>
             <li class="<?php if($this->uri->segment(2)=='news'){echo"current";}?>">
                 <a href="<?php echo base_url('lpmi/news');?>">
-                    <i class="fa fa-drivers-license-o"></i>
+                    <i class="fa fa-drivers-license"></i>
                     News
                 </a>
             </li>
-            <li class="">
+            <li  class="<?php if($this->uri->segment(2)=='knowledge'){echo"current";}?>">
                 <a href="#">
                     <i class="fa fa-folder"></i>
                     Document
@@ -256,14 +256,14 @@
             </li>
             <li class="<?php if($this->uri->segment(2)=='testimonials'){echo"current";}?>">
                 <a href="<?php echo base_url('lpmi/testimonials');?>">
-                    <i class="fa fa-bolt"></i>
+                    <i class="fa fa-comments"></i>
                     Testimonials
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='partner'){echo"current";}?>">
                 <a href="<?php echo base_url('lpmi/partner');?>">
                     <i class="fa fa-handshake-o"></i>
-                    Partnert
+                    Partner
                 </a>
             </li>
             

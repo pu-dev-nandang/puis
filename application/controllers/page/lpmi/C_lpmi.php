@@ -114,6 +114,7 @@ class C_lpmi extends Lpmi_Controler {
     public function menu_content(){
         // $data['pages'] = $pages;
         $data['department'] = parent::__getDepartement();
+        $data['category'] = $this->m_lpmi->get_category();
         $content = $this->load->view('page/'.$data['department'].'/content/menu_content',$data,true);
         $this->temp($content);
     }
@@ -153,6 +154,7 @@ class C_lpmi extends Lpmi_Controler {
         //output to json format
         echo json_encode($output);
     }
+
     public function ajax_edit($id)
     {
         $data = $this->m_lpmi->get_by_id($id);
@@ -165,6 +167,7 @@ class C_lpmi extends Lpmi_Controler {
         $data = array(
                 // 'IDType' => $this->input->post('type'),
                 'Title' => $this->input->post('title'),
+                'IDCat' => $this->input->post('category'),
                 'Description' => $this->input->post('description'),
                 'Meta_description' => $this->input->post('meta_des'),
                 'Meta_keywords' => $this->input->post('meta_key'),
@@ -184,12 +187,62 @@ class C_lpmi extends Lpmi_Controler {
         $insert = $this->m_lpmi->save($data,$type);
         echo json_encode(array("status" => TRUE));
     }
- 
+
+
+    // Category
+
+    public  function list_category(){
+        $data=$this->m_lpmi->get_category();
+        echo json_encode($data);
+    }
+
+    public function ajax_addCat()
+    {
+        // $this->_validate();
+        $data = array(                
+                'Name' => $this->input->post('category'),
+                'CreateAt' => date('Y-m-d H:i:s'),
+                'CreateBy' => $this->session->userdata('NIP'),
+            );
+        
+        // print_r($data);die();
+        $insert = $this->m_lpmi->saveCat($data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    public function ajax_editCat($id)
+    {
+        $data = $this->m_lpmi->get_by_idCat($id);
+        echo json_encode($data);
+    }
+
+    public function ajax_updateCat()
+    {
+        // $this->_validate();
+        $data = array(                
+                'Name' => $this->input->post('category'),
+                'CreateAt' => date('Y-m-d H:i:s'),
+                'CreateBy' => $this->session->userdata('NIP'),
+            );
+        
+        // print_r($data);die();
+        $insert = $this->m_lpmi->updateCat(array('ID' => $this->input->post('idcat')),$data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    public function ajax_deleteCat($id)
+    {
+        $this->m_lpmi->delete_by_idCat($id);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    // Content 
     public function ajax_update()
     {
         $this->_validate();
         $data = array(
                 'Title' => $this->input->post('title'),
+                'IDCat' => $this->input->post('category'),
                 'Description' => $this->input->post('description'),
                 'Meta_description' => $this->input->post('meta_des'),
                 'Meta_keywords' => $this->input->post('meta_key'),
@@ -215,7 +268,7 @@ class C_lpmi extends Lpmi_Controler {
         $this->m_lpmi->update(array('ID' => $this->input->post('id')), $data);
         echo json_encode(array("status" => TRUE));
     }
- 
+    
     public function ajax_delete($id)
     {
         //delete file
