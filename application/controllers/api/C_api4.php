@@ -493,6 +493,37 @@ class C_api4 extends CI_Controller {
 
             return print_r(1);
         }
+        else if($data_arr['action']=='updateDateOnline'){
+
+            // Cek
+            $data = $this->db->get_where('db_academic.schedule_online',array(
+                'ScheduleID' => $data_arr['ScheduleID'],
+                'Session' => $data_arr['Session']
+            ))->result_array();
+
+            $dataIns = array(
+                'ScheduleID' => $data_arr['ScheduleID'],
+                'Session' => $data_arr['Session'],
+                'DateStart' => $data_arr['DateStart'],
+                'DateEnd' => $data_arr['DateEnd']
+            );
+
+            if(count($data)>0){
+                // Update
+                $dataIns['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataIns['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID', $data[0]['ID']);
+                $this->db->update('db_academic.schedule_online',$dataIns);
+            } else {
+                // Insert
+                $dataIns['EntredBy'] = $this->session->userdata('NIP');
+                $dataIns['EntredAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->insert('db_academic.schedule_online',$dataIns);
+            }
+
+            return print_r(1);
+
+        }
 
     }
 
@@ -587,8 +618,8 @@ class C_api4 extends CI_Controller {
                                     <a href="javascript:void(0);" data-active="'.$dataSes['Status'].'" data-schid="'.$row['ScheduleID'].'" 
                                     data-session="'.$s.'" data-start="'.$dataSes['RangeStart'].'" 
                                     data-end="'.$dataSes['RangeEnd'].'" class="btnAdmShowAttendance">
-                                    <div style="font-size: 10px;color: #607d8b;margin-top: 5px;font-weight: bold;">
-                                    '.$rangeSt.'<br/>'.$rangeEn.'</div>
+                                    <div id="show_scheduleOnlinr_'.$row['ScheduleID'].'_'.$s.'" style="font-size: 10px;color: #607d8b;margin-top: 5px;font-weight: bold;">
+                                    '.$rangeSt.'<br/>'.$rangeEn.'</div id="show_scheduleOnlinr_">
                                     </div></a>';
                  array_push($nestedData,$arr);
             }
