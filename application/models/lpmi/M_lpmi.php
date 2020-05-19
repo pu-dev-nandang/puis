@@ -24,9 +24,15 @@ class M_lpmi extends CI_Model {
             $this->db->where('IDindex', $getvaID);
         }
         
-        $this->db->from($this->table); 
+        $this->db->from('db_lpmi.content'); 
         $i = 0;
-     
+        
+        // if(!isset($_POST['category']))
+        // {
+        //     $this->db->join('db_lpmi.category', 'db_lpmi.content.IDCat = db_lpmi.category.ID');
+
+        // }
+
         foreach ($this->column_search as $item) // loop column 
         {
             if($_POST['search']['value']) // if datatable send POST for search
@@ -90,7 +96,15 @@ class M_lpmi extends CI_Model {
  
         return $query->row();
     }
- 
+    
+    public function get_by_idCat($id)
+    {
+        $this->db->from('db_lpmi.category');
+        $this->db->where('ID',$id);
+        $query = $this->db->get(); 
+        return $query->row();
+    }
+
     public function save($data,$type)
     {   
         $sql = 'select ci.* from db_lpmi.content_index AS ci
@@ -101,13 +115,39 @@ class M_lpmi extends CI_Model {
         $this->db->insert($this->table, $data);
         return $this->db->insert_id();
     }
+
+    function get_category(){
+        $this->db->from("db_lpmi.category");
+        $this->db->order_by('ID','desc');
+        $q = $this->db->get();
+        return $q->result();  
+    }
+
+    public function saveCat($data)
+    {           
+        $this->db->insert('db_lpmi.category', $data);
+        return $this->db->insert_id();
+    }
  
     public function update($where, $data)
     {
         $this->db->update($this->table, $data, $where);
         return $this->db->affected_rows();
     }
+    
+    public function updateCat($where, $data)
+    {
+        $this->db->update('db_lpmi.category', $data, $where);
+        return $this->db->affected_rows();
+    }
  
+
+    public function delete_by_idCat($id)
+    {
+        $this->db->where('ID', $id);
+        $this->db->delete('db_lpmi.category');
+    }
+
     public function delete_by_id($id)
     {
         $this->db->where('ID', $id);

@@ -15,9 +15,9 @@
         </div>
         <div class="panel-body" id="tabs">
         	<button class="btn btn-success" onclick="add_lpmi()"><i class="glyphicon glyphicon-plus"></i> Create</button>
+        	<?php if($Segment1=='knowledge'){echo '<button class="btn btn-success" onclick="Catlpmi()"><i class="glyphicon glyphicon-plus"></i> Add Category</button>';} ?>
         	<button class="btn btn-default" onclick="reload_table()"><i class="glyphicon glyphicon-refresh"></i> Reload</button>
-        	<hr>
-        	
+        	<hr>        	
 						
 			<div class="table-responsive">
 			  <table class="table table-condensed table-striped" id="table">
@@ -45,6 +45,54 @@
 <style type="text/css">.form-horizontal .form-group {
     padding: 5px 15px;
 }</style>
+<!-----Modal Category--->
+<div class="modal fade " id="modal_formCat" tabindex="-1" role="dialog" aria-labelledby="largeModal" aria-hidden="true">
+    <div class="modal-dialog modal-md" style="width: 60%">
+	    <div class="modal-content">
+	    <div class="modal-header" style="padding: 20px 35px">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	        <h3 class="modal-title" id="myModalLabel">Create Content <?= ucwords(str_replace("-"," ",$Segment1)); ?></h3>
+	    </div>
+	    
+	    <div class="modal-body form">
+			<form class="getcategory" id="formcat" style="margin: 0 15px;;">            		
+				<div class="form-group">  
+				    <label for=""><label id="cng">Add</label> Category:</label>  
+				    	<input type="hidden" value="" name="idcat"/>
+				    	<input id="namecategory" name="category" class="form-control" type="text" placeholder="Input Category Here" value="">  
+					
+				</div> 
+				<div class="form-group">
+					<div class="btn btn-success" id="btncategory" onclick="add_category()">Save</div>
+				</div>
+			</form> 
+			<div class="panel-body" style="min-height: 100px;">
+				<div class="table-responsive">
+			        <table class="table table-condensed table-striped">
+			            <thead>
+			                <tr>
+			                    <td style="width: 8%">No</td>
+			                    <td>Category</td>
+			                    <td>Create by</td>
+			                    <td>Create at</td>
+			                    <td>Action</td>
+			                </tr>
+			            </thead>
+			            <tbody id="viewDatalistCategory">					        
+					    </tbody>
+			        </table>
+			    </div>
+	    	</div>
+			<!-- <div class="modal-footer">
+		       	<button type="button" id="btnSave" onclick="save()" class="btn btn-info">Save</button>
+		        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+		    </div> -->
+
+    	</div>
+    	
+    	</div>
+	</div>
+</div>
 <!-- MODAL ADD -->
 	<div class="modal fade " id="modal_form" tabindex="-1" role="dialog" aria-labelledby="largeModal" aria-hidden="true">
 	    <div class="modal-dialog modal-lg" style="width: 80%">
@@ -72,7 +120,7 @@
 						      <div class="form-group">
 						      	<label>Date</label>
 						        <div class="input-group input-append date datetimepicker">
-						        	<input data-format="yyyy-MM-dd h:m" class="form-control input_modal_assign_to" type="text" name="date" readonly="" value="<?php echo date('Y-m-d h:m') ?>">
+						        	<input data-format="yyyy-MM-dd hh:mm" class="form-control input_modal_assign_to" type="text" name="date" readonly="" value="">
 						        	<span class="input-group-addon add-on">
 						        		<i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i>
 						        	</span>
@@ -115,6 +163,18 @@
 	                </div>    
 	            </div> 
 	            <div class="col-md-4">
+	            	<div id="show_a5" class="thumbnail" style="padding: 15px ;margin-bottom:15px" > 
+	            		<div class="form-group" style="margin-bottom: 0px">
+	                        <h3>Select Category</h3>
+	                        <select  name="category" class="form-control">
+	                          <option value="">--Select--</option>
+							  	<?php foreach($category as $row):?>
+		                        <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
+		                        <?php endforeach;?>							  
+							</select>
+							<span class="help-block"></span>
+	                    </div>
+	                </div>
 	            	<div class="thumbnail" style="padding: 15px; margin-bottom: 15px"> 	            		
 	            		
 	                    <div class="form-group" style="margin-bottom: 0px">
@@ -138,21 +198,27 @@
 	            	</div>
 	            	<div class="thumbnail" style="padding: 15px"> 	            		
 	            		
-	                    <div class="form-group" style="margin-bottom: 0px">
+	                    <div class="form-group" style="margin-bottom: 15px">
 	                        <h3>Setting Build</h3>	                                             
 							<hr>
 
-								<div><input type="checkbox" id="ad1"> <label id="setingedit0">Add</label> Date
+								<div><input type="checkbox" id="ad1" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="knowledge" || $Segment1 =="testimonials" || $Segment1 =="partner"){echo "disabled";}?> > <label id="setingedit0">Add</label> Date
 								</div>
-								<div><input type="checkbox" id="ad2"> <label id="setingedit">Add</label> Meta Descripton
+								<div><input type="checkbox" id="ad2" > <label id="setingedit">Add</label> Meta Descripton
 								</div>
 								<div><input type="checkbox" id="ad3"> <label id="setingedit1">Add</label> Meta Keywords
 								</div>
-								<div><input type="checkbox" id="ad4"> <label id="setingedit2">Add</label> Upload
+								<div><input type="checkbox" id="ad4" <?php if ($Segment1 =="vision" || $Segment1 =="mission" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="event" ){echo "disabled";}?>> <label id="setingedit2">Add</label> Upload
+								</div>
+								<div><input type="checkbox" id="ad5" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="event" || $Segment1 =="testimonials" || $Segment1 =="partner"){echo "disabled";}?> onchange="valueChanged()"> <label id="setingedit3">Add</label> Category
 								</div>										
 							<span class="help-block"></span>
 	                    </div>
-	            	</div>
+	            	</div>	           
+
+	                </form>
+	                                      
+	            	
 	            </div>               
 	      	</div>
 		</div>	
@@ -164,6 +230,7 @@
 
 
 	    </div>
+	    
 	</div>
 <!--END MODAL ADD-->
 <script>
@@ -175,8 +242,19 @@
 </script>
 
 <script>
-
+	$("#show_a5").hide();
+	function valueChanged()
+    {
+        if($('#ad5').is(":checked"))   
+            $("#show_a5").show();
+        else
+            $("#show_a5").hide();
+    }
+    $(document).ready(function(){
+    	
+    });
     $(document).ready(function () {
+    	
     	// show setting build
     	$('#ad1').change(function() {
 		  $("#show_a1").prop("hidden", !this.checked);
@@ -186,11 +264,14 @@
 		});
 		$('#ad3').change(function() {
 		  $("#show_a3").prop("hidden", !this.checked);
-		})
+		});
 		$('#ad4').change(function() {
 			$("#show_a4").prop("hidden", !this.checked);
-
-		})
+		});
+		// $('#ad5').change(function() {
+		// 	$("#show_a5").show();
+		// 	document.getElementById('show_a5')[ ($("#ad5==''").is(":checked")? "show" : "hide" ]();;
+		// });
         $('#Description').summernote({
             placeholder: 'Text your announcement',
             tabsize: 2,
@@ -281,6 +362,150 @@
 	    });
 	 
 	});
+	 
+
+	function add_category()
+	{
+		$('#btncategory').text('Saving...'); //change button text
+	    $('#btncategory').attr('disabled',true); //set button disable 
+	    var url;
+	 
+	    if(save_method == 'add') {
+	        url = base_url_js+'__ajaxaddCat_lpmi';
+	    } else {
+	        url = base_url_js+'__ajaxupdateCat_lpmi';
+	    }
+	 
+	    // ajax adding data to database
+	    var category = new FormData($('#formcat')[0]);
+	    // console.log(category);
+	    $.ajax({
+	        url : url,
+	        type: "POST",
+	        data: category,
+	        contentType: false,
+	        processData: false,
+	        dataType: "JSON",
+	        success: function(data)
+	        {
+	 
+	            if(data.status) //if success close modal and reload ajax table
+	            {
+	            	toastr.success('Data saved','Success');
+	                // $('#modal_form').modal('hide');
+	                // reload_table();
+	                loadDatacate();
+	                $('#namecategory').val('');
+	                $('#btncategory').text('Save'); //change button text
+	            	$('#btncategory').attr('disabled',false); //set button enable 
+	            	$('#cng').text('Add')
+	            }
+	            
+	                       
+	 			
+	        },
+	        error: function (jqXHR, textStatus, errorThrown)
+	        {
+	            alert('Error adding / update data');
+	            $('#btncategory').text('Save'); //change button text
+	            $('#btncategory').attr('disabled',false); //set button enable 
+	 
+	        }
+	    });
+	    return false;
+	}
+
+
+	function loadDatacate() {
+        
+        $.ajax({
+              type  : 'GET',
+              url   : base_url_js+'__ajaxCat_lpmi',
+              async : false,
+              dataType : 'json',
+              success : function(data){
+
+                  var html = '';
+                  var i;
+                  for (i = 0; i < data.length; i++) {
+                      html += '<tr>'+
+		                        '<td>'+(i+1)+'</td>'+
+		                        '<td>'+data[i].Name+'</td>'+
+		                        '<td>'+data[i].CreateAt+'</td>'+
+		                        '<td>'+data[i].CreateBy+'</td>'+
+		                        '<td>'+
+		                          '<a id="tab1-20933" class="btn btn-success" onclick="editCat_lpmi('+data[i].ID+')" href="javascript:;" data="'+data[i].ID+'"> Edit</a>'+
+		                          '<a id="tab1-20933" class="btn btn-danger" onclick="deleteCat_lpmi('+data[i].ID+')" href="javascript:;" data="'+data[i].ID+'"> Delete</a>'+
+		                        '</td>'+
+		                      '</tr>';
+		                      // console.log(data[i].Name);
+                  }
+                  
+                  $('#viewDatalistCategory').html(html);
+              }
+          })
+    }
+
+	function Catlpmi()
+	{
+		loadDatacate();	
+	    save_method = 'add';
+	    $('#formcat')[0].reset(); // reset form on modals
+	    $('.form-group').removeClass('has-error'); // clear error class
+	    $('.help-block').empty(); // clear error string
+	    $('#modal_formCat').modal('show'); // show bootstrap modal
+	    $('.modal-title').text('Build Category'); // Set Title to Bootstrap modal title
+	}
+
+
+	function editCat_lpmi(id)
+	{
+	    save_method = 'update';
+	    $.ajax({
+	        url : base_url_js+'__ajaxeditCat_lpmi/'+id,
+	        type: "GET",
+	        dataType: "JSON",
+	        success: function(data)
+	        {
+	 			$('[name="idcat"]').val(data.ID);
+	            $('[name="category"]').val(data.Name);	
+				$('[name="category"]').focus();	  
+				$('#cng').text('Edit')          			
+
+	        },
+	        error: function (jqXHR, textStatus, errorThrown)
+	        {
+	            alert('Error get data from ajax');
+	        }
+	    });
+	}
+
+	function deleteCat_lpmi(id)
+	{
+	    if(confirm('Are you sure delete this data?'))
+	    {
+	        // ajax delete data to database
+	        $.ajax({
+	            url : base_url_js+'__ajaxdeleteCat_lpmi/'+id,
+	            type: "POST",
+	            dataType: "JSON",
+	            success: function(data)
+	            {
+	                //if success reload ajax table
+	                toastr.success('Data delete','Success');
+	                $('#modal_form').modal('hide');
+	                loadDatacate();
+	            },
+	            error: function (jqXHR, textStatus, errorThrown)
+	            {
+	                alert('Error deleting data');
+	            }
+	        });
+	 
+	    }
+	}
+
+
 
 	function add_lpmi()
 	{
@@ -292,6 +517,17 @@
 	    $('.modal-title').text('Build Content'); // Set Title to Bootstrap modal title
 	    $('#photo-preview').hide(); // hide photo preview modal
 	    $('#Description').summernote('code', '');
+	    $('#show_a1').hide();
+	    $('#show_a2').hide();
+	    $('#show_a3').hide();
+	    $('#show_a4').hide();
+	    $('#show_a5').hide();
+
+	    $('#setingedit0').text('Add');  //change name checkbox
+	 	$('#setingedit').text('Add');  //change name checkbox
+	 	$('#setingedit1').text('Add');  //change name checkbox
+	 	$('#setingedit2').text('Add');  //change name checkbox
+	 	$('#setingedit3').text('Add');  //change name checkbox
 	}
 	 
 	function edit_lpmi(id)
@@ -304,6 +540,7 @@
 	 	$('#setingedit').text('Edit');  //change name checkbox
 	 	$('#setingedit1').text('Edit');  //change name checkbox
 	 	$('#setingedit2').text('Edit');  //change name checkbox
+	 	$('#setingedit3').text('Edit');  //change name checkbox
 	    //Ajax Load data from ajax
 	    $.ajax({
 	        url : base_url_js+'__ajaxedit_lpmi/'+id,
@@ -318,6 +555,8 @@
 	            $('#Description').summernote('code', data.Description);
 	            $('[name="meta_des"]').val(data.Meta_des);
 	            $('[name="meta_key"]').val(data.Meta_key);
+	            $('[name="date"]').val(data.AddDate);
+	            $('[name="category"]').val(data.IDCat);
 	            // Language
 	            if (data.Status=="Yes") {
                 	document.getElementById("st1").checked = true;
@@ -325,6 +564,26 @@
 	                document.getElementById("st2").checked = true;
 	            }
 
+	            if (data.AddDate=='' || data.AddDate=='0000-00-00 00:00:00'){
+	            	document.getElementById("ad1").checked = false;
+	            	document.getElementById("show_a1").hidden = true;
+	            	// $("#show_a1").prop("show", this.checked);
+	            }else{
+	            	document.getElementById("ad1").checked = true;
+	            	document.getElementById("show_a1").hidden = false;
+	            }
+	            // console.log(data.IDCat);
+	            if (data.IDCat ){
+	            	document.getElementById("ad5").checked = true;
+	            	$('#show_a5').show();
+	            	// $("#show_a1").prop("show", this.checked);
+	            	// console.log('no');
+	            }else{
+	            	document.getElementById("ad5").checked = false;
+	            	// document.getElementById("show_a5").hidden = false;
+	            	$('#show_a5').hide();
+	            	// console.log('ok');
+	            }
 	            // if (data.File!=="" ) {
              //    	// document.getElementById("ad4").checked = true;                	
 					
@@ -356,11 +615,13 @@
 	                }
 	
 	            }
-	            // else
-	            // {
-	            //     $('#label-photo').text('Upload Photo1'); // label photo upload
-	            //     $('#photo-preview div').text('(No photo)');
-	            // }
+	            else
+	            {
+	                // $('#label-photo').text('Upload Photo1'); // label photo upload
+	                // $('#photo-preview div').text('(No photo)');
+	                $('#photo-preview').hide();
+	                // document.getElementById("photo-preview").hidden = false;
+	            }
 	        },
 	        error: function (jqXHR, textStatus, errorThrown)
 	        {
@@ -440,6 +701,7 @@
 	            success: function(data)
 	            {
 	                //if success reload ajax table
+	                toastr.success('Data delete','Success');
 	                $('#modal_form').modal('hide');
 	                reload_table();
 	            },
