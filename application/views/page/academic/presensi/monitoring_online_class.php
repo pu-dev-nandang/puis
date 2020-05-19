@@ -48,6 +48,8 @@
     
     $(document).ready(function () {
 
+        setLoadFullPage();
+
         loSelectOptionSemester('#filterSemester','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
 
@@ -307,7 +309,30 @@
             var viewRangeStart = moment(RangeStart).format('dddd, DD MMMM YYYY');
             var viewRangeEnd = moment(RangeEnd).format('dddd, DD MMMM YYYY');
 
-            var htmlss = '<div class="alert alert-info" style="text-align: center;"><b>'+viewRangeStart+' - '+viewRangeEnd+'</b></div>' +
+            var htmlss = '<div class="alert alert-info" style="text-align: center;"><b id="modal_view_Schedule">'+viewRangeStart+' - '+viewRangeEnd+'</b>' +
+                '       <button class="btn btn-default btn-sm" type="button" data-toggle="collapse" data-target="#collapseEditDate" style="float: right;padding: 0px 9px;">Edit</button></div>' +
+                '<div class="collapse" id="collapseEditDate">' +
+                '  <div class="well">' +
+                '      <div class="form-group">' +
+                '           <div class="row">' +
+                '               <div class="col-md-4 col-md-offset-1">' +
+                '                   <label>Date Start</label>' +
+                '                   <input id="form_modal_DateStart" class="form-control" type="date" value="'+RangeStart+'" />' +
+                '                   <input id="form_modal_ScheduleID" class="hide" value="'+ScheduleID+'" />' +
+                '                   <input id="form_modal_Session" class="hide" value="'+Session+'" />' +
+                '               </div>' +
+                '               <div class="col-md-4">' +
+                '                   <label>Date End</label>' +
+                '                   <input id="form_modal_DateEnd" class="form-control" type="date" value="'+RangeEnd+'" />' +
+                '               </div>' +
+                '               <div class="col-md-2">' +
+                '                   <label>.</label>' +
+                '                   <button class="btn btn-success" id="btn_modal_Save">Save</button>' +
+                '               </div>' +
+                '           </div>' +
+                '       </div>' +
+                '   </div>' +
+                '</div>' +
                         '<input class="hide" id="attdModal_ScheduleID" value="'+ScheduleID+'" />' +
                         '<input class="hide" id="attdModal_RangeStart" value="'+RangeStart+'" />' +
                         '<input class="hide" id="attdModal_RangeEnd" value="'+RangeEnd+'" />' +
@@ -435,6 +460,51 @@
                },500);
            });
        }
+    });
+
+    // Save date online
+    $(document).on('click','#btn_modal_Save',function () {
+        var DateStart = $('#form_modal_DateStart').val();
+        var ScheduleID = $('#form_modal_ScheduleID').val();
+        var Session = $('#form_modal_Session').val();
+        var DateEnd = $('#form_modal_DateEnd').val();
+
+        if(DateStart!='' && DateStart!=null &&
+            ScheduleID!='' && ScheduleID!=null &&
+        Session!='' && Session!=null &&
+        DateEnd!='' && DateEnd!=null){
+
+            loading_buttonSm('#btn_modal_Save');
+
+            var data = {
+                action : 'updateDateOnline',
+                ScheduleID : ScheduleID,
+                Session : Session,
+                DateStart : DateStart,
+                DateEnd : DateEnd
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api4/__crudOnlineClass';
+
+            $.post(url,{token:token},function () {
+
+                var viewRangeStart = moment(DateStart).format('dddd, DD MMMM YYYY');
+                var viewRangeEnd = moment(DateEnd).format('dddd, DD MMMM YYYY');
+                $('#modal_view_Schedule').html(viewRangeStart+' - '+viewRangeEnd);
+
+                var viewRangeStart_2 = moment(DateStart).format('DD/MMM/YYYY');
+                var viewRangeEnd_2 = moment(DateEnd).format('DD/MMM/YYYY');
+                $('#show_scheduleOnlinr_'+ScheduleID+'_'+Session)
+                    .html(viewRangeStart_2+'<br/>'+viewRangeEnd_2);
+                toastr.success('Data saved','Success');
+                setTimeout(function () {
+                    $('#btn_modal_Save').prop('disabled',false).html('Save');
+
+                },500);
+
+            });
+
+        }
     });
 
 </script>

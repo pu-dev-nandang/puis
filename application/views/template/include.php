@@ -974,6 +974,12 @@
         });
     }
 
+    function setLoadFullPage() {
+        $('.fixed-header').addClass('sidebar-closed');
+        $('.list-group-item').removeClass('active-left-menu');
+        $('.collapse').removeClass('in');
+    }
+
     function loadSelectOptionClassOf_Year(element,selected) {
 
         var url = base_url_js+"api/__getKurikulumSelectOptionASC";
