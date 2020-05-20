@@ -3,6 +3,19 @@
         <!--=== Navigation ===-->
         <ul id="nav">
             <!-- list menu -->
+            <li class="<?php if($this->uri->segment(2)=='master-data'){echo "current";} ?>">
+                <a href="<?php echo base_url('warehouse/master-data'); ?>">
+                    <i class="fa fa-database"></i>
+                    Master Data
+                </a>
+            </li>
+            <li class="<?php if($this->uri->segment(2)=='good-receive'){echo "current";} ?>">
+                <a href="<?php echo base_url('warehouse/good-receive'); ?>">
+                    <i class="fa fa-cart-plus"></i>
+                    Good Receive
+                </a>
+            </li>
+
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
