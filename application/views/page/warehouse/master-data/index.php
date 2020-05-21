@@ -1,4 +1,5 @@
 <style type="text/css">
+	.dataTables_wrapper .dataTables_header,.dataTables_wrapper .dataTables_footer{padding: 15px}
 	.form-control-plaintext {
 	    display: block;
 	    width: 100%;

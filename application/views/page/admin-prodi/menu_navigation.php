@@ -1,9 +1,19 @@
+<style>
+    .nav-title{text-align: center;text-transform: uppercase;display: block;color: #f5f5f5;font-size: 14px;padding: 15px;background: #151b22;font-weight: bold;}
+</style>
 <div id="sidebar" class="sidebar-fixed">
     <div id="sidebar-content">
 
         <!--=== Navigation ===-->
 
         <ul id="nav">
+            <li class="<?php if($this->uri->segment(2)=='stock-good'){echo "current";} ?>">
+                <a href="<?php echo base_url('prodi/stock-good'); ?>">
+                    <i class="fa fa-cart-plus"></i>
+                    Stock Good
+                </a>
+            </li>
+            <li><span class="nav-title">web admin prodi</span></li>
             <?php
             $getData  = $this->session->userdata('menu_prodi_grouping');
             ?>
@@ -178,6 +188,7 @@
             }
 
             ?>
+
         </ul>
 
         <div class="sidebar-widget align-center">
