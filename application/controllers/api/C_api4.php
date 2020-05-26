@@ -569,6 +569,151 @@ class C_api4 extends CI_Controller {
             $row = $query[$i];
 
             $dataLect = $this->m_rest->getAllLecturerByScheduleID($row['ScheduleID']);
+
+            $dataSession = $this->m_rest->getRangeDateLearningOnline($row['ScheduleID']);
+
+            $viewLec = '';
+            if(count($dataLect)>0){
+                for ($t=0;$t<count($dataLect);$t++){
+                    $co = ($t==0) ? ' (Co)' : '';
+                    $viewLec = $viewLec.'<div>'.$dataLect[$t]['NIP'].' - '.$dataLect[$t]['Name'].$co.'</div>';
+                }
+            }
+
+            $nestedData[] = '<div>'.$no.'<textarea class="hide" id="text_'.$row['ScheduleID'].'">'.json_encode($row).'</textarea></div>';
+            $nestedData[] = '<div style="text-align: left;"><b>'.$row['CourseEng'].'</b>
+                                    <div style="font-size: 12px;">Group : '.$row['ClassGroup'].'</div>
+                                    <div>'.$viewLec.'</div>
+                                    </div>';
+
+            if(count($dataSession)>0){
+                $s = 0;
+                for($ses=0;$ses<count($dataSession);$ses++){
+                    $s+=1;
+                    $d = $dataSession[$ses];
+
+                    $rangeSt = date('d/M/Y',strtotime($d['RangeStart']));
+                    $rangeEn = date('d/M/Y',strtotime($d['RangeEnd']));
+
+                    $bg = ($d['Status']=='1' || $d['Status']==1)
+                        ? 'background: #ffeb3b42;border: 1px solid #9E9E9E;border-radius: 5px;' : '';
+
+                    $linkDetail = ($d['ManualSet']=='1' || $d['ManualSet']==1)
+                        ? 'color: #ff3f03;' : 'color: #607d8b;';
+
+                    $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
+                                    <a href="javascript:void(0);" data-active="'.$d['Status'].'" data-schid="'.$row['ScheduleID'].'"
+                                    data-session="'.$s.'" data-start="'.$d['RangeStart'].'"
+                                    data-end="'.$d['RangeEnd'].'" class="btnAdmShowAttendance">
+                                    <div id="show_scheduleOnlinr_'.$row['ScheduleID'].'_'.$s.'" 
+                                    style="'.$linkDetail.'font-size: 10px;margin-top: 5px;font-weight: bold;">
+                                    '.$rangeSt.'<br/>'.$rangeEn.'</div id="show_scheduleOnlinr_">
+                                    </div></a>';
+                    array_push($nestedData,$arr);
+                }
+            }
+
+
+
+//            for($s=1;$s<=14;$s++){
+//                // Get date
+//                $dataSes = $this->m_rest->getRangeDateLearningOnlinePerSession($row['ScheduleID'],$s);
+//
+//
+//
+//                $rangeSt = date('d/M/Y',strtotime($dataSes['RangeStart']));
+//                $rangeEn = date('d/M/Y',strtotime($dataSes['RangeEnd']));
+//
+//                $bg = ($dataSes['Status']=='1' || $dataSes['Status']==1)
+//                    ? 'background: #ffeb3b42;border: 1px solid #9E9E9E;border-radius: 5px;' : '';
+//
+//                // Material
+//                $viewMaterial = (count($dataSes['dataMaterial']))
+//                    ? '<div><a href="'.url_sign_in_lecturers.'uploads/material/'.$dataSes['dataMaterial'][0]['File'].'" target="_blank">
+//                                <span class="label label-default"><b>Material</b></span></a></div>'
+//                    : '';
+//
+//                // Cek Topik
+//                $viewCkTopik = ($dataSes['CheckTopik']>0)
+//                    ? '<a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" data-session="'.$s.'" class="btnAdmShowForum">
+//                            <div><span class="label label-primary"><b>Forum '.$dataSes['TotalComment'].'</b></span></div></a>'
+//                    : '';
+//
+//                // Cek Task
+//                $viewTask = ($dataSes['CheckTask']>0)
+//                    ? '<a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" data-session="'.$s.'" class="btnAdmShowTask">
+//                            <div><span class="label label-success"><b>Task '.$dataSes['TotalTask'].'</b></span></div></a>'
+//                    : '';
+//
+//                $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
+//                                    '.$viewCkTopik.$viewTask.$viewMaterial.'
+//                                    <a href="javascript:void(0);" data-active="'.$dataSes['Status'].'" data-schid="'.$row['ScheduleID'].'"
+//                                    data-session="'.$s.'" data-start="'.$dataSes['RangeStart'].'"
+//                                    data-end="'.$dataSes['RangeEnd'].'" class="btnAdmShowAttendance">
+//                                    <div id="show_scheduleOnlinr_'.$row['ScheduleID'].'_'.$s.'" style="font-size: 10px;color: #607d8b;margin-top: 5px;font-weight: bold;">
+//                                    '.$rangeSt.'<br/>'.$rangeEn.'</div id="show_scheduleOnlinr_">
+//                                    </div></a>';
+//                array_push($nestedData,$arr);
+//            }
+
+            $no++;
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval( $queryDefaultRow) ,
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+
+    }
+
+
+    public function getDataOnlineClass_2(){
+        $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken2();
+
+        $SemesterID = $data_arr['SemesterID'];
+        $WhereProdi = ($data_arr['ProdiID']!='') ? ' AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" ' : '';
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND (s.ClassGroup LIKE "%'.$search.'%" 
+                                    OR mk.MKCode LIKE "%'.$search.'%" 
+                                    OR mk.NameEng LIKE "%'.$search.'%"
+                                    ) ';
+        }
+
+        $queryDefault = 'SELECT s.ID AS ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng 
+                                    FROM db_academic.schedule s
+                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                    WHERE s.SemesterID = "'.$SemesterID.'" AND s.OnlineLearning = "1" '.$WhereProdi.$dataSearch.'
+                                    
+                                    GROUP BY s.ID ';
+
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT s.ID FROM db_academic.schedule s
+                                    LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                    WHERE s.SemesterID = "'.$SemesterID.'" AND s.OnlineLearning = "1" '.$WhereProdi.$dataSearch.'
+                                    GROUP BY s.ID ) xx';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $dataLect = $this->m_rest->getAllLecturerByScheduleID($row['ScheduleID']);
             $viewLec = '';
             if(count($dataLect)>0){
                 for ($t=0;$t<count($dataLect);$t++){
@@ -589,17 +734,19 @@ class C_api4 extends CI_Controller {
                 // Get date
                 $dataSes = $this->m_rest->getRangeDateLearningOnlinePerSession($row['ScheduleID'],$s);
 
-                // Material
-                $viewMaterial = (count($dataSes['dataMaterial']))
-                    ? '<div><a href="'.url_sign_in_lecturers.'uploads/material/'.$dataSes['dataMaterial'][0]['File'].'" target="_blank">
-                                <span class="label label-default"><b>Material</b></span></a></div>'
-                    : '';
+
 
                 $rangeSt = date('d/M/Y',strtotime($dataSes['RangeStart']));
                 $rangeEn = date('d/M/Y',strtotime($dataSes['RangeEnd']));
 
                 $bg = ($dataSes['Status']=='1' || $dataSes['Status']==1)
                     ? 'background: #ffeb3b42;border: 1px solid #9E9E9E;border-radius: 5px;' : '';
+
+                // Material
+                $viewMaterial = (count($dataSes['dataMaterial']))
+                    ? '<div><a href="'.url_sign_in_lecturers.'uploads/material/'.$dataSes['dataMaterial'][0]['File'].'" target="_blank">
+                                <span class="label label-default"><b>Material</b></span></a></div>'
+                    : '';
 
                 // Cek Topik
                 $viewCkTopik = ($dataSes['CheckTopik']>0)
@@ -613,7 +760,7 @@ class C_api4 extends CI_Controller {
                             <div><span class="label label-success"><b>Task '.$dataSes['TotalTask'].'</b></span></div></a>'
                     : '';
 
-                 $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
+                $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
                                     '.$viewCkTopik.$viewTask.$viewMaterial.'
                                     <a href="javascript:void(0);" data-active="'.$dataSes['Status'].'" data-schid="'.$row['ScheduleID'].'" 
                                     data-session="'.$s.'" data-start="'.$dataSes['RangeStart'].'" 
@@ -621,7 +768,7 @@ class C_api4 extends CI_Controller {
                                     <div id="show_scheduleOnlinr_'.$row['ScheduleID'].'_'.$s.'" style="font-size: 10px;color: #607d8b;margin-top: 5px;font-weight: bold;">
                                     '.$rangeSt.'<br/>'.$rangeEn.'</div id="show_scheduleOnlinr_">
                                     </div></a>';
-                 array_push($nestedData,$arr);
+                array_push($nestedData,$arr);
             }
 
             $no++;
@@ -639,6 +786,7 @@ class C_api4 extends CI_Controller {
         echo json_encode($json_data);
 
     }
+
 
     public function crudExamOnline(){
 
