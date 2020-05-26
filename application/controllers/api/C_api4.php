@@ -592,6 +592,8 @@ class C_api4 extends CI_Controller {
                     $s+=1;
                     $d = $dataSession[$ses];
 
+                    $dataDetail = $this->m_rest->checkKelengkapanLearningOnline($row['ScheduleID'],$s);
+
                     $rangeSt = date('d/M/Y',strtotime($d['RangeStart']));
                     $rangeEn = date('d/M/Y',strtotime($d['RangeEnd']));
 
@@ -601,7 +603,24 @@ class C_api4 extends CI_Controller {
                     $linkDetail = ($d['ManualSet']=='1' || $d['ManualSet']==1)
                         ? 'color: #ff3f03;' : 'color: #607d8b;';
 
+                    // Material
+                    $viewMaterial = (count($dataDetail['dataMaterial']))
+                        ? '<div><a href="'.url_sign_in_lecturers.'uploads/material/'.$dataDetail['dataMaterial'][0]['File'].'" target="_blank">
+                                <span class="label label-default" style="font-size: 8px;">Material</span></a></div>'
+                        : '';
+
+                    // Cek Topik
+                    $viewCkTopik = ($dataDetail['CheckTopik']>0)
+                        ? '<span class="label label-primary" style="font-size: 8px;">Forum</span>'
+                        : '';
+
+                    // Cek Task
+                    $viewTask = ($dataDetail['CheckTask']>0)
+                        ? '<span class="label label-success" style="font-size: 8px;">Task</span>'
+                        : '';
+
                     $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
+                                                        '.$viewCkTopik.$viewTask.$viewMaterial.'
                                     <a href="javascript:void(0);" data-active="'.$d['Status'].'" data-schid="'.$row['ScheduleID'].'"
                                     data-session="'.$s.'" data-start="'.$d['RangeStart'].'"
                                     data-end="'.$d['RangeEnd'].'" class="btnAdmShowAttendance">
