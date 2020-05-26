@@ -2200,6 +2200,8 @@ class M_rest extends CI_Model {
                 $f[$c]['Status'] =  $Status;
             }
 
+            $f[$c]['ManualSet'] = (count($dataManual)>0) ? 1 : 0;
+
         }
 
         return $f;
