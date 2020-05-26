@@ -2259,6 +2259,26 @@ class M_rest extends CI_Model {
         return $result;
     }
 
+    public function checkKelengkapanLearningOnline($ScheduleID,$Session){
+        $i = 0;
+        // Material
+        $data[$i]['dataMaterial'] = $this->db->query('SELECT sm.File FROM db_academic.schedule_material sm 
+                                                                    WHERE sm.ScheduleID = "'.$ScheduleID.'"
+                                                                     AND sm.Session = "'.$Session.'" ')->result_array();
+
+        // cek apakah topik sudah dibuat atau blm
+        $data[$i]['CheckTopik'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.counseling_topic ct 
+                                                                        WHERE ct.ScheduleID = "'.$ScheduleID.'"
+                                                                        AND ct.Sessions = "'.$Session.'" ')->result_array()[0]['Total'];
+
+        // Task
+        $data[$i]['CheckTask'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task st 
+                                                                    WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                                     AND st.Session = "'.$Session.'" ')->result_array()[0]['Total'];
+
+        return $data[0];
+    }
+
     public function getAllLecturerByScheduleID($ScheuldeID){
 
         $data = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.schedule s 
