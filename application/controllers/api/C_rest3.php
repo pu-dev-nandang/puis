@@ -305,7 +305,7 @@ class C_rest3 extends CI_Controller {
                 $sql = 'select * from (
                         select a.NIP,b.Name,a.EntredAt from db_agregator.rekognisi_dosen as a
                                 join db_employees.employees as b on a.NIP = b.NIP
-                                where b.ProdiID = ? and a.Tahun = ? and isApproved = 2
+                                where b.ProdiID = ? and a.Tahun = ? and a.isApproved = 2
                         UNION
                         select sk.User_create,b.Name,sk.User_create from db_agregator.sitasi_karya as sk
                         join db_employees.employees as b on sk.User_create = b.NIP
