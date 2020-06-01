@@ -5172,6 +5172,18 @@ class C_api3 extends CI_Controller {
             }
             return print_r(1);
         }
+        else if($data_arr['action']=='editJudisiumDate'){
+
+            $NPM = $data_arr['NPM'];
+            $JID = $data_arr['JID'];
+
+            $this->db->where('NPM',$NPM);
+            $this->db->update('db_academic.judiciums_list',
+                array('JID' => $JID));
+
+            return print_r(1);
+
+        }
         else if($data_arr['action']=='loadDataParticipantOfJudiciums'){
 
             $requestData= $_REQUEST;
@@ -5200,10 +5212,12 @@ class C_api3 extends CI_Controller {
                                                         LEFT JOIN db_academic.final_project fp ON (fp.NPM = ats.NPM)
                                                         WHERE j.ID = "'.$JID.'" '.$WhereProdi.' '.$dataSearch;
 
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
             $query = $this->db->query($sql)->result_array();
-            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
             $no = $requestData['start'] + 1;
             $data = array();
@@ -5222,9 +5236,17 @@ class C_api3 extends CI_Controller {
                 } else if ($NPM=='') {
                     $btnInvitation = '<a href="'.base_url('images/icon/invitation.png').'" target="_blank" class="btn btn-sm btn-primary">Download</a>';
                 }
+
+                // Show buttun change yudisium
+                $buttonShowChangeY = (isset($data_arr['Source']) && $data_arr['Source']=='puis')
+                    ? '<br/><a href="javascript:void(0);" class="btnChangePeriode" data-name="'.$row['Name'].'" data-npm="'.$row['NPM'].'" data-jid="'.$JID.'" style="color: #fd9700;">Change Periode</a>'
+                    : '';
+
+
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div><img src="'.$urlImg.'" class="img-rounded" style="width: 100%;max-width: 150px;"></div>';
-                $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'<br/>'.$row['ProdiEng'].'</div>';
+                $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b>
+                                    <br/>'.$row['NPM'].'<br/>'.$row['ProdiEng'].$buttonShowChangeY.'</div>';
                 $nestedData[] = '<div style="text-align: left;"><b>'.$row['TitleInd'].'</b><br/><i>'.$row['TitleEng'].'</i></div>';
                 $nestedData[] = '<div>'.$btnInvitation.'</div>';
 
@@ -5235,8 +5257,8 @@ class C_api3 extends CI_Controller {
 
             $json_data = array(
                 "draw"            => intval( $requestData['draw'] ),
-                "recordsTotal"    => intval(count($queryDefaultRow)),
-                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval($queryDefaultRow),
                 "data"            => $data
             );
             echo json_encode($json_data);

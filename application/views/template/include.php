@@ -708,9 +708,11 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
+            // console.log(jsonResult);
+
             if(jsonResult.length>0){
                 $.each(jsonResult,function (i,v) {
-                    var sc = (v.GraduationYear==selected) ? 'selected' : '';
+                    var sc = (v.ID==selected) ? 'selected' : '';
                     $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Title+'</option>');
 
                 });
