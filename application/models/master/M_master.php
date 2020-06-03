@@ -2800,9 +2800,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function userKB($IDDivision = '')
     {
         $arr_result = array();
-        $Q_add = ($IDDivision == '') ? '' : ' where SPLIT_STR(emp.PositionMain, ".", 1) = "'.$IDDivision.'" order by IDType asc';
+        $Q_add = ($IDDivision == '') ? '' : ' where kt.IDDivision = "'.$IDDivision.'" ';
         $sql = 'select kb.*,kt.Type as TypeName from db_employees.knowledge_base as kb
-        inner join  db_employees.employees as emp on kb.EntredBy=emp.NIP
         inner join db_employees.kb_type as kt on kb.IDType=kt.ID
          '.$Q_add;
 

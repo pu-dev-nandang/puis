@@ -74,7 +74,7 @@
                 <label>Division</label>
                 <select class="select2-select-00 full-width-fix" id="Division">
                   <?php for($i = 0; $i < count($G_division); $i++): ?>
-                    <option value="<?php echo $G_division[$i]['ID'] ?>" > <?php echo $G_division[$i]['Division'] ?> </option>
+                    <option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>
                   <?php endfor ?>
                  </select>
               </div>
@@ -84,37 +84,7 @@
       <div class="row">
         <div id ="viewkb" class="col-md-12">
               <ul class="list-group" id="headerlist">
-                <?php for($i = 0; $i < count($G_data); $i++): ?>
-                  <?php $no = $i+1 ?>
-                    <li class="list-group-item item-head">
-                                      <a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i ?>">
-                                          <span class="numbering"><b><?php echo $no; ?></b></span>
-                                          <span class="info"><b><?php echo $G_data[$i]['Type']?></b></span>
-                                      </a>
-
-                      <div id="<?php echo $i ?>" class="collapse detailKB">
-                        <ul class="list-group">
-                          <?php $data = $G_data[$i]['data'] ?>
-                          <?php for($j = 0; $j < count($data); $j++): ?>
-                            <li class="list-group-item">
-                              <a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i.'__'.$j ?>">
-                                   <b><?php echo $data[$j]['Desc'] ?></b>
-                              </a>
-                              <?php //error_reporting(0) ?>
-                              <div id="<?php echo $i.'__'.$j ?>" class="collapse">
-                                <div style="margin-top: 15px;margin-bottom: 15px;">
-                                  <a class="btn btn-default <?php if($data[$j]['File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/kb-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> File</a>
-                                    <?php if ($selected ==$this->session->userdata('PositionMain')['IDDivision']): ?>
-                                      <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
-                                    <?php endif; ?>
-                                </div>
-                              </div>
-                            </li>
-                          <?php endfor ?>
-                        </ul>
-                      </div>
-                    </li>
-                  <?php endfor ?>
+                
               </ul>
         </div>
       </div>
@@ -124,9 +94,6 @@
 
 <script type="text/javascript">
 	$(document).ready(function () {
-    <?php if ($_SERVER['SERVER_NAME'] = 'localhost'): ?>
-         $('#pageContent').html('<h1 align = "center">Urgently Maintenance</h1>');
-    <?php endif ?>
 		$("#Division option").filter(function() {
 		   //may want to use $.trim in here
 		   return $(this).val() == "<?php echo $selected ?>";
@@ -134,8 +101,8 @@
 		$('#Division').select2({
 
 		});
-
-    //loadTypeKB() ;
+     $('#Division').trigger('change');  
+    loadTypeKB() ;
 	});
 
 //save_formKB
@@ -197,7 +164,7 @@ $('#saveFormKB').click(function () {
           $('#formKB_Type').val('');
           $('#formKB_Desc').val('');
           $('#formKB_File').val('');
-
+          $('#Division').trigger('change');
           }, 500);
 
         });
@@ -219,9 +186,10 @@ $('#saveFormKB').click(function () {
       });
 
 	$(document).on('change','#Division', function () {
+    console.log('asdsad');
 	   var url = base_url_js+"kb";
 	   var data = {
-	   	Division : $(this).val(),
+	   	Division : $(this).find('option:selected').val(),
 	   };
 	   $.post(url,data,function (resultJson) {
 	   	$(".list-group").empty();
@@ -298,6 +266,7 @@ $('#saveFormKB').click(function () {
                       $('#btnKBSave').prop('disabled',false).html('Save');
                       $('#formKB_ID').val('');
                       $('#formKB_Type').val('');
+                      
                   },500);
               });
 
