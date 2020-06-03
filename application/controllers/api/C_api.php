@@ -9195,7 +9195,9 @@ class C_api extends CI_Controller {
                                         fpc.Cl_Academic, fpc.Cl_Academic_By, fpc.Cl_Academic_At, emp6.Name AS Cl_Academic_Name,
                                         fpc.Cl_StdLife, fpc.Cl_StdLife_By, fpc.Cl_StdLife_At, emp7.Name AS Cl_StdLife_Name,
                                         
-                                        fpn.finance AS Finance_Note
+                                        fpn.finance AS Finance_Note,
+                                        
+                                        j.Title AS JudiciumPeriode, j.JudiciumsDate AS JudiciumDate
               
                                         FROM db_academic.auth_students ats
                                         LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
@@ -9212,6 +9214,9 @@ class C_api extends CI_Controller {
                                         LEFT JOIN db_employees.employees emp6 ON (fpc.Cl_Academic_By = emp6.NIP)
                                         LEFT JOIN db_employees.employees emp7 ON (fpc.Cl_StdLife_By = emp7.NIP)
                                         LEFT JOIN db_employees.employees emp8 ON (fpc.Cl_Academic_By = emp8.NIP)
+                                        
+                                        LEFT JOIN db_academic.judiciums_list jl ON (jl.NPM = ats.NPM)
+                                        LEFT JOIN db_academic.judiciums j ON (j.ID = jl.JID)
 
                                         WHERE ats.NPM = "'.$data_arr['NPM'].'" ')->result_array();
 
