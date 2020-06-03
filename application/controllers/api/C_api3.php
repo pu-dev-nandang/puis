@@ -5269,7 +5269,28 @@ class C_api3 extends CI_Controller {
     }
 
 
+    private function getDepartmentByNav(){
+        // read by session
+        $IDDivision;
+        $inArrDiv = [15,34]; // prodi dan faculty
+        $IDDivision;
+        if (!in_array($this->session->userdata('IDdepartementNavigation'), $inArrDiv))
+        {
+            $IDDivision = 'NA.'.$this->session->userdata('IDdepartementNavigation');
+        }
+        else
+        {
+            if ($this->session->userdata('IDdepartementNavigation') == 15) {
+                $IDDivision = 'AC.'.$this->session->userdata('prodi_active_id');
+            }
+            else
+            {
+                $IDDivision = 'FT.'.$this->session->userdata('faculty_active_id');
+            }
+        }
+        return $IDDivision;
 
+    }
 
     public function crudkb(){
 
@@ -5315,7 +5336,10 @@ class C_api3 extends CI_Controller {
             print_r(updatenewKB);
         }
         else if($data_arr['action']=='viewListKB_2'){
-            $IDDivision = $this->session->userdata('PositionMain')['IDDivision'];
+            // $IDDivision = $this->session->userdata('PositionMain')['IDDivision'];
+
+            // added by adhi
+            $IDDivision = $this->getDepartmentByNav();
 
             $data = $this->db->get_where('db_employees.kb_type',array(
                 'IDDivision' => $IDDivision
@@ -5325,7 +5349,9 @@ class C_api3 extends CI_Controller {
         }
         else if($data_arr['action']=='updateListKB_2'){
             $ID = $data_arr['ID'];
-            $IDDivision = $this->session->userdata('PositionMain')['IDDivision'];
+            //$IDDivision = $this->session->userdata('PositionMain')['IDDivision'];
+            // addded by adhi
+            $IDDivision = $this->getDepartmentByNav();
             $dataForm = array(
                 'Type' => $data_arr['Type'],
                 'IDDivision' => $IDDivision
