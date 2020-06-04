@@ -1541,7 +1541,9 @@ class C_employees extends HR_Controler {
     public function fetchAttdTempEmp(){
         set_time_limit(0);
         $this->load->helper("General_helper");
-        $reqdata = $this->input->post();
+        $reqdata = $this->input->post(); 
+        $myDivisionID = $this->session->userdata('PositionMain')['IDDivision'];
+
         if($reqdata){
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
@@ -1597,34 +1599,41 @@ class C_employees extends HR_Controler {
                 }
                 //check data for employee
                 else{
-                    if(!empty($output['status'])){
+                    if(!empty($output['statusstd'])){
                         $sn = 1;
                         $dataArrStatus = array();
                         $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                        if(count($output['status']) == 1){
-                            $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        if(count($output['statusstd']) == 1){
+                            $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$output['statusstd'][0]."' ","filter"=> "" );
                         }else{
-                            foreach ($output['status'] as $s) {
-                                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                            foreach ($output['statusstd'] as $s) {
+                                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($output['statusstd'])) ? ' OR ':'')) ,"filter"=> null );
                                 $sn++;
                             }
                         }
                         $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }else{
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 1 or " ,"filter"=> null );    
+                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 2 " ,"filter"=> null );    
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);    
                     }
                 }
 
                 if(!empty($output['division'])){
                     if(!empty($output['position'])){
-                        $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);
                         $param[] = array("field"=>"em.PositionOther1","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther2","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$output['division'].".".$output['position']."' ) ","filter"=>"AND",);
                     }else{
-                        $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);
                         $param[] = array("field"=>"em.PositionOther1","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$output['division'].".%' ) ","filter"=>"AND",);
                     }
+                }else{
+                    $param[] = array("field"=>"em.PositionMain","data"=>" like '".$myDivisionID.".%' ","filter"=>"AND",);
                 }
                 
 
@@ -1701,10 +1710,18 @@ class C_employees extends HR_Controler {
                 $rs = array();
                 $sort = array();
                 $index=0;
+                $mytime = "08:00";
                 
                 foreach ($result as $r) {
-                    $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
-                    $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
+                    if(!empty($r->FirstLoginPortal)){
+                        $isLate = false;
+                        if (date('H:i',strtotime($mytime)) < date('H:i', strtotime($r->FirstLoginPortal))) {
+                            $isLate = true;
+                        }
+                        $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                        $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
+                        $r->IsLateCome = $isLate;
+                    }
                     $rs[] = $r;
                     $index++;
                 }
