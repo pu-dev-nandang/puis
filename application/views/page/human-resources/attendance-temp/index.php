@@ -189,7 +189,6 @@
 	                                <th>Day</th>
 	                                <th width="20%">First Login</th>
 	                                <th>Last Login</th>
-	                                <th width="5%">Detail</th>
 	                            </tr>
                             </thead>
                             <tbody>
@@ -304,14 +303,7 @@
             			}
             			return label;
             		}             		
-            	},
-            	{
-            		"data":"NIP",
-            		"render": function (data, type, row, meta) {
-            			var label = '<button class="btn btn-info btn-detail" data-date="'+row.FirstLoginPortal+'" data-dateend="'+row.LastLoginPortal+'" data-id="'+data+'"><i class="fa fa-folder-open"></i></button>';
-            			return '-';
-            		}
-            	},
+            	}
         	]
         });
 	}
