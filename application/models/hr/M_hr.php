@@ -116,7 +116,7 @@ class M_hr extends CI_Model {
 
 
     public function fetchEmployee($count=false,$param='',$start='',$limit='',$order=''){
-        $where='';$startDate = date("Y-m-d");
+        $where='';$where2='';$startDate = date("Y-m-d");
         if(!empty($param)){
             $where = 'WHERE '; $conditionDate = '';
             $counter = 0;
@@ -129,16 +129,25 @@ class M_hr extends CI_Model {
                 }
 
                 if($counter==0){
-                    $where = $where.$value['field']." ".$value['data'];
+                    if(strpos($value['field'], 'lem.AccessedOn') !== false){
+                        $where2 = $where.$value['field']." ".$value['data'];
+                    }else{
+                        $where = $where.$value['field']." ".$value['data'];                        
+                    }
                 }else{ 
-                    $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                    if(strpos($value['field'], 'lem.AccessedOn') !== false){
+                        $where2 = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                    }else{
+                        $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                    }
                 }
 
-                
                 $counter++;
             }
         }
-
+        if($where == 'WHERE '){
+            $where = '';
+        }
         $lims="";
         if($start!="" || $limit!=""){
             $lims = " LIMIT {$start},{$limit}"; 
@@ -146,9 +155,73 @@ class M_hr extends CI_Model {
 
         $groupby = '';
         $sorted = '';
+        $order_by = '';
         if($count){
-            $select = "count(DISTINCT em.NIP, DATE(lem.AccessedOn) ) as Total";
+            //$select = "count(DISTINCT em.NIP, DATE(lem.AccessedOn) ) as Total";
+            $select = "COUNT(DISTINCT NIP) as Total";
+            $query1 = "SELECT distinct (em.NIP)
+                        FROM db_employees.employees em 
+                        left JOIN db_employees.log_employees lem on (em.NIP = lem.NIP) 
+                        {$where2}
+                        GROUP BY em.NIP, DATE(lem.AccessedOn)";
+            $query2 = "select distinct (em.NIP)
+                        from db_employees.employees em
+                        {$where}";
         }else{
+            $select = "*";
+            $query1 = "SELECT em.*
+                        ,d.Division as DivisionMain_, p.Position as PositionMain_
+                        ,concat(d1.Division,'-',p1.Position ) as PositionOther1Name
+                        ,concat(d2.Division,'-',p2.Position ) as PositionOther2Name
+                        ,concat(d3.Division,'-',p3.Position ) as PositionOther3Name
+                        ,DATE_FORMAT(lem.AccessedOn, '%d-%M-%Y %H:%i:%s') as FirstLoginPortal 
+                        ,DAYNAME(lem.AccessedOn) as FirstLoginPortalDay 
+                        ,WEEKDAY(lem.AccessedOn) as FirstLoginPortalDayNum 
+
+                        FROM db_employees.employees em 
+                        left JOIN db_employees.log_employees lem on (em.NIP = lem.NIP) 
+
+                        LEFT JOIN db_employees.division d on (d.ID = SUBSTRING_INDEX(em.PositionMain,'.',1) ) 
+                        LEFT JOIN db_employees.position p on (p.ID = SUBSTRING_INDEX(em.PositionMain,'.',-1) ) 
+
+                        LEFT JOIN db_employees.division d1 on (d1.ID = SUBSTRING_INDEX(em.PositionOther1,'.',1) ) 
+                        LEFT JOIN db_employees.position p1 on (p1.ID = SUBSTRING_INDEX(em.PositionOther1,'.',-1) ) 
+
+                        LEFT JOIN db_employees.division d2 on (d2.ID = SUBSTRING_INDEX(em.PositionOther2,'.',1) ) 
+                        LEFT JOIN db_employees.position p2 on (p2.ID = SUBSTRING_INDEX(em.PositionOther2,'.',-1) ) 
+
+                        LEFT JOIN db_employees.division d3 on (d3.ID = SUBSTRING_INDEX(em.PositionOther3,'.',1) ) 
+                        LEFT JOIN db_employees.position p3 on (p3.ID = SUBSTRING_INDEX(em.PositionOther3,'.',-1) ) 
+
+                        {$where2} 
+                        GROUP BY em.NIP, DATE(lem.AccessedOn) order by FirstLoginPortal asc ";
+            $query2 = "select em.*
+                        ,d.Division as DivisionMain_, p.Position as PositionMain_
+                        ,concat(d1.Division,'-',p1.Position ) as PositionOther1Name
+                        ,concat(d2.Division,'-',p2.Position ) as PositionOther2Name
+                        ,concat(d3.Division,'-',p3.Position ) as PositionOther3Name
+                        ,null as FirstLoginPortal
+                        ,null as  FirstLoginPortalDay
+                        ,null as FirstLoginPortalDayNum 
+
+                        from db_employees.employees em
+
+                        LEFT JOIN db_employees.division d on (d.ID = SUBSTRING_INDEX(em.PositionMain,'.',1) ) 
+                        LEFT JOIN db_employees.position p on (p.ID = SUBSTRING_INDEX(em.PositionMain,'.',-1) ) 
+
+                        LEFT JOIN db_employees.division d1 on (d1.ID = SUBSTRING_INDEX(em.PositionOther1,'.',1) ) 
+                        LEFT JOIN db_employees.position p1 on (p1.ID = SUBSTRING_INDEX(em.PositionOther1,'.',-1) ) 
+
+                        LEFT JOIN db_employees.division d2 on (d2.ID = SUBSTRING_INDEX(em.PositionOther2,'.',1) ) 
+                        LEFT JOIN db_employees.position p2 on (p2.ID = SUBSTRING_INDEX(em.PositionOther2,'.',-1) ) 
+
+                        LEFT JOIN db_employees.division d3 on (d3.ID = SUBSTRING_INDEX(em.PositionOther3,'.',1) ) 
+                        LEFT JOIN db_employees.position p3 on (p3.ID = SUBSTRING_INDEX(em.PositionOther3,'.',-1) ) 
+                        {$where} 
+                        ";
+            $groupby = "GROUP BY NIP";
+            $order_by = 'order by FirstLoginPortal desc';
+            /*
             $select = "em.*
                         ,d.Division as DivisionMain_, p.Position as PositionMain_
                         ,concat(d1.Division,'-',p1.Position ) as PositionOther1
@@ -159,9 +232,11 @@ class M_hr extends CI_Model {
                         ,WEEKDAY(lem.AccessedOn) as FirstLoginPortalDayNum ";
             $groupby = 'GROUP BY em.NIP, DATE(lem.AccessedOn)';
             $sorted = " order by ".(!empty($order) ? $order : 'FirstLoginPortal asc');
+            */
         }
         
         
+        /*
         $string = "SELECT {$select}
                    FROM db_employees.log_employees lem
                    LEFT JOIN db_employees.employees em on (em.NIP = lem.NIP)
@@ -179,6 +254,19 @@ class M_hr extends CI_Model {
                     LEFT JOIN db_employees.position p3 on (p3.ID = SUBSTRING_INDEX(em.PositionOther3,'.',-1) ) 
                     
                     {$where} {$groupby} {$sorted} {$lims} ";
+        */
+
+
+        $string = "select {$select} 
+                   from (
+                    ( {$query1} )
+
+                    union all
+
+                    ( {$query2} )
+
+                    ) as Attendance
+                    {$groupby} {$order_by} {$lims}";
         
         $value  = $this->db->query($string);
         //var_dump($this->db->last_query());

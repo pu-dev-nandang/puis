@@ -1541,7 +1541,9 @@ class C_employees extends HR_Controler {
     public function fetchAttdTempEmp(){
         set_time_limit(0);
         $this->load->helper("General_helper");
-        $reqdata = $this->input->post();
+        $reqdata = $this->input->post(); 
+        $myDivisionID = $this->session->userdata('PositionMain')['IDDivision'];
+
         if($reqdata){
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
@@ -1597,34 +1599,41 @@ class C_employees extends HR_Controler {
                 }
                 //check data for employee
                 else{
-                    if(!empty($output['status'])){
+                    if(!empty($output['statusstd'])){
                         $sn = 1;
                         $dataArrStatus = array();
                         $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                        if(count($output['status']) == 1){
-                            $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        if(count($output['statusstd']) == 1){
+                            $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$output['statusstd'][0]."' ","filter"=> "" );
                         }else{
-                            foreach ($output['status'] as $s) {
-                                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                            foreach ($output['statusstd'] as $s) {
+                                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($output['statusstd'])) ? ' OR ':'')) ,"filter"=> null );
                                 $sn++;
                             }
                         }
                         $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }else{
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 1 or " ,"filter"=> null );    
+                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 2 " ,"filter"=> null );    
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);    
                     }
                 }
 
                 if(!empty($output['division'])){
                     if(!empty($output['position'])){
-                        $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);
                         $param[] = array("field"=>"em.PositionOther1","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther2","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$output['division'].".".$output['position']."' ) ","filter"=>"AND",);
                     }else{
-                        $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);
                         $param[] = array("field"=>"em.PositionOther1","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$output['division'].".%' ) ","filter"=>"AND",);
                     }
+                }else{
+                    $param[] = array("field"=>"em.PositionMain","data"=>" like '".$myDivisionID.".%' ","filter"=>"AND",);
                 }
                 
 
@@ -1701,10 +1710,18 @@ class C_employees extends HR_Controler {
                 $rs = array();
                 $sort = array();
                 $index=0;
+                $mytime = "08:30";
                 
                 foreach ($result as $r) {
-                    $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
-                    $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
+                    if(!empty($r->FirstLoginPortal)){
+                        $isLate = false;
+                        if (date('H:i',strtotime($mytime)) < date('H:i', strtotime($r->FirstLoginPortal))) {
+                            $isLate = true;
+                        }
+                        $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                        $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
+                        $r->IsLateCome = $isLate;
+                    }
                     $rs[] = $r;
                     $index++;
                 }
@@ -1798,9 +1815,11 @@ class C_employees extends HR_Controler {
                     $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$reqdata['division'].".%' ","filter"=>"OR",);
                     $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$reqdata['division'].".%' ) ","filter"=>"AND",);
                 }
+            }else{
+                $param[] = array("field"=>"em.PositionMain","data"=>" like '".$myDivisionID.".%' ","filter"=>"AND",);
             }
 
-            if(!empty($reqdata['status'])){
+            if(!empty($reqdata['statusstd'])){
                 $sn = 1;
                 $dataArrStatus = array();
                 $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
@@ -1813,6 +1832,11 @@ class C_employees extends HR_Controler {
                     }
                 }
                 $param[] = array("field"=>")","data"=>null,"filter"=>null);
+            }else{
+                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 1 or " ,"filter"=> null );    
+                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 2 " ,"filter"=> null );    
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);    
             }
 
             if(!empty($reqdata['staff'])){
@@ -1878,43 +1902,28 @@ class C_employees extends HR_Controler {
 
             if(!empty($result)){
                 $rs = array();
+                $timeIn = "08:30";
                 foreach ($result as $r) {
-                    $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
-                    $r->LastLoginPortal = lastLogin($conditions)->AccessedOn;
+                    $isLate = true;
+                    if(!empty($r->FirstLoginPortal)){
+                        if (date('H:i',strtotime($timeIn)) < date('H:i', strtotime($r->FirstLoginPortal))) {
+                            $isLate = true;
+                        }else{$isLate = false;}
+
+                        $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                        $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
+                        $r->IsLateCome = $isLate;
+                    }else{
+                        $r->IsLateCome = $isLate;
+                    }
                     $rs[] = $r;
                 }
                 $result = $rs;
             }
-
             /*
-            // disposition / encoding on response body
-            header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
-            header("Content-Disposition: attachment; filename=Attendance-Temporary-DownloadAT.xls");  //File name extension was wrong
-            header("Expires: 0");
-            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-            header("Cache-Control: private",false);
-            $table = '<table border="1"><thead><tr><th>No</th><th>NIP</th><th>Employee</th><th>Division/Position</th><th>First Login</th><th>Last Login</th></tr></thead><tbody>';
-            if(!empty($result)){
-                $num=1;
-                foreach ($result as $v) {
-                $table .= '<tr><td>'.$num++.'</td>
-                              <td>'.$v->NIP.'</td>
-                              <td>'.$v->Name.'</td>
-                              <td>'.$v->DivisionMain_.'-'.$v->PositionMain_.
-                              (!empty($v->PositionOther1) ? '<br>'.$v->PositionOther1 : '').
-                              (!empty($v->PositionOther2) ? '<br>'.$v->PositionOther2 : '').
-                              (!empty($v->PositionOther3) ? '<br>'.$v->PositionOther3 : '').
-                              '</td>
-                              <td>'.date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal)).'</td>
-                              <td>'.date('d-F-Y H:i:s',strtotime($v->LastLoginPortal)).'</td>
-                          </tr>';
-                }
-            }
-            $table .= '</tbody></table>';
-            echo $table; 
+            echo "<pre>";
+            var_dump($result);die();
             */
-
-            
             include APPPATH.'third_party/PHPExcel/PHPExcel.php';
             ini_set('memory_limit', '-1');
             ini_set('max_execution_time', 600); //600 seconds = 10 minutes
@@ -1936,8 +1945,8 @@ class C_employees extends HR_Controler {
             $excel->setActiveSheetIndex(0)->setCellValue('A1', $pr);
             $excel->getActiveSheet()->mergeCells('A1:F1');
             $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
-        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
-        $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
+            $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+            $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
             
             $header= [array("cell"=>"A","val"=>"No"),
                     array("cell"=>"B","val"=>"NIP"),
@@ -1991,18 +2000,37 @@ class C_employees extends HR_Controler {
                     $excel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
                     $excel->getActiveSheet()->getStyle('C'.$numRow)->applyFromArray($styleCell);
                     
-                    $excel->setActiveSheetIndex(0)->setCellValue('D'.$numRow, $v->DivisionMain_.'/'.$v->PositionMain_);
+                    $otherPosition = '';
+                    if(!empty($v->PositionOther1Name)){
+                        $otherPosition .= '<br>'.$v->PositionOther1Name;
+                    }else if(!empty($v->PositionOther2Name)){
+                        $otherPosition .= '<br>'.$v->PositionOther2Name;
+                    }else if(!empty($v->PositionOther3Name)){
+                        $otherPosition .= '<br>'.$v->PositionOther3Name;
+                    }
+
+                    $excel->setActiveSheetIndex(0)->setCellValue('D'.$numRow, $v->DivisionMain_.'/'.$v->PositionMain_.(!empty($otherPosition) ? $otherPosition : ''));
                     $excel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
                     $excel->getActiveSheet()->getStyle('D'.$numRow)->applyFromArray($styleCell);
                     
-                    $excel->setActiveSheetIndex(0)->setCellValue('E'.$numRow, date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal)));
+                    $excel->setActiveSheetIndex(0)->setCellValue('E'.$numRow, ( !empty($v->FirstLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal))) : ''));
                     $excel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
                     $excel->getActiveSheet()->getStyle('E'.$numRow)->applyFromArray($styleCell);
                     
-                    $excel->setActiveSheetIndex(0)->setCellValue('F'.$numRow, date('d-F-Y H:i:s',strtotime($v->LastLoginPortal)));
+                    $excel->setActiveSheetIndex(0)->setCellValue('F'.$numRow, (!empty($v->LastLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->LastLoginPortal))) : ''));
                     $excel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
                     $excel->getActiveSheet()->getStyle('F'.$numRow)->applyFromArray($styleCell);
                     
+                    if($v->IsLateCome){
+                        $excel->getActiveSheet()
+                        ->getStyle('A'.$numRow.':F'.$numRow)
+                        ->getFill()
+                        ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
+                        ->getStartColor()
+                        ->setARGB('FF0000');
+                    }
+                    
+
                     $no++;
                     $numRow++;
                 }

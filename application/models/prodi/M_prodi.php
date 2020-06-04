@@ -274,4 +274,12 @@ class M_prodi extends CI_Model {
             redirect(base_url().'page404');die();
         }
     }
+
+
+
+    /*ADDED BY FEBRI @ MAY 2020 # STOCK GOOD */
+    public function fetchMyPurchaseOrder(){
+        
+    }
+    /*END ADDED BY FEBRI @ MAY 2020 # STOCK GOOD */
 }

@@ -55,14 +55,14 @@
             		"data":"DivisionMain_",
             		"render": function (data, type, row, meta) {
             			var label = data+"-"+row.PositionMain_;
-            			if($.trim(row.PositionOther1).length > 0){
-            				label += '<br>'+row.PositionOther1;
+            			if($.trim(row.PositionOther1Name).length > 0){
+            				label += '<br>'+row.PositionOther1Name;
             			}
-            			if($.trim(row.PositionOther2).length > 0){
-            				label += '<br>'+row.PositionOther2;
+            			if($.trim(row.PositionOther2Name).length > 0){
+            				label += '<br>'+row.PositionOther2Name;
             			}
-            			if($.trim(row.PositionOther3).length > 0){
-            				label += '<br>'+row.PositionOther3;
+            			if($.trim(row.PositionOther3Name).length > 0){
+            				label += '<br>'+row.PositionOther3Name;
             			}
 
             			
@@ -72,23 +72,34 @@
             	{
             		"data":"FirstLoginPortalDay",
             		"render": function(data, type, row, meta){
-            			var label = '<span class="day-week bg-'+((row.FirstLoginPortalDayNum > 5) ? 'success':'danger')+'">'+data+'</span>';
+            			var label = '';
+            			if(!jQuery.isEmptyObject(row.FirstLoginPortalDayNum)){
+            				label = '<span class="day-week bg-'+((row.FirstLoginPortalDayNum > 5) ? 'success':'danger')+'">'+data+'</span>';
+            			}
             			return label;
             		}
             	},
             	{
-            		"data":"FirstLoginPortal"            		
+            		"data":"FirstLoginPortal",
+            		"render": function(data, type, row, meta){
+            			var label = '';
+            			if(!jQuery.isEmptyObject(row.FirstLoginPortal)){
+            				var late = (row.IsLateCome) ? 'text-danger':'';
+            				label = '<span class="'+late+'">'+data+'</span>';
+            			}
+            			return label;
+            		}         		
             	},
             	{
-            		"data":"LastLoginPortal"            		
-            	},
-            	{
-            		"data":"NIP",
-            		"render": function (data, type, row, meta) {
-            			var label = '<button class="btn btn-info btn-detail" data-date="'+row.FirstLoginPortal+'" data-id="'+data+'"><i class="fa fa-folder-open"></i></button>';
-            			return '-';
-            		}
-            	},
+            		"data":"LastLoginPortal",
+            		"render": function(data, type, row, meta){
+            			var label = '';
+            			if(!jQuery.isEmptyObject(row.LastLoginPortal)){
+            				label = data;
+            			}
+            			return label;
+            		}             		
+            	}
         	]
         });
 	}
@@ -348,7 +359,6 @@
 	                                <th>Day</th>
 	                                <th>First Login</th>
 	                                <th>Last Login</th>
-	                                <th width="5%">Detail</th>
 	                            </tr>
 	                        </thead>
 	                        <tbody>
