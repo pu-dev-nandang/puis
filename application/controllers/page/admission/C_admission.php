@@ -1562,14 +1562,12 @@ class C_admission extends Admission_Controler {
             $Photo = ''; // id foto 5
             if (!file_exists('./uploads/document/'.$NPM)) {
                 mkdir('./uploads/document/'.$NPM, 0777, true);
-                // copy("./document/index.html",'./document/'.$namaFolder.'/index.html');
-                // copy("./document/index.php",'./document/'.$namaFolder.'/index.php');
+                copy("./uploads/index.html",'./uploads/document/'.$NPM.'/index.html');
+                copy("./uploads/index.php",'./uploads/document/'.$NPM.'/index.php');
             }
 
             if (!file_exists('./uploads/students/'.$ta)) {
                 mkdir('./uploads/students/'.$ta, 0777, true);
-                // copy("./document/index.html",'./document/'.$namaFolder.'/index.html');
-                // copy("./document/index.php",'./document/'.$namaFolder.'/index.php');
             }
 
             $getDoc = $this->m_master->caribasedprimary('db_admission.register_document','ID_register_formulir',$arrInputID[$i]);

@@ -469,7 +469,7 @@ class M_doc extends CI_Model {
     	$this->ApiConvertDocxToPDF($pathFile,$FileName,$pathFolder);
     }
 
-    private function ApiConvertDocxToPDF($pathFile,$pathFolder,$FileName){
+    public function ApiConvertDocxToPDF($pathFile,$pathFolder,$FileName){
     	$rs = array();
     	$headerOrigin = 'https://pcam.podomorouniversity.ac.id';
     	// $header[] = 'Content-Type: application/json';
