@@ -15,7 +15,7 @@
                     <select class="form-control filter-option" id="filterStatusGenerate">
                         <option value="">-- All Status --</option>
                         <option value="1">Has Been Generated</option>
-                        <option style="color: red;" value="0">Not Genrate Yet</option>
+                        <option style="color: red;" value="0">Not Generate Yet</option>
                     </select>
                 </div>
             </div>
@@ -25,8 +25,8 @@
 
 <div class="row">
     <div class="col-md-12" style="text-align: right;margin-bottom: 20px;">
-        <button class="btn btn-lg btn-default" id="btnGenrateShow">Genrate Student</button>
-        <button class="btn btn-lg btn-success btnActGenrate hide" id="btnGenrateNow">Genrate Now</button>
+        <button class="btn btn-lg btn-default" id="btnGenrateShow">Generate Ijazah</button>
+        <button class="btn btn-lg btn-success btnActGenrate hide" id="btnGenrateNow">Generate Now</button>
         <button class="btn btn-lg btn-danger btnActGenrate hide" id="btnGenrateClear">Clear Selected Student</button>
         <button class="btn btn-lg btn-default btnActGenrate hide" id="btnGenrateCancel">Cancel</button>
         <div class="hide">
@@ -112,7 +112,7 @@
             }
 
             $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-                '<h4 class="modal-title">Genrate Student</h4>');
+                '<h4 class="modal-title">Generate Ijazah</h4>');
 
             var htmlss = '<div class="row">' +
                 '    <div class="col-md-12">' +
