@@ -9008,7 +9008,7 @@ class C_api extends CI_Controller {
 
             $nestedData[] = $btnSKPI;
             $nestedData[] = $btnTranscript;
-            $nestedData[] = $btnIjazah;
+//            $nestedData[] = $btnIjazah;
 
             $no++;
 
@@ -9253,33 +9253,6 @@ class C_api extends CI_Controller {
                 }
 
                 return print_r(json_encode($data));
-
-            }
-
-            else if($data_arr['action']=='viewRegistrationSchedule'){
-
-//
-//
-//                $SemesterID = $data_arr['SemesterID'];
-//
-//                $data = $this->db->select('TARegStart,TARegEnd')->get_where('db_academic.academic_years',array(
-//                    'SemesterID' => $SemesterID
-//                ))->result_array();
-//
-//                // Check
-//                $getDateNow = $this->m_rest->getDateNow();
-//
-//                $TARegStart = $data[0]['TARegStart'];
-//                $TARegEnd = $data[0]['TARegEnd'];
-//
-//                $sw = 0;
-//                if(strtotime($TARegStart) <= strtotime($getDateNow) && strtotime($TARegEnd) >= strtotime($getDateNow)){
-//                    $sw = 1;
-//                }
-//
-//                $data[0]['Show'] = $sw;
-//
-//                return print_r(json_encode($data));
 
             }
             else if($data_arr['action']=='viewDocumentSkripsi'){
@@ -9696,6 +9669,19 @@ class C_api extends CI_Controller {
                 return print_r(1);
 
 
+            }
+            else if($data_arr['action']=='nowGenrateStudent'){
+                $dataForm = $data_arr['dataForm'];
+                for($i=0;$i<count($dataForm);$i++){
+                    $d = (array) $dataForm[$i];
+                    $arr = array(
+                        'NPM' => $d['NPM'],
+                        'Code' => $this->m_api->checkCodeIjazah(),
+                        'EntredBy' => $this->session->userdata('NIP')
+                    );
+                    $this->db->insert('db_academic.ijazah',$arr);
+                }
+                return print_r(1);
             }
         }
     }
@@ -12831,9 +12817,16 @@ class C_api extends CI_Controller {
 
         $requestData= $_REQUEST;
         $data_arr = $this->getInputToken();
+        $showGenrateOption = $data_arr['showGenrateOption'];
 
+        $dataWhereGeneratd = '';
+        if($data_arr['Generated']!='' && $data_arr['Generated']=='1'){
+            $dataWhereGeneratd = ' AND i.Code IS NOT NULL';
+        } else if($data_arr['Generated']!='' && $data_arr['Generated']=='0'){
+            $dataWhereGeneratd = ' AND i.Code IS NULL';
+        }
         $dataWhereProdi = ($data_arr['ProdiID']!='') ? 'AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
-        $dataWhere = ' AND aut_s.Year = "'.$data_arr['Year'].'" '.$dataWhereProdi;
+        $dataWhere = ' AND aut_s.Year = "'.$data_arr['Year'].'" '.$dataWhereProdi.$dataWhereGeneratd;
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
@@ -12841,20 +12834,20 @@ class C_api extends CI_Controller {
                            OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" )';
         }
 
-        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng 
+        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng, 
+                                      j.JudiciumsDate, i.Code, i.GenrateDate
                                       FROM db_academic.auth_students aut_s
                                       LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
-                                      WHERE aut_s.StatusStudentID = 1 '.$dataWhere.' '.$dataSearch.' ORDER BY aut_s.NPM ASC ';
+                                      LEFT JOIN db_academic.judiciums_list jl ON (jl.NPM = aut_s.NPM)
+                                      LEFT JOIN db_academic.judiciums j ON (j.ID = jl.JID)
+                                      LEFT JOIN db_academic.ijazah i ON (i.NPM = aut_s.NPM)
+                                      WHERE aut_s.StatusStudentID = 1 '.$dataWhere.' '.$dataSearch.' ';
 
 //        print_r($queryDefault);exit;
 
-        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM (SELECT aut_s.ID 
-                                                        FROM db_academic.auth_students aut_s
-                                                        LEFT JOIN db_academic.program_study ps 
-                                                        ON (ps.ID = aut_s.ProdiID)
-                                                        WHERE aut_s.StatusStudentID = 1 '.$dataWhere.' '.$dataSearch.') xx';
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
 
-        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+        $sql = $queryDefault.' ORDER BY aut_s.NPM ASC LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
         $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
@@ -12866,12 +12859,42 @@ class C_api extends CI_Controller {
             $row = $query[$i];
 
 
-            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div  style="text-align:left;">'.$row['Name'].'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $dateJudicium = ($row['JudiciumsDate']!=null && $row['JudiciumsDate']!='')
+                ? date('l, d F Y',strtotime($row['JudiciumsDate']))
+                : '';
+
+
+            $showGenrateOption = ($showGenrateOption==1
+                                    || $showGenrateOption=='1')
+                                    ? '' : 'hide';
+
+            $viewCheckBox = ($row['GenrateDate']!='' && $row['GenrateDate']!=null)
+                ? ''
+                : '<br/><div class="checkbox"><label>
+                   <input type="checkbox" class="ckstd '.$showGenrateOption.'" data-npm="'.$row['NPM'].'" id="ck_'.$row['NPM'].'">
+                            </label></div>';
+            $GenrateDate = ($row['GenrateDate']!=null && $row['GenrateDate']!='')
+                ? date('l, d F Y',strtotime($row['GenrateDate']))
+                : '';
+
+            $viewTokenGenrate = ($row['GenrateDate']!=null && $row['GenrateDate']!='')
+                ? $row['Code']
+                : '';
+
+            $db_ = 'ta_'.$row['Year'];
+            $viewDownloadIjazah = ($row['GenrateDate']!=null && $row['GenrateDate']!='')
+                ? '<button class="btn btn-success btn-sm btnDownloadIjazah" data-db="'.$db_.'" data-npm="'.$row['NPM'].'">Download</button>'
+                : '';
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.$viewCheckBox.'</div>';
+            $nestedData[] = '<div  style="text-align:left;">
+                                <b id="showName_'.$row['NPM'].'">'.$row['Name'].'</b><br/>'.$row['NPM'].'
+                             </div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiName'].'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$dateJudicium.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$GenrateDate.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$viewTokenGenrate.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$viewDownloadIjazah.'</div>';
 
             $no++;
 

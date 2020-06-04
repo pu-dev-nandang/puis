@@ -5,7 +5,7 @@
                         $this->uri->segment(3)=='setting-transcript') ? 'active' : ''; ?>">
             <a href="<?= base_url('academic/transcript'); ?>">Transcript</a>
         </li>
-        <li class="hide <?= ($this->uri->segment(3)=='ijazah') ? 'active' : ''; ?>">
+        <li class="<?= ($this->uri->segment(3)=='ijazah') ? 'active' : ''; ?>">
             <a href="<?= base_url('academic/transcript/ijazah'); ?>">Ijazah</a>
         </li>
     </ul>
