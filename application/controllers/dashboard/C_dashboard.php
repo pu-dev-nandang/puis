@@ -1551,6 +1551,7 @@ class C_dashboard extends Globalclass {
 
             $myNIP = $this->session->userdata('NIP');
             $myName = $this->session->userdata('Name');
+            $myDivisionID = $this->session->userdata('PositionMain')['IDDivision'];
             $isEmployee = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$myNIP))->row(); 
 
             if(!empty($isEmployee)){
@@ -1608,42 +1609,43 @@ class C_dashboard extends Globalclass {
                 }
                 //check data for employee
                 else{
-                    if(!empty($output['division'])){
-                        $param[] = array("field"=>"em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);
-                    }
-                    if( !empty($output['division']) && !empty($output['position'])){
-                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);
-                    }
-
-                    if(!empty($output['status'])){
+                    if(!empty($output['statusstd'])){
                         $sn = 1;
                         $dataArrStatus = array();
                         $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                        if(count($output['status']) == 1){
-                            $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        if(count($output['statusstd']) == 1){
+                            $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$output['statusstd'][0]."' ","filter"=> "" );
                         }else{
-                            foreach ($output['status'] as $s) {
-                                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                            foreach ($output['statusstd'] as $s) {
+                                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($output['statusstd'])) ? ' OR ':'')) ,"filter"=> null );
                                 $sn++;
                             }
                         }
                         $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }else{
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 1 or " ,"filter"=> null );    
+                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 2 " ,"filter"=> null );    
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);    
                     }
                 }
 
                 if(!empty($output['division'])){
                     if(!empty($output['position'])){
-                        $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);
                         $param[] = array("field"=>"em.PositionOther1","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther2","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$output['division'].".".$output['position']."' ) ","filter"=>"AND",);
                     }else{
-                        $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
+                        $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);
                         $param[] = array("field"=>"em.PositionOther1","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$output['division'].".%' ) ","filter"=>"AND",);
                     }
+                }else{
+                    $param[] = array("field"=>"em.PositionMain","data"=>" like '".$myDivisionID.".%' ","filter"=>"AND",);
                 }
+                
 
                 if(!empty($output['staff'])){
                     $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
@@ -1691,7 +1693,6 @@ class C_dashboard extends Globalclass {
                     }
                     $param[] = array("field"=>")","data"=>null,"filter"=>null);
                 }
-
                 if(!empty($output['attendance_start'])){
                     if(!empty($output['attendance_end'])){
                         $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."' ","filter"=>"AND",);
@@ -1701,14 +1702,15 @@ class C_dashboard extends Globalclass {
                 }else{
                     $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
                 }
-
                 if(!empty($output['sorted'])){
                     $orderBy = $output['sorted'];
                 }
             }
             $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
-            if(!empty($reqdata['length']) ){
+            //var_dump($this->db->last_query());
+            //var_dump($totalData);die();
+            if(!empty($reqdata['length'])){
                 $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'])->result();
             }else{
                 $result = $this->m_hr->fetchEmployee(false,$param)->result();
@@ -1716,10 +1718,22 @@ class C_dashboard extends Globalclass {
 
             if(!empty($result)){
                 $rs = array();
+                $sort = array();
+                $index=0;
+                $mytime = "08:30";
+                
                 foreach ($result as $r) {
-                    $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
-                    $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
+                    if(!empty($r->FirstLoginPortal)){
+                        $isLate = false;
+                        if (date('H:i',strtotime($mytime)) < date('H:i', strtotime($r->FirstLoginPortal))) {
+                            $isLate = true;
+                        }
+                        $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                        $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
+                        $r->IsLateCome = $isLate;
+                    }
                     $rs[] = $r;
+                    $index++;
                 }
                 $result = $rs;
             }

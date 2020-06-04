@@ -260,13 +260,13 @@
             		"data":"DivisionMain_",
             		"render": function (data, type, row, meta) {
             			var label = data+"-"+row.PositionMain_;
-            			if($.trim(row.PositionOther1).length > 0){
+            			if($.trim(row.PositionOther1Name).length > 0){
             				label += '<br>'+row.PositionOther1Name;
             			}
-            			if($.trim(row.PositionOther2).length > 0){
+            			if($.trim(row.PositionOther2Name).length > 0){
             				label += '<br>'+row.PositionOther2Name;
             			}
-            			if($.trim(row.PositionOther3).length > 0){
+            			if($.trim(row.PositionOther3Name).length > 0){
             				label += '<br>'+row.PositionOther3Name;
             			}
 
@@ -278,7 +278,6 @@
             		"data":"FirstLoginPortalDay",
             		"render": function(data, type, row, meta){
             			var label = '';
-            			console.log(row.IsLateCome);
             			if(!jQuery.isEmptyObject(row.FirstLoginPortalDayNum)){
             				label = '<span class="day-week bg-'+((row.FirstLoginPortalDayNum > 5) ? 'success':'danger')+'">'+data+'</span>';
             			}
