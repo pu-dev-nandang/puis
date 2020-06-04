@@ -16,7 +16,7 @@
 
 
         <li class="<?php if($this->uri->segment(3)=='judiciums') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('academic/final-project/judiciums'); ?>">Yudisium</a>
+            <a href="<?php echo base_url('academic/final-project/judiciums'); ?>">Judisium</a>
         </li>
 
         <li class="<?php if($this->uri->segment(3)=='seminar-schedule') { echo 'active'; } ?>">

@@ -134,11 +134,12 @@
                     '                    <th style="width: 20%;">SKL Number</th>' +
                     '                    <th style="width: 15%;">SKPI</th>' +
                     '                    <th style="width: 15%;">Transcript</th>' +
-                    '                    <th style="width: 7%;">Ijazah</th>' +
                     '                </tr>' +
                     '                </thead>' +
                     '                <tbody></tbody>' +
                     '            </table>');
+
+                // '                    <th style="width: 7%;">Ijazah</th>' +
 
 
                 var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null) ? filterBaseProdi.split('.')[0] : '' ;
