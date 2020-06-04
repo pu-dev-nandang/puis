@@ -845,85 +845,83 @@
 
     });
 
-    <?php if ($_SERVER['SERVER_NAME'] == 'localhost'): ?>
-      $(document).on('click','.btnSetTahun',function(event) {
-        const registerid = $(this).attr('registerid');
-        const Data = $(this).attr('data');
+    $(document).on('click','.btnSetTahun',function(event) {
+      const registerid = $(this).attr('registerid');
+      const Data = $(this).attr('data');
 
-        const OptTahun = () => {
-          let wr = '';
-          const thisYear = (new Date()).getFullYear();
-          const EndNextYear = parseInt(thisYear)+ 3;
-          const Yearselected = parseInt(thisYear)+1;
-          for (var i = thisYear; i <= EndNextYear; i++) {
-            var selected = (i == Yearselected) ? 'selected' : '';
-            wr+= '<option value = "'+i+'" '+selected+' >'+i+'</option>';
-          }
-          return wr;
+      const OptTahun = () => {
+        let wr = '';
+        const thisYear = (new Date()).getFullYear();
+        const EndNextYear = parseInt(thisYear)+ 3;
+        const Yearselected = parseInt(thisYear)+1;
+        for (var i = thisYear; i <= EndNextYear; i++) {
+          var selected = (i == Yearselected) ? 'selected' : '';
+          wr+= '<option value = "'+i+'" '+selected+' >'+i+'</option>';
         }
+        return wr;
+      }
 
 
-        const htmlWrite  = () => {
-          return '<div class = "row">' +
-                    '<div class = "col-sm-6">'+
-                        '<div class = "form-group">'+
-                          '<label>Data</label>'+
-                          '<input style = "color:black;" type = "text" class = "form-control" value ="'+Data+'" readonly>'+
-                        '</div>'+
-                        '<div class = "form-group">'+
-                          '<label>Set Tahun</label>'+
-                          '<select class = "form-control FrmYear">'+
-                            OptTahun()+
-                          '</select>'+
-                        '</div>'+
-                    '</div>'+
-                  '</div>'  
+      const htmlWrite  = () => {
+        return '<div class = "row">' +
+                  '<div class = "col-sm-6">'+
+                      '<div class = "form-group">'+
+                        '<label>Data</label>'+
+                        '<input style = "color:black;" type = "text" class = "form-control" value ="'+Data+'" readonly>'+
+                      '</div>'+
+                      '<div class = "form-group">'+
+                        '<label>Set Tahun</label>'+
+                        '<select class = "form-control FrmYear">'+
+                          OptTahun()+
+                        '</select>'+
+                      '</div>'+
+                  '</div>'+
+                '</div>'  
 
-          ;
+        ;
+      }
+
+      const footer = () => {
+        return '<button class = "btn btn-success" id = "sbmtSetTahun" registerid = "'+registerid+'">Save</button>  <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>';
+      }
+      $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Set Tahun/Angkatan Masuk Universitas </h4>');
+      $('#GlobalModalLarge .modal-body').html(htmlWrite());
+      $('#GlobalModalLarge .modal-footer').html(footer());
+      $('#GlobalModalLarge').modal({
+          'show' : true,
+          'backdrop' : 'static'
+      });
+    })
+
+    $(document).on('click','#sbmtSetTahun',async function(e){
+      const itsme = $(this);
+      const data = {
+        SetTa : $('.FrmYear option:selected').val(),
+        RegisterID : itsme.attr('registerid'),
+      };
+
+      const url = base_url_js + 'admission/proses-calon-mahasiswa/setTahun';
+      let token = jwt_encode(data,'UAP)(*');
+      loading_button2(itsme);
+      try{
+        const ajaxGetResponse = await AjaxSubmitFormPromises(url,token);
+        if (ajaxGetResponse == 1) {
+          toastr.success('Saved');
+          oTable1.ajax.reload( null, false );
         }
-
-        const footer = () => {
-          return '<button class = "btn btn-success" id = "sbmtSetTahun" registerid = "'+registerid+'">Save</button>  <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>';
+        else
+        {
+          toastr.error('Failed');
         }
-        $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Set Tahun/Angkatan Masuk Universitas </h4>');
-        $('#GlobalModalLarge .modal-body').html(htmlWrite());
-        $('#GlobalModalLarge .modal-footer').html(footer());
-        $('#GlobalModalLarge').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
-      })
+        $('#GlobalModalLarge').modal('hide')
+      }
+      catch(err){
+        console.log(err);
+        toastr.error('Something Wrong');
+      }
 
-      $(document).on('click','#sbmtSetTahun',async function(e){
-        const itsme = $(this);
-        const data = {
-          SetTa : $('.FrmYear option:selected').val(),
-          RegisterID : itsme.attr('registerid'),
-        };
+      end_loading_button2(itsme,'Save');
 
-        const url = base_url_js + 'admission/proses-calon-mahasiswa/setTahun';
-        let token = jwt_encode(data,'UAP)(*');
-        loading_button2(itsme);
-        try{
-          const ajaxGetResponse = await AjaxSubmitFormPromises(url,token);
-          if (ajaxGetResponse == 1) {
-            toastr.success('Saved');
-            oTable1.ajax.reload( null, false );
-          }
-          else
-          {
-            toastr.error('Failed');
-          }
-          $('#GlobalModalLarge').modal('hide')
-        }
-        catch(err){
-          console.log(err);
-          toastr.error('Something Wrong');
-        }
-
-        end_loading_button2(itsme,'Save');
-
-      })
-    <?php endif ?>
+    })
 
 </script>
