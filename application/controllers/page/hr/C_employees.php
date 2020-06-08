@@ -1713,26 +1713,37 @@ class C_employees extends HR_Controler {
                 $rs = array();
                 $sort = array();
                 $index=0;
-                $mytime = "08:30";
+                $maxTime = minMaxCalculate()['maxTime'];
                 $maxCalTime = minMaxCalculate()['max'];
                 $minCalTime = minMaxCalculate()['min'];
 
                 foreach ($result as $r) {
+                    $isLateCome = false; $isLateOut = false;
                     if(!empty($r->FirstLoginPortal)){
-                        $isLate = false;
-                        /*if (date('H:i',strtotime($mytime)) < date('H:i', strtotime($r->FirstLoginPortal))) {
-                            $isLate = true;
-                        }*/
+                        
                         $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
                         $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
-                        $r->CalculateAttendanceTime = calculateAttendanceTime($r->FirstLoginPortal,$r->LastLoginPortal);
+                        /*$r->CalculateAttendanceTime = calculateAttendanceTime($r->FirstLoginPortal,$r->LastLoginPortal);
                         if($r->CalculateAttendanceTime < $minCalTime){
                             $isLate = true;
                         }else if($r->CalculateAttendanceTime > $maxCalTime){
                             $isLate = true;
                         }
-                        $r->IsLateCome = $isLate;
-                    }
+                        */
+                        //cek is late
+                        //$plusMaxTime = strtotime(date('H:i',strtotime($r->FirstLoginPortal))) + 60*60*3; // time + 3 jam
+                        $fTime = date('H:i',strtotime($r->FirstLoginPortal));
+                        $plusTime = date('H:i', strtotime ("+3 hour", strtotime($r->FirstLoginPortal)));
+                        if (date('H:i',strtotime($maxTime)) < $fTime) {
+                            $isLateCome = true;
+                        }
+                        if (date('H:i', strtotime($r->LastLoginPortal)) < $plusTime )  {
+                            $isLateOut = true;
+                        }
+                        
+                    }else{$isLateCome = true;$isLateOut = true;}
+                    $r->IsLateCome = $isLateCome;
+                    $r->IsLateOut = $isLateOut;
                     $rs[] = $r;
                     $index++;
                 }
@@ -1920,29 +1931,30 @@ class C_employees extends HR_Controler {
 
             if(!empty($result)){
                 $rs = array();
-                $timeIn = "08:30";
+                $maxTime = minMaxCalculate()['maxTime'];
                 $maxCalTime = minMaxCalculate()['max'];
                 $minCalTime = minMaxCalculate()['min'];
                 foreach ($result as $r) {
-                    $isLate = false;
+                    $isLateCome = false; $isLateOut = false;
                     if(!empty($r->FirstLoginPortal)){
-                        /*if (date('H:i',strtotime($timeIn)) < date('H:i', strtotime($r->FirstLoginPortal))) {
-                            $isLate = true;
-                        }else{$isLate = false;}*/
-
                         $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
                         $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
                         $r->CalculateAttendanceTime = calculateAttendanceTime($r->FirstLoginPortal,$r->LastLoginPortal);
-                        if($r->CalculateAttendanceTime < $minCalTime){
-                            $isLate = true;
-                        }else if($r->CalculateAttendanceTime > $maxCalTime){
-                            $isLate = true;
-                        }else { $isLate = false;}
+    
+                        //cek is late
+                        $fTime = date('H:i',strtotime($r->FirstLoginPortal));
+                        $plusTime = date('H:i', strtotime ("+3 hour", strtotime($r->FirstLoginPortal)));
+                        if (date('H:i',strtotime($maxTime)) < $fTime) {
+                            $isLateCome = true;
+                        }
+                        if (date('H:i', strtotime($r->LastLoginPortal)) < $plusTime )  {
+                            $isLateOut = true;
+                        }
                         
-                    }else{
-                        $isLate = true;
-                    }
-                    $r->IsLateCome = $isLate;
+                    }else{$isLateCome = true;$isLateOut = true;}
+
+                    $r->IsLateCome = $isLateCome;
+                    $r->IsLateOut = $isLateOut;
                     $rs[] = $r;
                 }
                 $result = $rs;
@@ -2048,7 +2060,7 @@ class C_employees extends HR_Controler {
                     $excel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
                     $excel->getActiveSheet()->getStyle('F'.$numRow)->applyFromArray($styleCell);
                     
-                    if($v->IsLateCome){
+                    if($v->IsLateCome || $v->IsLateOut){
                         $excel->getActiveSheet()
                         ->getStyle('A'.$numRow.':F'.$numRow)
                         ->getFill()
