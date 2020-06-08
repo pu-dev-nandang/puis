@@ -1975,9 +1975,14 @@ class C_global extends CI_Controller {
         header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
         $keyRest = "bed5e018722291a0e22c4eca78f51027";
-        $rest_setting = $this->db->query(
-                'select * from db_ticketing.rest_setting'
-        )->result_array()[0];
+        $getallheaders = getallheaders();
+        $rest_setting = 'No data key';
+        if (array_key_exists('Keyrest', $getallheaders) && $getallheaders['keyRest'] == $keyRest ) {
+            $rest_setting = $this->db->query(
+                    'select * from db_ticketing.rest_setting'
+            )->result_array()[0];
+        }
+        
         echo json_encode($rest_setting);
     }
 
