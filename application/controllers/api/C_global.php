@@ -1977,7 +1977,7 @@ class C_global extends CI_Controller {
         $keyRest = "bed5e018722291a0e22c4eca78f51027";
         $getallheaders = getallheaders();
         $rest_setting = 'No data key';
-        if (array_key_exists('Keyrest', $getallheaders) && $getallheaders['keyRest'] == $keyRest ) {
+        if (array_key_exists('Keyrest', $getallheaders) && $getallheaders['Keyrest'] == $keyRest ) {
             $rest_setting = $this->db->query(
                     'select * from db_ticketing.rest_setting'
             )->result_array()[0];
