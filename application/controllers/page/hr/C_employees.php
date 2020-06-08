@@ -1625,18 +1625,16 @@ class C_employees extends HR_Controler {
                         $param[] = array("field"=>"(em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);
                         $param[] = array("field"=>"em.PositionOther1","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther2","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"OR",);
-                        $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$output['division'].".".$output['position']."' ) ","filter"=>"AND",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" = '".$output['division'].".".$output['position']."' ) ","filter"=>"OR",);
                     }else{
                         $param[] = array("field"=>"(em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);
                         $param[] = array("field"=>"em.PositionOther1","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
                         $param[] = array("field"=>"em.PositionOther2","data"=>" like '".$output['division'].".%' ","filter"=>"OR",);
-                        $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$output['division'].".%' ) ","filter"=>"AND",);
+                        $param[] = array("field"=>"em.PositionOther3","data"=>" like '".$output['division'].".%' ) ","filter"=>"OR",);
                     }
                 }else{
                     $param[] = array("field"=>"em.PositionMain","data"=>" like '".$myDivisionID.".%' ","filter"=>"AND",);
                 }
-                
-
                 if(!empty($output['staff'])){
                     $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
                     $param[] = array("field"=>"em.Name","data"=>" like '%".$output['staff']."%' )","filter"=>"OR",);
@@ -1683,23 +1681,28 @@ class C_employees extends HR_Controler {
                     }
                     $param[] = array("field"=>")","data"=>null,"filter"=>null);
                 }
+                $dateX='';
                 if(!empty($output['attendance_start'])){
                     if(!empty($output['attendance_end'])){
                         $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."' ","filter"=>"AND",);
+                        $dateX= " between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."'";
                     }else{
                         $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                        $dateX= "='".date("Y-m-d",strtotime($output['attendance_start']))."' ";
                     }
                 }else{
                     $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
+                    $dateX= " = '".date("Y-m-d")."' ";
                 }
                 if(!empty($output['sorted'])){
                     $orderBy = $output['sorted'];
                 }
             }
+
+            $param[] = array("subquery"=>" NOT EXISTS( select NIP from db_employees.log_employees a where a.NIP = em.NIP and (DATE(a.AccessedOn) ".$dateX." )  limit 1 ) ","field"=>null,"data"=>null,"filter"=>null,);
+
             $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
-            //var_dump($this->db->last_query());
-            //var_dump($totalData);die();
             if(!empty($reqdata['length'])){
                 $result = $this->m_hr->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'])->result();
             }else{
@@ -1711,15 +1714,23 @@ class C_employees extends HR_Controler {
                 $sort = array();
                 $index=0;
                 $mytime = "08:30";
-                
+                $maxCalTime = minMaxCalculate()['max'];
+                $minCalTime = minMaxCalculate()['min'];
+
                 foreach ($result as $r) {
                     if(!empty($r->FirstLoginPortal)){
                         $isLate = false;
-                        if (date('H:i',strtotime($mytime)) < date('H:i', strtotime($r->FirstLoginPortal))) {
+                        /*if (date('H:i',strtotime($mytime)) < date('H:i', strtotime($r->FirstLoginPortal))) {
                             $isLate = true;
-                        }
+                        }*/
                         $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
                         $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
+                        $r->CalculateAttendanceTime = calculateAttendanceTime($r->FirstLoginPortal,$r->LastLoginPortal);
+                        if($r->CalculateAttendanceTime < $minCalTime){
+                            $isLate = true;
+                        }else if($r->CalculateAttendanceTime > $maxCalTime){
+                            $isLate = true;
+                        }
                         $r->IsLateCome = $isLate;
                     }
                     $rs[] = $r;
@@ -1823,11 +1834,11 @@ class C_employees extends HR_Controler {
                 $sn = 1;
                 $dataArrStatus = array();
                 $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
-                if(count($reqdata['status']) == 1){
-                    $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$reqdata['status'][0]."' ","filter"=> "" );
+                if(count($reqdata['statusstd']) == 1){
+                    $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$reqdata['statusstd'][0]."' ","filter"=> "" );
                 }else{
-                    foreach ($reqdata['status'] as $s) {
-                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($reqdata['status'])) ? ' OR ':'')) ,"filter"=> null );
+                    foreach ($reqdata['statusstd'] as $s) {
+                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($reqdata['statusstd'])) ? ' OR ':'')) ,"filter"=> null );
                         $sn++;
                     }
                 }
@@ -1886,15 +1897,22 @@ class C_employees extends HR_Controler {
                 $param[] = array("field"=>")","data"=>null,"filter"=>null);
             }
 
+            $dateX='';
             if(!empty($reqdata['attendance_start'])){
                 if(!empty($reqdata['attendance_end'])){
                     $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($reqdata['attendance_start']))."' and '".date("Y-m-d",strtotime($reqdata['attendance_end']))."' ","filter"=>"AND",);
+                    $dateX= " between '".date("Y-m-d",strtotime($reqdata['attendance_start']))."' and '".date("Y-m-d",strtotime($reqdata['attendance_end']))."'";
                 }else{
                     $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d",strtotime($reqdata['attendance_start']))."' ","filter"=>"AND",);
+                    $dateX= "='".date("Y-m-d",strtotime($reqdata['attendance_start']))."' ";
                 }
             }else{
                 $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
+                $dateX= " = '".date("Y-m-d")."' ";
             }
+
+            $param[] = array("subquery"=>" NOT EXISTS( select NIP from db_employees.log_employees a where a.NIP = em.NIP and (DATE(a.AccessedOn) ".$dateX." )  limit 1 ) ","field"=>null,"data"=>null,"filter"=>null,);
+
 
             $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
@@ -1903,19 +1921,28 @@ class C_employees extends HR_Controler {
             if(!empty($result)){
                 $rs = array();
                 $timeIn = "08:30";
+                $maxCalTime = minMaxCalculate()['max'];
+                $minCalTime = minMaxCalculate()['min'];
                 foreach ($result as $r) {
-                    $isLate = true;
+                    $isLate = false;
                     if(!empty($r->FirstLoginPortal)){
-                        if (date('H:i',strtotime($timeIn)) < date('H:i', strtotime($r->FirstLoginPortal))) {
+                        /*if (date('H:i',strtotime($timeIn)) < date('H:i', strtotime($r->FirstLoginPortal))) {
                             $isLate = true;
-                        }else{$isLate = false;}
+                        }else{$isLate = false;}*/
 
                         $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
                         $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
-                        $r->IsLateCome = $isLate;
+                        $r->CalculateAttendanceTime = calculateAttendanceTime($r->FirstLoginPortal,$r->LastLoginPortal);
+                        if($r->CalculateAttendanceTime < $minCalTime){
+                            $isLate = true;
+                        }else if($r->CalculateAttendanceTime > $maxCalTime){
+                            $isLate = true;
+                        }else { $isLate = false;}
+                        
                     }else{
-                        $r->IsLateCome = $isLate;
+                        $isLate = true;
                     }
+                    $r->IsLateCome = $isLate;
                     $rs[] = $r;
                 }
                 $result = $rs;

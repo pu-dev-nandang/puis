@@ -72,3 +72,19 @@ function lastLogin($data){
 	//var_dump($CI->db->last_query());die();
 	return $results;
 }
+
+function minMaxCalculate(){
+	$result = array('min'=>5,'max'=>15);
+	return $result;
+}
+
+function calculateAttendanceTime($assigned_time,$completed_time){
+	$d1 = new DateTime($assigned_time);
+	$d2 = new DateTime($completed_time);
+	$interval = $d2->diff($d1);
+
+	$calculateDays = $interval->format('%d days');
+	$calculateHours = $interval->format('%H');
+
+	return $calculateHours;
+}
