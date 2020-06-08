@@ -74,7 +74,7 @@ function lastLogin($data){
 }
 
 function minMaxCalculate(){
-	$result = array('min'=>5,'max'=>15);
+	$result = array('min'=>3,'max'=>15,'maxTime'=>'09.30');
 	return $result;
 }
 

@@ -277,7 +277,7 @@
             	{
             		"data":"FirstLoginPortalDay",
             		"render": function(data, type, row, meta){
-            			//console.log(row);
+            			console.log(row);
             			var label = '';
             			if(!jQuery.isEmptyObject(row.FirstLoginPortalDayNum)){
             				label = '<span class="day-week bg-'+((row.FirstLoginPortalDayNum > 5) ? 'success':'danger')+'">'+data+'</span>';
@@ -291,7 +291,7 @@
             			var label = '';
             			if(!jQuery.isEmptyObject(row.FirstLoginPortal)){
             				var late = (row.IsLateCome) ? 'text-danger':'';
-            				label = data;
+            				label = '<span class="'+late+'">'+data+'</span>';
             			}
             			return label;
             		}         		
@@ -301,7 +301,8 @@
             		"render": function(data, type, row, meta){
             			var label = '';
             			if(!jQuery.isEmptyObject(row.LastLoginPortal)){
-            				label = data;
+            				var late = (row.IsLateOut) ? 'text-danger':'';
+            				label = '<span class="'+late+'">'+data+'</span>';
             			}
             			return label;
             		}             		
