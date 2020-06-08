@@ -1970,5 +1970,16 @@ class C_global extends CI_Controller {
         $this->load->view('template/404page',$data);
     }
 
+    // for Mobile
+    public function getRestAuth(){
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        $keyRest = "bed5e018722291a0e22c4eca78f51027";
+        $rest_setting = $this->db->query(
+                'select * from db_ticketing.rest_setting'
+        )->result_array()[0];
+        echo json_encode($rest_setting);
+    }
+
 
 }
