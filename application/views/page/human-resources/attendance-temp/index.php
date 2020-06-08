@@ -217,6 +217,7 @@
             "serverSide": true,
             "iDisplayLength" : 5,
             "responsive": true,
+            "lengthMenu": [[10, 25, 50], [10, 25, 50]],
             "ajax":{
                 url : base_url_js+'human-resources/fetch-attendance-temp', // json datasource
                 ordering : false,
@@ -276,6 +277,7 @@
             	{
             		"data":"FirstLoginPortalDay",
             		"render": function(data, type, row, meta){
+            			//console.log(row);
             			var label = '';
             			if(!jQuery.isEmptyObject(row.FirstLoginPortalDayNum)){
             				label = '<span class="day-week bg-'+((row.FirstLoginPortalDayNum > 5) ? 'success':'danger')+'">'+data+'</span>';
@@ -289,7 +291,7 @@
             			var label = '';
             			if(!jQuery.isEmptyObject(row.FirstLoginPortal)){
             				var late = (row.IsLateCome) ? 'text-danger':'';
-            				label = '<span class="'+late+'">'+data+'</span>';
+            				label = data;
             			}
             			return label;
             		}         		
