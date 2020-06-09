@@ -95,7 +95,8 @@
             		"render": function(data, type, row, meta){
             			var label = '';
             			if(!jQuery.isEmptyObject(row.LastLoginPortal)){
-            				label = data;
+            				var late = (row.IsLateOut) ? 'text-danger':'';
+            				label = '<span class="'+late+'">'+data+'</span>';
             			}
             			return label;
             		}             		
