@@ -166,6 +166,15 @@
                     </li>
                     <?php endif ?>
                     
+                    <?php if ($_SERVER['SERVER_NAME'] == 'localhost'): ?>
+                        <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-deposit-mhs"){echo "current";} ?>">
+                            <a href="<?php echo base_url('finance/tagihan-mhs/set-deposit-mhs'); ?>">
+                            <i class="icon-angle-right"></i>
+                            Set Deposit
+                            </a>
+                        </li>    
+                    <?php endif ?>    
+
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/set-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
