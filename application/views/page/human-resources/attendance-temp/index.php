@@ -217,7 +217,6 @@
             "serverSide": true,
             "iDisplayLength" : 5,
             "responsive": true,
-            "lengthMenu": [[10, 25, 50], [10, 25, 50]],
             "ajax":{
                 url : base_url_js+'human-resources/fetch-attendance-temp', // json datasource
                 ordering : false,
