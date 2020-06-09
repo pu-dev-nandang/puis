@@ -1699,19 +1699,26 @@ class C_dashboard extends Globalclass {
                     }
                     $param[] = array("field"=>")","data"=>null,"filter"=>null);
                 }
+                $dateX='';
                 if(!empty($output['attendance_start'])){
                     if(!empty($output['attendance_end'])){
                         $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."' ","filter"=>"AND",);
+                        $dateX= " between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."'";
                     }else{
                         $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                        $dateX= "='".date("Y-m-d",strtotime($output['attendance_start']))."' ";
                     }
                 }else{
                     $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
+                    $dateX= " = '".date("Y-m-d")."' ";
                 }
                 if(!empty($output['sorted'])){
                     $orderBy = $output['sorted'];
                 }
             }
+
+            $param[] = array("subquery"=>" NOT EXISTS( select NIP from db_employees.log_employees a where a.NIP = em.NIP and (DATE(a.AccessedOn) ".$dateX." )  limit 1 ) ","field"=>null,"data"=>null,"filter"=>null,);
+
             $totalData = $this->m_hr->fetchEmployee(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
             //var_dump($this->db->last_query());
@@ -1722,22 +1729,43 @@ class C_dashboard extends Globalclass {
                 $result = $this->m_hr->fetchEmployee(false,$param)->result();
             }
 
+
+
             if(!empty($result)){
                 $rs = array();
                 $sort = array();
                 $index=0;
-                $mytime = "08:30";
-                
+                $maxTime = minMaxCalculate()['maxTime'];
+                $maxCalTime = minMaxCalculate()['max'];
+                $minCalTime = minMaxCalculate()['min'];
+
                 foreach ($result as $r) {
+                    $isLateCome = false; $isLateOut = false;
                     if(!empty($r->FirstLoginPortal)){
-                        $isLate = false;
-                        if (date('H:i',strtotime($mytime)) < date('H:i', strtotime($r->FirstLoginPortal))) {
-                            $isLate = true;
-                        }
+                        
                         $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
                         $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLogin($conditions)->AccessedOn ));
-                        $r->IsLateCome = $isLate;
-                    }
+                        /*$r->CalculateAttendanceTime = calculateAttendanceTime($r->FirstLoginPortal,$r->LastLoginPortal);
+                        if($r->CalculateAttendanceTime < $minCalTime){
+                            $isLate = true;
+                        }else if($r->CalculateAttendanceTime > $maxCalTime){
+                            $isLate = true;
+                        }
+                        */
+                        //cek is late
+                        //$plusMaxTime = strtotime(date('H:i',strtotime($r->FirstLoginPortal))) + 60*60*3; // time + 3 jam
+                        $fTime = date('H:i',strtotime($r->FirstLoginPortal));
+                        $plusTime = date('H:i', strtotime ("+3 hour", strtotime($r->FirstLoginPortal)));
+                        if (date('H:i',strtotime($maxTime)) < $fTime) {
+                            $isLateCome = true;
+                        }
+                        if (date('H:i', strtotime($r->LastLoginPortal)) < $plusTime )  {
+                            $isLateOut = true;
+                        }
+                        
+                    }else{$isLateCome = true;$isLateOut = true;}
+                    $r->IsLateCome = $isLateCome;
+                    $r->IsLateOut = $isLateOut;
                     $rs[] = $r;
                     $index++;
                 }
