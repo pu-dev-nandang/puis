@@ -2193,6 +2193,7 @@ class C_employees extends HR_Controler {
                 }
 
                 if(!empty($output['ProdiID'])){
+                    if($output['ProdiID'] == 7){$output['ProdiID'] = 0;}
                     $param[] = array("field"=>"em.ProdiID","data"=>" = ".$output['ProdiID'].' ',"filter"=>"AND",);
                 }else{
                     $param[] = array("field"=>"em.ProdiID","data"=>" = 4 ","filter"=>"AND",);
