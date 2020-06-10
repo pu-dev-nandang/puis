@@ -1524,7 +1524,8 @@ class C_employees extends HR_Controler {
     }
 
 
-
+    /*ATTENDANCE TEMPORARY
+    ATTENDANCE EMPLOYEE*/
     public function attendanceTemp(){
         $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","IDStatus != '-2'","IDStatus","asc")->result();
         $data['division'] = $this->General_model->fetchData("db_employees.division",array())->result();
@@ -1764,7 +1765,7 @@ class C_employees extends HR_Controler {
     }
 
 
-    public function detailAttdTempEmp(){
+    /*public function detailAttdTempEmp(){
         $data = $this->input->post();
         if($data){
             $key = "UAP)(*";
@@ -1779,7 +1780,7 @@ class C_employees extends HR_Controler {
                 $this->load->view('page/'.$department.'/attendance-temp/detail',$data);                
             }else{echo "<h1>Employee not founded</h1>";}
         }else{show_404();}
-    }
+    }*/
 
 
     public function fetchMemberDepartment(){
@@ -2088,9 +2089,487 @@ class C_employees extends HR_Controler {
         }else{
             show_404();
         }
-        
-
+    
     }
+
+    /*END ATTENDANCE EMPLOYEE*/
+
+
+    /*ATTENDANCE LECTURER*/
+    public function attendanceTempLect(){
+        $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","Type = 'lec'","IDStatus","asc")->result();
+        $data['prody'] = $this->General_model->fetchData("db_academic.program_study",array(),'NameEng','ASC')->result();
+        $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
+        $data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+
+        $department = parent::__getDepartement();
+        $page = $this->load->view('page/'.$department.'/attendance-temp/lecturer',$data,true);
+        $this->temp($page);
+    }
+
+
+    public function fetchAttdTempLect(){
+        set_time_limit(0);
+        $this->load->helper("General_helper");
+        $reqdata = $this->input->post(); 
+        $myDivisionID = $this->session->userdata('PositionMain')['IDDivision'];
+
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $param = array();$orderBy=" lem.ID DESC ";
+
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+
+                $param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);
+                $param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' )","filter"=>"OR",);
+            }
+            if(!empty($data_arr['Filter'])){
+                $parse = parse_str($data_arr['Filter'],$output);
+
+                //check data emp if lecturers
+                if(!empty($output['isLecturer'])){
+                    $divLect = '14';
+                    $param[] = array("field"=>"(em.PositionMain","data"=>" like'".$divLect.".%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"em.PositionOther1","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther2","data"=>" like'".$divLect.".%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"em.PositionOther3","data"=>" like'".$divLect.".%' )","filter"=>"OR",);
+                    if( !empty($output['position'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$divLect.".".$output['position']."' ","filter"=>"AND",);
+                    }
+                    if(!empty($output['status'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['status']) == 1){
+                            $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['status'] as $s) {
+                                $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                    if(!empty($output['study_program'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['study_program']) == 1){
+                            $param[] = array("field"=>"em.ProdiID","data"=>" ='".$output['study_program'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['study_program'] as $s) {
+                                $param[] = array("field"=>"em.ProdiID","data"=>" ='".$s."' ".((($sn < count($output['study_program'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                }
+                //check data for employee
+                else{
+                    if(!empty($output['statusstd'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['statusstd']) == 1){
+                            $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$output['statusstd'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['statusstd'] as $s) {
+                                $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$s."' ".((($sn < count($output['statusstd'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }else{
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" = 3 or " ,"filter"=> null );    
+                        $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" = 4 or " ,"filter"=> null );    
+                        $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" = 5 or " ,"filter"=> null );    
+                        $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" = 6 " ,"filter"=> null );    
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                }
+
+                if(!empty($output['ProdiID'])){
+                    if($output['ProdiID'] == 7){$output['ProdiID'] = 0;}
+                    $param[] = array("field"=>"em.ProdiID","data"=>" = ".$output['ProdiID'].' ',"filter"=>"AND",);
+                }else{
+                    $param[] = array("field"=>"em.ProdiID","data"=>" = 4 ","filter"=>"AND",);
+                }
+                if(!empty($output['staff'])){
+                    $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"em.Name","data"=>" like '%".$output['staff']."%' )","filter"=>"OR",);
+                }
+                if(!empty($output['religion'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['religion']) == 1){
+                        $param[] = array("field"=>"em.ReligionID","data"=>" ='".$output['religion'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['religion'] as $s) {
+                            $param[] = array("field"=>"em.ReligionID","data"=>" ='".$s."' ".((($sn < count($output['religion'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['gender'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['gender']) == 1){
+                        $param[] = array("field"=>"em.Gender","data"=>" ='".$output['gender'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['gender'] as $s) {
+                            $param[] = array("field"=>"em.Gender","data"=>" ='".$s."' ".((($sn < count($output['gender'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['level_education'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['level_education']) == 1){
+                        $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$output['level_education'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['level_education'] as $s) {
+                            $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$s."' ".((($sn < count($output['level_education'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                $dateX='';
+                if(!empty($output['attendance_start'])){
+                    if(!empty($output['attendance_end'])){
+                        $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."' ","filter"=>"AND",);
+                        $dateX= " between '".date("Y-m-d",strtotime($output['attendance_start']))."' and '".date("Y-m-d",strtotime($output['attendance_end']))."'";
+                    }else{
+                        $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d",strtotime($output['attendance_start']))."' ","filter"=>"AND",);
+                        $dateX= "='".date("Y-m-d",strtotime($output['attendance_start']))."' ";
+                    }
+                }else{
+                    $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
+                    $dateX= " = '".date("Y-m-d")."' ";
+                }
+                if(!empty($output['sorted'])){
+                    $orderBy = $output['sorted'];
+                }
+            }
+
+            $param[] = array("subquery"=>" NOT EXISTS( select NIP from db_employees.log_lecturers a where a.NIP = em.NIP and (DATE(a.AccessedOn) ".$dateX." )  limit 1 ) ","field"=>null,"data"=>null,"filter"=>null,);
+
+            $totalData = $this->m_hr->fetchLecturer(true,$param)->row();
+            $TotalData = (!empty($totalData) ? $totalData->Total : 0);
+            if(!empty($reqdata['length'])){
+                $result = $this->m_hr->fetchLecturer(false,$param,$reqdata['start'],$reqdata['length'])->result();
+            }else{
+                $result = $this->m_hr->fetchLecturer(false,$param)->result();
+            }
+
+            if(!empty($result)){
+                $rs = array();
+                $sort = array();
+                $index=0;
+                $maxTime = minMaxCalculate()['maxTime'];
+                $maxCalTime = minMaxCalculate()['max'];
+                $minCalTime = minMaxCalculate()['min'];
+
+                foreach ($result as $r) {
+                    $isLateCome = false; $isLateOut = false;
+                    if(!empty($r->FirstLoginPortal)){
+                        
+                        $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                        $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLoginLect($conditions)->AccessedOn ));
+                        $fTime = date('H:i',strtotime($r->FirstLoginPortal));
+                        $plusTime = date('H:i', strtotime ("+3 hour", strtotime($r->FirstLoginPortal)));
+                        if (date('H:i',strtotime($maxTime)) < $fTime) {
+                            $isLateCome = true;
+                        }
+                        if (date('H:i', strtotime($r->LastLoginPortal)) < $plusTime )  {
+                            $isLateOut = true;
+                        }
+                        
+                    }else{$isLateCome = true;$isLateOut = true;}
+                    $r->IsLateCome = $isLateCome;
+                    $r->IsLateOut = $isLateOut;
+                    $rs[] = $r;
+                    $index++;
+                }
+                $result = $rs;
+            }
+
+            
+            $json_data = array(
+                "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
+                "recordsTotal"    => intval($TotalData),
+                "recordsFiltered" => intval($TotalData),
+                "data"            => (!empty($result) ? $result : 0)
+            );
+
+        }else{$json_data=null;}
+        $response = $json_data;
+        echo json_encode($response);
+    }
+
+
+    public function downloadAttendanceTempLect(){
+        set_time_limit(0);
+        $reqdata = $this->input->post();
+        if($reqdata){
+            $this->load->helper("General_helper");
+            $param = array();$orderBy=" em.ID DESC ";
+
+            if(!empty($reqdata['ProdiID'])){
+                $param[] = array("field"=>"em.ProdiID","data"=>" = ".$reqdata['ProdiID'].' ',"filter"=>"AND",);
+            }else{
+                $param[] = array("field"=>"em.ProdiID","data"=>" = 4 ","filter"=>"AND",);
+            }
+
+            if(!empty($reqdata['statusstd'])){
+                $sn = 1;
+                $dataArrStatus = array();
+                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                if(count($reqdata['statusstd']) == 1){
+                    $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$reqdata['statusstd'][0]."' ","filter"=> "" );
+                }else{
+                    foreach ($reqdata['statusstd'] as $s) {
+                        $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$s."' ".((($sn < count($reqdata['statusstd'])) ? ' OR ':'')) ,"filter"=> null );
+                        $sn++;
+                    }
+                }
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);
+            }else{
+                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" = 3 or " ,"filter"=> null );    
+                $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" = 4 or " ,"filter"=> null );    
+                $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" = 5 or " ,"filter"=> null );    
+                $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" = 6 " ,"filter"=> null );    
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);    
+            }
+
+            if(!empty($reqdata['staff'])){
+                $param[] = array("field"=>"(em.NIP","data"=>" like '%".$reqdata['staff']."%' ","filter"=>"AND",);
+                $param[] = array("field"=>"em.Name","data"=>" like '%".$reqdata['staff']."%' )","filter"=>"OR",);
+            }
+            if(!empty($reqdata['religion'])){
+                $sn = 1;
+                $dataArrStatus = array();
+                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                if(count($reqdata['religion']) == 1){
+                    $param[] = array("field"=>"em.ReligionID","data"=>" ='".$reqdata['religion'][0]."' ","filter"=> "" );
+                }else{
+                    foreach ($reqdata['religion'] as $s) {
+                        $param[] = array("field"=>"em.ReligionID","data"=>" ='".$s."' ".((($sn < count($reqdata['religion'])) ? ' OR ':'')) ,"filter"=> null );
+                        $sn++;
+                    }
+                }
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);
+            }
+            if(!empty($reqdata['gender'])){
+                $sn = 1;
+                $dataArrStatus = array();
+                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                if(count($reqdata['gender']) == 1){
+                    $param[] = array("field"=>"em.Gender","data"=>" ='".$reqdata['gender'][0]."' ","filter"=> "" );
+                }else{
+                    foreach ($reqdata['gender'] as $s) {
+                        $param[] = array("field"=>"em.Gender","data"=>" ='".$s."' ".((($sn < count($reqdata['gender'])) ? ' OR ':'')) ,"filter"=> null );
+                        $sn++;
+                    }
+                }
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);
+            }
+            if(!empty($reqdata['level_education'])){
+                $sn = 1;
+                $dataArrStatus = array();
+                $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                if(count($reqdata['level_education']) == 1){
+                    $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$reqdata['level_education'][0]."' ","filter"=> "" );
+                }else{
+                    foreach ($reqdata['level_education'] as $s) {
+                        $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$s."' ".((($sn < count($reqdata['level_education'])) ? ' OR ':'')) ,"filter"=> null );
+                        $sn++;
+                    }
+                }
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);
+            }
+
+            $dateX='';
+            if(!empty($reqdata['attendance_start'])){
+                if(!empty($reqdata['attendance_end'])){
+                    $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>" between '".date("Y-m-d",strtotime($reqdata['attendance_start']))."' and '".date("Y-m-d",strtotime($reqdata['attendance_end']))."' ","filter"=>"AND",);
+                    $dateX= " between '".date("Y-m-d",strtotime($reqdata['attendance_start']))."' and '".date("Y-m-d",strtotime($reqdata['attendance_end']))."'";
+                }else{
+                    $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d",strtotime($reqdata['attendance_start']))."' ","filter"=>"AND",);
+                    $dateX= "='".date("Y-m-d",strtotime($reqdata['attendance_start']))."' ";
+                }
+            }else{
+                $param[] = array("multiple"=>"date","field"=>"lem.AccessedOn","data"=>"='".date("Y-m-d")."' ","filter"=>"AND",);
+                $dateX= " = '".date("Y-m-d")."' ";
+            }
+
+            $param[] = array("subquery"=>" NOT EXISTS( select NIP from db_employees.log_lecturers a where a.NIP = em.NIP and (DATE(a.AccessedOn) ".$dateX." )  limit 1 ) ","field"=>null,"data"=>null,"filter"=>null,);
+
+
+            $totalData = $this->m_hr->fetchLecturer(true,$param)->row();
+            $TotalData = (!empty($totalData) ? $totalData->Total : 0);
+            $result = $this->m_hr->fetchLecturer(false,$param)->result();
+
+            if(!empty($result)){
+                $rs = array();
+                $maxTime = minMaxCalculate()['maxTime'];
+                $maxCalTime = minMaxCalculate()['max'];
+                $minCalTime = minMaxCalculate()['min'];
+                foreach ($result as $r) {
+                    $isLateCome = false; $isLateOut = false;
+                    if(!empty($r->FirstLoginPortal)){
+                        $conditions = array("NIP"=>$r->NIP,"DATE(a.AccessedOn)"=>date("Y-m-d",strtotime($r->FirstLoginPortal)));
+                        $r->LastLoginPortal = date("d-M-Y H:i:s",strtotime( lastLoginLect($conditions)->AccessedOn ));
+                        $r->CalculateAttendanceTime = calculateAttendanceTime($r->FirstLoginPortal,$r->LastLoginPortal);
+    
+                        //cek is late
+                        $fTime = date('H:i',strtotime($r->FirstLoginPortal));
+                        $plusTime = date('H:i', strtotime ("+3 hour", strtotime($r->FirstLoginPortal)));
+                        if (date('H:i',strtotime($maxTime)) < $fTime) {
+                            $isLateCome = true;
+                        }
+                        if (date('H:i', strtotime($r->LastLoginPortal)) < $plusTime )  {
+                            $isLateOut = true;
+                        }
+                        
+                    }else{$isLateCome = true;$isLateOut = true;}
+
+                    $r->IsLateCome = $isLateCome;
+                    $r->IsLateOut = $isLateOut;
+                    $rs[] = $r;
+                }
+                $result = $rs;
+            }
+
+            include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+            ini_set('memory_limit', '-1');
+            ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+
+            // Panggil class PHPExcel nya
+            $excel = new PHPExcel();
+
+            $pr = strtoupper('Attendance Temporary - By Portal');
+
+            // Settingan awal fil excel
+            $excel->getProperties()->setCreator('IT PU')
+                ->setLastModifiedBy('IT PU')
+                ->setTitle($pr)
+                ->setSubject($pr)
+                ->setDescription($pr)
+                ->setKeywords($pr);
+
+            $excel->setActiveSheetIndex(0)->setCellValue('A1', $pr);
+            $excel->getActiveSheet()->mergeCells('A1:F1');
+            $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
+            $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+            $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
+            
+            $header= [array("cell"=>"A","val"=>"No"),
+                    array("cell"=>"B","val"=>"NIP"),
+                    array("cell"=>"C","val"=>"Lecturer"),
+                    array("cell"=>"D","val"=>"Program Study"),
+                    array("cell"=>"E","val"=>"First Login"),
+                    array("cell"=>"F","val"=>"Last Login")
+            ];
+
+            $styleColHeader = array(
+                'font' => array('bold' => true), // Set font nya jadi bold
+                'alignment' => array(
+                    'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+                ),
+                'borders' => array(
+                    'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                    'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                    'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                    'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+                )
+            );
+            $numRow = 3;
+            foreach ($header as $k=>$v) {
+                $excel->setActiveSheetIndex(0)->setCellValue($v['cell'].$numRow, $v['val']);
+                $excel->getActiveSheet()->getStyle($v['cell'].$numRow)->applyFromArray($styleColHeader);
+            }
+
+            $numRow = $numRow+1;
+            
+            if(!empty($result)){
+                $styleCell = array(
+                    'borders' => array(
+                        'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                        'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                        'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                        'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+                    )
+                );
+                $no=1;
+                foreach ($result as $v) {
+                    $excel->setActiveSheetIndex(0)->setCellValue('A'.$numRow, $no);
+                    $excel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('A'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('B'.$numRow, $v->NIP);
+                    $excel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('B'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('C'.$numRow, $v->Name);
+                    $excel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('C'.$numRow)->applyFromArray($styleCell);
+                   
+                    $excel->setActiveSheetIndex(0)->setCellValue('D'.$numRow, $v->ProdiName);
+                    $excel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('D'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('E'.$numRow, ( !empty($v->FirstLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal))) : ''));
+                    $excel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('E'.$numRow)->applyFromArray($styleCell);
+                    
+                    $excel->setActiveSheetIndex(0)->setCellValue('F'.$numRow, (!empty($v->LastLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->LastLoginPortal))) : ''));
+                    $excel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('F'.$numRow)->applyFromArray($styleCell);
+                    
+                    if($v->IsLateCome || $v->IsLateOut){
+                        $excel->getActiveSheet()
+                        ->getStyle('A'.$numRow.':F'.$numRow)
+                        ->getFill()
+                        ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
+                        ->getStartColor()
+                        ->setARGB('FF0000');
+                    }
+                    
+
+                    $no++;
+                    $numRow++;
+                }
+            }
+
+            // Proses file excel
+            $filename = "Attendance-Temp-Download.xlsx";
+            //$FILEpath = "./dokument/".$filename;
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename='.$filename); // Set nama file excel nya
+            header('Cache-Control: max-age=0');
+
+            $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+            $write->save('php://output');
+    
+        }else{
+            show_404();
+        }
+    }
+    /*END ATTENDANCE LECTURER*/
     
     /*END ADDED BY FEBI @ FEB 2020*/
 

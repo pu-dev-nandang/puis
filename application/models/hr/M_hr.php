@@ -280,6 +280,92 @@ class M_hr extends CI_Model {
     }
 
 
+    public function fetchLecturer($count=false,$param='',$start='',$limit='',$order=''){
+        $where='';$where2='';$startDate = date("Y-m-d");
+        if(!empty($param)){
+            $where = 'WHERE '; $conditionDate = '';
+            $counter = 0; $notExistquery = '';
+            foreach ($param as $key => $value) {
+                if($value['field'] == "lem.AccessedOn"){
+                    //$startDate = preg_replace("/'/", '', $value['data']);
+                    $value['field'] = "DATE(".$value['field'].")";
+                    $value['data'] = $value['data'];
+                    //$conditionDate = " and "."DATE(a.AccessedOn)" ." ".$value['data'];
+                }
+                if(!empty($value['subquery'])){
+                    $notExistquery = $value['subquery'];
+                }
+
+                if($counter==0){
+                    if(strpos($value['field'], 'lem.AccessedOn') !== false){
+                        $where2 = $where.$value['field']." ".$value['data'];
+                    }else{
+                        $where = $where.$value['field']." ".$value['data'];                        
+                    }
+                }else{ 
+                    if(strpos($value['field'], 'lem.AccessedOn') !== false){
+                        $where2 = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                    }else{
+                        $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                    }
+                }
+
+                $counter++;
+            }
+        }
+        //echo $where2;die();
+        if($where == 'WHERE '){
+            $where = '';
+        }
+        $lims="";
+        if($start!="" || $limit!=""){
+            $lims = " LIMIT {$start},{$limit}"; 
+        }
+
+        $query1 = "SELECT em.*
+                    , ps.ID as ProdiID_, ps.CodeID as ProdiCodeID, ps.NameEng as ProdiName, ps.`Code` as ProdiCode 
+                    ,DATE_FORMAT(lem.AccessedOn,'%d-%M-%Y %H:%i:%s') as FirstLoginPortal 
+                    ,DAYNAME(lem.AccessedOn) as FirstLoginPortalDay 
+                    ,WEEKDAY(lem.AccessedOn) as FirstLoginPortalDayNum 
+                    FROM db_employees.employees em 
+                    left JOIN db_employees.log_lecturers lem on (em.NIP = lem.NIP) 
+                    LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID) 
+                    {$where2} 
+                    GROUP BY em.NIP, DATE(lem.AccessedOn) order by FirstLoginPortal asc ";
+        $query2 = "select em.*
+                    ,ps.ID as ProdiID_, ps.CodeID as ProdiCodeID, ps.NameEng as ProdiName, ps.`Code` as ProdiCode 
+                    ,null as FirstLoginPortal
+                    ,null as FirstLoginPortalDay 
+                    ,null as FirstLoginPortalDayNum 
+                    from db_employees.employees em
+                    LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                    {$where} AND {$notExistquery} 
+                    ";
+
+        $groupby = '';
+        $sorted = '';
+        $order_by = '';
+        if($count){
+            $select = "COUNT(*) as Total";
+        }else{
+            $select = "*";
+            $groupby = "GROUP BY NIP,FirstLoginPortal";
+            $order_by = 'order by NIP,FirstLoginPortal desc';
+        }
+        
+        $string = "select {$select} 
+                   from (
+                    ( {$query1} )
+                    union all
+                    ( {$query2} )
+                    ) as Attendance
+                    {$groupby} {$order_by} {$lims}";
+        $value  = $this->db->query($string);
+        //var_dump($this->db->last_query());
+        return $value;
+    }
+
+
     public function fetchMemberOFDepartpent($data){
         $this->db->select('em.*,d.Division as DivisionMainName, p.Position as PositionMainName
                             ,( case when (em.PositionOther1 is null or em.PositionOther1 = "") then "" else ( concat(d1.Division,"-",p1.Position ) ) end ) as PositionOtherName1
