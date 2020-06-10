@@ -10,14 +10,23 @@
     .day-week{background: yellow;padding: 5px;border-radius: 5px;}
     .day-week.bg-danger{background: #51a351;color:#fff;}
     .day-week.bg-success{background: #dd5600;color:#fff;}
+
+    select.ProdiID option {
+	  margin: 40px;
+	}
+
+	select.ProdiID option[value="7"] {
+	  color: red
+	}
 </style>
+
 
 <div id="attendance-temporary">
 
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="" aria-controls="home" role="tab" data-toggle="tab">Employee</a></li>
-    <li role="presentation"><a href="<?=base_url('human-resources/attendance-temp-lecturer')?>">Lecturer</a></li>
+    <li role="presentation"><a href="<?=base_url('human-resources/attendance-temp')?>">Employee</a></li>
+    <li role="presentation" class="active"><a href="" aria-controls="home" role="tab" data-toggle="tab">Lecturer</a></li>
   </ul>
 
   <!-- Tab panes -->
@@ -41,26 +50,17 @@
 			            </div>
 			            <div class="col-sm-3">
 			              <div class="form-group">
-			                <label>Division</label>               
-			                <select class="form-control" name="division">
+			                <label>Program Study</label>               
+			                <select class="form-control ProdiID" name="ProdiID">
 			                  <option value="">-Choose one-</option>
-			                  <?php foreach ($division as $d) {
-			                  echo '<option value="'.$d->ID.'">'.$d->Division.'</option>';
+			                  <?php foreach ($prody as $d) {
+			                  	$selected = (($d->ID == 4) ? 'selected':'');
+			                  echo '<option value="'.$d->ID.'" '.$selected.' >'.$d->NameEng.'</option>';
 			                  } ?>
 			                </select>
 			              </div>
 			            </div>
-			            <div class="col-sm-3">
-			              <div class="form-group">
-			                <label>Position</label>               
-			                <select class="form-control" name="position" disabled>
-			                  <option value="">-Choose one-</option>
-			                  <?php foreach ($position as $p) {
-			                  echo '<option value="'.$p->ID.'">'.$p->Description.'</option>';
-			                  } ?>
-			                </select>               
-			              </div>
-			            </div>
+			            
 			            <div class="col-sm-2">
 			              <div class="form-group">
 			                <label>Attendance Start From</label>
@@ -195,8 +195,8 @@
 		                            <tr>
 		                                <th width="5%">No</th>
 		                                <th>NIP</th>
-		                                <th>Employee</th>
-		                                <th>Position</th>
+		                                <th>Lecturer</th>
+		                                <th>Program Study</th>
 		                                <th>Day</th>
 		                                <th width="20%">First Login</th>
 		                                <th>Last Login</th>
@@ -232,7 +232,7 @@
             "iDisplayLength" : 5,
             "responsive": true,
             "ajax":{
-                url : base_url_js+'human-resources/fetch-attendance-temp', // json datasource
+                url : base_url_js+'human-resources/fetch-attendance-temp-lecturer', // json datasource
                 ordering : false,
                 data : {token:token},
                 type: "post",  // method  , by default get
@@ -270,22 +270,7 @@
             		"data":"Name"            		
             	},
             	{
-            		"data":"DivisionMain_",
-            		"render": function (data, type, row, meta) {
-            			var label = data+"-"+row.PositionMain_;
-            			if($.trim(row.PositionOther1Name).length > 0){
-            				label += '<br>'+row.PositionOther1Name;
-            			}
-            			if($.trim(row.PositionOther2Name).length > 0){
-            				label += '<br>'+row.PositionOther2Name;
-            			}
-            			if($.trim(row.PositionOther3Name).length > 0){
-            				label += '<br>'+row.PositionOther3Name;
-            			}
-
-            			
-            			return label;
-            		}            		
+            		"data":"ProdiName"          		
             	},
             	{
             		"data":"FirstLoginPortalDay",
@@ -331,46 +316,9 @@
       changeMonth: true,
   	});
 
-    var attdMin="", attdMax="";
-    /*$("#attendance_start").datepicker({
-	  dateFormat: 'dd-mm-yy',
-      changeYear: true,
-      changeMonth: true,
-	  //defaultDate: new Date(),
-	  //minDate: new Date(),
-	  //beforeShowDay: $.datepicker.noWeekends,
-	  onSelect: function(dateStr)
-	  {
-	      attdMin = dateStr;
-	      $("#attendance_end").val(dateStr);
-	        var date = $(this).datepicker('getDate');
-	        console.log(dateStr);
-	        console.log(date);
-	        var endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + 1);//6
-	      	console.log(endDate);
-	      	attdMax = new Date(endDate);
-	      $( "#attendance_end" ).datepicker("option",{minDate: endDate, maxDate:new Date(dateStr)});
-	      
-	  }
-	});
-
-	$('#attendance_end').datepicker({
-	  dateFormat: 'dd-mm-yy',
-      changeYear: true,
-      changeMonth: true,
-      //defaultDate: new Date(),
-	  //beforeShowDay: $.datepicker.noWeekends,
-	  onSelect: function(dateStr) {
-	  	console.log(dateStr);
-	    toDate = new Date(dateStr);
-	    //fromDate = ConvertDateToShortDateString(fromDate);
-	    //toDate = ConvertDateToShortDateString(toDate);
-	  }
-	}); */
-
     $(".btn-download").click(function(){
     	var itsme = $(this);
-    	var division = $("#form-filter select[name=division]").val();
+    	var division = $("#form-filter select[name=ProdiID]").val();
     	var attendance_start = $("#form-filter input[name=attendance_start]").val();
     	division = $.trim(division);
     	attendance_start = $.trim(attendance_start);
@@ -378,10 +326,10 @@
     		var filtering = $("#form-filter").serialize();
 			//itsme.prop("disabled",true).html("loading");
 	        var token = jwt_encode({Filter : filtering},'UAP)(*');
-	        var urld = base_url_js+"human-resources/download-attendance-temp";
+	        var urld = base_url_js+"human-resources/download-attendance-temp-lecturer";
 	        $("#form-filter").attr("action",urld);
 	        $("#form-filter")[0].submit();
-    	}else{alert("Please select DIVISION and Attendance Day");}
+    	}else{alert("Please select PROGRAM STUDY and ATTENDANCE DAY");}
     });
 
     $('#form-filter').on('keyup keypress', function(e) {

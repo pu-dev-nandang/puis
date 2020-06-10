@@ -73,6 +73,15 @@ function lastLogin($data){
 	return $results;
 }
 
+function lastLoginLect($data){
+	$CI = & get_instance();
+	$CI->load->model('General_model');
+	$results = $CI->General_model->fetchData("db_employees.log_lecturers a",$data,"a.ID","desc","0#1")->row();
+	//var_dump($CI->db->last_query());die();
+	return $results;
+}
+
+
 function minMaxCalculate(){
 	$result = array('min'=>3,'max'=>15,'maxTime'=>'09.30');
 	return $result;
