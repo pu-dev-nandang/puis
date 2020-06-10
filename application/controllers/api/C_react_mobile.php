@@ -128,13 +128,21 @@ class C_react_mobile extends CI_Controller {
                )->result_array();
                $DeptList[] = [
                 'DepartmenID' => 'NA.'.$DeptDiv[0]['ID'] ,
-                'DepartmentName' => 'Prodi '.$DeptDiv[0]['Division'],
+                'DepartmentName' => $DeptDiv[0]['Division'],
                ];
                break;
            }
          }
 
+         $rs['status'] = 1;
+         $rs['callback'] = [
+          'data' => $dataEMP,
+          'DeptList' => $DeptList
+         ];
+
       }
+
+      echo json_encode($rs);
 
 
     }
