@@ -1,4 +1,3 @@
-
 <style>
 
     #viewkb .item-head:hover{
@@ -36,7 +35,7 @@
 </style>
 <div class="row">
     <div class="col-md-3 panel-admin" style="border-right: 1px solid #CCCCCC;">
-<?php if (true){ ?>
+<?php if(true){ ?>
      <div class="panel panel-default">
         <div class="panel-heading"></div>
         <div class="panel-body">
@@ -89,11 +88,11 @@
         </div>
       </div>
       <div class="row">
-        <div id="" class="col-md-12">
+        <div id="viewkb" class="col-md-12">
               <ul class="list-group" id="headerlist">
                 <?php for($i = 0; $i < count($G_data); $i++): ?>
                   <?php $no = $i+1 ?>
-                    <li class="list-group-item item-head">
+                    <li class="list-group-item item-head">dsds
                                       <a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i ?>">
                                           <span class="numbering"><b><?php echo $no; ?></b></span>
                                           <span class="info"><b><?php echo $G_data[$i]['Type']?></b></span>
@@ -103,8 +102,14 @@
                         <ul class="list-group">
                           <?php $data = $G_data[$i]['data'] ?>
                           <?php for($j = 0; $j < count($data); $j++): ?>
-                            <li class="list-group-item"><a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i.'__'.$j ?>">
+                            <li class="list-group-item" data-contentid="<?=$data[$j]['ID']?>" data-type="knowledge_base">
+                              ...<a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i.'__'.$j ?>">
                                               <b><?php echo $data[$j]['Desc'] ?></b>
+                                              <span class="pull-right viewers">
+                                              <?php if(!empty($data[$j]['CountRead']->Total)){ ?>
+                                              <span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read"><?=$data[$j]['CountRead']->Total?></span> times</span>
+                                              <?php } ?>
+                                              </span>
                                           </a>
                               <div id="<?php echo $i.'__'.$j ?>" class="collapse">
                                 <div style="margin-top: 15px;margin-bottom: 15px;">
@@ -428,3 +433,43 @@ $('#saveFormKB').click(function () {
 
 
 </script>
+
+
+<!-- ADDED BY FEBRI @ JUNE 2020 -->
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("#viewkb").on('click','.detailKB .list-group-item',function(){
+      var itsme = $(this);
+      var contentid = itsme.data('contentid');
+      var type = itsme.data('type');
+
+      var dataPost = {
+        ContentID : contentid,
+        TypeContent : type
+      }
+        
+      var token = jwt_encode(dataPost,'UAP)(*');
+
+      $.ajax({
+        type : 'POST',
+        url : base_url_js+"help/hitlog",
+        data : {token:token},
+        dataType : 'json',
+        beforeSend :function(){},
+        error : function(jqXHR){
+          $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+          $('body #GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+          $("body #GlobalModal").modal("show");
+        },success : function(response){
+          console.log(response);
+          if(!jQuery.isEmptyObject(response)){
+            if(response.finish){
+              itsme.find(".viewers").html('<span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read">'+response.count+'</span> times</span>');
+            }
+          }
+        }
+    });
+    });
+  });
+</script>
+<!-- END ADDED BY FEBRI @ JUNE 2020 -->
