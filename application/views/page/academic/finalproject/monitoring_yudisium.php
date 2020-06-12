@@ -41,6 +41,8 @@
 </div>
 
 
+
+
 <script>
 
     $(document).ready(function () {
@@ -86,7 +88,8 @@
             var data = {
                 action : 'loadDataParticipantOfJudiciums',
                 ProdiID : ProdiID,
-                JID : filterJudiciumsYear
+                JID : filterJudiciumsYear,
+                Source : 'puis'
             };
 
             var token = jwt_encode(data,'UAP)(*');
@@ -341,6 +344,82 @@
 
         });
 
+
+    });
+
+    // Change Yudisium list
+    $(document).on('click','.btnChangePeriode',function () {
+        var NPM = $(this).attr('data-npm');
+        var Name = $(this).attr('data-name');
+        var JID = $(this).attr('data-jid');
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Change Periode Judiciums</h4>');
+
+        var htmlss = '<div class="row">' +
+            '    <div class="col-md-6 col-md-offset-3">' +
+            '        <div class="form-group">' +
+            '            <label>'+NPM+' - '+Name+'</label>' +
+            '            <input class="hide" id="filterModalNPM" value="'+NPM+'" />' +
+            '        </div>' +
+            '        <div class="form-group">' +
+            '            <label>Periode</label>' +
+            '            <select class="form-control" id="filterModalJudiciumsYear"></select>' +
+            '        </div>' +
+            '    </div>' +
+            '</div>';
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        loadSelectOptionJudiciumsYear('#filterModalJudiciumsYear',JID);
+
+        $('#GlobalModal .modal-footer').html('' +
+            '<button class="btn btn-success" id="btnModalSaveChangePeriode">Save</button>' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+        $('#GlobalModal').on('shown.bs.modal', function () {
+            $('#formSimpleSearch').focus();
+        });
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+    });
+
+    $(document).on('click','#btnModalSaveChangePeriode',function () {
+
+        var filterModalNPM = $('#filterModalNPM').val();
+        var filterModalJudiciumsYear = $('#filterModalJudiciumsYear').val();
+
+
+        if(filterModalNPM!='' && filterModalNPM!=null &&
+            filterModalJudiciumsYear!='' && filterModalJudiciumsYear!=null) {
+
+            loading_button('#btnModalSaveChangePeriode');
+
+            var data = {
+                action : 'editJudisiumDate',
+                NPM : filterModalNPM,
+                JID : filterModalJudiciumsYear
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api3/__crudYudisium';
+            $.post(url,{token:token},function (result) {
+
+                loadDataParticipant();
+
+                toastr.success('Date updated','Success');
+
+                setTimeout(function () {
+                    $('#GlobalModal').modal('hide');
+                },500);
+
+            });
+
+        }
 
     });
 

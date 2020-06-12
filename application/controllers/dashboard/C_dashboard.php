@@ -1012,14 +1012,20 @@ class C_dashboard extends Globalclass {
     {
         $post = $_POST;
         if (count($post) > 0) {
+            // create session change division select option
             $data['selected'] = $post['Division'];
+            $this->session->set_userdata('kb_div',$data['selected']);
             $data['G_data'] = $this->m_master->userKB($data['selected']);
             echo $this->load->view('global/kb/content_change',$data,true);
         }
         else
         {
-            $data['G_division'] = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
-            $data['selected'] = 6;
+            // clear session first for change division
+            $this->session->unset_userdata('kb_div');
+            $data['G_division'] = $this->m_master->apiservertoserver(base_url().'api/__getAllDepartementPU');
+            // $data['G_division'] = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
+
+            $data['selected'] = 'NA.6';
             $data['G_data'] = $this->m_master->userKB($data['selected']);
             $content = $this->load->view('global/kb/kb',$data,true);
             $this->temp($content);

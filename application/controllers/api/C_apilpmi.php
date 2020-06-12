@@ -170,7 +170,7 @@ class C_apilpmi extends CI_Controller {
         // print_r($IDType).die();
         $data = $this->db->query('SELECT * FROM  db_employees.employees AS e
                 LEFT JOIN db_employees.position p on SUBSTRING_INDEX(SUBSTRING_INDEX(e.PositionMain, ".", 2), ".", -1) = p.ID
-                WHERE e.PositionMain LIKE "%3.%" AND e.PositionMain NOT LIKE "%13.%" AND e.PositionMain NOT LIKE "%33.%" OR e.PositionOther1 like "%3.%" AND e.PositionOther1 NOT LIKE "%13.%" AND e.PositionOther1 NOT LIKE "%33.%" OR e.PositionOther2 like "%3.%" AND e.PositionOther2 NOT LIKE "%13.%" AND e.PositionOther2 NOT LIKE "%33.%" OR e.PositionOther3 like "%3.%" AND e.PositionOther3 NOT LIKE "%13.%" AND e.PositionOther3 NOT LIKE "%33.%"
+                WHERE e.PositionMain LIKE "%3.%" AND e.PositionMain NOT LIKE "%13.%" AND e.PositionMain NOT LIKE "%33.%" AND e.StatusEmployeeID in (1,2) OR e.PositionOther1 like "%3.%" AND e.PositionOther1 NOT LIKE "%13.%" AND e.PositionOther1 NOT LIKE "%33.%" AND e.StatusEmployeeID in (1,2) OR e.PositionOther2 like "%3.%" AND e.PositionOther2 NOT LIKE "%13.%" AND e.PositionOther2 NOT LIKE "%33.%" AND e.StatusEmployeeID in (1,2) OR e.PositionOther3 like "%3.%" AND e.PositionOther3 NOT LIKE "%13.%" AND e.PositionOther3 NOT LIKE "%33.%" AND e.StatusEmployeeID in (1,2)
                 ORDER BY p.ID ASC')->result_array();
         return print_r(json_encode($data));
     }

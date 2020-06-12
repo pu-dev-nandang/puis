@@ -25,9 +25,58 @@
 														<div id="<?php echo $i.'__'.$j ?>" class="collapse">
 																<div style="margin-top: 15px;margin-bottom: 15px;">
 																		<a class="btn btn-default <?php if($data[$j]['File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/kb-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> PDF File</a>
+																			<br/>
+																			    <?php 
+																			      if ($this->session->userdata('IDdepartementNavigation')== 12) // IT
+																			      { ?>
+																			        <br/>
+																			        <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
+																			<?php }
+																			      else
+																			      {
+																			        // read navigasi department
+																			        $inArrDiv = [15,34]; // prodi dan faculty
+																			        if (!in_array($this->session->userdata('IDdepartementNavigation'), $inArrDiv) ) {
+																			          if ('NA.'.$this->session->userdata('IDdepartementNavigation') == $this->session->userdata('kb_div')) 
+																			          { ?>
+																			            <br/>
+																			            <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>    
+																			            
+																			   <?php  }
+
+																			        }
+																			        else
+																			        {
+																			          // prodi dan faculty
+																			          if($this->session->userdata('IDdepartementNavigation') == 15) // prodi
+																			          {
+																			            if ('AC.'.$this->session->userdata('prodi_active_id') == $this->session->userdata('kb_div') ) 
+																			            { ?>
+																			                <br/>
+																			                <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
+
+																			      <?php }
+																			          }
+																			          else
+																			          {
+																			            // faculty
+																			            if ('FT.'.$this->session->userdata('faculty_active_id') == $this->session->userdata('kb_div') ) 
+																			            { ?>
+																			                <br/>
+																			                <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
+
+																			      <?php }
+
+																			          }  
+
+																			        }
+																			      }
+																			      
+																			     ?>
 																			<?php if ($selected ==$this->session->userdata('PositionMain')['IDDivision']): ?>
-																			  <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
+																			  <!-- <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a> -->
 																			<?php endif; ?>
+
 																</div>
 														</div>
 

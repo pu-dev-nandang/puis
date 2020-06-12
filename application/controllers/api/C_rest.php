@@ -1348,7 +1348,7 @@ class C_rest extends CI_Controller {
 
                     if(count($dataSmt)>0){
                         $data[$i]['Semester'] = count($dataSmt);
-                        $datapay = $this->db->query('SELECT Invoice, Status FROM db_finance.payment_students WHERE ID_payment = "'.$data[$i]['ID'].'" ')->result_array();
+                        $datapay = $this->db->query('SELECT Invoice, Status,Deadline,DatePayment FROM db_finance.payment_students WHERE ID_payment = "'.$data[$i]['ID'].'" ')->result_array();
                         $data[$i]['DetailPay'] = $datapay;
                         array_push($result,$data[$i]);
                     }

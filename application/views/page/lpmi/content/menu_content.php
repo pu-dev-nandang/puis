@@ -202,15 +202,15 @@
 	                        <h3>Setting Build</h3>	                                             
 							<hr>
 
-								<div><input type="checkbox" id="ad1" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="knowledge" || $Segment1 =="testimonials" || $Segment1 =="partner"){echo "disabled";}?> > <label id="setingedit0">Add</label> Date
+								<div><input type="checkbox" id="ad1" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="knowledge" || $Segment1 =="testimonials" || $Segment1 =="partner"){echo "disabled";}?> onchange="valueChanged1()"> <label id="setingedit0">Add</label> Date
 								</div>
-								<div><input type="checkbox" id="ad2" > <label id="setingedit">Add</label> Meta Descripton
+								<div><input type="checkbox" id="ad2" onchange="valueChanged2()"> <label id="setingedit">Add</label> Meta Descripton
 								</div>
-								<div><input type="checkbox" id="ad3"> <label id="setingedit1">Add</label> Meta Keywords
+								<div><input type="checkbox" id="ad3" onchange="valueChanged3()"> <label id="setingedit1">Add</label> Meta Keywords
 								</div>
-								<div><input type="checkbox" id="ad4" <?php if ($Segment1 =="vision" || $Segment1 =="mission" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="event" ){echo "disabled";}?>> <label id="setingedit2">Add</label> Upload
+								<div><input type="checkbox" id="ad4" <?php if ($Segment1 =="vision" || $Segment1 =="mission" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="event" ){echo "disabled";}?> onchange="valueChanged4()"> <label id="setingedit2">Add</label> Upload
 								</div>
-								<div><input type="checkbox" id="ad5" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="event" || $Segment1 =="testimonials" || $Segment1 =="partner"){echo "disabled";}?> onchange="valueChanged()"> <label id="setingedit3">Add</label> Category
+								<div><input type="checkbox" id="ad5" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="event" || $Segment1 =="testimonials" || $Segment1 =="partner"){echo "disabled";}?> onchange="valueChanged5()"> <label id="setingedit3">Add</label> Category
 								</div>										
 							<span class="help-block"></span>
 	                    </div>
@@ -242,32 +242,11 @@
 </script>
 
 <script>
-	$("#show_a5").hide();
-	function valueChanged()
-    {
-        if($('#ad5').is(":checked"))   
-            $("#show_a5").show();
-        else
-            $("#show_a5").hide();
-    }
-    $(document).ready(function(){
-    	
-    });
+	
     $(document).ready(function () {
     	
-    	// show setting build
-    	$('#ad1').change(function() {
-		  $("#show_a1").prop("hidden", !this.checked);
-		});
-    	$('#ad2').change(function() {
-		  $("#show_a2").prop("hidden", !this.checked);
-		});
-		$('#ad3').change(function() {
-		  $("#show_a3").prop("hidden", !this.checked);
-		});
-		$('#ad4').change(function() {
-			$("#show_a4").prop("hidden", !this.checked);
-		});
+    	
+
 		// $('#ad5').change(function() {
 		// 	$("#show_a5").show();
 		// 	document.getElementById('show_a5')[ ($("#ad5==''").is(":checked")? "show" : "hide" ]();;
@@ -301,6 +280,61 @@
 
     }); 
 
+     // show setting build
+    $("#show_a1").hide();
+    $("#show_a2").hide();	
+    $("#show_a3").hide();
+    $("#show_a4").hide();
+    $("#show_a5").hide();
+	function valueChanged1()
+    {
+        if($('#ad1').is(":checked"))   
+            $("#show_a1").show();
+        else
+            $("#show_a1").hide();
+    }
+    function valueChanged2()
+    {
+        if($('#ad2').is(":checked"))   
+            $("#show_a2").show();
+        else
+            $("#show_a2").hide();
+    }
+    function valueChanged3()
+    {
+        if($('#ad3').is(":checked"))   
+            $("#show_a3").show();
+        else
+            $("#show_a3").hide();
+    }
+    function valueChanged4()
+    {
+        if($('#ad4').is(":checked"))   
+            $("#show_a4").show();
+        else
+            $("#show_a4").hide();
+    }
+    function valueChanged5()
+    {
+        if($('#ad5').is(":checked"))   
+            $("#show_a5").show();
+        else
+            $("#show_a5").hide();
+    }
+   
+  //   	$('#ad1').change(function() {
+		//   $("#show_a1").hide();
+		// });
+  //   	$('#ad2').change(function() {
+		//   $("#show_a2").prop("hidden", !this.checked);
+		// });
+		// $('#ad3').change(function() {
+		//   $("#show_a3").prop("hidden", !this.checked);
+		// });
+		// $('#ad4').change(function() {
+		// 	$("#show_a4").prop("hidden", !this.checked);
+		// });
+
 	var save_method; //for save method string
 	var table;
 	 
@@ -312,8 +346,7 @@
 	        "processing": true, //Feature control the processing indicator.
 	        "serverSide": true, //Feature control DataTables' server-side processing mode.
 	        "ordering": true, // Set true agar bisa di sorting
-           "order": [[ 0, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
-
+            "order": [[ 0, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
 	 
 	        // Load data for the table's content from an Ajax source
 	        "ajax": {	        	
@@ -324,7 +357,7 @@
 		            }
 	        },	 
 	        "deferRender": true,
-           "aLengthMenu": [[5, 10, 50],[ 5, 10, 50]], // Combobox Limit
+            "aLengthMenu": [[5, 10, 50],[ 5, 10, 50]], // Combobox Limit
 	        // 	Tambahkan bagian ini:
 			// "columns": [
 			// 	{data: 'Title'},
@@ -563,14 +596,14 @@
 	            } else {
 	                document.getElementById("st2").checked = true;
 	            }
-
+	            console.log(data.AddDate);
 	            if (data.AddDate=='' || data.AddDate=='0000-00-00 00:00:00'){
 	            	document.getElementById("ad1").checked = false;
-	            	document.getElementById("show_a1").hidden = true;
+	            	$("#show_a1").hide();
 	            	// $("#show_a1").prop("show", this.checked);
 	            }else{
 	            	document.getElementById("ad1").checked = true;
-	            	document.getElementById("show_a1").hidden = false;
+	            	$("#show_a1").show()
 	            }
 	            // console.log(data.IDCat);
 	            if (data.IDCat ){
