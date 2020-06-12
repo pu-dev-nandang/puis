@@ -305,7 +305,7 @@ class C_rest3 extends CI_Controller {
                 $sql = 'select * from (
                         select a.NIP,b.Name,a.EntredAt from db_agregator.rekognisi_dosen as a
                                 join db_employees.employees as b on a.NIP = b.NIP
-                                where b.ProdiID = ? and a.Tahun = ? and isApproved = 2
+                                where b.ProdiID = ? and a.Tahun = ? and a.isApproved = 2
                         UNION
                         select sk.User_create,b.Name,sk.User_create from db_agregator.sitasi_karya as sk
                         join db_employees.employees as b on sk.User_create = b.NIP
@@ -3182,6 +3182,54 @@ class C_rest3 extends CI_Controller {
           # code...
           break;
       }
+    }
+
+    public function HistoryDeposit(){
+      $dataToken = $this->getInputToken3();
+      $action = $dataToken['action'];
+      switch ($action) {
+        case 'history':
+          $queryData = $this->db->query(
+            'select a.*,b.Name as NameEMP from db_finance.trans_deposit as a 
+              join db_employees.employees as b on a.FillBy = b.NIP
+              where a.NPM = "'.$dataToken['data']['NPM'].'"
+              order by a.ID desc
+             '
+          )->result_array();
+          $data = array();
+          for ($i=0; $i < count($queryData); $i++) { 
+            $row = $queryData[$i];
+            $nestedData = array();
+            $nestedData[] = ($i+1);
+            $nestedData[] = $row['Credit'];
+            $nestedData[] = $row['Debit'];
+            $nestedData[] = $row['FillBy'];
+            $nestedData[] = $row['Desc'];
+            $nestedData[] = $row['FillAt'];
+            $nestedData[] = $row['NameEMP'];
+            $data[] = $nestedData;
+          }
+
+          $json_data = array(
+              "draw"            => intval(0),
+              "recordsTotal"    => intval(count($queryData) ),
+              "recordsFiltered" => intval( count($queryData)),
+              "data"            => $data,
+          );
+
+          echo json_encode($json_data);
+          break;
+        case 'DepositLeft' :
+          echo json_encode(
+              $this->db->query(
+                'select Deposit from db_academic.auth_students where NPM  = "'.$dataToken['data']['NPM'].'"  '
+              )->result_array()[0]['Deposit']
+          );
+        default:
+          # code...
+          break;
+      }
+      
     }
 
 }

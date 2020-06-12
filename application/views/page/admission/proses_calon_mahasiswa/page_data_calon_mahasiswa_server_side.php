@@ -59,6 +59,8 @@
                            <div class="col-md-12">
                              <p style="color: red;">* Detail resend email : history resend email tentang pembayaran formulir</p>
                              <p style="color: red;">* Resend email : Resend email tentang pembayaran formulir</p>
+                             <p  style="color: red;">* <i class="fa fa-circle" style="color:#bdc80e;"></i> <span style="color: #bdc80e;">Online</span></p>
+                             <p  style="color: red;"> * <i class="fa fa-circle" style="color:#db4273;"></i> <span style="color: #db4273;">Offline</span></p>
                            </div>
                          </div>
                          <div class = "row">
@@ -90,7 +92,7 @@
         var thisYear = (new Date()).getFullYear();
         // var startTahun = parseInt(thisYear);
         var startTahun = 2019;
-        var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
+        var selisih = (2018 < parseInt(thisYear)) ? parseInt(2) + (parseInt(thisYear) - parseInt(2018)) : 2;
         for (var i = 0; i <= selisih; i++) {
           var selected = (( parseInt(startTahun) + parseInt(i) )==academic_year_admission) ? 'selected' : '';
           $('#selectTahun').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
@@ -165,7 +167,7 @@
                                '<th>Detail Payment</th>'+
                                '<th>Status</th>'+
                                '<th>RegisterAt</th>'+
-                               '<th>Action</th>'+
+                               '<th width = "17%"><i class="fa fa-cog"></i></th>'+
                            '</tr>'+
                            '</thead>'+
                            '<tbody id="dataRow"></tbody>'+
@@ -842,5 +844,84 @@
       ]);
 
     });
+
+    $(document).on('click','.btnSetTahun',function(event) {
+      const registerid = $(this).attr('registerid');
+      const Data = $(this).attr('data');
+
+      const OptTahun = () => {
+        let wr = '';
+        const thisYear = (new Date()).getFullYear();
+        const EndNextYear = parseInt(thisYear)+ 3;
+        const Yearselected = parseInt(thisYear)+1;
+        for (var i = thisYear; i <= EndNextYear; i++) {
+          var selected = (i == Yearselected) ? 'selected' : '';
+          wr+= '<option value = "'+i+'" '+selected+' >'+i+'</option>';
+        }
+        return wr;
+      }
+
+
+      const htmlWrite  = () => {
+        return '<div class = "row">' +
+                  '<div class = "col-sm-6">'+
+                      '<div class = "form-group">'+
+                        '<label>Data</label>'+
+                        '<input style = "color:black;" type = "text" class = "form-control" value ="'+Data+'" readonly>'+
+                      '</div>'+
+                      '<div class = "form-group">'+
+                        '<label>Set Tahun</label>'+
+                        '<select class = "form-control FrmYear">'+
+                          OptTahun()+
+                        '</select>'+
+                      '</div>'+
+                  '</div>'+
+                '</div>'  
+
+        ;
+      }
+
+      const footer = () => {
+        return '<button class = "btn btn-success" id = "sbmtSetTahun" registerid = "'+registerid+'">Save</button>  <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>';
+      }
+      $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Set Tahun/Angkatan Masuk Universitas </h4>');
+      $('#GlobalModalLarge .modal-body').html(htmlWrite());
+      $('#GlobalModalLarge .modal-footer').html(footer());
+      $('#GlobalModalLarge').modal({
+          'show' : true,
+          'backdrop' : 'static'
+      });
+    })
+
+    $(document).on('click','#sbmtSetTahun',async function(e){
+      const itsme = $(this);
+      const data = {
+        SetTa : $('.FrmYear option:selected').val(),
+        RegisterID : itsme.attr('registerid'),
+      };
+
+      const url = base_url_js + 'admission/proses-calon-mahasiswa/setTahun';
+      let token = jwt_encode(data,'UAP)(*');
+      loading_button2(itsme);
+      try{
+        const ajaxGetResponse = await AjaxSubmitFormPromises(url,token);
+        if (ajaxGetResponse == 1) {
+          toastr.success('Saved');
+          oTable1.ajax.reload( null, false );
+        }
+        else
+        {
+          toastr.error('Failed');
+        }
+        $('#GlobalModalLarge').modal('hide')
+      }
+      catch(err){
+        console.log(err);
+        toastr.error('Something Wrong');
+      }
+
+      end_loading_button2(itsme,'Save');
+
+    })
 
 </script>

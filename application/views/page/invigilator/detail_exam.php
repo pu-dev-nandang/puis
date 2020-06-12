@@ -203,8 +203,8 @@
             if(jsonResult.length>0){
                 var tr = '';
                 $.each(jsonResult,function (i,v) {
-                    var viewStartWorking = moment(v.StartWorking).format('D MMM H:mm:ss');
-                    var viewSavedAt = (v.SavedAt!='' && v.SavedAt!=null) ? moment(v.SavedAt).format('D MMM H:mm:ss') : '';
+                    var viewStartWorking = moment(v.StartWorking).format('D MMM H:mm');
+                    var viewSavedAt = (v.SavedAt!='' && v.SavedAt!=null) ? moment(v.SavedAt).format('D MMM H:mm') : '';
 
                     var viewDescAnsw = (v.Description!='' && v.Description!=null)
                         ? '<div><textarea class="form-control" readonly>'+v.Description+'</textarea></div>'
@@ -327,7 +327,7 @@
         var isASC = (snapshot.val().Type == 'asc')
             ? '<small class="text-muted label label-danger">ASC</small> | ' : ''
 
-        var chatOn = moment(snapshot.val().EntredAt).format('d MMM HH:mm');
+        var chatOn = moment(snapshot.val().EntredAt).format('D MMM HH:mm');
 
         var divChat = '<li class="clearfix">' +
             '                                            <div class="chat-body clearfix">' +

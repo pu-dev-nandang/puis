@@ -2528,4 +2528,41 @@ class C_finance extends Finnance_Controler {
         echo json_encode('');
     }
 
+    public function page_set_deposit_mhs()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_set_deposit_mhs',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function actionDeposit(){
+        header('Content-Type: application/json');
+        $rs = ['status' => -1,'msg' => ''];
+        $dataToken = json_decode(json_encode($this->getInputToken()),true);
+        $data = $dataToken['data'];
+        $data['FillBy'] = $this->session->userdata('NIP');
+        $data['FillAt'] = date('Y-m-d H:i:s');
+        // insert di trans_deposit
+        $this->db->insert(
+            'db_finance.trans_deposit',$data
+        );
+
+        $action = $dataToken['action'];
+        $NPM = $data['NPM'];
+        // update auth student
+        if ($action == 'Credit') {
+            $this->db->query(
+                'update db_academic.auth_students set Deposit = Deposit + '.$data['Credit'].' where NPM = "'.$NPM.'" '
+            );
+        }
+        else
+        {
+            $this->db->query(
+                'update db_academic.auth_students set Deposit = Deposit - '.$data['Debit'].' where NPM = "'.$NPM.'" '
+            );
+        }
+        
+        $rs = ['status' => 1,'msg' => ''];
+        echo json_encode($rs);
+    }
+
 }

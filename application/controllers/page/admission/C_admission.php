@@ -1149,12 +1149,16 @@ class C_admission extends Admission_Controler {
             $nestedData=array();
             $row = $query[$i];
 
-            // $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
-            // $nestedData[] = $row['NamePrody'];
+            // online or offline
+            $stFormulirAct = '<i class="fa fa-circle" style="color:#bdc80e;"></i>'; // online
+            if ($row['StatusReg'] == 1) {
+              $stFormulirAct = '<i class="fa fa-circle" style="color:#db4273;"></i>'; // offline
+            }
+            
             $Code = ($row['No_Ref'] != "") ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
             $nestedData[] = $No;
 
-            $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['Phone'].'<br>'.$row['SchoolName'];
+            $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['Phone'].'<br>'.$row['SchoolName'].'<br/>'.$stFormulirAct;
             $nestedData[] = $row['NamePrody'].'<br>'.$Code.'<br>'.$row['VA_number'];
             $nestedData[] = $row['NameSales'];
             $nestedData[] = $row['Rangking'];
@@ -1182,23 +1186,39 @@ class C_admission extends Admission_Controler {
             $nestedData[] = $row['chklunas'];
             $nestedData[] = $row['RegisterAT'];
 
-            
-
-            // get data resend email
-            $btnResendEmail = '';
+            $actLogin = '<a href="javascript:void(0)" class ="btnLoginPortalRegister" data-xx="'.$row['Email'].'" data-xx2="'.$row['FormulirCode'].'">Login portal</a>';
+            $actDetailResendEmail = '<a href="javascript:void(0)" class = "btnDetaiLResendEmail" RegisterID = "'.$row['RegisterID'].'"> Detail Resend Email</a>';
+            $actResendEmail = '';
+            $actSetTahun = '';
             if ( ($row['FormulirCode'] == '' || $row['FormulirCode'] == null || empty($row['FormulirCode'])) && $row['StatusReg'] == 0 ) {
               // show email to resend in html
               $DataEmailSend = $this->m_admission->DataEmailSend($row['RegisterID']);
+              $actResendEmail = '<a href="javascript:void(0)" class = "btnResendEmail" RegisterID = "'.$row['RegisterID'].'" DataEmailSend = "'.$DataEmailSend.'">Resend Email</a>';
+              $actSetTahun = '<a href="javascript:void(0)" class = "btnSetTahun" RegisterID = "'.$row['RegisterID'].'" data = "'.$row['Name'].' || '.$row['Email'].'" >Set Tahun</a>';
 
-              $btnResendEmail = '<button class = "btn btn-warning btnResendEmail" RegisterID = "'.$row['RegisterID'].'" DataEmailSend = "'.$DataEmailSend.'"><i class = "fa fa-envelope"></i> Resend Email</button>';
             }
-            $btnDetaiLResendEmail = '<button class = "btn btn-default btnDetaiLResendEmail" RegisterID = "'.$row['RegisterID'].'"> Detail Resend Email</button>';
 
-            $nestedData[] = '<div style="text-align: center;"><button class="btn btn-sm btn-primary btnLoginPortalRegister " data-xx="'.$row['Email'].'" data-xx2="'.$row['FormulirCode'].'"  ><i class="fa fa-sign-in right-margin"></i> Login Portal</button>
-              <br/><br/>
-              '.$btnDetaiLResendEmail.'<br/><br/>
-              '.$btnResendEmail.'
-            </div>';
+            $actionCol = '<div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-edit"></i> <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                              <li>'.$actLogin.'</li>
+                              <li role="separator" class="divider"></li>
+                              <li>'.$actDetailResendEmail.'</li>
+                              <li role="separator" class="divider"></li>
+                              <li>'.$actResendEmail.'</li>
+                              <li role="separator" class="divider"></li>
+                              <li>'.$actSetTahun.'</li>
+                            </ul>
+                          </div>
+
+
+            '; 
+
+             $nestedData[] = $actionCol;
+
+
             $data[] = $nestedData;
             $No++;
         }
@@ -1244,7 +1264,7 @@ class C_admission extends Admission_Controler {
                 ) as chklunas,
               (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
               ,xx.Name as NameSales,
-              if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,
+              if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,a.StatusReg,
               if(
                 (select count(*) as total from db_finance.payment_pre where `Status` = 1 and ID_register_formulir = e.ID ) > 0,"Intake","Not Intake"
               ) as CekIntake
@@ -1294,10 +1314,14 @@ class C_admission extends Admission_Controler {
           $nestedData=array();
           $row = $query[$i];
 
-          // $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
-          // $nestedData[] = $row['NamePrody'];
+          // online or offline
+          $stFormulirAct = '<i class="fa fa-circle" style="color:#bdc80e;"></i>'; // online
+          if ($row['StatusReg'] == 1) {
+            $stFormulirAct = '<i class="fa fa-circle" style="color:#db4273;"></i>'; // offline
+          }
+
           $nestedData[] = $No.' &nbsp <input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
-          $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'];
+          $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'].'<br/>'.$stFormulirAct;
           $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
           $nestedData[] = $row['NamePrody'].'<br>'.$FormulirCode.'<br>'.$row['VA_number'];
           $nestedData[] = $row['NameSales'];
@@ -1538,14 +1562,12 @@ class C_admission extends Admission_Controler {
             $Photo = ''; // id foto 5
             if (!file_exists('./uploads/document/'.$NPM)) {
                 mkdir('./uploads/document/'.$NPM, 0777, true);
-                // copy("./document/index.html",'./document/'.$namaFolder.'/index.html');
-                // copy("./document/index.php",'./document/'.$namaFolder.'/index.php');
+                copy("./uploads/index.html",'./uploads/document/'.$NPM.'/index.html');
+                copy("./uploads/index.php",'./uploads/document/'.$NPM.'/index.php');
             }
 
             if (!file_exists('./uploads/students/'.$ta)) {
                 mkdir('./uploads/students/'.$ta, 0777, true);
-                // copy("./document/index.html",'./document/'.$namaFolder.'/index.html');
-                // copy("./document/index.php",'./document/'.$namaFolder.'/index.php');
             }
 
             $getDoc = $this->m_master->caribasedprimary('db_admission.register_document','ID_register_formulir',$arrInputID[$i]);
@@ -2918,6 +2940,20 @@ class C_admission extends Admission_Controler {
       $RegisterID = $dataToken['RegisterID'];
       $rs =  $this->m_admission->ResendEmail($RegisterID);
       echo json_encode($rs);
+    }
+
+    public function actSetTahun(){
+      header('Access-Control-Allow-Origin: *');
+      header('Content-Type: application/json');
+      $dataToken = $this->getInputToken();
+      $ID = $dataToken['RegisterID'];
+      $SetTa = $dataToken['SetTa'];
+      $this->db->where('ID',$ID);
+      $this->db->update('db_admission.register',[
+        'SetTa' => $SetTa,
+      ]);
+      echo json_encode(1);
+
     }
 
 }

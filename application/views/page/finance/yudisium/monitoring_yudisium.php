@@ -174,7 +174,8 @@
         var dept = $(this).attr('data-dept');
         var NPM = $(this).attr('data-npm');
 
-        var valNote = $('#'+dept+'_viewValueNote_'+NPM).val();
+        var v = $('#'+dept+'_viewValueNote_'+NPM).val();
+        var valNote = (typeof v !== "undefined") ? v : '';
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Note to '+NPM+'</h4>');
