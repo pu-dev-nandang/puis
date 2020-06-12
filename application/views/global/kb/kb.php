@@ -1,3 +1,4 @@
+
 <style>
 
     #viewkb .item-head:hover{
@@ -35,7 +36,7 @@
 </style>
 <div class="row">
     <div class="col-md-3 panel-admin" style="border-right: 1px solid #CCCCCC;">
-<?php if(true){ ?>
+<?php if (true){ ?>
      <div class="panel panel-default">
         <div class="panel-heading"></div>
         <div class="panel-body">
@@ -464,7 +465,14 @@ $('#saveFormKB').click(function () {
           console.log(response);
           if(!jQuery.isEmptyObject(response)){
             if(response.finish){
-              itsme.find(".viewers").html('<span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read">'+response.count+'</span> times</span>');
+              if(itsme.hasClass(".total-read")){
+                var lastNum = itsme.find(".total-read").text();
+                lastNum = parseInt(lastNum) + 1;
+                itsme.find(".total-read").text(lastNum);
+              }else{
+                itsme.find(".viewers").html('<span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read"><?=$data[$j]['CountRead']->Total?></span> times</span>');
+              }
+              
             }
           }
         }

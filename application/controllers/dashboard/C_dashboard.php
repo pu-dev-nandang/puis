@@ -1021,6 +1021,8 @@ class C_dashboard extends Globalclass {
             $data['G_division'] = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
             $data['selected'] = 6;
             $data['G_data'] = $this->m_master->userKB($data['selected']);
+            /*echo "<pre>";
+            var_dump($data['G_data']);die();*/
             $content = $this->load->view('global/kb/kb',$data,true);
             $this->temp($content);
         }
