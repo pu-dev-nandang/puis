@@ -7,6 +7,8 @@ class C_api_doc extends CI_Controller {
     private $keyToken = 's3Cr3T-G4N';
     function __construct(){
         parent::__construct();
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Headers: *');
         $this->load->model('master/m_master');
         $this->load->model('m_api_doc');
         $this->load->library('JWT');
@@ -15,10 +17,6 @@ class C_api_doc extends CI_Controller {
           if (!$this->auth($G_setting)) {
             echo '{"status":"999","message":"Not Authenfication"}'; 
             die();
-          }
-          else
-          {
-            header('Access-Control-Allow-Origin: *');
           }
         } catch (Exception $e) {
           echo json_encode($e);
