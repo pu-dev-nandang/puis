@@ -293,7 +293,7 @@
             			console.log(row);
             			var label = '';
             			if(!jQuery.isEmptyObject(row.FirstLoginPortalDayNum)){
-            				label = '<span class="day-week bg-'+((row.FirstLoginPortalDayNum > 5) ? 'success':'danger')+'">'+data+'</span>';
+            				label = '<span class="day-week bg-'+((row.FirstLoginPortalDayNum > 4) ? 'success':'danger')+'">'+data+'</span>';
             			}
             			return label;
             		}

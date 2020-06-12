@@ -41,14 +41,14 @@
         <div class="panel-heading"></div>
         <div class="panel-body">
           <div class="form-group hide">
-      			<label>Division</label>
+            <label>Division</label>
             <input type="text" id="formKB_IDDivision" value="<?= $this->session->userdata('PositionMain')['IDDivision']; ?>">
-      			<!-- <select class="select2-select-00 full-width-fix" id="formKB_IDDivision">
-      				<?php for($i = 0; $i < count($G_division); $i++): ?>
-      					<option value="<?php echo $G_division[$i]['ID'] ?>" > <?php echo $G_division[$i]['Division'] ?> </option>
-      				<?php endfor ?>
-      			 </select> -->
-      		</div>
+            <!-- <select class="select2-select-00 full-width-fix" id="formKB_IDDivision">
+              <?php for($i = 0; $i < count($G_division); $i++): ?>
+                <option value="<?php echo $G_division[$i]['ID'] ?>" > <?php echo $G_division[$i]['Division'] ?> </option>
+              <?php endfor ?>
+             </select> -->
+          </div>
           <div class="form-group">
               <label>Type</label>
               <select class="form-control" id="formKBID"></select>
@@ -81,7 +81,7 @@
                 <label>Division</label>
                 <select class="select2-select-00 full-width-fix" id="Division">
                   <?php for($i = 0; $i < count($G_division); $i++): ?>
-                    <option value="<?php echo $G_division[$i]['ID'] ?>" > <?php echo $G_division[$i]['Division'] ?> </option>
+                    <option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>
                   <?php endfor ?>
                  </select>
               </div>
@@ -114,7 +114,7 @@
                                           </a>
                               <div id="<?php echo $i.'__'.$j ?>" class="collapse">
                                 <div style="margin-top: 15px;margin-bottom: 15px;">
-                                  <a class="btn btn-default <?php if($data[$j]['=File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/kb-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> File</a>
+                                  <a class="btn btn-default <?php if($data[$j]['File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/kb-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> File</a>
                                     <?php if ($selected ==$this->session->userdata('PositionMain')['IDDivision']): ?>
                                       <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
                                     <?php endif; ?>
@@ -135,17 +135,17 @@
 
 
 <script type="text/javascript">
-	$(document).ready(function () {
-		$("#Division option").filter(function() {
-		   //may want to use $.trim in here
-		   return $(this).val() == "<?php echo $selected ?>";
-		 }).prop("selected", true);
-		$('#Division').select2({
+  $(document).ready(function () {
+    $("#Division option").filter(function() {
+       //may want to use $.trim in here
+       return $(this).val() == "<?php echo $selected ?>";
+     }).prop("selected", true);
+    $('#Division').select2({
 
-		});
+    });
 
     loadTypeKB() ;
-	});
+  });
 
 //save_formKB
 $('#saveFormKB').click(function () {
@@ -227,21 +227,21 @@ $('#saveFormKB').click(function () {
 
       });
 
-	$(document).on('change','#Division', function () {
-	   var url = base_url_js+"kb";
-	   var data = {
-	   	Division : $(this).val(),
-	   };
-	   $.post(url,data,function (resultJson) {
-	   	$(".list-group").empty();
-	   	$(".list-group").html('<div id = "pageloading"></div>');
-	   	loading_page('#pageloading');
-	   	setTimeout(function () {
-	   		$(".list-group").html(resultJson);
-	   	},1000);
-	   })
+  $(document).on('change','#Division', function () {
+     var url = base_url_js+"kb";
+     var data = {
+      Division : $(this).val(),
+     };
+     $.post(url,data,function (resultJson) {
+      $(".list-group").empty();
+      $(".list-group").html('<div id = "pageloading"></div>');
+      loading_page('#pageloading');
+      setTimeout(function () {
+        $(".list-group").html(resultJson);
+      },1000);
+     })
 
-	});
+  });
 
 
 
@@ -470,7 +470,7 @@ $('#saveFormKB').click(function () {
                 lastNum = parseInt(lastNum) + 1;
                 itsme.find(".total-read").text(lastNum);
               }else{
-                itsme.find(".viewers").html('<span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read"><?=$data[$j]['CountRead']->Total?></span> times</span>');
+                itsme.find(".viewers").html('<span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read">1</span> times</span>');
               }
               
             }

@@ -1027,8 +1027,6 @@ class C_dashboard extends Globalclass {
 
             $data['selected'] = 'NA.6';
             $data['G_data'] = $this->m_master->userKB($data['selected']);
-            /*echo "<pre>";
-            var_dump($data['G_data']);die();*/
             $content = $this->load->view('global/kb/kb',$data,true);
             $this->temp($content);
         }
