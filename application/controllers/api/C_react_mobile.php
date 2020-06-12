@@ -87,7 +87,7 @@ class C_react_mobile extends CI_Controller {
            switch ($RuleUser[$i]['IDDivision']) {
              case '15': // Prodi
              case 15:
-               $ProdiAuth = $this->m_master->caribasedprimary('db_prodi.auth_prodi','NIP',$NIP);
+               $Auth_prodi = $this->m_master->caribasedprimary('db_prodi.auth_prodi','NIP',$NIP);
                if (count($Auth_prodi) > 0) {
                  $Auth_prodi =   $ProdiAuth[0]['ProdiAuth'];
                  $Auth_prodi =   json_decode($Auth_prodi,true);
