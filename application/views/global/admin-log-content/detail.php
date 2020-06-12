@@ -87,7 +87,7 @@
 									<th width="5%">No</th>
 									<th>Type</th>
 									<th>Question</th>
-									<th>Time read</th>
+									<th>Last Time read</th>
 								</tr>
 							</thead>
 							<tbody>
