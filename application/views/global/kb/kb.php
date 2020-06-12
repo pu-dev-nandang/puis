@@ -1,4 +1,3 @@
-
 <style>
 
     #viewkb .item-head:hover{
@@ -93,7 +92,7 @@
               <ul class="list-group" id="headerlist">
                 <?php for($i = 0; $i < count($G_data); $i++): ?>
                   <?php $no = $i+1 ?>
-                    <li class="list-group-item item-head">dsds
+                    <li class="list-group-item item-head">
                                       <a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i ?>">
                                           <span class="numbering"><b><?php echo $no; ?></b></span>
                                           <span class="info"><b><?php echo $G_data[$i]['Type']?></b></span>
