@@ -241,8 +241,7 @@ class M_hr extends CI_Model {
             $sorted = " order by ".(!empty($order) ? $order : 'FirstLoginPortal asc');
             */
         }
-        
-        
+                
         /*
         $string = "SELECT {$select}
                    FROM db_employees.log_employees lem
@@ -262,7 +261,6 @@ class M_hr extends CI_Model {
                     
                     {$where} {$groupby} {$sorted} {$lims} ";
         */
-
 
         $string = "select {$select} 
                    from (

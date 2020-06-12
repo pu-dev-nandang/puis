@@ -10,7 +10,7 @@ class C_dashboard extends Globalclass {
     function __construct()
     {
         parent::__construct();
-        $this->load->model(array('master/m_master','General_model','General_model','global-informations/Globalinformation_model','hr/m_hr'));
+        $this->load->model(array('master/m_master','General_model','General_model','global-informations/Globalinformation_model','hr/m_hr','m_log_content'));
         $this->load->helper("General_helper");
     }
     public function temp($content)
@@ -1027,6 +1027,8 @@ class C_dashboard extends Globalclass {
 
             $data['selected'] = 'NA.6';
             $data['G_data'] = $this->m_master->userKB($data['selected']);
+            /*echo "<pre>";
+            var_dump($data['G_data']);die();*/
             $content = $this->load->view('global/kb/kb',$data,true);
             $this->temp($content);
         }
@@ -1802,6 +1804,97 @@ class C_dashboard extends Globalclass {
         }else{show_404();}
     }
 
+
+
+    public function hitLog(){
+        $reqdata = $this->input->post();
+        $jsonarray = array();
+        $myNIP = $this->session->userdata('NIP');
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $dataHit = array("NIP"=>$myNIP, "TypeContent"=>$data_arr['TypeContent'], "ContentID"=>$data_arr['ContentID']);
+            $insert = $this->General_model->insertData("db_employees.log_countable_content",$dataHit);
+            if($insert){
+                $sqlRead = "select count(*) as Total from db_employees.log_countable_content a where a.TypeContent = '{$data_arr['TypeContent']}' and a.NIP = {$myNIP} and a.ContentID = {$data_arr['ContentID']}";
+                $runQuery = $this->db->query($sqlRead);
+                $result = $runQuery->row();
+                $jsonarray = array("finish"=>( $insert  ? true:false),"count"=>$result->Total );
+            }
+        }
+        echo json_encode($jsonarray);
+    }
+
+
+    public function adminKB(){
+        $param = $this->uri->segment(2);
+        $data['typecontent'] = $param;        
+        $myDivision = $this->session->userdata('PositionMain')['IDDivision'];
+        if($myDivision == 12){
+            $content = $this->load->view('global/admin-log-content/index',$data,true);
+            $this->temp($content);
+        }else{show_404();}
+    }
+
+
+    public function adminKBFetchLog(){
+        $reqdata = $this->input->post(); 
+        $myDivisionID = $this->session->userdata('PositionMain')['IDDivision'];
+        $json_data=array();
+        $json_data = $reqdata;
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $param = array();$orderBy=" lem.ID DESC ";
+
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+
+                $param[] = array("field"=>"(a.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);
+                $param[] = array("field"=>"c.Name","data"=>" like '%".$search."%' )","filter"=>"OR",);
+            }
+            if(!empty($data_arr['Filter'])){
+                $parse = parse_str($data_arr['Filter'],$output);
+                if(!empty($output['TypeContent'])){
+                    $param[] = array("field"=>"a.TypeContent","data"=>" = '".$output['TypeContent']."' ","filter"=>"AND",);
+                }
+                if(!empty($output['NIP'])){
+                    $param[] = array("field"=>"a.NIP","data"=>" = '".$output['NIP']."' ","filter"=>"AND",);
+                }
+
+            }
+            
+            $totalData = $this->m_log_content->fetchLogContent(true,$param)->row();
+            $TotalData = (!empty($totalData) ? $totalData->Total : 0);
+            if(!empty($reqdata['length'])){
+                $result = $this->m_log_content->fetchLogContent(false,$param,$reqdata['start'],$reqdata['length'])->result();
+            }else{
+                $result = $this->m_log_content->fetchLogContent(false,$param)->result();
+            }
+            
+            $json_data = array(
+                "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
+                "recordsTotal"    => intval($TotalData),
+                "recordsFiltered" => intval($TotalData),
+                "data"            => (!empty($result) ? $result : 0)
+            );
+
+        }
+        $response = $json_data;
+        echo json_encode($response);
+    }
+
+
+    public function adminKBDetailLog(){
+        $data = $this->input->post();
+        if(!empty($data)){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $param[] = array("field"=>"em.NIP","data"=>" = ".$data_arr['NIP']." ","filter"=>"AND",);    
+            $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
+            $this->load->view("global/admin-log-content/detail",$data,false);
+        }else{show_404();}
+    }
 
     /*END ADDED BY FEBRI @ MARCH 2020*/
 

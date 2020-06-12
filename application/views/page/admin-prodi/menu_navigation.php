@@ -7,12 +7,12 @@
         <!--=== Navigation ===-->
 
         <ul id="nav">
-            <li class="<?php if($this->uri->segment(2)=='stock-good'){echo "current";} ?>">
+            <!-- <li class="<?php if($this->uri->segment(2)=='stock-good'){echo "current";} ?>">
                 <a href="<?php echo base_url('prodi/stock-good'); ?>">
                     <i class="fa fa-cart-plus"></i>
                     Stock Good
                 </a>
-            </li>
+            </li> -->
             <li><span class="nav-title">web admin prodi</span></li>
             <?php
             $getData  = $this->session->userdata('menu_prodi_grouping');

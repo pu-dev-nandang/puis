@@ -1741,6 +1741,10 @@ class C_employees extends HR_Controler {
                         if (date('H:i', strtotime($r->LastLoginPortal)) < $plusTime )  {
                             $isLateOut = true;
                         }
+                        if($r->FirstLoginPortalDayNum > 4){
+                            $isLateCome = true;
+                            $isLateOut = true;
+                        }
                         
                     }else{$isLateCome = true;$isLateOut = true;}
                     $r->IsLateCome = $isLateCome;
@@ -1951,6 +1955,10 @@ class C_employees extends HR_Controler {
                         if (date('H:i', strtotime($r->LastLoginPortal)) < $plusTime )  {
                             $isLateOut = true;
                         }
+                        if($r->FirstLoginPortalDayNum > 4){
+                            $isLateCome = true;
+                            $isLateOut = true;
+                        }
                         
                     }else{$isLateCome = true;$isLateOut = true;}
 
@@ -1992,8 +2000,9 @@ class C_employees extends HR_Controler {
                     array("cell"=>"B","val"=>"NIP"),
                     array("cell"=>"C","val"=>"Employee"),
                     array("cell"=>"D","val"=>"Division/Position"),
-                    array("cell"=>"E","val"=>"First Login"),
-                    array("cell"=>"F","val"=>"Last Login")
+                    array("cell"=>"E","val"=>"Day"),
+                    array("cell"=>"F","val"=>"First Login"),
+                    array("cell"=>"G","val"=>"Last Login")
             ];
 
             $styleColHeader = array(
@@ -2053,17 +2062,21 @@ class C_employees extends HR_Controler {
                     $excel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
                     $excel->getActiveSheet()->getStyle('D'.$numRow)->applyFromArray($styleCell);
                     
-                    $excel->setActiveSheetIndex(0)->setCellValue('E'.$numRow, ( !empty($v->FirstLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal))) : ''));
+                    $excel->setActiveSheetIndex(0)->setCellValue('E'.$numRow, ( !empty($v->FirstLoginPortalDay) ? $v->FirstLoginPortalDay : ''));
                     $excel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
                     $excel->getActiveSheet()->getStyle('E'.$numRow)->applyFromArray($styleCell);
                     
-                    $excel->setActiveSheetIndex(0)->setCellValue('F'.$numRow, (!empty($v->LastLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->LastLoginPortal))) : ''));
+                    $excel->setActiveSheetIndex(0)->setCellValue('F'.$numRow, ( !empty($v->FirstLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal))) : ''));
                     $excel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
                     $excel->getActiveSheet()->getStyle('F'.$numRow)->applyFromArray($styleCell);
                     
+                    $excel->setActiveSheetIndex(0)->setCellValue('G'.$numRow, (!empty($v->LastLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->LastLoginPortal))) : ''));
+                    $excel->getActiveSheet()->getColumnDimension('G')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('G'.$numRow)->applyFromArray($styleCell);
+                    
                     if($v->IsLateCome || $v->IsLateOut){
                         $excel->getActiveSheet()
-                        ->getStyle('A'.$numRow.':F'.$numRow)
+                        ->getStyle('A'.$numRow.':G'.$numRow)
                         ->getFill()
                         ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
                         ->getStartColor()
@@ -2294,6 +2307,11 @@ class C_employees extends HR_Controler {
                         if (date('H:i', strtotime($r->LastLoginPortal)) < $plusTime )  {
                             $isLateOut = true;
                         }
+
+                        if($r->FirstLoginPortalDayNum > 4){
+                            $isLateCome = true;
+                            $isLateOut = true;
+                        }
                         
                     }else{$isLateCome = true;$isLateOut = true;}
                     $r->IsLateCome = $isLateCome;
@@ -2442,6 +2460,11 @@ class C_employees extends HR_Controler {
                         if (date('H:i', strtotime($r->LastLoginPortal)) < $plusTime )  {
                             $isLateOut = true;
                         }
+
+                        if($r->FirstLoginPortalDayNum > 4){
+                            $isLateCome = true;
+                            $isLateOut = true;
+                        }
                         
                     }else{$isLateCome = true;$isLateOut = true;}
 
@@ -2460,7 +2483,7 @@ class C_employees extends HR_Controler {
             // Panggil class PHPExcel nya
             $excel = new PHPExcel();
 
-            $pr = strtoupper('Attendance Temporary - By Portal');
+            $pr = strtoupper('Attendance Lecturer Temporary - By Portal');
 
             // Settingan awal fil excel
             $excel->getProperties()->setCreator('IT PU')
@@ -2480,8 +2503,9 @@ class C_employees extends HR_Controler {
                     array("cell"=>"B","val"=>"NIP"),
                     array("cell"=>"C","val"=>"Lecturer"),
                     array("cell"=>"D","val"=>"Program Study"),
-                    array("cell"=>"E","val"=>"First Login"),
-                    array("cell"=>"F","val"=>"Last Login")
+                    array("cell"=>"E","val"=>"Day"),
+                    array("cell"=>"F","val"=>"First Login"),
+                    array("cell"=>"G","val"=>"Last Login")
             ];
 
             $styleColHeader = array(
@@ -2532,17 +2556,21 @@ class C_employees extends HR_Controler {
                     $excel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
                     $excel->getActiveSheet()->getStyle('D'.$numRow)->applyFromArray($styleCell);
                     
-                    $excel->setActiveSheetIndex(0)->setCellValue('E'.$numRow, ( !empty($v->FirstLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal))) : ''));
+                    $excel->setActiveSheetIndex(0)->setCellValue('E'.$numRow, ( !empty($v->FirstLoginPortal) ? $v->FirstLoginPortalDay : ''));
                     $excel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
                     $excel->getActiveSheet()->getStyle('E'.$numRow)->applyFromArray($styleCell);
                     
-                    $excel->setActiveSheetIndex(0)->setCellValue('F'.$numRow, (!empty($v->LastLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->LastLoginPortal))) : ''));
+                    $excel->setActiveSheetIndex(0)->setCellValue('F'.$numRow, ( !empty($v->FirstLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->FirstLoginPortal))) : ''));
                     $excel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
                     $excel->getActiveSheet()->getStyle('F'.$numRow)->applyFromArray($styleCell);
                     
+                    $excel->setActiveSheetIndex(0)->setCellValue('G'.$numRow, (!empty($v->LastLoginPortal) ? (date('d-F-Y H:i:s',strtotime($v->LastLoginPortal))) : ''));
+                    $excel->getActiveSheet()->getColumnDimension('G')->setAutoSize(true);
+                    $excel->getActiveSheet()->getStyle('G'.$numRow)->applyFromArray($styleCell);
+                    
                     if($v->IsLateCome || $v->IsLateOut){
                         $excel->getActiveSheet()
-                        ->getStyle('A'.$numRow.':F'.$numRow)
+                        ->getStyle('A'.$numRow.':G'.$numRow)
                         ->getFill()
                         ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
                         ->getStartColor()
@@ -2556,7 +2584,7 @@ class C_employees extends HR_Controler {
             }
 
             // Proses file excel
-            $filename = "Attendance-Temp-Download.xlsx";
+            $filename = "Attendance-Lecturer-Temp-Download.xlsx";
             //$FILEpath = "./dokument/".$filename;
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment; filename='.$filename); // Set nama file excel nya

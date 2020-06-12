@@ -2759,24 +2759,37 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $Q_add = ($IDDivision == '') ? '' : ' where Division_ID = "'.$IDDivision.'" order by Division_ID asc,Type asc';
         $sql = 'select * from db_employees.user_qna '.$Q_add;
         $query=$this->db->query($sql, array())->result_array();
+        $myNIP = $this->session->userdata('NIP');
         for ($i=0; $i < count($query); $i++) {
             $Type1 = $query[$i]['Type'];
             $temp = array('Type' => $Type1);
             $datatemp = array();
+            //count read article
+            $sqlRead = "select count(NIP) as Total from db_employees.log_countable_content where NIP = {$myNIP} and TypeContent = 'user_qna' and ContentID = {$query[$i]['Id']} ";
+            $runQuery = $this->db->query($sqlRead);
+
             $datatemp[] = array(
+                'ID' => $query[$i]['Id'],
                 'Questions' => $query[$i]['Questions'],
                 'Answers' => $query[$i]['Answers'],
                 'File' => $query[$i]['File'],
+                'CountRead' => $runQuery->row(),
             );
 
             for ($j=$i+1; $j < count($query); $j++) {
                 $Type2 = $query[$j]['Type'];
+
                 if ($Type1 == $Type2) {
-                  $datatemp[] = array(
-                      'Questions' => $query[$j]['Questions'],
-                      'Answers' => $query[$j]['Answers'],
-                      'File' => $query[$j]['File'],
-                  );
+                    //count read article
+                    $sqlRead2 = "select count(NIP) as Total from db_employees.log_countable_content where NIP = {$myNIP} and TypeContent = 'user_qna' and ContentID = {$query[$j]['Id']} ";
+                    $runQuery2 = $this->db->query($sqlRead2);
+                    $datatemp[] = array(
+                        'ID' => $query[$j]['Id'],
+                        'Questions' => $query[$j]['Questions'],
+                        'Answers' => $query[$j]['Answers'],
+                        'File' => $query[$j]['File'],
+                        'CountRead' => $runQuery2->row(),
+                    );
                 }
                 else
                 {
@@ -2808,7 +2821,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     // print_r($sql);die();
         $query=$this->db->query($sql, array())->result_array();
         //print_r($query);die();
+        $myNIP = $this->session->userdata('NIP');
         for ($i=0; $i < count($query); $i++) {
+            //count read article
+            $sqlRead = "select count(NIP) as Total from db_employees.log_countable_content where NIP = {$myNIP} and TypeContent = 'knowledge_base' and ContentID = {$query[$i]['ID']} ";
+            $runQuery = $this->db->query($sqlRead);
+
             $Type1 = $query[$i]['IDType'];
             $temp = array('Type' => $query[$i]['TypeName']);
             $datatemp = array();
@@ -2816,15 +2834,19 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 'ID' => $query[$i]['ID'],
                 'Desc' => $query[$i]['Desc'],
                 'File' => $query[$i]['File'],
+                'CountRead' => $runQuery->row(),
             );
 
             for ($j=$i+1; $j < count($query); $j++) {
                 $Type2 = $query[$j]['IDType'];
                 if ($Type1 == $Type2) {
+                  $sqlRead2 = "select count(NIP) as Total from db_employees.log_countable_content where NIP = {$myNIP} and TypeContent = 'knowledge_base' and ContentID = {$query[$j]['ID']} ";
+                  $runQuery2 = $this->db->query($sqlRead2);
                   $datatemp[] = array(
                       'ID' => $query[$j]['ID'],
                       'Desc' => $query[$j]['Desc'],
                       'File' => $query[$j]['File'],
+                      'CountRead' => $runQuery2->row(),
                   );
                 }
                 else

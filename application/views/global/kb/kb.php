@@ -34,14 +34,20 @@
     }
 
 </style>
-<div class="row" id = "pageContent">
+<div class="row">
     <div class="col-md-3 panel-admin" style="border-right: 1px solid #CCCCCC;">
+<?php if (true){ ?>
      <div class="panel panel-default">
         <div class="panel-heading"></div>
         <div class="panel-body">
           <div class="form-group hide">
       			<label>Division</label>
             <input type="text" id="formKB_IDDivision" value="<?= $this->session->userdata('PositionMain')['IDDivision']; ?>">
+      			<!-- <select class="select2-select-00 full-width-fix" id="formKB_IDDivision">
+      				<?php for($i = 0; $i < count($G_division); $i++): ?>
+      					<option value="<?php echo $G_division[$i]['ID'] ?>" > <?php echo $G_division[$i]['Division'] ?> </option>
+      				<?php endfor ?>
+      			 </select> -->
       		</div>
           <div class="form-group">
               <label>Type</label>
@@ -64,6 +70,7 @@
               <button class="btn btn-primary" id="saveFormKB">Save</button>
           </div>
         </div>
+
       </div>
     </div>
     <div class="col-md-9">
@@ -74,7 +81,7 @@
                 <label>Division</label>
                 <select class="select2-select-00 full-width-fix" id="Division">
                   <?php for($i = 0; $i < count($G_division); $i++): ?>
-                    <option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>
+                    <option value="<?php echo $G_division[$i]['ID'] ?>" > <?php echo $G_division[$i]['Division'] ?> </option>
                   <?php endfor ?>
                  </select>
               </div>
@@ -82,14 +89,49 @@
         </div>
       </div>
       <div class="row">
-        <div id ="viewkb" class="col-md-12">
+        <div id="viewkb" class="col-md-12">
               <ul class="list-group" id="headerlist">
-                
+                <?php for($i = 0; $i < count($G_data); $i++): ?>
+                  <?php $no = $i+1 ?>
+                    <li class="list-group-item item-head">dsds
+                                      <a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i ?>">
+                                          <span class="numbering"><b><?php echo $no; ?></b></span>
+                                          <span class="info"><b><?php echo $G_data[$i]['Type']?></b></span>
+                                      </a>
+
+                      <div id="<?php echo $i ?>" class="collapse detailKB">
+                        <ul class="list-group">
+                          <?php $data = $G_data[$i]['data'] ?>
+                          <?php for($j = 0; $j < count($data); $j++): ?>
+                            <li class="list-group-item" data-contentid="<?=$data[$j]['ID']?>" data-type="knowledge_base">
+                              ...<a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i.'__'.$j ?>">
+                                              <b><?php echo $data[$j]['Desc'] ?></b>
+                                              <span class="pull-right viewers">
+                                              <?php if(!empty($data[$j]['CountRead']->Total)){ ?>
+                                              <span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read"><?=$data[$j]['CountRead']->Total?></span> times</span>
+                                              <?php } ?>
+                                              </span>
+                                          </a>
+                              <div id="<?php echo $i.'__'.$j ?>" class="collapse">
+                                <div style="margin-top: 15px;margin-bottom: 15px;">
+                                  <a class="btn btn-default <?php if($data[$j]['=File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/kb-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> File</a>
+                                    <?php if ($selected ==$this->session->userdata('PositionMain')['IDDivision']): ?>
+                                      <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
+                                    <?php endif; ?>
+                                </div>
+                              </div>
+                            </li>
+                          <?php endfor ?>
+                        </ul>
+                      </div>
+                    </li>
+                  <?php endfor ?>
               </ul>
         </div>
       </div>
     </div>
   </div>
+<?php } ?>
 
 
 <script type="text/javascript">
@@ -101,7 +143,7 @@
 		$('#Division').select2({
 
 		});
-     $('#Division').trigger('change');  
+
     loadTypeKB() ;
 	});
 
@@ -164,7 +206,7 @@ $('#saveFormKB').click(function () {
           $('#formKB_Type').val('');
           $('#formKB_Desc').val('');
           $('#formKB_File').val('');
-          $('#Division').trigger('change');
+
           }, 500);
 
         });
@@ -186,10 +228,9 @@ $('#saveFormKB').click(function () {
       });
 
 	$(document).on('change','#Division', function () {
-    console.log('asdsad');
 	   var url = base_url_js+"kb";
 	   var data = {
-	   	Division : $(this).find('option:selected').val(),
+	   	Division : $(this).val(),
 	   };
 	   $.post(url,data,function (resultJson) {
 	   	$(".list-group").empty();
@@ -266,7 +307,6 @@ $('#saveFormKB').click(function () {
                       $('#btnKBSave').prop('disabled',false).html('Save');
                       $('#formKB_ID').val('');
                       $('#formKB_Type').val('');
-                      
                   },500);
               });
 
@@ -394,3 +434,50 @@ $('#saveFormKB').click(function () {
 
 
 </script>
+
+
+<!-- ADDED BY FEBRI @ JUNE 2020 -->
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("#viewkb").on('click','.detailKB .list-group-item',function(){
+      var itsme = $(this);
+      var contentid = itsme.data('contentid');
+      var type = itsme.data('type');
+
+      var dataPost = {
+        ContentID : contentid,
+        TypeContent : type
+      }
+        
+      var token = jwt_encode(dataPost,'UAP)(*');
+
+      $.ajax({
+        type : 'POST',
+        url : base_url_js+"help/hitlog",
+        data : {token:token},
+        dataType : 'json',
+        beforeSend :function(){},
+        error : function(jqXHR){
+          $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+          $('body #GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+          $("body #GlobalModal").modal("show");
+        },success : function(response){
+          console.log(response);
+          if(!jQuery.isEmptyObject(response)){
+            if(response.finish){
+              if(itsme.hasClass(".total-read")){
+                var lastNum = itsme.find(".total-read").text();
+                lastNum = parseInt(lastNum) + 1;
+                itsme.find(".total-read").text(lastNum);
+              }else{
+                itsme.find(".viewers").html('<span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read"><?=$data[$j]['CountRead']->Total?></span> times</span>');
+              }
+              
+            }
+          }
+        }
+    });
+    });
+  });
+</script>
+<!-- END ADDED BY FEBRI @ JUNE 2020 -->

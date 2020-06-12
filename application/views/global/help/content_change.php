@@ -1,5 +1,3 @@
-
-
 <?php if (count($G_data) == 0): ?>
 	<div class="thumbnail" style="color: red; padding: 20px;">No Result Data</div>
 <?php else: ?>
@@ -18,8 +16,13 @@
                 <ul class="list-group">
                     <?php $data = $G_data[$i]['data'] ?>
                     <?php for($j = 0; $j < count($data); $j++): ?>
-                        <li class="list-group-item"><a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i.'__'.$j ?>">
+                        <li class="list-group-item" data-contentid="<?=$data[$j]['ID']?>" data-type="user_qna" ><a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i.'__'.$j ?>">
                                 <b><?php echo $data[$j]['Questions'] ?></b>
+                                <span class="pull-right viewers">
+                                <?php if(!empty($data[$j]['CountRead']->Total)){ ?>
+                                  <span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read"><?=$data[$j]['CountRead']->Total?></span> times</span>
+                                <?php } ?>
+                                </span>
                             </a>
                             <div id="<?php echo $i.'__'.$j ?>" class="collapse">
                                 <p style="margin-top: 10px">
