@@ -1,4 +1,11 @@
 <div id="log-content">
+	<div class="row" style="margin-bottom:15px">
+		<div class="col-sm-4">
+			<div class="btn-group">
+				<button class="btn btn-warning btn-sm" type="button" onclick="window.history.go(-1); return false;"><i class="fa fa-angle-double-left"></i> Going back</button>
+			</div>
+		</div>
+	</div>
 	<div class="row">
 		<div class="col-sm-4">
 			<div class="panel panel-default" id="filter-form">

@@ -41,7 +41,8 @@
        <div class="panel-heading"><h4 class="panel-title">Admin tools</h4></div>
        <div class="panel-body text-center">
         <div class="btn-group">
-          <button class="btn btn-sm btn-success" type="button" onclick="location.href='<?=base_url('admin-log-content/user_qna')?>'"><i class="fa fa-wrench"></i> Configuration</button>
+          <button class="btn btn-sm btn-info" type="button" onclick="location.href='<?=base_url('admin-log-config/user_qna')?>'"><i class="fa fa-wrench"></i> Access Config</button>
+          <button class="btn btn-sm btn-success" type="button" onclick="location.href='<?=base_url('admin-log-content/user_qna')?>'"><i class="fa fa-history"></i> Logs of employee</button>
         </div>
        </div>
      </div>

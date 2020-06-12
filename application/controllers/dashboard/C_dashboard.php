@@ -1824,7 +1824,7 @@ class C_dashboard extends Globalclass {
     }
 
 
-    public function adminKB(){
+    public function adminLogs(){
         $param = $this->uri->segment(2);
         $data['typecontent'] = $param;        
         $myDivision = $this->session->userdata('PositionMain')['IDDivision'];
@@ -1835,7 +1835,7 @@ class C_dashboard extends Globalclass {
     }
 
 
-    public function adminKBFetchLog(){
+    public function adminLogsFetchLog(){
         $reqdata = $this->input->post(); 
         $myDivisionID = $this->session->userdata('PositionMain')['IDDivision'];
         $json_data=array();
@@ -1883,15 +1883,106 @@ class C_dashboard extends Globalclass {
     }
 
 
-    public function adminKBDetailLog(){
+    public function adminLogsDetailLog(){
         $data = $this->input->post();
         if(!empty($data)){
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
             $param[] = array("field"=>"em.NIP","data"=>" = ".$data_arr['NIP']." ","filter"=>"AND",);    
-            $data['employee'] = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
+            $employee = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
+            $url_image = './uploads/employees/'.$employee->Photo;
+            $srcImg =  base_url('images/icon/userfalse.png');
+            if($employee->Photo != '' && $employee->Photo != null || !empty($employee->Photo)){
+                $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$employee->Photo) : base_url('images/icon/userfalse.png') ;
+            }
+            $employee->ProfilePic = $srcImg;
+            $data['employee'] = $employee;
+            $data['TypeContent'] = $data_arr['TypeContent'];
+            $param2[] = array("field"=>"a.TypeContent","data"=>" = '".$data_arr['TypeContent']."' ","filter"=>"AND",);    
+            $param2[] = array("field"=>"a.NIP","data"=>" = ".$data_arr['NIP']." ","filter"=>"AND",);    
+            $data['FType']  = $this->m_log_content->fetchLogByEmployee(false,$param2,'','','group by b.Type','order by b.Type asc')->result();
             $this->load->view("global/admin-log-content/detail",$data,false);
         }else{show_404();}
+    }
+
+
+    public function adminFetchLogByEmp(){
+        $reqdata = $this->input->post(); 
+        $myDivisionID = $this->session->userdata('PositionMain')['IDDivision'];
+        $json_data=array();
+        $json_data = $reqdata;
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $param = array();$orderBy=" lem.ID DESC ";
+
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+
+                $param[] = array("field"=>"(b.Type","data"=>" like '%".$search."%' ","filter"=>"AND",);
+                $param[] = array("field"=>"b.Questions","data"=>" like '%".$search."%' )","filter"=>"OR",);
+            }
+            if(!empty($data_arr['Filter'])){
+                $parse = parse_str($data_arr['Filter'],$output);
+                if(!empty($output['type'])){
+                    $param[] = array("field"=>"b.Type","data"=>" like '%".$output['type']."%' ","filter"=>"AND",);
+                }
+                if(!empty($output['question'])){
+                    $param[] = array("field"=>"b.Questions","data"=>" like '%".$output['question']."%' ","filter"=>"AND",);
+                }
+
+                if(!empty($output['NIP'])){
+                    $param[] = array("field"=>"a.NIP","data"=>" = '".$output['NIP']."' ","filter"=>"AND",);
+                }
+
+                if(!empty($output['startDate'])){
+                    if(!empty($output['endDate'])){
+                        $param[] = array("multiple"=>"date","field"=>"DATE(a.ViewedAt) ","data"=>" between '".date("Y-m-d",strtotime($output['startDate']))."' and '".date("Y-m-d",strtotime($output['endDate']))."' ","filter"=>"AND",);
+                    }else{
+                        $param[] = array("multiple"=>"date","field"=>"DATE(a.ViewedAt) ","data"=>"='".date("Y-m-d",strtotime($output['startDate']))."' ","filter"=>"AND",);
+                    }
+                }
+
+            }
+
+            $param[] = array("field"=>"a.TypeContent","data"=>" = '".$output['TypeContent']."' ","filter"=>"AND",);
+            
+            $totalData = $this->m_log_content->fetchLogByEmployee(true,$param)->row();
+            $TotalData = (!empty($totalData) ? $totalData->Total : 0);
+            if(!empty($reqdata['length'])){
+                $result = $this->m_log_content->fetchLogByEmployee(false,$param,$reqdata['start'],$reqdata['length'])->result();
+            }else{
+                $result = $this->m_log_content->fetchLogByEmployee(false,$param)->result();
+            }
+            //var_dump($this->db->last_query());
+            
+            $json_data = array(
+                "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
+                "recordsTotal"    => intval($TotalData),
+                "recordsFiltered" => intval($TotalData),
+                "data"            => (!empty($result) ? $result : 0)
+            );
+
+        }
+        $response = $json_data;
+        echo json_encode($response);
+    }
+
+
+    public function adminLogsConfigAccess(){
+        $param = $this->uri->segment(2);
+        $data['typecontent'] = $param;        
+        $myDivision = $this->session->userdata('PositionMain')['IDDivision'];
+        if($myDivision == 12){
+            $data['G_division'] = $this->m_master->apiservertoserver(base_url().'api/__getAllDepartementPU');
+            $content = $this->load->view('global/admin-log-content/access',$data,true);
+            $this->temp($content);
+        }else{show_404();}
+    }
+
+
+    public function adminLogsConfigSaved(){
+        # code...
     }
 
     /*END ADDED BY FEBRI @ MARCH 2020*/

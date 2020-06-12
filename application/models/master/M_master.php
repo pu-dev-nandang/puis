@@ -2810,18 +2810,20 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     }
 
 
-    public function userKB($IDDivision = '')
-    {
+    public function userKB($IDDivision = ''){
         $arr_result = array();
         $Q_add = ($IDDivision == '') ? '' : ' where kt.IDDivision = "'.$IDDivision.'" ';
         $sql = 'select kb.*,kt.Type as TypeName from db_employees.knowledge_base as kb
         inner join db_employees.kb_type as kt on kb.IDType=kt.ID
          '.$Q_add;
 
-    // print_r($sql);die();
+        // print_r($sql);die();
         $query=$this->db->query($sql, array())->result_array();
         //print_r($query);die();
         $myNIP = $this->session->userdata('NIP');
+        //echo "<pre>";
+        //var_dump($query);die();
+
         for ($i=0; $i < count($query); $i++) {
             //count read article
             $sqlRead = "select count(NIP) as Total from db_employees.log_countable_content where NIP = {$myNIP} and TypeContent = 'knowledge_base' and ContentID = {$query[$i]['ID']} ";
@@ -2863,7 +2865,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         }
 
-//print_r($arr_result);die;
+        //print_r($arr_result);die;
         return $arr_result;
 
     }
