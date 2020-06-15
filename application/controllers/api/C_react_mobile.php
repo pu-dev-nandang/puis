@@ -139,7 +139,12 @@ class C_react_mobile extends CI_Controller {
           'data' => $dataEMP,
           'DeptList' => $DeptList
          ];
-
+         // set expired for auto login
+         $timestamp = date('Y-m-d H:i:s');
+         $start_date = date($timestamp);
+         $expires = strtotime('+30 days', strtotime($timestamp));
+         $date_diff=($expires-strtotime($timestamp)) / 86400;
+         $rs['callback']['expiresIn'] = $date_diff;
       }
 
       echo json_encode($rs);
