@@ -87,9 +87,9 @@ class C_react_mobile extends CI_Controller {
          $As = function($NIP,$DepartmenID) {
           $Total = $this->db->query(
             'select count(*) as total from db_ticketing.admin_register where NIP = "'.$NIP.'"
-             and DepartmenID = "'.$DepartmenID.'"
+             and DepartmentID = "'.$DepartmenID.'"
             ' 
-          )->result_array()[0]['total'];
+          )->result_array();$Total = $Total[0]['total'];
           $adm  = ($Total > 0) ? true : false;
           $auth = $this->m_general->auth($DepartmenID,$NIP);
           return ($adm || $auth) ? 'Admin' : 'Non Admin';
@@ -144,7 +144,7 @@ class C_react_mobile extends CI_Controller {
                $DeptDiv = $this->db->query(
                   'select * from db_employees.division where ID = '.$RuleUser[$i]['IDDivision'].'  '
                )->result_array();
-               $DepartmenID = 'NA.'.$DeptDiv[0]['ID']
+               $DepartmenID = 'NA.'.$DeptDiv[0]['ID'];
                $DeptList[] = [
                 'DepartmenID' => $DepartmenID,
                 'DepartmentName' => $DeptDiv[0]['Division'],
@@ -164,7 +164,7 @@ class C_react_mobile extends CI_Controller {
          $start_date = date($timestamp);
          $expires = strtotime('+30 days', strtotime($timestamp));
          $rs['callback']['expiresIn'] = $expires;
-      }
+       }
 
       echo json_encode($rs);
 
