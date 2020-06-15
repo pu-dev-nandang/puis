@@ -80,8 +80,20 @@ class C_react_mobile extends CI_Controller {
       )->result_array();
       $RuleUser = $this->db->query('SELECT * FROM db_employees.rule_users WHERE NIP LIKE "'.$NIP.'"')->result_array();
       if (count($dataEMP) > 0 && count($RuleUser) > 0 ) {
+         $this->load->model('ticketing/m_general');
         // read rule user
          $DeptList = [];
+
+         $As = function($NIP,$DepartmenID) {
+          $Total = $this->db->query(
+            'select count(*) as total from db_ticketing.admin_register where NIP = "'.$NIP.'"
+             and DepartmenID = "'.$DepartmenID.'"
+            ' 
+          )->result_array()[0]['total'];
+          $adm  = ($Total > 0) ? true : false;
+          $auth = $this->m_general->auth($DepartmenID,$NIP);
+          return ($adm || $auth) ? 'Admin' : 'Non Admin';
+         };
 
          for ($i=0; $i <count($RuleUser) ; $i++) { 
            switch ($RuleUser[$i]['IDDivision']) {
@@ -95,8 +107,9 @@ class C_react_mobile extends CI_Controller {
                    $ProdiID =  $Auth_prodi[$i];
                    $d = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
                    $DeptList[] = [
-                    'DepartmenID' => 'AC.'.$ProdiID,
+                    'DepartmenID' => $DepartmenID = 'AC.'.$ProdiID,
                     'DepartmentName' => 'Prodi '.$d[0]['Name'],
+                    'As' => $As($NIP,$DepartmenID)
                    ];
                  }
                }
@@ -109,14 +122,16 @@ class C_react_mobile extends CI_Controller {
               $k_ID = $this->m_master->caribasedprimary('db_academic.faculty','NIP',$NIP);
               if (count($a_ID) > 0) {
                   $DeptList[] = [
-                   'DepartmenID' => 'FT.'.$a_ID[0]['ID'],
+                   'DepartmenID' => $DepartmenID = 'FT.'.$a_ID[0]['ID'],
                    'DepartmentName' => 'Fakultas '.$a_ID[0]['Name'],
+                   'As' => $As($NIP,$DepartmenID)
                   ];
               }
               elseif (count($k_ID) > 0) {
                   $DeptList[] = [
-                   'DepartmenID' => 'FT.'.$k_ID[0]['ID'],
+                   'DepartmenID' => $DepartmenID = 'FT.'.$k_ID[0]['ID'],
                    'DepartmentName' => 'Fakultas '.$k_ID[0]['Name'],
+                   'As' => $As($NIP,$DepartmenID)
                   ];
               }
               
@@ -127,8 +142,9 @@ class C_react_mobile extends CI_Controller {
                   'select * from db_employees.division where ID = '.$RuleUser[$i]['IDDivision'].'  '
                )->result_array();
                $DeptList[] = [
-                'DepartmenID' => 'NA.'.$DeptDiv[0]['ID'] ,
+                'DepartmenID' => $DepartmenID = 'NA.'.$DeptDiv[0]['ID'] ,
                 'DepartmentName' => $DeptDiv[0]['Division'],
+                'As' => $As($NIP,$DepartmenID)
                ];
                break;
            }
@@ -137,7 +153,7 @@ class C_react_mobile extends CI_Controller {
          $rs['status'] = 1;
          $rs['callback'] = [
           'data' => $dataEMP,
-          'DeptList' => $DeptList
+          'deptList' => $DeptList
          ];
          // set expired for auto login
          $timestamp = date('Y-m-d H:i:s');
