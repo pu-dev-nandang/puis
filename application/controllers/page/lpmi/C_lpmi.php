@@ -132,6 +132,7 @@ class C_lpmi extends Lpmi_Controler {
             $no++;
             $row = array();
             $row[] = $m->Title;
+            
             // $row[] = $m->Description;
             $row[] = $m->Status;
             $row[] = $m->UpdatedAt;

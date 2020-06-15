@@ -86,7 +86,12 @@ class C_home extends Prodi_Controler {
         $pagevisimisi = $this->load->view('page/'.$data['department'].'/about/V_mission',$data,true);
         $this->menu_visimisi($pagevisimisi);
     }
-    
+    public function knowledge(){
+        $data['department'] = parent::__getDepartement();
+        $data['category'] = $this->m_home->get_category();
+        $content = $this->load->view('page/'.$data['department'].'/about/V_knowledge',$data,true);
+        parent::template($content);
+    }
 // ===== Call to Action ======
     function calltoaction()
     {
@@ -145,6 +150,10 @@ class C_home extends Prodi_Controler {
         $pagecontact = $this->load->view('page/'.$data['department'].'/contact/V_address',$data,true);
         $this->menu_contact($pagecontact);
     }
+
+
+    
+
             
 }
 

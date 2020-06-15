@@ -7,11 +7,12 @@ class C_prodi extends Prodi_Controler {
     function __construct()
     {
         parent::__construct();
-        $this->load->model('m_sendemail');
+        $this->load->model('m_sendemail');        
         $this->data['department'] = parent::__getDepartement(); 
         $this->load->model(array('m_api','master/m_master','General_model'));
         $this->session->set_userdata('db_select','db_prodi');
         $this->data['db_select'] = $this->session->userdata('db_select');
+        $this->load->model('admin-prodi/beranda/m_home');
     }
 
     public function temp($content)
@@ -443,8 +444,6 @@ class C_prodi extends Prodi_Controler {
     }
 
 
-
-
     /*#ADDED BY FEBRI MAY 2020
     #STOCK GOOD */
 
@@ -494,5 +493,225 @@ class C_prodi extends Prodi_Controler {
 
     /*#END ADDED BY FEBRI MAY 2020
     #STOCK GOOD */
+
+    public function ajax_list()
+    {
+        // print_r('k');die();
+        $type=$this->uri->segment(2);
+        // print_r($type);die();
+        $list = $this->m_home->get_datatables($type);
+        
+        $data = array();        
+        $no = $_POST['start'];
+        foreach ($list as $m) {
+            $no++;
+            $row = array();
+            $row[]=$no;
+            $row[] = $m->Title;
+            // $row[] = $m->Description;
+            // $row[] = $m->File;
+            $row[] = $m->Language;
+            $row[] = $m->UpdatedAt;
+            
+            
+ 
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_prodi('."'".$m->ID."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_prodi('."'".$m->ID."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 
+            $data[] = $row;
+        }
+ 
+        $output = array(
+                        "draw" => $_POST['draw'],
+                        "recordsTotal" => $this->m_home->count_all(),
+                        "recordsFiltered" => $this->m_home->count_filtered(),
+                        "data" => $data,
+                );
+        //output to json format
+        echo json_encode($output);
+    }
+
+
+    public function ajax_edit($id)
+    {
+        $data = $this->m_home->get_by_id($id);
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add()
+    {
+        // print_r($this->session->userdata('prodi_active_id'));die();
+        $this->_validate();
+        $data = array(
+                // 'Type' => $this->input->post('type'),
+                'ProdiID' => $this->session->userdata('prodi_active_id'),
+                'LangID' =>$this->input->post('lang'),                
+                'ID_CatBase' => $this->input->post('category'), 
+                'Type' => "knowledge",
+                'Title' => $this->input->post('title'),
+                'Description' => '',
+                'UpdatedAt' => date('Y-m-d H:i:s'),
+                'UpdatedBy' => $this->session->userdata('NIP'),
+            );
+        // print_r($data);die();
+        if(!empty($_FILES['photo']['name']))
+        {
+            $upload = $this->_do_upload();
+            $data['File'] = $upload;
+        }
+        $type = $this->input->post('type');
+        $insert = $this->m_home->save($data,$type);
+        echo json_encode(array("status" => TRUE));
+    }
+
+
+    public  function list_category(){
+        $data=$this->m_home->get_category();
+        echo json_encode($data);
+    }
+
+    function get_category(){
+        $this->db->from("db_prodi.category");
+        $this->db->order_by('ID','desc');
+        $q = $this->db->get();
+        return $q->result();  
+    }
+
+   public function ajax_addCat()
+    {
+        // $this->_validate();
+        $data = array(                
+                'Name' => $this->input->post('category'),
+                'CreateAt' => date('Y-m-d H:i:s'),
+                'CreateBy' => $this->session->userdata('NIP'),
+            );
+        
+        // print_r($data);die();
+        $insert = $this->m_home->saveCat($data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    public function ajax_editCat($id)
+    {
+        $data = $this->m_home->get_by_idCat($id);
+        echo json_encode($data);
+    }
+
+    public function ajax_updateCat()
+    {
+        // $this->_validate();
+        $data = array(                
+                'Name' => $this->input->post('category'),
+                'CreateAt' => date('Y-m-d H:i:s'),
+                'CreateBy' => $this->session->userdata('NIP'),
+            );
+        
+        // print_r($data);die();
+        $insert = $this->m_home->updateCat(array('ID' => $this->input->post('idcat')),$data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    public function ajax_deleteCat($id)
+    {
+        $this->m_home->delete_by_idCat($id);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    // Content 
+    public function ajax_update()
+    {
+        $this->_validate();
+        $data = array(
+                'Title' => $this->input->post('title'),
+                'ID_CatBase' => $this->input->post('category'),
+                // 'Description' => $this->input->post('description'),
+                // 'Meta_description' => $this->input->post('meta_des'),
+                // 'Meta_keywords' => $this->input->post('meta_key'),
+                'LangID' => $this->input->post('lang'),
+                // 'AddDate' => $this->input->post('date'),
+                // 'Status' => $this->input->post('status'),
+                'UpdatedAt' => date('Y-m-d H:i:s'),
+                'UpdatedBy' => $this->session->userdata('NIP'),
+            );
+
+        if(!empty($_FILES['photo']['name']))
+        {
+            $upload = $this->_do_upload();
+             
+            //delete file
+            $home = $this->m_home->get_by_id($this->input->post('id'));
+            if(file_exists('./uploads/prodi/'.$home->File) && $home->File)
+                unlink('./uploads/prodi/'.$home->File);
+ 
+            $data['File'] = $upload;
+        }
+
+        $this->m_home->update(array('ID' => $this->input->post('id')), $data);
+        echo json_encode(array("status" => TRUE));
+    }
+    
+    public function ajax_delete($id)
+    {
+        //delete file
+        $home = $this->m_home->get_by_id($id);
+        if(file_exists('./uploads/prodi/'.$home->File) && $home->File)
+            unlink('./uploads/prodi/'.$home->File);
+
+        $this->m_home->delete_by_id($id);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    private function _do_upload()
+    {
+        $config['upload_path']          = './uploads/prodi';
+        $config['allowed_types']        = 'gif|jpg|png|jpeg|pdf';
+        $config['max_size']             = 2048000; //set max size allowed in Kilobyte 2mb
+        // $config['max_width']            = 1000; // set max width image allowed
+        // $config['max_height']           = 1000; // set max height allowed
+        $config['file_name']            = round(microtime(true) * 1000); //just milisecond timestamp fot unique name
+ 
+        $this->load->library('upload', $config);
+        $this->upload->initialize($config);
+
+        if(!$this->upload->do_upload('photo')) //upload and validate
+        {
+            $data['inputerror'][] = 'photo';
+            $data['error_string'][] = 'Upload error: '.$this->upload->display_errors('',''); //show ajax error
+            $data['status'] = FALSE;
+            echo json_encode($data);
+            exit();
+        }
+        return $this->upload->data('file_name');
+    }
+
+    private function _validate()
+    {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;
+ 
+        if($this->input->post('title') == '')
+        {
+            $data['inputerror'][] = 'title';
+            $data['error_string'][] = 'Title is required';
+            $data['status'] = FALSE;
+        }
+ 
+        // if($this->input->post('description') == '')
+        // {
+        //     $data['inputerror'][] = 'description';
+        //     $data['error_string'][] = 'Description is required';
+        //     $data['status'] = FALSE;
+        // }
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
+        }
+        
+    }
+
 
 }
