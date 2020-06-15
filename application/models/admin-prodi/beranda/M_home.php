@@ -95,10 +95,11 @@ class M_home extends CI_Model{
             $data=$this->db->where('Type', $getvaID);
             // print_r($getvaID);die();
         }
-        
+        $this->db->select('pt.ID,pt.Title,l.Language,pt.UpdatedAt');
         $this->db->from('db_prodi.prodi_texting as pt'); 
         $this->db->join('db_prodi.language as l', 'pt.LangID = l.ID');
         $this->db->where('pt.ProdiID', $prodi_active_id);
+        $this->db->order_by('ID','desc');
         // $this->db->order_by("ID", "desc");
         $i = 0;
         
@@ -149,6 +150,7 @@ class M_home extends CI_Model{
         $this->db->limit($_POST['length'], $_POST['start']);
 
         $query = $this->db->get();
+        // print_r($query->result());
         return $query->result();
     }
 

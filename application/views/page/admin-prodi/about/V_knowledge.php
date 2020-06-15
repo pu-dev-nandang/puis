@@ -611,7 +611,7 @@
                 // $('#Description').summernote('code', data.Description);
                 // $('[name="meta_des"]').val(data.Meta_des);
                 // $('[name="meta_key"]').val(data.Meta_key);
-                // $('[name="date"]').val(data.AddDate);
+                $('[name="lang"]').val(data.LangID);
                 $('[name="category"]').val(data.ID_CatBase);
                 // Language
                 // if (data.Status=="Yes") {
