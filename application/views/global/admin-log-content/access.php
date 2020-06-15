@@ -1,3 +1,11 @@
+<?php $message = $this->session->flashdata('message');
+    if(!empty($message)){ ?>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        toastr.info("<?= $this->session->flashdata('message');?>",'Info!');
+    });
+    </script>
+<?php } ?>
 <style type="text/css">
 	.checkbox-lb{font-weight: 100;cursor: pointer;}
 </style>
@@ -18,8 +26,9 @@
 					</div>
 					<div class="panel-body">
 						<div class="form-group">
+							<input type="hidden" name="ID">
 							<label>Division</label>
-							<select class="select2-select-00 full-width-fix select2-required" id="DivisionID" name="DivisionID">
+							<select class="select2-select-00 full-width-fix select2-required" id="DivisionID" name="DivisiID">
 			                  <option>Choose one</option>
 			                  <?php for($i = 0; $i < count($G_division); $i++): ?>
 			                    <option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>
@@ -59,7 +68,7 @@
 				</div>
 				<div class="panel-body">
 					<div class="fetch-data table-responsive">
-						<table class="table table-bordered">
+						<table class="table table-bordered" id="table-list-data">
 							<thead>
 								<tr>
 									<th width="5%">No</th>
@@ -84,26 +93,100 @@
 
 
 <script type="text/javascript">
+	function fetchLogActivity() {
+		var filtering = $("#form-filter").serialize();		
+
+        var token = jwt_encode({POST : 'fetching'},'UAP)(*');
+        var dataTable = $('#table-list-data').DataTable( {
+            "destroy": true,
+            "ordering" : false,
+            "retrieve":true,
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 5,
+            "responsive": true,
+            "ajax":{
+                url : base_url_js+'admin-access-control', // json datasource
+                ordering : false,
+                data : {token:token},
+                type: "post",  // method  , by default get
+                error: function(jqXHR){  // error handling
+                    loading_modal_hide();
+                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                        '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                    $('#GlobalModal .modal-body').html(jqXHR.responseText);
+                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                    $('#GlobalModal').modal({
+                        'show' : true,
+                        'backdrop' : 'static'
+                    });
+                }
+            },
+            "initComplete": function(settings, json) {
+                //loading_modal_hide();
+            },
+            "columns": [
+            	{
+            		"data":"ID",
+            		render: function (data, type, row, meta) {
+				        return meta.row + meta.settings._iDisplayStart + 1;
+				    }
+            	},
+            	{
+            		"data":"DivisiID",
+            		"render": function (data, type, row, meta) {
+            			var label = data;
+            			return label;
+            		}
+            	},
+            	{
+            		"data":"TypeContent",
+            		"render": function (data, type, row, meta) {
+            			var label = data;
+            			var name = 'undefined';
+            			if(data == 'user_qna'){
+            				name = 'help';
+            			}else if(data == 'knowledge_base'){
+            				name = 'knowledge base';
+            			}
+            			label = '<span class="capitalize">'+name+'</span>'
+            			return label;
+            		}
+            	},
+            	{
+            		"data":"IsLogEmp", 
+            		"render": function (data, type, row, meta) {
+            			var label = ((data == 'Y') ? "Has an access to ":"Doesn't have an access to")+" <b>List of Employee Log</b>";
+            			label += "<br>"+((row.IsCreateGuide == 'Y') ? "Has an access to ":"Doesn't have an access to")+" <b>Create Guideline</b>";
+            			return label;
+            		}           		
+            	},
+            	{
+            		"data":"ID", 
+            		"render": function (data, type, row, meta) {
+            			var label = data;
+            			return label;
+            		}           		
+            	},
+        	]
+        });
+	}
 	$(document).ready(function(){
+		fetchLogActivity();
 		$("#form-access-control .btn-save").click(function(){
 			var itsme = $(this);
 			var itsform = itsme.parent().parent().parent();
             itsform.find(".select2-required").each(function(){
                 var value = $(this).val();
-                if($.isNumeric(value)){
-                    if($.trim(value) == ''){
-                        $(this).addClass("error");
-                        $(this).parent().find(".text-message").text("Please fill this field");
-                        error = false;
-                    }else{
-                        error = true;
-                        $(this).removeClass("error");
-                        $(this).parent().find(".text-message").text("");
-                    }
-                }else{
-                    error = false;  
+                console.log(value);
+                if($.trim(value) == ''){
                     $(this).addClass("error");
                     $(this).parent().find(".text-message").text("Please fill this field");
+                    error = false;
+                }else{
+                    error = true;
+                    $(this).removeClass("error");
+                    $(this).parent().find(".text-message").text("");
                 }
             });
             itsform.find(".required").each(function(){

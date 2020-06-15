@@ -1,89 +1,39 @@
-<?php if (count($G_data) == 0): ?>
-	<div class="thumbnail" style="color: red; padding: 20px;">No Result Data</div>
-<?php else: ?>
-	<?php for($i = 0; $i < count($G_data); $i++): ?>
-		<?php $no = $i+1 ?>
-        <li class="list-group-item item-head">
-            <a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i ?>">
-                <span class="numbering"><b><?php echo $no; ?></b></span>
-                <span class="info"><b><?php echo $G_data[$i]['Type']?></b></span>
+<!-- UPDATED CODE BY FEBRI @ JUNE 2020 -->
+<?php if(!empty($G_data)){ $num=1;
+ foreach ($G_data as $key => $value) { ?>
+    <li class="list-group-item item-head">
+      <a href="javascript:void(0)" data-toggle="collapse" data-target="#kb-<?=$num ?>">
+          <span class="numbering"><b><?=$num; ?></b></span>
+          <span class="info"><b><?=$key?></b></span>
+      </a>
+
+      <div id="kb-<?=$num?>" class="collapse detailKB">
+        <ul class="list-group">
+          <?php foreach ($value as $v) {?>
+          <li class="list-group-item" data-contentid="<?=$v->KBID?>" data-type="knowledge_base">
+            <a href="javascript:void(0)" data-toggle="collapse" data-target="#KBC-<?=$v->KBID?>">
+                <b><?=$v->Desc?></b>
+                <span class="pull-right viewers">
+                <?php if(!empty($v->CountRead->Total)){ ?>
+                <span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read"><?=$v->CountRead->Total?></span> times</span>
+                <?php } ?>
+                </span>
             </a>
-						<div id="<?php echo $i ?>" class="collapse detailKB">
-								<ul class="list-group">
-										<?php $data = $G_data[$i]['data'];
 
-										?>
-										<?php for($j = 0; $j < count($data); $j++): ?>
-												<li class="list-group-item" data-contentid="<?=$data[$j]['ID']?>" data-type="knowledge_base"><a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i.'__'.$j ?>">
-																<?php echo $data[$j]['Desc'] ?>
-																<span class="pull-right viewers">
-																<?php if(!empty($data[$j]['CountRead']->Total)){ ?>
-					                                              <span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read"><?=$data[$j]['CountRead']->Total?></span> times</span>
-				                                              	<?php } ?>
-				                                              	</span>
-														</a>
-														<div id="<?php echo $i.'__'.$j ?>" class="collapse">
-																<div style="margin-top: 15px;margin-bottom: 15px;">
-																		<a class="btn btn-default <?php if($data[$j]['File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/kb-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> PDF File</a>
-																			<br/>
-																			    <?php 
-																			      if ($this->session->userdata('IDdepartementNavigation')== 12) // IT
-																			      { ?>
-																			        <br/>
-																			        <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
-																			<?php }
-																			      else
-																			      {
-																			        // read navigasi department
-																			        $inArrDiv = [15,34]; // prodi dan faculty
-																			        if (!in_array($this->session->userdata('IDdepartementNavigation'), $inArrDiv) ) {
-																			          if ('NA.'.$this->session->userdata('IDdepartementNavigation') == $this->session->userdata('kb_div')) 
-																			          { ?>
-																			            <br/>
-																			            <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>    
-																			            
-																			   <?php  }
-
-																			        }
-																			        else
-																			        {
-																			          // prodi dan faculty
-																			          if($this->session->userdata('IDdepartementNavigation') == 15) // prodi
-																			          {
-																			            if ('AC.'.$this->session->userdata('prodi_active_id') == $this->session->userdata('kb_div') ) 
-																			            { ?>
-																			                <br/>
-																			                <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
-
-																			      <?php }
-																			          }
-																			          else
-																			          {
-																			            // faculty
-																			            if ('FT.'.$this->session->userdata('faculty_active_id') == $this->session->userdata('kb_div') ) 
-																			            { ?>
-																			                <br/>
-																			                <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
-
-																			      <?php }
-
-																			          }  
-
-																			        }
-																			      }
-																			      
-																			     ?>
-																			<?php if ($selected ==$this->session->userdata('PositionMain')['IDDivision']): ?>
-																			  <!-- <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a> -->
-																			<?php endif; ?>
-
-																</div>
-														</div>
-
-												</li>
-										<?php endfor ?>
-								</ul>
-						</div>
-        </li>
-	<?php endfor ?>
-<?php endif ?>
+            <div id="KBC-<?=$v->KBID ?>" class="collapse">
+              <div style="margin-top: 15px;margin-bottom: 15px;">
+                <a class="btn btn-default <?php if(empty($v->File) ? 'hide':'') ?>" style="display: inline;" href="<?= serverRoot.'/fileGetAny/kb-'.$v->File ?>" target="_blank">
+                  <i class="fa fa-download margin-right"></i> File
+                </a>
+                <?php if ($selected == $this->session->userdata('PositionMain')['IDDivision']): ?>
+                  <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $v->KBID; ?>" data-no="'+i+'">Remove</a>
+                <?php endif; ?>
+              </div>
+            </div>
+          </li>
+          <?php } ?>
+        </ul>
+      </div>
+    </li>
+<?php $num++; } }else{echo '<li>No data available</li>';} ?>
+<!-- END UPDATED CODE BY FEBRI @ JUNE 2020 -->

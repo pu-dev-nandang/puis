@@ -1824,13 +1824,26 @@ class C_dashboard extends Globalclass {
     }
 
 
+    private function checkAccess($DivisiID,$Type){
+        $result = array();
+        $isExist = $this->General_model->fetchData("db_employees.log_access_content",array("DivisiID"=>"NA.".$DivisiID,"TypeContent"=>$Type))->row();
+        if(!empty($isExist)){
+            $result = $isExist;
+        }
+        return $result;
+    }
+
+
     public function adminLogs(){
         $param = $this->uri->segment(2);
         $data['typecontent'] = $param;        
-        $myDivision = $this->session->userdata('PositionMain')['IDDivision'];
-        if($myDivision == 12){
-            $content = $this->load->view('global/admin-log-content/index',$data,true);
-            $this->temp($content);
+        $myDivision = $this->session->userdata('IDdepartementNavigation');
+        $accessLog = $this->checkAccess($myDivision,$param);
+        if(!empty($accessLog)){
+            if($accessLog->IsLogEmp == 'Y'){
+                $content = $this->load->view('global/admin-log-content/index',$data,true);
+                $this->temp($content);
+            }else{show_404();}
         }else{show_404();}
     }
 
@@ -1841,6 +1854,7 @@ class C_dashboard extends Globalclass {
         $json_data=array();
         $json_data = $reqdata;
         if($reqdata){
+
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
             $param = array();$orderBy=" lem.ID DESC ";
@@ -1888,20 +1902,26 @@ class C_dashboard extends Globalclass {
         if(!empty($data)){
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
-            $param[] = array("field"=>"em.NIP","data"=>" = ".$data_arr['NIP']." ","filter"=>"AND",);    
-            $employee = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
-            $url_image = './uploads/employees/'.$employee->Photo;
-            $srcImg =  base_url('images/icon/userfalse.png');
-            if($employee->Photo != '' && $employee->Photo != null || !empty($employee->Photo)){
-                $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$employee->Photo) : base_url('images/icon/userfalse.png') ;
+            $myDivision = $this->session->userdata('IDdepartementNavigation');
+            $accessLog = $this->checkAccess($myDivision,$data_arr['TypeContent']);
+            if(!empty($accessLog)){
+                if($accessLog->IsLogEmp == 'Y'){
+                    $param[] = array("field"=>"em.NIP","data"=>" = ".$data_arr['NIP']." ","filter"=>"AND",);    
+                    $employee = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
+                    $url_image = './uploads/employees/'.$employee->Photo;
+                    $srcImg =  base_url('images/icon/userfalse.png');
+                    if($employee->Photo != '' && $employee->Photo != null || !empty($employee->Photo)){
+                        $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$employee->Photo) : base_url('images/icon/userfalse.png') ;
+                    }
+                    $employee->ProfilePic = $srcImg;
+                    $data['employee'] = $employee;
+                    $data['TypeContent'] = $data_arr['TypeContent'];
+                    $param2[] = array("field"=>"a.TypeContent","data"=>" = '".$data_arr['TypeContent']."' ","filter"=>"AND",);    
+                    $param2[] = array("field"=>"a.NIP","data"=>" = ".$data_arr['NIP']." ","filter"=>"AND",);    
+                    $data['FType']  = $this->m_log_content->fetchLogByEmployee(false,$param2,'','','group by b.Type','order by b.Type asc')->result();
+                    $this->load->view("global/admin-log-content/detail",$data,false);
+                }
             }
-            $employee->ProfilePic = $srcImg;
-            $data['employee'] = $employee;
-            $data['TypeContent'] = $data_arr['TypeContent'];
-            $param2[] = array("field"=>"a.TypeContent","data"=>" = '".$data_arr['TypeContent']."' ","filter"=>"AND",);    
-            $param2[] = array("field"=>"a.NIP","data"=>" = ".$data_arr['NIP']." ","filter"=>"AND",);    
-            $data['FType']  = $this->m_log_content->fetchLogByEmployee(false,$param2,'','','group by b.Type','order by b.Type asc')->result();
-            $this->load->view("global/admin-log-content/detail",$data,false);
         }else{show_404();}
     }
 
@@ -1971,7 +1991,7 @@ class C_dashboard extends Globalclass {
 
     public function adminLogsConfigAccess(){
         $param = $this->uri->segment(2);
-        $data['typecontent'] = $param;        
+        $data['typecontent'] = $param;
         $myDivision = $this->session->userdata('PositionMain')['IDDivision'];
         if($myDivision == 12){
             $data['G_division'] = $this->m_master->apiservertoserver(base_url().'api/__getAllDepartementPU');
@@ -1982,7 +2002,75 @@ class C_dashboard extends Globalclass {
 
 
     public function adminLogsConfigSaved(){
-        # code...
+        $data = $this->input->post();
+        if($data){
+            $data['CreatedBy'] = $this->session->userdata('NIP').'/'.$this->session->userdata('Name');
+            $data['IsLogEmp'] = (!empty($data['IsLogEmp']) ? $data['IsLogEmp'] : 'N');
+            $data['IsCreateGuide'] = (!empty($data['IsCreateGuide']) ? $data['IsCreateGuide'] : 'N');
+            $isExist = $this->General_model->fetchData("db_employees.log_access_content",array('DivisiID'=>$data['DivisiID'],'TypeContent'=>$data['TypeContent']))->row();
+            if(empty($isExist)){
+                $execute = $this->General_model->insertData("db_employees.log_access_content",$data);
+            }else{
+                $execute = $this->General_model->updateData("db_employees.log_access_content",$data,array("ID"=>$data['ID']));
+            }
+
+            $message = (($execute) ? 'Successfully':'Failed').' saved.';
+            $this->session->set_flashdata("message",$message);
+            redirect(site_url('admin-log-config/'.$data['TypeContent']));
+
+        }else{show_404();}
+    }
+
+
+    public function adminLogsFetchAccess(){
+        $reqdata = $this->input->post(); 
+        $json_data=array();
+        $json_data = $reqdata;
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $param = array();$orderBy=" lem.ID DESC ";
+
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+
+                $param[] = array("field"=>"(b.Type","data"=>" like '%".$search."%' ","filter"=>"AND",);
+                $param[] = array("field"=>"b.Questions","data"=>" like '%".$search."%' )","filter"=>"OR",);
+            }
+
+            $totalData = $this->General_model->countData("db_employees.log_access_content",$param)->row();
+            $TotalData = (!empty($totalData) ? $totalData->Total : 0);
+            if(!empty($reqdata['length'])){
+                $result = $this->General_model->fetchData("db_employees.log_access_content",$param,null,null,$reqdata['start'].'#'.$reqdata['length'])->result();
+            }else{
+                $result = $this->General_model->fetchData("db_employees.log_access_content",$param)->result();
+            }
+            $json_data = array(
+                "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : null) ),
+                "recordsTotal"    => intval($TotalData),
+                "recordsFiltered" => intval($TotalData),
+                "data"            => (!empty($result) ? $result : 0)
+            );
+
+        }
+        $response = $json_data;
+        echo json_encode($response);
+    }
+
+
+    public function checkHasAnAccess(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            //Check division
+            $isExist = $this->General_model->fetchData("db_employees.log_access_content",array("DivisiID"=>"NA.".$data_arr['DivisiID'],"TypeContent"=>$data_arr['TypeContent']))->row();
+            if(!empty($isExist)){
+                $json = $isExist;
+            }
+        }
+        echo json_encode($json);
     }
 
     /*END ADDED BY FEBRI @ MARCH 2020*/

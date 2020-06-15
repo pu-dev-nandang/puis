@@ -2811,6 +2811,36 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
 
     public function userKB($IDDivision = ''){
+        //UPDATED BY FEBRI @ JUNE 2020
+        $myNIP = $this->session->userdata('NIP');
+        $result = array();
+        $condition = array("IDDivision"=>$IDDivision);
+        $this->db->select("a.ID, a.Type, a.IDDivision, b.ID as KBID, b.Desc, b.File");
+        $this->db->from("db_employees.kb_type a");
+        $this->db->join("db_employees.knowledge_base b","b.IDType = a.ID","left");
+        $this->db->where($condition);
+        $queryKBType = $this->db->get();
+        $resultKBType = $queryKBType->result();
+        if(!empty($resultKBType)){
+            $arr = array();
+            foreach ($resultKBType as $key => $item) {
+                //count read article
+                //var_dump($item->KBID);die();
+                if(!empty($item->KBID)){
+                    $sqlRead = "select count(NIP) as Total from db_employees.log_countable_content where NIP = {$myNIP} and TypeContent = 'knowledge_base' and ContentID = ".$item->KBID;
+                    //echo $sqlRead;
+                    $runQuery = $this->db->query($sqlRead);
+                    $item->CountRead = $runQuery->row();
+                   $arr[$item->Type][$key] = $item;
+               }
+            }
+            $result = $arr;
+        }
+
+        return $result;
+        //END UPDATED
+
+        /* #OLD QUERY#
         $arr_result = array();
         $Q_add = ($IDDivision == '') ? '' : ' where kt.IDDivision = "'.$IDDivision.'" ';
         $sql = 'select kb.*,kt.Type as TypeName from db_employees.knowledge_base as kb
@@ -2867,6 +2897,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         //print_r($arr_result);die;
         return $arr_result;
+        #END QUERY# */
 
     }
 
