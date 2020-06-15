@@ -813,6 +813,32 @@ class C_api_prodi extends CI_Controller {
         return print_r(json_encode($data));
 
     }
+    public function GetDataContentKnowledge(){
+        $data_arr = $this->getInputToken2();       
+        $LangCode = $data_arr['LangCode'];        
+        $ProdiID = $data_arr['ProdiID'];
+        $Type = $data_arr['Type'];
+        $IDCat = $data_arr['IDCat'];
+        // print_r($IDCat);die();
+        if($IDCat==''){
+
+            $data = $this->db->query('SELECT pt.*, l.language, ck.Name FROM db_prodi.prodi_texting pt 
+                                            LEFT JOIN db_prodi.language l ON (l.ID = pt.LangID)
+                                            LEFT JOIN db_prodi.category_knowledge ck ON (ck.ID = pt.ID_CatBase)
+                                            WHERE pt.ProdiID = "'.$ProdiID.'"
+                                            AND pt.Type = "'.$Type.'" ')->result_array();
+        }else{
+            
+            $data = $this->db->query('SELECT pt.*, l.language, ck.Name FROM db_prodi.prodi_texting pt 
+                                            LEFT JOIN db_prodi.language l ON (l.ID = pt.LangID)
+                                            LEFT JOIN db_prodi.category_knowledge ck ON (ck.ID = pt.ID_CatBase)
+                                            WHERE pt.ProdiID = "'.$ProdiID.'"
+                                            AND pt.Type = "'.$Type.'" 
+                                            AND pt.ID_CatBase="'.$IDCat.'" ')->result_array();
+        }
+        // print_r($data);die();
+        return print_r(json_encode($data));
+    }
 
     function getDetailProdi(){
         $data_arr = $this->getInputToken2();
