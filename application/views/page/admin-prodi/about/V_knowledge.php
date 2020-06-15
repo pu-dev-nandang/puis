@@ -733,8 +733,8 @@
                 
                 $('#btnSave').text('Save'); //change button text
                 $('#btnSave').attr('disabled',false); //set button enable 
-                $('#modal_form').modal('hidden');   
-                edit_prodi(id);
+                // $('#modal_form').modal('hidden');   
+                // edit_prodi(id);
             },
             error: function (jqXHR, textStatus, errorThrown)
             {
