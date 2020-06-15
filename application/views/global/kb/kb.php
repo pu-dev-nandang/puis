@@ -34,10 +34,23 @@
 
 </style>
 <div class="row">
-    <div class="col-md-3 panel-admin" style="border-right: 1px solid #CCCCCC;">
-<?php if (true){ ?>
-     <div class="panel panel-default">
-        <div class="panel-heading"></div>
+    <div class="col-md-3" style="border-right: 1px solid #CCCCCC;">
+      <div class="panel panel-default hidden" id="panel-admin">
+         <div class="panel-heading"><h4 class="panel-title">Admin tools</h4></div>
+         <div class="panel-body text-center">
+          <div class="btn-group">
+            <?php if ($this->session->userdata('PositionMain')['IDDivision']=='12'){ ?>
+            <button class="btn btn-sm btn-info" type="button" onclick="location.href='<?=base_url('admin-log-config/user_qna')?>'"><i class="fa fa-wrench"></i> Access Config</button>          
+            <?php } ?>
+            <button class="btn btn-sm btn-success btn-log-view hidden" type="button" onclick="location.href='<?=base_url('admin-log-content/user_qna')?>'"><i class="fa fa-history"></i> Logs of employee</button>
+          </div>
+         </div>
+      </div>
+
+     <div class="panel panel-default hidden" id="panel-form">
+        <div class="panel-heading">
+          <h4 class="panel-title"><i class="fa fa-edit"></i> Form Guideline Knowledge Base</h4>
+        </div>
         <div class="panel-body">
           <div class="form-group hide">
             <label>Division</label>
@@ -72,9 +85,9 @@
 
       </div>
     </div>
-    <div class="col-md-9">
+    <div class="col-md-9" id="user-panel">
       <div class="row">
-        <div class="col-md-4 col-md-offset-4">
+        <div class="col-md-4">
             <div class="well">
               <div class="form-group">
                 <label>Division</label>
@@ -89,48 +102,51 @@
       </div>
       <div class="row">
         <div id="viewkb" class="col-md-12">
-              <ul class="list-group" id="headerlist">
-                <?php for($i = 0; $i < count($G_data); $i++): ?>
-                  <?php $no = $i+1 ?>
-                    <li class="list-group-item item-head">
-                                      <a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i ?>">
-                                          <span class="numbering"><b><?php echo $no; ?></b></span>
-                                          <span class="info"><b><?php echo $G_data[$i]['Type']?></b></span>
-                                      </a>
+          <ul class="list-group" id="headerlist">
+          <!-- UPDATED CODE BY FEBRI @ JUNE 2020 -->
+          <?php if(!empty($G_data)){ $num=1;
+           foreach ($G_data as $key => $value) { ?>
+           <li class="list-group-item item-head">
+              <a href="javascript:void(0)" data-toggle="collapse" data-target="#kb-<?=$num ?>">
+                  <span class="numbering"><b><?=$num; ?></b></span>
+                  <span class="info"><b><?=$key?></b></span>
+              </a>
 
-                      <div id="<?php echo $i ?>" class="collapse detailKB">
-                        <ul class="list-group">
-                          <?php $data = $G_data[$i]['data'] ?>
-                          <?php for($j = 0; $j < count($data); $j++): ?>
-                            <li class="list-group-item" data-contentid="<?=$data[$j]['ID']?>" data-type="knowledge_base">
-                              ...<a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i.'__'.$j ?>">
-                                              <b><?php echo $data[$j]['Desc'] ?></b>
-                                              <span class="pull-right viewers">
-                                              <?php if(!empty($data[$j]['CountRead']->Total)){ ?>
-                                              <span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read"><?=$data[$j]['CountRead']->Total?></span> times</span>
-                                              <?php } ?>
-                                              </span>
-                                          </a>
-                              <div id="<?php echo $i.'__'.$j ?>" class="collapse">
-                                <div style="margin-top: 15px;margin-bottom: 15px;">
-                                  <a class="btn btn-default <?php if($data[$j]['File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/kb-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> File</a>
-                                    <?php if ($selected ==$this->session->userdata('PositionMain')['IDDivision']): ?>
-                                      <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
-                                    <?php endif; ?>
-                                </div>
-                              </div>
-                            </li>
-                          <?php endfor ?>
-                        </ul>
+              <div id="kb-<?=$num?>" class="collapse detailKB">
+                <ul class="list-group">
+                  <?php foreach ($value as $v) {?>
+                  <li class="list-group-item" data-contentid="<?=$v->KBID?>" data-type="knowledge_base">
+                    <a href="javascript:void(0)" data-toggle="collapse" data-target="#KBC-<?=$v->KBID?>">
+                        <b><?=$v->Desc?></b>
+                        <span class="pull-right viewers">
+                        <?php if(!empty($v->CountRead->Total)){ ?>
+                        <span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read"><?=$v->CountRead->Total?></span> times</span>
+                        <?php } ?>
+                        </span>
+                    </a>
+
+                    <div id="KBC-<?=$v->KBID ?>" class="collapse">
+                      <div style="margin-top: 15px;margin-bottom: 15px;">
+                        <a class="btn btn-default <?php if(empty($v->File) ? 'hide':'') ?>" style="display: inline;" href="<?= serverRoot.'/fileGetAny/kb-'.$v->File ?>" target="_blank">
+                          <i class="fa fa-download margin-right"></i> File
+                        </a>
+                        <?php if ($selected == $this->session->userdata('PositionMain')['IDDivision']): ?>
+                          <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $v->KBID; ?>" data-no="'+i+'">Remove</a>
+                        <?php endif; ?>
                       </div>
-                    </li>
-                  <?php endfor ?>
-              </ul>
+                    </div>
+                  </li>
+                  <?php } ?>
+                </ul>
+              </div>
+            </li>
+          <?php $num++; } } ?>
+          </ul>
+          <!-- END UPDATED CODE BY FEBRI @ JUNE 2020 -->
         </div>
       </div>
     </div>
   </div>
-<?php } ?>
 
 
 <script type="text/javascript">
@@ -437,6 +453,33 @@ $('#saveFormKB').click(function () {
 
 <!-- ADDED BY FEBRI @ JUNE 2020 -->
 <script type="text/javascript">
+  function checkHasAccess() {
+    var result = [];
+    var dataPost = {
+      DivisiID : "<?=$this->session->userdata('IDdepartementNavigation')?>",
+      TypeContent : 'knowledge_base'
+    }
+    var token = jwt_encode(dataPost,'UAP)(*');
+    $.ajax({
+        type : 'POST',
+        url : base_url_js+"user-access-content",
+        data : {token:token},
+        dataType : 'json',
+        async: false, 
+        beforeSend :function(){},
+        error : function(jqXHR){
+          $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                    '<h4 class="modal-title">Error !</h4>');
+          $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+          $('body #GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+          $("body #GlobalModal").modal("show");
+        },success : function(response){
+          result = response;
+        }
+    });
+
+    return result;
+  }
   $(document).ready(function(){
     $("#viewkb").on('click','.detailKB .list-group-item',function(){
       var itsme = $(this);
@@ -464,19 +507,29 @@ $('#saveFormKB').click(function () {
           console.log(response);
           if(!jQuery.isEmptyObject(response)){
             if(response.finish){
-              if(itsme.hasClass(".total-read")){
-                var lastNum = itsme.find(".total-read").text();
-                lastNum = parseInt(lastNum) + 1;
-                itsme.find(".total-read").text(lastNum);
-              }else{
-                itsme.find(".viewers").html('<span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read">1</span> times</span>');
-              }
-              
+              itsme.find(".viewers").html('<span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read">'+response.count+'</span> times</span>');             
             }
           }
         }
     });
     });
+
+    var HasAnAccess = checkHasAccess();
+    if(!jQuery.isEmptyObject(HasAnAccess)){
+      if(HasAnAccess.IsLogEmp == 'Y'){
+        $("#panel-admin, .btn-log-view").removeClass('hidden');
+      }else{
+        $("#panel-admin, .btn-log-view").addClass('hidden');        
+      }
+      if(HasAnAccess.IsCreateGuide == 'Y'){
+        $("#panel-form").removeClass('hidden');
+        $("#user-panel").removeClass("col-md-12").addClass("col-md-9");
+      }else{
+        $("#user-panel").removeClass("col-md-9").addClass("col-md-12");
+        $("#panel-form").addClass('hidden');
+      }
+
+    }
   });
 </script>
 <!-- END ADDED BY FEBRI @ JUNE 2020 -->
