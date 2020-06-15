@@ -40,9 +40,9 @@
          <div class="panel-body text-center">
           <div class="btn-group">
             <?php if ($this->session->userdata('PositionMain')['IDDivision']=='12'){ ?>
-            <button class="btn btn-sm btn-info" type="button" onclick="location.href='<?=base_url('admin-log-config/user_qna')?>'"><i class="fa fa-wrench"></i> Access Config</button>          
+            <button class="btn btn-sm btn-info" type="button" onclick="location.href='<?=base_url('admin-log-config/knowledge_base')?>'"><i class="fa fa-wrench"></i> Access Config</button>          
             <?php } ?>
-            <button class="btn btn-sm btn-success btn-log-view hidden" type="button" onclick="location.href='<?=base_url('admin-log-content/user_qna')?>'"><i class="fa fa-history"></i> Logs of employee</button>
+            <button class="btn btn-sm btn-success btn-log-view hidden" type="button" onclick="location.href='<?=base_url('admin-log-content/knowledge_base')?>'"><i class="fa fa-history"></i> Logs of employee</button>
           </div>
          </div>
       </div>
