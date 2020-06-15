@@ -143,8 +143,7 @@ class C_react_mobile extends CI_Controller {
          $timestamp = date('Y-m-d H:i:s');
          $start_date = date($timestamp);
          $expires = strtotime('+30 days', strtotime($timestamp));
-         $date_diff=($expires-strtotime($timestamp)) / 86400;
-         $rs['callback']['expiresIn'] = $date_diff;
+         $rs['callback']['expiresIn'] = $expires;
       }
 
       echo json_encode($rs);
