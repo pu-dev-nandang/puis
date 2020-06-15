@@ -106,8 +106,9 @@ class C_react_mobile extends CI_Controller {
                  for ($j=0; $j < count($Auth_prodi); $j++) { 
                    $ProdiID =  $Auth_prodi[$i];
                    $d = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                   $DepartmenID = 'AC.'.$ProdiID;
                    $DeptList[] = [
-                    'DepartmenID' => $DepartmenID = 'AC.'.$ProdiID,
+                    'DepartmenID' => $DepartmenID,
                     'DepartmentName' => 'Prodi '.$d[0]['Name'],
                     'As' => $As($NIP,$DepartmenID)
                    ];
@@ -121,15 +122,17 @@ class C_react_mobile extends CI_Controller {
               $a_ID = $this->m_master->caribasedprimary('db_academic.faculty','AdminID',$NIP);
               $k_ID = $this->m_master->caribasedprimary('db_academic.faculty','NIP',$NIP);
               if (count($a_ID) > 0) {
+                $DepartmenID = 'FT.'.$a_ID[0]['ID'];
                   $DeptList[] = [
-                   'DepartmenID' => $DepartmenID = 'FT.'.$a_ID[0]['ID'],
+                   'DepartmenID' => $DepartmenID,
                    'DepartmentName' => 'Fakultas '.$a_ID[0]['Name'],
                    'As' => $As($NIP,$DepartmenID)
                   ];
               }
               elseif (count($k_ID) > 0) {
+                $DepartmenID = 'FT.'.$k_ID[0]['ID'];
                   $DeptList[] = [
-                   'DepartmenID' => $DepartmenID = 'FT.'.$k_ID[0]['ID'],
+                   'DepartmenID' => $DepartmenID,
                    'DepartmentName' => 'Fakultas '.$k_ID[0]['Name'],
                    'As' => $As($NIP,$DepartmenID)
                   ];
@@ -141,8 +144,9 @@ class C_react_mobile extends CI_Controller {
                $DeptDiv = $this->db->query(
                   'select * from db_employees.division where ID = '.$RuleUser[$i]['IDDivision'].'  '
                )->result_array();
+               $DepartmenID = 'NA.'.$DeptDiv[0]['ID']
                $DeptList[] = [
-                'DepartmenID' => $DepartmenID = 'NA.'.$DeptDiv[0]['ID'] ,
+                'DepartmenID' => $DepartmenID,
                 'DepartmentName' => $DeptDiv[0]['Division'],
                 'As' => $As($NIP,$DepartmenID)
                ];
