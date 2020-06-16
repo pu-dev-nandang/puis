@@ -47,7 +47,7 @@
          </div>
       </div>
 
-     <div class="panel panel-default hidden" id="panel-form">
+     <div class="panel panel-default hiddens" id="panel-form">
         <div class="panel-heading">
           <h4 class="panel-title"><i class="fa fa-edit"></i> Form Guideline Knowledge Base</h4>
         </div>
@@ -521,13 +521,13 @@ $('#saveFormKB').click(function () {
       }else{
         $("#panel-admin, .btn-log-view").addClass('hidden');        
       }
-      if(HasAnAccess.IsCreateGuide == 'Y'){
+      /*if(HasAnAccess.IsCreateGuide == 'Y'){
         $("#panel-form").removeClass('hidden');
         $("#user-panel").removeClass("col-md-12").addClass("col-md-9");
       }else{
         $("#user-panel").removeClass("col-md-9").addClass("col-md-12");
         $("#panel-form").addClass('hidden');
-      }
+      }*/
 
     }
   });
