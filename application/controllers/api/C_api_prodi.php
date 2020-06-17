@@ -819,22 +819,37 @@ class C_api_prodi extends CI_Controller {
         $ProdiID = $data_arr['ProdiID'];
         $Type = $data_arr['Type'];
         $IDCat = $data_arr['IDCat'];
-        // print_r($IDCat);die();
+        // print_r($LangCode);
+
+        $rs= [];
+        $dataKnowledge = $this->db->query(
+            'select * from db_prodi.category_knowledge'
+        )->result_array();
+
+        for ($i=0; $i < count($dataKnowledge) ; $i++) { 
+            $dataProdiText = $this->db->query(
+                'select Title,File from db_prodi.prodi_texting as pt
+                where pt.ID_CatBase = '.$IDCat.' and 
+
+                '
+            )->result_array();
+        }
+
         if($IDCat==''){
 
-            $data = $this->db->query('SELECT pt.*, l.language, ck.Name FROM db_prodi.prodi_texting pt 
-                                            LEFT JOIN db_prodi.language l ON (l.ID = pt.LangID)
-                                            LEFT JOIN db_prodi.category_knowledge ck ON (ck.ID = pt.ID_CatBase)
-                                            WHERE pt.ProdiID = "'.$ProdiID.'"
-                                            AND pt.Type = "'.$Type.'" ')->result_array();
+            $data = $this->db->query('SELECT cat.ID as IDCat,cat.Name,pt.ProdiID,COUNT(pt.ID_CatBase) jml, pt.* FROM db_prodi.category_knowledge cat 
+                                        LEFT JOIN ( select pt2.* from db_prodi.prodi_texting as pt2 
+                                        LEFT JOIN db_prodi.language l ON (l.ID = pt2.LangID) 
+                                        WHERE l.Code LIKE "'.$LangCode.'" AND pt2.ProdiID="'.$ProdiID.'" AND pt2.Type = "'.$Type.'") pt on cat.ID=pt.ID_CatBase
+                                        GROUP BY cat.ID,cat.Name')->result_array();
         }else{
             
-            $data = $this->db->query('SELECT pt.*, l.language, ck.Name FROM db_prodi.prodi_texting pt 
-                                            LEFT JOIN db_prodi.language l ON (l.ID = pt.LangID)
-                                            LEFT JOIN db_prodi.category_knowledge ck ON (ck.ID = pt.ID_CatBase)
-                                            WHERE pt.ProdiID = "'.$ProdiID.'"
-                                            AND pt.Type = "'.$Type.'" 
-                                            AND pt.ID_CatBase="'.$IDCat.'" ')->result_array();
+            $data = $this->db->query('SELECT cat.ID as IDCat,cat.Name,pt.ProdiID,COUNT(pt.ID_CatBase) jml, pt.* FROM db_prodi.category_knowledge cat 
+                                        LEFT JOIN ( select pt2.* from db_prodi.prodi_texting as pt2 
+                                        LEFT JOIN db_prodi.language l ON (l.ID = pt2.LangID) 
+                                        WHERE l.Code LIKE "'.$LangCode.'" AND pt2.ProdiID="'.$ProdiID.'" AND pt2.Type = "'.$Type.'" 
+                                        AND pt2.ID_CatBase="'.$IDCat.'") pt on cat.ID=pt.ID_CatBase
+                                        GROUP BY cat.ID,cat.Name')->result_array();
         }
         // print_r($data);die();
         return print_r(json_encode($data));
