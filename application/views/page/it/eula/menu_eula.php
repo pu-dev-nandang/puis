@@ -5,10 +5,13 @@
             <?php $activeMenu = $this->uri->segment(1); ?>
             <ul class="nav nav-tabs">
                 <li class="<?= ($this->uri->segment(3) == 'list-eula') ? 'active' : '' ?>">
-                    <a href="<?php echo base_url('it/eula/list-eula'); ?>">List</a>
+                    <a href="<?php echo base_url('it/eula/list-eula'); ?>">Master Eula</a>
+                </li>
+                <li class="<?= ($this->uri->segment(3) == 'date-eula' ) ? 'active' : '' ?>">
+                    <a href="<?php echo base_url('it/eula/date-eula'); ?>">Publication Date</a>
                 </li>
                 <li class="<?= ($this->uri->segment(3) == 'create-eula' ) ? 'active' : '' ?>">
-                    <a href="<?php echo base_url('it/eula/create-eula'); ?>">Create / Edit</a>
+                    <a href="<?php echo base_url('it/eula/create-eula'); ?>">Create / Edit Eula</a>
                 </li>
             </ul>
 
