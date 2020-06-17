@@ -1030,11 +1030,13 @@ class C_api4 extends CI_Controller {
                 $queue = count($dataCk1) + 1;
 
                 if(count($dataBefore)>0){
+                    $newQueue = ($dataBefore[0]['PublishedAt']==$data_arr['EmpDate'])
+                        ? $dataBefore[0]['Queue'] :  $queue;
                     $ID_EPL = $dataBefore[0]['ID'];
                     $this->db->where('ID', $ID_EPL);
                     $this->db->update('db_it.eula_publish_list',array(
                         'PublishedAt' => $data_arr['EmpDate'],
-                        'Queue' => $queue
+                        'Queue' => $newQueue
                     ));
                 }
                 else {
@@ -1073,11 +1075,14 @@ class C_api4 extends CI_Controller {
 
                 if(count($dataStdBefore)>0){
 
+                    $newQueue = ($dataStdBefore[0]['PublishedAt']==$data_arr['EmpDate'])
+                        ? $dataStdBefore[0]['Queue'] :  $queue;
+
                     $ID_EPL = $dataStdBefore[0]['ID'];
                     $this->db->where('ID', $ID_EPL);
                     $this->db->update('db_it.eula_publish_list',array(
                         'PublishedAt' => $data_arr['StdDate'],
-                        'Queue' => $queue
+                        'Queue' => $newQueue
                     ));
 
                 } else {
@@ -1150,20 +1155,10 @@ class C_api4 extends CI_Controller {
         }
         else if($data_arr['action']=='updateQueueEula'){
 
-            if(count($data_arr['listEmp'])>0){
-                for($i=0;$i<count($data_arr['listEmp']);$i++){
-                    $this->db->where('ID', $data_arr['listEmp'][$i]);
-                    $this->db->update('db_it.eula_publish_list',array('Queue' => ($i+1) ));
-                    $this->db->reset_query();
-                }
-            }
-
-            if(count($data_arr['listStd'])>0){
-                for($i=0;$i<count($data_arr['listStd']);$i++){
-                    $this->db->where('ID', $data_arr['listStd'][$i]);
-                    $this->db->update('db_it.eula_publish_list',array('Queue' => ($i+1) ));
-                    $this->db->reset_query();
-                }
+            for($i=0;$i<count($data_arr['dataForm']);$i++){
+                $this->db->where('ID', $data_arr['dataForm'][$i]);
+                $this->db->update('db_it.eula_linked',array('Queue' => ($i+1) ));
+                $this->db->reset_query();
             }
 
             return print_r(1);
@@ -1176,6 +1171,184 @@ class C_api4 extends CI_Controller {
                                                 LEFT JOIN db_it.eula_publish_list l2 ON (l2.To="std" AND e.ID = l2.EID)
                                                 WHERE e.ID = "'.$data_arr['ID'].'" ')->result_array();
             return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='updatePublicationDate'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+            // Cek apakah tanggal bentrok atau tidak
+            $Start = $dataForm['RangeStart'];
+            $End = $dataForm['RangeEnd'];
+
+            $WhereCkID = ($ID!='') ? 'ed.ID!= "'.$ID.'" AND ' : '';
+
+            $dataCk = $this->db->query('SELECT * FROM db_it.eula_date ed WHERE ed.To = "'.$dataForm['To'].'" AND '.$WhereCkID.' ( 
+                                                        (ed.RangeStart>="' . $Start . '" AND ed.RangeStart<="' . $End . '") OR 
+                                                        (ed.RangeStart<="' . $Start . '" AND ed.RangeEnd>="' . $End . '") OR 
+                                                        (ed.RangeEnd>="' . $Start . '" AND ed.RangeEnd<="' . $End . '") OR
+                                                        (ed.RangeStart>="' . $Start . '" AND ed.RangeEnd<="' . $End . '")
+                                                        )')
+                ->result_array();
+
+            if(count($dataCk)<=0){
+
+                if($ID!=''){
+                    // Update
+                    $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                    $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->where('ID',$ID);
+                    $this->db->update('db_it.eula_date',$dataForm);
+
+                    $result = array(
+                        'Status' => 1,
+                        'Message' => 'Data updated'
+                    );
+
+                } else {
+                    // Insert
+                    $dataForm['CreatedBy'] = $this->session->userdata('NIP');
+                    $dataForm['CreatedAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->insert('db_it.eula_date',$dataForm);
+
+                    $result = array(
+                        'Status' => 1,
+                        'Message' => 'Data saved'
+                    );
+                }
+
+
+
+            } else {
+                $result = array(
+                    'Status' => 0,
+                    'Message' => 'Conflict',
+                    'Details' => $dataCk
+                );
+            }
+
+
+
+            return print_r(json_encode($result));
+
+        }
+        else if($data_arr['action']=='getListEULAInPD'){
+            $ID = $data_arr['ID'];
+
+            $data = $this->db->query('SELECT el.*, e.Title FROM db_it.eula_linked el 
+                                                LEFT JOIN db_it.eula e ON (e.ID = el.EID)
+                                                WHERE el.EDID = "'.$ID.'" ORDER BY el.Queue ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='getEULASearch'){
+            $key = $data_arr['key'];
+            $EDID = $data_arr['EDID'];
+            $data = $this->db->query('SELECT e.ID,e.Title FROM db_it.eula e 
+                                                        WHERE e.Title LIKE "%'.$key.'%"
+                                                        AND e.ID NOT IN (SELECT EID FROM db_it.eula_linked WHERE EDID = "'.$EDID.'" ) 
+                                                        GROUP BY e.ID
+                                                        LIMIT 7')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='addTOListPD'){
+            $EID = $data_arr['EID'];
+            $EDID = $data_arr['EDID'];
+
+            $dataCK = $this->db->query('SELECT COUNT(*) AS Total FROM db_it.eula_linked 
+                                        WHERE EDID = "'.$EDID.'" ')->result_array()[0]['Total'];
+
+            $Queue = $dataCK + 1;
+            $dataIns = array(
+                'EID' => $EID,
+                'EDID' => $EDID,
+                'Queue' => $Queue
+            );
+
+            $this->db->insert('db_it.eula_linked',$dataIns);
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='removeFromListEULAInPD'){
+            $this->db->where('ID', $data_arr['ID']);
+            $this->db->delete('db_it.eula_linked');
+            return print_r(1);
+        }
+        else if($data_arr['action']=='getListPublicationDate'){
+
+            $requestData = $_REQUEST;
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataScr = '(e.Title LIKE "%'.$search.'%" OR e.Description LIKE "%'.$search.'%")';
+
+                $dataSearch = ($data_arr['FilterPortal']!='' || $data_arr['FilterDate']!='') ? ' AND '.$dataScr : ' WHERE '.$dataScr;
+            }
+
+            $queryDefault = 'SELECT * FROM db_it.eula_date ed';
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+
+                $Published = ($row['Published']=='1')
+                    ? '<span class="label label-success">Published</span>' : '<span class="label label-default">Unpublished</span>';
+
+                $BtnAct = '<div class="btn-group">
+                          <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-edit"></i> <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li><a href="javascript:void(0);" data-pdid="'.$row['ID'].'" class="btnEditDate">Edit Date</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="javascript:void(0);" data-pdid="'.$row['ID'].'" class="btnEditListEula">List EULA</a></li>
+                          </ul>
+                        </div>';
+
+                $viewCountEula = $this->db->query('SELECT COUNT(*) AS Total FROM db_it.eula_linked 
+                                                                    WHERE EDID = "'.$row['ID'].'" ')
+                                        ->result_array()[0]['Total'];
+
+                $nestedData[] = '<div>'.$no.'<textarea class="hide" id="dataPD_'.$row['ID'].'">'.json_encode($row).'</textarea></div>';
+                $nestedData[] = '<div>'.date('d M Y',strtotime($row['RangeStart'])).'</div>';
+                $nestedData[] = '<div>'.date('d M Y',strtotime($row['RangeEnd'])).'</div>';
+                $nestedData[] = '<div>'.$row['To'].'</div>';
+                $nestedData[] = '<div>'.$Published.'</div>';
+                $nestedData[] = '<div>'.$BtnAct.'</div>';
+                $nestedData[] = '<div><a href="javascript:void(0);" class="viewDetailEULA" data-edid="'.$row['ID'].'">'.$viewCountEula.'</a></div>';
+
+
+//            $nestedData[] = '<div style="text-align: left;">'.$viewLink.$tokenText.'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval( $queryDefaultRow),
+                "data"            => $data,
+                "dataQuery"            => $query
+            );
+            echo json_encode($json_data);
 
         }
     }
