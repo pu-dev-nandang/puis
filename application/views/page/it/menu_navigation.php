@@ -261,6 +261,12 @@
                     Console Developer
                 </a>
             </li>
+            <li class="<?php if($this->uri->segment(2)=='eula'){echo"current";}?>">
+                <a href="<?php echo base_url('it/eula/list-eula');?>">
+                    <i class="fa fa-file-text-o"></i>
+                    Eula
+                </a>
+            </li>
             <!-- ADDED BY FEBRI @ JAN 2020 -->
             <li class="<?php if($this->uri->segment(2)=='generate-edom'){echo"current";}?>">
                 <a href="<?php echo base_url('it/generate-edom');?>">

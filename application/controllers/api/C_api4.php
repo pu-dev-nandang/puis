@@ -919,13 +919,13 @@ class C_api4 extends CI_Controller {
             if($ID!=''){
                 // Update
                 $this->db->where('ID', $ID);
-                $this->db->update('block',$dataForm);
+                $this->db->update('db_academic.block',$dataForm);
                 $this->db->reset_query();
                 $insert_id = $ID;
             } else {
                 $dataForm['CreatedBy'] = $this->session->userdata('NIP');
                 $dataForm['CreatedAt'] = $this->m_rest->getDateTimeNow();
-                $this->db->insert('block',$dataForm);
+                $this->db->insert('db_academic.block',$dataForm);
                 $insert_id = $this->db->insert_id();
                 $this->db->reset_query();
             }
@@ -976,6 +976,288 @@ class C_api4 extends CI_Controller {
 
             return print_r(1);
         }
+
+    }
+
+    public function crudEula(){
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='updateDataEula'){
+
+            $ID = $data_arr['ID'];
+
+            $dataForm = array(
+                'Title' => $data_arr['Title'],
+                'Description' => $data_arr['Description'],
+                'SummernoteID' => $data_arr['SummernoteID']
+            );
+
+            if($ID!=''){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_it.eula',$dataForm);
+                $insert_id = $ID;
+                $this->db->reset_query();
+            }
+            else {
+                $dataForm['CreatedBy'] = $this->session->userdata('NIP');
+                $dataForm['CreatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->insert('db_it.eula',$dataForm);
+                $insert_id = $this->db->insert_id();
+                $this->db->reset_query();
+            }
+
+            // Update EPL
+            // Cek tanggal untuk Emp
+            if($data_arr['EmpDate']!=''){
+
+                $dataBefore = $this->db->get_where('db_it.eula_publish_list',
+                                                array(
+                                                    'EID' => $insert_id,
+                                                    'To' => 'emp'
+                                                ))->result_array();
+
+                $dataCk1 = $this->db
+                    ->get_where('db_it.eula_publish_list',
+                        array(
+                            'PublishedAt' => $data_arr['EmpDate'],
+                            'To' => 'emp'
+                        ))
+                    ->result_array();
+
+                $queue = count($dataCk1) + 1;
+
+                if(count($dataBefore)>0){
+                    $ID_EPL = $dataBefore[0]['ID'];
+                    $this->db->where('ID', $ID_EPL);
+                    $this->db->update('db_it.eula_publish_list',array(
+                        'PublishedAt' => $data_arr['EmpDate'],
+                        'Queue' => $queue
+                    ));
+                }
+                else {
+
+                    $this->db->insert('db_it.eula_publish_list',array(
+                        'EID' => $insert_id,
+                        'PublishedAt' => $data_arr['EmpDate'],
+                        'To' => 'emp',
+                        'Queue' => $queue
+                    ));
+                }
+
+
+
+            }
+
+            if($data_arr['StdDate']!=''){
+
+                $dataStdBefore = $this->db
+                    ->get_where('db_it.eula_publish_list',
+                        array(
+                            'EID' => $insert_id,
+                            'To' => 'std'
+                        ))
+                    ->result_array();
+
+                $dataCk2 = $this->db
+                    ->get_where('db_it.eula_publish_list',
+                        array(
+                            'PublishedAt' => $data_arr['StdDate'],
+                            'To' => 'std'
+                        ))
+                    ->result_array();
+
+                $queue = count($dataCk2) + 1;
+
+                if(count($dataStdBefore)>0){
+
+                    $ID_EPL = $dataStdBefore[0]['ID'];
+                    $this->db->where('ID', $ID_EPL);
+                    $this->db->update('db_it.eula_publish_list',array(
+                        'PublishedAt' => $data_arr['StdDate'],
+                        'Queue' => $queue
+                    ));
+
+                } else {
+
+                    $this->db->insert('db_it.eula_publish_list',array(
+                        'EID' => $insert_id,
+                        'PublishedAt' => $data_arr['StdDate'],
+                        'To' => 'std',
+                        'Queue' => $queue
+                    ));
+
+                }
+
+
+            }
+
+
+            // Cek image in summernote
+            $dataSummernoteImg = $this->db->get_where('db_it.summernote_image',array( 'SummernoteID' => $data_arr['SummernoteID']))->result_array();
+            if(count($dataSummernoteImg)>0){
+                for($s=0;$s<count($dataSummernoteImg);$s++){
+                    $dataCk = $this->db
+                        ->query('SELECT COUNT(*) AS Total FROM db_it.eula WHERE Description LIKE "%'.$dataSummernoteImg[$s]['Image'].'%" ')
+                        ->result_array();
+
+                    if($dataCk[0]['Total']<=0){
+                        $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
+                        if(file_exists($file_path)){
+                            unlink($file_path);
+                            // Delete data
+                            $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
+                            $this->db->delete('db_it.summernote_image');
+                        }
+                    } else {
+                        $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
+                        $this->db->update('db_it.summernote_image',array('Status'=>'1'));
+                    }
+
+
+
+                }
+            }
+
+            return print_r(json_encode(array('ID'=>$insert_id)));
+        }
+        else if($data_arr['action']=='viewListQueueEula'){
+
+            $EmpDate = $data_arr['EmpDate'];
+            $StdDate = $data_arr['StdDate'];
+
+            $dataCk1 = [];
+            $dataCk2 = [];
+
+            if($EmpDate!='') {
+                $dataCk1 = $this->db
+                    ->query('SELECT epl.*, e.Title FROM db_it.eula_publish_list epl LEFT JOIN db_it.eula e ON (e.ID = epl.EID)
+                                        WHERE epl.PublishedAt = "'.$EmpDate.'" AND epl.To = "emp" ORDER BY epl.Queue ASC')
+                                ->result_array();
+            }
+
+            if($StdDate!='') {
+                $dataCk2 = $this->db
+                    ->query('SELECT epl.*, e.Title FROM db_it.eula_publish_list epl LEFT JOIN db_it.eula e ON (e.ID = epl.EID)
+                                        WHERE epl.PublishedAt = "'.$StdDate.'" AND epl.To = "std" ORDER BY epl.Queue ASC')
+                                ->result_array();
+            }
+
+            return print_r(json_encode(array('Emp' => $dataCk1, 'Std' => $dataCk2)));
+
+        }
+        else if($data_arr['action']=='updateQueueEula'){
+
+            if(count($data_arr['listEmp'])>0){
+                for($i=0;$i<count($data_arr['listEmp']);$i++){
+                    $this->db->where('ID', $data_arr['listEmp'][$i]);
+                    $this->db->update('db_it.eula_publish_list',array('Queue' => ($i+1) ));
+                    $this->db->reset_query();
+                }
+            }
+
+            if(count($data_arr['listStd'])>0){
+                for($i=0;$i<count($data_arr['listStd']);$i++){
+                    $this->db->where('ID', $data_arr['listStd'][$i]);
+                    $this->db->update('db_it.eula_publish_list',array('Queue' => ($i+1) ));
+                    $this->db->reset_query();
+                }
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='getDataEula'){
+
+            $data = $this->db->query('SELECT e.*, l1.PublishedAt AS PublishAtEmp, l2.PublishedAt AS PublishAtStd FROM db_it.eula e 
+                                                LEFT JOIN db_it.eula_publish_list l1 ON (l1.To="emp" AND e.ID = l1.EID)
+                                                LEFT JOIN db_it.eula_publish_list l2 ON (l2.To="std" AND e.ID = l2.EID)
+                                                WHERE e.ID = "'.$data_arr['ID'].'" ')->result_array();
+            return print_r(json_encode($data));
+
+        }
+    }
+
+    public function getListEula(){
+
+        $requestData = $_REQUEST;
+
+        $data_arr = $this->getInputToken2();
+
+        $dataWhere = '';
+        if($data_arr['FilterPortal']!='' && $data_arr['FilterDate']!=''){
+            $dataWhere = ' WHERE epl.To = "'.$data_arr['FilterPortal'].'" AND epl.PublishedAt = "'.$data_arr['FilterDate'].'" ';
+        }
+        else if($data_arr['FilterPortal']!='' && $data_arr['FilterDate']==''){
+            $dataWhere = ' WHERE epl.To = "'.$data_arr['FilterPortal'].'" ';
+        }
+        else if($data_arr['FilterPortal']=='' && $data_arr['FilterDate']!=''){
+            $dataWhere = ' WHERE epl.PublishedAt = "'.$data_arr['FilterDate'].'" ';
+        }
+
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataScr = '(e.Title LIKE "%'.$search.'%" OR e.Description LIKE "%'.$search.'%")';
+
+            $dataSearch = ($data_arr['FilterPortal']!='' || $data_arr['FilterDate']!='') ? ' AND '.$dataScr : ' WHERE '.$dataScr;
+        }
+
+        $viewOrderBy = ($data_arr['FilterPortal']!='' || $data_arr['FilterDate']!='' || !empty($requestData['search']['value']))
+            ? ' ORDER BY epl.Queue ASC ' : '';
+
+        $queryDefault = 'SELECT e.* FROM db_it.eula e LEFT JOIN db_it.eula_publish_list epl ON (e.ID = epl.EID) '.$dataWhere.$dataSearch.' GROUP BY e.ID '.$viewOrderBy;
+
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+
+            $nestedData = array();
+            $row = $query[$i];
+
+            // Publish to
+            $dataEmp = $this->db->get_where('db_it.eula_publish_list',array('EID'=>$row['ID'],'To'=>'emp'))->result_array();
+            $viewEmp = (count($dataEmp)>0 && ($data_arr['FilterPortal']=='emp' || $data_arr['FilterPortal']=='') ) ? '<span class="label label-primary">Emp : '.date('d M Y',strtotime($dataEmp[0]['PublishedAt'])).' ('.$dataEmp[0]['Queue'].')</span>' : '';
+
+            $dataStd = $this->db->get_where('db_it.eula_publish_list',array('EID'=>$row['ID'],'To'=>'std'))->result_array();
+            $viewStd = (count($dataStd)>0 && ($data_arr['FilterPortal']=='std' || $data_arr['FilterPortal']=='') ) ? '<span class="label label-success">Std : '.date('d M Y',strtotime($dataStd[0]['PublishedAt'])).' ('.$dataStd[0]['Queue'].')</span>' : '';
+
+
+
+            $nestedData[] = '<div>'.$no.'</div>';
+            $nestedData[] = '<div style="text-align: left;"><div class="panel-title">'.$row['Title'].'</div>
+                                <div class="panel-description">'.$row['Description'].'</div>
+                                </div>';
+            $nestedData[] = '<div style="text-align: left;">'.$viewEmp.' '.$viewStd.' <div style="margin-top: 10px;"><a href="'.base_url('it/eula/create-eula?id=').$row['ID'].'" class="btn btn-sm btn-default">Edit</a></div></div>';
+
+
+//            $nestedData[] = '<div style="text-align: left;">'.$viewLink.$tokenText.'</div>';
+
+            $data[] = $nestedData;
+            $no++;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval( $queryDefaultRow),
+            "data"            => $data,
+            "dataQuery"            => $query
+        );
+        echo json_encode($json_data);
 
     }
 

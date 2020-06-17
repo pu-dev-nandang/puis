@@ -1034,5 +1034,37 @@
         ],'');
      });
 
+     function summernote_UploadImage(element,image,SummernoteID) {
+         var data = new FormData();
+         data.append("image", image);
+         $.ajax({
+             url: "<?= base_url('upload/summernote/upload_image?id=')?>"+SummernoteID,
+             cache: false,
+             contentType: false,
+             processData: false,
+             data: data,
+             type: "POST",
+             success: function(url) {
+                 $(element).summernote("insertImage", url);
+             },
+             error: function(data) {
+                 alert('Error Upload');
+                 console.log(data);
+             }
+         });
+     }
+
+     function summernote_DeleteImage(src) {
+         $.ajax({
+             data: {src : src},
+             type: "POST",
+             url: "<?= base_url('upload/summernote/delete_image')?>",
+             cache: false,
+             success: function(response) {
+                 console.log(response);
+             }
+         });
+     }
+
 
 </script>
