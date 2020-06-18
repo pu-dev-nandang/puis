@@ -548,7 +548,7 @@ class C_prodi extends Prodi_Controler {
                 'ProdiID' => $this->session->userdata('prodi_active_id'),
                 'LangID' =>$this->input->post('lang'),                
                 'ID_CatBase' => $this->input->post('category'), 
-                'Type' => "knowledge",
+                // 'Type' => "knowledge",
                 'Title' => $this->input->post('title'),
                 'Description' => '',
                 'UpdatedAt' => date('Y-m-d H:i:s'),
@@ -560,7 +560,7 @@ class C_prodi extends Prodi_Controler {
             $upload = $this->_do_upload();
             $data['File'] = $upload;
         }
-        $type = $this->input->post('type');
+        $type = 'knowledge';
         $insert = $this->m_home->save($data,$type);
         echo json_encode(array("status" => TRUE));
     }
