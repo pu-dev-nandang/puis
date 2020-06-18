@@ -5340,6 +5340,7 @@ class C_api3 extends CI_Controller {
 
             // added by adhi
             $IDDivision = $this->getDepartmentByNav();
+            /*echo $IDDivision;*/
 
             $data = $this->db->get_where('db_employees.kb_type',array(
                 'IDDivision' => $IDDivision

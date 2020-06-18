@@ -107,6 +107,7 @@ class C_global_informations extends Globalclass {
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchStudentsPS(true,false,$param);
     	$TotalDataPS = (!empty($totalData) ? $totalData->Total : 0);
+        $reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
     	$result = $this->Globalinformation_model->fetchStudentsPS(false,false,$param,$reqdata['start'],$reqdata['length'],$orderBy);
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
@@ -285,6 +286,7 @@ class C_global_informations extends Globalclass {
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchLecturer(true,$param)->row();
     	$TotalData = (!empty($totalData) ? $totalData->Total : 0);
+        $reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
     	$result = $this->Globalinformation_model->fetchLecturer(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
         //var_dump($this->db->last_query());
     	$no = $reqdata['start'] + 1;
@@ -463,6 +465,7 @@ class C_global_informations extends Globalclass {
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchEmployee(true,$param)->row();
     	$TotalData = (!empty($totalData) ? $totalData->Total : 0);
+        $reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
     	$result = $this->Globalinformation_model->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
     	
     	$no = $reqdata['start'] + 1;
@@ -909,6 +912,7 @@ class C_global_informations extends Globalclass {
             $data = array();
             $totalData = $this->Globalinformation_model->fetchSubjectType(true,$param)->row();
             $TotalDataRS = (!empty($totalData) ? $totalData->Total : 0);
+            $reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
             $result = $this->Globalinformation_model->fetchSubjectType(false,$param,(!empty($reqdata['start']) ? $reqdata['start']:0),(!empty($reqdata['length']) ? $reqdata['length'] : 0))->result();
             $json_data = array(
                 "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : 0) ),
@@ -1044,6 +1048,7 @@ class C_global_informations extends Globalclass {
             $data = array();
             $totalData = $this->Globalinformation_model->fetchAccessRole(true,$param)->row();
             $TotalDataRS = (!empty($totalData) ? $totalData->Total : 0);
+            $reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
             $result = $this->Globalinformation_model->fetchAccessRole(false,$param,(!empty($reqdata['start']) ? $reqdata['start']:0),(!empty($reqdata['length']) ? $reqdata['length'] : 0))->result();
             $json_data = array(
                 "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : 0) ),

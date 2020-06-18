@@ -71,17 +71,30 @@ class M_log_content extends CI_Model{
             $lims = " LIMIT {$start},{$limit}"; 
         }
 
+
+        $tablename2=trim(preg_replace('/[^ \w-]/', '', $tablename));
+        
+        $leftJoinTable = ""; $selectC="";
+        if($tablename2 == 'knowledge_base'){
+        	$leftJoinTable = 'LEFT JOIN db_employees.knowledge_base b on a.ContentID = b.ID ';
+        	$leftJoinTable .= 'LEFT JOIN db_employees.kb_type d on d.ID = b.IDType ';
+        	$selectC = 'd.Type as TypeName, b.Desc as Description';
+        }else if($tablename2 == 'user_qna'){
+        	$leftJoinTable = 'LEFT JOIN db_employees.user_qna b on a.ContentID = b.Id';
+        	$selectC = 'b.Type as TypeName, b.Questions as Description';
+        }
+
         if($count){
             $select = "count(a.NIP) as Total";
         }else{
-            $select = "c.NIP, c.`Name`, b.*, DATE_FORMAT(a.ViewedAt,'%d-%M-%Y %H:%i:%s') as ViewedAt";
+            $select = "c.NIP, c.`Name`, DATE_FORMAT(a.ViewedAt,'%d-%M-%Y %H:%i:%s') as ViewedAt, {$selectC} ";
             //$groupby = "GROUP BY a.NIP";
-            $order_by = 'order by a.ViewedAt,b.Type, b.Questions asc';
+            
         }
         
         $string = " select {$select}
 					from db_employees.log_countable_content a
-					LEFT JOIN db_employees.user_qna b on a.ContentID = b.Id
+					{$leftJoinTable}
 					LEFT JOIN db_employees.employees c on c.NIP = a.NIP
                    {$where} {$groupby} {$order_by} {$lims}";
         $value  = $this->db->query($string);
