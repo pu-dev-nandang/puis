@@ -33,9 +33,9 @@
     }
 
 </style>
-<div class="row">
+<div class="row" id = "pageContent">
     <div class="col-md-3" style="border-right: 1px solid #CCCCCC;">
-      <div class="panel panel-default hidden" id="panel-admin">
+     <div class="panel panel-default hidden" id="panel-admin">
          <div class="panel-heading"><h4 class="panel-title">Admin tools</h4></div>
          <div class="panel-body text-center">
           <div class="btn-group">
@@ -47,7 +47,7 @@
          </div>
       </div>
 
-     <div class="panel panel-default hiddens" id="panel-form">
+     <div class="panel panel-default">
         <div class="panel-heading">
           <h4 class="panel-title"><i class="fa fa-edit"></i> Form Guideline Knowledge Base</h4>
         </div>
@@ -55,11 +55,6 @@
           <div class="form-group hide">
             <label>Division</label>
             <input type="text" id="formKB_IDDivision" value="<?= $this->session->userdata('PositionMain')['IDDivision']; ?>">
-            <!-- <select class="select2-select-00 full-width-fix" id="formKB_IDDivision">
-              <?php for($i = 0; $i < count($G_division); $i++): ?>
-                <option value="<?php echo $G_division[$i]['ID'] ?>" > <?php echo $G_division[$i]['Division'] ?> </option>
-              <?php endfor ?>
-             </select> -->
           </div>
           <div class="form-group">
               <label>Type</label>
@@ -82,12 +77,11 @@
               <button class="btn btn-primary" id="saveFormKB">Save</button>
           </div>
         </div>
-
       </div>
     </div>
-    <div class="col-md-9" id="user-panel">
+    <div class="col-md-9">
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4 col-md-offset-4">
             <div class="well">
               <div class="form-group">
                 <label>Division</label>
@@ -101,48 +95,8 @@
         </div>
       </div>
       <div class="row">
-        <div id="viewkb" class="col-md-12">
-          <ul class="list-group" id="headerlist">
-          <!-- UPDATED CODE BY FEBRI @ JUNE 2020 -->
-          <?php if(!empty($G_data)){ $num=1;
-           foreach ($G_data as $key => $value) { ?>
-           <li class="list-group-item item-head">
-              <a href="javascript:void(0)" data-toggle="collapse" data-target="#kb-<?=$num ?>">
-                  <span class="numbering"><b><?=$num; ?></b></span>
-                  <span class="info"><b><?=$key?></b></span>
-              </a>
-
-              <div id="kb-<?=$num?>" class="collapse detailKB">
-                <ul class="list-group">
-                  <?php foreach ($value as $v) {?>
-                  <li class="list-group-item" data-contentid="<?=$v->KBID?>" data-type="knowledge_base">
-                    <a href="javascript:void(0)" data-toggle="collapse" data-target="#KBC-<?=$v->KBID?>">
-                        <b><?=$v->Desc?></b>
-                        <span class="pull-right viewers">
-                        <?php if(!empty($v->CountRead->Total)){ ?>
-                        <span class="text-success"><i class="fa fa-check-square"></i> has bean read <span class="total-read"><?=$v->CountRead->Total?></span> times</span>
-                        <?php } ?>
-                        </span>
-                    </a>
-
-                    <div id="KBC-<?=$v->KBID ?>" class="collapse">
-                      <div style="margin-top: 15px;margin-bottom: 15px;">
-                        <a class="btn btn-default <?php if(empty($v->File) ? 'hide':'') ?>" style="display: inline;" href="<?= serverRoot.'/fileGetAny/kb-'.$v->File ?>" target="_blank">
-                          <i class="fa fa-download margin-right"></i> File
-                        </a>
-                        <?php if ($selected == $this->session->userdata('PositionMain')['IDDivision']): ?>
-                          <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $v->KBID; ?>" data-no="'+i+'">Remove</a>
-                        <?php endif; ?>
-                      </div>
-                    </div>
-                  </li>
-                  <?php } ?>
-                </ul>
-              </div>
-            </li>
-          <?php $num++; } } ?>
-          </ul>
-          <!-- END UPDATED CODE BY FEBRI @ JUNE 2020 -->
+        <div id ="viewkb" class="col-md-12">
+              <ul class="list-group" id="headerlist">...</ul>
         </div>
       </div>
     </div>
@@ -158,7 +112,7 @@
     $('#Division').select2({
 
     });
-
+    $('#Division').trigger('change');  
     loadTypeKB() ;
   });
 
@@ -221,7 +175,7 @@ $('#saveFormKB').click(function () {
           $('#formKB_Type').val('');
           $('#formKB_Desc').val('');
           $('#formKB_File').val('');
-
+          $('#Division').trigger('change');
           }, 500);
 
         });
@@ -243,9 +197,10 @@ $('#saveFormKB').click(function () {
       });
 
   $(document).on('change','#Division', function () {
+    console.log('asdsad');
      var url = base_url_js+"kb";
      var data = {
-      Division : $(this).val(),
+      Division : $(this).find('option:selected').val(),
      };
      $.post(url,data,function (resultJson) {
       $(".list-group").empty();
@@ -322,6 +277,7 @@ $('#saveFormKB').click(function () {
                       $('#btnKBSave').prop('disabled',false).html('Save');
                       $('#formKB_ID').val('');
                       $('#formKB_Type').val('');
+                      
                   },500);
               });
 
@@ -346,13 +302,13 @@ $('#saveFormKB').click(function () {
           var url = base_url_js+'api3/__crudkb';
 
           $.post(url,{token:token},function (jsonResult) {
-            console.log(jsonResult);
+            
 
               $('#listData,#formKBID').empty();
               if(jsonResult.length>0){
 
                   $.each(jsonResult,function (i,v) {
-
+                    console.log(v);
                       $('#listData').append('<tr>' +
                           '<td>'+(i+1)+'</td>' +
                           '<td>'+v.Type+'</td>' +
@@ -450,8 +406,6 @@ $('#saveFormKB').click(function () {
 
 </script>
 
-
-<!-- ADDED BY FEBRI @ JUNE 2020 -->
 <script type="text/javascript">
   function checkHasAccess() {
     var result = [];
@@ -532,4 +486,3 @@ $('#saveFormKB').click(function () {
     }
   });
 </script>
-<!-- END ADDED BY FEBRI @ JUNE 2020 -->

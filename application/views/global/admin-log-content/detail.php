@@ -61,14 +61,14 @@
 								<option value="">-choose one-</option>
 								<?php if(!empty($FType)){
 								foreach ($FType as $v) { ?>
-								<option value="<?=$v->Type?>"><?=$v->Type?></option>
+								<option value="<?=$v->TypeName?>"><?=$v->TypeName?></option>
 								<?php }	} ?>
 							</select>
 						</div>
-						<div class="form-group">
+						<!-- <div class="form-group">
 							<label>Question</label>
 							<input type="text" name="question" class="form-control">
-						</div>
+						</div> -->
 						<div class="row">
 							<div class="col-sm-6">
 								<div class="form-group">
@@ -159,14 +159,14 @@
 				    }
             	},
             	{
-            		"data":"Type",
+            		"data":"TypeName",
             		"render": function (data, type, row, meta) {
             			var label = data;
             			return label;
             		}
             	},
             	{
-            		"data":"Questions",
+            		"data":"Description",
             		"render": function (data, type, row, meta) {
             			var label = data;
             			return label;

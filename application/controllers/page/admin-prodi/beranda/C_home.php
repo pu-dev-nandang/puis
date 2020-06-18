@@ -151,9 +151,6 @@ class C_home extends Prodi_Controler {
         $this->menu_contact($pagecontact);
     }
 
-
-    
-
-            
+   
 }
 

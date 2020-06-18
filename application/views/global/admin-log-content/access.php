@@ -51,9 +51,6 @@
 						<div class="form-group">
 							<label class="checkbox-lb"><input type="checkbox" name="IsLogEmp" value="Y"> access for Logs Employee</label>
 						</div>
-						<div class="form-group">
-							<label class="checkbox-lb"><input type="checkbox" name="IsCreateGuide" value="Y"> access for create Guide Line</label>
-						</div>
 					</div>
 					<div class="panel-footer text-right">
 						<button class="btn btn-sm btn-primary btn-save" type="button">Save changes</button>
@@ -133,7 +130,7 @@
 				    }
             	},
             	{
-            		"data":"DivisiID",
+            		"data":"DivisionName",
             		"render": function (data, type, row, meta) {
             			var label = data;
             			return label;
@@ -157,14 +154,13 @@
             		"data":"IsLogEmp", 
             		"render": function (data, type, row, meta) {
             			var label = ((data == 'Y') ? "Has an access to ":"Doesn't have an access to")+" <b>List of Employee Log</b>";
-            			label += "<br>"+((row.IsCreateGuide == 'Y') ? "Has an access to ":"Doesn't have an access to")+" <b>Create Guideline</b>";
             			return label;
             		}           		
             	},
             	{
             		"data":"ID", 
             		"render": function (data, type, row, meta) {
-            			var label = data;
+            			var label = '<button class="btn btn-sm btn-danger btn-remove" type="button" data-TypeContent="'+row.TypeContent+'" data-id="'+data+'" ><i class="fa fa-trash"></i></button>';
             			return label;
             		}           		
             	},
@@ -209,6 +205,40 @@
             }else{
                 alert("Please fill out the field.");
             }
+		});
+		$("#table-list-data").on("click",".btn-remove",function(){
+			var itsme = $(this);
+			var ID = itsme.data('id');
+			var TypeContent = itsme.data('TypeContent');
+
+			var dataPost = {
+		        ID : ID,
+		        TypeContent : TypeContent
+	      	}
+		        
+	      	var token = jwt_encode(dataPost,'UAP)(*');
+
+	      	$.ajax({
+		        type : 'POST',
+		        url : base_url_js+"admin-access-remove",
+		        data : {token:token},
+		        dataType : 'json',
+		        beforeSend :function(){itsme.html('<i class="fa fa-spinner fa-spin"></i>');},
+		        error : function(jqXHR){
+					$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+		                '<h4 class="modal-title">Error !</h4>');
+					$("body #GlobalModal .modal-body").html(jqXHR.responseText);
+					$('body #GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+					$("body #GlobalModal").modal("show");
+		        },success : function(response){
+		        	if(!jQuery.isEmptyObject(response)){
+		        		toastr.success('Info',response.message);
+		        		$('body #table-list-data').DataTable().destroy();
+		        		fetchLogActivity();
+		        	}
+		        }
+		    });
+
 		});
 	});
 </script>
