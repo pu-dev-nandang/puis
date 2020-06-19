@@ -25,22 +25,22 @@
                 <a class="btn btn-default <?php if(empty($v->File) ? 'hide':'') ?>" style="display: inline;" href="<?= serverRoot.'/fileGetAny/kb-'.$v->File ?>" target="_blank">
                   <i class="fa fa-download margin-right"></i> File
                 </a>
-                <?php 
+                <?php
                       if ($this->session->userdata('IDdepartementNavigation')== 12) // IT
                       { ?>
                         <br/>
-                        <a href="javascript:void(0);" class="btnActRemove" data-id="<?=$v->KBID?>" data-no="'+i+'">Remove</a>
+                        <br><a href="javascript:void(0);" class="btnActRemove" data-id="<?=$v->KBID?>" data-no="'+i+'">Remove</a>
                 <?php }
                       else
                       {
                         // read navigasi department
                         $inArrDiv = [15,34]; // prodi dan faculty
                         if (!in_array($this->session->userdata('IDdepartementNavigation'), $inArrDiv) ) {
-                          if ('NA.'.$this->session->userdata('IDdepartementNavigation') == $this->session->userdata('kb_div')) 
+                          if ('NA.'.$this->session->userdata('IDdepartementNavigation') == $this->session->userdata('kb_div'))
                           { ?>
                             <br/>
-                            <a href="javascript:void(0);" class="btnActRemove" data-id="<?=$v->KBID?>" data-no="'+i+'">Remove</a>    
-                            
+                            <br><a href="javascript:void(0);" class="btnActRemove" data-id="<?=$v->KBID?>" data-no="'+i+'">Remove</a>
+
                    <?php  }
 
                         }
@@ -49,28 +49,28 @@
                           // prodi dan faculty
                           if($this->session->userdata('IDdepartementNavigation') == 15) // prodi
                           {
-                            if ('AC.'.$this->session->userdata('prodi_active_id') == $this->session->userdata('kb_div') ) 
+                            if ('AC.'.$this->session->userdata('prodi_active_id') == $this->session->userdata('kb_div') )
                             { ?>
                                 <br/>
-                                <a href="javascript:void(0);" class="btnActRemove" data-id="<?=$v->KBID?>" data-no="'+i+'">Remove</a>
+                                <br><a href="javascript:void(0);" class="btnActRemove" data-id="<?=$v->KBID?>" data-no="'+i+'">Remove</a>
 
                       <?php }
                           }
                           else
                           {
                             // faculty
-                            if ('FT.'.$this->session->userdata('faculty_active_id') == $this->session->userdata('kb_div') ) 
+                            if ('FT.'.$this->session->userdata('faculty_active_id') == $this->session->userdata('kb_div') )
                             { ?>
                                 <br/>
-                                <a href="javascript:void(0);" class="btnActRemove" data-id="<?=$v->KBID?>" data-no="'+i+'">Remove</a>
+                                <br><a href="javascript:void(0);" class="btnActRemove" data-id="<?=$v->KBID?>" data-no="'+i+'">Remove</a><br>
 
                       <?php }
 
-                          }  
+                          }
 
                         }
                       }
-                      
+
                      ?>
                 <?php if ($selected ==$this->session->userdata('PositionMain')['IDDivision']): ?>
                   <!-- <a href="javascript:void(0);" class="btnActRemove" data-id="<?=$v->KBID?>" data-no="'+i+'">Remove</a> -->
