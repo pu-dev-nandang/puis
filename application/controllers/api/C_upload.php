@@ -15,7 +15,6 @@ class C_upload extends CI_Controller {
         $this->load->model('master/m_master');
         $this->load->library('JWT');
         $this->load->library('google');
-        $this->load->library('upload');
     }
 
 
@@ -418,6 +417,8 @@ class C_upload extends CI_Controller {
         header('Content-Type: text/html; charset=UTF-8');
 
         if(isset($_FILES["image"]["name"])){
+
+            $this->load->library('upload');
 
             $unixTime = strtotime($this->m_rest->getDateTimeNow());
             $ext = explode('.',$_FILES["image"]["name"]);
