@@ -1052,9 +1052,7 @@ class C_api4 extends CI_Controller {
         }
         else if($data_arr['action']=='getDataEula'){
 
-            $data = $this->db->query('SELECT e.*, l1.PublishedAt AS PublishAtEmp, l2.PublishedAt AS PublishAtStd FROM db_it.eula e 
-                                                LEFT JOIN db_it.eula_publish_list l1 ON (l1.To="emp" AND e.ID = l1.EID)
-                                                LEFT JOIN db_it.eula_publish_list l2 ON (l2.To="std" AND e.ID = l2.EID)
+            $data = $this->db->query('SELECT e.* FROM db_it.eula e 
                                                 WHERE e.ID = "'.$data_arr['ID'].'" ')->result_array();
             return print_r(json_encode($data));
 
