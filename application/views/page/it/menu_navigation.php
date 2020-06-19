@@ -262,7 +262,7 @@
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='eula'){echo"current";}?>">
-                <a href="<?php echo base_url('it/eula/list-eula');?>">
+                <a href="<?php echo base_url('it/eula/date-eula');?>">
                     <i class="fa fa-file-text-o"></i>
                     Eula
                 </a>
