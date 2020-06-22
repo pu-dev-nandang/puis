@@ -202,6 +202,7 @@ class C_lpmi extends Lpmi_Controler {
         // $this->_validate();
         $data = array(                
                 'Name' => $this->input->post('category'),
+                'Lang' => $this->input->post('lang'),
                 'CreateAt' => date('Y-m-d H:i:s'),
                 'CreateBy' => $this->session->userdata('NIP'),
             );
@@ -222,6 +223,7 @@ class C_lpmi extends Lpmi_Controler {
         // $this->_validate();
         $data = array(                
                 'Name' => $this->input->post('category'),
+                'Lang' => $this->input->post('lang'),
                 'CreateAt' => date('Y-m-d H:i:s'),
                 'CreateBy' => $this->session->userdata('NIP'),
             );
