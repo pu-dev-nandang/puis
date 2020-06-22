@@ -184,12 +184,13 @@ class M_home extends CI_Model{
         return $query->row();
     }
 
-    public function save($data,$type)
+    public function save($data)
     {   
-        $sql = 'select pt.* from db_prodi.prodi_texting AS pt
-                            WHERE pt.Type="'.$type.'" ';
-        $query=$this->db->query($sql, array())->result_array();
-        $data['Type'] = $query[0]['Type'];
+        // $sql = 'select pt.* from db_prodi.prodi_texting AS pt
+        //                     WHERE pt.Type="'.$type.'" ';
+        // // print_r($sql);die;
+        // $query=$this->db->query($sql, array())->result_array();
+        // $data['Type'] = $query[0]['Type'];
          // print_r($data);die();
         $this->db->insert($this->table, $data);
         return $this->db->insert_id();
