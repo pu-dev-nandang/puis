@@ -25,7 +25,7 @@
 			        <tr>
 			          <!-- <th>#</th> -->
 			          <th><?php if ($Segment1 =="testimonials"){echo "Name";}else{echo "Title";}?></th>
-			          <!-- <th>Text</th> -->
+			          <!-- <th>Category</th> -->
 			          <th>Published</th>
 			          <th>Date Update</th>
 			          <th>Lang</th>
@@ -60,8 +60,17 @@
 				    <label for=""><label id="cng">Add</label> Category:</label>  
 				    	<input type="hidden" value="" name="idcat"/>
 				    	<input id="namecategory" name="category" class="form-control" type="text" placeholder="Input Category Here" value="">  
-					
+						
 				</div> 
+				<div class="form-group" style="margin-bottom: 0px">
+                    <h3>Language</h3>
+                    <select  name="lang" class="form-control">
+                      <option value="">--Select--</option>
+					  <option value="Eng">English</option>
+					  <option value="Ind">Indonesia</option>							  
+					</select>
+					<span class="help-block"></span>
+                </div>
 				<div class="form-group">
 					<div class="btn btn-success" id="btncategory" onclick="add_category()">Save</div>
 				</div>
@@ -73,6 +82,7 @@
 			                <tr>
 			                    <td style="width: 8%">No</td>
 			                    <td>Category</td>
+			                    <td>Lang</td>
 			                    <td>Create by</td>
 			                    <td>Create at</td>
 			                    <td>Action</td>
@@ -464,6 +474,7 @@
                       html += '<tr>'+
 		                        '<td>'+(i+1)+'</td>'+
 		                        '<td>'+data[i].Name+'</td>'+
+		                        '<td>'+data[i].Lang+'</td>'+
 		                        '<td>'+data[i].CreateAt+'</td>'+
 		                        '<td>'+data[i].CreateBy+'</td>'+
 		                        '<td>'+
@@ -501,7 +512,8 @@
 	        success: function(data)
 	        {
 	 			$('[name="idcat"]').val(data.ID);
-	            $('[name="category"]').val(data.Name);	
+	            $('[name="category"]').val(data.Name);
+	            $('[name="lang"]').val(data.Lang);	
 				$('[name="category"]').focus();	  
 				$('#cng').text('Edit')          			
 
