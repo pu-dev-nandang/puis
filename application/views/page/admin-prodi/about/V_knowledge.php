@@ -27,7 +27,7 @@
                       <th width="3%">#</th>
                       <th width="20%">Title</th>
                       <!-- <th>Text</th> -->
-                      <!-- <th>File</th> -->
+                      <th width="10%">Category</th>
                       <th width="10%">Lang</th>
                       <th width="10%">Date Update</th>
                       
@@ -60,10 +60,19 @@
             <form class="getcategory" id="formcat" style="margin: 0 15px;;">                    
                 <div class="form-group">  
                     <label for=""><label id="cng">Add</label> Category:</label>  
-                        <input type="hidden" value="" name="idcat"/>
-                        <input id="namecategory" name="category" class="form-control" type="text" placeholder="Input Category Here" value="">  
+                    <input type="hidden" value="" name="idcat"/>
+                    <input id="namecategory" name="category" class="form-control" type="text" placeholder="Input Category Here" value="">  
                     
                 </div> 
+                <div class="form-group" style="margin-bottom: 0px">
+                    <h3>Language</h3>
+                    <select  name="lang" class="form-control">
+                      <option id='0' value="">--Select--</option>
+                      <option id="1" value="1">English</option>
+                      <option id="2" value="2">Indonesia</option>                              
+                    </select>
+                    <span class="help-block"></span>
+                </div>
                 <div class="form-group">
                     <div class="btn btn-success" id="btncategory" onclick="add_category()">Save</div>
                 </div>
@@ -75,6 +84,7 @@
                             <tr>
                                 <td style="width: 8%">No</td>
                                 <td>Category</td>
+                                <td>Lang</td>
                                 <td>Create by</td>
                                 <td>Create at</td>
                                 <td>Action</td>
@@ -85,10 +95,6 @@
                     </table>
                 </div>
             </div>
-            <!-- <div class="modal-footer">
-                <button type="button" id="btnSave" onclick="save()" class="btn btn-info">Save</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-            </div> -->
 
         </div>
         
@@ -116,56 +122,28 @@
                             <input name="title" placeholder="<?php if ($Segment2 =="knowledge"){echo "Name";}else{echo "Title";}?>" class="form-control" type="text">
                             <span class="help-block"></span>
                         </div>
-                         <!-- <div class="container" id="show_a1" hidden="true">
-                          <div class="row">
-                            <div class='col-sm-6' style="padding: 0px">
-                              <div class="form-group">
-                                <label>Date</label>
-                                <div class="input-group input-append date datetimepicker">
-                                    <input data-format="yyyy-MM-dd hh:mm" class="form-control input_modal_assign_to" type="text" name="date" readonly="" value="">
-                                    <span class="input-group-addon add-on">
-                                        <i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i>
-                                    </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div> -->
-                         <!-- <div class="form-group">
-                            <label for="Description">Text</label>
-                            <textarea id="Description" name="description" placeholder="Description" class="form-control"></textarea>
-                            <span class="help-block"></span>
-                        </div> -->
-                        
-                        <!-- <div class="form-group" id="show_a2" hidden="true">
-                            <label>Meta description</label>
-                            <small class="red">Max 160 characters</small>
-                            <textarea name="meta_des" placeholder="Meta Description" class="form-control" style="border-color: #d9d9d9;"></textarea>
-                        </div>
-                        <div class="form-group" id="show_a3" hidden="true">
-                            <label>Meta Keywords</label>
-                            <small class="red">No more than 10 keyword</small>
-                            <textarea name="meta_key" placeholder="Meta Keywords" class="form-control" style="border-color: #d9d9d9;"></textarea>
-                        </div> -->
-                        <div class="form-group" style="margin-bottom: 0px">
-                            <label>Select Category</label>
-                            <select  name="category" class="form-control">
-                              <option value="">--Select--</option>
-                                <?php foreach($category as $row):?>
-                                <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
-                                <?php endforeach;?>                           
-                            </select>
-                            <span class="help-block"></span>
-                        </div>
+                         
                         <div class="form-group" style="margin-bottom: 0px">
                             <h3>Language</h3>
-                            <select  name="lang" class="form-control">
+                            <select  name="lang" class="form-control getidlang">
                               <option value="">--Select--</option>
                               <option value="1">English</option>
                               <option value="2">Indonesia</option>                              
                             </select>
                             <span class="help-block"></span>
                         </div>
+
+                        <div class="form-group" style="margin-bottom: 0px">
+                            <label>Select Category</label>
+                            <select  name="category" class="form-control" id="showcategory">
+                              <option value="">--Select--</option>
+                                <!-- <?php foreach($category as $row):?>
+                                <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
+                                <?php endforeach;?>  -->                          
+                            </select>
+                            <span class="help-block"></span>
+                        </div>
+                        
                         <div class="form-group" id="photo-preview">
                             <label>File</label>
                             <div>
@@ -183,64 +161,7 @@
                         </div>
                     </div>    
                 </div> 
-                <!-- <div class="col-md-4">
-                    <div id="show_a5" class="thumbnail" style="padding: 15px ;margin-bottom:15px" > 
-                        <div class="form-group" style="margin-bottom: 0px">
-                            <h3>Select Category</h3>
-                            <select  name="category" class="form-control">
-                              <option value="">--Select--</option>
-                                <?php foreach($category as $row):?>
-                                <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
-                                <?php endforeach;?>                           
-                            </select>
-                            <span class="help-block"></span>
-                        </div>
-                    </div>
-                    <div class="thumbnail" style="padding: 15px; margin-bottom: 15px">                      
-                        
-                        <div class="form-group" style="margin-bottom: 0px">
-                            <h3>Language</h3>
-                            <select  name="lang" class="form-control">
-                              <option value="">--Select--</option>
-                              <option value="Eng">English</option>
-                              <option value="Ind">Indonesia</option>                              
-                            </select>
-                            <span class="help-block"></span>
-                        </div>
-                        <div class="form-group">
-                            <h3>Published</h3>                        
                             
-                                <input type="radio" value="Yes" name="status" id="st1"> Yes
-                            
-                                <input type="radio" value="No" name="status" id="st2"> No
-                            
-                            <span class="help-block"></span>
-                        </div>
-                    </div>
-                    <div class="thumbnail" style="padding: 15px">                       
-                        
-                        <div class="form-group" style="margin-bottom: 15px">
-                            <h3>Setting Build</h3>                                               
-                            <hr>
-
-                                <div><input type="checkbox" id="ad1" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="knowledge" || $Segment1 =="testimonials" || $Segment1 =="partner"){echo "disabled";}?> onchange="valueChanged1()"> <label id="setingedit0">Add</label> Date
-                                </div>
-                                <div><input type="checkbox" id="ad2" onchange="valueChanged2()"> <label id="setingedit">Add</label> Meta Descripton
-                                </div>
-                                <div><input type="checkbox" id="ad3" onchange="valueChanged3()"> <label id="setingedit1">Add</label> Meta Keywords
-                                </div>
-                                <div><input type="checkbox" id="ad4" <?php if ($Segment1 =="vision" || $Segment1 =="mission" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="event" ){echo "disabled";}?> onchange="valueChanged4()"> <label id="setingedit2">Add</label> Upload
-                                </div>
-                                <div><input type="checkbox" id="ad5" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="event" || $Segment1 =="testimonials" || $Segment1 =="partner"){echo "disabled";}?> onchange="valueChanged5()"> <label id="setingedit3">Add</label> Category
-                                </div>                                      
-                            <span class="help-block"></span>
-                        </div>
-                    </div>             
-
-                    </form>
-                                          
-                    
-                </div>  -->              
             </div>
         </div>  
 
@@ -342,19 +263,6 @@
         else
             $("#show_a5").hide();
     }
-   
-  //    $('#ad1').change(function() {
-        //   $("#show_a1").hide();
-        // });
-  //    $('#ad2').change(function() {
-        //   $("#show_a2").prop("hidden", !this.checked);
-        // });
-        // $('#ad3').change(function() {
-        //   $("#show_a3").prop("hidden", !this.checked);
-        // });
-        // $('#ad4').change(function() {
-        //  $("#show_a4").prop("hidden", !this.checked);
-        // });
 
     var save_method; //for save method string
     var table;
@@ -417,6 +325,30 @@
      
     });
      
+
+    $('.getidlang').change(function () {
+    var idlang =  $(this).val();
+    // alert(idlang); 
+    $.ajax({
+        url: base_url_js+'__getCatByLang',
+        method : "POST",
+        data : {idlang: idlang},
+        async : true,
+        dataType : 'json',
+        success: function (data) {
+
+                var html = '';
+                var i;
+                for(i=0; i<data.length; i++){
+                    html += '<option value='+data[i].ID+'>'+data[i].Name+'</option>';
+                }
+                $('#showcategory').html(html);
+
+            }
+
+        });
+
+    });
 
     function add_category()
     {
@@ -485,6 +417,7 @@
                       html += '<tr>'+
                                 '<td>'+(i+1)+'</td>'+
                                 '<td>'+data[i].Name+'</td>'+
+                                '<td>'+data[i].Language+'</td>'+
                                 '<td>'+data[i].CreateAt+'</td>'+
                                 '<td>'+data[i].CreateBy+'</td>'+
                                 '<td>'+
@@ -523,6 +456,7 @@
             {
                 $('[name="idcat"]').val(data.ID);
                 $('[name="category"]').val(data.Name);  
+                $('[name="lang"]').val(data.lang);  
                 $('[name="category"]').focus();   
                 $('#cng').text('Edit')                      
 
@@ -607,48 +541,9 @@
      
                 $('[name="id"]').val(data.ID);
                 $('[name="title"]').val(data.Title);
-                // $('[name="description"]').val(data.Description);
-                // $('#Description').summernote('code', data.Description);
-                // $('[name="meta_des"]').val(data.Meta_des);
-                // $('[name="meta_key"]').val(data.Meta_key);
                 $('[name="lang"]').val(data.LangID);
-                $('[name="category"]').val(data.ID_CatBase);
-                // Language
-                // if (data.Status=="Yes") {
-                //     document.getElementById("st1").checked = true;
-                // } else {
-                //     document.getElementById("st2").checked = true;
-                // }
-                // console.log(data.AddDate);
-                // if (data.AddDate=='' || data.AddDate=='0000-00-00 00:00:00'){
-                //     document.getElementById("ad1").checked = false;
-                //     $("#show_a1").hide();
-                //     // $("#show_a1").prop("show", this.checked);
-                // }else{
-                //     document.getElementById("ad1").checked = true;
-                //     $("#show_a1").show()
-                // }
-                // console.log(data.IDCat);
-                // if (data.ID_CatBase ){
-                //     document.getElementById("ad5").checked = true;
-                //     $('#show_a5').show();
-                //     // $("#show_a1").prop("show", this.checked);
-                //     // console.log('no');
-                // }else{
-                //     document.getElementById("ad5").checked = false;
-                //     // document.getElementById("show_a5").hidden = false;
-                //     $('#show_a5').hide();
-                //     // console.log('ok');
-                // }
-                // if (data.File!=="" ) {
-             //     // document.getElementById("ad4").checked = true;                   
-                    
-                // } else {
-                //     $('#photo-preview').hide();
+                $('[name="category"]').val(data.ID_CatBase);               
 
-                // }
-                // $('[name="status"]').val(data.Status);
-                // $('[name="lang"]').val(data.Lang);
                 $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
                 $('.modal-title').text('Update Content'); // Set title to Bootstrap modal title
                     
