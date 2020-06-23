@@ -2358,6 +2358,79 @@
 
     }
 
+    function loadSelectOptionEULAPUblicationDate(element,selected,filterTo) {
+
+        var data = {
+            action : 'getPublicationDate',
+            To : (typeof filterTo !== 'undefined' && filterTo!='' && filterTo!=null) ? filterTo : ''
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api4/__crudEula';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+
+                var RangeStart = moment(v.RangeStart).format('DD MMM YYYY');
+                var RangeEnd = moment(v.RangeEnd).format('DD MMM YYYY');
+
+
+                var sc = (selected==v.ID) ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+RangeStart+' - '+RangeEnd+' | '+v.To+'</option>');
+
+            });
+
+        });
+
+    }
+
+    function loadSelectOptionEULAPUblicationTo(element,selected) {
+
+        var data = {
+            action : 'getPublicationTo',
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api4/__crudEula';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.To) ? 'selected' : '';
+                $(element).append('<option value="'+v.To+'" '+sc+'>'+v.To+'</option>');
+
+            });
+
+        });
+
+    }
+
+    function loadSelectOptionEULATitle(element,selected,PublicationID) {
+
+        var data = {
+            action : 'getEULATitle',
+            EDID : (typeof PublicationID !== 'undefined' && PublicationID!='' && PublicationID!=null)
+                ? PublicationID : ''
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api4/__crudEula';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.ID) ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Title+'</option>');
+
+            });
+
+        });
+
+    }
+
     function getCustomtoFixed(dataValue,digit) {
         // var exTitik = dataValue.toFixed(4).toString().split('.');
         // var exKoma = dataValue.toFixed(4).toString().split(',');
