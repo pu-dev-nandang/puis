@@ -456,7 +456,7 @@
             {
                 $('[name="idcat"]').val(data.ID);
                 $('[name="category"]').val(data.Name);  
-                $('[name="lang"]').val(data.lang);  
+                $('[name="lang"]').val(data.Lang);  
                 $('[name="category"]').focus();   
                 $('#cng').text('Edit')                      
 
