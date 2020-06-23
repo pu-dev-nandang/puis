@@ -508,7 +508,7 @@ class C_prodi extends Prodi_Controler {
             $row = array();
             $row[]=$no;
             $row[] = $m->Title;
-            // $row[] = $m->Description;
+            $row[] = $m->Name;
             // $row[] = $m->File;
             $row[] = $m->Language;
             $row[] = $m->UpdatedAt;
@@ -571,23 +571,33 @@ class C_prodi extends Prodi_Controler {
         echo json_encode($data);
     }
 
-    function get_category(){
+    public function get_category(){
         $this->db->from("db_prodi.category");
         $this->db->order_by('ID','desc');
         $q = $this->db->get();
         return $q->result();  
     }
 
+    public function getCatByLang(){
+
+        $getidlang =  $this->input->post('idlang');
+        // print_r($getidlang);
+        $q = $this->m_home->getCategory($getidlang);        
+        echo json_encode($q);  
+    }
+
    public function ajax_addCat()
     {
         // $this->_validate();
-        $data = array(                
+        $data = array(     
+                'ProdiID' => $this->session->userdata('prodi_active_id'),           
                 'Name' => $this->input->post('category'),
+                'Lang' => $this->input->post('lang'),
                 'CreateAt' => date('Y-m-d H:i:s'),
                 'CreateBy' => $this->session->userdata('NIP'),
             );
         
-        // print_r($data);die();
+        // print_r($data);die();        
         $insert = $this->m_home->saveCat($data);
         echo json_encode(array("status" => TRUE));
     }
@@ -601,8 +611,10 @@ class C_prodi extends Prodi_Controler {
     public function ajax_updateCat()
     {
         // $this->_validate();
-        $data = array(                
+        $data = array(    
+                'ProdiID' => $this->session->userdata('prodi_active_id'),            
                 'Name' => $this->input->post('category'),
+                'Lang' => $this->input->post('lang'),
                 'CreateAt' => date('Y-m-d H:i:s'),
                 'CreateBy' => $this->session->userdata('NIP'),
             );
