@@ -1383,8 +1383,12 @@ class C_api4 extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataScr = '(e.Title LIKE "%'.$search.'%" OR e.Description LIKE "%'.$search.'%")';
-                $dataSearch = ' WHERE '.$dataScr;
+                $dataScr = '(e.Title LIKE "%'.$search.'%" OR em.Name LIKE "%'.$search.'%" 
+                                OR em.NIP LIKE "%'.$search.'%" OR ats.Name LIKE "%'.$search.'%"
+                                 OR ats.NPM LIKE "%'.$search.'%")';
+                $dataSearch = ($To!='' || $EDID!='' || $EID!='')
+                    ? ' AND ('.$dataScr.')'
+                    : ' WHERE '.$dataScr;
             }
 
             $queryDefault = 'SELECT e.Title, ed.RangeStart, ed.RangeEnd, ed.To, eu.EntredAt, eu.Username,  
@@ -1395,7 +1399,8 @@ class C_api4 extends CI_Controller {
                                             LEFT JOIN db_it.eula_date ed ON (ed.ID = el.EDID)
                                             
                                             LEFT JOIN db_employees.employees em ON (em.NIP = eu.Username)
-                                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM = eu.Username) '.$dataWhere;
+                                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM = eu.Username) '.
+                                            $dataWhere.$dataSearch;
 
 //            print_r($queryDefault);exit();
 
@@ -1425,8 +1430,9 @@ class C_api4 extends CI_Controller {
                     : '<span class="label label-success">Student</span>';
 
                 $nestedData[] = '<div>'.$no.'</div>';
-                $nestedData[] = '<div style="text-align: left;"><b>'.$UserName.'</b><div>'.$row['Username'].' '.$labelUser.'</div></div>';
+                $nestedData[] = '<div style="text-align: left;"><b>'.$UserName.'</b><div>'.$row['Username'].'</div></div>';
                 $nestedData[] = '<div>'.$RangeStart.$RangeEnd.'</div>';
+                $nestedData[] = '<div>'.$labelUser.'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$row['Title'].'</div>';
                 $nestedData[] = '<div>'.date('d M Y H:i',strtotime($row['EntredAt'])).'</div>';
 

@@ -73,14 +73,15 @@
 
     function loadDataLog() {
 
-        $('#loadTable').html('<table id="tableData" class="table table-bordered table-centre">' +
+        $('#loadTable').html('<table id="tableData" class="table table-bordered table-striped table-centre">' +
             '            <thead>' +
-            '            <tr>' +
+            '            <tr style="background: #eceff1;">' +
             '                <th style="width: 1%;">No</th>' +
             '                <th style="width: 15%;">User</th>' +
-            '                <th style="width: 13%;">Publication Date</th>' +
+            '                <th style="width: 10%;">Publication Date</th>' +
+            '                <th style="width: 7%;">To</th>' +
             '                <th>Eula Title</th>' +
-            '                <th style="width: 15%;">Entred At</th>' +
+            '                <th style="width: 10%;">Entred At</th>' +
             '            </tr>' +
             '            </thead>' +
             '        </table>');
