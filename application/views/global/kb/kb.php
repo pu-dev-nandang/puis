@@ -159,7 +159,6 @@ $('#saveFormKB').click(function () {
       };
       var token = jwt_encode(data,'UAP)(*');
 
-
       $.post(url,{token:token},function (jsonResult) {
 
           toastr.success('Data saved','Success');
@@ -167,7 +166,6 @@ $('#saveFormKB').click(function () {
           if (upload_files!=null && upload_files!=''){
             upload_kb(jsonResult.ID,'');
           }
-
 
           setTimeout(function () {
           $('#saveFormKB').html('Save').prop('disabled',false);

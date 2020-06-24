@@ -122,7 +122,7 @@ abstract class Globalclass extends MyAbstract{
 
         $MainPosition = $this->session->userdata('PositionMain');
         $data['rule_service'] = $this->m_master->__getService($MainPosition['IDDivision']);
-
+        
         $page = $this->load->view('template/header',$data,true);
         return $page;
     }

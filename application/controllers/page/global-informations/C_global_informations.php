@@ -107,7 +107,7 @@ class C_global_informations extends Globalclass {
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchStudentsPS(true,false,$param);
     	$TotalDataPS = (!empty($totalData) ? $totalData->Total : 0);
-        $reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
+
     	$result = $this->Globalinformation_model->fetchStudentsPS(false,false,$param,$reqdata['start'],$reqdata['length'],$orderBy);
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
@@ -286,7 +286,6 @@ class C_global_informations extends Globalclass {
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchLecturer(true,$param)->row();
     	$TotalData = (!empty($totalData) ? $totalData->Total : 0);
-        $reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
     	$result = $this->Globalinformation_model->fetchLecturer(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
         //var_dump($this->db->last_query());
     	$no = $reqdata['start'] + 1;
@@ -465,7 +464,7 @@ class C_global_informations extends Globalclass {
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchEmployee(true,$param)->row();
     	$TotalData = (!empty($totalData) ? $totalData->Total : 0);
-        $reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
+        //$reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
     	$result = $this->Globalinformation_model->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
     	
     	$no = $reqdata['start'] + 1;
@@ -650,19 +649,25 @@ class C_global_informations extends Globalclass {
                 }
                 if(!empty($v->mail_cc)){
                     $mail_cc = json_decode($v->mail_cc);
-                    foreach ($mail_cc as $c) {
-                        if(!in_array($c,$myAddressBook)){
-                            $myAddressBook[] = $c;
+                    if(count($mail_cc) > 1){
+                        foreach ($mail_cc as $c) {
+                            if(!in_array($c,$myAddressBook)){
+                                $myAddressBook[] = $c;
+                            }
                         }
                     }
                 }
-                if(!empty($v->mail_bcc)){
+
+                if(!empty($v->mail_bcc) && $v->mail_bcc != 'null'){
                     $mail_bcc = json_decode($v->mail_bcc);
-                    foreach ($mail_bcc as $b) {
-                        if(!in_array($b,$myAddressBook)){
-                            $myAddressBook[] = $b;
+                    if(count($mail_bcc) > 1){
+                        foreach ($mail_bcc as $b) {
+                            if(!in_array($b,$myAddressBook)){
+                                $myAddressBook[] = $b;
+                            }
                         }
                     }
+                    
                 }
             }
         }
@@ -912,7 +917,6 @@ class C_global_informations extends Globalclass {
             $data = array();
             $totalData = $this->Globalinformation_model->fetchSubjectType(true,$param)->row();
             $TotalDataRS = (!empty($totalData) ? $totalData->Total : 0);
-            $reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
             $result = $this->Globalinformation_model->fetchSubjectType(false,$param,(!empty($reqdata['start']) ? $reqdata['start']:0),(!empty($reqdata['length']) ? $reqdata['length'] : 0))->result();
             $json_data = array(
                 "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : 0) ),
@@ -1048,7 +1052,6 @@ class C_global_informations extends Globalclass {
             $data = array();
             $totalData = $this->Globalinformation_model->fetchAccessRole(true,$param)->row();
             $TotalDataRS = (!empty($totalData) ? $totalData->Total : 0);
-            $reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
             $result = $this->Globalinformation_model->fetchAccessRole(false,$param,(!empty($reqdata['start']) ? $reqdata['start']:0),(!empty($reqdata['length']) ? $reqdata['length'] : 0))->result();
             $json_data = array(
                 "draw"            => intval( (!empty($reqdata['draw']) ? $reqdata['draw'] : 0) ),

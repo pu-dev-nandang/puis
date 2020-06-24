@@ -1829,7 +1829,6 @@ class C_dashboard extends Globalclass {
         switch ($dpt) {
             case 15 :
                 $sessionProdiGet = $this->session->userdata('prodi_get');
-                $this->load->model('prodi/m_prodi');
                 if($this->session->userdata('prodi_get')) {
                     if(!empty($sessionProdiGet)){
                         foreach ($sessionProdiGet as $s) {
