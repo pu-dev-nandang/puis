@@ -13,7 +13,7 @@
         <!--            <a href="--><?php //echo base_url('human-resources/monitoring-attendance/permanent-lecturer'); ?><!--">Resume (Coming Soon)</a>-->
         <!--        </li>-->
         <li class="<?php if($this->uri->segment(3)=='download-result' || $this->uri->segment(3)=='download-result') { echo 'active'; } ?>">
-            <a href="<?=site_url('lpmi/lecturer-evaluation/download-result')?>">Donwload Result</a>
+            <a href="<?=site_url('lpmi/lecturer-evaluation/download-result')?>">Download Result</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
