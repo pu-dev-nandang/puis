@@ -447,10 +447,15 @@ class C_prodi extends Prodi_Controler {
     /*#ADDED BY FEBRI MAY 2020
     #STOCK GOOD */
 
+    private function hasAnAccessStockGood($ProdiID){
+        $DeptIDSession = $this->session->userdata('IDdepartementNavigation');
+        if($DeptIDSession == 15){
+            return true;
+        }else{ return false;}
+    }
+
     public function stockGood(){
-        $myNIP = $this->session->userdata('NIP');
-        $myName = $this->session->userdata('Name');
-        $data['title'] = '';
+        $data=array();
         $content = $this->load->view('page/prodi/stock-good/index',$data,true);
         $this->temp($content);
     }

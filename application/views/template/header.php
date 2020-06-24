@@ -1,4 +1,3 @@
-
 <style>
     .navbar .nav > li.current > a {
         background: #0f1f4b85;
@@ -175,7 +174,6 @@
                         <!--                    <i class="icon-caret-down small"></i>-->
                     </a>
                     <ul class="dropdown-menu">
-
                         <!-- Lecturer -->
                         <?php if(in_array(2,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(2)=='lecturers'){echo 'active';} ?>">
@@ -237,19 +235,37 @@
                             </li>
                         <?php } ?>
 
-                            <!-- Adding for Testing -->
-                            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
-                                 <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='request-document-generator'){echo 'active';} ?>">
-                                     <a href="<?php echo base_url('request-document-generator'); ?>"><i class="glyphicon glyphicon-transfer" aria-hidden="true"></i> Request Document Generator</a>
-                                 </li>
-                            <!-- End Adding for Testing -->
+                        <!-- Adding for Testing -->
+                        <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
+                             <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='request-document-generator'){echo 'active';} ?>">
+                                 <a href="<?php echo base_url('request-document-generator'); ?>"><i class="glyphicon glyphicon-transfer" aria-hidden="true"></i> Request Document Generator</a>
+                             </li>
+                        <!-- End Adding for Testing -->
 
-                            <!-- Adding for Testing -->
-                            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
-                                 <li class="<?php echo $sw?> BlogAdminUrl">
-                                     <a href="javascript:void(0)"><i class="fa fa-rss" aria-hidden="true"></i> Blog Admin</a>
-                                 </li>
-                            <!-- End Adding for Testing -->
+                        <!-- Adding for Testing -->
+                        <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
+                             <li class="<?php echo $sw?> BlogAdminUrl">
+                                 <a href="javascript:void(0)"><i class="fa fa-rss" aria-hidden="true"></i> Blog Admin</a>
+                             </li>
+                        <!-- End Adding for Testing -->
+
+                        <!-- Added by Febri @ Jun 2020 -->
+                        <?php 
+                        $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; 
+                        $ProdyNavSession = $this->session->userdata('prodi_get');
+                        $DepartmentIDNavSession =$this->session->userdata('IDdepartementNavigation');
+                        $isProdyNav = ((count($ProdyNavSession) > 0) ? true:false);
+                        if($DepartmentIDNavSession == 15 &&  $isProdyNav){
+                        ?>
+                             <li class="<?php echo $sw?> StockGood">
+                                 <a href="<?=base_url('prodi/stock-good')?>">
+                                    <i class="fa fa-cart-plus" aria-hidden="true"></i> 
+                                    Stock Good
+                                </a>
+                             </li>
+                         <?php } ?>
+                        <!-- End Added by Febri -->
+                        
 
                     </ul>
                 </li>
