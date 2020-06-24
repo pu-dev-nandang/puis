@@ -7,6 +7,9 @@
                 <li class="<?= ($this->uri->segment(3) == 'date-eula' ) ? 'active' : '' ?>">
                     <a href="<?php echo base_url('it/eula/date-eula'); ?>">Publication Date</a>
                 </li>
+                <li class="<?= ($this->uri->segment(3) == 'log-eula') ? 'active' : '' ?>">
+                    <a href="<?php echo base_url('it/eula/log-eula'); ?>">User Log</a>
+                </li>
                 <li class="<?= ($this->uri->segment(3) == 'list-eula') ? 'active' : '' ?>">
                     <a href="<?php echo base_url('it/eula/list-eula'); ?>">Master Eula</a>
                 </li>

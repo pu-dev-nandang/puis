@@ -26,11 +26,6 @@
     <div class="col-md-12" id="loadTable"></div>
 </div>
 
-
-
-
-
-
 <script>
 
     $(document).ready(function () {
@@ -365,6 +360,8 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
+            $('#viewDetailEULA_'+ID).html(jsonResult.length);
+
             if(jsonResult.length>0){
                 var ls = '';
                 $.each(jsonResult,function (i,v) {
@@ -447,19 +444,56 @@
 
         var ID = $(this).attr('data-edid');
 
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Details Publication EULA</h4>');
+        var data = {
+            action : 'getDetailListEULA',
+            EDID : ID
+        };
 
-        var htmlss = '<input value="'+ID+'" id="viewEDID" />';
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api4/__crudEula';
 
-        $('#GlobalModal .modal-body').html(htmlss);
+        $.post(url,{token:token},function (jsonResult) {
 
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Details Publication EULA</h4>');
 
-        $('#GlobalModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
+            var listb = '';
+            $.each(jsonResult,function (i,v) {
+                listb = listb + '<tr>' +
+                    '<td>'+(i+1)+'</td>' +
+                    '<td style="text-align: left;">'+v.Title+'</td>' +
+                    '<td><a>'+v.TotalUser+'</a></td>' +
+                    '</tr>';
+            });
+
+            var htmlss = '<input value="'+ID+'" id="viewEDID" class="hide" />' +
+                '<div class="row">' +
+                '    <div class="col-md-12">' +
+                '        <table class="table table-bordered table-centre">' +
+                '            <thead>' +
+                '            <tr>' +
+                '                <th style="width: 3%;">No</th>' +
+                '                <th>EULA</th>' +
+                '                <th style="width: 13%;">Read</th>' +
+                '            </tr>' +
+                '            </thead>' +
+                '            <tbody>'+listb+'</tbody>' +
+                '        </table>' +
+                '    </div>' +
+                '</div>';
+
+            $('#GlobalModal .modal-body').html(htmlss);
+
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+
         });
+
+
 
     });
     

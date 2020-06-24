@@ -46,6 +46,14 @@ class C_eula extends It_Controler {
         $this->menu_eula($page);
     }
 
+    public function log_eula()
+    {
+        $department = parent::__getDepartement();
+        $data['NIP']= $this->session->userdata('NIP');
+        $page = $this->load->view('page/'.$department.'/eula/log_eula',$data,true);
+        $this->menu_eula($page);
+    }
+
 
 
 

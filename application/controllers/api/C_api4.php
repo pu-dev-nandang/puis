@@ -1156,6 +1156,12 @@ class C_api4 extends CI_Controller {
 
         }
         else if($data_arr['action']=='removeFromListEULAInPD'){
+
+            // Remove eula_user
+            $this->db->where('ELID', $data_arr['ID']);
+            $this->db->delete('db_it.eula_user');
+            $this->db->reset_query();
+
             $this->db->where('ID', $data_arr['ID']);
             $this->db->delete('db_it.eula_linked');
             return print_r(1);
@@ -1209,13 +1215,15 @@ class C_api4 extends CI_Controller {
                                                                     WHERE EDID = "'.$row['ID'].'" ')
                                         ->result_array()[0]['Total'];
 
+                $viewLISTEULA = '<a href="javascript:void(0);" id="viewDetailEULA_'.$row['ID'].'" class="viewDetailEULA" data-edid="'.$row['ID'].'">'.$viewCountEula.'</a>';
+
                 $nestedData[] = '<div>'.$no.'<textarea class="hide" id="dataPD_'.$row['ID'].'">'.json_encode($row).'</textarea></div>';
                 $nestedData[] = '<div>'.date('d M Y',strtotime($row['RangeStart'])).'</div>';
                 $nestedData[] = '<div>'.date('d M Y',strtotime($row['RangeEnd'])).'</div>';
                 $nestedData[] = '<div>'.$row['To'].'</div>';
                 $nestedData[] = '<div>'.$Published.'</div>';
                 $nestedData[] = '<div>'.$BtnAct.'</div>';
-                $nestedData[] = '<div><a href="javascript:void(0);" class="viewDetailEULA" data-edid="'.$row['ID'].'">'.$viewCountEula.'</a></div>';
+                $nestedData[] = '<div>'.$viewLISTEULA.'</div>';
 
 
 //            $nestedData[] = '<div style="text-align: left;">'.$viewLink.$tokenText.'</div>';
@@ -1248,7 +1256,6 @@ class C_api4 extends CI_Controller {
 
 
             $queryDefault = 'SELECT e.* FROM db_it.eula e '.$dataSearch.' GROUP BY e.ID ORDER BY e.ID';
-
             $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
 
 
@@ -1307,6 +1314,140 @@ class C_api4 extends CI_Controller {
             $this->db->insert('db_it.eula_user',$dataIns);
             return print_r(1);
         }
+        else if($data_arr['action']=='getDetailListEULA'){
+
+            $EDID = $data_arr['EDID'];
+
+            $data = $this->db->query('SELECT el.ID, e.Title, e.Description FROM db_it.eula_linked el 
+                                                LEFT JOIN db_it.eula e ON (e.ID = el.EID)
+                                                WHERE el.EDID = "'.$EDID.'" ')->result_array();
+
+            if(count($data)>0){
+
+                for($i=0;$i<count($data);$i++){
+                    $dataUsr = $this->db->query('SELECT COUNT(*) AS Total FROM db_it.eula_user eu 
+                                                    WHERE eu.ELID = "'.$data[$i]['ID'].'" ')->result_array();
+                    $data[$i]['TotalUser'] = $dataUsr[0]['Total'];
+                }
+
+            }
+
+            return print_r(json_encode($data));
+
+        }
+
+        else if($data_arr['action']=='getPublicationDate'){
+
+            $where = ($data_arr['To']!='') ? ' WHERE ed.To LIKE "'.$data_arr['To'].'" ' : '';
+
+            $data = $this->db->query('SELECT ed.* FROM db_it.eula_date ed '.$where)->result_array();
+
+            return print_r(json_encode($data));
+        }
+
+        else if($data_arr['action']=='getPublicationTo'){
+            $data = $this->db->query('SELECT ed.To FROM db_it.eula_date ed GROUP BY ed.To ORDER BY ed.To ASC')->result_array();
+
+            return print_r(json_encode($data));
+        }
+
+        else if($data_arr['action']=='getEULATitle'){
+
+            $EDID = $data_arr['EDID'];
+
+            $data = $this->db->query('SELECT e.ID, e.Title FROM db_it.eula e LEFT JOIN db_it.eula_linked el ON (el.EID = e.ID) 
+                                                WHERE el.EDID = "'.$EDID.'" ORDER BY el.Queue ASC ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+
+        else if($data_arr['action']=='getLogEULA'){
+
+            $requestData = $_REQUEST;
+
+            $To = $data_arr['To'];
+            $EDID = $data_arr['EDID'];
+            $EID = $data_arr['EID'];
+
+            $dataWhere = '';
+            if($To!='' || $EDID!='' || $EID!=''){
+                $wTo = ($To!='') ? 'AND ed.To = "'.$To.'" ' : '';
+                $wEDID = ($EDID!='') ? 'AND el.EDID = "'.$EDID.'" ' : '';
+                $wEID = ($EID!='') ? 'AND el.EID = "'.$EID.'" ' : '';
+
+                $w = $wTo.$wEDID.$wEID;
+                $dataWhere = ' WHERE '.substr($w,3);
+            }
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataScr = '(e.Title LIKE "%'.$search.'%" OR e.Description LIKE "%'.$search.'%")';
+                $dataSearch = ' WHERE '.$dataScr;
+            }
+
+            $queryDefault = 'SELECT e.Title, ed.RangeStart, ed.RangeEnd, ed.To, eu.EntredAt, eu.Username,  
+                                            em.Name AS NameEmp, ats.Name AS NameStd
+                                            FROM db_it.eula_user eu
+                                            LEFT JOIN db_it.eula_linked el ON (el.ID = eu.ELID)
+                                            LEFT JOIN db_it.eula e ON (e.ID = el.EID)
+                                            LEFT JOIN db_it.eula_date ed ON (ed.ID = el.EDID)
+                                            
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = eu.Username)
+                                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM = eu.Username) '.$dataWhere;
+
+//            print_r($queryDefault);exit();
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                $UserName = ($row['NameEmp']!=null && $row['NameEmp']!='') ? $row['NameEmp'] : $row['NameStd'];
+
+                $RangeStart = date('d M Y',strtotime($row['RangeStart']));
+                $RangeEnd = '<br/>'.date('d M Y',strtotime($row['RangeEnd']));
+
+                $labelUser = ($row['To']=='emp')
+                    ? '<span class="label label-primary">Employee</span>'
+                    : '<span class="label label-success">Student</span>';
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;"><b>'.$UserName.'</b><div>'.$row['Username'].' '.$labelUser.'</div></div>';
+                $nestedData[] = '<div>'.$RangeStart.$RangeEnd.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Title'].'</div>';
+                $nestedData[] = '<div>'.date('d M Y H:i',strtotime($row['EntredAt'])).'</div>';
+
+
+                $data[] = $nestedData;
+                $no++;
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval( $queryDefaultRow),
+                "data"            => $data,
+                "dataQuery"            => $query
+            );
+            echo json_encode($json_data);
+
+        }
+
+
     }
 
 
