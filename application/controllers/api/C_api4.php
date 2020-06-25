@@ -1305,6 +1305,13 @@ class C_api4 extends CI_Controller {
 
             return print_r(json_encode($data));
         }
+
+        else if($data_arr['action']=='getListEULAForDirection'){
+
+            $data = $this->db->get_where('db_it.eula_direct',array('Username'=>$data_arr['Username']))->result_array()[0];
+
+            return print_r(json_encode($data));
+        }
         else if($data_arr['action']=='insertEULAForUser'){
             $dataIns = array(
                 'ELID' => $data_arr['ELID'],
