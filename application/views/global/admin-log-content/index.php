@@ -1,5 +1,7 @@
 <style type="text/css">
 	.label-content{text-transform: uppercase;}
+	.detail-log:hover > b{text-decoration: underline;color: #0f1f4b}
+	.detail-log{cursor: pointer; }
 </style>
 <div id="log-content">
 	<div class="row" style="margin-bottom:15px">
@@ -141,7 +143,7 @@
             	{
             		"data":"NIP",
             		"render": function (data, type, row, meta) {
-            			var label = '<b>'+data+"</b><br>"+row.Name;
+            			var label = '<span class="detail-log" data-nip="'+data+'" data-content="'+row.ContentTable+'" ><b>'+data+"</b><span class='load'></span><br>"+row.Name+'</span>';
             			return label;
             		}
             	},
@@ -234,10 +236,10 @@
 			$(".label-content").text(labelname);
 	    });
 
-	    $("#table-list-data").on("click",".btn-detail",function(){
+	    $("#table-list-data").on("click",".detail-log",function(){
 	    	var itsme = $(this);
 	    	var NIP = itsme.data("nip");
-	    	var TYPE = itsme.data("type");
+	    	var TYPE = itsme.data("content");
 
 	    	var dataPost = {
 		        NIP : NIP,
@@ -251,7 +253,7 @@
 		        url : base_url_js+"admin-log-detail",
 		        data : {token:token},
 		        dataType : 'html',
-		        beforeSend :function(){itsme.html('<i class="fa fa-spinner fa-spin"></i>');},
+		        beforeSend :function(){itsme.find(".load").html('<i class="fa fa-spinner fa-spin"></i>');},
 		        error : function(jqXHR){
 					$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
 		                '<h4 class="modal-title">Error !</h4>');
@@ -259,8 +261,8 @@
 					$('body #GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 					$("body #GlobalModal").modal("show");
 		        },success : function(response){
+		        	itsme.find(".load").empty();
 		        	$("#GlobalModal .modal-dialog").css({"width":"80%"});
-		        	itsme.html('<i class="fa fa-folder-open"></i>');
 		          	$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
 		                '<h4 class="modal-title">Historical log</h4>');
 		          	$('body #GlobalModal .modal-footer').hide();

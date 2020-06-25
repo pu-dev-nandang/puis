@@ -57,7 +57,7 @@ class M_log_content extends CI_Model{
 
         
         
-        $string = " select {$select}
+        $string = " select {$select}, '{$tablename2}' as ContentTable
 					from db_employees.log_countable_content a
 					{$leftJoinTable}
 					LEFT JOIN db_employees.employees c on c.NIP = a.NIP
