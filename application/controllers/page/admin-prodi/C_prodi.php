@@ -447,7 +447,7 @@ class C_prodi extends Prodi_Controler {
     /*#ADDED BY FEBRI MAY 2020
     #STOCK GOOD */
 
-    private function hasAnAccessStockGood($ProdiID){
+    private function hasAnAccessStockGood(){
         $DeptIDSession = $this->session->userdata('IDdepartementNavigation');
         if($DeptIDSession == 15){
             return true;
@@ -455,9 +455,11 @@ class C_prodi extends Prodi_Controler {
     }
 
     public function stockGood(){
-        $data=array();
-        $content = $this->load->view('page/prodi/stock-good/index',$data,true);
-        $this->temp($content);
+        if($this->hasAnAccessStockGood()){
+            $data=array();
+            $content = $this->load->view('page/prodi/stock-good/index',$data,true);
+            $this->temp($content);
+        }else{show_404();}
     }
 
 
@@ -490,9 +492,35 @@ class C_prodi extends Prodi_Controler {
 
 
     public function formStockGood(){
-        $data['units'] = $this->General_model->fetchData("db_warehouse.m_unit",array("IsActive"=>1))->result();
-        $content = $this->load->view('page/prodi/stock-good/form',$data,true);
-        $this->temp($content);
+        if($this->hasAnAccessStockGood()){
+            $data['units'] = $this->General_model->fetchData("db_warehouse.m_unit",array("IsActive"=>1))->result();
+            $content = $this->load->view('page/prodi/stock-good/form',$data,true);
+            $this->temp($content);
+        }else{show_404();}
+    }
+
+
+    public function saveStockGood(){
+        echo "<pre>";
+        $data = $this->input->post();
+        $myname = $this->session->userdata('Name');
+        $mynip = $this->session->userdata('NIP');
+        $sessionPrody = $this->session->userdata('prodi_get');
+        $DivisionID = $this->session->userdata('IDdepartementNavigation');
+        $ProdiID = null;
+        $KabagID = '';
+        if(!empty($sessionPrody)){
+            $ProdiID = $sessionPrody[0]['ID'];
+            $employeeKABAG = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$sessionPrody[0]['KaprodiID']))->row();
+            $KabagID = "";
+        }else{
+
+        }     
+        if($data){
+            $dataPostPurchase = array("Code"=>$data['Code'],"Note"=>$data['Note'],"DeptID"=>$DivisionID,"ProdiID"=>$ProdiID,"IsApproved1"=>1,"ApprovedBy1");
+            $itemName = $data['Name'];
+            var_dump($data);
+        }
     }
 
 

@@ -1,3 +1,6 @@
+<style type="text/css">
+	.label-content{text-transform: uppercase;}
+</style>
 <div id="log-content">
 	<div class="row" style="margin-bottom:15px">
 		<div class="col-sm-4">
@@ -17,9 +20,9 @@
 						<div class="row">
 							<div class="col-sm-6">
 								<div class="form-group">
-									<label>Type Content</label>
-									<select class="form-control" name="TypeContent">
-										<option value="">-choose one-</option>
+									<label>Content</label>
+									<select class="form-control" name="TypeContent" id="TypeContent">
+										<option value="">Choose one</option>
 										<option <?=($typecontent == 'user_qna') ? 'selected':''?> value="user_qna">Help</option>
 										<option <?=($typecontent == 'knowledge_base') ? 'selected':''?> value="knowledge_base">Knowledge Base</option>
 									</select>
@@ -27,10 +30,29 @@
 							</div>
 							<div class="col-sm-6">
 								<div class="form-group">
-									<label>NIP</label>
-									<input type="text" name="NIP" class="form-control">
+									<label>Division</label>
+									<select class="select-required" style="width:100%" name="DivisiID" id="DivisionID"></select>
+								</div>
+							</div>
+
+						</div>
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label>Type</label>
+									<select class="form-control required" name="Type" id="Type">
+										<option value="0">Choose one</option>
+									</select>
 								</div>		
-							</div>					
+							</div>	
+							<div class="col-sm-6">
+								<div class="form-group">
+									<label>Question</label>
+									<select class="form-control required" name="Question">
+										<option value="0">Choose one</option>
+									</select>
+								</div>		
+							</div>
 						</div>
 						<div class="row">
 							<div class="col-sm-12 text-left">
@@ -45,7 +67,7 @@
 			<div class="panel panel-default" id="result-table">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<i class="fa fa-bars"></i> List content
+						<i class="fa fa-bars"></i> List content <span class="label-content"><?=trim(preg_replace('/_/', ' ', $typecontent))?></span>
 					</h4>
 				</div>
 				<div class="panel-body">
@@ -54,10 +76,10 @@
 							<thead>
 								<tr>
 									<th width="5%">No</th>
-									<th>Employee</th>
-									<th>Type Content</th>
-									<th>Total</th>
-									<th>Detail</th>
+									<th width="20%">Employee</th>
+									<th>Type</th>
+									<th>Question</th>
+									<th width="15%">Last Viewed</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -71,9 +93,6 @@
 			</div>
 		</div>
 	</div>
-	
-
-	
 </div>
 
 <script type="text/javascript">
@@ -89,6 +108,9 @@
             "serverSide": true,
             "iDisplayLength" : 5,
             "responsive": true,
+            language: {
+		        searchPlaceholder: "Search by NIP or name"
+		    },
             "ajax":{
                 url : base_url_js+'admin-fetch-log', // json datasource
                 ordering : false,
@@ -97,7 +119,7 @@
                 error: function(jqXHR){  // error handling
                     loading_modal_hide();
                     $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-                        '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                        '<h4 class="modal-title">Error Fetch Data</h4>');
                     $('#GlobalModal .modal-body').html(jqXHR.responseText);
                     $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
                     $('#GlobalModal').modal({
@@ -119,35 +141,27 @@
             	{
             		"data":"NIP",
             		"render": function (data, type, row, meta) {
-            			var label = data+"/"+row.Name;
+            			var label = '<b>'+data+"</b><br>"+row.Name;
             			return label;
             		}
             	},
             	{
-            		"data":"TypeContent",
+            		"data":"TypeName",
+            		"render": function (data, type, row, meta) {
+            			var label = '<b>'+row.DivisionName+'</b><br>'+data;            			
+            			return label;
+            		}
+            	},
+            	{
+            		"data":"Description", 
             		"render": function (data, type, row, meta) {
             			var label = data;
-            			var name = 'undefined';
-            			if(data == 'user_qna'){
-            				name = 'help';
-            			}else if(data == 'knowledge_base'){
-            				name = 'knowledge base';
-            			}
-            			label = '<span class="capitalize">'+name+'</span>'
-            			return label;
-            		}
-            	},
-            	{
-            		"data":"totalRead", 
-            		"render": function (data, type, row, meta) {
-            			var label = data+" articles has been read";
             			return label;
             		}           		
-            	},
-            	{
-            		"data":"NIP", 
+            	},{
+            		"data":"totalRead", 
             		"render": function (data, type, row, meta) {
-            			var label = '<button class="btn btn-default btn-detail btn-xs" data-nip="'+row.NIP+'" data-type="'+row.TypeContent+'" type="button"><i class="fa fa-folder-open"></i></button>';
+            			var label = data+" times read";
             			return label;
             		}           		
             	},
@@ -156,12 +170,70 @@
 	}
 
 
+	function typeSelect(TypeContent,DivisionID,TypeSelect,TypeQuest) {
+		var result = [];
+		var dataPost = {
+	        TypeContent : TypeContent,
+	        DivisionID : DivisionID,
+	        SelectBox : TypeSelect,
+	        TypeQuest : TypeQuest
+      	}
+	        
+      	var token = jwt_encode(dataPost,'UAP)(*');
+
+      	$.ajax({
+	        type : 'POST',
+	        url : base_url_js+"get-type-question",
+	        data : {token:token},
+	        dataType : 'json',
+	        async: false,
+	        beforeSend :function(){},
+	        error : function(jqXHR){
+				$('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+	                '<h4 class="modal-title">Error !</h4>');
+				$("body #GlobalModal .modal-body").html(jqXHR.responseText);
+				$('body #GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+				$("body #GlobalModal").modal("show");
+	        },success : function(response){
+	        	result = response;
+	        }
+	    });
+		return result;
+	}
+
+
+	function loadSelectOptionAllDivisionProdFac(element,selected) {
+		var url = base_url_js+'api/__getAllDepartementPU';
+        $.getJSON(url,function (jsonResult) {
+        	$(element).append('<option value="0" >Choose one</option>');
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = ( selected!='' && typeof selected !== "undefined" && selected==d.Code) ? 'selected' : '';
+                $(element).append('<option value="'+d.Code+'" '+sc+'>'+d.Name2+'</option>');
+            }
+            $(element).select2({'width':'100%'});
+        });
+    }
+
+
 	$(document).ready(function(){
 		fetchLogActivity();
+
+		<?php if($typecontent == "user_qna"){ ?>
+		loadSelectOptionDivision("#DivisionID",12);
+		//$("#DivisionID").select2({'width':'100%'});
+		<?php }else{ ?>
+		loadSelectOptionAllDivisionProdFac("#DivisionID");
+		<?php } ?>
+
+
 		$("#form-filter .btn-filter").click(function(){
 	    	$('body #table-list-data').DataTable().destroy();
 	        fetchLogActivity();
+	        var labelname = $("#TypeContent option:selected").text();
+			$(".label-content").text(labelname);
 	    });
+
 	    $("#table-list-data").on("click",".btn-detail",function(){
 	    	var itsme = $(this);
 	    	var NIP = itsme.data("nip");
@@ -203,5 +275,61 @@
                 'backdrop' : 'static'
             });	    	
 	    });
+		
+		$("#TypeContent").change(function(){
+			var itsme = $(this);
+			var value = itsme.val();
+			$("#form-filter select:not(#TypeContent)").empty();
+			if(value == "user_qna"){
+				loadSelectOptionDivision("#DivisionID");
+			}else{
+				loadSelectOptionAllDivisionProdFac("#DivisionID",'0');
+			}
+		});
+
+		$("#DivisionID").change(function(){
+			var itsme = $(this);
+			var value = itsme.val();
+			var content = $("#TypeContent").val();
+			var result = typeSelect(content,value,"Type");
+			if(!jQuery.isEmptyObject(result)){
+
+				$("#form-filter select[name=Type]").empty();
+					var options = "<option>Choose one</option>";
+					if(content == "knowledge_base"){
+					var iniID = 0;
+					$.each(result,function(k,v){
+						$.each(v,function(key, val){
+							if(iniID != parseInt(val.ID)){
+								options += '<option value="'+val.ID+'">'+val.Type+'</option>';
+							}
+							iniID = parseInt(val.ID);
+						});
+					});
+				}else{
+					$.each(result,function(k,v){
+						options += '<option value="'+v.Type+'">'+v.Type+'</option>';
+					});
+				}
+				$("#form-filter select[name=Type]").append(options);
+			}
+		});
+
+		$("#Type").change(function(){
+			var itsme = $(this);
+			var value = itsme.val();
+			var content = $("#TypeContent").val();
+			var TypeQuest = $("#Type").val();
+			var result = typeSelect(content,value,"Questions",TypeQuest);
+			if(!jQuery.isEmptyObject(result)){
+				$("#form-filter select[name=Question]").empty();
+				var options = "<option>Choose one</option>";
+				$.each(result,function(k,v){
+					options += '<option value="'+v.ID+'">'+v.Desc+'</option>';
+				});
+				$("#form-filter select[name=Question]").append(options);
+			}
+		});
+
 	});
 </script>
