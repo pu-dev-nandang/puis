@@ -51,7 +51,8 @@ class M_log_content extends CI_Model{
             $select = "count(DISTINCT a.NIP) as Total";
         }else{
             $select = "c.NIP, c.`Name`, DATE_FORMAT(a.ViewedAt,'%d-%M-%Y %H:%i:%s') as ViewedAt, {$selectC}, 
-                       ( select count(NIP) from db_employees.log_countable_content where NIP = a.NIP and TypeContent = '{$tablename2}' and ContentID = a.ContentID  ) as totalRead ";
+                       ( select count(NIP) from db_employees.log_countable_content where NIP = a.NIP and TypeContent = '{$tablename2}' and ContentID = a.ContentID  ) as totalRead,
+                       ( select count(NIP) from db_employees.log_countable_content where NIP = a.NIP and TypeContent = 'knowledge_base') as totalReadCtn ";
             $groupby = "group by a.NIP";
         }
 

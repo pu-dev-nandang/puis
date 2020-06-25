@@ -81,7 +81,7 @@
 									<th width="20%">Employee</th>
 									<th>Type</th>
 									<th>Question</th>
-									<th width="15%">Last Viewed</th>
+									<th width="15%">Total Viewed</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -157,13 +157,13 @@
             	{
             		"data":"Description", 
             		"render": function (data, type, row, meta) {
-            			var label = data;
+            			var label = data+' <small>('+row.totalRead+' times read)</small>';
             			return label;
             		}           		
             	},{
-            		"data":"totalRead", 
+            		"data":"totalReadCtn", 
             		"render": function (data, type, row, meta) {
-            			var label = data+" times read";
+            			var label = data+" times read article";
             			return label;
             		}           		
             	},

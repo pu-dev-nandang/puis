@@ -251,7 +251,7 @@
 
                         <!-- Added by Febri @ Jun 2020 -->
                         <?php 
-                        $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; 
+                        $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; 
                         $ProdyNavSession = $this->session->userdata('prodi_get');
                         $DepartmentIDNavSession =$this->session->userdata('IDdepartementNavigation');
                         $isProdyNav = ((count($ProdyNavSession) > 0) ? true:false);
