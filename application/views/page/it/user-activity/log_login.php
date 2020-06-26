@@ -13,9 +13,9 @@
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <label>Type</label>
+                    <label>Login By</label>
                     <select class="form-control filter-log" id="filterLogin">
-                        <option value="">Login By</option>
+                        <option value="">All</option>
                         <option disabled>---------</option>
                         <option value="basic">Basic</option>
                         <option value="gmail">Gmail</option>
