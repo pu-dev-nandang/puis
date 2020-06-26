@@ -1,4 +1,36 @@
 
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <div class="well">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Type</label>
+                    <select class="form-control filter-log" id="filterType">
+                        <option value="">All</option>
+                        <option disabled>---------</option>
+                        <option value="std">Student</option>
+                        <option value="emp">Employee</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label>Type</label>
+                    <select class="form-control filter-log" id="filterLogin">
+                        <option value="">Login By</option>
+                        <option disabled>---------</option>
+                        <option value="basic">Basic</option>
+                        <option value="gmail">Gmail</option>
+                        <option value="ad">Active Directory</option>
+                    </select>
+                </div>
+                <div class="col-md-4 hide">
+                    <label>Login Date</label>
+                    <input type="text" class="form-control" id="filterDate" style="background: #fff;color: #333;" readonly>
+                </div>
+            </div>
+        </div>
+        <hr/>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-md-12" id="loadTable">
@@ -10,10 +42,24 @@
 
     $(document).ready(function () {
         getDataLog();
+
+        $( "#filterDate" )
+            .datepicker({
+                showOtherMonths:true,
+                autoSize: true,
+                dateFormat: 'dd MM yy',
+                onSelect : function () {
+                    getDataLog();
+                }
+            });
+
+    });
+
+    $('.filter-log').change(function () {
+        getDataLog();
     });
 
     function getDataLog() {
-
 
         $('#loadTable').html('<table id="tableData" class="table table-striped table-bordered table-centre">' +
             '            <thead>' +
@@ -30,8 +76,15 @@
             '            </thead>' +
             '        </table>');
 
+        var filterType = $('#filterType').val();
+        var filterLogin = $('#filterLogin').val();
+        var filterDate = $('#filterDate').datepicker("getDate");
+        var fDate = (filterDate!=null) ? moment(filterDate).format('YYYY-MM-DD') : '';
+
         var data = {
-            action : 'getListPublicationDate',
+            UserType : (filterType!='') ? filterType : '',
+            LogonBy : (filterLogin!='') ? filterLogin : '',
+            Date : fDate
         };
 
         var token = jwt_encode(data,'UAP)(*');

@@ -1386,9 +1386,9 @@ class C_api4 extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataScr = '(e.Title LIKE "%'.$search.'%" OR em.Name LIKE "%'.$search.'%" 
+                $dataScr = 'e.Title LIKE "%'.$search.'%" OR em.Name LIKE "%'.$search.'%" 
                                 OR em.NIP LIKE "%'.$search.'%" OR ats.Name LIKE "%'.$search.'%"
-                                 OR ats.NPM LIKE "%'.$search.'%")';
+                                 OR ats.NPM LIKE "%'.$search.'%"';
                 $dataSearch = ($To!='' || $EDID!='' || $EID!='')
                     ? ' AND ('.$dataScr.')'
                     : ' WHERE '.$dataScr;
@@ -1466,16 +1466,30 @@ class C_api4 extends CI_Controller {
         $data_arr = $this->getInputToken2();
 
 
+        $UserType = $data_arr['UserType'];
+        $LogonBy = $data_arr['LogonBy'];
+//        $Date = $data_arr['Date'];
+
         $dataWhere = '';
+        if($UserType!='' || $LogonBy!=''){
+            $w_UserType = ($UserType!='') ? 'AND ll.UserType = "'.$UserType.'" ' : '';
+            $w_LogonBy = ($LogonBy!='') ? 'AND ll.LogonBy = "'.$LogonBy.'" ' : '';
+            $w = $w_UserType.$w_LogonBy;
+            $dataWhere = ' WHERE '.substr($w,3);
+        }
+
+
+
 
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
-            $dataScr = 'WHERE ll.Username LIKE "%'.$search.'%" OR ll.UserType LIKE "%'.$search.'%" 
+            $dataScr = 'll.Username LIKE "%'.$search.'%" OR ll.UserType LIKE "%'.$search.'%" 
                                 OR ll.LogonBy LIKE "%'.$search.'%" OR ll.IPLocal LIKE "%'.$search.'%"
                                  OR ll.IPPublic LIKE "%'.$search.'%" OR em.Name LIKE "%'.$search.'%" 
                                   OR ats.Name LIKE "%'.$search.'%"';
-            $dataSearch = $dataScr;
+            $dataSearch = ($UserType!='' || $LogonBy!='')
+                ? ' AND ('.$dataScr.')' : 'WHERE '.$dataScr;
         }
 
         $queryDefault = 'SELECT ll.Username, ll.UserType, ll.LogonBy, ll.LogonAt, ll.IPLocal, ll.IPPublic,  
@@ -1483,7 +1497,7 @@ class C_api4 extends CI_Controller {
                                                 ELSE ats.Name END AS "Name" FROM db_it.log_login ll 
                                                 LEFT JOIN db_employees.employees em ON (em.NIP = ll.Username)
                                                 LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ll.Username)
-                                                '.$dataSearch;
+                                                '.$dataWhere.$dataSearch;
 
         $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
 
