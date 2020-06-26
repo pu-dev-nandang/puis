@@ -303,7 +303,7 @@
             		"render": function(data, type, row, meta){
             			var label = '';
             			if(!jQuery.isEmptyObject(row.FirstLoginPortal)){
-            				var late = (row.IsLateCome) ? 'text-danger':'';
+            				var late = (row.IsLateCome) ? 'text-danger btn-danger':'';
             				label = '<span class="'+late+'">'+data+'</span>';
             			}
             			return label;
@@ -314,7 +314,7 @@
             		"render": function(data, type, row, meta){
             			var label = '';
             			if(!jQuery.isEmptyObject(row.LastLoginPortal)){
-            				var late = (row.IsLateOut) ? 'text-danger':'';
+            				var late = (row.IsLateOut) ? 'text-danger btn-danger':'';
             				label = '<span class="'+late+'">'+data+'</span>';
             			}
             			return label;

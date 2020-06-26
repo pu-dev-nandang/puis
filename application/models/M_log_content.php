@@ -31,7 +31,7 @@ class M_log_content extends CI_Model{
         $leftJoinTable = ""; $selectC="";
         if($tablename2 == 'knowledge_base'){
             $selectC         = 'd.Type as TypeName, b.Desc as Description, abc.NameDepartment as DivisionName';
-            $leftJoinTable  .= 'LEFT JOIN db_employees.knowledge_base b on a.ContentID = b.ID ';
+            $leftJoinTable  .= 'INNER JOIN db_employees.knowledge_base b on a.ContentID = b.ID ';
             $leftJoinTable  .= 'LEFT JOIN db_employees.kb_type d on d.ID = b.IDType ';
             $leftJoinTable  .= 'left join (
                                         select * from (
@@ -43,7 +43,7 @@ class M_log_content extends CI_Model{
                                 ) abc) abc on d.IDDivision = abc.ID';
         }else if($tablename2 == 'user_qna'){
             $selectC         = 'b.Type as TypeName, b.Questions as Description, d.Division as DivisionName ';
-            $leftJoinTable   = 'LEFT JOIN db_employees.user_qna b on a.ContentID = b.Id ';
+            $leftJoinTable   = 'INNER JOIN db_employees.user_qna b on a.ContentID = b.Id ';
             $leftJoinTable  .= 'LEFT JOIN db_employees.division d on d.ID = Division_ID ';
         }
 
@@ -51,8 +51,7 @@ class M_log_content extends CI_Model{
             $select = "count(DISTINCT a.NIP) as Total";
         }else{
             $select = "c.NIP, c.`Name`, DATE_FORMAT(a.ViewedAt,'%d-%M-%Y %H:%i:%s') as ViewedAt, {$selectC}, 
-                       ( select count(NIP) from db_employees.log_countable_content where NIP = a.NIP and TypeContent = '{$tablename2}' and ContentID = a.ContentID  ) as totalRead,
-                       ( select count(NIP) from db_employees.log_countable_content where NIP = a.NIP and TypeContent = 'knowledge_base') as totalReadCtn ";
+                       ( select count(NIP) from db_employees.log_countable_content x inner join  db_employees.knowledge_base z on x.ContentID = z.ID where NIP = a.NIP and TypeContent = 'knowledge_base') as totalReadCtn ";
             $groupby = "group by a.NIP";
         }
 
@@ -98,11 +97,11 @@ class M_log_content extends CI_Model{
         $leftJoinTable = ""; $selectC="";
         if($tablename2 == 'knowledge_base'){
         	$selectC = 'd.Type as TypeName, b.Desc as Description';
-            $leftJoinTable = 'LEFT JOIN db_employees.knowledge_base b on a.ContentID = b.ID ';
+            $leftJoinTable = 'INNER JOIN db_employees.knowledge_base b on a.ContentID = b.ID ';
             $leftJoinTable .= 'LEFT JOIN db_employees.kb_type d on d.ID = b.IDType ';
         }else if($tablename2 == 'user_qna'){
         	$selectC = 'b.Type as TypeName, b.Questions as Description';
-            $leftJoinTable = 'LEFT JOIN db_employees.user_qna b on a.ContentID = b.Id';
+            $leftJoinTable = 'INNER JOIN db_employees.user_qna b on a.ContentID = b.Id';
         }
 
         if($count){

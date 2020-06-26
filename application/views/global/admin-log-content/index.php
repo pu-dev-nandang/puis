@@ -157,7 +157,7 @@
             	{
             		"data":"Description", 
             		"render": function (data, type, row, meta) {
-            			var label = data+' <small>('+row.totalRead+' times read)</small>';
+            			var label = data;
             			return label;
             		}           		
             	},{
