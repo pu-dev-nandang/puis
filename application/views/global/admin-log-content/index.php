@@ -25,7 +25,9 @@
 									<label>Content</label>
 									<select class="form-control" name="TypeContent" id="TypeContent">
 										<option value="">Choose one</option>
+										<?php if ($this->session->userdata('PositionMain')['IDDivision']=='12'){ ?>
 										<option <?=($typecontent == 'user_qna') ? 'selected':''?> value="user_qna">Help</option>
+										<?php } ?>
 										<option <?=($typecontent == 'knowledge_base') ? 'selected':''?> value="knowledge_base">Knowledge Base</option>
 									</select>
 								</div>
