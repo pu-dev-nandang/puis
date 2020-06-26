@@ -1294,7 +1294,6 @@ class C_api4 extends CI_Controller {
             echo json_encode($json_data);
 
         }
-
         else if($data_arr['action']=='getListEULAForUser'){
 
             $data = $this->db->query('SELECT el.ID AS ELID, e.Title, e.Description, el.Queue, eu.Username FROM db_it.eula_linked el 
@@ -1305,7 +1304,6 @@ class C_api4 extends CI_Controller {
 
             return print_r(json_encode($data));
         }
-
         else if($data_arr['action']=='getListEULAForDirection'){
 
             $data = $this->db->get_where('db_it.eula_direct',array('Username'=>$data_arr['Username']))->result_array()[0];
@@ -1342,7 +1340,6 @@ class C_api4 extends CI_Controller {
             return print_r(json_encode($data));
 
         }
-
         else if($data_arr['action']=='getPublicationDate'){
 
             $where = ($data_arr['To']!='') ? ' WHERE ed.To LIKE "'.$data_arr['To'].'" ' : '';
@@ -1351,7 +1348,6 @@ class C_api4 extends CI_Controller {
 
             return print_r(json_encode($data));
         }
-
         else if($data_arr['action']=='getPublicationTo'){
             $data = $this->db->query('SELECT ed.To FROM db_it.eula_date ed GROUP BY ed.To ORDER BY ed.To ASC')->result_array();
 
@@ -1460,6 +1456,88 @@ class C_api4 extends CI_Controller {
 
         }
 
+
+    }
+
+    public function getLogLogin(){
+
+        $requestData = $_REQUEST;
+
+        $data_arr = $this->getInputToken2();
+
+
+        $dataWhere = '';
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataScr = 'WHERE ll.Username LIKE "%'.$search.'%" OR ll.UserType LIKE "%'.$search.'%" 
+                                OR ll.LogonBy LIKE "%'.$search.'%" OR ll.IPLocal LIKE "%'.$search.'%"
+                                 OR ll.IPPublic LIKE "%'.$search.'%" OR em.Name LIKE "%'.$search.'%" 
+                                  OR ats.Name LIKE "%'.$search.'%"';
+            $dataSearch = $dataScr;
+        }
+
+        $queryDefault = 'SELECT ll.Username, ll.UserType, ll.LogonBy, ll.LogonAt, ll.IPLocal, ll.IPPublic,  
+                                                CASE WHEN  em.Name IS NOT NULL THEN em.Name
+                                                ELSE ats.Name END AS "Name" FROM db_it.log_login ll 
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = ll.Username)
+                                                LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ll.Username)
+                                                '.$dataSearch;
+
+        $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+
+        $sql = $queryDefault.' ORDER BY ll.LogonAt DESC LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+
+            $nestedData = array();
+            $row = $query[$i];
+
+            $IPLocal = ($row['IPLocal']!='' && $row['IPLocal']!=null) ? $row['IPLocal'] : '';
+            $IPPublic = ($row['IPPublic']!='' && $row['IPPublic']!=null) ? $row['IPPublic'] : '';
+
+            $LabelLoginAs = ($row['UserType']=='std')
+                ? ' <span class="label label-primary">Student</span>'
+                : ' <span class="label label-success">Employee</span>';
+
+            $LabelLogin = '<span class="label label-default">Basic</span>';
+            if($row['LogonBy']=='gmail'){
+                $LabelLogin = '<span class="label label-danger">Gmail</span>';
+            } else if($row['LogonBy']=='ad'){
+                $LabelLogin = '<span class="label label-primary">Active Directory</span>';
+            }
+
+            $nestedData[] = '<div>'.$no.'</div>';
+            $nestedData[] = '<div>'.$row['Username'].'</div>';
+            $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b></div>';
+            $nestedData[] = '<div>'.$LabelLoginAs.'</div>';
+            $nestedData[] = '<div>'.$LabelLogin.'</div>';
+            $nestedData[] = '<div>'.$IPLocal.'</div>';
+            $nestedData[] = '<div>'.$IPPublic.'</div>';
+            $nestedData[] = '<div>'.date('d M Y H:i',strtotime($row['LogonAt'])).'</div>';
+
+
+            $data[] = $nestedData;
+            $no++;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($queryDefaultRow),
+            "recordsFiltered" => intval( $queryDefaultRow),
+            "data"            => $data,
+            "dataQuery"            => $query
+        );
+        echo json_encode($json_data);
 
     }
 
