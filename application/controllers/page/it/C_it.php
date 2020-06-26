@@ -134,6 +134,13 @@ class C_it extends It_Controler {
         $this->menu_user_activity($page);
     }
 
+    public function log_login(){
+        $department = parent::__getDepartement();
+        $data['NIP']= $this->session->userdata('NIP');
+        $page = $this->load->view('page/'.$department.'/user-activity/log_login',$data,true);
+        $this->menu_user_activity($page);
+    }
+
     public function seleksi_mahasiswa_asing(){
 
     }
