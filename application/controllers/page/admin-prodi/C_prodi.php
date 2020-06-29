@@ -524,8 +524,7 @@ class C_prodi extends Prodi_Controler {
     }
 
 
-    /*#END ADDED BY FEBRI MAY 2020
-    #STOCK GOOD */
+    /*#END ADDED BY FEBRI MAY 2020 #STOCK GOOD */
 
     public function ajax_list()
     {

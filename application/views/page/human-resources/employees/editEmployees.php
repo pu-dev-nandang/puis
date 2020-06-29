@@ -498,6 +498,7 @@
                                         <div class="form-group">
                                             <label>Programme Study</label>
                                             <select class="form-control" id="formProgrammeStudy"></select>
+                                            <small class="text-danger text-message"></small>
                                         </div>
                                     </div>
                                     <div class="col-xs-3">
@@ -1015,16 +1016,26 @@
         if(isLecturer){
             var statusLecturerVA = itsform.find("#formStatusLecturer > option:selected").attr("value");
             var statusLecturer = itsform.find("#formStatusLecturer > option:selected").val();
-                console.log("c:"+statusLecturer);
+
+            var prodyStatusVA = itsform.find("#formProgrammeStudy > option:selected").attr("value");
+            var prodyStatus = itsform.find("#formProgrammeStudy > option:selected").val();
+            
             if(typeof statusLecturerVA !== typeof undefined && statusLecturerVA !== false){
-                console.log("v:"+statusLecturerVA);
-                  error=true;
+                error=true;
             }else{
                 if($.trim(statusLecturer).length > 0){
                     itsform.find("#formStatusLecturer").addClass("required");
                     itsform.find("#formStatusLecturer").parent().find(".text-message").text("Please fill this field");
                     error=false;
-                }    
+                }
+            }
+
+            if(prodyStatusVA.length > 0){
+                error=true;
+            }else{
+                itsform.find("#formProgrammeStudy").addClass("required error");
+                itsform.find("#formProgrammeStudy").parent().find(".text-message").text("Please fill this field");
+                error=false;
             }
             
         }
