@@ -73,7 +73,7 @@
         }
     }
 
-    function LoadDataForTable()
+    function LoadDataForTable(MakeDataSelected="")
     {
         DataSelected = [];
         // make table
@@ -104,7 +104,10 @@
 
         $.post(url,{token:token},function (jsonResult) {
             MakeDataTable(jsonResult);
-            MakeDataSelected(); 
+            if (MakeDataSelected == "") {
+                MakeDataSelected();
+            }
+             
             
         });
     }
@@ -220,7 +223,7 @@
                         $.post(url,{token:token},function (resultJson) {
                             DataSelected = resultJson.Dt;
                             MakeDataSelected();
-                             DataSelected = []; // set to default
+                            LoadDataForTable("1");  // not load dataselected
                             S_Table.$('input[type="checkbox"]').each(function(){
 			                    if(this.checked){
                                     $(this).closest('tr').remove();
