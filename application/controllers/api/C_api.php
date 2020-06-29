@@ -800,13 +800,14 @@ class C_api extends CI_Controller {
                           LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
                           ';
         if( !empty($requestData['search']['value']) ) {
+            $dataWhere = (empty($dataWhere)) ? ' where ' : ' and ';
             $sql.= '  '.$dataWhere.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
             $sql.= ' OR asx.FormulirCode LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR asx.No_Ref LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR emp.Name LIKE "'.$requestData['search']['value'].'%" )';
-            $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
+            // $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
         }
         else {
             $sql.= ' '.$dataWhere;
