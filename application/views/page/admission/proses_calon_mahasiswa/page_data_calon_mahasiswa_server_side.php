@@ -341,7 +341,7 @@
                 });
 
                 $("#generateToBEMhs").click(function(){
-
+                  let btnGenerate = $(this);
                     var checkboxArr = [];
                      table.$('input[type="checkbox"]').each(function(){
                        if(this.checked){
@@ -355,24 +355,11 @@
                      });
 
                      if (checkboxArr.length > 0) {
-                         $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Apakah anda yakin untuk melakukan request ini ?? </b> ' +
-                             '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
-                             '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
-                             '</div>');
-                         $('#NotificationModal').modal('show');
-
-                         $("#confirmYes").click(function(){
-                             $('#NotificationModal .modal-header').addClass('hide');
-                             $('#NotificationModal .modal-body').html('<center>' +
-                                 '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
-                                 '                    <br/>' +
-                                 '                    Loading Data . . .' +
-                                 '                </center>');
-                             $('#NotificationModal .modal-footer').addClass('hide');
-                             $('#NotificationModal').modal({
-                                 'backdrop' : 'static',
-                                 'show' : true
-                             });
+                          if (confirm('Are you sure ?')) {
+                            oTable2.$('input[type="checkbox"]').attr('disabled',true);
+                            btnGenerate.attr('disabled',true);
+                            // return;
+                            loading_modal_show();
 
                              var url = base_url_js+'admission/proses-calon-mahasiswa/generate_to_be_mhs';
                              var data = {
@@ -394,19 +381,22 @@
                                  {
                                   toastr.success('Proses Finish', 'Success!');
                                  }
-                                 $('#NotificationModal').modal('hide');
+                                loading_modal_hide();
                              }).done(function() {
                                loadPage('to-be-mhs/1');
-                               $('#NotificationModal').modal('hide');
+                               loading_modal_hide();
                              }).fail(function() {
                                toastr.error('Please check the completeness of the data', 'Failed!!');
-                               $('#NotificationModal').modal('hide');
+                               loading_modal_hide();
                              }).always(function() {
+                              oTable2.$('input[type="checkbox"]').attr('disabled',false);
+                              btnGenerate.attr('disabled',false);
                               loadPage('to-be-mhs/1');
-                              $('#NotificationModal').modal('hide');
+                              loading_modal_hide();
 
                              });
-                         })
+                          }
+
                      }
                      else
                      {
