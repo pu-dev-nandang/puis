@@ -245,7 +245,7 @@ abstract class Admission_Controler extends Globalclass{
         $this->GetNameMenu();
     }
 
-    // public $path_upload_regOnline = path_register_online.'document/';
+    public $path_upload_regOnline = path_register_online.'document/';
 
     private function GetNameMenu()
     {
