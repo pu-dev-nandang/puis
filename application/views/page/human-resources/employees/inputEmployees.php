@@ -996,7 +996,8 @@
                     RegionID    : RegionID,
                     DistrictID  : DistrictID,
                     Extension   : formExtension,
-                    PassTelp    : formPassTelp
+                    PassTelp    : formPassTelp,
+                    isApproved : 0
                 }
             };
 

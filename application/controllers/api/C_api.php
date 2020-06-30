@@ -6303,7 +6303,7 @@ class C_api extends CI_Controller {
                     $myNIP = $this->session->userdata('NIP');
                     $myName = $this->session->userdata('Name');
                     $formInsert['EnteredBy'] = $myNIP.'/'.$myName;
-                    $formInsert['isApproved'] = 1;
+                    $formInsert['isApproved'] = null;
                     /*END ADDED BY FEBRI @ FEB 2020*/
                     
                     $insert = $this->db->insert('db_employees.employees',$formInsert);
