@@ -168,7 +168,7 @@ class C_lpmi extends Lpmi_Controler {
         $data = array(
                 // 'IDType' => $this->input->post('type'),
                 'Title' => $this->input->post('title'),
-                'IDCat' => $this->input->post('category'),
+                'IDSubCat' => $this->input->post('category'),
                 'Description' => $this->input->post('description'),
                 'Meta_description' => $this->input->post('meta_des'),
                 'Meta_keywords' => $this->input->post('meta_key'),
@@ -245,7 +245,7 @@ class C_lpmi extends Lpmi_Controler {
         $this->_validate();
         $data = array(
                 'Title' => $this->input->post('title'),
-                'IDCat' => $this->input->post('category'),
+                'IDSubCat' => $this->input->post('category'),
                 'Description' => $this->input->post('description'),
                 'Meta_description' => $this->input->post('meta_des'),
                 'Meta_keywords' => $this->input->post('meta_key'),

@@ -166,8 +166,9 @@
                             <label  id="label-photo">Upload file </label>
                             <div>
                                 <input name="photo" type="file">
-                                <p>Max size 2 MB (type file jpg, jpeg, png and pdf)</p>
-                                <span class="help-block"></span>
+                                <p style="color: red;">* Max size 2 MB (type file jpg, jpeg, png and pdf)</p>
+                                <p style="color: red;">* Image weight 1028 x height 600</p>
+                                <span class="help-block" style="color: red;"></span>
                             </div>
                         </div>
 	                </div>    

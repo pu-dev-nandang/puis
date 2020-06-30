@@ -62,12 +62,22 @@ class C_apilpmi extends CI_Controller {
         $idindex = $query[0]['ID'];
         
         // print_r($IDType).die();
-        $data = $this->db->query('SELECT c.*, l.language, ct.Label , ci.SegmentMenu 
+        if($IDType=='event'){
+            $data = $this->db->query('SELECT c.*, l.language, ct.Label , ci.SegmentMenu 
+            FROM db_lpmi.content c 
+            LEFT JOIN db_lpmi.content_type ct ON (ct.ID = c.IDindex)
+            LEFT JOIN db_lpmi.content_index ci ON (ci.ID = c.IDindex)
+            LEFT JOIN db_lpmi.language l ON (l.ID = ct.LangID)
+            WHERE c.IDindex ='.$idindex.' and c.Lang="'.$lang.'" and c.Status="Yes" and c.AddDate >= ( CURDATE() - INTERVAL 3 DAY ) ORDER BY c.AddDate ASC LIMIT 4')->result();
+        }else{
+            $data = $this->db->query('SELECT c.*, l.language, ct.Label , ci.SegmentMenu 
             FROM db_lpmi.content c 
             LEFT JOIN db_lpmi.content_type ct ON (ct.ID = c.IDindex)
             LEFT JOIN db_lpmi.content_index ci ON (ci.ID = c.IDindex)
             LEFT JOIN db_lpmi.language l ON (l.ID = ct.LangID)
             WHERE c.IDindex ='.$idindex.' and c.Lang="'.$lang.'" and c.Status="Yes" Limit 6')->result();
+        }
+        
 
         for ($i=0; $i < count($data); $i++) {
             $string = $data[$i]->Title;
@@ -106,13 +116,26 @@ class C_apilpmi extends CI_Controller {
         $idindex = $query[0]['ID'];
         
         // print_r($IDType).die();
-        $data = $this->db->query('SELECT c.*, l.language, ct.Label , ci.SegmentMenu , e.Name
+        if($IDType=='event'){
+
+            $data = $this->db->query('SELECT c.*, l.language, ct.Label , ci.SegmentMenu , e.Name
+            FROM db_lpmi.content c 
+            LEFT JOIN db_lpmi.content_type ct ON (ct.ID = c.IDindex)
+            LEFT JOIN db_lpmi.content_index ci ON (ci.ID = c.IDindex)
+            LEFT JOIN db_lpmi.language l ON (l.ID = ct.LangID)
+            LEFT JOIN db_employees.employees e ON (e.NIP=c.CreateBy)
+            WHERE c.IDindex ='.$idindex.' and c.Lang="'.$lang.'" and c.Status="Yes" ORDER BY c.AddDate ASC')->result_array();
+
+        }else{
+            
+            $data = $this->db->query('SELECT c.*, l.language, ct.Label , ci.SegmentMenu , e.Name
             FROM db_lpmi.content c 
             LEFT JOIN db_lpmi.content_type ct ON (ct.ID = c.IDindex)
             LEFT JOIN db_lpmi.content_index ci ON (ci.ID = c.IDindex)
             LEFT JOIN db_lpmi.language l ON (l.ID = ct.LangID)
             LEFT JOIN db_employees.employees e ON (e.NIP=c.CreateBy)
             WHERE c.IDindex ='.$idindex.' and c.Lang="'.$lang.'" and c.Status="Yes" ')->result_array();
+        }        
 
         for ($i=0; $i < count($data); $i++) {
             $string=$data[$i]['Title'];
@@ -180,22 +203,22 @@ class C_apilpmi extends CI_Controller {
         $data_arr = $this->getInputToken2();
         $IDType = $data_arr['IDType'];
         $lang = $data_arr['LangCode'];
-        $IDCat = $data_arr['IDCat'];
-        // print_r($IDCat);
+        $IDSubCat = $data_arr['IDCat'];
+        // print_r($IDSubCat);
         $sql = 'select ci.* from db_lpmi.content_index AS ci
                 WHERE ci.SegmentMenu="'.$IDType.'" ';
         $query=$this->db->query($sql, array())->result_array();
         $idindex = $query[0]['ID'];
         
         // print_r($IDType).die();
-        if($IDCat==''){
+        if($IDSubCat==''){
             // print_r('kos');
             $data = $this->db->query('SELECT c.*, l.language, ct.Label , ci.SegmentMenu
             FROM db_lpmi.content c 
             LEFT JOIN db_lpmi.content_type ct ON (ct.ID = c.IDindex)
             LEFT JOIN db_lpmi.content_index ci ON (ci.ID = c.IDindex)
             LEFT JOIN db_lpmi.language l ON (l.ID = ct.LangID)
-            LEFT JOIN db_lpmi.category cat ON (c.IDCat = cat.ID)
+            LEFT JOIN db_lpmi.category cat ON (c.IDSubCat = cat.ID)
             WHERE c.IDindex ='.$idindex.' and c.Lang="'.$lang.'" and c.Status="Yes" ')->result();
         }else{
             // print_r('da');
@@ -204,8 +227,8 @@ class C_apilpmi extends CI_Controller {
             LEFT JOIN db_lpmi.content_type ct ON (ct.ID = c.IDindex)
             LEFT JOIN db_lpmi.content_index ci ON (ci.ID = c.IDindex)
             LEFT JOIN db_lpmi.language l ON (l.ID = ct.LangID)
-            LEFT JOIN db_lpmi.category cat ON (c.IDCat = cat.ID)
-            WHERE c.IDindex ='.$idindex.' and c.Lang="'.$lang.'" and c.Status="Yes" and c.IDCat='.$IDCat.'')->result();
+            LEFT JOIN db_lpmi.category cat ON (c.IDSubCat = cat.ID)
+            WHERE c.IDindex ='.$idindex.' and c.Lang="'.$lang.'" and c.Status="Yes" and c.IDSubCat='.$IDSubCat.'')->result();
         }
         // print_r($data);die();
         
