@@ -16,6 +16,7 @@
         <div class="panel-body" id="tabs">
         	<button class="btn btn-success" onclick="add_lpmi()"><i class="glyphicon glyphicon-plus"></i> Create</button>
         	<?php if($Segment1=='knowledge'){echo '<button class="btn btn-success" onclick="Catlpmi()"><i class="glyphicon glyphicon-plus"></i> Add Category</button>';} ?>
+        	<?php if($Segment1=='knowledge'){echo '<button class="btn btn-success" onclick="SubCatlpmi()"><i class="glyphicon glyphicon-plus"></i> Add Sub Category</button>';} ?>
         	<button class="btn btn-default" onclick="reload_table()"><i class="glyphicon glyphicon-refresh"></i> Reload</button>
         	<hr>        	
 						
@@ -45,6 +46,10 @@
 <style type="text/css">.form-horizontal .form-group {
     padding: 5px 15px;
 }</style>
+
+
+
+
 <!-----Modal Category--->
 <div class="modal fade " id="modal_formCat" tabindex="-1" role="dialog" aria-labelledby="largeModal" aria-hidden="true">
     <div class="modal-dialog modal-md" style="width: 60%">
@@ -103,6 +108,87 @@
     	</div>
 	</div>
 </div>
+
+
+
+
+
+<!-----Modal Sub Category--->
+<div class="modal fade " id="modal_formSubCat" tabindex="-1" role="dialog" aria-labelledby="largeModal" aria-hidden="true">
+    <div class="modal-dialog modal-md" style="width: 60%">
+	    <div class="modal-content">
+	    <div class="modal-header" style="padding: 20px 35px">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	        <h3 class="modal-title" id="myModalLabel">Create Content <?= ucwords(str_replace("-"," ",$Segment1)); ?></h3>
+	    </div>
+	    
+	    <div class="modal-body form">
+			<form class="getcategory" id="formSubcat" style="margin: 0 15px;;">        				
+				<input type="hidden" value="" name="idSubcat"/>
+				<div class="form-group" style="margin-bottom: 0px">
+                    <label>Language</label>
+                    <select  name="lang" class="form-control getidlang">
+                      <option value="">--Select--</option>
+					  <option value="Eng">English</option>
+					  <option value="Ind">Indonesia</option>							  
+					</select>
+					<span class="help-block"></span>
+                </div> 
+
+				<div class="form-group" style="margin-bottom: 0px">
+                    <label>Select Category</label>
+                    <select  name="idcategory" class="form-control" id="showcategory">
+                      <option value="">--Select--</option>
+                        <!-- <?php foreach($category as $row):?>
+                        <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
+                        <?php endforeach;?>  -->                          
+                    </select>
+                    <span class="help-block"></span>
+                </div> 
+
+                <div class="form-group" style="margin-bottom: 0px">
+                    <label>Name Sub Category</label>                       
+                    <input name="subcategoryname" placeholder="Input sub category" class="form-control" type="text">
+                    <span class="help-block"></span>
+                </div> 
+				
+				<div class="form-group">
+					<div class="btn btn-success" id="btnSubcategory" onclick="add_Subcategory()">Save</div>
+				</div>
+			</form> 
+			<div class="panel-body" style="min-height: 100px;">
+				<div class="table-responsive">
+			        <table class="table table-condensed table-striped">
+			            <thead>
+			                <tr>
+			                    <td style="width: 8%">No</td>
+			                    <td>Sub Category</td>
+			                    <td>Category</td>
+			                    <td>Lang</td>
+			                    <td>Create by</td>
+			                    <td>Create at</td>
+			                    <td>Action</td>
+			                </tr>
+			            </thead>
+			            <tbody id="viewDatalistSubCategory">					        
+					    </tbody>
+			        </table>
+			    </div>
+	    	</div>
+			<!-- <div class="modal-footer">
+		       	<button type="button" id="btnSave" onclick="save()" class="btn btn-info">Save</button>
+		        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+		    </div> -->
+
+    	</div>
+    	
+    	</div>
+	</div>
+</div>
+
+
+
+
 <!-- MODAL ADD -->
 	<div class="modal fade " id="modal_form" tabindex="-1" role="dialog" aria-labelledby="largeModal" aria-hidden="true">
 	    <div class="modal-dialog modal-lg" style="width: 80%">
@@ -174,23 +260,12 @@
 	                </div>    
 	            </div> 
 	            <div class="col-md-4">
-	            	<div id="show_a5" class="thumbnail" style="padding: 15px ;margin-bottom:15px" > 
-	            		<div class="form-group" style="margin-bottom: 0px">
-	                        <h3>Select Category</h3>
-	                        <select  name="category" class="form-control">
-	                          <option value="">--Select--</option>
-							  	<?php foreach($category as $row):?>
-		                        <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
-		                        <?php endforeach;?>							  
-							</select>
-							<span class="help-block"></span>
-	                    </div>
-	                </div>
+	            	
 	            	<div class="thumbnail" style="padding: 15px; margin-bottom: 15px"> 	            		
 	            		
 	                    <div class="form-group" style="margin-bottom: 0px">
 	                        <h3>Language</h3>
-	                        <select  name="lang" class="form-control">
+	                        <select  name="lang" class="form-control getidlangcontent">
 	                          <option value="">--Select--</option>
 							  <option value="Eng">English</option>
 							  <option value="Ind">Indonesia</option>							  
@@ -207,6 +282,32 @@
 							<span class="help-block"></span>
 	                    </div>
 	            	</div>
+	            	<div id="show_a5" class="thumbnail" style="padding: 15px ;margin-bottom:15px" > 
+	            		<div class="form-group" style="margin-bottom: 0px">
+	                        <h3>Select Category</h3>
+	                        <div class="form-group" style="margin-bottom: 0px">
+			                    <label>Select Category</label>
+			                    <select  name="category" class="form-control getsubCatcontent" id="showcategorycontent">
+			                      <option value="">--Select--</option>
+			                        <!-- <?php foreach($category as $row):?>
+			                        <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
+			                        <?php endforeach;?>  -->                          
+			                    </select>
+			                    <span class="help-block"></span>
+			                </div> 
+							<span class="help-block"></span>
+	                    </div>
+	                    <div class="form-group" style="margin-bottom: 0px">
+		                    <label>Select Sub Category</label>
+		                    <select  name="idsubcategory" class="form-control " id="showSubcategorycontent">
+		                      <option value="">--Select--</option>
+		                        <!-- <?php foreach($category as $row):?>
+		                        <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
+		                        <?php endforeach;?>  -->                          
+		                    </select>
+		                    <span class="help-block"></span>
+		                </div> 
+	                </div>
 	            	<div class="thumbnail" style="padding: 15px"> 	            		
 	            		
 	                    <div class="form-group" style="margin-bottom: 15px">
@@ -254,14 +355,8 @@
 
 <script>
 	
-    $(document).ready(function () {
+    $(document).ready(function () {    	
     	
-    	
-
-		// $('#ad5').change(function() {
-		// 	$("#show_a5").show();
-		// 	document.getElementById('show_a5')[ ($("#ad5==''").is(":checked")? "show" : "hide" ]();;
-		// });
         $('#Description').summernote({
             placeholder: 'Text your announcement',
             tabsize: 2,
@@ -333,18 +428,6 @@
             $("#show_a5").hide();
     }
    
-  //   	$('#ad1').change(function() {
-		//   $("#show_a1").hide();
-		// });
-  //   	$('#ad2').change(function() {
-		//   $("#show_a2").prop("hidden", !this.checked);
-		// });
-		// $('#ad3').change(function() {
-		//   $("#show_a3").prop("hidden", !this.checked);
-		// });
-		// $('#ad4').change(function() {
-		// 	$("#show_a4").prop("hidden", !this.checked);
-		// });
 
 	var save_method; //for save method string
 	var table;
@@ -357,7 +440,7 @@
 	        "processing": true, //Feature control the processing indicator.
 	        "serverSide": true, //Feature control DataTables' server-side processing mode.
 	        "ordering": true, // Set true agar bisa di sorting
-            "order": [[ 0, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
+            "order": [[ 0, 'desc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
 	 
 	        // Load data for the table's content from an Ajax source
 	        "ajax": {	        	
@@ -368,17 +451,8 @@
 		            }
 	        },	 
 	        "deferRender": true,
-            "aLengthMenu": [[5, 10, 50],[ 5, 10, 50]], // Combobox Limit
-	        // 	Tambahkan bagian ini:
-			// "columns": [
-			// 	{data: 'Title'},
-			// 	{data: 'Published'},
-			// 	{data: 'UpdatedAT'},
-			// 	{data: 'Lang'},
-			// 	{data: 'Action'},
-
-			// ],
-	
+            "aLengthMenu": [[5, 10, 50,100],[ 5, 10, 50,100]], // Combobox Limit
+	        
 	        //Set column definition initialisation properties.
 	        "columnDefs": [
 			        { 
@@ -407,6 +481,121 @@
 	 
 	});
 	 
+
+
+
+	// show category
+
+	$('.getidlang').change(function () {
+    var idlang =  $(this).val();
+    // alert(idlang); 
+    $.ajax({
+        url: base_url_js+'__getCatByLang_lpmi',
+        method : "POST",
+        data : {idlang: idlang},
+        async : true,
+        dataType : 'json',
+        success: function (data) {
+
+                var html = '';
+                var i;
+                for(i=0; i<data.length; i++){
+                    html += '<option value='+data[i].ID+'>'+data[i].Name+'</option>';
+                }
+                $('#showcategory').html(html);
+
+            }
+
+        });
+
+    });
+
+
+
+    // show sub category
+
+
+    $('.getsubCat').change(function () {
+    var idcat =  $(this).val();
+    // alert(idlang); 
+    $.ajax({
+        url: base_url_js+'__getSubCat_lpmi',
+        method : "POST",
+        data : {idcat: idcat},
+        async : true,
+        dataType : 'json',
+        success: function (data) {
+
+                var html = '';
+                var i;
+                for(i=0; i<data.length; i++){
+                    html += '<option value='+data[i].IDSub+'>'+data[i].SubName+'</option>';
+                }
+                $('#showSubcategory').html(html);
+
+            }
+
+        });
+
+    });
+
+
+    // show category Content
+
+	$('.getidlangcontent').change(function () {
+    var idlang =  $(this).val();
+    // alert(idlang); 
+    $.ajax({
+        url: base_url_js+'__getCatByLang_lpmi',
+        method : "POST",
+        data : {idlang: idlang},
+        async : true,
+        dataType : 'json',
+        success: function (data) {
+
+                var html = '';
+                var i;
+                for(i=0; i<data.length; i++){
+                    html += '<option value='+data[i].ID+'>'+data[i].Name+'</option>';
+                }
+                $('#showcategorycontent').html(html);
+
+            }
+
+        });
+
+    });
+
+
+
+    // show sub category Content
+
+
+    $('.getsubCatcontent').change(function () {
+    var idcat =  $(this).val();
+    // alert(idlang); 
+    $.ajax({
+        url: base_url_js+'__getSubCat_lpmi',
+        method : "POST",
+        data : {idcat: idcat},
+        async : true,
+        dataType : 'json',
+        success: function (data) {
+
+                var html = '';
+                var i;
+                for(i=0; i<data.length; i++){
+                    html += '<option value='+data[i].IDSub+'>'+data[i].SubName+'</option>';
+                }
+                $('#showSubcategorycontent').html(html);
+
+            }
+
+        });
+
+    });
+
+
 
 	function add_category()
 	{
@@ -501,7 +690,7 @@
 	    $('#modal_formCat').modal('show'); // show bootstrap modal
 	    $('.modal-title').text('Build Category'); // Set Title to Bootstrap modal title
 	}
-
+	
 
 	function editCat_lpmi(id)
 	{
@@ -513,7 +702,7 @@
 	        success: function(data)
 	        {
 	 			$('[name="idcat"]').val(data.ID);
-	            $('[name="category"]').val(data.Name);
+	            $('[name="category"]').append(data.Name);
 	            $('[name="lang"]').val(data.Lang);	
 				$('[name="category"]').focus();	  
 				$('#cng').text('Edit')          			
@@ -552,6 +741,157 @@
 	}
 
 
+
+
+ // Sub Category
+
+	function loadDataSubcate() {
+        
+        $.ajax({
+              type  : 'GET',
+              url   : base_url_js+'__ajaxSubCat_lpmi',
+              async : false,
+              dataType : 'json',
+              success : function(data){
+
+                  var html = '';
+                  var i;
+                  for (i = 0; i < data.length; i++) {
+                      html += '<tr>'+
+		                        '<td>'+(i+1)+'</td>'+
+		                        '<td>'+data[i].SubName+'</td>'+
+		                        '<td>'+data[i].Name+'</td>'+
+		                        '<td>'+data[i].Lang+'</td>'+
+		                        '<td>'+data[i].CreateAt+'</td>'+
+		                        '<td>'+data[i].CreateBy+'</td>'+
+		                        '<td>'+
+		                          '<a id="tab1-20933" class="btn btn-success" onclick="editSubCat_lpmi('+data[i].IDSub+')" href="javascript:;" data="'+data[i].IDSub+'"> Edit</a>'+
+		                          '<a id="tab1-20933" class="btn btn-danger" onclick="deleteSubCat_lpmi('+data[i].IDSub+')" href="javascript:;" data="'+data[i].IDSub+'"> Delete</a>'+
+		                        '</td>'+
+		                      '</tr>';
+		                      // console.log(data[i].Name);
+                  }
+                  
+                  $('#viewDatalistSubCategory').html(html);
+              }
+          })
+    }
+
+	function SubCatlpmi()
+	{
+		loadDataSubcate();	
+	    save_method = 'add';
+	    $('#formSubcat')[0].reset(); // reset form on modals
+	    $('.form-group').removeClass('has-error'); // clear error class
+	    $('.help-block').empty(); // clear error string
+	    $('#modal_formSubCat').modal('show'); // show bootstrap modal
+	    $('.modal-title').text('Build Sub Category'); // Set Title to Bootstrap modal title
+	}
+
+
+	function add_Subcategory()
+	{
+		$('#btnSubcategory').text('Saving...'); //change button text
+	    $('#btnSubcategory').attr('disabled',true); //set button disable 
+	    var url;
+	 
+	    if(save_method == 'add') {
+	        url = base_url_js+'__ajaxaddSubCat_lpmi';
+	    } else {
+	        url = base_url_js+'__ajaxupdateSubCat_lpmi';
+	    }
+	 
+	    // ajax adding data to database
+	    var category = new FormData($('#formSubcat')[0]);
+	    // console.log(category);
+	    $.ajax({
+	        url : url,
+	        type: "POST",
+	        data: category,
+	        contentType: false,
+	        processData: false,
+	        dataType: "JSON",
+	        success: function(data)
+	        {
+	 
+	            if(data.status) //if success close modal and reload ajax table
+	            {
+	            	toastr.success('Data saved','Success');
+	                // $('#modal_form').modal('hide');
+	                // reload_table();
+	                loadDataSubcate();
+	                $('#namecategory').val('');
+	                $('#btnSubcategory').text('Save'); //change button text
+	            	$('#btnSubcategory').attr('disabled',false); //set button enable 
+	            	$('#cng1').text('Add')
+	            }
+	            
+	                       
+	 			
+	        },
+	        error: function (jqXHR, textStatus, errorThrown)
+	        {
+	            alert('Error adding / update data');
+	            $('#btnSubcategory').text('Save'); //change button text
+	            $('#btnSubcategory').attr('disabled',false); //set button enable 
+	 
+	        }
+	    });
+	    return false;
+	}
+
+
+	function editSubCat_lpmi(id)
+	{
+	    save_method = 'update';
+	    $.ajax({
+	        url : base_url_js+'__ajaxeditSubCat_lpmi/'+id,
+	        type: "GET",
+	        dataType: "JSON",
+	        success: function(data)
+	        {
+	        	$('[name="idSubcat"]').val(data.IDSub);
+	        	$('[name="lang"]').val(data.Lang).trigger('change');
+	 			$('[name="idcategory"]').val(data.IDCat).trigger('change');
+	            $('[name="subcategoryname"]').val(data.SubName);
+				$('[name="subcategoryname"]').focus();	  
+				$('#cng1').text('Edit')          			
+
+	        },
+	        error: function (jqXHR, textStatus, errorThrown)
+	        {
+	            alert('Error get data from ajax');
+	        }
+	    });
+	}
+
+	function deleteSubCat_lpmi(id)
+	{
+	    if(confirm('Are you sure delete this data?'))
+	    {
+	        // ajax delete data to database
+	        $.ajax({
+	            url : base_url_js+'__ajaxdeleteSubCat_lpmi/'+id,
+	            type: "POST",
+	            dataType: "JSON",
+	            success: function(data)
+	            {
+	                //if success reload ajax table
+	                toastr.success('Data delete','Success');
+	                $('#modal_form').modal('hide');
+	                loadDataSubcate();
+	            },
+	            error: function (jqXHR, textStatus, errorThrown)
+	            {
+	                alert('Error deleting data');
+	            }
+	        });
+	 
+	    }
+	}
+
+
+// Craete content
 
 	function add_lpmi()
 	{
@@ -602,8 +942,13 @@
 	            $('[name="meta_des"]').val(data.Meta_des);
 	            $('[name="meta_key"]').val(data.Meta_key);
 	            $('[name="date"]').val(data.AddDate);
-	            $('[name="category"]').val(data.IDCat);
+	            // $('[name="category"]').val(data.IDCat);
 	            // Language
+	            $('[name="lang"]').val(data.Lang).trigger('change');
+	            $('[name="category"]').val(data.IDCat).trigger('change');
+	            $('[name="idsubcategory"]').val(data.IDSub).trigger('change');
+	            
+
 	            if (data.Status=="Yes") {
                 	document.getElementById("st1").checked = true;
 	            } else {
@@ -638,7 +983,7 @@
 
 	            // }
 	            // $('[name="status"]').val(data.Status);
-	            $('[name="lang"]').val(data.Lang);
+	            // $('[name="lang"]').val(data.Lang);
 	            $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
 	            $('.modal-title').text('Update Content'); // Set title to Bootstrap modal title
 	 				
