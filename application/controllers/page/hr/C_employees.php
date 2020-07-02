@@ -1616,7 +1616,8 @@ class C_employees extends HR_Controler {
                     }else{
                         $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
                         $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 1 or " ,"filter"=> null );    
-                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 2 " ,"filter"=> null );    
+                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 2 or " ,"filter"=> null );    
+                        $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 7 " ,"filter"=> null );    
                         $param[] = array("field"=>")","data"=>null,"filter"=>null);    
                     }
                 }
@@ -1709,6 +1710,7 @@ class C_employees extends HR_Controler {
             }else{
                 $result = $this->m_hr->fetchEmployee(false,$param)->result();
             }
+            //var_dump($this->db->last_query());die();
 
             if(!empty($result)){
                 $rs = array();
@@ -1862,8 +1864,9 @@ class C_employees extends HR_Controler {
             }else{
                 $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
                 $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 1 or " ,"filter"=> null );    
-                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 2 " ,"filter"=> null );    
-                $param[] = array("field"=>")","data"=>null,"filter"=>null);    
+                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 2 or " ,"filter"=> null );    
+                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" = 7 " ,"filter"=> null );    
+                $param[] = array("field"=>")","data"=>null,"filter"=>null);
             }
 
             if(!empty($reqdata['staff'])){
