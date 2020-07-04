@@ -1555,6 +1555,94 @@ class C_api4 extends CI_Controller {
 
     }
 
+    public function crudLiveChat(){
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='getUserOnlineChat'){
+
+            $data = $this->db->select('NIP,Name,Photo')->limit(10)->get_where('db_employees.employees',array('StatusEmployeeID'=>1))->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+    }
+
+    public function crudQuiz(){
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='getQuestionType'){
+            $data = $this->db->get('db_academic.q_question_type')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='saveQuestion'){
+
+            $ID = $data_arr['ID']; // ID Question
+            $dataQustion = (array) $data_arr['dataQustion'];
+
+            if($ID!=''){
+                // Update question
+                $dataQustion['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataQustion['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+            }
+            else {
+                // Insert question
+                $dataQustion['CreatedBy'] = $this->session->userdata('NIP');
+                $dataQustion['CreatedAt'] = $this->m_rest->getDateTimeNow();
+
+                $this->db->insert('db_academic.q_question',$dataQustion);
+                $ID = $this->db->insert_id();
+            }
+
+            if($dataQustion['QTID']==1 || $dataQustion['QTID']==2){
+
+                // Remove Option
+                $this->db->where('QID',$ID);
+                $this->db->delete('db_academic.q_question_options');
+                $this->db->reset_query();
+
+                $dataOption = (array) $data_arr['dataOption'];
+                if(count($dataOption)>0){
+                    for($i=0;$i<count($dataOption);$i++){
+                        $arrins = array(
+                            'QID' => $ID,
+                            'Option' => $dataOption[$i]->Option,
+                            'IsTheAnswer' => $dataOption[$i]->IsTheAnswer
+                        );
+                        $this->db->insert('db_academic.q_question_options',$arrins);
+                    }
+                }
+
+
+            }
+
+            return print_r(json_encode(array('QID' => $ID)));
+
+        }
+        else if($data_arr['action']=='getArrDataQuestion'){
+            $ArrQID = (array) $data_arr['ArrQID'];
+
+            $result = [];
+
+            if(count($ArrQID)>0){
+                for($i=0;$i<count($ArrQID);$i++){
+                    $QID = $ArrQID[$i];
+                    $dataQuestion = $this->db->query('SELECT q.Question,q.Note, qt.Description AS Type FROM db_academic.q_question q 
+                                                                    LEFT JOIN db_academic.q_question_type qt ON (q.QTID = qt.ID)
+                                                                    WHERE q.ID = "'.$QID.'" ')->result_array();
+                    $dataOption = $this->db->select('Option,IsTheAnswer')->get_where('db_academic.q_question_options',array('QID'=>$QID))->result_array();
+                    $arrP = array(
+                        'Question' => $dataQuestion[0],
+                        'Option' => $dataOption
+                    );
+                    array_push($result,$arrP);
+                }
+            }
+
+            return print_r(json_encode($result));
+
+        }
+    }
+
 
 
 }
