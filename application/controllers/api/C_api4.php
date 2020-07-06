@@ -1603,11 +1603,19 @@ class C_api4 extends CI_Controller {
                 $dataOption = (array) $data_arr['dataOption'];
                 if(count($dataOption)>0){
                     for($i=0;$i<count($dataOption);$i++){
+
+
+
                         $arrins = array(
                             'QID' => $ID,
                             'Option' => $dataOption[$i]->Option,
                             'IsTheAnswer' => $dataOption[$i]->IsTheAnswer
                         );
+
+                        if($dataQustion['QTID']==2){
+                            $arrins['Point'] = $dataOption[$i]->Point;
+                        }
+
                         $this->db->insert('db_academic.q_question_options',$arrins);
                     }
                 }
@@ -1626,10 +1634,10 @@ class C_api4 extends CI_Controller {
             if(count($ArrQID)>0){
                 for($i=0;$i<count($ArrQID);$i++){
                     $QID = $ArrQID[$i];
-                    $dataQuestion = $this->db->query('SELECT q.Question,q.Note, qt.Description AS Type FROM db_academic.q_question q 
+                    $dataQuestion = $this->db->query('SELECT q.ID,q.Question,q.Note, qt.Description AS Type, q.QTID FROM db_academic.q_question q 
                                                                     LEFT JOIN db_academic.q_question_type qt ON (q.QTID = qt.ID)
                                                                     WHERE q.ID = "'.$QID.'" ')->result_array();
-                    $dataOption = $this->db->select('Option,IsTheAnswer')->get_where('db_academic.q_question_options',array('QID'=>$QID))->result_array();
+                    $dataOption = $this->db->select('Option,IsTheAnswer,Point')->get_where('db_academic.q_question_options',array('QID'=>$QID))->result_array();
                     $arrP = array(
                         'Question' => $dataQuestion[0],
                         'Option' => $dataOption
@@ -1640,6 +1648,74 @@ class C_api4 extends CI_Controller {
 
             return print_r(json_encode($result));
 
+        }
+        else if ($data_arr['action']=='saveDataQuiz'){
+
+            // Cek apakah sudah pernah bikin quiz atau blm
+            $ScheduleID = $data_arr['ScheduleID'];
+            $Session = $data_arr['Session'];
+
+            $dataCk = $this->db->select('ID')->get_where('db_academic.q_quiz',array(
+                'ScheduleID' => $ScheduleID,
+                'Session' => $Session
+            ))->result_array();
+
+            $dataFmQuiz = array(
+                'NotesForStudents' => $data_arr['NotesForStudents'],
+                'Duration' => $data_arr['Duration']
+            );
+
+            if(count($dataCk)>0){
+                // Update
+                $QuizID = $dataCk[0]['ID'];
+                $dataFmQuiz['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataFmQuiz['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID', $QuizID);
+                $this->db->update('db_academic.q_quiz',$dataFmQuiz);
+                $this->db->reset_query();
+
+            } else {
+                // Insert
+                $dataFmQuiz['ScheduleID'] = $ScheduleID;
+                $dataFmQuiz['Session'] = $Session;
+
+                $dataFmQuiz['CreatedBy'] = $this->session->userdata('NIP');
+                $dataFmQuiz['CreatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->insert('db_academic.q_quiz',$dataFmQuiz);
+                $QuizID = $this->db->insert_id();
+                $this->db->reset_query();
+            }
+
+
+            $dataForm = (array) $data_arr['dataForm'];
+            if(count($dataForm)>0){
+                $this->db->where('QuizID',$QuizID);
+                $this->db->delete('db_academic.q_quiz_details');
+                $this->db->reset_query();
+
+                for($i=0;$i<count($dataForm);$i++){
+                    $d = (array) $dataForm[$i];
+                    $d['QuizID'] = $QuizID;
+                    $this->db->insert('db_academic.q_quiz_details',$d);
+                    $this->db->reset_query();
+
+                }
+
+            }
+
+            return print_r(1);
+        }
+        else if ($data_arr['action']=='getQuizInThisSession'){
+
+            $ScheduleID = $data_arr['ScheduleID'];
+            $Session = $data_arr['Session'];
+
+            $data = $this->db->query('SELECT qd.QID FROM db_academic.q_quiz_details qd 
+                                               LEFT JOIN db_academic.q_quiz q ON (q.ID = qd.QuizID)
+                                               WHERE q.ScheduleID = "'.$ScheduleID.'" AND q.Session = "'.$Session.'" ')
+                        ->result_array();
+
+            return print_r(json_encode($data));
         }
     }
 
