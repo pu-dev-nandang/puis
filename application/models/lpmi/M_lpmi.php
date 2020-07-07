@@ -64,7 +64,7 @@ class M_lpmi extends CI_Model {
             $order = $this->order;
             $this->db->order_by(key($order), $order[key($order)]);
         }
-        
+
     }
  
     function get_datatables()
@@ -91,8 +91,9 @@ class M_lpmi extends CI_Model {
     
     public function get_by_id($id)
     {
-        $this->db->from($this->table);
-        $this->db->where('ID',$id);
+        $this->db->from('db_lpmi.content as co');
+        $this->db->join('db_lpmi.sub_category as sb','sb.IDSub=co.IDSubCat');          
+        $this->db->join('db_lpmi.category as cat','sb.IDSub=cat.ID');       
         $query = $this->db->get();
  
         return $query->row();

@@ -299,7 +299,7 @@
 	                    </div>
 	                    <div class="form-group" style="margin-bottom: 0px">
 		                    <label>Select Sub Category</label>
-		                    <select  name="idsubcategory" class="form-control " id="showSubcategorycontent">
+		                    <select  name="idsubcategory" class="form-control shotes" id="showSubcategorycontent">
 		                      <option value="">--Select--</option>
 		                        <!-- <?php foreach($category as $row):?>
 		                        <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
@@ -356,7 +356,6 @@
 <script>
 	
     $(document).ready(function () {    	
-    	
         $('#Description').summernote({
             placeholder: 'Text your announcement',
             tabsize: 2,
@@ -542,27 +541,11 @@
 
     // show category Content
 
-	$('.getidlangcontent').change(function () {
-    var idlang =  $(this).val();
-    // alert(idlang); 
-    $.ajax({
-        url: base_url_js+'__getCatByLang_lpmi',
-        method : "POST",
-        data : {idlang: idlang},
-        async : true,
-        dataType : 'json',
-        success: function (data) {
-
-                var html = '';
-                var i;
-                for(i=0; i<data.length; i++){
-                    html += '<option value='+data[i].ID+'>'+data[i].Name+'</option>';
-                }
-                $('#showcategorycontent').html(html);
-
-            }
-
-        });
+	$('.getidlangcontent').change(async function () {
+    	var idlang =  $(this).val();
+    	const DataCategory = await AjaxshowCategoryBylang(idlang);
+    		HtmlDataCategory(DataCategory);
+    		$('.getsubCatcontent').trigger('change');
 
     });
 
@@ -571,27 +554,11 @@
     // show sub category Content
 
 
-    $('.getsubCatcontent').change(function () {
-    var idcat =  $(this).val();
-    // alert(idlang); 
-    $.ajax({
-        url: base_url_js+'__getSubCat_lpmi',
-        method : "POST",
-        data : {idcat: idcat},
-        async : true,
-        dataType : 'json',
-        success: function (data) {
-
-                var html = '';
-                var i;
-                for(i=0; i<data.length; i++){
-                    html += '<option value='+data[i].IDSub+'>'+data[i].SubName+'</option>';
-                }
-                $('#showSubcategorycontent').html(html);
-
-            }
-
-        });
+    $('.getsubCatcontent').change( async function () {
+    	// console.log('XXXX');
+    	var idcat =  $(this).val();
+		const DataSubCategory = await AjaxshowSubCategoryByCategory(idcat);
+			HtmlDataSubCategory(DataSubCategory);    
 
     });
 
@@ -915,10 +882,9 @@
 	 	$('#setingedit2').text('Add');  //change name checkbox
 	 	$('#setingedit3').text('Add');  //change name checkbox
 	}
-	 
-	function edit_lpmi(id)
-	{
-	    save_method = 'update';
+
+	const loadDefaultEdit = () => {
+		save_method = 'update';
 	    $('#form')[0].reset(); // reset form on modals
 	    $('.form-group').removeClass('has-error'); // clear error class
 	    $('.help-block').empty(); // clear error string
@@ -927,99 +893,263 @@
 	 	$('#setingedit1').text('Edit');  //change name checkbox
 	 	$('#setingedit2').text('Edit');  //change name checkbox
 	 	$('#setingedit3').text('Edit');  //change name checkbox
-	    //Ajax Load data from ajax
-	    $.ajax({
-	        url : base_url_js+'__ajaxedit_lpmi/'+id,
-	        type: "GET",
-	        dataType: "JSON",
-	        success: function(data)
-	        {
+	}
+
+	const LoadAjaxByID = async(id) => {
+		const url = base_url_js+'__ajaxedit_lpmi/'+id;
+		const data = {}
+		const token = jwt_encode(data,'UAP)(*');
+		const response = await AjaxSubmitFormPromises(url,token);
+		return response;
+	}
+
+	const fillDataModal = (data) => {
+		$('[name="id"]').val(data.ID);
+		$('[name="title"]').val(data.Title);
+		// $('[name="description"]').val(data.Description);
+		$('#Description').summernote('code', data.Description);
+		$('[name="meta_des"]').val(data.Meta_des);
+		$('[name="meta_key"]').val(data.Meta_key);
+		$('[name="date"]').val(data.AddDate);
+	}
+
+	const AjaxshowCategoryBylang = async(idlang) => {
+		const url = base_url_js+'__getCatByLang_lpmi';
+		const data = {idlang:idlang}
+		const response = await AjaxSubmitFormPromisesNoToken(url,data);
+		return response;
+	}
+
+	const HtmlDataCategory = (data) => {
+		var html = '';
+		var i;
+		for(i=0; i<data.length; i++){
+		    html += '<option value='+data[i].ID+'>'+data[i].Name+'</option>';
+		}
+		$('#showcategorycontent').html(html);
+	}
+
+	const AjaxshowSubCategoryByCategory = async(idcat) => {
+		const url = base_url_js+'__getSubCat_lpmi';
+		const data = {idcat:idcat}
+		const response = await AjaxSubmitFormPromisesNoToken(url,data);
+		return response;
+	}
+
+
+	const HtmlDataSubCategory = (data) => {
+		var html = '';
+		var i;
+		for(i=0; i<data.length; i++){
+		    html += '<option value='+data[i].IDSub+'>'+data[i].SubName+'</option>';
+		}
+		$('#showSubcategorycontent').html(html);
+	}
+
+	const edit_lpmi =async(id) => {
+		/*
+			1. isi data default
+			2. Load Ajax __ajaxedit_lpmi
+			3. result point 2 ajax ke  plus event change (getidlang)
+			4. result point 3 ajax isi category
+			5. result category auto ke suc categegory plus event change (getsubCat)
+		
+		*/
+
+		// 1
+		loadDefaultEdit(); 
+		// 2 
+		const dataLPMI = await LoadAjaxByID(id);
+			fillDataModal(dataLPMI);
+
+		// 3
+		const lang = dataLPMI.Lang;
+		$('[name="lang"]').val(lang);
+		const DataCategory = await AjaxshowCategoryBylang(lang);
+			HtmlDataCategory(DataCategory);
+		// 4 dan 5
+		const getCategory = $('.getsubCatcontent').find('option:selected').val();
+
+		const DataSubCategory = await AjaxshowSubCategoryByCategory(getCategory);
+			HtmlDataSubCategory(DataSubCategory);
+
+			const data = dataLPMI;
+            if (data.Status=="Yes") {
+            	document.getElementById("st1").checked = true;
+            } else {
+                document.getElementById("st2").checked = true;
+            }
+            console.log(data.AddDate);
+            if (data.AddDate=='' || data.AddDate=='0000-00-00 00:00:00'){
+            	document.getElementById("ad1").checked = false;
+            	$("#show_a1").hide();
+            	// $("#show_a1").prop("show", this.checked);
+            }else{
+            	document.getElementById("ad1").checked = true;
+            	$("#show_a1").show()
+            }
+            // console.log(data.IDCat);
+            if (data.IDSubCat ){
+            	document.getElementById("ad5").checked = true;
+            	$('#show_a5').show();
+            	// $("#show_a1").prop("show", this.checked);
+            	// console.log('no');
+            }else{
+            	document.getElementById("ad5").checked = false;
+            	// document.getElementById("show_a5").hidden = false;
+            	$('#show_a5').hide();
+            	// console.log('ok');
+            }
+            // if (data.File!=="" ) {
+         //    	// document.getElementById("ad4").checked = true;                	
+				
+            // } else {
+            //     $('#photo-preview').hide();
+
+            // }
+            // $('[name="status"]').val(data.Status);
+            // $('[name="lang"]').val(data.Lang);
+            $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
+            $('.modal-title').text('Update Content'); // Set title to Bootstrap modal title
+ 				
+ 			// $('#photo-preview').show(); // show photo preview modal
+ 			// console.log(data.File);
+ 			
+
+ 			if(data.File)
+            {
+            	
+		        var fileName = data.File;
+		        var fileNameExt = fileName.substr(fileName.lastIndexOf('.') + 1);
+		        // console.log(fileNameExt);
+            	if(!fileNameExt=='pdf'){
+	                $('#label-photo').text('Change file'); // label photo upload
+	                $('#photo-preview div').html('<img src="'+base_url_js+'uploads/lpmi/'+data.File+'" class="img-responsive">'); // show photo
+	                // $('#photo-preview div').append('<input type="checkbox" name="remove_photo" value="'+data.file+'"/> Remove photo when saving'); // remove photo
+                }else{
+                	$('#photo-preview div').html('<iframe src="'+base_url_js+'uploads/lpmi/'+data.File+'" height="100%" width="100%" scrolling="auto"></iframe>');
+                }
+
+            }
+            else
+            {
+                // $('#label-photo').text('Upload Photo1'); // label photo upload
+                // $('#photo-preview div').text('(No photo)');
+                $('#photo-preview').hide();
+                // document.getElementById("photo-preview").hidden = false;
+            }
+
+
+
+	}
 	 
-	            $('[name="id"]').val(data.ID);
-	            $('[name="title"]').val(data.Title);
-	            // $('[name="description"]').val(data.Description);
-	            $('#Description').summernote('code', data.Description);
-	            $('[name="meta_des"]').val(data.Meta_des);
-	            $('[name="meta_key"]').val(data.Meta_key);
-	            $('[name="date"]').val(data.AddDate);
-	            // $('[name="category"]').val(data.IDCat);
-	            // Language
-	            $('[name="lang"]').val(data.Lang).trigger('change');
-	            $('[name="category"]').val(data.IDCat).trigger('change');
-	            $('[name="idsubcategory"]').val(data.IDSub).trigger('change');
-	            
+	// function edit_lpmi(id)
+	// {
+	//     save_method = 'update';
+	//     $('#form')[0].reset(); // reset form on modals
+	//     $('.form-group').removeClass('has-error'); // clear error class
+	//     $('.help-block').empty(); // clear error string
+	//     $('#setingedit0').text('Edit');  //change name checkbox
+	//  	$('#setingedit').text('Edit');  //change name checkbox
+	//  	$('#setingedit1').text('Edit');  //change name checkbox
+	//  	$('#setingedit2').text('Edit');  //change name checkbox
+	//  	$('#setingedit3').text('Edit');  //change name checkbox
+	//     //Ajax Load data from ajax
+	//     $.ajax({
+	//         url : base_url_js+'__ajaxedit_lpmi/'+id,
+	//         type: "GET",
+	//         dataType: "JSON",
+	//         success: function(data)
+	//         {
+	//  			// console.log(data.IDSubCat);
+	//  			// console.log(data.SubName);
+	//             $('[name="id"]').val(data.ID);
+	//             $('[name="title"]').val(data.Title);
+	//             // $('[name="description"]').val(data.Description);
+	//             $('#Description').summernote('code', data.Description);
+	//             $('[name="meta_des"]').val(data.Meta_des);
+	//             $('[name="meta_key"]').val(data.Meta_key);
+	//             $('[name="date"]').val(data.AddDate);
+	//             // $('[name="category"]').val(data.IDCat);
+	//             // Language
+	//             $('[name="lang"]').val(data.Lang).trigger('change');
+	//             $('[name="category"]').val(data.IDCat).trigger('change');
+	//             $('[name="idsubcategory"]').val(data.IDSub).trigger('change');
 
-	            if (data.Status=="Yes") {
-                	document.getElementById("st1").checked = true;
-	            } else {
-	                document.getElementById("st2").checked = true;
-	            }
-	            console.log(data.AddDate);
-	            if (data.AddDate=='' || data.AddDate=='0000-00-00 00:00:00'){
-	            	document.getElementById("ad1").checked = false;
-	            	$("#show_a1").hide();
-	            	// $("#show_a1").prop("show", this.checked);
-	            }else{
-	            	document.getElementById("ad1").checked = true;
-	            	$("#show_a1").show()
-	            }
-	            // console.log(data.IDCat);
-	            if (data.IDCat ){
-	            	document.getElementById("ad5").checked = true;
-	            	$('#show_a5').show();
-	            	// $("#show_a1").prop("show", this.checked);
-	            	// console.log('no');
-	            }else{
-	            	document.getElementById("ad5").checked = false;
-	            	// document.getElementById("show_a5").hidden = false;
-	            	$('#show_a5').hide();
-	            	// console.log('ok');
-	            }
-	            // if (data.File!=="" ) {
-             //    	// document.getElementById("ad4").checked = true;                	
+	//             // $('.getsubCatcontent').trigger('change');
+
+
+	//             if (data.Status=="Yes") {
+ //                	document.getElementById("st1").checked = true;
+	//             } else {
+	//                 document.getElementById("st2").checked = true;
+	//             }
+	//             console.log(data.AddDate);
+	//             if (data.AddDate=='' || data.AddDate=='0000-00-00 00:00:00'){
+	//             	document.getElementById("ad1").checked = false;
+	//             	$("#show_a1").hide();
+	//             	// $("#show_a1").prop("show", this.checked);
+	//             }else{
+	//             	document.getElementById("ad1").checked = true;
+	//             	$("#show_a1").show()
+	//             }
+	//             // console.log(data.IDCat);
+	//             if (data.IDSubCat ){
+	//             	document.getElementById("ad5").checked = true;
+	//             	$('#show_a5').show();
+	//             	// $("#show_a1").prop("show", this.checked);
+	//             	// console.log('no');
+	//             }else{
+	//             	document.getElementById("ad5").checked = false;
+	//             	// document.getElementById("show_a5").hidden = false;
+	//             	$('#show_a5').hide();
+	//             	// console.log('ok');
+	//             }
+	//             // if (data.File!=="" ) {
+ //             //    	// document.getElementById("ad4").checked = true;                	
 					
-	            // } else {
-	            //     $('#photo-preview').hide();
+	//             // } else {
+	//             //     $('#photo-preview').hide();
 
-	            // }
-	            // $('[name="status"]').val(data.Status);
-	            // $('[name="lang"]').val(data.Lang);
-	            $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
-	            $('.modal-title').text('Update Content'); // Set title to Bootstrap modal title
+	//             // }
+	//             // $('[name="status"]').val(data.Status);
+	//             // $('[name="lang"]').val(data.Lang);
+	//             $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
+	//             $('.modal-title').text('Update Content'); // Set title to Bootstrap modal title
 	 				
-	 			// $('#photo-preview').show(); // show photo preview modal
-	 			// console.log(data.File);
+	//  			// $('#photo-preview').show(); // show photo preview modal
+	//  			// console.log(data.File);
 	 			
 
-	 			if(data.File)
-	            {
+	//  			if(data.File)
+	//             {
 	            	
-			        var fileName = data.File;
-			        var fileNameExt = fileName.substr(fileName.lastIndexOf('.') + 1);
-			        console.log(fileNameExt);
-	            	if(!fileNameExt=='pdf'){
-		                $('#label-photo').text('Change file'); // label photo upload
-		                $('#photo-preview div').html('<img src="'+base_url_js+'uploads/lpmi/'+data.File+'" class="img-responsive">'); // show photo
-		                // $('#photo-preview div').append('<input type="checkbox" name="remove_photo" value="'+data.file+'"/> Remove photo when saving'); // remove photo
-	                }else{
-	                	$('#photo-preview div').html('<iframe src="'+base_url_js+'uploads/lpmi/'+data.File+'" height="100%" width="100%" scrolling="auto"></iframe>');
-	                }
+	// 		        var fileName = data.File;
+	// 		        var fileNameExt = fileName.substr(fileName.lastIndexOf('.') + 1);
+	// 		        // console.log(fileNameExt);
+	//             	if(!fileNameExt=='pdf'){
+	// 	                $('#label-photo').text('Change file'); // label photo upload
+	// 	                $('#photo-preview div').html('<img src="'+base_url_js+'uploads/lpmi/'+data.File+'" class="img-responsive">'); // show photo
+	// 	                // $('#photo-preview div').append('<input type="checkbox" name="remove_photo" value="'+data.file+'"/> Remove photo when saving'); // remove photo
+	//                 }else{
+	//                 	$('#photo-preview div').html('<iframe src="'+base_url_js+'uploads/lpmi/'+data.File+'" height="100%" width="100%" scrolling="auto"></iframe>');
+	//                 }
 	
-	            }
-	            else
-	            {
-	                // $('#label-photo').text('Upload Photo1'); // label photo upload
-	                // $('#photo-preview div').text('(No photo)');
-	                $('#photo-preview').hide();
-	                // document.getElementById("photo-preview").hidden = false;
-	            }
-	        },
-	        error: function (jqXHR, textStatus, errorThrown)
-	        {
-	            alert('Error get data from ajax');
-	        }
-	    });
-	}
+	//             }
+	//             else
+	//             {
+	//                 // $('#label-photo').text('Upload Photo1'); // label photo upload
+	//                 // $('#photo-preview div').text('(No photo)');
+	//                 $('#photo-preview').hide();
+	//                 // document.getElementById("photo-preview").hidden = false;
+	//             }
+	//         },
+	//         error: function (jqXHR, textStatus, errorThrown)
+	//         {
+	//             alert('Error get data from ajax');
+	//         }
+	//     });
+	// }
 	 
 	function reload_table()
 	{

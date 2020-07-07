@@ -159,6 +159,7 @@ class C_lpmi extends Lpmi_Controler {
     public function ajax_edit($id)
     {
         $data = $this->m_lpmi->get_by_id($id);
+        // print_r($data);die();
         echo json_encode($data);
     }
  
