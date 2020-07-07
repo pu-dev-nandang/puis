@@ -843,13 +843,16 @@ class C_rest extends CI_Controller {
                                               LEFT JOIN db_academic.counseling_topic ct
                                               ON (ct.ID = cu.TopicID)
                                               WHERE ( cu.UserID = "'.$UserID.'" ) '.$dataSearch.'
-                                               ORDER BY cu.TopicID DESC';
+                                               ';
+
+                $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
 
 
-                $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+                $sql = $queryDefault.' ORDER BY cu.TopicID DESC LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
                 $query = $this->db->query($sql)->result_array();
-                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
                 $no = $requestData['start'] + 1;
                 $data = array();
@@ -930,14 +933,12 @@ class C_rest extends CI_Controller {
 
                 $json_data = array(
                     "draw"            => intval( $requestData['draw'] ),
-                    "recordsTotal"    => intval(count($queryDefaultRow)),
-                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "recordsTotal"    => intval($queryDefaultRow),
+                    "recordsFiltered" => intval($queryDefaultRow),
                     "data"            => $data
                 );
 
                 echo json_encode($json_data);
-//                $data = $this->m_rest->getTopicByUserID($UserID);
-//                return print_r(json_encode($data));
             }
             else if($dataToken['action']=='readDetailTopic'){
 
