@@ -4193,5 +4193,63 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $output; // return array and encode to insert to db
     }
 
+    public function postApiPHP($url,$post,$fileattach=[],$customPost=[]){
+        /*
+            fileattach = array(
+                'file_name_with_full_path' => {any},
+                'MimeType' => {any},
+                'filename' => {any},
+                'varfiles' => {any},
+            );
+
+            $customPost = [
+                'get' => $Apikey,   // value = '?apikey='.Apikey,
+                'header' => [
+                    'Hjwtkey' => $Hjwtkey,
+                ],
+                
+            ];
+
+
+        */
+
+        $header[] = "Content-type: multipart/form-data";
+        $header[] = "Origin: ".base_url()."";
+        $header[] = "Cache-Control: max-age=0";
+        $header[] = "Connection: keep-alive";
+        $header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+
+        if (!empty($customPost) && array_key_exists('get', $customPost)) {
+            $url = $url.$customPost['get'];
+            if (array_key_exists('header', $customPost)) {
+                $headerpost = $customPost['header'];
+                foreach ($headerpost as $key => $value) {
+                    $header[] = $key.':'.$value;
+                }
+            }
+        }
+
+        $ch = curl_init();
+        $new_post_array  = $post;
+        if (!empty($fileattach)) {
+            $cfile = new CURLFile($fileattach['file_name_with_full_path'], $fileattach['MimeType'],$fileattach['filename']);
+            $new_post_array = $new_post_array + array($fileattach['varfiles'].'[]' => $cfile);
+        }
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $new_post_array);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $pr = curl_exec($ch);
+        $rs = $pr;
+        curl_close ($ch);
+        return $rs;
+    }
+
 
 }
