@@ -1030,9 +1030,6 @@ class C_api4 extends CI_Controller {
                         $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
                         $this->db->update('db_it.summernote_image',array('Status'=>'1'));
                     }
-
-
-
                 }
             }
 
@@ -1581,16 +1578,42 @@ class C_api4 extends CI_Controller {
 
             if($ID!=''){
                 // Update question
-                $dataQustion['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataQustion['UpdatedBy'] = $data_arr['NIP'];
                 $dataQustion['UpdatedAt'] = $this->m_rest->getDateTimeNow();
             }
             else {
                 // Insert question
-                $dataQustion['CreatedBy'] = $this->session->userdata('NIP');
+                $dataQustion['CreatedBy'] = $data_arr['NIP'];
                 $dataQustion['CreatedAt'] = $this->m_rest->getDateTimeNow();
+                $dataQustion['UpdatedAt'] = $this->m_rest->getDateTimeNow();
 
                 $this->db->insert('db_academic.q_question',$dataQustion);
                 $ID = $this->db->insert_id();
+            }
+
+            // Cek image in summernote
+            $dataSummernoteImg = $this->db->get_where('db_it.summernote_image',
+                array( 'SummernoteID' => $data_arr['SummernoteID']))->result_array();
+            if(count($dataSummernoteImg)>0){
+                for($s=0;$s<count($dataSummernoteImg);$s++){
+                    $dataCk = $this->db
+                        ->query('SELECT COUNT(*) AS Total FROM db_academic.q_question 
+                            WHERE Question LIKE "%'.$dataSummernoteImg[$s]['Image'].'%" ')
+                        ->result_array();
+
+                    if($dataCk[0]['Total']<=0){
+                        $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
+                        if(file_exists($file_path)){
+                            unlink($file_path);
+                            // Delete data
+                            $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
+                            $this->db->delete('db_it.summernote_image');
+                        }
+                    } else {
+                        $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
+                        $this->db->update('db_it.summernote_image',array('Status'=>'1'));
+                    }
+                }
             }
 
             if($dataQustion['QTID']==1 || $dataQustion['QTID']==2){
@@ -1603,11 +1626,17 @@ class C_api4 extends CI_Controller {
                 $dataOption = (array) $data_arr['dataOption'];
                 if(count($dataOption)>0){
                     for($i=0;$i<count($dataOption);$i++){
+
                         $arrins = array(
                             'QID' => $ID,
                             'Option' => $dataOption[$i]->Option,
                             'IsTheAnswer' => $dataOption[$i]->IsTheAnswer
                         );
+
+                        if($dataQustion['QTID']==2){
+                            $arrins['Point'] = $dataOption[$i]->Point;
+                        }
+
                         $this->db->insert('db_academic.q_question_options',$arrins);
                     }
                 }
@@ -1626,10 +1655,10 @@ class C_api4 extends CI_Controller {
             if(count($ArrQID)>0){
                 for($i=0;$i<count($ArrQID);$i++){
                     $QID = $ArrQID[$i];
-                    $dataQuestion = $this->db->query('SELECT q.Question,q.Note, qt.Description AS Type FROM db_academic.q_question q 
+                    $dataQuestion = $this->db->query('SELECT q.ID,q.Question,q.Note, qt.Description AS Type, q.QTID FROM db_academic.q_question q 
                                                                     LEFT JOIN db_academic.q_question_type qt ON (q.QTID = qt.ID)
                                                                     WHERE q.ID = "'.$QID.'" ')->result_array();
-                    $dataOption = $this->db->select('Option,IsTheAnswer')->get_where('db_academic.q_question_options',array('QID'=>$QID))->result_array();
+                    $dataOption = $this->db->select('Option,IsTheAnswer,Point')->get_where('db_academic.q_question_options',array('QID'=>$QID))->result_array();
                     $arrP = array(
                         'Question' => $dataQuestion[0],
                         'Option' => $dataOption
@@ -1640,6 +1669,146 @@ class C_api4 extends CI_Controller {
 
             return print_r(json_encode($result));
 
+        }
+        else if ($data_arr['action']=='saveDataQuiz'){
+
+            // Cek apakah sudah pernah bikin quiz atau blm
+            $ScheduleID = $data_arr['ScheduleID'];
+            $Session = $data_arr['Session'];
+
+            $dataCk = $this->db->select('ID')->get_where('db_academic.q_quiz',array(
+                'ScheduleID' => $ScheduleID,
+                'Session' => $Session
+            ))->result_array();
+
+            $dataFmQuiz = array(
+                'NotesForStudents' => $data_arr['NotesForStudents'],
+                'Duration' => $data_arr['Duration']
+            );
+
+            if(count($dataCk)>0){
+                // Update
+                $QuizID = $dataCk[0]['ID'];
+                $dataFmQuiz['UpdatedBy'] = $data_arr['NIP'];
+                $dataFmQuiz['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID', $QuizID);
+                $this->db->update('db_academic.q_quiz',$dataFmQuiz);
+                $this->db->reset_query();
+
+            } else {
+                // Insert
+                $dataFmQuiz['ScheduleID'] = $ScheduleID;
+                $dataFmQuiz['Session'] = $Session;
+
+                $dataFmQuiz['CreatedBy'] = $data_arr['NIP'];
+                $dataFmQuiz['CreatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->insert('db_academic.q_quiz',$dataFmQuiz);
+                $QuizID = $this->db->insert_id();
+                $this->db->reset_query();
+            }
+
+
+            $dataForm = (array) $data_arr['dataForm'];
+            if(count($dataForm)>0){
+                $this->db->where('QuizID',$QuizID);
+                $this->db->delete('db_academic.q_quiz_details');
+                $this->db->reset_query();
+
+                for($i=0;$i<count($dataForm);$i++){
+                    $d = (array) $dataForm[$i];
+                    $d['QuizID'] = $QuizID;
+                    $this->db->insert('db_academic.q_quiz_details',$d);
+                    $this->db->reset_query();
+
+                }
+
+            }
+
+            return print_r(1);
+        }
+        else if ($data_arr['action']=='getQuizInThisSession'){
+
+            $ScheduleID = $data_arr['ScheduleID'];
+            $Session = $data_arr['Session'];
+
+            $data = $this->db->query('SELECT qd.QID, qd.Point FROM db_academic.q_quiz_details qd 
+                                               LEFT JOIN db_academic.q_quiz q ON (q.ID = qd.QuizID)
+                                               WHERE q.ScheduleID = "'.$ScheduleID.'" AND q.Session = "'.$Session.'" ')
+                        ->result_array();
+
+            $Quiz = $this->db->get_where('db_academic.q_quiz',array('ScheduleID' => $ScheduleID, 'Session' => $Session))->result_array();
+
+            $result = array(
+                'Quiz' => $Quiz,
+                'Details' => $data
+            );
+
+            return print_r(json_encode($result));
+        }
+        else if($data_arr['action']=='getMyQuestion'){
+            $requestData= $_REQUEST;
+
+            $NIP = $data_arr['NIP'];
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = ' AND ( ct.Topic LIKE "%'.$search.'%" )';
+            }
+
+            $queryDefault = 'SELECT q.*, qt.Description FROM db_academic.q_question q 
+                                        LEFT JOIN db_academic.q_question_type qt ON (qt.ID = q.QTID)
+                                        WHERE q.CreatedBy = "'.$NIP.'" ';
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+
+
+            $sql = $queryDefault.' ORDER BY q.UpdatedAt DESC , q.CreatedAt DESC LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+                $nestedData = array();
+                $row = $query[$i];
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Question'].'
+                                    <div>
+                                        <span class="lbl-'.$row['QTID'].'">'.$row['Description'].'</span>
+                                         <span class="label label-default" style="left: 0px;font-size: 11px;">Last modify : '.date('d M Y H:i',strtotime($row['UpdatedAt'])).'</span> 
+                                    </div>
+                                    </div>';
+                $nestedData[] = '<div>
+                                <div class="btn-group">
+                                  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa fa-edit"></i> <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu" style="left: -114px;">
+                                    <li><a href="javascript:void(0);" class="editQuestion" data-tqid="'.$row['QTID'].'" data-id="'.$row['ID'].'">Edit</a></li>
+                                    <li><a href="javascript:void(0);" class="addToQuizFromMyQuestion" data-id="'.$row['ID'].'">Add to quiz</a></li>
+                                  </ul>
+                                </div>
+                                </div>';
+
+
+                $no++;
+
+                $data[] = $nestedData;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval($queryDefaultRow),
+                "data"            => $data
+            );
+
+            echo json_encode($json_data);
         }
     }
 
