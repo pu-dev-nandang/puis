@@ -1321,7 +1321,6 @@ class C_employees extends HR_Controler {
 
         }else{show_404();}
     }
-
     
 
     public function workExperience($NIP){
