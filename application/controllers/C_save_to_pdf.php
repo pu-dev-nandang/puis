@@ -4246,12 +4246,12 @@ class C_save_to_pdf extends CI_Controller {
 
         if ($Student['Faculty'][0]=='T')
         {
-            $pdf->SetX(103);
+            $pdf->SetX(117);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');
         }else{
-            $pdf->SetX(102);
+            $pdf->SetX(118);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');
@@ -4479,7 +4479,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Arial','BU',$fn_b);
 
 
-        $warek1 = $datawarek1[0]['TitleAhead'].' '.$datawarek1[0]['Name'].' '.$datawarek1[0]['TitleBehind'];
+        $warek1 = $datawarek1[0]['TitleAhead'].' '.$datawarek1[0]['Name'].', '.$datawarek1[0]['TitleBehind'];
         $pdf->Cell($fillFull,$h,$warek1,$border,1,'L');
         //================ hormat kami ========================
         //================ Tanda tangan =======================
