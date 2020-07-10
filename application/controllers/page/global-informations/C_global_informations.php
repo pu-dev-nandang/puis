@@ -106,9 +106,10 @@ class C_global_informations extends Globalclass {
 
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchStudentsPS(true,false,$param);
-    	$TotalDataPS = (!empty($totalData) ? $totalData->Total : 0);
+        //var_dump($this->db->last_query());
+        $TotalDataPS = (!empty($totalData) ? $totalData->Total : 0);
 
-    	$result = $this->Globalinformation_model->fetchStudentsPS(false,false,$param,$reqdata['start'],$reqdata['length'],$orderBy);
+        $result = $this->Globalinformation_model->fetchStudentsPS(false,false,$param,$reqdata['start'],$reqdata['length'],$orderBy);
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
     		//$detailStudent = $this->General_model->fetchData("ta_".$v->ClassOf.".students",array("NPM"=>$v->NPM))->row();
