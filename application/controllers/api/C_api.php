@@ -6470,6 +6470,7 @@ class C_api extends CI_Controller {
                 $this->db->update('db_employees.employees',$formUpdate);
 
                 // check fill admin Prodi / Ka prodi
+                //UPDATED BY FEBRI @ JULY 2020
                 $PositionMain = $formUpdate['PositionMain'];
                 $PositionMain = explode('.', $PositionMain);
                 $Position = $PositionMain[1];
@@ -6507,12 +6508,13 @@ class C_api extends CI_Controller {
 
 
 
-                //if ($Position == 6 || $Division == 15) {
+                //if ($Position == 6 || $Division == 15) { => OLD script
                 if( (($Division == 14 || $Division == 15) && $Position == 6) ||
                     (($Division_OTH1 == 14 || $Division_OTH1 == 15) && $Position_OTH1 == 6) ||
                     (($Division_OTH2 == 14 || $Division_OTH2 == 15) && $Position_OTH2 == 6) ||
                     (($Division_OTH3 == 14 || $Division_OTH3 == 15) && $Position_OTH3 == 6)
                     ){
+                //END UPDATED BY FEBRI @ JULY 2020
                     $ProdiArr = (array) $data_arr['arr_Prodi'];
                     if ($Division == 15) {
                         $dataSave = array(

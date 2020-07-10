@@ -39,15 +39,15 @@
                             <div class="col-sm-3">                                
                                 <div class="form-group">
                                     <label>Number of ID Card</label>
-                                    <p class="<?=(($origin->KTP != $detail->KTP) ? 'different':'')?>" ><?=(!empty($detail->KTP) ? $detail->KTP : '-')?></p>
+                                    <p class="<?=(!empty($detail->KTP) ?  (($origin->KTP != $detail->KTP) ? 'different':'') : '')?>" ><?=(!empty($detail->KTP) ? $detail->KTP : '-')?></p>
                                 </div>
                                 <div class="form-group">
                                     <label>Gender</label>
-                                    <p class="<?=(($origin->Gender != $detail->Gender) ? 'different':'')?>"><?=(!empty($detail->Gender) ? (($detail->Gender == 'L') ? 'Male':'Female') : '-' )?></p>
+                                    <p class="<?=(!empty($detail->Gender) ? (($origin->Gender != $detail->Gender) ? 'different':'') : '')?>"><?=(!empty($detail->Gender) ? (($detail->Gender == 'L') ? 'Male':'Female') : '-' )?></p>
                                 </div>
                                 <div class="form-group">
                                     <label>Religion</label>
-                                    <p class="<?=(!empty($detail->Religion) ? (($origin->ReligionID != $detail->Religion->IDReligion) ? 'different':'') : '')?>"><?=(!empty($detail->Religion) ? $detail->Religion->Religion : '-')?></p>
+                                    <p class="<?=(!empty($detail->Religion) ? (!empty($detail->Religion) ? (($origin->ReligionID != $detail->Religion->IDReligion) ? 'different':'') : '') : '')?>"><?=(!empty($detail->Religion) ? $detail->Religion->Religion : '-')?></p>
                                 </div>
                             </div>
                             <div class="col-sm-3">
@@ -59,25 +59,25 @@
                                 <?php } ?>
                                 <div class="form-group">
                                     <label>Blood</label>
-                                    <p class="<?=(($origin->Blood != $detail->Blood) ? 'different':'')?>" ><?=(!empty($detail->Blood) ? $detail->Blood : '-')?></p>
+                                    <p class="<?= (!empty($detail->Blood) ? (($origin->Blood != $detail->Blood) ? 'different':'') : '')?>" ><?=(!empty($detail->Blood) ? $detail->Blood : '-')?></p>
                                 </div>
                                 <div class="form-group">
                                     <label>Place of Birthdate</label>
-                                    <p class="<?=(($origin->PlaceOfBirth != $detail->PlaceOfBirth) ? 'different':'')?>" ><?=(!empty($detail->PlaceOfBirth) ? $detail->PlaceOfBirth : '-')?></p>
+                                    <p class="<?= (!empty($detail->PlaceOfBirth) ? (($origin->PlaceOfBirth != $detail->PlaceOfBirth) ? 'different':'') : '')?>" ><?=(!empty($detail->PlaceOfBirth) ? $detail->PlaceOfBirth : '-')?></p>
                                 </div>                                
                             </div>
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label>Access Card Number</label>
-                                    <p class="<?=(($origin->Access_Card_Number != $detail->Access_Card_Number) ? 'different':'')?>" ><?=(!empty($detail->Access_Card_Number) ? $detail->Access_Card_Number : '-')?></p>
+                                    <p class="<?= (!empty($detail->Access_Card_Number) ? (($origin->Access_Card_Number != $detail->Access_Card_Number) ? 'different':'') : '')?>" ><?=(!empty($detail->Access_Card_Number) ? $detail->Access_Card_Number : '-')?></p>
                                 </div> 
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <p class="<?=(($origin->Email != $detail->Email) ? 'different':'')?>"><?=(!empty($detail->Email) ? $detail->Email : '-')?></p>
+                                    <p class="<?= (!empty($detail->Email) ? (($origin->Email != $detail->Email) ? 'different':'') : '')?>"><?=(!empty($detail->Email) ? $detail->Email : '-')?></p>
                                 </div>                       
                                 <div class="form-group">
                                     <label>Mobile</label>
-                                    <p  class="<?=(($origin->HP != $detail->HP) ? 'different':'')?>" ><?=(!empty($detail->HP) ? $detail->HP : '-')?></p>
+                                    <p  class="<?= (!empty($detail->HP) ? (($origin->HP != $detail->HP) ? 'different':'') : '')?>" ><?=(!empty($detail->HP) ? $detail->HP : '-')?></p>
                                 </div>                       
 
                             </div>
@@ -89,7 +89,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <label>Address</label>
-                                            <p class="<?=(($origin->Address != $detail->Address) ? 'different':'')?>" ><?=(!empty($detail->Address) ? $detail->Address : '-')?></p>
+                                            <p class="<?=(!empty($detail->Address) ? (($origin->Address != $detail->Address) ? 'different':'') : '')?>" ><?=(!empty($detail->Address) ? $detail->Address : '-')?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -106,7 +106,7 @@
                                         <div class="form-group">
                                             <label>Province</label>
                                             <p class="<?=(!empty($detail->Province) ? (($origin->ProvinceID != $detail->Province->ProvinceID) ? 'different':'') : '')?>" >
-                                            <?=$detail->Province->ProvinceName?></p>
+                                            <?=(!empty($detail->Province->ProvinceName) ? $detail->Province->ProvinceName : '-')?></p>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
@@ -126,13 +126,13 @@
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Post Code</label>
-                                            <p class="<?=(($origin->Postcode != $detail->Postcode) ? 'different':'')?>" ><?=(!empty($detail->Postcode) ? $detail->Postcode : '-')?></p>
+                                            <p class="<?=(!empty($detail->Postcode) ? (($origin->Postcode != $detail->Postcode) ? 'different':'') : '')?>" ><?=(!empty($detail->Postcode) ? $detail->Postcode : '-')?></p>
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Phone</label>
-                                            <p class="<?=(($origin->Phone != $detail->Phone) ? 'different':'')?>"><?=(!empty($detail->Phone) ? $detail->Phone : '-')?></p>
+                                            <p class="<?=(!empty($detail->Phone) ? (($origin->Phone != $detail->Phone) ? 'different':'') : '')?>"><?=(!empty($detail->Phone) ? $detail->Phone : '-')?></p>
                                         </div>
                                     </div>
 
@@ -144,7 +144,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <label>Address</label>
-                                            <p class="<?=(($origin->CurrAddress != $detail->CurrAddress) ? 'different':'')?>" ><?=(!empty($detail->CurrAddress) ? $detail->CurrAddress : '-')?></p>
+                                            <p class="<?=(!empty($detail->CurrAddress) ? (($origin->CurrAddress != $detail->CurrAddress) ? 'different':'') : '')?>" ><?=(!empty($detail->CurrAddress) ? $detail->CurrAddress : '-')?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -152,13 +152,13 @@
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Post Code</label>
-                                            <p class="<?=(($origin->CurrPostCode != $detail->CurrPostCode) ? 'different':'')?>" ><?=(!empty($detail->CurrPostCode) ? $detail->CurrPostCode : '-')?></p>
+                                            <p class="<?=(!empty($detail->CurrPostCode) ?  (($origin->CurrPostCode != $detail->CurrPostCode) ? 'different':'') : '')?>" ><?=(!empty($detail->CurrPostCode) ? $detail->CurrPostCode : '-')?></p>
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>Phone</label>
-                                            <p class="<?=(($origin->CurrPhone != $detail->CurrPhone) ? 'different':'')?>" ><?=(!empty($detail->CurrPhone) ? $detail->CurrPhone : '-')?></p>
+                                            <p class="<?=(!empty($detail->CurrPhone) ? (($origin->CurrPhone != $detail->CurrPhone) ? 'different':'') : '')?>" ><?=(!empty($detail->CurrPhone) ? $detail->CurrPhone : '-')?></p>
                                         </div>
                                     </div>
 
