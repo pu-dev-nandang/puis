@@ -9,6 +9,7 @@ class C_scheduler extends CI_Controller {
         parent::__construct();
         $this->load->model('master/m_master');
         $this->load->library('JWT');
+         $this->load->model(array('m_api'));
         try {
           $G_setting = $this->m_master->showData_array('db_ticketing.rest_setting');
           if (!$this->auth($G_setting)) {
@@ -75,7 +76,9 @@ class C_scheduler extends CI_Controller {
         case 's1':
           $this->__s1();
           break;
-        
+        case 's2a':
+          $this->__s2a();
+          break;
         default:
           # code...
           break;
@@ -86,7 +89,71 @@ class C_scheduler extends CI_Controller {
 
 
     private function getProdi(){
-      return $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+      return $this->m_api->__getBaseProdiSelectOption();
+    }
+
+    private function __s2a(){
+      // save to log
+      $this->db->insert('aps_apt_rekap.log',[
+        'RunTime' => date('Y-m-d H:i:s'),
+        'TableName' => 's2a'
+      ]);
+
+      $ID = $this->db->insert_id();
+      // get Prodi first
+      $dataProdi = $this->getProdi();
+      $param = [
+        'action' => 'readDataMHSBaruByProdi',
+      ];
+      $urlPost = base_url().'api3/__crudAgregatorTB2';
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+      for ($i=0; $i < count($dataProdi); $i++) { 
+        $param['filterProdi'] = $dataProdi[$i]['ID'].'.'.$dataProdi[$i]['Code'];
+        $param['filterProdiName'] = $dataProdi[$i]['Level'].' - '.$dataProdi[$i]['NameEng'];
+        $ProdiID = $dataProdi[$i]['ID'];
+        $token = $this->jwt->encode($param,"UAP)(*");
+        $data_post = [
+          'token' => $token,
+        ];
+        
+        try {
+          // remove old data first by years and month
+          $this->db->query(
+            'delete from aps_apt_rekap.s2a where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'" and ProdiID = '.$ProdiID
+          );
+          $postTicket = $this->m_master->postApiPHP($urlPost,$data_post);
+          $result = (array) json_decode($postTicket,true);
+          for ($j=0; $j < count($result); $j++) { 
+            $row = $result[$j];
+            $dataSave = [
+              'ProdiID' => $ProdiID,
+              'TahunAkademik' => $row['Year'],
+              'Capacity' => $row['Capacity'],
+              'JCM_Pendaftar' =>   $row['Registrant'],
+              'JCM_LulusSeleksi' =>   $row['PassSelection'],
+              'JMB_Reguler' =>   $row['Regular'],
+              'JMB_Transfer' =>   $row['Transfer'],
+              'JM_Reguler' =>   $row['Regular2'],
+              'JM_Transfer' =>   $row['Transfer2'],
+              'DateCreated' =>   $DateCreated,
+            ];
+
+            $this->db->insert('aps_apt_rekap.s2a',$dataSave);
+          }
+        } catch (Exception $e) {
+           print_r($e);
+        }
+      }
+
+      $this->data['status'] = 1;
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+
+
     }
 
     private function __s1(){
