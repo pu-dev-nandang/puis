@@ -1339,7 +1339,7 @@ class C_dashboard extends Globalclass {
                                 $err_msg     .= "Size of image '".$file_name."'s too large from 2Mb.";
                             }else { $ispic = true; }
 
-                            $trainingTitleFilename = preg_replace('/\s+/', "_", $data['trainingTitle'][$k]);
+                            $trainingTitleFilename = preg_replace('/[^\p{L}\p{N}\s]/u', "_", $data['trainingTitle'][$k]);
                             $newFilename = $data['NIP']."-TRAINING-".$trainingTitleFilename."-".date('ymd').".jpg";
 
                             if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id'){
@@ -1368,7 +1368,12 @@ class C_dashboard extends Globalclass {
                                 }
                             }
                         }else{
-                            $certificateName = null;
+                            $checkFile = $this->General_model->fetchData("db_employees.employees_educations_training",array("ID"=>$data['trainingID'][$k]))->row();
+                            if(!empty($checkFile)){
+                                $certificateName = $checkFile->certificate;
+                            }else{
+                                $certificateName = null;
+                            }
                         }
                         $certificates[] = array("ID"=>$data['trainingID'][$k],"NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$k],"organizer"=>$data['trainingorganizer'][$k],"start_event"=>$data['trainingStart'][$k].' '.$data['trainingStartTime'][$k].':00',"end_event"=>$data['trainingEnd'][$k].' '.$data['trainingEndTime'][$k].':00',"location"=>$data['trainingLocation'][$k],"category"=>$data['trainingCategory'][$k],"costCompany"=>$data['trainingCostCompany'][$k],"costEmployee"=>$data['trainingCostEmployee'][$k],"certificate"=>$certificateName);                                
                     }
@@ -1727,8 +1732,6 @@ class C_dashboard extends Globalclass {
             }else{
                 $result = $this->m_hr->fetchEmployee(false,$param)->result();
             }
-
-
 
             if(!empty($result)){
                 $rs = array();
