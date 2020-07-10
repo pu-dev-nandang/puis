@@ -366,7 +366,7 @@
                                     <td class="text-center"><?php 
                                     if(!empty($detail->MyEducationTraining[$a]->certificate)){
                                         $protocol = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ? "https" : "http")."://";
-                                        if($_SERVER['SERVER_NAME']=='lecturerpu.podomorouniversity.ac.id'){
+                                        if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id'){
                                             $fPath = $protocol."pcam.podomorouniversity.ac.id/";
                                         }else{
                                             $fPath = $protocol."localhost/puis/";
