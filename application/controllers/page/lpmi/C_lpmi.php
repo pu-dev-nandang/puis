@@ -159,6 +159,7 @@ class C_lpmi extends Lpmi_Controler {
     public function ajax_edit($id)
     {
         $data = $this->m_lpmi->get_by_id($id);
+        // print_r($data);die();
         echo json_encode($data);
     }
  
@@ -168,7 +169,7 @@ class C_lpmi extends Lpmi_Controler {
         $data = array(
                 // 'IDType' => $this->input->post('type'),
                 'Title' => $this->input->post('title'),
-                'IDSubCat' => $this->input->post('category'),
+                'IDSubCat' => $this->input->post('idsubcategory'),
                 'Description' => $this->input->post('description'),
                 'Meta_description' => $this->input->post('meta_des'),
                 'Meta_keywords' => $this->input->post('meta_key'),
@@ -236,6 +237,74 @@ class C_lpmi extends Lpmi_Controler {
     public function ajax_deleteCat($id)
     {
         $this->m_lpmi->delete_by_idCat($id);
+        echo json_encode(array("status" => TRUE));
+    }
+
+
+    // Sub Category
+    public function getCatByLang(){
+
+        $getidlang =  $this->input->post('idlang');
+        // print_r($getidlang);
+        $q = $this->m_lpmi->getCategory($getidlang);        
+        echo json_encode($q);  
+    }
+
+
+    public function getSubCat(){
+
+        $getidcat =  $this->input->post('idcat');
+        // print_r($getidlang);
+        $q = $this->m_lpmi->getSubCategory($getidcat);        
+        echo json_encode($q);  
+    }
+
+
+    public  function list_Subcategory(){
+        $data=$this->m_lpmi->get_Subcategory();
+        echo json_encode($data);
+    }
+
+    public function ajax_addSubCat()
+    {
+        // $this->_validate();
+        $data = array(  
+                'IDCat' => $this->input->post('idcategory'),
+                'SubName' => $this->input->post('subcategoryname'),
+                'CreateAt' => date('Y-m-d H:i:s'),
+                'CreateBy' => $this->session->userdata('NIP'),
+            );
+        
+        // print_r($data);die();
+        $insert = $this->m_lpmi->saveSubCat($data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    public function ajax_editSubCat($id)
+    {
+        $data = $this->m_lpmi->get_by_idSubCat($id);
+        echo json_encode($data);
+    }
+
+    public function ajax_updateSubCat()
+    {
+        // $this->_validate();
+        $data = array(                
+                'IDCat' => $this->input->post('idcategory'),
+                'SubName' => $this->input->post('subcategoryname'),
+                'CreateAt' => date('Y-m-d H:i:s'),
+                'CreateBy' => $this->session->userdata('NIP'),
+            );
+        
+        // print_r($data);die();
+        $insert = $this->m_lpmi->updateSubCat(array('IDSub' => $this->input->post('idSubcat')),$data);
+        // print_r($insert);die();
+        echo json_encode(array("status" => TRUE));
+    }
+
+    public function ajax_deleteSubCat($id)
+    {
+        $this->m_lpmi->delete_by_idSubCat($id);
         echo json_encode(array("status" => TRUE));
     }
 
