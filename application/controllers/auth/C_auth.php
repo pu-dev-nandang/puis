@@ -21,6 +21,8 @@ class C_auth extends Globalclass {
 
     public function checkSKS($SemesterID,$StatusEmployeeID,$StatusLecturerID,$ProdiID){
 
+        exit();
+
         $whereProdi = ($ProdiID!='0' && $ProdiID!=0) ? ' AND em.ProdiID = "'.$ProdiID.'" ' : '';
 
         $dataLecturer = $this->db->query('SELECT NIP, Name FROM db_employees.employees em
@@ -151,34 +153,93 @@ class C_auth extends Globalclass {
 
     }
 
-    public function dataSinta(){
+    public function dataSinta($Year){
 
-        $api_key = 'a39e735fd5049ba1f7ff0b4e05c9f207';
-        $NIDN = '0025106201';
-        $limit = '&offset=0&limit=10';
 
-        $str = 'GET : http://sinta2.ristekdikti.go.id/api/author?api_key='.$api_key.'&nidn='.$NIDN.'
-GET : http://sinta2.ristekdikti.go.id/api/gsdocs?api_key='.$api_key.'&nidn='.$NIDN.''.$limit.'
-GET : http://sinta2.ristekdikti.go.id/api/scopusdocs?api_key='.$api_key.'&nidn='.$NIDN.''.$limit.'
-GET : http://sinta2.ristekdikti.go.id/api/authors?api_key='.$api_key.'&afiliasi_id=384'.$limit.'
-GET : http://sinta2.ristekdikti.go.id/api/authorbooks?api_key='.$api_key.'&id='.$NIDN.''.$limit.'
-GET : http://sinta2.ristekdikti.go.id/api/authoriprs?api_key='.$api_key.'&id='.$NIDN.''.$limit.'
-GET : http://sinta2.ristekdikti.go.id/api/affiliation?api_key='.$api_key.'&kode=002001
-GET : http://sinta2.ristekdikti.go.id/api/countauthors?api_key='.$api_key.'&kode_pt=001002&verified=1
-GET : http://sinta2.ristekdikti.go.id/api/countcitations?api_key='.$api_key.'&kode_pt=001002';
+        // Get data mhs active
 
-        $str_arr = explode('GET : ',$str);
-        $listApi = [];
-        if(count($str_arr)>0){
-            for($i=0;$i<count($str_arr);$i++){
-                if($str_arr[$i]!=''){
-                    array_push($listApi,$str_arr[$i]);
+        $db = 'ta_'.$Year;
+        $SemesterID_lalu = 15;
+        $SemesterID = 16;
+        $data = $this->db->query('SELECT ats.NPM,ats.Name, ps.Name AS Prodi FROM db_academic.auth_students ats 
+                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                        WHERE ats.StatusStudentID = "3" AND ats.Year = "'.$Year.'" ORDER BY ats.NPM ASC ')->result_array();
+
+        if(count($data)>0){
+            for ($i=0;$i<count($data);$i++){
+                $dataSp = $this->db->select('SemesterID, NPM, Credit, GradeValue')->get_where($db.'.study_planning',array(
+                    'SemesterID <= ' => $SemesterID,
+                    'NPM' => $data[$i]['NPM']
+                ))->result_array();
+
+                $TotalSKS = 0;
+                $TotalGradeValue = 0;
+
+                $TotalSKS_lalu = 0;
+                $TotalGradeValue_lalu = 0;
+                if(count($dataSp)>0){
+                    foreach ($dataSp AS $itm){
+                        $TotalSKS = $TotalSKS + $itm['Credit'];
+                        $TotalGradeValue = $TotalGradeValue + ($itm['Credit'] * $itm['GradeValue']);
+
+                        if ($itm['SemesterID'] <= $SemesterID_lalu){
+                            $TotalSKS_lalu = $TotalSKS_lalu + $itm['Credit'];
+                            $TotalGradeValue_lalu = $TotalGradeValue_lalu + ($itm['Credit'] * $itm['GradeValue']);
+                        }
+
+                    }
                 }
+
+                $data[$i]['TotalSKS'] = $TotalSKS;
+                $data[$i]['TotalGradeValue'] = $TotalGradeValue;
+                $data[$i]['IPK_Asli'] = $TotalGradeValue / $TotalSKS;
+                $data[$i]['IPK_Pembulatan'] = number_format(round($TotalGradeValue / $TotalSKS,2),2);
+
+                $data[$i]['Lalu_TotalSKS'] = $TotalSKS_lalu;
+                $data[$i]['Lalu_TotalGradeValue'] = $TotalGradeValue_lalu;
+                $data[$i]['Lalu_IPK_Asli'] = $TotalGradeValue_lalu / $TotalSKS_lalu;
+                $data[$i]['Lalu_IPK_Pembulatan'] = number_format(round($TotalGradeValue_lalu / $TotalSKS_lalu,2),2);
+
+
+//                $data[$i]['Details'] = $dataSp;
             }
         }
 
-        $data['listApi'] = $listApi;
-        $this->load->view('template/sementara',$data);
+        $datasc['datasc'] = $data;
+
+        $this->load->view('template/sementara',$datasc);
+//        print_r($data);
+
+//
+//
+//
+//
+//        $api_key = 'a39e735fd5049ba1f7ff0b4e05c9f207';
+//        $NIDN = '0025106201';
+//        $limit = '&offset=0&limit=10';
+//
+//        $str = 'GET : http://sinta2.ristekdikti.go.id/api/author?api_key='.$api_key.'&nidn='.$NIDN.'
+//GET : http://sinta2.ristekdikti.go.id/api/gsdocs?api_key='.$api_key.'&nidn='.$NIDN.''.$limit.'
+//GET : http://sinta2.ristekdikti.go.id/api/scopusdocs?api_key='.$api_key.'&nidn='.$NIDN.''.$limit.'
+//GET : http://sinta2.ristekdikti.go.id/api/authors?api_key='.$api_key.'&afiliasi_id=384'.$limit.'
+//GET : http://sinta2.ristekdikti.go.id/api/authorbooks?api_key='.$api_key.'&id='.$NIDN.''.$limit.'
+//GET : http://sinta2.ristekdikti.go.id/api/authoriprs?api_key='.$api_key.'&id='.$NIDN.''.$limit.'
+//GET : http://sinta2.ristekdikti.go.id/api/affiliation?api_key='.$api_key.'&kode=002001
+//GET : http://sinta2.ristekdikti.go.id/api/countauthors?api_key='.$api_key.'&kode_pt=001002&verified=1
+//GET : http://sinta2.ristekdikti.go.id/api/countcitations?api_key='.$api_key.'&kode_pt=001002';
+//
+//        $str_arr = explode('GET : ',$str);
+//        $listApi = [];
+//        if(count($str_arr)>0){
+//            for($i=0;$i<count($str_arr);$i++){
+//                if($str_arr[$i]!=''){
+//                    array_push($listApi,$str_arr[$i]);
+//                }
+//            }
+//        }
+//
+//        $data['listApi'] = $listApi;
+//        $this->load->view('template/sementara',$data);
 
 //        print_r($listApi);
 
