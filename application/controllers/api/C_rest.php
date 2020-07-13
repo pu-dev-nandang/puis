@@ -1422,7 +1422,7 @@ class C_rest extends CI_Controller {
 
 
 
-                $data = $this->db->query('SELECT q.ID, qs.ID AS QuizStudentID, qs.StartSession, qs.EndSession FROM db_academic.q_quiz q 
+                $data = $this->db->query('SELECT q.ID, q.Duration , qs.ID AS QuizStudentID, qs.StartSession, qs.EndSession FROM db_academic.q_quiz q 
                                                     LEFT JOIN db_academic.q_quiz_students qs 
                                                     ON (qs.QuizID = q.ID AND qs.NPM = "'.$NPM.'")
                                                     WHERE q.ID = "'.$QuizID.'"')->result_array();
@@ -1578,7 +1578,9 @@ class C_rest extends CI_Controller {
 
                     $this->db->where('ID', $dataToken['QuizStudentID']);
                     $this->db->update('db_academic.q_quiz_students',
-                        array('Score'=>str_replace(',','.',$ScoreSementara),'ShowScore'=>$ShowScore));
+                        array('Score'=>str_replace(',','.',$ScoreSementara),
+                            'ShowScore'=>$ShowScore,
+                            'WorkDuration' => $dataToken['WorkDuration']));
                     $this->db->reset_query();
                 }
 

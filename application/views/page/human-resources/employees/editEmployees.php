@@ -6,6 +6,10 @@
 </script>
 <style type="text/css">
     .bg-required{color: red;font-weight: bold;}
+    #AppendProdi {
+        margin: auto;
+        width: 100%;
+    }
 </style>
 
 <div class="panel panel-primary" id="form-employee">
@@ -358,19 +362,21 @@
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Division</label>
-                                        <select class="form-control required" id="form_MainDivision"></select>
+                                        <select class="form-control required selectDiv" id="form_MainDivision"></select>
                                         <small class="text-danger text-message"></small>
                                     </div>
                                 </div>
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Position</label>
-                                        <select class="form-control required" id="form_MainPosition"></select>
+                                        <select class="form-control required selectPost" id="form_MainPosition"></select>
                                         <small class="text-danger text-message"></small>
                                     </div>
                                 </div>
                             </div>
-                            <div id = "AddingProdi"></div>
+
+                            <div id="AddingProdi__"></div>
+
                         </div>
                     </div>
                 </div>
@@ -384,16 +390,19 @@
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Division</label>
-                                        <select class="form-control" id="form_Other1Division"></select>
+                                        <select class="form-control selectDiv" id="form_Other1Division"></select>
                                     </div>
                                 </div>
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Position</label>
-                                        <select class="form-control" id="form_Other1Position"></select>
+                                        <select class="form-control selectPost" id="form_Other1Position"></select>
                                     </div>
                                 </div>
                             </div>
+
+
+
                         </div>
                     </div>
                 </div>
@@ -406,16 +415,19 @@
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Division</label>
-                                        <select class="form-control" id="form_Other2Division"></select>
+                                        <select class="form-control selectDiv" id="form_Other2Division"></select>
                                     </div>
                                 </div>
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Position</label>
-                                        <select class="form-control" id="form_Other2Position"></select>
+                                        <select class="form-control selectPost" id="form_Other2Position"></select>
                                     </div>
                                 </div>
                             </div>
+
+
+
                         </div>
                     </div>
                 </div>
@@ -428,13 +440,13 @@
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Division</label>
-                                        <select class="form-control" id="form_Other3Division"></select>
+                                        <select class="form-control selectDiv" id="form_Other3Division"></select>
                                     </div>
                                 </div>
                                 <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>Position</label>
-                                        <select class="form-control" id="form_Other3Position"></select>
+                                        <select class="form-control selectPost" id="form_Other3Position"></select>
                                     </div>
                                 </div>
                             </div>
@@ -498,6 +510,7 @@
                                         <div class="form-group">
                                             <label>Programme Study</label>
                                             <select class="form-control" id="formProgrammeStudy"></select>
+                                            <small class="text-danger text-message"></small>
                                         </div>
                                     </div>
                                     <div class="col-xs-3">
@@ -587,8 +600,7 @@
         }
         loadSelectOptionDivision('#form_MainDivision',MainDivision_ID);
         loadSelectOptionPosition('#form_MainPosition',MainPosition_ID);
-
-
+        
         $('#form_Other1Division,#form_Other1Position,' +
             '#form_Other2Division,#form_Other2Position,' +
             '#form_Other3Division,#form_Other3Position').append('<option>-- Empty --</option>');
@@ -758,12 +770,38 @@
               }
             };
 
+            //OLD SCRIPT NANDANG
+                /*$("#form_MainDivision").change(function(){
+                    var getValue = $(this).val();
+                    var form_MainPosition = $("#form_MainPosition").val();
+                    if (getValue == 15 || form_MainPosition == 6) { // if selected Admin Prodi
+                         Opform_MainDivision('');
+                    }
+                    else
+                    {
+                        $("#AddingProdi").empty();
+                    }
+                })
+
+                $("#form_MainPosition").change(function(){
+                    var getValue = $(this).val();
+                    var form_MainDivision = $("#form_MainDivision").val();
+                    if (getValue == 6 || form_MainDivision == 15) { // if selected Admin Prodi
+                         Opform_MainDivision('');
+                    }
+                    else
+                    {
+                        $("#AddingProdi").empty();
+                    }
+                })*/
+            //END OF OLD SCRIPT NANDANG
+
             waitForEl("#form_MainPosition option[value='1']", function() {
               waitForEl("#form_MainDivision option[value='1']", function() {
                 var form_MainPosition = $("#form_MainPosition").val();
                 var form_MainDivision = $("#form_MainDivision").val();
-                // console.log(form_MainDivision)
-                if (form_MainPosition == 6 || form_MainDivision == 15) {
+                //OLD SCRIPT NANDANG
+                /*if (form_MainPosition == 6 || form_MainDivision == 15) {
                     if (form_MainDivision == 15) {
                         Opform_MainDivision(NIP); 
                     }
@@ -771,33 +809,90 @@
                     {
                       Opform_MainDivision(NIP,'KaprodiID'); 
                     }
+                }*/
+                //END SCRIPT NANDANG
+
+                if((form_MainDivision == 14 || form_MainDivision == 15) && form_MainPosition == 6){
+                    var parentAppd = $("body #form_MainDivision").parent().parent().parent();
+                    checkBoxProdi(parentAppd,NIP,'KaprodiID');
                 }
               });  
             });
+            
+        //UPDATED BY FEBRI JULY 2020
+        //UPDATED KAPRODI CHEKBOX
 
-        $("#form_MainDivision").change(function(){
-            var getValue = $(this).val();
-            var form_MainPosition = $("#form_MainPosition").val();
-            if (getValue == 15 || form_MainPosition == 6) { // if selected Admin Prodi
-                 Opform_MainDivision('');
-            }
-            else
-            {
-                $("#AddingProdi").empty();
-            }
-        })
+            waitForEl("#form_Other1Position option[value='1']", function() {
+                waitForEl("#form_Other1Division option[value='1']", function() {
+                    var form_OTH1Division = $("#form_Other1Division").val();
+                    var form_OTH1Position = $("#form_Other1Position").val();
+                    if((form_OTH1Division == 14 || form_OTH1Division == 15) && form_OTH1Position == 6){
+                        var parentAppd = $("body #form_Other1Division").parent().parent().parent();
+                        checkBoxProdi(parentAppd,NIP,'KaprodiID');
+                    }
+                });  
+            });                
+                
+            waitForEl("#form_Other2Position option[value='1']", function() {
+                waitForEl("#form_Other2Division option[value='1']", function() {
+                    var form_OTH2Division = $("#form_Other2Division").val();
+                    var form_OTH2Position = $("#form_Other2Position").val();
+                    if((form_OTH2Division == 14 || form_OTH2Division == 15) && form_OTH2Position == 6){
+                        var parentAppd = $("body #form_Other1Division").parent().parent().parent();
+                        checkBoxProdi(parentAppd,NIP,'KaprodiID');
+                    }
+                });  
+            }); 
+            
+            waitForEl("#form_Other3Position option[value='1']", function() {
+                waitForEl("#form_Other3Division option[value='1']", function() {
+                    var form_OTH3Division = $("#form_Other3Division").val();
+                    var form_OTH3Position = $("#form_Other3Position").val();
+                    if((form_OTH3Division == 14 || form_OTH3Division == 15) && form_OTH3Position == 6){
+                        var parentAppd = $("body #form_Other3Division").parent().parent().parent();
+                        checkBoxProdi(parentAppd,NIP,'KaprodiID');
+                    }
+                });  
+            }); 
+        
+        
+            $("#form-employee").on("change",".selectPost",function(){
+                var itsme = $(this);
+                var value = itsme.val();
+                var parent = itsme.parent().parent().parent();
+                var divValue = parent.find("select.selectDiv").val();
+                if(divValue !== "" && value !== ""){
+                    if((divValue == 14 || divValue == 15) && value == 6){
+                        checkBoxProdi(parent,value);                    
+                    }else{
+                        $("body #AppendProdi").remove();
+                    }
+                }
+            });
 
-        $("#form_MainPosition").change(function(){
-            var getValue = $(this).val();
-            var form_MainDivision = $("#form_MainDivision").val();
-            if (getValue == 6 || form_MainDivision == 15) { // if selected Admin Prodi
-                 Opform_MainDivision('');
-            }
-            else
-            {
-                $("#AddingProdi").empty();
-            }
-        })
+
+            var checkBoxProdi = function($appLocation,NIP,Type = 'AdminID'){
+                $("body #AppendProdi").remove();
+                var dom_div = '<div class="col-xs-11" id = "AppendProdi">'+
+                              '<table class="table" id ="tablechkAddingProdi">';
+                var getRow = 0;
+                for (var i = 0; i < split; i++) {
+                    if ((sisa > 0) && ((i+1) == split) ) {
+                        splitBagi = sisa;
+                    }
+                    dom_div += '<tr id = "Prodi'+i+'">';
+                    for (var k = 0; k < splitBagi; k++) {
+                        var selected = (NIP == Prodi[getRow][Type]) ? 'checked' : '';
+                        dom_div += '<td><input type="checkbox" class = "chkProdi" name="chkProdi" value = "'+Prodi[getRow].ID+'" '+selected+'>&nbsp'+ Prodi[getRow].NameEng+'</td>';
+                        getRow++;
+                    }
+                    dom_div += '<tr>';
+                }            
+                dom_div += '</table></div>';
+                $appLocation.append(dom_div);
+            };
+
+    //END UPDATED BY FEBRI JULY 2020
 
     }
 
@@ -1015,16 +1110,26 @@
         if(isLecturer){
             var statusLecturerVA = itsform.find("#formStatusLecturer > option:selected").attr("value");
             var statusLecturer = itsform.find("#formStatusLecturer > option:selected").val();
-                console.log("c:"+statusLecturer);
+
+            var prodyStatusVA = itsform.find("#formProgrammeStudy > option:selected").attr("value");
+            var prodyStatus = itsform.find("#formProgrammeStudy > option:selected").val();
+            
             if(typeof statusLecturerVA !== typeof undefined && statusLecturerVA !== false){
-                console.log("v:"+statusLecturerVA);
-                  error=true;
+                error=true;
             }else{
                 if($.trim(statusLecturer).length > 0){
                     itsform.find("#formStatusLecturer").addClass("required");
                     itsform.find("#formStatusLecturer").parent().find(".text-message").text("Please fill this field");
                     error=false;
-                }    
+                }
+            }
+
+            if(prodyStatusVA.length > 0){
+                error=true;
+            }else{
+                itsform.find("#formProgrammeStudy").addClass("required error");
+                itsform.find("#formProgrammeStudy").parent().find(".text-message").text("Please fill this field");
+                error=false;
             }
             
         }
@@ -1128,7 +1233,8 @@
 
             // check validation Admin Prodi
                 var arr_Prodi = [];
-                if (form_MainDivision == 15 || form_MainPosition == 6) {
+                //if (form_MainDivision == 15 || form_MainPosition == 6) {
+                if($("body #AppendProdi").length ){
                     $(".chkProdi:checked").each(function(){
                         valuee = this.value;
                         arr_Prodi.push(valuee);
@@ -1139,7 +1245,7 @@
                     //     return;
                     // }
                 }
-
+                
             var DateOfBirht = formYearBirth + '-' + formMontBirth + '-' + formDateBirth;
             var Password_Old = formDateBirth + '' + formMontBirth + '' + formYearBirth.substr(2, 2);
 

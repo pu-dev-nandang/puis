@@ -1339,7 +1339,7 @@ class C_dashboard extends Globalclass {
                                 $err_msg     .= "Size of image '".$file_name."'s too large from 2Mb.";
                             }else { $ispic = true; }
 
-                            $trainingTitleFilename = preg_replace('/\s+/', "_", $data['trainingTitle'][$k]);
+                            $trainingTitleFilename = preg_replace('/[^\p{L}\p{N}\s]/u', "_", $data['trainingTitle'][$k]);
                             $newFilename = $data['NIP']."-TRAINING-".$trainingTitleFilename."-".date('ymd').".jpg";
 
                             if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id'){
@@ -1368,7 +1368,12 @@ class C_dashboard extends Globalclass {
                                 }
                             }
                         }else{
-                            $certificateName = null;
+                            $checkFile = $this->General_model->fetchData("db_employees.employees_educations_training",array("ID"=>$data['trainingID'][$k]))->row();
+                            if(!empty($checkFile)){
+                                $certificateName = $checkFile->certificate;
+                            }else{
+                                $certificateName = null;
+                            }
                         }
                         $certificates[] = array("ID"=>$data['trainingID'][$k],"NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$k],"organizer"=>$data['trainingorganizer'][$k],"start_event"=>$data['trainingStart'][$k].' '.$data['trainingStartTime'][$k].':00',"end_event"=>$data['trainingEnd'][$k].' '.$data['trainingEndTime'][$k].':00',"location"=>$data['trainingLocation'][$k],"category"=>$data['trainingCategory'][$k],"costCompany"=>$data['trainingCostCompany'][$k],"costEmployee"=>$data['trainingCostEmployee'][$k],"certificate"=>$certificateName);                                
                     }
@@ -1728,8 +1733,6 @@ class C_dashboard extends Globalclass {
                 $result = $this->m_hr->fetchEmployee(false,$param)->result();
             }
 
-
-
             if(!empty($result)){
                 $rs = array();
                 $sort = array();
@@ -1864,7 +1867,8 @@ class C_dashboard extends Globalclass {
         $data = array();
         $param = $this->uri->segment(2);
         
-        $data['typecontent'] = $param;        
+        $data['typecontent'] = $param;    
+        $data['G_division'] = $this->m_master->apiservertoserver(base_url().'api/__getAllDepartementPU');    
         $myDivision = $this->session->userdata('IDdepartementNavigation');
         $accessLog = $this->checkAccess($myDivision,$param);
         if(!empty($accessLog)){
@@ -1898,12 +1902,12 @@ class C_dashboard extends Globalclass {
                 if(!empty($output['TypeContent'])){
                     $param[] = array("field"=>"a.TypeContent","data"=>" = '".$output['TypeContent']."' ","filter"=>"AND",);
                 }
-                if(!empty($output['NIP'])){
-                    $param[] = array("field"=>"a.NIP","data"=>" = '".$output['NIP']."' ","filter"=>"AND",);
+                if(!empty($output['Question'])){
+                    $param[] = array("field"=>"a.ContentID","data"=>" = '".$output['Question']."' ","filter"=>"AND",);
                 }
 
             }
-            
+
             $totalData = $this->m_log_content->fetchLogContent(true,$param)->row();
             $TotalData = (!empty($totalData) ? $totalData->Total : 0);
             $reqdata['length'] = (($reqdata['length'] == '-1') ? 0:$reqdata['length']);
@@ -1971,12 +1975,7 @@ class C_dashboard extends Globalclass {
             $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
             $param = array();$orderBy=" lem.ID DESC ";
 
-            if(!empty($reqdata['search']['value']) ) {
-                $search = $reqdata['search']['value'];
-
-                $param[] = array("field"=>"(b.Type","data"=>" like '%".$search."%' ","filter"=>"AND",);
-                $param[] = array("field"=>"b.Questions","data"=>" like '%".$search."%' )","filter"=>"OR",);
-            }
+            
             if(!empty($data_arr['Filter'])){
                 $parse = parse_str($data_arr['Filter'],$output);
                 if(!empty($output['type'])){
@@ -2002,6 +2001,21 @@ class C_dashboard extends Globalclass {
                     }
                 }
 
+            }
+
+
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+                /*$param[] = array("field"=>"(b.Type","data"=>" like '%".$search."%' ","filter"=>"AND",);
+                $param[] = array("field"=>"b.Questions","data"=>" like '%".$search."%' )","filter"=>"OR",);*/
+                $parse = parse_str($data_arr['Filter'],$output);
+                if($output['TypeContent'] == 'knowledge_base'){
+                    $param[] = array("field"=>"(d.Type","data"=>" like '%".$search."%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"b.Desc","data"=>" like '%".$search."%' )","filter"=>"OR",);
+                }else if($output['TypeContent'] == 'user_qna'){
+                    $param[] = array("field"=>"(b.Type","data"=>" like '%".$search."%' ","filter"=>"AND",);
+                    $param[] = array("field"=>"b.Questions","data"=>" like '%".$search."%' )","filter"=>"AND",);
+                }
             }
 
             $param[] = array("field"=>"a.TypeContent","data"=>" = '".$output['TypeContent']."' ","filter"=>"AND",);
@@ -2147,6 +2161,49 @@ class C_dashboard extends Globalclass {
                 $json = array("message"=>$message);
             }
 
+        }
+        echo json_encode($json);
+    }
+
+
+    public function getTypeQuest(){
+        $data = $this->input->post();
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            if($data_arr['TypeContent'] == "knowledge_base"){
+                if($data_arr['SelectBox'] == "Type"){
+                    $condition = array("IDDivision"=>$data_arr['DivisionID']);
+                    $results = $this->m_master->userKB($data_arr['DivisionID']);
+                    $json = $results;
+                }else if($data_arr['SelectBox'] == "Questions"){
+                    if(!empty($data_arr['TypeQuest'])){
+                        $condition = array("IDType"=>$data_arr['TypeQuest']);
+                        $results = $this->General_model->fetchData("db_employees.knowledge_base",$condition,"Desc","ASC")->result();
+                        $json = $results;
+                    }
+                }
+            }else if($data_arr['TypeContent'] == "user_qna"){
+                if($data_arr['SelectBox'] == "Type"){
+                    $results = $this->General_model->fetchData("db_employees.user_qna",array("Division_ID"=>$data_arr['DivisionID']),'Type','ASC',null,'Type')->result();
+                    $json = $results;
+                }else if($data_arr['SelectBox'] == "Questions"){
+                    if(!empty($data_arr['TypeQuest'])){
+                        $results = $this->General_model->fetchData("db_employees.user_qna",array("Type"=>$data_arr['TypeQuest']), 'Questions','ASC')->result();
+                        if(!empty($results)){
+                            $newRess = array();
+                            foreach ($results as $v) {
+                                $dataArr = array();
+                                $dataArr['ID'] = $v->Id;
+                                $dataArr['Desc'] = $v->Questions;
+                                $newRess[] = $dataArr;
+                            }
+                            $json = $newRess;
+                        }
+                    }
+                }
+            }
         }
         echo json_encode($json);
     }

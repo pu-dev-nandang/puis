@@ -12,7 +12,7 @@
 					<h4 class="panel-title"><i class="fa fa-bars"></i> List of Purchase Order</h4>				
 				</div>
 				<div class="col-sm-2">
-					<p class="req-btn" onclick="location.href='<?=base_url('prodi/add-stock-good')?>';">
+					<p class="req-btn" onclick="location.href='<?=base_url('stock-good/form')?>';">
 						<i class="fa fa-plus"></i> Add new request
 					</p>
 				</div>
@@ -56,7 +56,7 @@ function fetchPurchaseOrder() {
             "iDisplayLength" : 5,
             "responsive": true,
             "ajax":{
-                url : base_url_js+'prodi/fetch-my-purchase-order', // json datasource
+                url : base_url_js+'stock-good/fetch-my-purchase-order', // json datasource
                 ordering : false,
                 data : {token:token},
                 type: "post",  // method  , by default get

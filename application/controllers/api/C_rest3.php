@@ -2154,7 +2154,7 @@ class C_rest3 extends CI_Controller {
                          }
 
                          // Remove file di folder upload/document/{NPM}
-                         $path = FCPATH.'uploads\\document\\'.$NPM;
+                         $path = FCPATH.'uploads/document/'.$NPM;
                          if (file_exists('./uploads/document/'.$NPM)) {
                             $this->m_master->deleteDir($path);
                             $MSG .= '<br/>Remove Folder upload/document/'.$NPM.' : Selesai';
@@ -2167,7 +2167,7 @@ class C_rest3 extends CI_Controller {
                           if (count($G_dtMHS) > 0) {
                             $Photo = $G_dtMHS[0]['Photo'];
                             if (file_exists('./upload/students/'.$ta.'/'.$Photo)) {
-                                $path = FCPATH.'uploads\\students\\'.$ta.'\\'.$Photo;
+                                $path = FCPATH.'uploads/students/'.$ta.'/'.$Photo;
                                 unlink($path);
                                 $MSG .= '<br/>File Photo  : Berhasil Dihapus';
                             }

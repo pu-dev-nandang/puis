@@ -1,10 +1,10 @@
 <div id="stock-good">
 	<div class="row">
 		<div class="col-sm-12">
-			<p><a class="btn btn-warning" href="<?=base_url('prodi/stock-good')?>"> <i class="fa fa-chevron-left"></i> Back to list</a></p>
+			<p><a class="btn btn-warning" href="<?=base_url('stock-good')?>"> <i class="fa fa-chevron-left"></i> Back to list</a></p>
 		</div>
 		<div class="col-sm-12">
-			<form action="<?=base_url('prodi/save-stock-good')?>" method="post" autocomplete="off" id="form-stock-good">
+			<form action="<?=base_url('stock-good/save-changes')?>" method="post" autocomplete="off" id="form-stock-good">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h4 class="panel-title"><i class="fa fa-edit"></i> Form Stock Good</h4>
@@ -78,11 +78,36 @@
 		var totalRow = $tableitem.find("tbody > tr").length;
 		$clonerow = $tableitem.find("tbody > tr:first").clone();
 		$clonerow.find(".form-control").val("");
+		$clonerow.find(".text-message").text("");
 		var label = ' <button class="btn-xs btn-danger btn-remove-row" type="button"><i class="fa fa-trash"></i></button>';
 		$clonerow.find("td:first").html( label );
 		$tableitem.find("tbody").append($clonerow);
 	});
 	$(".table-purchase-item").on("click","tbody .btn-remove-row",function(){
 		$(this).parent().parent().remove();
+	});
+	$("#form-stock-good .btn-submit").click(function(){
+		var itsme = $(this);
+        var itsform = itsme.parent().parent().parent().parent();
+        itsform.find(".required").each(function(){
+            var value = $(this).val();
+            if($.trim(value) == ''){
+                $(this).addClass("error");
+                $(this).parent().find(".text-message").text("Please fill this field");
+                error = false;
+            }else{
+                error = true;
+                $(this).removeClass("error");
+                $(this).parent().find(".text-message").text("");
+            }
+        });
+        
+        var totalError = itsform.find(".error").length;
+        if(error && totalError == 0 ){
+            loading_modal_show();
+            $("#form-stock-good")[0].submit();
+        }else{
+            alert("Please fill out the field.");
+        }
 	});
 </script>

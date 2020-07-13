@@ -800,13 +800,14 @@ class C_api extends CI_Controller {
                           LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
                           ';
         if( !empty($requestData['search']['value']) ) {
+            $dataWhere = (empty($dataWhere)) ? ' where ' : ' and ';
             $sql.= '  '.$dataWhere.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
             $sql.= ' OR asx.FormulirCode LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR asx.No_Ref LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR emp.Name LIKE "'.$requestData['search']['value'].'%" )';
-            $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
+            // $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
         }
         else {
             $sql.= ' '.$dataWhere;
@@ -6302,7 +6303,7 @@ class C_api extends CI_Controller {
                     $myNIP = $this->session->userdata('NIP');
                     $myName = $this->session->userdata('Name');
                     $formInsert['EnteredBy'] = $myNIP.'/'.$myName;
-                    $formInsert['isApproved'] = 1;
+                    $formInsert['isApproved'] = null;
                     /*END ADDED BY FEBRI @ FEB 2020*/
                     
                     $insert = $this->db->insert('db_employees.employees',$formInsert);
@@ -6469,11 +6470,51 @@ class C_api extends CI_Controller {
                 $this->db->update('db_employees.employees',$formUpdate);
 
                 // check fill admin Prodi / Ka prodi
+                //UPDATED BY FEBRI @ JULY 2020
                 $PositionMain = $formUpdate['PositionMain'];
                 $PositionMain = explode('.', $PositionMain);
                 $Position = $PositionMain[1];
                 $Division = $PositionMain[0];
-                if ($Position == 6 || $Division == 15) {
+
+                if(!empty($formUpdate['PositionOther1'])){
+                    $PositionOTH1 = $formUpdate['PositionOther1'];
+                    $PositionOTH1 = explode('.', $PositionOTH1);
+                    $Position_OTH1 = $PositionOTH1[1];
+                    $Division_OTH1 = $PositionOTH1[0];
+                }else{
+                    $Position_OTH1 = 0;
+                    $Division_OTH1 = 0;
+                }
+                
+                if(!empty($formUpdate['PositionOther2'])){
+                    $PositionOTH2 = $formUpdate['PositionOther2'];
+                    $PositionOTH2 = explode('.', $PositionOTH2);
+                    $Position_OTH2 = $PositionOTH2[1];
+                    $Division_OTH2 = $PositionOTH2[0];
+                }else{
+                    $Position_OTH2 = 0;
+                    $Division_OTH2 = 0;
+                }
+                
+                if(!empty($formUpdate['PositionOther3'])){
+                    $PositionOTH3 = $formUpdate['PositionOther3'];
+                    $PositionOTH3 = explode('.', $PositionOTH3);
+                    $Position_OTH3 = $PositionOTH3[1];
+                    $Division_OTH3 = $PositionOTH3[0];
+                }else{
+                    $Position_OTH3 = 0;
+                    $Division_OTH3 = 0;
+                }
+
+
+
+                //if ($Position == 6 || $Division == 15) { => OLD script
+                if( (($Division == 14 || $Division == 15) && $Position == 6) ||
+                    (($Division_OTH1 == 14 || $Division_OTH1 == 15) && $Position_OTH1 == 6) ||
+                    (($Division_OTH2 == 14 || $Division_OTH2 == 15) && $Position_OTH2 == 6) ||
+                    (($Division_OTH3 == 14 || $Division_OTH3 == 15) && $Position_OTH3 == 6)
+                    ){
+                //END UPDATED BY FEBRI @ JULY 2020
                     $ProdiArr = (array) $data_arr['arr_Prodi'];
                     if ($Division == 15) {
                         $dataSave = array(
@@ -6490,10 +6531,7 @@ class C_api extends CI_Controller {
                             $this->db->update('db_academic.program_study',$dataSave);
 
                         }
-                    }
-                    else
-                    {
-
+                    }else{
                         $dataSave = array(
                             'KaprodiID' => null,
                         );

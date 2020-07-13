@@ -452,12 +452,12 @@ class M_save_to_pdf extends CI_Model {
         // Get Rektor
         $dataRektor = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_employees.employees em
                                                     LEFT JOIN db_employees.employees_status ems ON (ems.ID = em.StatusEmployeeID)
-                                                    WHERE em.PositionMain = "2.2" AND ems.IDStatus != -1 AND ems.IDStatus != -2 ')->result_array();
+                                                    WHERE ems.IDStatus != -1 AND ems.IDStatus != -2  AND (em.PositionMain = "2.2" OR em.PositionOther1 = "2.2" OR em.PositionOther2 = "2.2" OR em.PositionOther3 = "2.2")  ')->result_array();
 
         // Wakil rektor akademik / Warek I
         $dataWaRek1 = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_employees.employees em
                                                     LEFT JOIN db_employees.employees_status ems ON (ems.ID = em.StatusEmployeeID)
-                                                    WHERE em.PositionMain = "2.2" AND ems.IDStatus != -1 AND ems.IDStatus != -2 ')->result_array();
+                                                    WHERE ems.IDStatus != -1 AND ems.IDStatus != -2 AND (em.PositionMain = "2.2" OR em.PositionOther1 = "2.2" OR em.PositionOther2 = "2.2" OR em.PositionOther3 = "2.2") ')->result_array();
 
         $dataTranscript = $this->db->limit(1)->get('db_academic.setting_transcript')->result_array();
         $dataTempTranscript = $this->db->limit(1)->get('db_academic.setting_temp_transcript')->result_array();

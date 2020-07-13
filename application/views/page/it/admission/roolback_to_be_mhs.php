@@ -73,7 +73,7 @@
         }
     }
 
-    function LoadDataForTable()
+    function LoadDataForTable(MakeDataSelected="")
     {
         DataSelected = [];
         // make table
@@ -104,7 +104,10 @@
 
         $.post(url,{token:token},function (jsonResult) {
             MakeDataTable(jsonResult);
-            MakeDataSelected(); 
+            if (MakeDataSelected == "") {
+                MakeDataSelected();
+            }
+             
             
         });
     }
@@ -206,6 +209,7 @@
     $(document).off('click', '.btn-save').on('click', '.btn-save',function(e) {
             if (confirm('Are you sure ?')) {
                     if (DataSelected.length > 0) {
+                         S_Table.$('input[type="checkbox"]').attr('disabled',true);
                         var url = base_url_js+'rest3/__get_roolback_door_to_be_mhs_admission';
                         var ta = $('#SelectTA option:selected').val();
                         var data = {
@@ -219,6 +223,7 @@
                         $.post(url,{token:token},function (resultJson) {
                             DataSelected = resultJson.Dt;
                             MakeDataSelected();
+                            LoadDataForTable("1");  // not load dataselected
                             S_Table.$('input[type="checkbox"]').each(function(){
 			                    if(this.checked){
                                     $(this).closest('tr').remove();
@@ -228,7 +233,7 @@
                         }).fail(function() {
                             toastr.info('No Result Data'); 
                         }).always(function() {
-                                        
+                            S_Table.$('input[type="checkbox"]').attr('disabled',false);              
                         });
                     } 
             }

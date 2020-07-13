@@ -139,7 +139,7 @@
                 error: function(jqXHR){  // error handling
                     loading_modal_hide();
                     $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-                        '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                        '<h4 class="modal-title">Error Fetch Data</h4>');
                     $('#GlobalModal .modal-body').html(jqXHR.responseText);
                     $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
                     $('#GlobalModal').modal({

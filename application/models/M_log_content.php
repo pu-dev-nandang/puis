@@ -25,21 +25,41 @@ class M_log_content extends CI_Model{
             $lims = " LIMIT {$start},{$limit}"; 
         }
 
-        $groupby = '';
-        $sorted = '';
-        $order_by = '';
+        $groupby = ''; $sorted = ''; $order_by = '';
+
+        $tablename2=trim(preg_replace('/[^ \w-]/', '', $tablename));
+        $leftJoinTable = ""; $selectC="";
+        if($tablename2 == 'knowledge_base'){
+            $selectC         = 'd.Type as TypeName, b.Desc as Description, abc.NameDepartment as DivisionName';
+            $leftJoinTable  .= 'INNER JOIN db_employees.knowledge_base b on a.ContentID = b.ID ';
+            $leftJoinTable  .= 'LEFT JOIN db_employees.kb_type d on d.ID = b.IDType ';
+            $leftJoinTable  .= 'left join (
+                                        select * from (
+                                        select CONCAT("AC.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Code as Abbr from db_academic.program_study
+                                        UNION
+                                        select CONCAT("NA.",ID) as ID, Division as NameDepartment,Description as NameDepartmentIND,Abbreviation as Abbr from db_employees.division  
+                                        UNION
+                                        select CONCAT("FT.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Abbr from db_academic.faculty 
+                                ) abc) abc on d.IDDivision = abc.ID';
+        }else if($tablename2 == 'user_qna'){
+            $selectC         = 'b.Type as TypeName, b.Questions as Description, d.Division as DivisionName ';
+            $leftJoinTable   = 'INNER JOIN db_employees.user_qna b on a.ContentID = b.Id ';
+            $leftJoinTable  .= 'LEFT JOIN db_employees.division d on d.ID = Division_ID ';
+        }
+
         if($count){
             $select = "count(DISTINCT a.NIP) as Total";
         }else{
-            $select = "c.NIP, c.`Name`, a.TypeContent, a.ViewedAt, b.*
-					,( select count(NIP) from  db_employees.log_countable_content where NIP = a.NIP and TypeContent {$tablename}) as totalRead";
-            $groupby = "GROUP BY a.NIP";
-            $order_by = 'order by a.ContentID asc';
+            $select = "c.NIP, c.`Name`, DATE_FORMAT(a.ViewedAt,'%d-%M-%Y %H:%i:%s') as ViewedAt, {$selectC}, 
+                       ( select count(NIP) from db_employees.log_countable_content x inner join  db_employees.knowledge_base z on x.ContentID = z.ID where NIP = a.NIP and TypeContent = 'knowledge_base') as totalReadCtn ";
+            $groupby = "group by a.NIP";
         }
+
         
-        $string = " select {$select}
+        
+        $string = " select {$select}, '{$tablename2}' as ContentTable
 					from db_employees.log_countable_content a
-					LEFT JOIN db_employees.user_qna b on a.ContentID = b.Id
+					{$leftJoinTable}
 					LEFT JOIN db_employees.employees c on c.NIP = a.NIP
                    {$where} {$groupby} {$order_by} {$lims}";
         $value  = $this->db->query($string);
@@ -76,20 +96,18 @@ class M_log_content extends CI_Model{
         
         $leftJoinTable = ""; $selectC="";
         if($tablename2 == 'knowledge_base'){
-        	$leftJoinTable = 'LEFT JOIN db_employees.knowledge_base b on a.ContentID = b.ID ';
-        	$leftJoinTable .= 'LEFT JOIN db_employees.kb_type d on d.ID = b.IDType ';
         	$selectC = 'd.Type as TypeName, b.Desc as Description';
+            $leftJoinTable = 'INNER JOIN db_employees.knowledge_base b on a.ContentID = b.ID ';
+            $leftJoinTable .= 'LEFT JOIN db_employees.kb_type d on d.ID = b.IDType ';
         }else if($tablename2 == 'user_qna'){
-        	$leftJoinTable = 'LEFT JOIN db_employees.user_qna b on a.ContentID = b.Id';
         	$selectC = 'b.Type as TypeName, b.Questions as Description';
+            $leftJoinTable = 'INNER JOIN db_employees.user_qna b on a.ContentID = b.Id';
         }
 
         if($count){
             $select = "count(a.NIP) as Total";
         }else{
             $select = "c.NIP, c.`Name`, DATE_FORMAT(a.ViewedAt,'%d-%M-%Y %H:%i:%s') as ViewedAt, {$selectC} ";
-            //$groupby = "GROUP BY a.NIP";
-            
         }
         
         $string = " select {$select}
