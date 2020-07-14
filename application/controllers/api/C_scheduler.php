@@ -82,6 +82,9 @@ class C_scheduler extends CI_Controller {
         case 's2b':
           $this->__s2b();
           break;
+        case 's3a1':
+          $this->__s3a1();
+          break;
         default:
           # code...
           break;
@@ -350,6 +353,69 @@ class C_scheduler extends CI_Controller {
         $this->db->where('ID',$ID);
         $this->db->update('aps_apt_rekap.log',['Status' => 1]);
       }
+    }
+
+    private function __s3a1(){
+     // save to log
+     $this->db->insert('aps_apt_rekap.log',[
+       'RunTime' => date('Y-m-d H:i:s'),
+       'TableName' => 's2b'
+     ]);
+
+     $ID = $this->db->insert_id();
+     // get Prodi first
+     $dataProdi = $this->getProdi();
+     $param = [
+      'auth' => 's3Cr3T-G4N',
+      'mode' => 'DataDosen'
+     ];
+
+     $arr_StatusForlap = [
+        '0', // NUP
+        '1', // NIDN
+        '2' // NIDK
+     ];
+
+     $getSemester = $this->m_master->showData_array('db_academic.semester');
+
+     $urlPost = base_url().'rest3/__get_APS_CrudAgregatorTB3';
+     $Year = date('Y');
+     $Month = date('m');
+     $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+     for ($i=0; $i < count($dataProdi); $i++) { 
+        // remove old data first by years and month
+        $this->db->query(
+          'delete from aps_apt_rekap.s3a1 where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'" and ProdiID = '.$ProdiID
+        );
+        $ProdiID = $dataProdi[$i]['ID'];
+
+        for ($j=0; $j < count($arr_StatusForlap); $j++) { 
+          $StatusForlap = $arr_StatusForlap[$i];
+
+          for ($k=0; $k < count($getSemester); $k++) { 
+            $SemesterID = $getSemester[$j]['ID'];
+            $param['StatusForlap']  = $StatusForlap;
+            $param['SemesterID']  = $SemesterID;
+            $param['ProdiID']  = $ProdiID;
+            $token = $this->jwt->encode($param,"UAP)(*");
+            $data_post = [
+              'token' => $token,
+            ];
+
+            try {
+              $postTicket = $this->m_master->postApiPHP($urlPost,$data_post);
+              $result = (array) json_decode($postTicket,true);
+            } catch (Exception $e) {
+              
+            }
+
+
+          }
+
+        }
+
+     }
     }
 
 }
