@@ -1676,55 +1676,78 @@ class C_api4 extends CI_Controller {
             $ScheduleID = $data_arr['ScheduleID'];
             $Session = $data_arr['Session'];
 
-            $dataCk = $this->db->select('ID')->get_where('db_academic.q_quiz',array(
-                'ScheduleID' => $ScheduleID,
-                'Session' => $Session
-            ))->result_array();
+            // Cek apakah ada student yang pernah ngisi atau engga
+            $TotalAnswer = $this->db->query('SELECT COUNT(*) AS TotalAnswer FROM db_academic.q_quiz qq 
+                                                    LEFT JOIN db_academic.q_quiz_students qqs
+                                                    ON (qq.ID = qqs.QuizID)
+                                                    WHERE qq.ScheduleID = "'.$ScheduleID.'"
+                                                     AND qq.Session = "'.$Session.'" ')
+                                            ->result_array()[0]['TotalAnswer'];
 
-            $dataFmQuiz = array(
-                'NotesForStudents' => $data_arr['NotesForStudents'],
-                'Duration' => $data_arr['Duration']
-            );
+            if($TotalAnswer<=0){
+                $dataCk = $this->db->select('ID')->get_where('db_academic.q_quiz',array(
+                    'ScheduleID' => $ScheduleID,
+                    'Session' => $Session
+                ))->result_array();
 
-            if(count($dataCk)>0){
-                // Update
-                $QuizID = $dataCk[0]['ID'];
-                $dataFmQuiz['UpdatedBy'] = $data_arr['NIP'];
-                $dataFmQuiz['UpdatedAt'] = $this->m_rest->getDateTimeNow();
-                $this->db->where('ID', $QuizID);
-                $this->db->update('db_academic.q_quiz',$dataFmQuiz);
-                $this->db->reset_query();
+                $dataFmQuiz = array(
+                    'NotesForStudents' => $data_arr['NotesForStudents'],
+                    'Duration' => $data_arr['Duration']
+                );
 
-            } else {
-                // Insert
-                $dataFmQuiz['ScheduleID'] = $ScheduleID;
-                $dataFmQuiz['Session'] = $Session;
-
-                $dataFmQuiz['CreatedBy'] = $data_arr['NIP'];
-                $dataFmQuiz['CreatedAt'] = $this->m_rest->getDateTimeNow();
-                $this->db->insert('db_academic.q_quiz',$dataFmQuiz);
-                $QuizID = $this->db->insert_id();
-                $this->db->reset_query();
-            }
-
-
-            $dataForm = (array) $data_arr['dataForm'];
-            if(count($dataForm)>0){
-                $this->db->where('QuizID',$QuizID);
-                $this->db->delete('db_academic.q_quiz_details');
-                $this->db->reset_query();
-
-                for($i=0;$i<count($dataForm);$i++){
-                    $d = (array) $dataForm[$i];
-                    $d['QuizID'] = $QuizID;
-                    $this->db->insert('db_academic.q_quiz_details',$d);
+                if(count($dataCk)>0){
+                    // Update
+                    $QuizID = $dataCk[0]['ID'];
+                    $dataFmQuiz['UpdatedBy'] = $data_arr['NIP'];
+                    $dataFmQuiz['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->where('ID', $QuizID);
+                    $this->db->update('db_academic.q_quiz',$dataFmQuiz);
                     $this->db->reset_query();
 
                 }
+                else {
+                    // Insert
+                    $dataFmQuiz['ScheduleID'] = $ScheduleID;
+                    $dataFmQuiz['Session'] = $Session;
 
+                    $dataFmQuiz['CreatedBy'] = $data_arr['NIP'];
+                    $dataFmQuiz['CreatedAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->insert('db_academic.q_quiz',$dataFmQuiz);
+                    $QuizID = $this->db->insert_id();
+                    $this->db->reset_query();
+                }
+
+                $dataForm = (array) $data_arr['dataForm'];
+                if(count($dataForm)>0){
+                    $this->db->where('QuizID',$QuizID);
+                    $this->db->delete('db_academic.q_quiz_details');
+                    $this->db->reset_query();
+
+                    for($i=0;$i<count($dataForm);$i++){
+                        $d = (array) $dataForm[$i];
+                        $d['QuizID'] = $QuizID;
+                        $this->db->insert('db_academic.q_quiz_details',$d);
+                        $this->db->reset_query();
+
+                    }
+
+                }
+
+                $result = array(
+                    'Status' => 1,
+                    'Message' => 'Data saved'
+                );
+            } else {
+                $result = array(
+                    'Status' => -1,
+                    'Message' => 'Quiz cannot be edited',
+                    'TotalAnswer' => $TotalAnswer
+                );
             }
 
-            return print_r(1);
+
+
+            return print_r(json_encode($result));
         }
         else if ($data_arr['action']=='getQuizInThisSession'){
 
@@ -1736,11 +1759,19 @@ class C_api4 extends CI_Controller {
                                                WHERE q.ScheduleID = "'.$ScheduleID.'" AND q.Session = "'.$Session.'" ')
                         ->result_array();
 
-            $Quiz = $this->db->get_where('db_academic.q_quiz',array('ScheduleID' => $ScheduleID, 'Session' => $Session))->result_array();
+            $Quiz = $this->db->get_where('db_academic.q_quiz',
+                array('ScheduleID' => $ScheduleID, 'Session' => $Session))->result_array();
+
+            $dataStd = $this->db->query('SELECT COUNT(*) AS TotalAnswer FROM db_academic.q_quiz_students qqs 
+                                                    LEFT JOIN db_academic.q_quiz qq 
+                                                    ON (qqs.QuizID = qq.ID)
+                                                    WHERE qq.ScheduleID = "'.$ScheduleID.'" 
+                                                    AND qq.Session = "'.$Session.'" ')->result_array();
 
             $result = array(
                 'Quiz' => $Quiz,
-                'Details' => $data
+                'Details' => $data,
+                'TotalAnswer' => $dataStd[0]['TotalAnswer']
             );
 
             return print_r(json_encode($result));
