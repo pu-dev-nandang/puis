@@ -79,6 +79,9 @@ class C_scheduler extends CI_Controller {
         case 's2a':
           $this->__s2a();
           break;
+        case 's2b':
+          $this->__s2b();
+          break;
         default:
           # code...
           break;
@@ -232,6 +235,114 @@ class C_scheduler extends CI_Controller {
            print_r($e);
         }
 
+      }
+
+      $this->data['status'] = 1;
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+    }
+
+    private function __s2b(){
+      // save to log
+      $this->db->insert('aps_apt_rekap.log',[
+        'RunTime' => date('Y-m-d H:i:s'),
+        'TableName' => 's2b'
+      ]);
+
+      $ID = $this->db->insert_id();
+      // get Prodi first
+      $dataProdi = $this->getProdi();
+      $param = [
+        'action' => 'readDataMHSBaruAsingByProdi',
+      ];
+      $urlPost = base_url().'api3/__crudAgregatorTB2';
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+      // checkCloumn By Ta
+      $getTa = $this->m_master->ShowDBLikes();
+      $getColoumn = $this->m_master->getColumnTable('aps_apt_rekap.s2b');
+      $def_col_alter = [
+                        'JMA',
+                        'JMAPeW',
+                        'JMAPaW'
+                       ];
+
+      $setColoumn = function($arr_ta,$getColoumn,$def_col_alter) {
+        for ($i=0; $i < count($arr_ta); $i++) { 
+          $ta = explode('_', $arr_ta[$i]);
+          $ta = $ta[1];
+          
+          $field = $getColoumn['field'];
+
+          $find = false;
+          for ($j=0; $j < count($field); $j++) { 
+            $col = $field[$j];
+            $split = explode('_', $col);
+            if (  count($split) > 1 && in_array($split[0], $def_col_alter) && $split[1] == $ta ) {
+                $find = true;
+                break;
+            }
+          }
+
+          if (!$find) {
+            for ($j=0; $j < count($def_col_alter); $j++) { 
+              // adding coloumn
+              $NameField = $def_col_alter[$j].'_'.$ta;
+              $this->db->query(
+                'ALTER TABLE aps_apt_rekap.s2b ADD '.$NameField.' int NOT NULL DEFAULT 0 '
+              );
+            }
+          }
+        }
+      };
+
+      $setColoumn($getTa,$getColoumn,$def_col_alter);
+      for ($i=0; $i < count($dataProdi); $i++) { 
+        $param['ProdiID'] = $dataProdi[$i]['ID'].'.'.$dataProdi[$i]['Code'];
+        $param['ProdiName'] = $dataProdi[$i]['Level'].' - '.$dataProdi[$i]['NameEng'];
+        $ProdiID = $dataProdi[$i]['ID'];
+        $token = $this->jwt->encode($param,"UAP)(*");
+        $data_post = [
+          'token' => $token,
+        ];
+        
+        try {
+          // remove old data first by years and month
+          $this->db->query(
+            'delete from aps_apt_rekap.s2b where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'" and ProdiID = '.$ProdiID
+          );
+          $postTicket = $this->m_master->postApiPHP($urlPost,$data_post);
+          $result = (array) json_decode($postTicket,true);
+          $bodyResult = $result['body'];
+          $dataSave = [
+            'ProdiID' => $ProdiID,
+            'DateCreated' => $DateCreated,
+          ];
+
+          for ($z=2; $z < count($bodyResult); $z++) { // 0 is ID, 1 Name Prodi
+              for ($k=0; $k < count($def_col_alter); $k++) { 
+                $dbTA =  $getTa;
+                for ($l=0; $l < count($dbTA); $l++) { 
+                  $value = $bodyResult[$z];
+                  $ta = explode('_', $dbTA[$l]);
+                  $ta = $ta[1];
+                  $key = $def_col_alter[$k].'_'.$ta;
+                  $dataSave[$key] =$value;
+                  $z++;
+                }
+
+              }
+          }
+
+           $this->db->insert('aps_apt_rekap.s2b',$dataSave);
+
+        } catch (Exception $e) {
+           print_r($e);
+        }
       }
 
       $this->data['status'] = 1;
