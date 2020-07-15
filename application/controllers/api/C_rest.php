@@ -1316,7 +1316,9 @@ class C_rest extends CI_Controller {
 
                 $ScheduleID = $dataToken['ScheduleID'];
 
-                $dataCkOnline = $this->db->select('OnlineLearning')->get_where('db_academic.schedule',array('ID' => $ScheduleID))->result_array();
+                $dataCkOnline = $this->db->select('OnlineLearning')
+                    ->get_where('db_academic.schedule',array('ID' => $ScheduleID))
+                    ->result_array();
 
                 if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
                     $dataOpenDate = $this->m_rest->getRangeDateLearningOnline($ScheduleID);
@@ -1401,9 +1403,16 @@ class C_rest extends CI_Controller {
 
 
                     $whereNPM = ($NPM!='') ? ' AND qs.NPM = "'.$NPM.'" ' : '';
-                    $dataCkSession[0]['Details'] = $this->db->query('SELECT qs.*, ats.Name FROM db_academic.q_quiz_students qs
+                     $Details = $this->db->query('SELECT qs.*, ats.Name FROM db_academic.q_quiz_students qs
                                                                     LEFT JOIN db_academic.auth_students ats ON (ats.NPM = qs.NPM)
                                                                     WHERE qs.QuizID = "'.$d['ID'].'" '.$whereNPM)->result_array();
+
+                     if(count($Details)>0){
+                         if($Details[0]['ShowScore']=='0' || $Details[0]['ShowScore']==0){
+                             unset($Details[0]['Score']);
+                         }
+                     }
+                    $dataCkSession[0]['Details'] = $Details;
                 }
 
                 $result = array(
@@ -1420,9 +1429,10 @@ class C_rest extends CI_Controller {
                 $QuizID = $dataToken['QuizID'];
                 $NPM = $dataToken['NPM'];
 
-
-
-                $data = $this->db->query('SELECT q.ID, q.Duration , qs.ID AS QuizStudentID, qs.StartSession, qs.EndSession FROM db_academic.q_quiz q 
+                $data = $this->db->query('SELECT q.ID, q.Duration , qs.ID AS QuizStudentID,   
+                                                    qs.StartSession, qs.EndSession,
+                                                    qs.WorkDuration
+                                                    FROM db_academic.q_quiz q
                                                     LEFT JOIN db_academic.q_quiz_students qs 
                                                     ON (qs.QuizID = q.ID AND qs.NPM = "'.$NPM.'")
                                                     WHERE q.ID = "'.$QuizID.'"')->result_array();
@@ -1445,11 +1455,20 @@ class C_rest extends CI_Controller {
 
 
 
+                    $joinWithResult = (isset($dataToken['action2']) && $dataToken['action2']=='getDataQuiz2GetResume')
+                        ? ' LEFT JOIN db_academic.q_quiz_students_details qsd ON (qsd.QID = q.ID AND qsd.QuizStudentID = "'.$data[0]['QuizStudentID'].'") ' : '';
+
+                    $selectWithResult = (isset($dataToken['action2']) && $dataToken['action2']=='getDataQuiz2GetResume')
+                        ? ', qsd.Point AS PointAswer, qsd.EssayAnswer ' : '';
+
+
                     $Question = $this->db->query('SELECT qqd.QID, qqd.Point, q.Question, q.QTID,  
-                                                            qt.Description, qqd.ID AS QuizDetailID 
+                                                            qt.Description, qqd.ID AS QuizDetailID
+                                                             '.$selectWithResult.'
                                                             FROM db_academic.q_quiz_details qqd 
                                                             LEFT JOIN db_academic.q_question q ON (qqd.QID = q.ID)
                                                             LEFT JOIN db_academic.q_question_type qt ON (qt.ID = q.QTID)
+                                                            '.$joinWithResult.'
                                                             WHERE qqd.QuizID = "'.$QuizID.'" ')->result_array();
 
                     if(count($Question)>0){
@@ -1457,6 +1476,24 @@ class C_rest extends CI_Controller {
                             $Options = $this->db->select('ID,Option')->order_by('ID', 'RANDOM')->get_where('db_academic.q_question_options',
                                 array('QID'=>$Question[$q]['QID']))->result_array();
                             $Question[$q]['Options'] = $Options;
+
+                            if(isset($dataToken['action2']) && $dataToken['action2']=='getDataQuiz2GetResume'){
+                                $answer = $this->db->query('SELECT qso.QOptionID, qso.PointOption, qso.Status  FROM db_academic.q_quiz_students_option qso 
+                                                                        LEFT JOIN db_academic.q_quiz_students_details qsd
+                                                                        ON (qsd.ID = qso.QuizStudentsDetailsID)
+                                                                        WHERE qsd.QuizStudentID = "'.$data[0]['QuizStudentID'].'" 
+                                                                        AND qsd.QID = "'.$Question[$q]['QID'].'" ')->result_array();
+
+                                $arrAnswer = [];
+                                if(count($answer)>0){
+                                    for($ans=0;$ans<count($answer);$ans++){
+                                        array_push($arrAnswer,$answer[$ans]['QOptionID']);
+                                    }
+                                }
+
+                                $Question[$q]['Answer'] = $arrAnswer;
+                            }
+
                         }
                     }
 
@@ -1516,6 +1553,7 @@ class C_rest extends CI_Controller {
                         $arrInsert = array(
                             'QuizStudentID' => $dataToken['QuizStudentID'],
                             'QuizDetailID' => $d['QuizDetailID'],
+                            'QID' => $d['QID'],
                             'QTID' => $d['QTID'],
                             'EssayAnswer' => $d['EssayAnswer']
                         );
@@ -1584,7 +1622,14 @@ class C_rest extends CI_Controller {
                     $this->db->reset_query();
                 }
 
-                return print_r(1);
+                // return quiz
+                $dataReturn = $this->db->query('SELECT q.ScheduleID, q.Session FROM db_academic.q_quiz q 
+                                                        LEFT JOIN db_academic.q_quiz_students qs 
+                                                        ON (qs.QuizID = q.ID )
+                                                        WHERE qs.ID = "'.$dataToken['QuizStudentID'].'" ')
+                    ->result_array()[0];
+
+                return print_r(json_encode($dataReturn));
 
 
 
