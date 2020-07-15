@@ -41,8 +41,83 @@ class M_doc extends CI_Model {
     	foreach ($sourceNodes as $entry) {
     	    $line[]=$entry->nodeValue;
     	}
+        // print_r($line);die();
+        $line = $this->__domConversiTag($line);    
 
     	return $line;
+    }
+
+    private function __domConversiTag($line){
+        $arr_dom = [];
+        $SignatureArr = [];
+        $TableArr = [];
+        for ($i=0; $i < count($line); $i++) { 
+            if(preg_match_all('/{+(.*?)}/', $line[$i], $matches)){
+                $getMatches = $matches[0];
+                
+                for ($j=0; $j < count($getMatches); $j++) { 
+                   $getTag = substr($getMatches[$j], 1,(strpos($getMatches[$j], '.') - 1) );
+                   if ($getTag == $this->KeySET) {
+                      if (!in_array($line[$i], $SignatureArr)){
+                        $SignatureArr[] = $line[$i];
+                      }
+                   }
+                   elseif ($getTag ==  $this->KeyTABLE) {
+                        if (!in_array($line[$i], $TableArr)){
+                           $TableArr[]=$line[$i];
+                        }
+                     
+                   }
+                   elseif ($getTag == 'Signature') {
+                       continue;
+                   }
+                   else
+                   {
+                    $arr_dom[] = '$'.$getMatches[$j];
+                   }
+                   
+                }
+            }
+        }
+
+        $Signature = implode("", $SignatureArr);
+        $Table = implode("", $TableArr);
+
+        if (!empty($Signature)) {
+            $arr_dom[] = $Signature;
+        }
+
+        if (!empty($Table)) {
+            $arr_dom[] = $Table;
+        }
+
+        // print_r($arr_dom);
+        // die();
+
+        for ($i=0; $i < count($arr_dom); $i++) { 
+            $r = $arr_dom[$i];
+            
+            for ($j=0; $j < count($arr_dom); $j++) { 
+                if ($i == $j) {
+                    continue;
+                }
+
+                $rj = $arr_dom[$j];
+
+                if (strpos($rj, $r) !== false) {
+                    // print_r('find i == '.$i.'  && j == '.$j.'<br/>');
+                    // print_r($r.'<br/>');
+                    // print_r($rj);
+                    $arr_dom[$j] = str_replace($r, "", $arr_dom[$j]);
+                }
+            }    
+           
+        }
+        
+        // print_r($arr_dom);
+        // die();
+
+        return $arr_dom;
     }
 
     public function readTemplate(){
@@ -229,6 +304,7 @@ class M_doc extends CI_Model {
     	foreach ($line as $v) {
     	    if(preg_match_all('/{+(.*?)}/', $v, $matches)){
     	        $str = trim($matches[1][0]);
+                // print_r($str);
                 // $strMatch = $matches[1];
                 // $str = $this->__filterKeyScript($strMatch);
                 // print_r($matches);
@@ -1166,7 +1242,7 @@ class M_doc extends CI_Model {
                     if ($ex[0] == 'Signature') {
                         $key2 = $ex[1];
                         $exKey2 = explode('#', $key2);
-                        if (count($exKey2)) {
+                        if (count($exKey2) > 0) {
                             switch ($exKey2[0]) {
                                 case 'Image':
                                     $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
@@ -1673,6 +1749,7 @@ class M_doc extends CI_Model {
                                         $TemplateProcessor->setValue($setValue,trim($rsGET[$keyRS][$setStr]['NoSuratStr']) );
                                     }
                                     elseif ($setStr == 'Signature') {
+                                        // print_r('asda');
                                         $arrKomponen = $matches[1];
                                         $arrValue = $rsGET[$keyRS][$setStr];
                                         $this->__SETWriteSignatureNoSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue);
@@ -1751,6 +1828,8 @@ class M_doc extends CI_Model {
                 
             }
         }
+
+        // die();
 
         $DocumentName = preg_replace('/\s+/', '_', $DocumentName);
 
@@ -2503,6 +2582,8 @@ class M_doc extends CI_Model {
             }
         }
 
+        // print_r($rs);die();
+
         $dataSave['UpdatedBy'] = $this->session->userdata('NIP');
         $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
         
@@ -2559,6 +2640,7 @@ class M_doc extends CI_Model {
                                     }
                                     elseif ($setStr == 'Signature') {
                                         $arrKomponen = $matches[1];
+                                        // print_r($arrKomponen);die();
                                         $arrValue = $rsGET[$keyRS][$setStr];
                                         $this->__ApproveSETWriteSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue);
                                         
@@ -2680,6 +2762,7 @@ class M_doc extends CI_Model {
 
     private function __ApproveSETWriteSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue){
         // print_r($arrValue);die();
+        // print_r($arrKomponen);die();
         for ($i=0; $i < count($arrValue); $i++) { 
             // $keyApproval = $i + 1;
             $keyApproval = $arrValue[$i]['number'];
@@ -2692,7 +2775,7 @@ class M_doc extends CI_Model {
                     if ($ex[0] == 'Signature') {
                         $key2 = $ex[1];
                         $exKey2 = explode('#', $key2);
-                        if (count($exKey2)) {
+                        if (count($exKey2) > 0) {
                             switch ($exKey2[0]) {
                                 case 'Image':
                                     if ($arrValue[$i]['verify']['valueVerify'] == 2 || $arrValue[$i]['approve'] == 1) {
@@ -2840,16 +2923,38 @@ class M_doc extends CI_Model {
             }
 
             // write name di arrKomponen key ke 2
-            if (array_key_exists(2, $arrKomponen)) {
-                $setValue = $arrKomponen[2];
-                $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
-            }
+                // if (array_key_exists(2, $arrKomponen)) {
+                //     $setValue = $arrKomponen[2];
+                //     $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+                // }
 
             // write name di arrKomponen key ke 3
-            if (array_key_exists(3, $arrKomponen)) {
-                $setValue = $arrKomponen[3];
-                $TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
+                // if (array_key_exists(3, $arrKomponen)) {
+                //     $setValue = $arrKomponen[3];
+                //     $TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
+                // }
+
+            for ($j=0; $j < count($arrKomponen); $j++) {
+                $str = $arrKomponen[$j];
+                $setValue = 'SET.Signature.Position'.'#'.$keyApproval;
+                if (strpos($str, $setValue) !== false) {
+                    // $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+                    $TemplateProcessor->setValue($str,$arrValue[$i]['NameEMP']);
+                    break;
+                }
+                
+                $setValue = 'SET.Signature.NIP'.'#'.$keyApproval;
+                if (strpos($str, $setValue) !== false) {
+                    // $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+                    $TemplateProcessor->setValue($str,$arrValue[$i]['NameEMP']);
+                    break;
+                }
+               
             }
+
+            // write NIP
+            $setValue = 'Signature.NIP'.'#'.$keyApproval;
+            $TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
             
         }
         
