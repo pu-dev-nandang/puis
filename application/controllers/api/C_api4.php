@@ -1841,6 +1841,104 @@ class C_api4 extends CI_Controller {
 
             echo json_encode($json_data);
         }
+        else if($data_arr['action']=='getDataStudentAnswers'){
+
+            $QuizID = $data_arr['QuizID'];
+
+            $data = $this->db->query('SELECT qqs.ID AS QuizStudentID, qqs.StartSession, 
+                                                qqs.EndSession, qqs.Score, qqs.ShowScore, 
+                                                qqs.WorkDuration, qqs.SubmittedAt,
+                                                ats.Name, ats.NPM
+                                                FROM db_academic.q_quiz_students qqs
+                                                LEFT JOIN db_academic.auth_students ats ON (qqs.NPM = ats.NPM)
+                                                WHERE qqs.QuizID = "'.$QuizID.'" ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='getDataAnswersDetails'){
+
+            $QuizStudentID = $data_arr['QuizStudentID'];
+
+            $Question = $this->db->query('SELECT qqsd.ID AS QuizStudentsDetailsID, qqsd.EssayAnswer,
+                                                            qqsd.Point AS PointAnswer, qqd.Point, 
+                                                            qqsd.EntredAt, q.Question, qt.Description AS QT_Description, 
+                                                            qqsd.QTID, qqsd.QID
+                                                            FROM db_academic.q_quiz_students_details qqsd
+                                                            LEFT JOIN db_academic.q_quiz_students qqs ON (qqs.ID = qqsd.QuizStudentID)
+                                                            LEFT JOIN db_academic.q_quiz_details qqd 
+                                                            ON (qqd.QID = qqsd.QID AND qqs.QuizID = qqd.QuizID)
+                                                            LEFT JOIN db_academic.q_question q ON (q.ID = qqsd.QID)
+                                                            LEFT JOIN db_academic.q_question_type qt ON (qt.ID = qqsd.QTID)
+                                                            WHERE qqsd.QuizStudentID = "'.$QuizStudentID.'" ')
+                ->result_array();
+
+            if(count($Question)>0){
+                for($a=0;$a<count($Question);$a++){
+
+                    $Options = $this->db->select('ID,Option')->order_by('ID', 'RANDOM')->get_where('db_academic.q_question_options',
+                        array('QID'=>$Question[$a]['QID']))->result_array();
+                    $Question[$a]['Options'] = $Options;
+
+                    $answer = $this->db->get_where('db_academic.q_quiz_students_option',
+                        array('QuizStudentID' => $QuizStudentID
+                        ,'QuizStudentsDetailsID' => $Question[$a]['QuizStudentsDetailsID']))->result_array();
+
+
+                    $arrAnswer = [];
+                    if(count($answer)>0){
+                        for($ans=0;$ans<count($answer);$ans++){
+                            array_push($arrAnswer,$answer[$ans]['QOptionID']);
+                        }
+                    }
+
+                    $Question[$a]['Answer'] = $arrAnswer;
+
+                }
+            }
+
+            return print_r(json_encode($Question));
+        }
+        else if($data_arr['action']=='setPointOfEssay'){
+
+            $QuizStudentID = $data_arr['QuizStudentID'];
+            $dataPoint = (array) $data_arr['dataPoint'];
+
+            if(count($dataPoint)>0){
+                for($i=0;$i<count($dataPoint);$i++){
+                    $d = (array) $dataPoint[$i];
+
+                    $this->db->where('ID', $d['QuizStudentsDetailsID']);
+                    $this->db->update('db_academic.q_quiz_students_details',
+                        array('Point'=>$d['Point']));
+                    $this->db->reset_query();
+
+                }
+            }
+
+            // menghitung ulang total point
+            $arrPoint = $this->db->get_where('db_academic.q_quiz_students_details',
+                array('QuizStudentID' => $QuizStudentID))->result_array();
+
+            $TotalPoint = 0;
+            if(count($arrPoint)>0){
+                for($p=0;$p<count($arrPoint);$p++){
+                    $Point = ($arrPoint[$p]['Point']!='' && $arrPoint[$p]['Point']!=null)
+                        ? $arrPoint[$p]['Point'] : 0;
+                    $TotalPoint = $TotalPoint + (float) $Point;
+                }
+            }
+
+            $NewScore = str_replace(',','.',$TotalPoint);
+            // update point dan show score
+            $this->db->where('ID', $QuizStudentID);
+            $this->db->update('db_academic.q_quiz_students',
+                array('Score'=> $NewScore,'ShowScore' => '1'));
+            $this->db->reset_query();
+
+            return print_r(json_encode(array('NewScore' => $NewScore)));
+
+        }
     }
 
 

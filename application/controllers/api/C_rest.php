@@ -1618,7 +1618,8 @@ class C_rest extends CI_Controller {
                     $this->db->update('db_academic.q_quiz_students',
                         array('Score'=>str_replace(',','.',$ScoreSementara),
                             'ShowScore'=>$ShowScore,
-                            'WorkDuration' => $dataToken['WorkDuration']));
+                            'WorkDuration' => $dataToken['WorkDuration'],
+                            'SubmittedAt' => $this->m_rest->getDateTimeNow()));
                     $this->db->reset_query();
                 }
 
