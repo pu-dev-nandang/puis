@@ -25,52 +25,84 @@ class C_upload extends CI_Controller {
         $NPM = $this->input->get('n');
         $column = $this->input->get('c');
 
-        $path = './uploads/document/'.$NPM;
-        if (!file_exists($path)) {
-            mkdir($path, 0777, true);
+        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+            $path = 'document/'.$NPM;
+            $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$fileName,'userfile',$path,'string');
+            if (!empty($uploadNas)) {
+                $fileName = $uploadNas;
+                // Cek mhs
+                $getStd = $this->db->get_where('db_academic.final_project_files',array(
+                    'NPM' => $NPM
+                ))->result_array();
+
+                if(count($getStd)>0){
+                    $this->db->where('NPM', $NPM);
+                    $this->db->update('db_academic.final_project_files',array(
+                        $column => $fileName
+                    ));
+                } else {
+                    $arr = array(
+                        'NPM' => $NPM,
+                        $column => $fileName
+                    );
+                    $this->db->insert('db_academic.final_project_files',$arr);
+                }
+
+                return print_r(1);
+            }
+            else
+            {
+                print_r('Upload to nas failed');die();
+            }
         }
-
-
-
-        $config['upload_path']          = $path;
-        $config['allowed_types']        = '*';
-        $config['max_size']             = 8000; // 8 mb
-        $config['file_name']            = $fileName;
-
-//        if($old!='' && is_file('./uploads/agregator/'.$old)){
-//            unlink('./uploads/agregator/'.$old);
-//        }
-
-
-        $this->load->library('upload', $config);
-        if ( ! $this->upload->do_upload('userfile')){
-            $error = array('error' => $this->upload->display_errors());
-//            return print_r(json_encode($error));
-            return print_r(0);
-        }
-        else {
-
-            // Cek mhs
-            $getStd = $this->db->get_where('db_academic.final_project_files',array(
-                'NPM' => $NPM
-            ))->result_array();
-
-            if(count($getStd)>0){
-                $this->db->where('NPM', $NPM);
-                $this->db->update('db_academic.final_project_files',array(
-                    $column => $fileName
-                ));
-            } else {
-                $arr = array(
-                    'NPM' => $NPM,
-                    $column => $fileName
-                );
-                $this->db->insert('db_academic.final_project_files',$arr);
+        else
+        {
+            $path = './uploads/document/'.$NPM;
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
             }
 
-            return print_r(1);
+            $config['upload_path']          = $path;
+            $config['allowed_types']        = '*';
+            $config['max_size']             = 8000; // 8 mb
+            $config['file_name']            = $fileName;
+
+    //        if($old!='' && is_file('./uploads/agregator/'.$old)){
+    //            unlink('./uploads/agregator/'.$old);
+    //        }
 
 
+            $this->load->library('upload', $config);
+            if ( ! $this->upload->do_upload('userfile')){
+                $error = array('error' => $this->upload->display_errors());
+    //            return print_r(json_encode($error));
+                return print_r(0);
+            }
+            else {
+
+                // Cek mhs
+                $getStd = $this->db->get_where('db_academic.final_project_files',array(
+                    'NPM' => $NPM
+                ))->result_array();
+
+                if(count($getStd)>0){
+                    $this->db->where('NPM', $NPM);
+                    $this->db->update('db_academic.final_project_files',array(
+                        $column => $fileName
+                    ));
+                } else {
+                    $arr = array(
+                        'NPM' => $NPM,
+                        $column => $fileName
+                    );
+                    $this->db->insert('db_academic.final_project_files',$arr);
+                }
+
+                return print_r(1);
+
+
+            }
         }
 
     }
@@ -81,15 +113,26 @@ class C_upload extends CI_Controller {
         $column = $this->input->get('c');
         $result = 0;
 
-        $path = './uploads/document/'.$NPM.'/'.$fileName;
-        if (file_exists($path)) {
-
-            unlink($path);
-
-            // Update DB
-
-
+        if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id') {
+            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+            $path = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/document/".$NPM.'/'.$fileName : "pcam/document/".$NPM.'/'.$fileName;
+            $this->m_master->DeleteFileToNas($headerOrigin,$path);
         }
+        else
+        {
+            $path = './uploads/document/'.$NPM.'/'.$fileName;
+
+            if (file_exists($path)) {
+
+                unlink($path);
+
+                // Update DB
+
+
+            }
+        }
+
+       
 
         $this->db->where('NPM', $NPM);
         $this->db->update('db_academic.final_project_files',array(
