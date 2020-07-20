@@ -5388,7 +5388,7 @@ class C_api3 extends CI_Controller {
                     $old = $G_data[0]['File'];
                     if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
                          $headerOrigin = serverRoot;
-                         $rs = $this->m_master->DeleteFileToNas($headerOrigin,'kb/'.$old);
+                         $rs = $this->m_master->DeleteFileToNas($headerOrigin,'pcam/kb/'.$old);
                          if ($rs['Status'] != '1') {
                              return print_r('Error delete file');
                              die();
