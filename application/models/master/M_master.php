@@ -3850,6 +3850,68 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
     }
 
+    public function UploadPathOneFilesToNas($headerOrigin,$filename='',$pathFile,$pathAdd=null,$return='string')
+    {
+        $filename = ($filename == '') ? uniqid() : $filename;
+        /*
+            $headerOrigin = Host Origin ex: http://localhost
+                path berdasarkan Host Origin
+            $filename = filename
+            $varFiles = variable key pada $_FILES
+            $pathAdd = pathAdd ex admission/temp => no slash in last word
+            $return = 'string/json'
+
+            ex :
+                 $uploadNas = $this->m_master->UploadPathOneFilesToNas("http://localhost",'test.pdf','./api.docx',null,'json');
+        */
+
+        $rs = array();
+        // $header[] = 'Content-Type: application/json';
+        $header[] = "Content-type: multipart/form-data";
+        $header[] = "Origin: ".$headerOrigin."";
+        $header[] = "Cache-Control: max-age=0";
+        $header[] = "Connection: keep-alive";
+        $header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+        $data = array(
+            'auth' => 's3Cr3T-G4N',
+            'filename' => $filename,
+        );
+        if (isset($pathAdd) && $pathAdd != '' && $pathAdd != null) {
+            $data['pathAdd'] = $pathAdd;
+        }
+
+        $url = url_files.'__uploadFile?apikey='.$this->passApiKey;
+        $token = $this->jwt->encode($data,"UAP)(*");
+
+        $Input = $token;
+        $ch = curl_init();
+        // $file_name_with_full_path = './images/logo.jpg';
+        // $cfile = new CURLFile($file_name_with_full_path, 'image/jpeg','logo.jpg');
+        // $cfile = new CURLFile($_FILES[$varFiles]['tmp_name'], $_FILES[$varFiles]['type'],$_FILES[$varFiles]['name']);
+        $myFile = pathinfo($pathFile); 
+        $cfile = new CURLFile($pathFile, $this->MimeType($pathFile), $myFile['basename']);
+        $post = array('token' => $Input,'file_contents[]'=>$cfile);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $pr = curl_exec($ch);
+        // print_r($pr);die();
+        $rs = (array) json_decode($pr,true);
+        curl_close ($ch);
+        if ($return == 'string') {
+            return (count($rs)>0) ? $rs[0] : '';
+        }
+        else
+        {
+            return json_encode($rs);
+        }
+    }
 
     public function UploadManyFilesToNas($headerOrigin,$filename='',$varFiles='userfile',$pathAdd=null,$return='json')
     {
