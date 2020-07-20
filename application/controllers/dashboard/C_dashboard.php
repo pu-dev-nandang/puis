@@ -984,6 +984,7 @@ class C_dashboard extends Globalclass {
             if (array_key_exists('userfile', $_FILES)) {
                 $headerOrigin = serverRoot;
                 $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$fileName,'userfile','help','string');
+                $fileName = $uploadNas;
                 // Update DB
                 $this->db->where('ID', $ID);
                 $this->db->update('db_employees.user_qna',array(
@@ -1072,6 +1073,7 @@ class C_dashboard extends Globalclass {
             if (array_key_exists('userfile', $_FILES)) {
                 $headerOrigin = serverRoot;
                 $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$fileName,'userfile','kb','string');
+                $fileName = $uploadNas;
                 // Update DB
                 $this->db->where('ID', $ID);
                 $this->db->update('db_employees.knowledge_base',array(
