@@ -127,6 +127,30 @@ class M_api_doc extends CI_Model {
         $pathFile = $pathFolder.$FileName;  
         $TemplateProcessor->saveAs($pathFile,$pathFolder);
         $convert = $this->m_doc->ApiConvertDocxToPDF($pathFile,$pathFolder,$FileName);
+
+        // upload to NAS dan delete di pcam
+        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+            $WordFile = $pathFolder.$FileName;  
+            $PdfFile = $pathFolder.$FilePDF; 
+            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot; 
+            // word file
+            $uploadNas = $this->m_master->UploadPathOneFilesToNas($headerOrigin,$FileName,$WordFile,'document/'.$NPM,'string');
+            // delete file word
+            if (file_exists($WordFile)) {
+                 unlink($WordFile);
+            }
+            
+            // pdf file
+            $uploadNas = $this->m_master->UploadPathOneFilesToNas($headerOrigin,$FilePDF,$PdfFile,'document/'.$NPM,'string');
+            // delete file pdf
+            if (file_exists($PdfFile)) {
+                 unlink($PdfFile);
+            }
+            $FilePDF = $uploadNas;
+
+        }
+
+
         $convert['callback'] = base_url().'fileGetAny/document-'.$NPM.'-'.$FilePDF;
         return $convert;
 

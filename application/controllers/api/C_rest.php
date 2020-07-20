@@ -2654,7 +2654,17 @@ class C_rest extends CI_Controller {
 
                 switch ($action) {
                     case 'add':
-                       $uploadFile2 = $this->m_rest->uploadDokumenMultiple('BuktiBayar_'.$G_PTID[0]['Abbreviation'],'fileData',$path);
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            // path overwrite
+                            $path = 'document/'.$G_payment[0]['NPM'];
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                            $uploadFile2 = $this->m_master->UploadManyFilesToNas($headerOrigin,'BuktiBayar_'.$G_PTID[0]['Abbreviation'],'fileData',$path,'array');
+                        }
+                        else
+                        {
+                            $uploadFile2 = $this->m_rest->uploadDokumenMultiple('BuktiBayar_'.$G_PTID[0]['Abbreviation'],'fileData',$path);
+                        }
+
                        $FileUpload = array();
                        for ($i=0; $i < count($uploadFile2); $i++) { 
                            $FileUpload[] = array(
@@ -2726,9 +2736,20 @@ class C_rest extends CI_Controller {
                 // print_r(FCPATH);die();
                 for ($i=0; $i < count($FileUpload); $i++) { 
                     if ($i == $index && $FileUpload[$i]['Filename'] == $filename) {
-                        $path = FCPATH.'uploads/document/'.$NPM.'/'.$filename;
-                        unlink($path);
-                        unset($FileUpload[$i]);
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                            $path = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/document/".$NPM.'/'.$filename : "pcam/document/".$NPM.'/'.$filename;
+                            $this->m_master->DeleteFileToNas($headerOrigin,$path);
+                        }
+                        else
+                        {
+                            $path = FCPATH.'uploads/document/'.$NPM.'/'.$filename;
+                            if (file_exists($path)) {
+                                 unlink($path);
+                            }
+                            unset($FileUpload[$i]);
+                        }
+                        
                     }
                 }
 
@@ -2773,16 +2794,38 @@ class C_rest extends CI_Controller {
                $NPM = $getDatapayment[0]['NPM'];
                $FileUpload = (array) json_decode($getDataproof[0]['FileUpload'],true);
                for ($i=0; $i < count($FileUpload); $i++) {
-                    $path = FCPATH.'uploads/document/'.$NPM.'/'.$FileUpload[$i]['Filename'];
-                    unlink($path);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/document/".$NPM.'/'.$FileUpload[$i]['Filename'] : "pcam/document/".$NPM.'/'.$FileUpload[$i]['Filename'];
+                        $this->m_master->DeleteFileToNas($headerOrigin,$path);
+                    }
+                    else
+                    {
+                        $path = FCPATH.'uploads/document/'.$NPM.'/'.$FileUpload[$i]['Filename'];
+                        if (file_exists($path)) {
+                             unlink($path);
+                        }
+                    }
                     unset($FileUpload[$i]); 
+                    
                }
 
                $FileUpload = array_values($FileUpload);
                for ($i=0; $i < count($FileUpload); $i++) {
-                    $path = FCPATH.'uploads/document/'.$NPM.'/'.$FileUpload[$i]['Filename'];
-                    unlink($path);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/document/".$NPM.'/'.$FileUpload[$i]['Filename'] : "pcam/document/".$NPM.'/'.$FileUpload[$i]['Filename'];
+                        $this->m_master->DeleteFileToNas($headerOrigin,$path);
+                    }
+                    else
+                    {
+                        $path = FCPATH.'uploads/document/'.$NPM.'/'.$FileUpload[$i]['Filename'];
+                        if (file_exists($path)) {
+                             unlink($path);
+                        }
+                    }
                     unset($FileUpload[$i]); 
+                    
                }
                if (count($FileUpload) == 0) {
                    $this->db->where('ID', $dataToken['idtable']);
