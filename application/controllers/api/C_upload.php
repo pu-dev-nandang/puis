@@ -113,7 +113,7 @@ class C_upload extends CI_Controller {
         $column = $this->input->get('c');
         $result = 0;
 
-        if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id') {
+        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
             $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
             $path = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/document/".$NPM.'/'.$fileName : "pcam/document/".$NPM.'/'.$fileName;
             $this->m_master->DeleteFileToNas($headerOrigin,$path);
