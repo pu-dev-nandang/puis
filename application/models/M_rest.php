@@ -25,6 +25,45 @@ class M_rest extends CI_Model {
         return $date;
     }
 
+    public function checkImageSummernote($act,$SummernoteID,$table,$column){
+        $dataSummernoteImg = $this->db->get_where('db_it.summernote_image',
+            array( 'SummernoteID' => $SummernoteID))->result_array();
+
+        if(count($dataSummernoteImg)>0){
+            for($s=0;$s<count($dataSummernoteImg);$s++){
+
+                if($act=='insert'){
+                    $dataCk = $this->db
+                        ->query('SELECT COUNT(*) AS Total FROM '.$table.' 
+                            WHERE '.$column.' LIKE "%'.$dataSummernoteImg[$s]['Image'].'%" ')
+                        ->result_array();
+
+                    if($dataCk[0]['Total']<=0){
+                        $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
+                        if(file_exists($file_path)){
+                            unlink($file_path);
+                            // Delete data
+                            $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
+                            $this->db->delete('db_it.summernote_image');
+                        }
+                    } else {
+                        $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
+                        $this->db->update('db_it.summernote_image',array('Status'=>'1'));
+                    }
+                }
+                else if($act=='delete'){
+                    $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
+                    if(file_exists($file_path)){unlink($file_path);}
+                    $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
+                    $this->db->delete('db_it.summernote_image');
+                }
+
+
+            }
+        }
+
+    }
+
     public function getCustomeDateTimeNow($custom){
         $date = date(''.$custom);
         return $date;
