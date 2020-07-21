@@ -2291,7 +2291,7 @@ class C_rest3 extends CI_Controller {
       if ($mode=='showDataDosen') {
         $sql = 'select a.NIP,a.Name,a.PositionMain,a.PositionOther1,a.PositionOther2,a.PositionOther3 from db_employees.employees as a
             where ( 
-                      StatusEmployeeID = 1
+                      StatusEmployeeID != -1
                     ) ';
         $query=$this->db->query($sql, array())->result_array();
         echo json_encode($query);
@@ -2342,44 +2342,6 @@ class C_rest3 extends CI_Controller {
         }
 
 
-    }
-    public function Setting_Monthly_Report() {
-      $dataToken = $this->data['dataToken'];
-      $mode = $dataToken['mode'];
-      if ($mode=='showDataDosen') {
-        $sql = 'select a.NIP,a.Name,a.PositionMain,a.PositionOther1,a.PositionOther2,a.PositionOther3 from db_employees.employees as a
-            where StatusEmployeeID != -1';
-        $query=$this->db->query($sql, array())->result_array();
-        echo json_encode($query);
-      }elseif ($mode=='showDepartment') {
-        $sql = 'select a.ID,a.Position from db_employees.position as a;';
-        $query=$this->db->query($sql, array())->result_array();
-        echo json_encode($query);
-      }
-        else if($mode=='saveDataJabatanSKS'){
-
-                          $dataForm = (array) $dataToken['dataForm'];
-                          $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
-                          $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
-                          $this->db->insert('db_rektorat.privileges_monthly_report',$dataForm);
-
-                          echo json_encode(1);
-        }
-        else if ($mode == 'listSetting') {
-
-          $sql = 'select a.*,b.Name, from db_rektorat.privileges.monthly_report as a 
-                    join db_employees.employees as b on a.UpdatedBy = b.NIP
-                    ';
-          $query=$this->db->query($sql, array())->result_array();
-
-          echo json_encode($query);
-        }
-        elseif ($mode == 'deletelistSetting') {
-          $ID=$dataToken['ID'];
-          $this->db->where('ID', $ID);
-          $this->db->delete('db_rektorat.privileges_monthly_report');
-          echo json_encode(1);
-        }
     }
 
     public function APS_CrudAgregatorTB7()
