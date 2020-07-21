@@ -1580,7 +1580,7 @@ class C_admission extends Admission_Controler {
                         if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id') {
                          $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
                          $path = 'students/'.$ta;
-                         $FileName = $explode[0];
+                         $FileName = $Photo;
                          $TheFile = $this->path_upload_regOnline.$Email.'/'.$explode[0];
                          $uploadNas = $this->m_master->UploadPathOneFilesToNas($headerOrigin,$FileName,$TheFile,$path,'string');
                         }
