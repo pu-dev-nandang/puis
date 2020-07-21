@@ -1030,9 +1030,6 @@ class C_api4 extends CI_Controller {
                         $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
                         $this->db->update('db_it.summernote_image',array('Status'=>'1'));
                     }
-
-
-
                 }
             }
 
@@ -1553,6 +1550,539 @@ class C_api4 extends CI_Controller {
         );
         echo json_encode($json_data);
 
+    }
+
+    public function crudLiveChat(){
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='getUserOnlineChat'){
+
+            $data = $this->db->select('NIP,Name,Photo')->limit(10)->get_where('db_employees.employees',array('StatusEmployeeID'=>1))->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+    }
+
+    public function crudQuiz(){
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='getQuestionType'){
+            $data = $this->db->get('db_academic.q_question_type')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='saveQuestion'){
+
+            $ID = $data_arr['ID']; // ID Question
+            $dataQustion = (array) $data_arr['dataQustion'];
+
+            if($ID!=''){
+                // Update question
+                $dataQustion['UpdatedBy'] = $data_arr['NIP'];
+                $dataQustion['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $QID = $ID;
+            }
+            else {
+                // Insert question
+                $dataQustion['SummernoteID'] = $data_arr['SummernoteID'];
+                $dataQustion['CreatedBy'] = $data_arr['NIP'];
+                $dataQustion['CreatedAt'] = $this->m_rest->getDateTimeNow();
+                $dataQustion['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+
+                $this->db->insert('db_academic.q_question',$dataQustion);
+                $QID = $this->db->insert_id();
+
+            }
+
+            $this->m_rest
+                ->checkImageSummernote('insert',$data_arr['SummernoteID'],'db_academic.q_question','Question');
+
+
+            // Option Process
+            if($dataQustion['QTID']==1 || $dataQustion['QTID']==2){
+
+                // Remove Option
+//                $this->db->where('QID',$ID);
+//                $this->db->delete('db_academic.q_question_options');
+//                $this->db->reset_query();
+
+                $dataOption = (array) $data_arr['dataOption'];
+                if($ID!=''){
+
+                } else {
+
+                    // Insert option
+                    if(count($dataOption)>0){
+                        for($i=0;$i<count($dataOption);$i++){
+
+                            $arrins = (array) $dataOption[$i];
+                            $arrins['QID'] = $QID;
+                            $this->db->insert('db_academic.q_question_options',$arrins);
+
+                            $this->m_rest
+                                ->checkImageSummernote('insert',$arrins['SummernoteID'],
+                                    'db_academic.q_question_options',
+                                    'Option');
+
+                        }
+                    }
+
+                }
+
+
+            }
+
+            return print_r(json_encode(array('QID' => $QID)));
+
+        }
+        else if($data_arr['action']=='removeOptionInQuestion'){
+            $SummernoteID = $data_arr['SummernoteID'];
+
+            $data = $this->db->get_where('db_it.summernote_image',
+                array('SummernoteID' => $SummernoteID))->result_array();
+
+            if(count($data)>0){
+                foreach ($data AS $item){
+                    $file_path = './uploads/summernote/images/'.$item['Image'];
+                    if(file_exists($file_path)){
+                        unlink($file_path);
+                    }
+
+                    // Delete data
+                    $this->db->where('Image', $item['Image']);
+                    $this->db->delete('db_it.summernote_image');
+                }
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='getArrDataQuestion'){
+            $ArrQID = (array) $data_arr['ArrQID'];
+
+            $result = [];
+
+            if(count($ArrQID)>0){
+                for($i=0;$i<count($ArrQID);$i++){
+                    $QID = $ArrQID[$i];
+                    $dataQuestion = $this->db->query('SELECT q.ID,q.Question,q.Note, qt.Description AS Type, q.QTID FROM db_academic.q_question q 
+                                                                    LEFT JOIN db_academic.q_question_type qt ON (q.QTID = qt.ID)
+                                                                    WHERE q.ID = "'.$QID.'" ')->result_array();
+                    $dataOption = $this->db->select('Option,IsTheAnswer,Point')
+                        ->get_where('db_academic.q_question_options',array('QID'=>$QID))->result_array();
+                    $arrP = array(
+                        'Question' => (count($dataQuestion)>0) ? $dataQuestion[0] : [],
+                        'Option' => $dataOption,
+                        'Status' => (count($dataQuestion)>0) ? 1 : 0,
+                        'QID' =>$QID
+                    );
+                    array_push($result,$arrP);
+                }
+            }
+
+            return print_r(json_encode($result));
+
+        }
+        else if ($data_arr['action']=='saveDataQuiz'){
+
+            // cek apakah ID Question exist atau tidak
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataCheck_IDQ = true;
+            if(count($dataForm)>0){
+                for($c=0;$c<count($dataForm);$c++){
+                    $dataCk = $this->db->select('ID')
+                        ->get_where('db_academic.q_question',array('ID'=>$dataForm[$c]->QID))->result_array();
+
+                    if(count($dataCk)<=0){
+                        $dataCheck_IDQ = false;
+                    }
+                }
+            }
+
+            if($dataCheck_IDQ){
+
+                // Cek apakah sudah pernah bikin quiz atau blm
+                $ScheduleID = $data_arr['ScheduleID'];
+                $Session = $data_arr['Session'];
+
+                // Cek apakah ada student yang pernah ngisi atau engga
+                $TotalAnswer = $this->db->query('SELECT COUNT(*) AS TotalAnswer FROM db_academic.q_quiz_students qqs 
+                                                    LEFT JOIN db_academic.q_quiz qq
+                                                    ON (qq.ID = qqs.QuizID)
+                                                    WHERE qq.ScheduleID = "'.$ScheduleID.'"
+                                                     AND qq.Session = "'.$Session.'" ')
+                    ->result_array()[0]['TotalAnswer'];
+
+                if($TotalAnswer<=0){
+                    $dataCk = $this->db->select('ID')->get_where('db_academic.q_quiz',array(
+                        'ScheduleID' => $ScheduleID,
+                        'Session' => $Session
+                    ))->result_array();
+
+                    $dataFmQuiz = array(
+                        'NotesForStudents' => $data_arr['NotesForStudents'],
+                        'Duration' => $data_arr['Duration']
+                    );
+
+                    if(count($dataCk)>0){
+                        // Update
+                        $QuizID = $dataCk[0]['ID'];
+                        $dataFmQuiz['UpdatedBy'] = $data_arr['NIP'];
+                        $dataFmQuiz['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                        $this->db->where('ID', $QuizID);
+                        $this->db->update('db_academic.q_quiz',$dataFmQuiz);
+                        $this->db->reset_query();
+
+                    }
+                    else {
+                        // Insert
+                        $dataFmQuiz['ScheduleID'] = $ScheduleID;
+                        $dataFmQuiz['Session'] = $Session;
+
+                        $dataFmQuiz['CreatedBy'] = $data_arr['NIP'];
+                        $dataFmQuiz['CreatedAt'] = $this->m_rest->getDateTimeNow();
+                        $this->db->insert('db_academic.q_quiz',$dataFmQuiz);
+                        $QuizID = $this->db->insert_id();
+                        $this->db->reset_query();
+                    }
+
+
+                    if(count($dataForm)>0){
+                        $this->db->where('QuizID',$QuizID);
+                        $this->db->delete('db_academic.q_quiz_details');
+                        $this->db->reset_query();
+
+                        for($i=0;$i<count($dataForm);$i++){
+                            $d = (array) $dataForm[$i];
+                            $d['QuizID'] = $QuizID;
+                            $this->db->insert('db_academic.q_quiz_details',$d);
+                            $this->db->reset_query();
+
+                        }
+
+                    }
+
+                    $result = array(
+                        'Status' => 1,
+                        'Message' => 'Data saved'
+                    );
+                }
+                else {
+                    $result = array(
+                        'Status' => -1,
+                        'Message' => 'Quiz cannot be edited',
+                        'TotalAnswer' => $TotalAnswer
+                    );
+                }
+
+            } else {
+                $result = array(
+                    'Status' => -2,
+                    'Message' => 'Question is outdated, please delete it immediately'
+                );
+            }
+
+
+            return print_r(json_encode($result));
+        }
+        else if ($data_arr['action']=='getQuizInThisSession'){
+
+            $ScheduleID = $data_arr['ScheduleID'];
+            $Session = $data_arr['Session'];
+
+            $data = $this->db->query('SELECT qd.QID, qd.Point FROM db_academic.q_quiz_details qd 
+                                               LEFT JOIN db_academic.q_quiz q ON (q.ID = qd.QuizID)
+                                               WHERE q.ScheduleID = "'.$ScheduleID.'" AND q.Session = "'.$Session.'" ')
+                        ->result_array();
+
+            $Quiz = $this->db->get_where('db_academic.q_quiz',
+                array('ScheduleID' => $ScheduleID, 'Session' => $Session))->result_array();
+
+            $dataStd = $this->db->query('SELECT COUNT(*) AS TotalAnswer FROM db_academic.q_quiz_students qqs 
+                                                    LEFT JOIN db_academic.q_quiz qq 
+                                                    ON (qqs.QuizID = qq.ID)
+                                                    WHERE qq.ScheduleID = "'.$ScheduleID.'" 
+                                                    AND qq.Session = "'.$Session.'" ')->result_array();
+
+            $result = array(
+                'Quiz' => $Quiz,
+                'Details' => $data,
+                'TotalAnswer' => $dataStd[0]['TotalAnswer']
+            );
+
+            return print_r(json_encode($result));
+        }
+        else if($data_arr['action']=='getMyQuestion'){
+            $requestData= $_REQUEST;
+
+            $NIP = $data_arr['NIP'];
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = 'AND ( q.Question LIKE "%'.$search.'%" )';
+            }
+
+            $queryDefault = 'SELECT q.*, qt.Description FROM db_academic.q_question q 
+                                        LEFT JOIN db_academic.q_question_type qt ON (qt.ID = q.QTID)
+                                        WHERE q.CreatedBy = "'.$NIP.'" '.$dataSearch;
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+
+
+            $sql = $queryDefault.' ORDER BY q.UpdatedAt DESC , q.CreatedAt DESC LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+                $nestedData = array();
+                $row = $query[$i];
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Question'].'
+                                    <div>
+                                        <span class="lbl-'.$row['QTID'].'">'.$row['Description'].'</span>
+                                         <span class="label label-default" style="left: 0px;font-size: 11px;">Last modify : '.date('d M Y H:i',strtotime($row['UpdatedAt'])).'</span> 
+                                    </div>
+                                    </div>';
+                $nestedData[] = '<div>
+                                <div class="btn-group">
+                                  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa fa-edit"></i> <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu" style="left: -114px;">
+                                    <li><a href="javascript:void(0);" class="addToQuizFromMyQuestion" data-id="'.$row['ID'].'">Add to quiz</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="javascript:void(0);" class="editQuestion" data-tqid="'.$row['QTID'].'" data-id="'.$row['ID'].'">Edit</a></li>
+                                    <li><a href="javascript:void(0);" class="removeQuestion" data-tqid="'.$row['QTID'].'" data-id="'.$row['ID'].'">Remove</a></li>
+                                  </ul>
+                                </div>
+                                </div>';
+
+
+                $no++;
+
+                $data[] = $nestedData;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval($queryDefaultRow),
+                "data"            => $data
+            );
+
+            echo json_encode($json_data);
+        }
+        else if($data_arr['action']=='getMasterQuestion'){
+            $requestData= $_REQUEST;
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = 'WHERE q.Question LIKE "%'.$search.'%" 
+                OR em.NIP LIKE "%'.$search.'%" OR em.Name LIKE "%'.$search.'%" ';
+            }
+
+            $queryDefault = 'SELECT q.*, qt.Description, em.NIP, em.Name FROM db_academic.q_question q 
+                                        LEFT JOIN db_academic.q_question_type qt ON (qt.ID = q.QTID)
+                                        LEFT JOIN db_employees.employees em ON (em.NIP = q.CreatedBy) 
+                                        '.$dataSearch;
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+
+
+            $sql = $queryDefault.' ORDER BY q.UpdatedAt DESC , q.CreatedAt DESC LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+                $nestedData = array();
+                $row = $query[$i];
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Question'].'
+                                    <div>
+                                        <span class="lbl-'.$row['QTID'].'">'.$row['Description'].'</span>
+                                         <span class="label label-default" style="left: 0px;font-size: 11px;">'.$row['Name'].' | Last modify : '.date('d M Y H:i',strtotime($row['UpdatedAt'])).'</span> 
+                                    </div>
+                                    </div>';
+                $nestedData[] = '<div>
+                                <a href="javascript:void(0);" class=" btn btn-sm btn-default addToQuizFromMyQuestion" data-id="'.$row['ID'].'">Add to quiz</a>
+                                </div>';
+
+
+                $no++;
+
+                $data[] = $nestedData;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval($queryDefaultRow),
+                "data"            => $data
+            );
+
+            echo json_encode($json_data);
+        }
+        else if($data_arr['action']=='getDataStudentAnswers'){
+
+            $QuizID = $data_arr['QuizID'];
+
+            $data = $this->db->query('SELECT qqs.ID AS QuizStudentID, qqs.StartSession, 
+                                                qqs.EndSession, qqs.Score, qqs.ShowScore, 
+                                                qqs.WorkDuration, qqs.SubmittedAt,
+                                                ats.Name, ats.NPM
+                                                FROM db_academic.q_quiz_students qqs
+                                                LEFT JOIN db_academic.auth_students ats ON (qqs.NPM = ats.NPM)
+                                                WHERE qqs.QuizID = "'.$QuizID.'" ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='getDataAnswersDetails'){
+
+            $QuizStudentID = $data_arr['QuizStudentID'];
+
+            $Question = $this->db->query('SELECT qqsd.ID AS QuizStudentsDetailsID, qqsd.EssayAnswer,
+                                                            qqsd.Point AS PointAnswer, qqd.Point, 
+                                                            qqsd.EntredAt, q.Question, qt.Description AS QT_Description, 
+                                                            qqsd.QTID, qqsd.QID
+                                                            FROM db_academic.q_quiz_students_details qqsd
+                                                            LEFT JOIN db_academic.q_quiz_students qqs ON (qqs.ID = qqsd.QuizStudentID)
+                                                            LEFT JOIN db_academic.q_quiz_details qqd 
+                                                            ON (qqd.QID = qqsd.QID AND qqs.QuizID = qqd.QuizID)
+                                                            LEFT JOIN db_academic.q_question q ON (q.ID = qqsd.QID)
+                                                            LEFT JOIN db_academic.q_question_type qt ON (qt.ID = qqsd.QTID)
+                                                            WHERE qqsd.QuizStudentID = "'.$QuizStudentID.'" ')
+                ->result_array();
+
+            if(count($Question)>0){
+                for($a=0;$a<count($Question);$a++){
+
+                    $Options = $this->db->select('ID,Option')->order_by('ID', 'RANDOM')->get_where('db_academic.q_question_options',
+                        array('QID'=>$Question[$a]['QID']))->result_array();
+                    $Question[$a]['Options'] = $Options;
+
+                    $answer = $this->db->get_where('db_academic.q_quiz_students_option',
+                        array('QuizStudentID' => $QuizStudentID
+                        ,'QuizStudentsDetailsID' => $Question[$a]['QuizStudentsDetailsID']))->result_array();
+
+
+                    $arrAnswer = [];
+                    if(count($answer)>0){
+                        for($ans=0;$ans<count($answer);$ans++){
+                            array_push($arrAnswer,$answer[$ans]['QOptionID']);
+                        }
+                    }
+
+                    $Question[$a]['Answer'] = $arrAnswer;
+
+                }
+            }
+
+            return print_r(json_encode($Question));
+        }
+        else if($data_arr['action']=='setPointOfEssay'){
+
+            $QuizStudentID = $data_arr['QuizStudentID'];
+            $dataPoint = (array) $data_arr['dataPoint'];
+
+            if(count($dataPoint)>0){
+                for($i=0;$i<count($dataPoint);$i++){
+                    $d = (array) $dataPoint[$i];
+
+                    $this->db->where('ID', $d['QuizStudentsDetailsID']);
+                    $this->db->update('db_academic.q_quiz_students_details',
+                        array('Point'=>$d['Point']));
+                    $this->db->reset_query();
+
+                }
+            }
+
+            // menghitung ulang total point
+            $arrPoint = $this->db->get_where('db_academic.q_quiz_students_details',
+                array('QuizStudentID' => $QuizStudentID))->result_array();
+
+            $TotalPoint = 0;
+            if(count($arrPoint)>0){
+                for($p=0;$p<count($arrPoint);$p++){
+                    $Point = ($arrPoint[$p]['Point']!='' && $arrPoint[$p]['Point']!=null)
+                        ? $arrPoint[$p]['Point'] : 0;
+                    $TotalPoint = $TotalPoint + (float) $Point;
+                }
+            }
+
+            $NewScore = str_replace(',','.',$TotalPoint);
+            // update point dan show score
+            $this->db->where('ID', $QuizStudentID);
+            $this->db->update('db_academic.q_quiz_students',
+                array('Score'=> $NewScore,'ShowScore' => '1'));
+            $this->db->reset_query();
+
+            return print_r(json_encode(array('NewScore' => $NewScore)));
+
+        }
+        else if($data_arr['action']=='removeQuestion'){
+
+            // cek apakah question sudah masuk kedalam kuis atau blm
+            $data = $this->db->query('SELECT COUNT(*) AS Total 
+                                        FROM db_academic.q_quiz_details 
+                                        WHERE QID = "'.$data_arr['QID'].'" ')
+                                ->result_array();
+
+            if($data[0]['Total']<=0){
+                // get data summernoteid
+                $dataQuestion = $this->db->select('SummernoteID')->get_where('db_academic.q_question',
+                    array('ID' => $data_arr['QID']))->result_array();
+
+                if(count($dataQuestion)>0){
+
+                    if($dataQuestion[0]['SummernoteID']!=''
+                        && $dataQuestion[0]['SummernoteID']!=null){
+                        $this->m_rest
+                            ->checkImageSummernote('delete',$dataQuestion[0]['SummernoteID'],'','');
+
+                        $this->db->where('ID', $data_arr['QID']);
+                        $this->db->delete('db_academic.q_question');
+                        $this->db->reset_query();
+
+
+                        $dataOption = $this->db->select('SummernoteID')
+                            ->get_where('db_academic.q_question_options'
+                            ,array('QID' => $data_arr['QID']))->result_array();
+
+                        if(count($dataOption)>0){
+                            for($opt=0;$opt<count($dataOption);$opt++){
+                                $this->m_rest
+                                    ->checkImageSummernote('delete',$dataOption[$opt]['SummernoteID'],'','');
+                            }
+                            $this->db->where('QID', $data_arr['QID']);
+                            $this->db->delete('db_academic.q_question_options');
+                            $this->db->reset_query();
+                        }
+
+                    }
+
+
+                }
+
+            }
+
+            return print_r(json_encode(array('Usage' => $data[0]['Total'])));
+
+        }
     }
 
 

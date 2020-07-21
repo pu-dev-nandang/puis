@@ -495,7 +495,27 @@ class C_database extends Globalclass {
                     if(!empty($getTempStudentReq->Photo)){
                         $reqpic = $getTempStudentReq->Photo;
                         $changeName = explode("-", $getTempStudentReq->Photo);
-                        rename("./uploads/students/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo, "./uploads/students/ta_".$data_arr['TA']."/".$changeName[0].".jpg");
+                        $ext = pathinfo($getTempStudentReq->Photo, PATHINFO_EXTENSION);
+                        $NewName = $changeName[0].'.'.$ext;
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                            $Path1 = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/students/ta_".$data_arr['TA'].'/'.$getTempStudentReq->Photo : "pcam/students/ta_".$data_arr['TA'].'/'.$getTempStudentReq->Photo;
+                            // print_r($Path1);die();
+                            $Path2 = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/students/ta_".$data_arr['TA'].'/'.$NewName : "pcam/students/ta_".$data_arr['TA'].'/'.$NewName;
+                            $this->m_master->MoveFileInNasServer($headerOrigin,$Path1,$Path2);
+                        }
+                        else
+                        {
+                           rename("./uploads/students/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo, "./uploads/students/ta_".$data_arr['TA']."/".$NewName); 
+                        }
+
+                        // update to ta
+                        $db_ta_table = "ta_".$data_arr['TA'].'.'.'students';
+                        $this->db->where('NPM',$data_arr['NPM']);
+                        $this->db->update($db_ta_table,[
+                            'Photo' => $NewName
+                        ]);
+
                     }
                     
                     unset($getTempStudentReq->Photo);
@@ -526,8 +546,18 @@ class C_database extends Globalclass {
                         $cardName = $getTempStudentReq->Card;
                         $clonepath = "./uploads/students/insurance_card/";
                         $cloneNewFile = str_replace("REQ", "APPV", $getTempStudentReq->Card);
-                        $cloneCard = copy($clonepath.$cardName, $clonepath.$cloneNewFile);
-                        unlink($clonepath.$cardName);
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                            $Path1 = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/students/insurance_card/".$cardName : "pcam/students/insurance_card/".$cardName;
+                            $Path2 = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/students/insurance_card/".$cloneNewFile : "pcam/students/insurance_card/".$cloneNewFile;
+                           $t = $this->m_master->MoveFileInNasServer($headerOrigin,$Path1,$Path2);
+                        }
+                        else
+                        {
+                            $cloneCard = copy($clonepath.$cardName, $clonepath.$cloneNewFile);
+                            unlink($clonepath.$cardName);
+                        }
+
                         $dataInsurance['Card'] = $cloneNewFile;
                     }
                     //end clone
@@ -629,6 +659,7 @@ class C_database extends Globalclass {
         $data = $this->input->post();
         $myName = $this->session->userdata('Name');
         $myNIP = $this->session->userdata('NIP');
+        $GetData = $this->m_master->caribasedprimary('db_academic.tmp_students','NPM',$data['NPM']);
         if($data){
             $conditions = array("NPM"=>$data['NPM']);
             $isExist = $this->General_model->fetchData("db_academic.auth_students",$conditions)->row();
@@ -679,7 +710,24 @@ class C_database extends Globalclass {
                     }
                     
                     $moveimage = move_uploaded_file($file_tmp,$pathFile."//".$newFilename);
-                    if($moveimage) {$data['Card'] = $newFilename;}
+                    if($moveimage) {
+                        $data['Card'] = $newFilename;
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : "http://pcam.podomorouniversity.ac.id";
+                            $path = 'students/insurance_card';
+
+                            if (count($GetData) > 0) {
+                                $pathDelete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/".$path."/".$GetData[0]['Card']: "pcam/".$path."/".$GetData[0]['Card'];
+                                $this->m_master->DeleteFileToNas($headerOrigin,$pathDelete);
+                            }
+
+                            $FileName = $newFilename;
+                            $TheFile = $pathFile.'/'.$newFilename;
+                            $uploadNas = $this->m_master->UploadPathOneFilesToNas($headerOrigin,$FileName,$TheFile,$path,'string');
+                            unlink($TheFile);
+                            $data['Card'] = $uploadNas;
+                        }
+                    }
                     $message .= ((!$moveimage) ? "<b>Failed upload image.</b> ":"");
                 }
 

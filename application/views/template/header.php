@@ -257,13 +257,10 @@
                         <!-- Added by Febri @ Jun 2020 -->
                         <?php 
                         $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; 
-                        $ProdyNavSession = $this->session->userdata('prodi_get');
-                        $DepartmentIDNavSession =$this->session->userdata('IDdepartementNavigation');
-                        $isProdyNav = ((count($ProdyNavSession) > 0) ? true:false);
-                        if($DepartmentIDNavSession == 15 &&  $isProdyNav){
+                        if(($_SERVER['SERVER_NAME']=='localhost') ? true:false){
                         ?>
                              <li class="<?php echo $sw?> StockGood">
-                                 <a href="<?=base_url('prodi/stock-good')?>">
+                                 <a href="<?=base_url('stock-good')?>">
                                     <i class="fa fa-cart-plus" aria-hidden="true"></i> 
                                     Stock Good
                                 </a>

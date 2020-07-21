@@ -1366,8 +1366,6 @@ class C_admission extends Admission_Controler {
 
     public function generate_to_be_mhs()
     {
-      // die();
-
       // check koneksi AD
       if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
         $urlAD = URLAD.'__api/Create';
@@ -1426,7 +1424,6 @@ class C_admission extends Admission_Controler {
             $aa = 1;
             $bb = 1;
                 $Q_getLastNPM = $this->m_master->getLastNPM($ta,$ProdiID);
-                // print_r($Q_getLastNPM);
                 if (count($Q_getLastNPM)== 1) {
                   $bb = $Q_getLastNPM[0]['NPM'];
                 }
@@ -1452,7 +1449,6 @@ class C_admission extends Admission_Controler {
                 }
                 else
                 {
-                  // $bb =(int)$bb
                   $bb = $bb + 1;
                   $inc = $bb;
                 }
@@ -1581,18 +1577,42 @@ class C_admission extends Admission_Controler {
                       $ff = explode('.', $G_FileName);
                       $Photo = $NPM.'.'.$ff[1];
                       if (file_exists($this->path_upload_regOnline.$Email.'/'.$explode[0])) {
-                        copy($this->path_upload_regOnline.$Email.'/'.$explode[0], './uploads/students/'.$ta.'/'.$Photo);
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                         $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                         $path = 'students/'.$ta;
+                         $FileName = $Photo;
+                         $TheFile = $this->path_upload_regOnline.$Email.'/'.$explode[0];
+                         $uploadNas = $this->m_master->UploadPathOneFilesToNas($headerOrigin,$FileName,$TheFile,$path,'string');
+                        }
+                        else
+                        {
+                          copy($this->path_upload_regOnline.$Email.'/'.$explode[0], './uploads/students/'.$ta.'/'.$Photo);
+                        }
+                        
                       }
 
                     }
                   }
 
-                // if ($getDoc[$z]['Status'] == 'Done') {
                   if (count($explode) > 0) {
                     for ($ee=0; $ee < count($explode); $ee++) {
+
                      if (file_exists($this->path_upload_regOnline.$Email.'/'.$explode[$ee])) {
-                      copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
-                      // unlink($this->path_upload_regOnline.$Email.'/'.$explode[$ee]);
+
+                       if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path = 'document/'.$NPM;
+                        $FileName = $explode[$ee];
+                        $TheFile = $this->path_upload_regOnline.$Email.'/'.$explode[$ee];
+                        $uploadNas = $this->m_master->UploadPathOneFilesToNas($headerOrigin,$FileName,$TheFile,$path,'string');
+                       }
+                       else
+                       {
+                         copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
+                       }
+                     
+                        // unlink($this->path_upload_regOnline.$Email.'/'.$explode[$ee]);
+
                      }
 
                     }
@@ -1600,16 +1620,24 @@ class C_admission extends Admission_Controler {
                   else
                   {
                     if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
-                      copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
+                      
+                      if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                       $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                       $path = 'document/'.$NPM;
+                       $FileName = $getDoc[$z]['Attachment'];
+                       $TheFile = $this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'];
+                       $uploadNas = $this->m_master->UploadPathOneFilesToNas($headerOrigin,$FileName,$TheFile,$path,'string');
+                      }
+                      else
+                      {
+                        copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
+                      }
+                      
                       // unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
                     }
 
                   }
 
-                  // if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
-                  //     unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
-                  // }
-                // }
               }
 
               $dataSave = array(

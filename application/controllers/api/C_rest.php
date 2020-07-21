@@ -843,13 +843,16 @@ class C_rest extends CI_Controller {
                                               LEFT JOIN db_academic.counseling_topic ct
                                               ON (ct.ID = cu.TopicID)
                                               WHERE ( cu.UserID = "'.$UserID.'" ) '.$dataSearch.'
-                                               ORDER BY cu.TopicID DESC';
+                                               ';
+
+                $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
 
 
-                $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+                $sql = $queryDefault.' ORDER BY cu.TopicID DESC LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
                 $query = $this->db->query($sql)->result_array();
-                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
 
                 $no = $requestData['start'] + 1;
                 $data = array();
@@ -930,14 +933,12 @@ class C_rest extends CI_Controller {
 
                 $json_data = array(
                     "draw"            => intval( $requestData['draw'] ),
-                    "recordsTotal"    => intval(count($queryDefaultRow)),
-                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "recordsTotal"    => intval($queryDefaultRow),
+                    "recordsFiltered" => intval($queryDefaultRow),
                     "data"            => $data
                 );
 
                 echo json_encode($json_data);
-//                $data = $this->m_rest->getTopicByUserID($UserID);
-//                return print_r(json_encode($data));
             }
             else if($dataToken['action']=='readDetailTopic'){
 
@@ -1290,6 +1291,352 @@ class C_rest extends CI_Controller {
 
                 return print_r(json_encode($result));
             }
+            else if($dataToken['action']=='updateScoreTask'){
+
+                $this->db->set('Score', $dataToken['Score']);
+                $this->db->where('ID', $dataToken['ID']);
+                $this->db->update('db_academic.schedule_task_student');
+
+                return print_r(1);
+
+            }
+        } else {
+            $msg = array(
+                'msg' => 'Error'
+            );
+            return print_r(json_encode($msg));
+        }
+    }
+
+    public function crudQuiz(){
+        $dataToken = $this->getInputToken();
+        $cekUser = $this->cekAuthAPI($dataToken['auth']);
+        if($cekUser){
+            if($dataToken['action']=='checkSessionsToNewQuiz'){
+
+                $ScheduleID = $dataToken['ScheduleID'];
+
+                $dataCkOnline = $this->db->select('OnlineLearning')
+                    ->get_where('db_academic.schedule',array('ID' => $ScheduleID))
+                    ->result_array();
+
+                if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+                    $dataOpenDate = $this->m_rest->getRangeDateLearningOnline($ScheduleID);
+                }
+
+                $result = [];
+                for($i=1;$i<=14;$i++){
+
+
+                    // Cek sudah ada atau blm
+                    $dataCkSession = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.q_quiz  q
+                                                            WHERE q.ScheduleID = "'.$ScheduleID.'"
+                                                             AND q.Session = "'.$i.'" ')->result_array();
+
+                    $Status = ($dataCkSession[0]['Total']>0) ? -1 : 1;
+
+
+                    if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+
+                        $arr = array(
+                            'Sessions' => ($i),
+                            'Status' => $Status,
+                            'isOnline' => 1,
+                            'StatusOnline' => $dataOpenDate[$i - 1]['Status'],
+                            'RangeStart' => $dataOpenDate[$i - 1]['RangeStart'],
+                            'RangeEnd' => $dataOpenDate[$i - 1]['RangeEnd'],
+                            'isUTS' => $dataOpenDate[$i - 1]['isUTS']
+
+                        );
+
+                    }
+                    else {
+                        $arr = array(
+                            'Sessions' => ($i),
+                            'Status' => $Status,
+                            'isOnline' => 0
+                        );
+                    }
+
+                    array_push($result,$arr);
+
+                }
+
+                return print_r(json_encode($result));
+
+            }
+            else if($dataToken['action']=='checkSessionsInQuiz'){
+                $ScheduleID = $dataToken['ScheduleID'];
+                $Session = $dataToken['Session'];
+                $NPM = (isset($dataToken['NPM']) && $dataToken['NPM']!='') ? $dataToken['NPM'] : '';
+
+                $dataCkOnline = $this->db->select('OnlineLearning')->get_where('db_academic.schedule',array('ID' => $ScheduleID))->result_array();
+                $isOnline = 0;
+                $RangeStart = '';
+                $RangeEnd = '';
+                $StatusOnline = '';
+                if($dataCkOnline[0]['OnlineLearning']==1 || $dataCkOnline[0]['OnlineLearning']=='1'){
+                    $dataOpenDate = $this->m_rest->getRangeDateLearningOnline($ScheduleID);
+                    $isOnline = 1;
+                    for ($i=0;$i<count($dataOpenDate);$i++){
+                        if($dataOpenDate[$i]['Session']==$Session){
+                            $RangeStart = $dataOpenDate[$i]['RangeStart'];
+                            $RangeEnd = $dataOpenDate[$i]['RangeEnd'];
+                            $StatusOnline = $dataOpenDate[$i]['Status'];
+                        }
+                    }
+                }
+
+
+
+                $dataCkSession = $this->db->query('SELECT q.*, em.Name AS Lecturer FROM db_academic.q_quiz  q
+                                                            LEFT JOIN db_employees.employees em ON (em.NIP = q.CreatedBy)
+                                                            WHERE q.ScheduleID = "'.$ScheduleID.'"
+                                                             AND q.Session = "'.$Session.'" ')->result_array();
+
+                $dateNow = $this->m_rest->getDateNow();
+                if(count($dataCkSession)>0){
+                    $d = $dataCkSession[0];
+
+                    // Cek apakah tanggal sekarang masuk dalam range pengerjaan
+                    $dataCkSession[0]['dateInRange']= ($dateNow>=$RangeStart && $dateNow<=$RangeEnd) ? 1 : 0;
+
+
+                    $whereNPM = ($NPM!='') ? ' AND qs.NPM = "'.$NPM.'" ' : '';
+                     $Details = $this->db->query('SELECT qs.*, ats.Name FROM db_academic.q_quiz_students qs
+                                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = qs.NPM)
+                                                                    WHERE qs.QuizID = "'.$d['ID'].'" '.$whereNPM)->result_array();
+
+                     if(count($Details)>0){
+                         if($Details[0]['ShowScore']=='0' || $Details[0]['ShowScore']==0){
+                             unset($Details[0]['Score']);
+                         }
+                     }
+                    $dataCkSession[0]['Details'] = $Details;
+                }
+
+                $result = array(
+                    'isOnline' => $isOnline,
+                    'RangeStart' => $RangeStart,
+                    'RangeEnd' => $RangeEnd,
+                    'StatusOnline' => $StatusOnline,
+                    'Data' => $dataCkSession
+                );
+
+                return print_r(json_encode($result));
+            }
+            else if($dataToken['action']=='getDataQuiz'){
+                $QuizID = $dataToken['QuizID'];
+                $NPM = $dataToken['NPM'];
+
+                $data = $this->db->query('SELECT q.ID, q.Duration , qs.ID AS QuizStudentID,   
+                                                    qs.StartSession, qs.EndSession,
+                                                    qs.WorkDuration
+                                                    FROM db_academic.q_quiz q
+                                                    LEFT JOIN db_academic.q_quiz_students qs 
+                                                    ON (qs.QuizID = q.ID AND qs.NPM = "'.$NPM.'")
+                                                    WHERE q.ID = "'.$QuizID.'"')->result_array();
+
+                if(count($data)>0){
+
+                    $dataTimeNow = $this->m_rest->getDateTimeNow();
+
+                    $data[0]['NowSession'] =  $dataTimeNow;
+                    $data[0]['Status'] = ($dataTimeNow<=$data[0]['EndSession']) ? 1 : 0;
+                    $DurationQuiz = 0;
+
+                    if($data[0]['Status']==1){
+                        $to_time = strtotime($data[0]['EndSession']);
+                        $from_time = strtotime($dataTimeNow);
+                        $DurationQuiz = round(abs($to_time - $from_time) / 60);
+                    }
+
+                    $data[0]['DurationQuiz'] = $DurationQuiz;
+
+
+
+                    $joinWithResult = (isset($dataToken['action2']) && $dataToken['action2']=='getDataQuiz2GetResume')
+                        ? ' LEFT JOIN db_academic.q_quiz_students_details qsd ON (qsd.QID = q.ID AND qsd.QuizStudentID = "'.$data[0]['QuizStudentID'].'") ' : '';
+
+                    $selectWithResult = (isset($dataToken['action2']) && $dataToken['action2']=='getDataQuiz2GetResume')
+                        ? ', qsd.Point AS PointAswer, qsd.EssayAnswer ' : '';
+
+
+                    $Question = $this->db->query('SELECT qqd.QID, qqd.Point, q.Question, q.QTID,  
+                                                            qt.Description, qqd.ID AS QuizDetailID
+                                                             '.$selectWithResult.'
+                                                            FROM db_academic.q_quiz_details qqd 
+                                                            LEFT JOIN db_academic.q_question q ON (qqd.QID = q.ID)
+                                                            LEFT JOIN db_academic.q_question_type qt ON (qt.ID = q.QTID)
+                                                            '.$joinWithResult.'
+                                                            WHERE qqd.QuizID = "'.$QuizID.'" ')->result_array();
+
+                    if(count($Question)>0){
+                        for($q=0;$q<count($Question);$q++){
+                            $Options = $this->db->select('ID,Option')->order_by('ID', 'RANDOM')->get_where('db_academic.q_question_options',
+                                array('QID'=>$Question[$q]['QID']))->result_array();
+                            $Question[$q]['Options'] = $Options;
+
+                            if(isset($dataToken['action2']) && $dataToken['action2']=='getDataQuiz2GetResume'){
+                                $answer = $this->db->query('SELECT qso.QOptionID, qso.PointOption, qso.Status  FROM db_academic.q_quiz_students_option qso 
+                                                                        LEFT JOIN db_academic.q_quiz_students_details qsd
+                                                                        ON (qsd.ID = qso.QuizStudentsDetailsID)
+                                                                        WHERE qsd.QuizStudentID = "'.$data[0]['QuizStudentID'].'" 
+                                                                        AND qsd.QID = "'.$Question[$q]['QID'].'" ')->result_array();
+
+                                $arrAnswer = [];
+                                if(count($answer)>0){
+                                    for($ans=0;$ans<count($answer);$ans++){
+                                        array_push($arrAnswer,$answer[$ans]['QOptionID']);
+                                    }
+                                }
+
+                                $Question[$q]['Answer'] = $arrAnswer;
+                            }
+
+                        }
+                    }
+
+                    $data[0]['Question'] = $Question;
+
+                }
+
+                return print_r(json_encode($data));
+
+            }
+            else if($dataToken['action']=='startMyQuiz'){
+                $QuizID = $dataToken['QuizID'];
+                $Duration = $dataToken['Duration'];
+                $NPM = $dataToken['NPM'];
+
+                // cek apakah sudah ada atau blm jika sudah maka tidak perlu update
+                $dataCk = $this->db->get_where('db_academic.q_quiz_students',
+                    array('NPM' => $NPM,'QuizID' => $QuizID))->result_array();
+
+                if(count($dataCk)<=0){
+
+                    $StartSession = $this->m_rest->getDateTimeNow();
+                    $time = strtotime($StartSession);
+                    $EndSession = date('Y-m-d H:i:s',strtotime('+'.$Duration.' minutes',$time));
+                    $dataInsert = array(
+                        'NPM' => $NPM,
+                        'QuizID' => $QuizID,
+                        'StartSession' => $StartSession,
+                        'EndSession' => $EndSession
+                    );
+                    $this->db->insert('db_academic.q_quiz_students',$dataInsert);
+                }
+
+                return print_r(1);
+
+            }
+            else if($dataToken['action']=='saveAnswerQuiz'){
+//                print_r($dataToken);
+
+                // Hapus jika ada datanya
+                $this->db->where('QuizStudentID', $dataToken['QuizStudentID']);
+                $this->db->delete(array('db_academic.q_quiz_students_details',
+                    'db_academic.q_quiz_students_option'));
+                $this->db->reset_query();
+
+                $dataQuestion = $dataToken['dataQuestion'];
+                $ScoreSementara = 0;
+                $ShowScore = '1';
+                if(count($dataQuestion)>0){
+                    for($i=0;$i<count($dataQuestion);$i++){
+                        $d = (array) $dataQuestion[$i];
+
+                        if($d['QTID']==3||$d['QTID']=='3'){
+                            $ShowScore = '0';
+                        }
+
+                        $arrInsert = array(
+                            'QuizStudentID' => $dataToken['QuizStudentID'],
+                            'QuizDetailID' => $d['QuizDetailID'],
+                            'QID' => $d['QID'],
+                            'QTID' => $d['QTID'],
+                            'EssayAnswer' => $d['EssayAnswer']
+                        );
+
+                        $this->db->insert('db_academic.q_quiz_students_details',$arrInsert);
+                        $QuizStudentsDetailsID = $this->db->insert_id();
+
+                        if(count($d['Options'])>0){
+
+                            // Multiple Choise Type B
+                            $TotalPointOption = 0;
+
+                            for($a=0;$a<count($d['Options']);$a++){
+                                $d2 = (array) $d['Options'][$a];
+                                // Cek apakah option benar atau salah
+                                $dataCkOpt = $this->db->get_where('db_academic.q_question_options',
+                                    array('ID' => $d2['QOptionID']))->result_array()[0];
+
+                                $arrInstOption = array(
+                                    'QuizStudentID' => $dataToken['QuizStudentID'],
+                                    'QuizStudentsDetailsID' => $QuizStudentsDetailsID,
+                                    'QOptionID' => $d2['QOptionID'],
+                                    'PointOption' => $dataCkOpt['Point'],
+                                    'Status' => $dataCkOpt['IsTheAnswer']
+                                );
+
+                                $this->db->insert('db_academic.q_quiz_students_option',$arrInstOption);
+                                $PointQuestion = 0;
+                                if($d['QTID']==2 || $d['QTID']=='2'){
+                                    $TotalPointOption = $TotalPointOption + (float) $dataCkOpt['Point'];
+
+                                    if($a==(count($d['Options']) - 1)){
+                                        $PointQuestion = ($TotalPointOption>0)
+                                            ? str_replace(',','.',''.((float) $d['Point'] / 100) * $TotalPointOption)
+                                            : 0;
+                                        $this->db->where('ID', $QuizStudentsDetailsID);
+                                        $this->db->update('db_academic.q_quiz_students_details',
+                                            array('Point'=>$PointQuestion));
+                                        $this->db->reset_query();
+                                    }
+
+                                }
+                                else if($d['QTID']==1 || $d['QTID']=='1') {
+                                    // Update point langsung karena multiple choise type A
+                                    $PointQuestion = ($dataCkOpt['IsTheAnswer']==1 || $dataCkOpt['IsTheAnswer']=='1')
+                                        ? $d['Point'] : 0;
+                                    $this->db->where('ID', $QuizStudentsDetailsID);
+                                    $this->db->update('db_academic.q_quiz_students_details',
+                                        array('Point'=>$PointQuestion));
+                                    $this->db->reset_query();
+                                }
+
+                                $ScoreSementara = $ScoreSementara + $PointQuestion;
+
+                            }
+
+                        }
+
+                    }
+
+                    $this->db->where('ID', $dataToken['QuizStudentID']);
+                    $this->db->update('db_academic.q_quiz_students',
+                        array('Score'=>str_replace(',','.',$ScoreSementara),
+                            'ShowScore'=>$ShowScore,
+                            'WorkDuration' => $dataToken['WorkDuration'],
+                            'SubmittedAt' => $this->m_rest->getDateTimeNow()));
+                    $this->db->reset_query();
+                }
+
+                // return quiz
+                $dataReturn = $this->db->query('SELECT q.ScheduleID, q.Session FROM db_academic.q_quiz q 
+                                                        LEFT JOIN db_academic.q_quiz_students qs 
+                                                        ON (qs.QuizID = q.ID )
+                                                        WHERE qs.ID = "'.$dataToken['QuizStudentID'].'" ')
+                    ->result_array()[0];
+
+                return print_r(json_encode($dataReturn));
+
+
+
+
+            }
+
             else if($dataToken['action']=='updateScoreTask'){
 
                 $this->db->set('Score', $dataToken['Score']);
@@ -2308,7 +2655,17 @@ class C_rest extends CI_Controller {
 
                 switch ($action) {
                     case 'add':
-                       $uploadFile2 = $this->m_rest->uploadDokumenMultiple('BuktiBayar_'.$G_PTID[0]['Abbreviation'],'fileData',$path);
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            // path overwrite
+                            $path = 'document/'.$G_payment[0]['NPM'];
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                            $uploadFile2 = $this->m_master->UploadManyFilesToNas($headerOrigin,'BuktiBayar_'.$G_PTID[0]['Abbreviation'],'fileData',$path,'array');
+                        }
+                        else
+                        {
+                            $uploadFile2 = $this->m_rest->uploadDokumenMultiple('BuktiBayar_'.$G_PTID[0]['Abbreviation'],'fileData',$path);
+                        }
+
                        $FileUpload = array();
                        for ($i=0; $i < count($uploadFile2); $i++) { 
                            $FileUpload[] = array(
@@ -2380,9 +2737,20 @@ class C_rest extends CI_Controller {
                 // print_r(FCPATH);die();
                 for ($i=0; $i < count($FileUpload); $i++) { 
                     if ($i == $index && $FileUpload[$i]['Filename'] == $filename) {
-                        $path = FCPATH.'uploads/document/'.$NPM.'/'.$filename;
-                        unlink($path);
-                        unset($FileUpload[$i]);
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                            $path = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/document/".$NPM.'/'.$filename : "pcam/document/".$NPM.'/'.$filename;
+                            $this->m_master->DeleteFileToNas($headerOrigin,$path);
+                        }
+                        else
+                        {
+                            $path = FCPATH.'uploads/document/'.$NPM.'/'.$filename;
+                            if (file_exists($path)) {
+                                 unlink($path);
+                            }
+                            unset($FileUpload[$i]);
+                        }
+                        
                     }
                 }
 
@@ -2427,16 +2795,38 @@ class C_rest extends CI_Controller {
                $NPM = $getDatapayment[0]['NPM'];
                $FileUpload = (array) json_decode($getDataproof[0]['FileUpload'],true);
                for ($i=0; $i < count($FileUpload); $i++) {
-                    $path = FCPATH.'uploads/document/'.$NPM.'/'.$FileUpload[$i]['Filename'];
-                    unlink($path);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/document/".$NPM.'/'.$FileUpload[$i]['Filename'] : "pcam/document/".$NPM.'/'.$FileUpload[$i]['Filename'];
+                        $this->m_master->DeleteFileToNas($headerOrigin,$path);
+                    }
+                    else
+                    {
+                        $path = FCPATH.'uploads/document/'.$NPM.'/'.$FileUpload[$i]['Filename'];
+                        if (file_exists($path)) {
+                             unlink($path);
+                        }
+                    }
                     unset($FileUpload[$i]); 
+                    
                }
 
                $FileUpload = array_values($FileUpload);
                for ($i=0; $i < count($FileUpload); $i++) {
-                    $path = FCPATH.'uploads/document/'.$NPM.'/'.$FileUpload[$i]['Filename'];
-                    unlink($path);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/document/".$NPM.'/'.$FileUpload[$i]['Filename'] : "pcam/document/".$NPM.'/'.$FileUpload[$i]['Filename'];
+                        $this->m_master->DeleteFileToNas($headerOrigin,$path);
+                    }
+                    else
+                    {
+                        $path = FCPATH.'uploads/document/'.$NPM.'/'.$FileUpload[$i]['Filename'];
+                        if (file_exists($path)) {
+                             unlink($path);
+                        }
+                    }
                     unset($FileUpload[$i]); 
+                    
                }
                if (count($FileUpload) == 0) {
                    $this->db->where('ID', $dataToken['idtable']);

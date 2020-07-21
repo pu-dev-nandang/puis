@@ -54,7 +54,7 @@
             loading_modal_show();
             getDataEula(ID);
         } else {
-            $('#formSummernoteID').val(UnixMoment);
+            $('#formSummernoteID').val(sessionNIP+'_'+UnixMoment);
             $('#viewAction').html('Create');
         }
 

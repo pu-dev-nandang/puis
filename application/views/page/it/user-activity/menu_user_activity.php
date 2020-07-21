@@ -13,7 +13,7 @@
                 <li class="<?php echo ($this->uri->segment(2) == 'user-activity-student'  ) ? 'active' : '' ?>">
                     <a href="<?php echo base_url('it/user-activity-student'); ?>">Student</a>
                 </li>
-                <li class="<?php echo ($this->uri->segment(2) == 'user-activity-log-login'  ) ? 'active' : '' ?>">
+                <li class="hide <?php echo ($this->uri->segment(2) == 'user-activity-log-login'  ) ? 'active' : '' ?>">
                     <a href="<?php echo base_url('it/user-activity-log-login'); ?>">Log Login</a>
                 </li>
             </ul>

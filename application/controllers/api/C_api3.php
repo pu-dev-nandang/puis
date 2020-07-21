@@ -5386,9 +5386,21 @@ class C_api3 extends CI_Controller {
                 $arr_file = (array) json_decode($G_data[0]['File'],true);
                 if(count($G_data)>0){
                     $old = $G_data[0]['File'];
-                    if($old!=''  && is_file('./uploads/kb/'.$old)){
-                        unlink('./uploads/kb/'.$old);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                         $headerOrigin = serverRoot;
+                         $rs = $this->m_master->DeleteFileToNas($headerOrigin,'pcam/kb/'.$old);
+                         if ($rs['Status'] != '1') {
+                             return print_r('Error delete file');
+                             die();
+                         }
                     }
+                    else
+                    {
+                        if($old!=''  && is_file('./uploads/kb/'.$old)){
+                            unlink('./uploads/kb/'.$old);
+                        }
+                    }
+                    
                 }
             }
 

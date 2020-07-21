@@ -6470,11 +6470,51 @@ class C_api extends CI_Controller {
                 $this->db->update('db_employees.employees',$formUpdate);
 
                 // check fill admin Prodi / Ka prodi
+                //UPDATED BY FEBRI @ JULY 2020
                 $PositionMain = $formUpdate['PositionMain'];
                 $PositionMain = explode('.', $PositionMain);
                 $Position = $PositionMain[1];
                 $Division = $PositionMain[0];
-                if ($Position == 6 || $Division == 15) {
+
+                if(!empty($formUpdate['PositionOther1'])){
+                    $PositionOTH1 = $formUpdate['PositionOther1'];
+                    $PositionOTH1 = explode('.', $PositionOTH1);
+                    $Position_OTH1 = $PositionOTH1[1];
+                    $Division_OTH1 = $PositionOTH1[0];
+                }else{
+                    $Position_OTH1 = 0;
+                    $Division_OTH1 = 0;
+                }
+                
+                if(!empty($formUpdate['PositionOther2'])){
+                    $PositionOTH2 = $formUpdate['PositionOther2'];
+                    $PositionOTH2 = explode('.', $PositionOTH2);
+                    $Position_OTH2 = $PositionOTH2[1];
+                    $Division_OTH2 = $PositionOTH2[0];
+                }else{
+                    $Position_OTH2 = 0;
+                    $Division_OTH2 = 0;
+                }
+                
+                if(!empty($formUpdate['PositionOther3'])){
+                    $PositionOTH3 = $formUpdate['PositionOther3'];
+                    $PositionOTH3 = explode('.', $PositionOTH3);
+                    $Position_OTH3 = $PositionOTH3[1];
+                    $Division_OTH3 = $PositionOTH3[0];
+                }else{
+                    $Position_OTH3 = 0;
+                    $Division_OTH3 = 0;
+                }
+
+
+
+                //if ($Position == 6 || $Division == 15) { => OLD script
+                if( (($Division == 14 || $Division == 15) && $Position == 6) ||
+                    (($Division_OTH1 == 14 || $Division_OTH1 == 15) && $Position_OTH1 == 6) ||
+                    (($Division_OTH2 == 14 || $Division_OTH2 == 15) && $Position_OTH2 == 6) ||
+                    (($Division_OTH3 == 14 || $Division_OTH3 == 15) && $Position_OTH3 == 6)
+                    ){
+                //END UPDATED BY FEBRI @ JULY 2020
                     $ProdiArr = (array) $data_arr['arr_Prodi'];
                     if ($Division == 15) {
                         $dataSave = array(
@@ -6491,10 +6531,7 @@ class C_api extends CI_Controller {
                             $this->db->update('db_academic.program_study',$dataSave);
 
                         }
-                    }
-                    else
-                    {
-
+                    }else{
                         $dataSave = array(
                             'KaprodiID' => null,
                         );
@@ -10154,10 +10191,18 @@ class C_api extends CI_Controller {
             $no = $reqdata['start'] + 1;
             if($result){
                 foreach ($result as $v) {
-                    $url_image = 'uploads/students/ta_'.$v->ClassOf.'/'.$v->Photo;
+                    // $url_image = 'uploads/students/ta_'.$v->ClassOf.'/'.$v->Photo;
+                    // $srcImg =  base_url('images/icon/userfalse.png');
+                    // if($v->Photo != '' || $v->Photo != null || !empty($v->Photo)){
+                    //     $srcImg = (file_exists($url_image)) ? base_url($url_image) : base_url('images/icon/userfalse.png') ;
+                    // }
+
+                    $url_image = base_url().'uploads/students/ta_'.$v->ClassOf.'/'.$v->Photo;
                     $srcImg =  base_url('images/icon/userfalse.png');
                     if($v->Photo != '' || $v->Photo != null || !empty($v->Photo)){
-                        $srcImg = (file_exists($url_image)) ? base_url($url_image) : base_url('images/icon/userfalse.png') ;
+                        if ($this->m_master->is_url_exist($url_image)) {
+                             $srcImg = $url_image;
+                        }
                     }
 
                     $dataToken = array(

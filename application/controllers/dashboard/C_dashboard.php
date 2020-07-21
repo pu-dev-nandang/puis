@@ -979,35 +979,64 @@ class C_dashboard extends Globalclass {
         $old = $this->input->get('old');
         $ID = $this->input->get('id');
 
-        $config['upload_path']          = './uploads/help/';
-        $config['allowed_types']        = '*';
-        $config['max_size']             = 8000; // 8 mb
-        $config['file_name']            = $fileName;
+        // upload to nas
+        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+            if (array_key_exists('userfile', $_FILES)) {
+                $headerOrigin = serverRoot;
+                $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$fileName,'userfile','help','string');
+                $fileName = $uploadNas;
+                // Update DB
+                $this->db->where('ID', $ID);
+                $this->db->update('db_employees.user_qna',array(
+                    'File' => $fileName
+                ));
 
-        if($old!=''  && is_file('./uploads/help/'.$old)){
-            unlink('./uploads/help/'.$old);
+                $success = array('success' => 
+                                        ['file_name' =>  $fileName]
+                                );
+                $success['success']['formGrade'] = 0;
+
+                return print_r(json_encode($success));
+
+            }
+            else
+            {
+                $error = array('error' =>'File not selected');
+                return print_r(json_encode($error));
+            }
         }
+        else
+        {
+            $config['upload_path']          = './uploads/help/';
+            $config['allowed_types']        = '*';
+            $config['max_size']             = 8000; // 8 mb
+            $config['file_name']            = $fileName;
 
-        $this->load->library('upload', $config);
-        if ( ! $this->upload->do_upload('userfile')){
-            $error = array('error' => $this->upload->display_errors());
-            return print_r(json_encode($error));
+            if($old!=''  && is_file('./uploads/help/'.$old)){
+                unlink('./uploads/help/'.$old);
+            }
+
+            $this->load->library('upload', $config);
+            if ( ! $this->upload->do_upload('userfile')){
+                $error = array('error' => $this->upload->display_errors());
+                return print_r(json_encode($error));
+            }
+            else {
+
+                // Update DB
+                $this->db->where('ID', $ID);
+                $this->db->update('db_employees.user_qna',array(
+                    'File' => $fileName
+                ));
+
+                $success = array('success' => $this->upload->data());
+                $success['success']['formGrade'] = 0;
+
+                return print_r(json_encode($success));
+            }
         }
-        else {
-
-            // Update DB
-            $this->db->where('ID', $ID);
-            $this->db->update('db_employees.user_qna',array(
-                'File' => $fileName
-            ));
-
-            $success = array('success' => $this->upload->data());
-            $success['success']['formGrade'] = 0;
-
-            return print_r(json_encode($success));
-        }
-
     }
+
     public function kb()
     {
         $post = $_POST;
@@ -1039,32 +1068,61 @@ class C_dashboard extends Globalclass {
         $old = $this->input->get('old');
         $ID = $this->input->get('id');
 
-        $config['upload_path']          = './uploads/kb/';
-        $config['allowed_types']        = '*';
-        $config['max_size']             = 8000; // 8 mb
-        $config['file_name']            = $fileName;
+        // upload to nas
+        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+            if (array_key_exists('userfile', $_FILES)) {
+                $headerOrigin = serverRoot;
+                $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$fileName,'userfile','kb','string');
+                $fileName = $uploadNas;
+                // Update DB
+                $this->db->where('ID', $ID);
+                $this->db->update('db_employees.knowledge_base',array(
+                    'File' => $fileName
+                ));
 
-        if($old!=''  && is_file('./uploads/kb/'.$old)){
-            unlink('./uploads/kb/'.$old);
+                $success = array('success' => 
+                                        ['file_name' =>  $fileName]
+                                );
+                $success['success']['formGrade'] = 0;
+
+                return print_r(json_encode($success));
+
+            }
+            else
+            {
+                $error = array('error' =>'File not selected');
+                return print_r(json_encode($error));
+            }
         }
+        else
+        {
+            $config['upload_path']          = './uploads/kb/';
+            $config['allowed_types']        = '*';
+            $config['max_size']             = 8000; // 8 mb
+            $config['file_name']            = $fileName;
 
-        $this->load->library('upload', $config);
-        if ( ! $this->upload->do_upload('userfile')){
-            $error = array('error' => $this->upload->display_errors());
-            return print_r(json_encode($error));
-        }
-        else {
+            if($old!=''  && is_file('./uploads/kb/'.$old)){
+                unlink('./uploads/kb/'.$old);
+            }
 
-            // Update DB
-            $this->db->where('ID', $ID);
-            $this->db->update('db_employees.knowledge_base',array(
-                'File' => $fileName
-            ));
+            $this->load->library('upload', $config);
+            if ( ! $this->upload->do_upload('userfile')){
+                $error = array('error' => $this->upload->display_errors());
+                return print_r(json_encode($error));
+            }
+            else {
 
-            $success = array('success' => $this->upload->data());
-            $success['success']['formGrade'] = 0;
+                // Update DB
+                $this->db->where('ID', $ID);
+                $this->db->update('db_employees.knowledge_base',array(
+                    'File' => $fileName
+                ));
 
-            return print_r(json_encode($success));
+                $success = array('success' => $this->upload->data());
+                $success['success']['formGrade'] = 0;
+
+                return print_r(json_encode($success));
+            }
         }
 
     }
@@ -1339,7 +1397,7 @@ class C_dashboard extends Globalclass {
                                 $err_msg     .= "Size of image '".$file_name."'s too large from 2Mb.";
                             }else { $ispic = true; }
 
-                            $trainingTitleFilename = preg_replace('/\s+/', "_", $data['trainingTitle'][$k]);
+                            $trainingTitleFilename = preg_replace('/[^\p{L}\p{N}\s]/u', "_", $data['trainingTitle'][$k]);
                             $newFilename = $data['NIP']."-TRAINING-".$trainingTitleFilename."-".date('ymd').".jpg";
 
                             if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id'){
@@ -1368,7 +1426,12 @@ class C_dashboard extends Globalclass {
                                 }
                             }
                         }else{
-                            $certificateName = null;
+                            $checkFile = $this->General_model->fetchData("db_employees.employees_educations_training",array("ID"=>$data['trainingID'][$k]))->row();
+                            if(!empty($checkFile)){
+                                $certificateName = $checkFile->certificate;
+                            }else{
+                                $certificateName = null;
+                            }
                         }
                         $certificates[] = array("ID"=>$data['trainingID'][$k],"NIP"=>$data['NIP'],"name"=>$data['trainingTitle'][$k],"organizer"=>$data['trainingorganizer'][$k],"start_event"=>$data['trainingStart'][$k].' '.$data['trainingStartTime'][$k].':00',"end_event"=>$data['trainingEnd'][$k].' '.$data['trainingEndTime'][$k].':00',"location"=>$data['trainingLocation'][$k],"category"=>$data['trainingCategory'][$k],"costCompany"=>$data['trainingCostCompany'][$k],"costEmployee"=>$data['trainingCostEmployee'][$k],"certificate"=>$certificateName);                                
                     }
@@ -1727,8 +1790,6 @@ class C_dashboard extends Globalclass {
             }else{
                 $result = $this->m_hr->fetchEmployee(false,$param)->result();
             }
-
-
 
             if(!empty($result)){
                 $rs = array();

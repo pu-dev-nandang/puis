@@ -390,6 +390,7 @@ $(document).ready(function(){
             cloneRow.find("td:first").text(num);
             cloneRow.find(".form-control").val("");
             cloneRow.find("input[type=file]").val("");
+            cloneRow.find(".fetch-file").remove();
             parent.find("#table-list-"+fieldName+" tbody").append(cloneRow);
 
             /*cloneRow.find("td input.autocomplete").attr("id","autocomplete-start-"+fieldName+"-"+num).removeClass("ui-autocomplete-input").removeAttr("autocomplete").val("00:00");

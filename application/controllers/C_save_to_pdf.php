@@ -719,12 +719,13 @@ class C_save_to_pdf extends CI_Controller {
 
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
-        $datawarek1 = $this->db->get_where('db_employees.employees',
-        array('PositionMain' => '2.2','StatusEmployeeID'=>'1' ))
+        $datawarek1 = $this->db->get_where('db_employees.employees em',
+        "(em.PositionMain = '2.2' OR em.PositionOther1 = '2.2' OR em.PositionOther2 = '2.2' OR em.PositionOther3 = '2.2') AND  em.StatusEmployeeID = '1'")
+        //array('PositionMain' => '2.2','StatusEmployeeID'=>'1' ))
         ->result_array();
 
 
-//        print_r($data_arr);
+     //print_r(datawarek1);
 //        exit;
 
         $pdf = new FPDF('l','mm','A4');
@@ -3077,6 +3078,9 @@ class C_save_to_pdf extends CI_Controller {
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
 
+        $datawarek1 = $this->db->get_where('db_employees.employees em',
+        "(em.PositionMain = '2.2' OR em.PositionOther1 = '2.2' OR em.PositionOther2 = '2.2' OR em.PositionOther3 = '2.2') AND  em.StatusEmployeeID = '1'");
+
         $dataStudent = $this->m_save_to_pdf->getTranscript($data_arr['DBStudent'],$data_arr['NPM']);
         $dataStudent['DetailCourse'] = $this->m_rest->getTranscript(substr($data_arr['DBStudent'],3,4),$data_arr['NPM'],'ASC');
 
@@ -3243,6 +3247,8 @@ class C_save_to_pdf extends CI_Controller {
 
     private function body_temp_transcript($lang,$pdf,$dataStudent,$dataTempTr){
 
+
+
         $mk = ($lang=='ind')? '' : 'Eng';
 
         $Student = $dataStudent['Student'][0];
@@ -3331,6 +3337,8 @@ class C_save_to_pdf extends CI_Controller {
         $data_arr = $this->getInputToken($token);
 
         $dataStudent = $this->m_save_to_pdf->getTranscript($data_arr['DBStudent'],$data_arr['NPM']);
+
+
 
         $dataStudent['DetailCourse'] = $this->m_rest->getTranscript(substr($data_arr['DBStudent'],3,4),$data_arr['NPM'],'ASC');
 
@@ -4104,8 +4112,9 @@ class C_save_to_pdf extends CI_Controller {
          // Get Semester
         $dataSmt = $this->db->query('SELECT * FROM db_academic.semester WHERE ID = "'.$filterSemester.'" ')->result_array();
 
-        $datawarek1 = $this->db->get_where('db_employees.employees',
-        array('PositionMain' => '2.2','StatusEmployeeID'=>'1' ))
+        $datawarek1 = $this->db->get_where('db_employees.employees em',
+        "(em.PositionMain = '2.2' OR em.PositionOther1 = '2.2' OR em.PositionOther2 = '2.2' OR em.PositionOther3 = '2.2') AND  em.StatusEmployeeID = '1'")
+        //array('PositionMain' => '2.2','StatusEmployeeID'=>'1' ))
         ->result_array();
         //print_r($dataSmt); exit;
 
@@ -4237,12 +4246,12 @@ class C_save_to_pdf extends CI_Controller {
 
         if ($Student['Faculty'][0]=='T')
         {
-            $pdf->SetX(103);
+            $pdf->SetX(117);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');
         }else{
-            $pdf->SetX(102);
+            $pdf->SetX(118);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
             $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');
@@ -4470,7 +4479,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Arial','BU',$fn_b);
 
 
-        $warek1 = $datawarek1[0]['TitleAhead'].' '.$datawarek1[0]['Name'].' '.$datawarek1[0]['TitleBehind'];
+        $warek1 = $datawarek1[0]['TitleAhead'].' '.$datawarek1[0]['Name'].', '.$datawarek1[0]['TitleBehind'];
         $pdf->Cell($fillFull,$h,$warek1,$border,1,'L');
         //================ hormat kami ========================
         //================ Tanda tangan =======================
@@ -6273,7 +6282,8 @@ Phone: (021) 29200456';
 
 
             // Get PHR -> 2.2
-            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 1))->result_array();
+            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees em',
+        "(em.PositionMain = '2.2' OR em.PositionOther1 = '2.2' OR em.PositionOther2 = '2.2' OR em.PositionOther3 = '2.2') AND  em.StatusEmployeeID = '1'")->result_array();
 
             $NamePHR_a = (count($dataPHR)>0) ? trim($dataPHR[0]['TitleAhead']).' ' : '';
             $NamePHR_b = (count($dataPHR)>0) ? ' '.trim($dataPHR[0]['TitleBehind']) : '';

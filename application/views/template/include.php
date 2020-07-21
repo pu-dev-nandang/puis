@@ -418,16 +418,30 @@
 
 
     $.fn.extend({
-        animateCss: function (animationName, callback) {
-            var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+        animateCss: function(animationName, callback) {
+            var animationEnd = (function(el) {
+                var animations = {
+                    animation: 'animationend',
+                    OAnimation: 'oAnimationEnd',
+                    MozAnimation: 'mozAnimationEnd',
+                    WebkitAnimation: 'webkitAnimationEnd',
+                };
+
+                for (var t in animations) {
+                    if (el.style[t] !== undefined) {
+                        return animations[t];
+                    }
+                }
+            })(document.createElement('div'));
+
             this.addClass('animated ' + animationName).one(animationEnd, function() {
                 $(this).removeClass('animated ' + animationName);
-                if (callback) {
-                    callback();
-                }
+
+                if (typeof callback === 'function') callback();
             });
+
             return this;
-        }
+        },
     });
 
     function loadCoutDown(element,EndSessions,Refreshpage){
@@ -2732,6 +2746,53 @@
            })
         })
     }
+
+    function AjaxSubmitFormPromisesNoToken(url='',data={},ArrUploadFilesSelector=[],Apikey='',requestHeader={}){
+        return new Promise((resolve, reject) => {
+           var form_data = new FormData();
+           for (key in data) {
+             form_data.append(key,data[key]);
+           }
+          
+           if (ArrUploadFilesSelector.length>0) {
+              for (var i = 0; i < ArrUploadFilesSelector.length; i++) {
+                  var NameField = ArrUploadFilesSelector[i].NameField+'[]';
+                  var Selector = ArrUploadFilesSelector[i].Selector;
+                  var UploadFile = Selector[0].files;
+                  for(var count = 0; count<UploadFile.length; count++)
+                  {
+                   form_data.append(NameField, UploadFile[count]);
+                  }
+              }
+           }
+          
+           $.ajax({
+             type:"POST",
+             // url:url+'?apikey='+Apikey,
+             url:(Apikey!='') ? url+'?apikey='+Apikey : url,
+             data: form_data,
+             contentType: false,       // The content type used when sending data to the server.
+             cache: false,             // To unable request pages to be cached
+             processData:false,
+             dataType: "json",
+             beforeSend: function (xhr)
+             {
+                for (key in requestHeader){
+                   xhr.setRequestHeader(key,requestHeader[key]);
+                }
+               
+             },
+             success:function(data)
+             {
+              resolve(data);
+             },  
+             error: function (data) {
+               reject();
+             }
+           })
+        })
+    }
+
 
     function timeout(ms){ // promises
         return new Promise(resolve => setTimeout(resolve, ms));

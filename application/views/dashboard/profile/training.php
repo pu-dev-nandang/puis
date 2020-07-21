@@ -182,8 +182,10 @@
                             }
 
                             if(k == "certificate"){
-                                if(v != ""){
-                                    $cloneRow.find(".train-certificate").html('<a href="'+base_url_js_server_ws+'uploads/profile/training/'+v+'"  target="_blank" class="btn btn-xs btn-primary" ><i class="fa fa-paperclip"></i> View file</a>');
+                                if(v == "" || v == null || $.trim(v).length == 0){
+                                    $cloneRow.find(".train-certificate").empty();
+                                }else{
+                                    $cloneRow.find(".train-certificate").html('<a href="'+base_url_js +'uploads/profile/training/'+v+'"  target="_blank" class="btn btn-xs btn-primary" ><i class="fa fa-paperclip"></i> View file</a>');
                                 }
                             }
 

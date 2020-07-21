@@ -1,10 +1,10 @@
 <div id="stock-good">
 	<div class="row">
 		<div class="col-sm-12">
-			<p><a class="btn btn-warning" href="<?=base_url('prodi/stock-good')?>"> <i class="fa fa-chevron-left"></i> Back to list</a></p>
+			<p><a class="btn btn-warning" href="<?=base_url('stock-good')?>"> <i class="fa fa-chevron-left"></i> Back to list</a></p>
 		</div>
 		<div class="col-sm-12">
-			<form action="<?=base_url('prodi/save-stock-good')?>" method="post" autocomplete="off" id="form-stock-good">
+			<form action="<?=base_url('stock-good/save-changes')?>" method="post" autocomplete="off" id="form-stock-good">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h4 class="panel-title"><i class="fa fa-edit"></i> Form Stock Good</h4>

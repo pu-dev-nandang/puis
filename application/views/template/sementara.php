@@ -24,21 +24,38 @@
 <div class="container" style="margin-top: 30px;">
     <div class="row">
         <div class="col-md-12">
-            <table class="table table-striped">
+            <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th style="width: 1%;">No</th>
-                    <th>Api</th>
+                    <th>NIM</th>
+                    <th>Name</th>
+                    <th>Prodi</th>
+                    <th>Total SKS Ganjil</th>
+                    <th>IPK Ganjil</th>
+
+                    <th>Total SKS Genap</th>
+                    <th>IPK Genap</th>
                 </tr>
                 </thead>
-                <tbody>
-                <?php $no=0; for ($i=0;$i<count($listApi);$i++){
-                    ?>
+                <?php for ($i=0;$i<count($datasc);$i++){ $d = $datasc[$i]; ?>
+
                     <tr>
                         <td><?= $i+1; ?></td>
-                        <td><a href="<?= $listApi[$i]; ?>" target="_blank"><?= $listApi[$i]; ?></a></td>
+                        <td><?= $d['NPM']; ?></td>
+                        <td><?= $d['Name']; ?></td>
+                        <td><?= $d['Prodi']; ?></td>
+
+                        <td><?= $d['Lalu_TotalSKS']; ?></td>
+                        <td><?= $d['Lalu_IPK_Pembulatan']; ?></td>
+
+                        <td><?= $d['TotalSKS']; ?></td>
+                        <td><?= $d['IPK_Pembulatan']; ?></td>
+
                     </tr>
-                <?php  } ?>
+
+                <?php } ?>
+                <tbody>
                 </tbody>
             </table>
         </div>
