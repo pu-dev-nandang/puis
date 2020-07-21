@@ -461,6 +461,8 @@ class C_upload extends CI_Controller {
 
         if(isset($_FILES["image"]["name"])){
 
+            $SummernoteID = $this->input->get('id');
+
             $this->load->library('upload');
 
             $unixTime = strtotime($this->m_rest->getDateTimeNow());
@@ -468,7 +470,7 @@ class C_upload extends CI_Controller {
 
             $pathFolderUrl = 'uploads/summernote/images/';
             $pathFolder = './'.$pathFolderUrl;
-            $unix_name = $unixTime.'.'.$ext[1];
+            $unix_name = $SummernoteID.'_'.$unixTime.'.'.$ext[1];
 
             $config['upload_path'] = $pathFolder;
             $config['allowed_types'] = 'jpg|jpeg|png|gif';
@@ -494,7 +496,6 @@ class C_upload extends CI_Controller {
                 $this->image_lib->resize();
 
                 // Update data temporary summernote
-                $SummernoteID = $this->input->get('id');
                 $this->db->insert('db_it.summernote_image',
                                         array('Image'=>$data['file_name'],
                                             'SummernoteID' => $SummernoteID));
