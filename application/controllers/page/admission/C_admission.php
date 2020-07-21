@@ -1577,7 +1577,7 @@ class C_admission extends Admission_Controler {
                       $ff = explode('.', $G_FileName);
                       $Photo = $NPM.'.'.$ff[1];
                       if (file_exists($this->path_upload_regOnline.$Email.'/'.$explode[0])) {
-                        if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id') {
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
                          $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
                          $path = 'students/'.$ta;
                          $FileName = $Photo;
@@ -1599,7 +1599,7 @@ class C_admission extends Admission_Controler {
 
                      if (file_exists($this->path_upload_regOnline.$Email.'/'.$explode[$ee])) {
 
-                       if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id') {
+                       if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
                         $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
                         $path = 'document/'.$NPM;
                         $FileName = $explode[$ee];
@@ -1621,7 +1621,7 @@ class C_admission extends Admission_Controler {
                   {
                     if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
                       
-                      if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id') {
+                      if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
                        $path = 'document/'.$NPM;
                        $FileName = $getDoc[$z]['Attachment'];
