@@ -40,8 +40,20 @@ class C_cooperation extends Cooperation_Controler {
             case 'add':
                 // Save data kerjasama
                 $kerjasama = json_decode(json_encode($Input['kerjasama']),true);
-                $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'BuktiUpload',$path = './uploads/cooperation');
-                $Upload = json_encode($Upload);
+                if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                    $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                    $path = 'cooperation';
+                    $FileName = uniqid();
+                    $TheFile = 'BuktiUpload';
+                    $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$FileName,$TheFile,$path,'array');
+                    $Upload = json_encode($uploadNas);
+                }
+                else
+                {
+                    $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'BuktiUpload',$path = './uploads/cooperation');
+                    $Upload = json_encode($Upload);
+                }
+                
                 $kerjasama['BuktiUpload'] = $Upload;
                 $kerjasama['UpdatedBy'] = $this->session->userdata('NIP');
                 $kerjasama['UpdatedAt'] = date('Y-m-d H:i:s');
@@ -60,8 +72,19 @@ class C_cooperation extends Cooperation_Controler {
                         if ($ex[1] == $Perjanjian[$j]) {
 
                             // upload file
-                            $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),$PostName,$path = './uploads/cooperation');
-                            $Upload = json_encode($Upload); 
+                            if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                                $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                                $path = 'cooperation';
+                                $FileName = uniqid();
+                                $TheFile = $PostName;
+                                $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$FileName,$TheFile,$path,'array');
+                                $Upload = json_encode($uploadNas);
+                            }
+                            else
+                            {
+                                $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),$PostName,$path = './uploads/cooperation');
+                                $Upload = json_encode($Upload);
+                            }
 
                             $k_perjanjian[] = array(
                                 'KerjasamaID' => $ID,
@@ -96,11 +119,32 @@ class C_cooperation extends Cooperation_Controler {
                         $arr_file = (array) json_decode($G_kerjasama[0]['BuktiUpload'],true);
                         $filePath = 'cooperation\\'.$arr_file[0]; // pasti ada file karena required
                         $path = FCPATH.'uploads\\'.$filePath;
-                        unlink($path);
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                            $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/cooperation/".$arr_file[0] : "pcam/cooperation/".$arr_file[0];
+                            $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
+                        }
+                        else
+                        {
+                            unlink($path);
+                        }
+                        
                     }
 
-                    $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'BuktiUpload',$path = './uploads/cooperation');
-                    $Upload = json_encode($Upload);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                         $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                         $path = 'cooperation';
+                         $FileName = uniqid();
+                         $TheFile = 'BuktiUpload';
+                         $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$FileName,$TheFile,$path,'array');
+                         $Upload = json_encode($uploadNas);
+                    }
+                    else
+                    {
+                        $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'BuktiUpload',$path = './uploads/cooperation');
+                        $Upload = json_encode($Upload);
+                    }
+                    
                     $kerjasama['BuktiUpload'] = $Upload;
                 }
 
@@ -137,11 +181,33 @@ class C_cooperation extends Cooperation_Controler {
                                             $arr_file = (array) json_decode($FileDt,true);
                                             $filePath = 'cooperation\\'.$arr_file[0]; // pasti ada file karena required
                                             $path = FCPATH.'uploads\\'.$filePath;
-                                            unlink($path);
+                                            if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                                                $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                                                $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/cooperation/".$arr_file[0] : "pcam/cooperation/".$arr_file[0];
+                                                $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
+                                            }
+                                            else
+                                            {
+                                                unlink($path);
+                                            }
+                                            
                                         }
 
-                                        $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),$PostName,$path = './uploads/cooperation');
-                                        $Upload = json_encode($Upload);
+                                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                                            $path = 'cooperation';
+                                            $FileName = uniqid();
+                                            $TheFile = $PostName;
+                                            $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$FileName,$TheFile,$path,'array');
+                                            $Upload = json_encode($uploadNas);
+
+                                        }
+                                        else
+                                        {
+                                            $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),$PostName,$path = './uploads/cooperation');
+                                            $Upload = json_encode($Upload);
+                                        }
+
                                         $dataSave['Upload'] = $Upload;
 
                                         $this->db->where('ID',$ID_Perjanjian);
@@ -157,8 +223,21 @@ class C_cooperation extends Cooperation_Controler {
                                 // upload file
                                 $Upload = json_encode('');
                                 if (array_key_exists($PostName, $_FILES)) {
-                                    $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),$PostName,$path = './uploads/cooperation');
-                                    $Upload = json_encode($Upload);
+                                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                                        $path = 'cooperation';
+                                        $FileName = uniqid();
+                                        $TheFile = $PostName;
+                                        $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$FileName,$TheFile,$path,'array');
+                                        $Upload = json_encode($uploadNas);
+
+                                    }
+                                    else
+                                    {
+                                        $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),$PostName,$path = './uploads/cooperation');
+                                        $Upload = json_encode($Upload);
+                                    }
+                                    
                                 }    
                                 $dataSave = array(
                                     'KerjasamaID' => $ID,
@@ -186,7 +265,16 @@ class C_cooperation extends Cooperation_Controler {
                                     $arr_file = (array) json_decode($FileDt,true);
                                     $filePath = 'cooperation\\'.$arr_file[0]; // pasti ada file karena required
                                     $path = FCPATH.'uploads\\'.$filePath;
-                                    unlink($path);
+                                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                                        $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/cooperation/".$arr_file[0] : "pcam/cooperation/".$arr_file[0];
+                                        $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
+                                    }
+                                    else
+                                    {
+                                       unlink($path);
+                                    }
+                                    
                                 }
 
                                 $this->db->where('ID',$ID_Perjanjian);
@@ -224,7 +312,16 @@ class C_cooperation extends Cooperation_Controler {
                     $arr_file = (array) json_decode($G_kerjasama[0]['BuktiUpload'],true);
                     $filePath = 'cooperation\\'.$arr_file[0]; // pasti ada file karena required
                     $path = FCPATH.'uploads\\'.$filePath;
-                    unlink($path);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/cooperation/".$arr_file[0] : "pcam/cooperation/".$arr_file[0];
+                        $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
+                    }
+                    else
+                    {
+                        unlink($path);
+                    }
+                    
                 }
 
                 $this->db->where('ID',$ID);
@@ -238,7 +335,15 @@ class C_cooperation extends Cooperation_Controler {
                         $arr_file = (array) json_decode($FileDt,true);
                         $filePath = 'cooperation\\'.$arr_file[0]; // pasti ada file karena required
                         $path = FCPATH.'uploads\\'.$filePath;
-                        unlink($path);
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                            $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/cooperation/".$arr_file[0] : "pcam/cooperation/".$arr_file[0];
+                            $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
+                        }
+                        else
+                        {
+                             unlink($path);
+                        }
                     }
 
                     $this->db->where('ID',$ID_Perjanjian);
@@ -275,8 +380,20 @@ class C_cooperation extends Cooperation_Controler {
                 // Save data kerjasama
                 $kegiatan = json_decode(json_encode($Input['kegiatan']),true);
                 if (array_key_exists('FileLain', $_FILES)) {
-                    $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'FileLain',$path = './uploads/cooperation');
-                    $Upload = json_encode($Upload);
+                    if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path = 'cooperation';
+                        $FileName = uniqid();
+                        $TheFile = 'FileLain';
+                        $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$FileName,$TheFile,$path,'array');
+                        $Upload = json_encode($uploadNas);
+                    }
+                    else
+                    {
+                        $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'FileLain',$path = './uploads/cooperation');
+                        $Upload = json_encode($Upload);
+                    }
+                   
                     $kegiatan['FileLain'] = $Upload;
                 }
                 
@@ -306,14 +423,28 @@ class C_cooperation extends Cooperation_Controler {
                 if (array_key_exists('FileLain', $_FILES)) {
                     if ($G_kegiatan[0]['FileLain'] != '' && $G_kegiatan[0]['FileLain'] != null) {
                         $arr_file = (array) json_decode($G_kegiatan[0]['FileLain'],true);
-                        $filePath = 'cooperation\\'.$arr_file[0]; // pasti ada file karena required
-                        $path = FCPATH.'uploads\\'.$filePath;
-                        if (file_exists($path)) {
-                            unlink($path);
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                             $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                             $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/cooperation/".$arr_file[0] : "pcam/cooperation/".$arr_file[0];
+                             $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
+                             $path = 'cooperation';
+                             $FileName = uniqid();
+                             $TheFile = 'FileLain';
+                             $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$FileName,$TheFile,$path,'array');
+                             $Upload = json_encode($uploadNas);
                         }
+                        else
+                        {
+                            $filePath = 'cooperation\\'.$arr_file[0]; // pasti ada file karena required
+                            $path = FCPATH.'uploads\\'.$filePath;
+                            if (file_exists($path)) {
+                                unlink($path);
+                            }
 
-                        $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'FileLain',$path = './uploads/cooperation');
-                        $Upload = json_encode($Upload);
+                            $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'FileLain',$path = './uploads/cooperation');
+                            $Upload = json_encode($Upload);
+                        }
+                        
                         $kegiatan['FileLain'] = $Upload;
                     }
                 }
@@ -347,10 +478,19 @@ class C_cooperation extends Cooperation_Controler {
                     $arr_file = (array) json_decode($G_kegiatan[0]['FileLain'],true);
                     $filePath = 'cooperation\\'.$arr_file[0]; // pasti ada file karena required
                     $path = FCPATH.'uploads\\'.$filePath;
-                    if (file_exists($path)) {
-                        // print_r('file exist');
-                        unlink($path);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/cooperation/".$arr_file[0] : "pcam/cooperation/".$arr_file[0];
+                        $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
                     }
+                    else
+                    {
+                        if (file_exists($path)) {
+                            // print_r('file exist');
+                            unlink($path);
+                        }
+                    }
+                    
                 }
                 // kerjasama
                 $this->db->where('ID',$ID);
