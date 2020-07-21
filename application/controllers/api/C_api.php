@@ -10191,10 +10191,16 @@ class C_api extends CI_Controller {
             $no = $reqdata['start'] + 1;
             if($result){
                 foreach ($result as $v) {
-                    $url_image = 'uploads/students/ta_'.$v->ClassOf.'/'.$v->Photo;
+                    // $url_image = 'uploads/students/ta_'.$v->ClassOf.'/'.$v->Photo;
+                    // $srcImg =  base_url('images/icon/userfalse.png');
+                    // if($v->Photo != '' || $v->Photo != null || !empty($v->Photo)){
+                    //     $srcImg = (file_exists($url_image)) ? base_url($url_image) : base_url('images/icon/userfalse.png') ;
+                    // }
+
+                    $url_image = base_url().'uploads/students/ta_'.$v->ClassOf.'/'.$v->Photo;
                     $srcImg =  base_url('images/icon/userfalse.png');
-                    if($v->Photo != '' || $v->Photo != null || !empty($v->Photo)){
-                        $srcImg = (file_exists($url_image)) ? base_url($url_image) : base_url('images/icon/userfalse.png') ;
+                    if ($this->m_master->is_url_exist($url_image)) {
+                         $srcImg = $url_image;
                     }
 
                     $dataToken = array(
