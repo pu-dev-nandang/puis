@@ -60,26 +60,58 @@ class C_akademik extends Academic_Controler {
         $config['max_size']             = 8000; // 8 mb
         $config['file_name']            = $fileName;
 
+        // upload to nas
+        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+             if (array_key_exists('userfile', $_FILES)) {
+                $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                $path = 'students/'.$folder;
+                $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$fileName,'userfile',$path,'string');
+                $fileName = $uploadNas;
 
-        $this->load->library('upload', $config);
-        if ( ! $this->upload->do_upload('userfile')){
-            $error = array('error' => $this->upload->display_errors());
-            return print_r(json_encode($error));
+                // Update Db
+                $dataNPM = trim(explode('.',$fileName)[0]);
+
+                $this->db->set('Photo', $fileName);
+                $this->db->where('NPM', $dataNPM);
+                $this->db->update($folder.'.students');
+
+                 $success = array('success' => 
+                                        ['file_name' =>  $fileName]
+                                );
+                $success['success']['formGrade'] = 0;
+
+                return print_r(json_encode($success));
+
+             }
+             else
+             {
+                 $error = array('error' =>'File not selected');
+                 return print_r(json_encode($error));
+             }
         }
-        else {
+        else
+        {
+            $this->load->library('upload', $config);
+            if ( ! $this->upload->do_upload('userfile')){
+                $error = array('error' => $this->upload->display_errors());
+                return print_r(json_encode($error));
+            }
+            else {
 
-            // Update Db
-            $dataNPM = trim(explode('.',$fileName)[0]);
+                // Update Db
+                $dataNPM = trim(explode('.',$fileName)[0]);
 
-            $this->db->set('Photo', $fileName);
-            $this->db->where('NPM', $dataNPM);
-            $this->db->update($folder.'.students');
+                $this->db->set('Photo', $fileName);
+                $this->db->where('NPM', $dataNPM);
+                $this->db->update($folder.'.students');
 
-            $success = array('success' => $this->upload->data());
-            $success['success']['formGrade'] = 0;
+                $success = array('success' => $this->upload->data());
+                $success['success']['formGrade'] = 0;
 
-            return print_r(json_encode($success));
+                return print_r(json_encode($success));
+            }
         }
+        
     }
 
 }

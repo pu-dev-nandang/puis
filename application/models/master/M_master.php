@@ -4255,5 +4255,44 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $output; // return array and encode to insert to db
     }
 
+    public function MoveFileInNasServer($headerOrigin,$Path1,$Path2){
+        /*
+            Path1 = src
+            Path2 = dst
+        */
+        $rs = array();
+        $header[] = "Content-type: multipart/form-data";
+        $header[] = "Origin: ".$headerOrigin."";
+        $header[] = "Cache-Control: max-age=0";
+        $header[] = "Connection: keep-alive";
+        $header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+        $data = array(
+            'auth' => 's3Cr3T-G4N',
+            'Path1' => $Path1,
+            'Path2' => $Path2,
+        );
+
+        $url = url_files.'__MoveFile?apikey='.$this->passApiKey;
+        $token = $this->jwt->encode($data,"UAP)(*");
+        $Input = $token;
+        $ch = curl_init();
+        $new_post_array  = ['token' => $Input];
+        $post = $new_post_array;
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $pr = curl_exec($ch);
+        // print_r($pr);die();
+        $rs = (array) json_decode($pr,true);
+        curl_close ($ch);
+        return $rs;
+    }
+
 
 }
