@@ -659,6 +659,7 @@ class C_database extends Globalclass {
         $data = $this->input->post();
         $myName = $this->session->userdata('Name');
         $myNIP = $this->session->userdata('NIP');
+        $GetData = $this->m_master->caribasedprimary('db_academic.tmp_students','NPM',$data['NPM']);
         if($data){
             $conditions = array("NPM"=>$data['NPM']);
             $isExist = $this->General_model->fetchData("db_academic.auth_students",$conditions)->row();
@@ -709,7 +710,24 @@ class C_database extends Globalclass {
                     }
                     
                     $moveimage = move_uploaded_file($file_tmp,$pathFile."//".$newFilename);
-                    if($moveimage) {$data['Card'] = $newFilename;}
+                    if($moveimage) {
+                        $data['Card'] = $newFilename;
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : "http://pcam.podomorouniversity.ac.id";
+                            $path = 'students/insurance_card';
+
+                            if (count($GetData) > 0) {
+                                $pathDelete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/".$path."/".$GetData[0]['Card']: "pcam/".$path."/".$GetData[0]['Card'];
+                                $this->m_master->DeleteFileToNas($headerOrigin,$pathDelete);
+                            }
+
+                            $FileName = $newFilename;
+                            $TheFile = $pathFile.'/'.$newFilename;
+                            $uploadNas = $this->m_master->UploadPathOneFilesToNas($headerOrigin,$FileName,$TheFile,$path,'string');
+                            unlink($TheFile);
+                            $data['Card'] = $uploadNas;
+                        }
+                    }
                     $message .= ((!$moveimage) ? "<b>Failed upload image.</b> ":"");
                 }
 
