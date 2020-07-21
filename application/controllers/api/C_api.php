@@ -10200,7 +10200,7 @@ class C_api extends CI_Controller {
                     $url_image = base_url().'uploads/students/ta_'.$v->ClassOf.'/'.$v->Photo;
                     $srcImg =  base_url('images/icon/userfalse.png');
                     if ($this->m_master->is_url_exist($url_image)) {
-                         $srcImg = (file_exists($url_image)) ? base_url($url_image) : base_url('images/icon/userfalse.png') ;
+                         $srcImg = $url_image;
                     }
 
                     $dataToken = array(
