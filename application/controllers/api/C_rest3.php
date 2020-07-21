@@ -2284,14 +2284,14 @@ class C_rest3 extends CI_Controller {
         
     }
 
-
+   
     public function Config_Jabatan_SKS() {
       $dataToken = $this->data['dataToken'];
       $mode = $dataToken['mode'];
       if ($mode=='showDataDosen') {
         $sql = 'select a.NIP,a.Name,a.PositionMain,a.PositionOther1,a.PositionOther2,a.PositionOther3 from db_employees.employees as a
             where ( 
-                      StatusEmployeeID = 1
+                      StatusEmployeeID != -1
                     ) ';
         $query=$this->db->query($sql, array())->result_array();
         echo json_encode($query);

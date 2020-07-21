@@ -4255,6 +4255,31 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $output; // return array and encode to insert to db
     }
 
+
+    public function getSessionDepartmentPU() {
+         $rs = NULL;
+         $dpt = $this->session->userdata('IDdepartementNavigation');
+         $CodeDepartment = '';
+         if ($dpt == 15) { // prodi
+              $CodeDepartment = 'AC.';
+              $rs = $CodeDepartment.$this->session->userdata('prodi_active_id');
+
+         }
+         elseif ($dpt == 34) { // Faculty
+             $CodeDepartment = 'FT.';
+             $rs = $CodeDepartment.$this->session->userdata('faculty_active_id');
+
+         }
+         else
+         {
+            $CodeDepartment = 'NA.';
+            $rs = $CodeDepartment.$dpt;
+         }
+
+         return $rs;
+
+    }
+
     public function MoveFileInNasServer($headerOrigin,$Path1,$Path2){
         /*
             Path1 = src

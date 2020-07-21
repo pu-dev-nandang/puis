@@ -195,7 +195,7 @@ $('#saveFormKB').click(function () {
       });
 
   $(document).on('change','#Division', function () {
-    console.log('asdsad');
+    //console.log('asdsad');
      var url = base_url_js+"kb";
      var data = {
       Division : $(this).find('option:selected').val(),
