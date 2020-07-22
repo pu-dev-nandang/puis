@@ -1028,6 +1028,9 @@ class C_api4 extends CI_Controller {
 
                             $this->m_master->DeleteFileToNas($headerOrigin,$path.'/'.$dataSummernoteImg[$s]['Image']);
 
+                            $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
+                            $this->db->delete('db_it.summernote_image');
+
                         } else {
                             $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
                             if(file_exists($file_path)){
