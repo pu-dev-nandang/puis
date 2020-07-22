@@ -3992,11 +3992,26 @@ class C_api extends CI_Controller {
                     );
                 } else {
 
-                    $uploadFile = $this->uploadFfile(mt_rand());
-                    $filename = '';
-                    if (is_array($uploadFile)) {
-                        $filename = $uploadFile['file_name'];
+                    $filename = NULL;
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        if (array_key_exists('fileData', $_FILES)) {
+                            // Upload file to NAS
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                            $path = 'vreservation';
+                            $FileName = md5(mt_rand());
+                            $TheFile = 'fileData';
+                            $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$FileName,$TheFile,$path,'string');
+                            $filename = $uploadNas;
+                        }
                     }
+                    else{
+
+                        $uploadFile = $this->uploadFfile(mt_rand());
+                        if (is_array($uploadFile)) {
+                            $filename = $uploadFile['file_name'];
+                        }
+                    }    
+                   
                     $file = array('Layout' => $filename);
                     $formData = $formData + $file;
                     $this->db->insert('db_academic.classroom',$formData);
@@ -4010,16 +4025,43 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action'] == 'edit'){
                 $formData = (array) $data_arr['formData'];
+                $ID = $data_arr['ID'];
+                // get data
+                $G_data = $this->m_master->caribasedprimary('db_academic.classroom','ID',$ID);
+                $filename = NULL;
+                if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                    if (array_key_exists('fileData', $_FILES)) {
+                        // delete data
+                        $TheFileSelected = $G_data[0]['Layout'];
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/vreservation/".$TheFileSelected : "pcam/vreservation/".$TheFileSelected;
+                        $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
 
-                $uploadFile = $this->uploadFfile(mt_rand());
-                $filename = '';
-                if (is_array($uploadFile)) {
-                    $filename = $uploadFile['file_name'];
+                        // Upload file to NAS
+                        $path = 'vreservation';
+                        $FileName = md5(mt_rand());
+                        $TheFile = 'fileData';
+                        $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$FileName,$TheFile,$path,'string');
+                        $filename = $uploadNas;
+                    }
                 }
+                else
+                {
+                    $path = FCPATH.'uploads/vreservation/'.$G_data[0]['Layout'];
+                    if (file_exists($path)) {
+                         unlink($path);
+                    } 
+                    
+                    $uploadFile = $this->uploadFfile(mt_rand());
+                    $filename = '';
+                    if (is_array($uploadFile)) {
+                        $filename = $uploadFile['file_name'];
+                    }
+                }
+               
                 $file = array('Layout' => $filename);
                 $formData = $formData + $file;
 
-                $ID = $data_arr['ID'];
                 $this->db->where('ID', $ID);
                 $this->db->update('db_academic.classroom',$formData);
                 $result = array(
@@ -4031,6 +4073,24 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action'] == 'delete'){
                 $ID = $data_arr['ID'];
+                $G_data = $this->m_master->caribasedprimary('db_academic.classroom','ID',$ID);
+
+                // delete file too
+                if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                    // delete data
+                    $TheFileSelected = $G_data[0]['Layout'];
+                    $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                    $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/vreservation/".$TheFileSelected : "pcam/vreservation/".$TheFileSelected;
+                    $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
+                }
+                else
+                {
+                    $path = FCPATH.'uploads/vreservation/'.$G_data[0]['Layout'];
+                    if (file_exists($path)) {
+                         unlink($path);
+                    }                     
+                }
+
                 $this->db->where('ID', $ID);
                 $this->db->delete('db_academic.classroom');
                 return print_r($ID);

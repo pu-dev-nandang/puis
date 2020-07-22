@@ -80,11 +80,24 @@ class C_transaksi extends Vreservation_Controler {
     public function add_save_transaksi()
     {
         $input = $this->getInputToken();
-        $uploadFile = $this->uploadFfile(mt_rand());
         $filename = '';
-        if (is_array($uploadFile)) {
-            $filename = $uploadFile['file_name'];
+        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+            if (array_key_exists('fileData', $_FILES)) {
+                $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                $path = 'vreservation';
+                $fileName = md5(mt_rand());
+                $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$fileName,'fileData',$path,'string');
+                $filename = $uploadNas;
+            }
         }
+        else
+        {
+           $uploadFile = $this->uploadFfile(mt_rand());
+           if (is_array($uploadFile)) {
+               $filename = $uploadFile['file_name'];
+           } 
+        }
+       
         
         $filenamemarkomm = ''; 
         if (array_key_exists('fileDataMarkomm',$_FILES)) {

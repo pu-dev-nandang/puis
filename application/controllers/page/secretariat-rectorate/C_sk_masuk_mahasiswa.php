@@ -42,9 +42,22 @@ class C_sk_masuk_mahasiswa extends Globalclass {
             $dataSave = [];
             if (array_key_exists('FileUpload', $_FILES)) {
                 // do upload file
-                $FileUpload = $this->m_master->uploadDokumenMultiple(uniqid(),'FileUpload',$path = './uploads/rektorat');
-                $FileUpload = json_encode($FileUpload); 
-                $dataSave['FileUpload'] = $FileUpload; 
+                if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                     $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                     $path = 'rektorat';
+                     $FileName = uniqid();
+                     $TheFile = 'FileUpload';
+                     $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$FileName,$TheFile,$path,'array');
+                     $Upload = json_encode($uploadNas);
+                     $dataSave['FileUpload'] = $Upload; 
+                }
+                else
+                {
+                    $FileUpload = $this->m_master->uploadDokumenMultiple(uniqid(),'FileUpload',$path = './uploads/rektorat');
+                    $FileUpload = json_encode($FileUpload); 
+                    $dataSave['FileUpload'] = $FileUpload; 
+                }
+            
             }
 
             $data = $Input['data'];
@@ -63,9 +76,18 @@ class C_sk_masuk_mahasiswa extends Globalclass {
                 $arr_file = (array) json_decode($G_data_[0]['FileUpload'],true);
                 $filePath = 'rektorat\\'.$arr_file[0]; // pasti ada file karena required
                 $path = FCPATH.'uploads\\'.$filePath;
-                if (file_exists($path)) {
-                    unlink($path);
+                if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                    $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                    $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/rektorat/".$arr_file[0] : "pcam/rektorat/".$arr_file[0];
+                    $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
                 }
+                else
+                {
+                    if (file_exists($path)) {
+                        unlink($path);
+                    }
+                }
+                
             }
             $this->db->where('ID',$ID);
             $this->db->delete('db_rektorat.sk_tgl_msk');
@@ -84,15 +106,37 @@ class C_sk_masuk_mahasiswa extends Globalclass {
                     $arr_file = (array) json_decode($G_data_[0]['FileUpload'],true);
                     $filePath = 'rektorat\\'.$arr_file[0]; // pasti ada file karena required
                     $path = FCPATH.'uploads\\'.$filePath;
-                    if (file_exists($path)) {
-                        unlink($path);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/rektorat/".$arr_file[0] : "pcam/rektorat/".$arr_file[0];
+                        $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
                     }
+                    else
+                    {
+                        if (file_exists($path)) {
+                            unlink($path);
+                        }
+                    }
+                    
                 }
 
                 // do upload file
-                $FileUpload = $this->m_master->uploadDokumenMultiple(uniqid(),'FileUpload',$path = './uploads/rektorat');
-                $FileUpload = json_encode($FileUpload); 
-                $dataSave['FileUpload'] = $FileUpload; 
+                if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                    $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                    $path = 'rektorat';
+                    $FileName = uniqid();
+                    $TheFile = "FileUpload";
+                    $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$FileName,$TheFile,$path,'array');
+                    $Upload = json_encode($uploadNas);
+                    $dataSave['FileUpload'] = $Upload; 
+                }
+                else
+                {
+                    $FileUpload = $this->m_master->uploadDokumenMultiple(uniqid(),'FileUpload',$path = './uploads/rektorat');
+                    $FileUpload = json_encode($FileUpload); 
+                    $dataSave['FileUpload'] = $FileUpload; 
+                }
+                
             }
 
             $dataSave = $dataSave + $data;
