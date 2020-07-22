@@ -156,24 +156,40 @@ class C_upload extends CI_Controller {
         if($f==1 || $f=='1'){
 
             $unix_name = $this->input->post('formNameFile');
-            $config['upload_path']          = './uploads/task/';
-            $config['allowed_types']        = 'pdf';
-            $config['max_size']             = 8000;
-//        $config['max_width']            = 1024;
-//        $config['max_height']           = 768;
-            $config['file_name'] = $unix_name;
-            $this->load->library('upload', $config);
-            if ( ! $this->upload->do_upload('userfile'))
-            {
-                $error = array('error' => $this->upload->display_errors());
-                $lanjut = false;
-                return print_r(json_encode($error));
+            if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                if (array_key_exists('userfile', $_FILES)) {
+                    $path = 'task';
+                    $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$unix_name,'userfile',$path,'string');
+                    $file_name = $uploadNas;
+                }
+                else
+                {
+                    $error = array('error' =>'File not selected');
+                    $lanjut = false;
+                    return print_r(json_encode($error));
+                }
             }
-            else
-            {
-                $success = array('success' => $this->upload->data());
-                $file_name = $success['success']['file_name'];
-            }
+            else{
+                $config['upload_path']          = './uploads/task/';
+                $config['allowed_types']        = 'pdf';
+                $config['max_size']             = 8000;
+    //        $config['max_width']            = 1024;
+    //        $config['max_height']           = 768;
+                $config['file_name'] = $unix_name;
+                $this->load->library('upload', $config);
+                if ( ! $this->upload->do_upload('userfile'))
+                {
+                    $error = array('error' => $this->upload->display_errors());
+                    $lanjut = false;
+                    return print_r(json_encode($error));
+                }
+                else
+                {
+                    $success = array('success' => $this->upload->data());
+                    $file_name = $success['success']['file_name'];
+                }
+            } 
 
         }
 
@@ -306,25 +322,41 @@ class C_upload extends CI_Controller {
         if($f==1 || $f=='1'){
 
             $unix_name = $this->input->post('formNameFile');
-            $config['upload_path']          = './uploads/task/';
-            $config['allowed_types']        = 'pdf';
-            $config['max_size']             = 8000;
-//        $config['max_width']            = 1024;
-//        $config['max_height']           = 768;
-            $config['file_name'] = $unix_name;
-            $this->load->library('upload', $config);
-            if ( ! $this->upload->do_upload('userfile'))
-            {
-                $error = array('error' => $this->upload->display_errors());
-                $lanjut = false;
-                return print_r(json_encode($error));
+            if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                 $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                 if (array_key_exists('userfile', $_FILES)) {
+                    $path = 'task';
+                    $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$unix_name,'userfile',$path,'string');
+                    $file_name = $uploadNas;
+                 }
+                 else
+                 {
+                     $error = array('error' =>'File not selected');
+                     $lanjut = false;
+                     return print_r(json_encode($error));
+                 }
             }
             else
             {
-                $success = array('success' => $this->upload->data());
-                $file_name = $success['success']['file_name'];
+               $config['upload_path']          = './uploads/task/';
+               $config['allowed_types']        = 'pdf';
+               $config['max_size']             = 8000;
+   //        $config['max_width']            = 1024;
+   //        $config['max_height']           = 768;
+               $config['file_name'] = $unix_name;
+               $this->load->library('upload', $config);
+               if ( ! $this->upload->do_upload('userfile'))
+               {
+                   $error = array('error' => $this->upload->display_errors());
+                   $lanjut = false;
+                   return print_r(json_encode($error));
+               }
+               else
+               {
+                   $success = array('success' => $this->upload->data());
+                   $file_name = $success['success']['file_name'];
+               } 
             }
-
         }
 
         if($lanjut){
@@ -394,32 +426,49 @@ class C_upload extends CI_Controller {
         $lanjut = true;
         $file_name = '';
         if ($f == 1 || $f == '1') {
-
             $formNameFileOld = $this->input->post('formNameFileOld');
-            $Path = './uploads/task-exam/' . $formNameFileOld;
-
-            if ($formNameFileOld != '' && file_exists($Path)) {
-                unlink($Path);
-            }
-
-
             $unix_name = $this->input->post('formNameFile');
-            $config['upload_path'] = './uploads/task-exam/';
-            $config['allowed_types'] = 'pdf';
-            $config['max_size'] = 8000;
-//        $config['max_width']            = 1024;
-//        $config['max_height']           = 768;
-            $config['file_name'] = $unix_name;
-            $this->load->library('upload', $config);
-            if (!$this->upload->do_upload('userfile')) {
-                $error = array('error' => $this->upload->display_errors());
-                $lanjut = false;
-                return print_r(json_encode($error));
-            } else {
-                $success = array('success' => $this->upload->data());
-                $file_name = $success['success']['file_name'];
+            if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                // delete first
+                $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/task-exam/".$formNameFileOld : "pcam/task-exam/".$formNameFileOld;
+                $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
+                if (array_key_exists('userfile', $_FILES)) {
+                    $path = 'task-exam';
+                    $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$unix_name,'userfile',$path,'string');
+                    $file_name = $uploadNas;
+                }
+                else
+                {
+                    $error = array('error' =>'File not selected');
+                    $lanjut = false;
+                    return print_r(json_encode($error));
+                }
             }
+            else
+            {
+                $Path = './uploads/task-exam/' . $formNameFileOld;
 
+                if ($formNameFileOld != '' && file_exists($Path)) {
+                    unlink($Path);
+                }
+                
+                $config['upload_path'] = './uploads/task-exam/';
+                $config['allowed_types'] = 'pdf';
+                $config['max_size'] = 8000;
+    //        $config['max_width']            = 1024;
+    //        $config['max_height']           = 768;
+                $config['file_name'] = $unix_name;
+                $this->load->library('upload', $config);
+                if (!$this->upload->do_upload('userfile')) {
+                    $error = array('error' => $this->upload->display_errors());
+                    $lanjut = false;
+                    return print_r(json_encode($error));
+                } else {
+                    $success = array('success' => $this->upload->data());
+                    $file_name = $success['success']['file_name'];
+                }
+            }
         }
 
 
@@ -443,8 +492,6 @@ class C_upload extends CI_Controller {
                 'NPM'=> $this->input->post('formNPM')
             ));
             $this->db->update('db_academic.exam_student_online', $data_insert);
-
-
 
             $success['success']['InsertID'] = $this->input->post('formExamID');
             return print_r(json_encode($success));
