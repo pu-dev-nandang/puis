@@ -1,36 +1,56 @@
-
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4 class="panel-title">Input Monthly Report</h4>
-    </div>
-    <div class="panel-body" style="min-height: 100px;">
-        <div class="form-group">
-            <label>Title</label>
-            <input type="text" class="form-control input" name = "Title">
+<?php if (count($auth) > 0): ?>
+  <?php if ($auth[0]['Access'] == 'Write' ): ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">Input Monthly Report</h4>
         </div>
-        <div class="form-group">
-            <label>Description</label>
-            <input type="text" class="form-control input" name = "Desc">
-        </div>
-        <div class="form-group">
-            <label>Date Report</label>
-            <div class="input-group input-append date datetimepicker" id="datetimepicker6">
-                <input data-format="yyyy-MM-dd" class="form-control input" type="text" readonly="" id = "dateFilterReport"  name = "DateReport" value = "<?php echo date('Y-m-d') ?>" >
-                <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+        <div class="panel-body" style="min-height: 100px;">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" class="form-control input" name = "Title">
             </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" class="form-control input" name = "Desc">
+            </div>
+            <div class="form-group">
+                <label>Date Report</label>
+                <div class="input-group input-append date datetimepicker" id="datetimepicker6">
+                    <input data-format="yyyy-MM-dd" class="form-control input" type="text" readonly="" id = "dateFilterReport"  name = "DateReport" value = "<?php echo date('Y-m-d') ?>" >
+                    <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Upload File</label>
+                <input type="file" class="form-control" name = "File" id = "UploadFile">
+                <div class = "fileShow"></div> 
+                <br>File Max 5 MB                                
+            </div>
+            
         </div>
-        <div class="form-group">
-            <label>Upload File</label>
-            <input type="file" class="form-control" name = "File" id = "UploadFile">
-            <div class = "fileShow"></div> 
-            <br>File Max 5 MB                                
+        <div class="panel-footer" style="text-align: right;">
+            <button class="btn btn-success" action= "add" data-id ="" id="btnSave">Save</button>
         </div>
-        
     </div>
-    <div class="panel-footer" style="text-align: right;">
-        <button class="btn btn-success" action= "add" data-id ="" id="btnSave">Save</button>
+  <?php else: ?>
+    <div class="row">
+      <div class="col-md-12">
+        <div style="padding: 10px;text-align: center;">
+          <h4>Unauthorize</h4>
+        </div>
+      </div>
     </div>
-</div>
+  <?php endif ?>
+
+<?php else: ?>
+  <div class="row">
+    <div class="col-md-12">
+      <div style="padding: 10px;text-align: center;">
+        <h4>Unauthorize</h4>
+      </div>
+    </div>
+  </div>
+<?php endif ?>
 <script type="text/javascript">
    var AppForm_Monthly_Report = {
         setDefaultInput : function(){
@@ -150,6 +170,7 @@
     $(document).ready(function() {
         AppForm_Monthly_Report.loaded();
     })
+
 
     $(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
        var selector = $(this);

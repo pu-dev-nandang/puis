@@ -122,16 +122,24 @@
 		    var ID = $(this).attr('data-id');
 		    var Token = $(this).attr('data');
 		    var data = jwt_decode(Token);
-		    for(var key in data) {
-		       	$('.input[name="'+key+'"]').val(data[key]);
-	        }
-	        if (data.FileUpload != null && data.FileUpload != '') {
-             var FileJSon = jQuery.parseJSON(data.FileUpload);
-             if (FileJSon.length > 0) {
-                html = '<li style = "margin-top : 4px;"><a href = "'+base_url_js+'fileGetAny/rektorat-monthlyreport-'+FileJSon[0]+'" target="_blank" class = "Fileexist">File'+'</a>&nbsp<button class="btn-xs btn-default btn-delete btn-default-warning btn-custom btn-delete-file" filepath = "rektorat-monthlyreport-'+FileJSon[0]+'" type="button" idtable = "'+ID+'" table = "db_rektorat.monthly_report" field = "FileUpload" typefield = "1" delimiter = "" fieldwhere = "ID"><i class="fa fa-trash" aria-hidden="true"></i></button></li>';
-                $('.fileShow').html(html);
-             }
-        }
+		    console.log(data);
+		    $('.input').not('div').each(function(e){
+		    	var key = $(this).attr('name');
+		    	if (!$(this).is("select")) {
+		    		$('.input[name="'+key+'"]').val(data[key]);
+		    	}
+		    	else
+		    	{
+		    		$(".input[name='"+key+"'] option").filter(function() {
+		    		   //may want to use $.trim in here
+		    		   return $(this).val() == data[key]; 
+		    		}).prop("selected", true);
+		    	}
+		    })
+		    $(".input[name='"+"NIP"+"']").select2({
+		        //allowClear: true
+		    }); 
+	        
 		    $('#btnSave').attr('action','edit');
 		    $('#btnSave').attr('data-id',ID);
 		})
