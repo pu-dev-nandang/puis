@@ -462,46 +462,64 @@ class C_upload extends CI_Controller {
         if(isset($_FILES["image"]["name"])){
 
             $SummernoteID = $this->input->get('id');
-
-            $this->load->library('upload');
-
             $unixTime = strtotime($this->m_rest->getDateTimeNow());
             $ext = explode('.',$_FILES["image"]["name"]);
-
-            $pathFolderUrl = 'uploads/summernote/images/';
-            $pathFolder = './'.$pathFolderUrl;
             $unix_name = $SummernoteID.'_'.$unixTime.'.'.$ext[1];
 
-            $config['upload_path'] = $pathFolder;
-            $config['allowed_types'] = 'jpg|jpeg|png|gif';
-            $config['file_name'] = $unix_name;
-            $this->upload->initialize($config);
-            if(!$this->upload->do_upload('image')){
-                $this->upload->display_errors();
-                return FALSE;
-            }else{
-
-
-                $data = $this->upload->data();
-                //Compress Image
-                $config['image_library']='gd2';
-                $config['source_image']= $pathFolder.$data['file_name'];
-                $config['create_thumb']= FALSE;
-                $config['maintain_ratio']= TRUE;
-                $config['quality']= '60%';
-                $config['width']= 800;
-                $config['height']= 800;
-                $config['new_image']= $pathFolder.$data['file_name'];
-                $this->load->library('image_lib', $config);
-                $this->image_lib->resize();
+            if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                $path = 'summernote/images';
+                $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$unix_name,'image',$path,'string');
+                $fileName = $uploadNas;
 
                 // Update data temporary summernote
                 $this->db->insert('db_it.summernote_image',
-                                        array('Image'=>$data['file_name'],
-                                            'SummernoteID' => $SummernoteID));
+                    array('Image'=>$fileName,
+                        'SummernoteID' => $SummernoteID));
 
-                echo base_url().$pathFolderUrl.$data['file_name'];
+                echo base_url('uploads/summernote/images/').$fileName;
+
             }
+            else {
+                $this->load->library('upload');
+
+                $pathFolderUrl = 'uploads/summernote/images/';
+                $pathFolder = './'.$pathFolderUrl;
+
+                $config['upload_path'] = $pathFolder;
+                $config['allowed_types'] = 'jpg|jpeg|png|gif';
+                $config['file_name'] = $unix_name;
+                $this->upload->initialize($config);
+                if(!$this->upload->do_upload('image')){
+                    $this->upload->display_errors();
+                    return FALSE;
+                }
+                else{
+
+
+                    $data = $this->upload->data();
+                    //Compress Image
+                    $config['image_library']='gd2';
+                    $config['source_image']= $pathFolder.$data['file_name'];
+                    $config['create_thumb']= FALSE;
+                    $config['maintain_ratio']= TRUE;
+                    $config['quality']= '60%';
+                    $config['width']= 800;
+                    $config['height']= 800;
+                    $config['new_image']= $pathFolder.$data['file_name'];
+                    $this->load->library('image_lib', $config);
+                    $this->image_lib->resize();
+
+                    // Update data temporary summernote
+                    $this->db->insert('db_it.summernote_image',
+                        array('Image'=>$data['file_name'],
+                            'SummernoteID' => $SummernoteID));
+
+                    echo base_url().$pathFolderUrl.$data['file_name'];
+                }
+            }
+
+
         }
     }
 
@@ -514,13 +532,25 @@ class C_upload extends CI_Controller {
         // Get file name
         $file_name = str_replace(base_url('uploads/summernote/images/'), '', $src);
 
-        if(unlink($file_path)){
+        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id'){
+            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+            $path = ($_SERVER['SERVER_NAME'] == 'localhost')
+                ? 'localhost/summernote/images/'.$file_name : 'pcam/summernote/images/'.$file_name;
 
-            $this->db->where('Image',$file_name);
-            $this->db->delete('db_it.summernote_image');
+            $this->m_master->DeleteFileToNas($headerOrigin,$path);
 
-            echo 'File Delete Successfully';
+        } else {
+
+            if(unlink($file_path)){
+                $this->db->where('Image',$file_name);
+                $this->db->delete('db_it.summernote_image');
+
+            }
         }
+
+        echo 'File Delete Successfully';
+
+
     }
 
 
