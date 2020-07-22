@@ -751,6 +751,7 @@
                     var urlPath = base_url_js+'uploads/students/'+db+'/'+fileName;
                     var ev = selector_this.closest('tr');
                     var s_pr = ev.find('.PrintIDCard').attr('path',urlPath);
+                    toastr.success('Upload success');
 
                 }
             });
