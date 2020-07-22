@@ -39,13 +39,23 @@ class M_rest extends CI_Model {
                         ->result_array();
 
                     if($dataCk[0]['Total']<=0){
-                        $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
-                        if(file_exists($file_path)){
-                            unlink($file_path);
-                            // Delete data
-                            $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
-                            $this->db->delete('db_it.summernote_image');
+
+                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id'){
+                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                            $path = ($_SERVER['SERVER_NAME'] == 'localhost')
+                                ? 'localhost/summernote/images' : 'pcam/summernote/images';
+                            $this->m_master->DeleteFileToNas($headerOrigin,$path.'/'.$dataSummernoteImg[$s]['Image']);
+
+                        } else {
+                            $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
+                            if(file_exists($file_path)){
+                                unlink($file_path);
+                            }
                         }
+
+                        $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
+                        $this->db->delete('db_it.summernote_image');
+
                     } else {
                         $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
                         $this->db->update('db_it.summernote_image',array('Status'=>'1'));
@@ -53,7 +63,17 @@ class M_rest extends CI_Model {
                 }
                 else if($act=='delete'){
                     $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
-                    if(file_exists($file_path)){unlink($file_path);}
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id'){
+
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path = ($_SERVER['SERVER_NAME'] == 'localhost')
+                            ? 'localhost/summernote/images' : 'pcam/summernote/images';
+                        $this->m_master->DeleteFileToNas($headerOrigin,$path.'/'.$dataSummernoteImg[$s]['Image']);
+
+                    } else {
+                        if(file_exists($file_path)){unlink($file_path);}
+                    }
+
                     $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
                     $this->db->delete('db_it.summernote_image');
                 }

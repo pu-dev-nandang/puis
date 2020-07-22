@@ -1011,42 +1011,8 @@ class C_api4 extends CI_Controller {
 
 
             // Cek image in summernote
-            $dataSummernoteImg = $this->db->get_where('db_it.summernote_image',array( 'SummernoteID' => $data_arr['SummernoteID']))->result_array();
-            if(count($dataSummernoteImg)>0){
-                for($s=0;$s<count($dataSummernoteImg);$s++){
-                    $dataCk = $this->db
-                        ->query('SELECT COUNT(*) AS Total FROM db_it.eula WHERE Description LIKE "%'.$dataSummernoteImg[$s]['Image'].'%" ')
-                        ->result_array();
-
-                    if($dataCk[0]['Total']<=0){
-
-                        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id'){
-
-                            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
-                            $path = ($_SERVER['SERVER_NAME'] == 'localhost')
-                                ? 'localhost/summernote/images' : 'pcam/summernote/images';
-
-                            $this->m_master->DeleteFileToNas($headerOrigin,$path.'/'.$dataSummernoteImg[$s]['Image']);
-
-                            $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
-                            $this->db->delete('db_it.summernote_image');
-
-                        } else {
-                            $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
-                            if(file_exists($file_path)){
-                                unlink($file_path);
-                                // Delete data
-                                $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
-                                $this->db->delete('db_it.summernote_image');
-                            }
-                        }
-
-                    } else {
-                        $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
-                        $this->db->update('db_it.summernote_image',array('Status'=>'1'));
-                    }
-                }
-            }
+            $this->m_rest
+                ->checkImageSummernote('insert',$data_arr['SummernoteID'],'db_it.eula','Description');
 
             return print_r(json_encode(array('ID'=>$insert_id)));
         }
