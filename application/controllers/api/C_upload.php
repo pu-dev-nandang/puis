@@ -538,13 +538,13 @@ class C_upload extends CI_Controller {
                 ? 'localhost/summernote/images/'.$file_name : 'pcam/summernote/images/'.$file_name;
 
             $this->m_master->DeleteFileToNas($headerOrigin,$path);
-
+            $this->db->where('Image',$file_name);
+            $this->db->delete('db_it.summernote_image');
         } else {
 
             if(unlink($file_path)){
                 $this->db->where('Image',$file_name);
                 $this->db->delete('db_it.summernote_image');
-
             }
         }
 
