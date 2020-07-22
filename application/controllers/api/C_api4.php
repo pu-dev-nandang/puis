@@ -1619,21 +1619,8 @@ class C_api4 extends CI_Controller {
         else if($data_arr['action']=='removeOptionInQuestion'){
             $SummernoteID = $data_arr['SummernoteID'];
 
-            $data = $this->db->get_where('db_it.summernote_image',
-                array('SummernoteID' => $SummernoteID))->result_array();
-
-            if(count($data)>0){
-                foreach ($data AS $item){
-                    $file_path = './uploads/summernote/images/'.$item['Image'];
-                    if(file_exists($file_path)){
-                        unlink($file_path);
-                    }
-
-                    // Delete data
-                    $this->db->where('Image', $item['Image']);
-                    $this->db->delete('db_it.summernote_image');
-                }
-            }
+            $this->m_rest
+                ->checkImageSummernote('delete',$SummernoteID,'','');
 
             return print_r(1);
 

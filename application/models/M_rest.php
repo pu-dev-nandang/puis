@@ -48,9 +48,7 @@ class M_rest extends CI_Model {
 
                         } else {
                             $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
-                            if(file_exists($file_path)){
-                                unlink($file_path);
-                            }
+                            if(file_exists($file_path)){unlink($file_path);}
                         }
 
                         $this->db->where('Image', $dataSummernoteImg[$s]['Image']);
@@ -62,7 +60,7 @@ class M_rest extends CI_Model {
                     }
                 }
                 else if($act=='delete'){
-                    $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
+
                     if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id'){
 
                         $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
@@ -71,6 +69,7 @@ class M_rest extends CI_Model {
                         $this->m_master->DeleteFileToNas($headerOrigin,$path.'/'.$dataSummernoteImg[$s]['Image']);
 
                     } else {
+                        $file_path = './uploads/summernote/images/'.$dataSummernoteImg[$s]['Image'];
                         if(file_exists($file_path)){unlink($file_path);}
                     }
 
