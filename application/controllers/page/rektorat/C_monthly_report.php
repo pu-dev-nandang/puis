@@ -23,10 +23,25 @@ class C_monthly_report extends Globalclass {
         $this->temp($content);
     }
 
+    private function authAction(){
+        $NIP = $this->session->userdata('NIP');
+
+        // read nav
+        $DivisionID = $this->m_master->getSessionDepartmentPU();
+
+        $G_data = $this->db->query(
+            'select * from db_rektorat.privileges_monthly_report where
+               NIP = "'.$NIP.'" and DivisionID = "'.$DivisionID.'" 
+              '
+        )->result_array();
+        return $G_data;
+    }
+
 
     public function index()
     {
-        $data['InputForm'] = $this->load->view('page/rektorat/monthly_report/InputForm','',true);
+        $data2['auth'] = $this->authAction();
+        $data['InputForm'] = $this->load->view('page/rektorat/monthly_report/InputForm',$data2,true);
         $data2['action'] = 'write';
         $data2['G_division'] = $this->m_master->apiservertoserver(base_url().'api/__getAllDepartementPU');
         $data['ViewTable'] = $this->load->view('page/rektorat/monthly_report/ViewTable',$data2,true);
@@ -41,10 +56,29 @@ class C_monthly_report extends Globalclass {
         $Input = $this->getInputToken();
         $action = $Input['action'];
         if ($action == 'read') {
+            $DivisionID = $Input['DivisionID'];
+            $Where = '';
+            // get Nav Dept
+            $Nav = $this->m_master->getSessionDepartmentPU();
+            if ($DivisionID == '%') {
+                if ($Nav == 'NA.12' || $Nav == 'NA.2') {
+                    $Where = '';
+                }
+                else
+                {
+                    $Where = ' Where a.DivisionID = "'.$DivisionID.'" ';
+                }
+            }
+            else
+            {
+                $Where = ' Where a.DivisionID = "'.$DivisionID.'" ';
+            }
+
             $sql = 'select a.*,b.Name, c.NameDepartment from db_rektorat.monthly_report as a 
                     join db_employees.employees as b on a.UpdatedBy = b.NIP
                     '.$this->m_master->QueryDepartmentJoin('a.DivisionID','c').'
-                    ';
+                    '.$Where;
+            // print_r($Where);die();
             $query = $this->db->query($sql,array())->result_array();
             $data = array();
             for ($i=0; $i < count($query); $i++) {
@@ -77,9 +111,22 @@ class C_monthly_report extends Globalclass {
             $dataSave = json_decode(json_encode($Input['data']),true);
             if (array_key_exists('File', $_FILES)) {
                 // do upload file
-                $FileUpload = $this->m_master->uploadDokumenMultiple(uniqid(),'File',$path = './uploads/rektorat/monthlyreport');
-                $FileUpload = json_encode($FileUpload); 
-                $dataSave['File'] = $FileUpload; 
+                if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                    $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                    $path = 'rektorat/monthlyreport';
+                    $FileName = uniqid();
+                    $TheFile = 'File';
+                    $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$FileName,$TheFile,$path,'array');
+                    $FileUpload = json_encode($uploadNas); 
+                    $dataSave['File'] = $FileUpload;
+                }
+                else
+                {
+                    $FileUpload = $this->m_master->uploadDokumenMultiple(uniqid(),'File',$path = './uploads/rektorat/monthlyreport');
+                    $FileUpload = json_encode($FileUpload); 
+                    $dataSave['File'] = $FileUpload; 
+                }
+                
             }
             $arr_add = [
                 'UpdatedAt' => date('Y-m-d H:i:s'),
@@ -98,9 +145,18 @@ class C_monthly_report extends Globalclass {
                     $arr_file = (array) json_decode($G_data_[0]['File'],true);
                     $filePath = 'rektorat\\monthlyreport\\'.$arr_file[0]; // pasti ada file karena required
                     $path = FCPATH.'uploads\\'.$filePath;
-                    if (file_exists($path)) {
-                        unlink($path);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/rektorat/monthlyreport/".$arr_file[0] : "pcam/rektorat/monthlyreport/".$arr_file[0];
+                        $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
                     }
+                    else
+                    {
+                        if (file_exists($path)) {
+                            unlink($path);
+                        }
+                    }
+                    
                 }
             }
             
@@ -117,15 +173,37 @@ class C_monthly_report extends Globalclass {
                     $arr_file = (array) json_decode($G_data_[0]['File'],true);
                     $filePath = 'rektorat\\monthlyreport\\'.$arr_file[0]; // pasti ada file karena required
                     $path = FCPATH.'uploads\\'.$filePath;
-                    if (file_exists($path)) {
-                        unlink($path);
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                        $path_delete = ($_SERVER['SERVER_NAME'] == 'localhost') ? "localhost/rektorat/monthlyreport/".$arr_file[0] : "pcam/rektorat/monthlyreport/".$arr_file[0];
+                        $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
                     }
+                    else
+                    {
+                        if (file_exists($path)) {
+                            unlink($path);
+                        }
+                    }
+                   
                 }
 
                 // do upload file
-                $FileUpload = $this->m_master->uploadDokumenMultiple(uniqid(),'File',$path = './uploads/rektorat/monthlyreport');
-                $FileUpload = json_encode($FileUpload); 
-                $dataSave['File'] = $FileUpload; 
+                if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                    $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                    $path = 'rektorat/monthlyreport';
+                    $FileName = uniqid();
+                    $TheFile = 'File';
+                    $uploadNas = $this->m_master->UploadManyFilesToNas($headerOrigin,$FileName,$TheFile,$path,'array');
+                    $FileUpload = json_encode($uploadNas); 
+                    $dataSave['File'] = $FileUpload;
+                }
+                else
+                {
+                    $FileUpload = $this->m_master->uploadDokumenMultiple(uniqid(),'File',$path = './uploads/rektorat/monthlyreport');
+                    $FileUpload = json_encode($FileUpload); 
+                    $dataSave['File'] = $FileUpload; 
+                }
+                
             }
             $arr_add = [
                 'UpdatedAt' => date('Y-m-d H:i:s'),

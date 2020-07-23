@@ -7,11 +7,11 @@
         <div class="form-group">
             <label>NIP</label>
             <br>
-            <select id = "NIP" style="width: 100%"> </select> 
+            <select id = "NIP" style="width: 100%" class="input" name = "NIP"> </select> 
         </div>
         <div class="form-group">
             <label>Department Access</label>
-            <select class="form-control" id="DivisionID">
+            <select class="form-control input" id="DivisionID" name = "DivisionID">
             <?php for($i = 0; $i < count($G_division); $i++): ?>
               <option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>
             <?php endfor ?>
@@ -20,9 +20,9 @@
         <div class="form-group">
            <label>Access</label>
            <br>
-           <select class="form-control" id = "Access">
-           <option value="read" selected>Read</option>
-           <option value="write">Write</option>
+           <select class="form-control input" id = "Access" name = "Access">
+           <option value="Read">Read</option>
+           <option value="Write">Write</option>
            </select>
         </div>
         
@@ -34,7 +34,7 @@
 <script type="text/javascript">
    var AppForm_Setting_Monthly_Report = {
         setDefaultInput : function(){
-            $('.input').val('');
+            // $('.input').val('');
             $('#btnSave').attr('action','add');
             $('#btnSave').attr('data-id','');
         },
@@ -44,8 +44,11 @@
             var data = {};
             $('.input').each(function(){
                 var field = $(this).attr('name');
-                data[field] = $(this).val();
-            })
+                if (field !== undefined) {
+                    data[field] = $(this).val();
+                }
+                
+            })  
             var dataform = {
                 action : action,
                 data : data,
@@ -125,7 +128,6 @@
        var selector = $(this);
        var action = selector.attr('action');
        var ID = selector.attr('data-id'); 
-       var 
         AppForm_Setting_Monthly_Report.ActionData(selector,action,ID);
        
     })

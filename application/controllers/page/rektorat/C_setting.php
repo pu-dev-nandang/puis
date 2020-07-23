@@ -41,8 +41,9 @@ public $data = array();
             $Input = $this->getInputToken();
             $action = $Input['action'];
             if ($action == 'read') {
-                $sql = 'select a.*,b.Name, c.NameDepartment from db_rektorat.privileges_monthly_report as a 
+                $sql = 'select a.*,b.Name, c.NameDepartment, d.Name as NamePrevileges from db_rektorat.privileges_monthly_report as a 
                         join db_employees.employees as b on a.UpdatedBy = b.NIP
+                        join db_employees.employees as d on a.NIP =  d.NIP
                         '.$this->m_master->QueryDepartmentJoin('a.DivisionID','c').'
                         ';
                 $query = $this->db->query($sql,array())->result_array();
@@ -51,7 +52,7 @@ public $data = array();
                     $nestedData = array();
                     $row = $query[$i]; 
                     $nestedData[] = $i+1;
-                    $nestedData[] = $row['NIP'];
+                    $nestedData[] = $row['NIP'].' - '.$row['NamePrevileges'];
                     $nestedData[] = $row['NameDepartment'];
                     $nestedData[] = $row['Access'];
                     $nestedData[] = $this->m_master->getDateIndonesian($row['UpdatedAt']);
@@ -72,6 +73,7 @@ public $data = array();
                 echo json_encode($json_data);   
             }
             elseif ($action =='add') {
+                // print_r($Input);die();
                 $dataSave = json_decode(json_encode($Input['data']),true);
                 $arr_add = [
                     'UpdatedAt' => date('Y-m-d H:i:s'),
