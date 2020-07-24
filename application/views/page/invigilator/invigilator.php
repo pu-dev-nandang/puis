@@ -271,7 +271,8 @@
                         var OnlineLearning = (d.OnlineLearning !== 'undefined' && (d.OnlineLearning==1 || d.OnlineLearning=='1'))
                             ? '<div><span class="label label-success">Online</span></div>' : '';
 
-                        var StartOnlineLearning = ((d.ButtonAttendance==1 || d.ButtonAttendance=='1') && (d.OnlineLearning !== 'undefined' && (d.OnlineLearning==1 || d.OnlineLearning=='1')))
+                        var StartOnlineLearning = ((d.ButtonAttendance==1 || d.ButtonAttendance=='1')
+                            && (d.OnlineLearning !== 'undefined' && (d.OnlineLearning==1 || d.OnlineLearning=='1')))
                             ? '<td colspan="2"><button class="btn btn-success btnEnterTheClass" data-tkn="'+jwt_encode(d,'s3Cr3T-G4N')+'" >Enter the class</button></td>'
                             : '<td>'+btnAttd+'</td>' +
                             '<td>'+btnLayout+'</td>';
@@ -340,7 +341,7 @@
 
     $(document).on('click','.btnLoadAttendance',function () {
         var ID = $(this).attr('data-id');
-
+        var filterTypeSemester = $('#filterTypeSemester').val();
         var data = {
             action : 'readAttendanceExam',
             ID : ID,
