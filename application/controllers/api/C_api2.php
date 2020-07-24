@@ -3864,6 +3864,12 @@ class C_api2 extends CI_Controller {
                 $IDSSD = $d['IDSSD'];
                 $Update = (array) $d['Update'];
 
+                $Update['Evaluasi'] = str_replace(',','.',$Update['Evaluasi']);
+                $Update['UTS'] = str_replace(',','.',$Update['UTS']);
+                $Update['UAS'] = str_replace(',','.',$Update['UAS']);
+                $Update['ScoreNew'] = str_replace(',','.',$Update['ScoreNew']);
+                $Update['GradeValueNew'] = str_replace(',','.',$Update['GradeValueNew']);
+
                 $this->db->where('ID', $IDSSD);
                 $this->db->update('db_academic.sa_student_details',$Update);
             }
