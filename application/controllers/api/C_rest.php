@@ -1365,6 +1365,14 @@ class C_rest extends CI_Controller {
                 return print_r(json_encode($result));
 
             }
+            else if($dataToken['action']=='countTotalMyQuestion'){
+                $NIP = $dataToken['NIP'];
+                $dataQuiz = $this->db->query('SELECT COUNT(*) Total FROM db_academic.q_question 
+                                        WHERE CreatedBy = "'.$NIP.'" ')->result_array();
+
+                return print_r(json_encode(array('Total' => $dataQuiz[0]['Total'])));
+
+            }
             else if($dataToken['action']=='checkSessionsInQuiz'){
                 $ScheduleID = $dataToken['ScheduleID'];
                 $Session = $dataToken['Session'];
