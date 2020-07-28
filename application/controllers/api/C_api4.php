@@ -1939,7 +1939,9 @@ class C_api4 extends CI_Controller {
             if(count($Question)>0){
                 for($a=0;$a<count($Question);$a++){
 
-                    $Options = $this->db->select('ID,Option')->order_by('ID', 'RANDOM')->get_where('db_academic.q_question_options',
+                    $Options = $this->db->select('*')
+                        ->order_by('ID', 'RANDOM')
+                        ->get_where('db_academic.q_question_options',
                         array('QID'=>$Question[$a]['QID']))->result_array();
                     $Question[$a]['Options'] = $Options;
 
