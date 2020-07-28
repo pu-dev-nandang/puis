@@ -10214,10 +10214,10 @@ class C_api extends CI_Controller {
                 // Filter Portal Alumni is active or not
                 if(!empty($output['isPortalAlumi'])){
                     if ($output['isPortalAlumi'] == 1) {
-                        $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" > 0","filter"=>"AND",); 
+                        $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" > 0 ","filter"=>"AND",); 
                     }
                     else if ($output['isPortalAlumi'] == 0) {
-                        $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" = 0","filter"=>"AND",);
+                        $param[] = array("field"=>"(select count(*) as total from `db_alumni`.`registration` as alm where alm.NPM = ta.NPM limit 1  )","data"=>" = 0 ","filter"=>"AND",);
                     }
                 }
 
