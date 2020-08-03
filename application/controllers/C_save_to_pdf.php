@@ -7254,10 +7254,17 @@ Phone: (021) 29200456';
 
                 // ======
 
-                $path = './uploads/students/'.$db.'/'.$d2['Photo'];
-                if(!file_exists($path)){
+                // $path = './uploads/students/'.$db.'/'.$d2['Photo'];
+                // if(!file_exists($path)){
+                //     $path = './images/icon/userfalse.png';
+                // }
+
+                $path =  base_url().'uploads/students/'.$db.'/'.$d2['Photo'];
+                $path = str_replace('https', 'http', $path);
+                if ( empty($d2['Photo']) || $d2['Photo'] == '' || !$this->m_master->is_url_exist($path)   ) {
                     $path = './images/icon/userfalse.png';
                 }
+                
                 $pdf->Image($path,10,$pdf->GetY(),25);
 
                 $pdf->SetFont('dinprolight','',$fontBody);
@@ -7468,10 +7475,20 @@ Phone: (021) 29200456';
                     $ttd_NIP = $d['DekanNIP'];
                     $ttd_Signatures = $d['Signatures'];
                 } else {
-                    $dataWarek = $this->db->limit(1)->get_where('db_employees.employees',array(
-                        'StatusEmployeeID' => 1,
-                        'PositionMain' => '2.2'
-                    ))->result_array()[0];
+                    $dataWarek =  $this->db->query(
+                        'select * from db_employees.employees
+                         where StatusEmployeeID = 1 
+                         and 
+                         (
+                            PositionMain = "2.2" or
+                            PositionOther1 = "2.2" or
+                            PositionOther2 = "2.2" or 
+                            PositionOther3 = "2.2"
+                         )
+
+                         limit 1
+                        '
+                    )->result_array()[0];
 
                     $t_a = ($dataWarek['TitleAhead']!='' && $dataWarek['TitleAhead']!=null)
                         ? $dataWarek['TitleAhead'].' ' : '';
