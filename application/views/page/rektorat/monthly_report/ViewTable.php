@@ -2,7 +2,7 @@
 	<div class="row">
 	    <div class="col-md-3 col-md-offset-4">
 	        <div class="well">
-	            <label>Departement</label>
+	            <label>Department</label>
 				   <select class="select2-select-00 full-width-fix" id="Division">
 				   	<?php if ($DivisionID == "NA.12" || $DivisionID == 'NA.2'): ?>
 				   		<option value="%" selected > ALL </option>
@@ -31,7 +31,7 @@
 	    			<tr>
 	    				<th>No</th>
 	    				<th>Title</th>
-	    				<th>Departement / Prodi</th>
+	    				<th>Department / Prodi</th>
 	    				<th>Description</th>
 	    				<th>Date Report</th>
 	    				<th>File</th>
@@ -48,7 +48,7 @@
 	<div class="row">
 		<div class="col-md-12">
 			<div style="padding: 10px;text-align: center;">
-				<h4>Unauthorize</h4>
+				<h3>You don't have access to this menu</h3>
 			</div>
 		</div>
 	</div>
