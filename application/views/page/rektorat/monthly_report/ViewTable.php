@@ -4,9 +4,20 @@
 	        <div class="well">
 	            <label>Departement</label>
 				   <select class="select2-select-00 full-width-fix" id="Division">
-	                  <option value="%" selected > ALL </option>
+				   	<?php if ($DivisionID == "NA.12" || $DivisionID == 'NA.2'): ?>
+				   		<option value="%" selected > ALL </option>
+				   	<?php endif ?>
+	                  
 	                <?php for($i = 0; $i < count($G_division); $i++): ?>
-	                  <option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>
+	                	<?php if ($DivisionID == "NA.12" || $DivisionID == 'NA.2'): ?>
+	                		<option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>
+	                	<?php else: ?>
+	                		<?php if ($G_division[$i]['Code'] == $DivisionID): ?>
+	                		<option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>	
+	                		<?php endif ?>
+	                	<?php endif ?>
+	                	
+	                  
 	                <?php endfor ?>
 	               </select>
 	        </div>

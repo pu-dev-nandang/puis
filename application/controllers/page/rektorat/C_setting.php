@@ -26,12 +26,17 @@ public $data = array();
 
     public function index()
     {
-        $data1['G_division'] = $this->m_master->apiservertoserver(base_url().'api/__getAllDepartementPU');
-        $data['InputSetting'] = $this->load->view('page/rektorat/monthly_report/InputSetting',$data1,true);
-        $data2['action'] = 'write';
-        $data['ViewSetting'] = $this->load->view('page/rektorat/monthly_report/ViewSetting',$data2,true);
-        $page = $this->load->view('page/rektorat/Setting',$data,true);
-        $this->menu_request($page);
+        $DivisionID = $this->m_master->getSessionDepartmentPU();
+        if ($DivisionID == "NA.12" || $DivisionID == 'NA.2') {
+            $data1['G_division'] = $this->m_master->apiservertoserver(base_url().'api/__getAllDepartementPU');
+            $data['InputSetting'] = $this->load->view('page/rektorat/monthly_report/InputSetting',$data1,true);
+            $data2['action'] = 'write';
+            $data['ViewSetting'] = $this->load->view('page/rektorat/monthly_report/ViewSetting',$data2,true);
+            $page = $this->load->view('page/rektorat/Setting',$data,true);
+            $this->menu_request($page);
+        }
+
+        
     }
 
      public function crud_setting_monthly_report()

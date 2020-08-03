@@ -234,11 +234,11 @@
                                 <a href="<?php echo base_url('lecturer-performance/lecturer-list'); ?>"><i class="fa fa-line-chart" aria-hidden="true"></i> Lecturers Credit (BKD)</a>
                             </li>
                         <?php } ?>
-                        <?php if(in_array(12,$rule_service)){ ?>
+                        
                             <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='monthly-report'){echo 'active';} ?>">
                                 <a href="<?php echo base_url('rektorat/monthly_report'); ?>"><i class="fa fa-line-chart" aria-hidden="true"></i> Monthly Report</a>
                             </li>
-                        <?php } ?>
+                        
 
                         <!-- Adding for Testing -->
                         <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>

@@ -40,6 +40,7 @@ class C_monthly_report extends Globalclass {
 
     public function index()
     {
+        $data2['DivisionID']= $this->m_master->getSessionDepartmentPU();
         $data2['auth'] = $this->authAction();
         $data['InputForm'] = $this->load->view('page/rektorat/monthly_report/InputForm',$data2,true);
         $data2['action'] = 'write';
