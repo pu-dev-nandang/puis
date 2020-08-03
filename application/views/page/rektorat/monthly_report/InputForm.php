@@ -31,7 +31,7 @@
             <div class="row">
               <div class="col-md-12">
                 <div style="padding: 10px;text-align: center;">
-                  <h4>Unauthorize</h4>
+                  <h3>You don't have access to this menu</h3>
                 </div>
               </div>
             </div>
@@ -50,7 +50,7 @@
   <div class="row">
     <div class="col-md-12">
       <div style="padding: 10px;text-align: center;">
-        <h4>Unauthorize</h4>
+        <h3>You don't have access to this menu</h3>
       </div>
     </div>
   </div>
