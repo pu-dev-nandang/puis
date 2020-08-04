@@ -113,6 +113,20 @@ class M_master extends CI_Model {
         $this->db->insert('upload_foto_survey', $data);
     }
 
+    public function checkColoumnExist($table,$fieldname){
+        $bool = true; // coloumn exist
+        $q = $this->db->query(
+            "SHOW COLUMNS FROM ".$table." LIKE '".$fieldname."'"
+        )->result_array();
+
+        if (count($q) == 0) {
+            $bool = false;
+        }
+
+        return $bool;
+
+    }
+
 
     public function getColumnTable($table)
     {
