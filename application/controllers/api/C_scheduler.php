@@ -74,22 +74,22 @@ class C_scheduler extends CI_Controller {
       $table = $dataToken['table'];
       switch ($table) {
         case 's1':
-          // $this->__s1();
+          $this->__s1();
           break;
         case 's2a':
-          // $this->__s2a();
+          $this->__s2a();
           break;
         case 's2b':
-          // $this->__s2b();
+          $this->__s2b();
           break;
         case 's3a1':
-          // $this->__s3a1();
+          $this->__s3a1();
           break;
         case 's3b1':
-          // $this->__s3b1();
+          $this->__s3b1();
           break;
         case 's3b2':
-          // $this->__s3b2();
+          $this->__s3b2();
           break;
         case 's3b4':
           $this->__s3b4();
