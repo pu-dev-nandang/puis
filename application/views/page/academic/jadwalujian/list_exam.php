@@ -1,16 +1,21 @@
 <style>
-    #tableShowExam>thead>tr>th, #tableExam>tbody>tr>td {
-        text-align: center;
+    /*#tableShowExam>thead>tr>th, #tableExam>tbody>tr>td {*/
+    /*    text-align: center;*/
+    /*}*/
+
+    /*#tableStudent thead tr th {*/
+    /*    text-align: center;*/
+    /*    background: #005975;*/
+    /*    color: #ffffff;*/
+    /*}*/
+    /*#tableStudent tbody tr td {*/
+    /*    text-align: center;*/
+    /*}*/
+
+    #tableShowExam td:nth-child(2), #tableShowExam td:nth-child(3), #tableShowExam td:last-child {
+        text-align: left;
     }
 
-    #tableStudent thead tr th {
-        text-align: center;
-        background: #005975;
-        color: #ffffff;
-    }
-    #tableStudent tbody tr td {
-        text-align: center;
-    }
     .btn-live-chat {
         padding: 0px 5px;
         font-size: 10px !important;
@@ -111,6 +116,8 @@
 
 <script>
     $(document).ready(function () {
+
+        setLoadFullPage();
         // loadSelectOptionBaseProdi('#filterBaseProdi','');
         loSelectOptionSemester('#filterSemester','');
 
@@ -508,7 +515,7 @@
 
             setTimeout(function () {
                 $('#divTable').html('<div class="">' +
-                    '                <table class="table table-bordered" id="tableShowExam">' +
+                    '                <table class="table table-bordered table-centre" id="tableShowExam">' +
                     '                    <thead>' +
                     '                    <tr style="background: #437e88;color: #ffffff;">' +
                     '                        <th style="width: 1%;">No</th>' +
@@ -518,7 +525,7 @@
                     '                        <th style="width: 5%;">Action</th>' +
                     '                        <th style="width: 15%;">Day, Date ,Time</th>' +
                     '                        <th style="width: 7%;">Room</th>' +
-                    '                        <th style="width: 15%;">Insert by</th>' +
+                    '                        <th style="width: 15%;">Desc.</th>' +
                     '                    </tr>' +
                     '                    </thead>' +
                     '                    <tbody id="trExam"></tbody>' +

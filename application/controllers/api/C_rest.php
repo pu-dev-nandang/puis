@@ -148,6 +148,14 @@ class C_rest extends CI_Controller {
 
                 return print_r(json_encode($schedule));
             }
+            else if($dataToken['action']=='getTimeTableOneSemester'){
+
+                $NIP = $dataToken['NIP'];
+                $SemesterID = $dataToken['SemesterID'];
+                $schedule = $this->m_rest->__geTimetable($NIP,$SemesterID);
+
+                return print_r(json_encode($schedule));
+            }
             else if($dataToken['action']=='chekTeamTheaching'){
 
                 $data = $this->db
@@ -1030,27 +1038,30 @@ class C_rest extends CI_Controller {
                 if($ScheduleID!='' && $ScheduleID!=null &&
                     $Sessions!='' && $Sessions!=null) {
 
+                    // Cek attendace online
+                    $this->m_onlineclass->checkOnlineAttendance($UserID,$ScheduleID,$Sessions);
+
                     // Cek apakah sudah membuat tugas
-                    $sc_t = $this->db->query('SELECT COUNT(*) AS Total 
-                                        FROM (SELECT stt.ID FROM db_academic.schedule_task_student stt
-                                        LEFT JOIN db_academic.schedule_task st ON (st.ID = stt.IDST)
-                                        WHERE st.ScheduleID = "'.$ScheduleID.'" 
-                                        AND st.Session = "'.$Sessions.'" 
-                                        AND stt.NPM = "'.$UserID.'" ) xx ')->result_array();
-
-                    if($sc_t[0]['Total']>0){
-
-                        $dataArrAttd = $this->m_onlineclass->getArrIDAttd($ScheduleID);
-
-                        $data_arr_attd = array(
-                            'ArrIDAttd' => $dataArrAttd,
-                            'Meet' => $Sessions,
-                            'Attendance' => '1',
-                            'NPM' => $UserID
-                        );
-
-                        $this->m_onlineclass->setAttendanceStudent($data_arr_attd);
-                    }
+//                    $sc_t = $this->db->query('SELECT COUNT(*) AS Total
+//                                        FROM (SELECT stt.ID FROM db_academic.schedule_task_student stt
+//                                        LEFT JOIN db_academic.schedule_task st ON (st.ID = stt.IDST)
+//                                        WHERE st.ScheduleID = "'.$ScheduleID.'"
+//                                        AND st.Session = "'.$Sessions.'"
+//                                        AND stt.NPM = "'.$UserID.'" ) xx ')->result_array();
+//
+//                    if($sc_t[0]['Total']>0){
+//
+//                        $dataArrAttd = $this->m_onlineclass->getArrIDAttd($ScheduleID);
+//
+//                        $data_arr_attd = array(
+//                            'ArrIDAttd' => $dataArrAttd,
+//                            'Meet' => $Sessions,
+//                            'Attendance' => '1',
+//                            'NPM' => $UserID
+//                        );
+//
+//                        $this->m_onlineclass->setAttendanceStudent($data_arr_attd);
+//                    }
 
 
                 }
@@ -1632,16 +1643,18 @@ class C_rest extends CI_Controller {
                 }
 
                 // return quiz
-                $dataReturn = $this->db->query('SELECT q.ScheduleID, q.Session FROM db_academic.q_quiz q 
+                $dataReturn = $this->db->query('SELECT q.ScheduleID, q.Session,qs.NPM FROM db_academic.q_quiz q 
                                                         LEFT JOIN db_academic.q_quiz_students qs 
                                                         ON (qs.QuizID = q.ID )
                                                         WHERE qs.ID = "'.$dataToken['QuizStudentID'].'" ')
                     ->result_array()[0];
 
+
+                // Cek attendace online
+                $this->m_onlineclass->checkOnlineAttendance($dataReturn['NPM'],
+                    $dataReturn['ScheduleID'],$dataReturn['Session']);
+
                 return print_r(json_encode($dataReturn));
-
-
-
 
             }
 

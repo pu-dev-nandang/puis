@@ -77,4 +77,74 @@ class M_onlineclass extends CI_Model {
         return $result;
     }
 
+    public function checkOnlineAttendance($NPM,$ScheduleID,$Session){
+
+        // Get SemesterID
+        $dataSetting = $this->db->quesry('SELECT soc.*, s.OnlineLearning FROM db_academic.schedule.setting_online_class soc 
+                                    LEFT JOIN db_academic.schedule s ON (s.SemesterID = soc.SemesterID)
+                                    WHERE s.ID = "'.$ScheduleID.'" ')->result_array();
+
+        $result = 0;
+        if(count($dataSetting)>0){
+
+            if($dataSetting[0]['OnlineLearning']=='1'){
+                // Task
+                $dataTask = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task_student sts 
+                                                        LEFT JOIN  db_academic.schedule_task st
+                                                        ON (sts.IDST = st.ID)
+                                                        WHERE sts.NPM = "'.$NPM.'" AND 
+                                                        st.ScheduleID = "'.$ScheduleID.'" AND
+                                                        st.Session = "'.$Session.'"
+                                                           ')->result_array()[0]['Total'];
+
+
+                // Forum
+                $dataForum = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.counseling_comment cc
+                                                        LEFT JOIN db_academic.counseling_topic ct 
+                                                        ON (ct.ID = cc.TopicID)
+                                                        WHERE cc.UserID = "'.$NPM.'" 
+                                                        AND ct.ScheduleID = "'.$ScheduleID.'"
+                                                         AND ct.Sessions = "'.$Session.'" ')->result_array()[0]['Total'];
+
+
+                // Quiz
+                $dataQuiz = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.q_quiz_students qqs
+                                                        LEFT JOIN db_academic.q_quiz qq 
+                                                        ON (qq.ID = qqs.QuizID)
+                                                        WHERE qqs.NPM = "'.$NPM.'"
+                                                        AND qqs.WorkDuration IS NOT NULL
+                                                        AND qqs.WorkDuration > 0
+                                                        AND qq.ScheduleID = "'.$ScheduleID.'"
+                                                         AND qq.Session = "'.$Session.'" ')->result_array()[0]['Total'];
+
+
+                $Task = ($dataSetting[0]['Task']=='1' && $dataTask>0) ? true : false;
+                $Forum = ($dataSetting[0]['Forum']=='1' && $dataForum>0) ? true : false;
+                $Quiz = ($dataSetting[0]['Quiz']=='1' && $dataQuiz>0) ? true : false;
+
+                if($Task && $Forum && $Quiz){
+
+                    $dataArrAttd = $this->getArrIDAttd($ScheduleID);
+
+                    $data_arr_attd = array(
+                        'ArrIDAttd' => $dataArrAttd,
+                        'Meet' => $Session,
+                        'Attendance' => '1',
+                        'NPM' => $NPM
+                    );
+
+                    $this->setAttendanceStudent($data_arr_attd);
+
+
+                    $result = 1;
+                }
+            }
+
+
+        }
+
+        return $result;
+
+    }
+
 }

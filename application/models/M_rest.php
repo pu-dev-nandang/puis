@@ -1044,16 +1044,13 @@ class M_rest extends CI_Model {
         return $data;
     }
 
-    public function __geTimetable($NIP)
+    public function __geTimetable($NIP,$SemesterID='')
     {
 
-        $SemesterActive = $this->_getSemesterActive();
-        $SemesterID = $SemesterActive['SemesterID'];
+        $WhereSmt = ($SemesterID!='') ? ' WHERE s.ID = "'.$SemesterID.'" ' : '';
 
-        $dataSemester = $this->db->query('SELECT s.* FROM db_academic.semester s ORDER BY s.ID ASC')->result_array();
+        $dataSemester = $this->db->query('SELECT s.* FROM db_academic.semester s '.$WhereSmt.' ORDER BY s.ID ASC')->result_array();
 
-//        print_r($dataSemester);
-//        exit;
 
         $result = [];
         for($i=0;$i<count($dataSemester);$i++){
@@ -2331,6 +2328,11 @@ class M_rest extends CI_Model {
 
         // Task
         $data[$i]['CheckTask'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task st 
+                                                                    WHERE st.ScheduleID = "'.$ScheduleID.'"
+                                                                     AND st.Session = "'.$Session.'" ')->result_array()[0]['Total'];
+
+        // Quiz
+        $data[$i]['CheckQuiz'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.q_quiz st 
                                                                     WHERE st.ScheduleID = "'.$ScheduleID.'"
                                                                      AND st.Session = "'.$Session.'" ')->result_array()[0]['Total'];
 

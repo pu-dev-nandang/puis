@@ -340,10 +340,17 @@ class M_api extends CI_Model {
             // Get Status Employees
             $dataStatus = $this->db->query('SELECT * FROM db_employees.employees_status WHERE IDStatus != -1 AND  IDStatus != -2 ')->result_array();
 
+            // Get setting Online Class
+            $dataOnlineClass = $this->db->select('Forum,Task,Quiz')
+                ->get_where('db_academic.setting_online_class',array('SemesterID' => $id))
+                ->result_array();
+
             $result['StatusEmployees'] = $dataStatus;
             $result['TahunAkademik'] = $data[0];
             $result['AttdSetting'] = $dataSetting;
-        } else {
+            $result['OnlineClass'] = $dataOnlineClass;
+        }
+        else {
             $result = false;
         }
         return $result;
