@@ -89,7 +89,7 @@ class C_monthly_report extends Globalclass {
                 $nestedData[] = $row['Title'];
                 $nestedData[] = $row['NameDepartment'];
                 $nestedData[] = $row['Desc'];
-                $nestedData[] = $this->m_master->getDateIndonesian($row['DateReport']);
+                $nestedData[] = date('M Y', strtotime($row['DateReport']) );
                 $nestedData[] = $row['File'];
                 $nestedData[] = $this->m_master->getDateIndonesian($row['UpdatedAt']);
                 // $nestedData[] = $row['UpdatedBy'];
