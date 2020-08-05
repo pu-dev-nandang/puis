@@ -15,10 +15,28 @@
                   <input type="text" class="form-control input" name = "Desc">
               </div>
               <div class="form-group">
-                  <label>Date Report</label>
-                  <div class="input-group input-append date datetimepicker" id="datetimepicker6">
-                      <input data-format="yyyy-MM-dd" class="form-control input" type="text" readonly="" id = "dateFilterReport"  name = "DateReport" value = "<?php echo date('Y-m-d') ?>" >
-                      <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+                  <div class="row">
+                    <div class="col-md-12" style="text-align: center;">
+                      <label><u>Date Report</u></label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Bulan</label>
+                        <select class="select2-select-00 full-width-fix select2-offscreen input" name = "Bulan">
+                          
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Tahun</label>
+                        <select class="select2-select-00 full-width-fix select2-offscreen input" name = "Tahun">
+                          
+                        </select>
+                      </div>
+                    </div>
                   </div>
               </div>
               <div class="form-group">
@@ -56,59 +74,120 @@
   </div>
 <?php endif ?>
 <script type="text/javascript">
+
+  const LoadMonth = () => {
+    const el = $('.input[name="Bulan"]');
+    el.empty();
+    SelectOptionloadBulan(el);
+  }
+
+  const LoadYear = () => {
+    const el = $('.input[name="Tahun"]');
+    const startYear  = 2014;
+    const endYear  = <?php echo date('Y') ?>;
+
+    let arr = [];
+
+    for (var i = startYear; i <= endYear; i++) {
+      arr.push(i);
+    }
+
+    el.empty();
+    el.append('<option value="'+'all'+'" '+'selected'+'>'+'--No Filtering Year--'+'</option>');
+
+    for (var i = 0; i < arr.length; i++) {
+      el.append('<option value="'+ arr[i] +'" '+''+'>'+arr[i]+'</option>');
+    }
+
+    el.select2({
+      // allowClear: true
+    });
+
+
+  }
+
    var AppForm_Monthly_Report = {
         setDefaultInput : function(){
             $('.input').val('');
             $('#btnSave').attr('action','add');
             $('#btnSave').attr('data-id','');
+            LoadMonth();
+            LoadYear();
+
         },
         ActionData : function(selector,action="add",ID=""){
             var htmlbtn = selector.html();
             var form_data = new FormData();
             var data = {};
-            $('.input').each(function(){
+            var valid = true;
+            $('.input').not('div').each(function(){
                 var field = $(this).attr('name');
                 data[field] = $(this).val();
-            })
-            var dataform = {
-                action : action,
-                data : data,
-                ID : ID,
-            };
-            var token = jwt_encode(dataform,"UAP)(*");
-            form_data.append('token',token);
 
-            if ( $( '#'+'UploadFile').length ) {
-                var UploadFile = $('#'+'UploadFile')[0].files;
-                for(var count = 0; count<UploadFile.length; count++)
+                if (field == 'Tahun' && $(this).val() == 'all' ) {
+                  valid = false;
+                  toastr.info('Please choose Tahun');
+                  return;
+                }
+                else
                 {
-                 form_data.append("File[]", UploadFile[count]);
+                  if ($(this).val() == '' || $(this).val() === undefined ) {
+                    valid = false;
+                    toastr.info('Please choose '+field);
+                    return;
+                  }
+                }
+                
+
+            })
+
+            if (valid) {
+                data['DateReport'] = data['Tahun']+'-'+data['Bulan']+'-01';
+                delete data['Tahun']; 
+                delete data['Bulan']; 
+
+                var dataform = {
+                    action : action,
+                    data : data,
+                    ID : ID,
+                };
+                var token = jwt_encode(dataform,"UAP)(*");
+                form_data.append('token',token);
+
+                if ( $( '#'+'UploadFile').length ) {
+                    var UploadFile = $('#'+'UploadFile')[0].files;
+                    for(var count = 0; count<UploadFile.length; count++)
+                    {
+                     form_data.append("File[]", UploadFile[count]);
+                    }
+                }
+                if (confirm('Are you sure ?')) {
+                    loading_button2(selector);
+                    var url = base_url_js + "rektorat/crud_monthly_report";
+                            $.ajax({
+                              type:"POST",
+                              url:url,
+                              data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+                              contentType: false,       // The content type used when sending data to the server.
+                              cache: false,             // To unable request pages to be cached
+                              processData:false,
+                              dataType: "json",
+                              success:function(data)
+                              {
+                                AppForm_Monthly_Report.setDefaultInput();
+                                end_loading_button2(selector,htmlbtn);
+                                oTable.ajax.reload( null, false );
+                              },
+                              error: function (data) {
+                                toastr.error("Connection Error, Please try again", 'Error!!');
+                                end_loading_button2(selector,htmlbtn);
+                                
+                              }
+                            })
                 }
             }
-            if (confirm('Are you sure ?')) {
-                loading_button2(selector);
-                var url = base_url_js + "rektorat/crud_monthly_report";
-                        $.ajax({
-                          type:"POST",
-                          url:url,
-                          data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-                          contentType: false,       // The content type used when sending data to the server.
-                          cache: false,             // To unable request pages to be cached
-                          processData:false,
-                          dataType: "json",
-                          success:function(data)
-                          {
-                            AppForm_Monthly_Report.setDefaultInput();
-                            end_loading_button2(selector,htmlbtn);
-                            oTable.ajax.reload( null, false );
-                          },
-                          error: function (data) {
-                            toastr.error("Connection Error, Please try again", 'Error!!');
-                            end_loading_button2(selector,htmlbtn);
-                            
-                          }
-                        })
-            }
+
+            
         },
 
 
