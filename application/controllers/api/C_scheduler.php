@@ -1151,7 +1151,23 @@ class C_scheduler extends CI_Controller {
                   $dataSave[$getField] = $result[$x][$getFieldLoop];
                 }
 
-                $this->db->insert($tableFill,$dataSave);
+                $chk = $this->db->query(
+                  'select count(*) as total from 
+                   (
+                     select 1 from '.$tableFill.' where ProdiID = '.$ProdiID.' and JenisPenggunaan = "'.$dataSave['JenisPenggunaan'].'"
+                   )xxx
+                  '
+                )->result_array()[0]['total'];
+
+                if ($chk == 0) {
+                  $this->db->insert($tableFill,$dataSave);
+                }
+                else
+                {
+                  $this->db->where('ProdiID',$ProdiID);
+                  $this->db->where('JenisPenggunaan',$dataSave['JenisPenggunaan']);
+                  $this->db->update($tableFill,$dataSave);
+                }
 
               }
             }catch (Exception $e) {
