@@ -1714,14 +1714,15 @@ class C_api extends CI_Controller {
 
 //        print_r($data_arr);
         if(count($data_arr)>0){
-            if($data_arr['action']=='read'){
+            if($data_arr['action']=='readDetailAcademicYear'){
 
                 $data = $this->m_api->__crudDataDetailTahunAkademik($data_arr['ID']);
                 return print_r(json_encode($data));
 
             }
-            else if($data_arr['action']=='edit') {
+            else if($data_arr['action']=='editDetailAcademicYear') {
                 $SemesterID = $data_arr['SemesterID'];
+
                 $dataForm = (array) $data_arr['dataForm'];
                 $this->db->where('SemesterID',$SemesterID);
                 $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
@@ -1742,8 +1743,25 @@ class C_api extends CI_Controller {
                     $this->db->insert('db_academic.attendance_setting',$dataFormAttd);
                 }
 
+                $this->db->reset_query();
 
-                return print_r($data_arr['SemesterID']);
+                // Class Online
+                $dataOnlineClass = (array) $data_arr['dataOnlineClass'];
+                $cekOnlineClass = $this->db->select('ID')
+                    ->get_where('db_academic.setting_online_class')
+                    ->result_array();
+
+                if(count($cekOnlineClass)>0){
+                    $this->db->where('SemesterID',$SemesterID);
+                    $this->db->update('db_academic.setting_online_class',$dataOnlineClass);
+                } else {
+                    $dataOnlineClass['SemesterID'] = $SemesterID;
+                    $this->db->insert('db_academic.setting_online_class',$dataOnlineClass);
+                }
+
+
+
+                return print_r($SemesterID);
             }
             else if($data_arr['action']=='publish'){
                 $ID = $data_arr['ID'];
@@ -3384,21 +3402,22 @@ class C_api extends CI_Controller {
             $dateInsert = ($row['InsertAt']!='' && $row['InsertAt']!=null) ? date('l, d M Y h:i',strtotime($row['InsertAt'])) : '-' ;
 
             // Cek apakah jadwal online atau bukan
-            $isOnline = ($row['OnlineLearning']==1 || $row['OnlineLearning']=='1') ? '<div><i style="color: green;" class="fa fa-circle"></i></div>' : '';
-            $isOnlineExam = ($row['ExamTaskID']!='' && $row['ExamTaskID']!=null) ? '<div><i style="color: green;" class="fa fa-check-square"></i></div>' : $isOnline;
+            $isOnline = ($row['OnlineLearning']==1 || $row['OnlineLearning']=='1')
+                ? '<div><span class="label label-success">Online</span></div>' : '';
+            $isOnlineExam = ($row['ExamTaskID']!='' && $row['ExamTaskID']!=null)
+                ? '<div><i style="color: green;" class="fa fa-check-square"></i> Exam file uploaded</div>' : '';
 
 
 
-            $nestedData[] = '<div style="text-align:center;">'.($no++).$isOnlineExam.'</div>';
+            $nestedData[] = '<div>'.($no++).'</div>';
             $nestedData[] = $course;
             $nestedData[] = $p;
-            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0);" class="btnShowDetailStdExam" data-examid="'.$row['ID'].'">'.$totalStudent.'</a>
+            $nestedData[] = '<div><a href="javascript:void(0);" class="btnShowDetailStdExam" data-examid="'.$row['ID'].'">'.$totalStudent.'</a>
                                 <br/><a href="'.base_url('academic/exam-schedule/live-chat/'.$row['ID']).'" target="_blank" class="btn btn-sm btn-success btn-live-chat hide">Live Chat</a></div>';
             $nestedData[] = $act;
-            $nestedData[] = '<div  style="text-align:center;">'.$exam_date.'<br/>'.$exam_time.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$exam_room.'</div>';
-            $nestedData[] = '<b><i class="fa fa-user margin-right"></i> '.$row['InsertByName'].'</b>
-                                <br/><span style="font-size: 11px;color: #9e9e9e;">'.$dateInsert.'</span>';
+            $nestedData[] = '<div>'.$exam_date.'<br/>'.$exam_time.'</div>';
+            $nestedData[] = '<div>'.$exam_room.$isOnline.'</div>';
+            $nestedData[] = $isOnlineExam;
 
             $data[] = $nestedData;
         }

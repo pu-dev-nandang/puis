@@ -399,6 +399,17 @@ class C_api4 extends CI_Controller {
                                                         AND ct.ScheduleID = "'.$ScheduleID.'"
                                                          AND ct.Sessions = "'.$i.'" ')->result_array()[0]['Total'];
 
+
+                // Quiz
+                $dataQuiz = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.q_quiz_students qqs
+                                                        LEFT JOIN db_academic.q_quiz qq 
+                                                        ON (qq.ID = qqs.QuizID)
+                                                        WHERE qqs.NPM = "'.$NPM.'"
+                                                        AND qqs.WorkDuration IS NOT NULL
+                                                        AND qqs.WorkDuration > 0
+                                                        AND qq.ScheduleID = "'.$ScheduleID.'"
+                                                         AND qq.Session = "'.$i.'" ')->result_array()[0]['Total'];
+
                 // Attendance
                 $dataAttd = $this->db->query('SELECT ID FROM db_academic.attendance 
                                                     WHERE ScheduleID = "'.$ScheduleID.'" ')->result_array();
@@ -425,11 +436,15 @@ class C_api4 extends CI_Controller {
 
 
 
+
+
+
                 $result[$i-1] = array(
                     'ScheduleID' => $ScheduleID,
                     'Session' => $i,
                     'Task' => $dataTask,
                     'Forum' => $dataForum,
+                    'Quiz' => $dataQuiz,
                     'AttdID' => count($dataAttd),
                     'AttdID_Details' => $dataAttd,
                     'Present' => $dataPresent,
@@ -439,7 +454,16 @@ class C_api4 extends CI_Controller {
 
             }
 
-            return print_r(json_encode($result));
+            // Syarat presensi
+            $dataSyarat = $this->db->get_where('db_academic.setting_online_class',
+                array('SemesterID' => $data_arr['SemesterID'] ))->result_array();
+
+            $res = array(
+                'Requirements' => $dataSyarat,
+                'Attendance' => $result
+            );
+
+            return print_r(json_encode($res));
 
         }
         else if($data_arr['action']=='actBtnReconfirmAttdStudent'){
@@ -605,8 +629,8 @@ class C_api4 extends CI_Controller {
 
                     // Material
                     $viewMaterial = (count($dataDetail['dataMaterial']))
-                        ? '<div><a href="'.url_sign_in_lecturers.'uploads/material/'.$dataDetail['dataMaterial'][0]['File'].'" target="_blank">
-                                <span class="label label-default" style="font-size: 8px;">Material</span></a></div>'
+                        ? '<a href="'.url_sign_in_lecturers.'uploads/material/'.$dataDetail['dataMaterial'][0]['File'].'" target="_blank">
+                                <span class="label label-default" style="font-size: 8px;">Material</span></a>'
                         : '';
 
                     // Cek Topik
@@ -619,8 +643,13 @@ class C_api4 extends CI_Controller {
                         ? '<span class="label label-success" style="font-size: 8px;">Task</span>'
                         : '';
 
+                    // Cek Quiz
+                    $viewQuiz = ($dataDetail['CheckQuiz']>0)
+                        ? '<span class="label label-warning" style="font-size: 8px;">Quiz</span>'
+                        : '';
+
                     $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
-                                                        '.$viewCkTopik.$viewTask.$viewMaterial.'
+                                                        '.$viewCkTopik.$viewTask.$viewMaterial.$viewQuiz.'
                                     <a href="javascript:void(0);" data-active="'.$d['Status'].'" data-schid="'.$row['ScheduleID'].'"
                                     data-session="'.$s.'" data-start="'.$d['RangeStart'].'"
                                     data-end="'.$d['RangeEnd'].'" class="btnAdmShowAttendance">
@@ -632,48 +661,6 @@ class C_api4 extends CI_Controller {
                 }
             }
 
-
-
-//            for($s=1;$s<=14;$s++){
-//                // Get date
-//                $dataSes = $this->m_rest->getRangeDateLearningOnlinePerSession($row['ScheduleID'],$s);
-//
-//
-//
-//                $rangeSt = date('d/M/Y',strtotime($dataSes['RangeStart']));
-//                $rangeEn = date('d/M/Y',strtotime($dataSes['RangeEnd']));
-//
-//                $bg = ($dataSes['Status']=='1' || $dataSes['Status']==1)
-//                    ? 'background: #ffeb3b42;border: 1px solid #9E9E9E;border-radius: 5px;' : '';
-//
-//                // Material
-//                $viewMaterial = (count($dataSes['dataMaterial']))
-//                    ? '<div><a href="'.url_sign_in_lecturers.'uploads/material/'.$dataSes['dataMaterial'][0]['File'].'" target="_blank">
-//                                <span class="label label-default"><b>Material</b></span></a></div>'
-//                    : '';
-//
-//                // Cek Topik
-//                $viewCkTopik = ($dataSes['CheckTopik']>0)
-//                    ? '<a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" data-session="'.$s.'" class="btnAdmShowForum">
-//                            <div><span class="label label-primary"><b>Forum '.$dataSes['TotalComment'].'</b></span></div></a>'
-//                    : '';
-//
-//                // Cek Task
-//                $viewTask = ($dataSes['CheckTask']>0)
-//                    ? '<a href="javascript:void(0);" data-schid="'.$row['ScheduleID'].'" data-session="'.$s.'" class="btnAdmShowTask">
-//                            <div><span class="label label-success"><b>Task '.$dataSes['TotalTask'].'</b></span></div></a>'
-//                    : '';
-//
-//                $arr = '<div style="'.$bg.'padding-top: 5px;padding-bottom: 5px;">
-//                                    '.$viewCkTopik.$viewTask.$viewMaterial.'
-//                                    <a href="javascript:void(0);" data-active="'.$dataSes['Status'].'" data-schid="'.$row['ScheduleID'].'"
-//                                    data-session="'.$s.'" data-start="'.$dataSes['RangeStart'].'"
-//                                    data-end="'.$dataSes['RangeEnd'].'" class="btnAdmShowAttendance">
-//                                    <div id="show_scheduleOnlinr_'.$row['ScheduleID'].'_'.$s.'" style="font-size: 10px;color: #607d8b;margin-top: 5px;font-weight: bold;">
-//                                    '.$rangeSt.'<br/>'.$rangeEn.'</div id="show_scheduleOnlinr_">
-//                                    </div></a>';
-//                array_push($nestedData,$arr);
-//            }
 
             $no++;
             $data[] = $nestedData;

@@ -367,33 +367,7 @@ class C_upload extends CI_Controller {
 
             $ScheduleID = $dataSS[0]['ScheduleID'];
             $Session = $dataSS[0]['Session'];
-
             $NPM = $this->input->post('formNPM');
-
-            // Cek di forum sudah komen blm
-            $dataForum = $this->db->query('SELECT COUNT(*) AS Total FROM (SELECT cc.ID 
-                                            FROM db_academic.counseling_comment cc
-                                            LEFT JOIN db_academic.counseling_topic ct 
-                                            ON (ct.ID = cc.TopicID)
-                                            WHERE ct.ScheduleID = "'.$ScheduleID.'" 
-                                            AND ct.Sessions = "'.$Session.'"
-                                             AND cc.UserID = "'.$NPM.'" ) xx ')
-                ->result_array();
-
-            if($dataForum[0]['Total']>0){
-
-                $dataArrAttd = $this->m_onlineclass->getArrIDAttd($ScheduleID);
-
-                $data_arr_attd = array(
-                    'ArrIDAttd' => $dataArrAttd,
-                    'Meet' => $Session,
-                    'Attendance' => '1',
-                    'NPM' => $NPM
-                );
-
-                $this->m_onlineclass->setAttendanceStudent($data_arr_attd);
-
-            }
 
             $data_insert = array(
                 'IDST' => $this->input->post('formIDST'),
@@ -407,6 +381,9 @@ class C_upload extends CI_Controller {
             $this->db->insert('db_academic.schedule_task_student',$data_insert);
             $idInsert = $this->db->insert_id();
             $success['success']['InsertID'] = $idInsert;
+
+            // Cek attendace online
+            $this->m_onlineclass->checkOnlineAttendance($NPM,$ScheduleID,$Session);
 
             return print_r(json_encode($success));
 

@@ -315,6 +315,21 @@
                 </tr>
             </table>
         </div>
+        <hr/>
+        <div class="well">
+            <h3 style="margin-top: 0px;border-left: 7px solid #FF9800;padding-left: 7px;">Online Class
+            <br/>
+            <small>Attendance requirements</small></h3>
+            <label class="checkbox-inline">
+                <input type="checkbox" id="OnlineForum" value="1"> Forum
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" id="OnlineTask" value="1"> Task
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" id="OnlineQuiz" value="1"> Quiz
+            </label>
+        </div>
     </div>
 
     <!-- Lecturer -->
@@ -426,98 +441,112 @@
 
     $('#btnSaveDetail').click(function () {
 
-        var form_In_Time_Std = $('#form_In_Time_Std').val();
-        var form_Out_Time_Std = $('#form_Out_Time_Std').val();
 
-        var form_In_Time_Lec = $('#form_In_Time_Lec').val();
-        var form_Out_Time_Lec = $('#form_Out_Time_Lec').val();
+        if(confirm('Are you sure?')){
+            loading_modal_show();
+            var form_In_Time_Std = $('#form_In_Time_Std').val();
+            var form_Out_Time_Std = $('#form_Out_Time_Std').val();
 
-        var totalStatus = parseInt($('#totalStatus').val());
-        var Out_User_Lec = [];
-        if(totalStatus>0){
-            for(var a=0;a<totalStatus;a++){
-                if($('#formUserLec'+a).is(':checked')){
-                    Out_User_Lec.push($('#formUserLec'+a).val());
+            var form_In_Time_Lec = $('#form_In_Time_Lec').val();
+            var form_Out_Time_Lec = $('#form_Out_Time_Lec').val();
+
+            var totalStatus = parseInt($('#totalStatus').val());
+            var Out_User_Lec = [];
+            if(totalStatus>0){
+                for(var a=0;a<totalStatus;a++){
+                    if($('#formUserLec'+a).is(':checked')){
+                        Out_User_Lec.push($('#formUserLec'+a).val());
+                    }
                 }
             }
+
+            var data = {
+                action : 'editDetailAcademicYear',
+                SemesterID : ID,
+                dataForm : {
+                    SemesterID : ID,
+                    bayarBPPStart : ($('#bpp_start').datepicker("getDate")!=null) ? moment($('#bpp_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    bayarBPPEnd : ($('#bpp_end').datepicker("getDate")!=null) ? moment($('#bpp_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    krsStart : ($('#krs_start').datepicker("getDate")!=null) ? moment($('#krs_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    krsEnd : ($('#krs_end').datepicker("getDate")!=null) ? moment($('#krs_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    bayarStart : ($('#bayar_start').datepicker("getDate")!=null) ? moment($('#bayar_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    bayarEnd : ($('#bayar_end').datepicker("getDate")!=null) ? moment($('#bayar_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    kuliahStart : ($('#kuliah_start').datepicker("getDate")!=null) ? moment($('#kuliah_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    kuliahEnd : ($('#kuliah_end').datepicker("getDate")!=null) ? moment($('#kuliah_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    utsStart : ($('#uts_start').datepicker("getDate")!=null) ? moment($('#uts_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    utsEnd : ($('#uts_end').datepicker("getDate")!=null) ? moment($('#uts_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    utsInputNilaiStart : ($('#nilaiuts_start').datepicker("getDate")!=null) ? moment($('#nilaiuts_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    utsInputNilaiEnd : ($('#nilaiuts_end').datepicker("getDate")!=null) ? moment($('#nilaiuts_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    showNilaiUts : ($('#show_nilai_uts').datepicker("getDate")!=null) ? moment($('#show_nilai_uts').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    uasStart : ($('#uas_start').datepicker("getDate")!=null) ? moment($('#uas_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    uasEnd : ($('#uas_end').datepicker("getDate")!=null) ? moment($('#uas_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    uasInputNilaiStart : ($('#nilaiuas_start').datepicker("getDate")!=null) ? moment($('#nilaiuas_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    uasInputNilaiEnd : ($('#nilaiuas_end').datepicker("getDate")!=null) ? moment($('#nilaiuas_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    assgInputEnd : ($('#nilaitugas_end').datepicker("getDate")!=null) ? moment($('#nilaitugas_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    showNilaiUas : ($('#show_nilai_uas').datepicker("getDate")!=null) ? moment($('#show_nilai_uas').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    showNilai_H : ($('#show_nilai_h').datepicker("getDate")!=null) ? moment($('#show_nilai_h').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    showNilai_T : ($('#show_nilai_t').datepicker("getDate")!=null) ? moment($('#show_nilai_t').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    updateTranscript : ($('#updateTranscript').datepicker("getDate")!=null) ? moment($('#updateTranscript').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    edomStart : ($('#edom_start').datepicker("getDate")!=null) ? moment($('#edom_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    edomEnd : ($('#edom_end').datepicker("getDate")!=null) ? moment($('#edom_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    edom2Start : ($('#edom2_start').datepicker("getDate")!=null) ? moment($('#edom2_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    edom2End : ($('#edom2_end').datepicker("getDate")!=null) ? moment($('#edom2_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    TARegStart : ($('#taReg_start').datepicker("getDate")!=null) ? moment($('#taReg_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                    TARegEnd : ($('#taReg_end').datepicker("getDate")!=null) ? moment($('#taReg_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                },
+                dataFormAttd : {
+                    In_Session_Std : $('#form_In_Session_Std').val(),
+                    In_Type_Std : $('#form_In_Type_Std').val(),
+                    In_Time_Std : (form_In_Time_Std!='' && form_In_Time_Std!=null && form_In_Time_Std!=0) ? form_In_Time_Std : 0,
+                    Out_Session_Std : $('#form_Out_Session_Std').val(),
+                    Out_Type_Std : $('#form_Out_Type_Std').val(),
+                    Out_Time_Std :(form_Out_Time_Std!='' &&  form_Out_Time_Std!=null &&  form_Out_Time_Std!=0) ?  form_Out_Time_Std : 0,
+                    In_Session_Lec : $('#form_In_Session_Lec').val(),
+                    In_Type_Lec : $('#form_In_Type_Lec').val(),
+                    In_Time_Lec : (form_In_Time_Lec!='' && form_In_Time_Lec!=null && form_In_Time_Lec!=0) ? form_In_Time_Lec : 0,
+                    Out_Session_Lec : $('#form_Out_Session_Lec').val(),
+                    Out_Type_Lec : $('#form_Out_Type_Lec').val(),
+                    Out_Time_Lec :( form_Out_Time_Lec!='' &&  form_Out_Time_Lec!=null &&  form_Out_Time_Lec!=0) ?  form_Out_Time_Lec : 0,
+                    Out_User_Lec : JSON.stringify(Out_User_Lec),
+                    DefaultAttendance : $("input[name=form_DefaultAttendance]:checked").val(),
+                    ModifyAttendance : ($('#ModifyAttendance').datepicker("getDate")!=null)
+                        ? moment($('#ModifyAttendance').datepicker("getDate")).format('YYYY-MM-DD')
+                        : moment($('#kuliah_end').datepicker("getDate")).format('YYYY-MM-DD'),
+                    UpdateBy : sessionNIP,
+                    UpdateAt : dateTimeNow()
+                },
+                dataOnlineClass : {
+                    Forum : ($('#OnlineForum').is(':checked')) ? '1' : '0',
+                    Task : ($('#OnlineTask').is(':checked')) ? '1' : '0',
+                    Quiz : ($('#OnlineQuiz').is(':checked')) ? '1' : '0',
+                    UpdatedBy : sessionNIP,
+                    UpdatedAt : dateTimeNow()
+                }
+            };
+
+            loading_button('#btnSaveDetail');
+            $('.form-tahun-akademik,#btnBack').prop('disabled',true);
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudDataDetailTahunAkademik';
+            $.post(url,{token:token},function (data) {
+                toastr.success('Data saved','Success!');
+                setTimeout(function () {
+                    loading_modal_hide();
+                    $('#btnSaveDetail').prop('disabled',false).html('Save');
+                    $('.form-tahun-akademik,#btnBack').prop('disabled',false);
+                },2000);
+            });
         }
 
-        var data = {
-            action : 'edit',
-            SemesterID : ID,
-            dataForm : {
-                SemesterID : ID,
-                bayarBPPStart : ($('#bpp_start').datepicker("getDate")!=null) ? moment($('#bpp_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                bayarBPPEnd : ($('#bpp_end').datepicker("getDate")!=null) ? moment($('#bpp_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                krsStart : ($('#krs_start').datepicker("getDate")!=null) ? moment($('#krs_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                krsEnd : ($('#krs_end').datepicker("getDate")!=null) ? moment($('#krs_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                bayarStart : ($('#bayar_start').datepicker("getDate")!=null) ? moment($('#bayar_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                bayarEnd : ($('#bayar_end').datepicker("getDate")!=null) ? moment($('#bayar_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                kuliahStart : ($('#kuliah_start').datepicker("getDate")!=null) ? moment($('#kuliah_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                kuliahEnd : ($('#kuliah_end').datepicker("getDate")!=null) ? moment($('#kuliah_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                utsStart : ($('#uts_start').datepicker("getDate")!=null) ? moment($('#uts_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                utsEnd : ($('#uts_end').datepicker("getDate")!=null) ? moment($('#uts_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                utsInputNilaiStart : ($('#nilaiuts_start').datepicker("getDate")!=null) ? moment($('#nilaiuts_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                utsInputNilaiEnd : ($('#nilaiuts_end').datepicker("getDate")!=null) ? moment($('#nilaiuts_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                showNilaiUts : ($('#show_nilai_uts').datepicker("getDate")!=null) ? moment($('#show_nilai_uts').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                uasStart : ($('#uas_start').datepicker("getDate")!=null) ? moment($('#uas_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                uasEnd : ($('#uas_end').datepicker("getDate")!=null) ? moment($('#uas_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                uasInputNilaiStart : ($('#nilaiuas_start').datepicker("getDate")!=null) ? moment($('#nilaiuas_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                uasInputNilaiEnd : ($('#nilaiuas_end').datepicker("getDate")!=null) ? moment($('#nilaiuas_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                assgInputEnd : ($('#nilaitugas_end').datepicker("getDate")!=null) ? moment($('#nilaitugas_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                showNilaiUas : ($('#show_nilai_uas').datepicker("getDate")!=null) ? moment($('#show_nilai_uas').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                showNilai_H : ($('#show_nilai_h').datepicker("getDate")!=null) ? moment($('#show_nilai_h').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                showNilai_T : ($('#show_nilai_t').datepicker("getDate")!=null) ? moment($('#show_nilai_t').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                updateTranscript : ($('#updateTranscript').datepicker("getDate")!=null) ? moment($('#updateTranscript').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                edomStart : ($('#edom_start').datepicker("getDate")!=null) ? moment($('#edom_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                edomEnd : ($('#edom_end').datepicker("getDate")!=null) ? moment($('#edom_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                edom2Start : ($('#edom2_start').datepicker("getDate")!=null) ? moment($('#edom2_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                edom2End : ($('#edom2_end').datepicker("getDate")!=null) ? moment($('#edom2_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                TARegStart : ($('#taReg_start').datepicker("getDate")!=null) ? moment($('#taReg_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                TARegEnd : ($('#taReg_end').datepicker("getDate")!=null) ? moment($('#taReg_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
-            },
-            dataFormAttd : {
-                In_Session_Std : $('#form_In_Session_Std').val(),
-                In_Type_Std : $('#form_In_Type_Std').val(),
-                In_Time_Std : (form_In_Time_Std!='' && form_In_Time_Std!=null && form_In_Time_Std!=0) ? form_In_Time_Std : 0,
-                Out_Session_Std : $('#form_Out_Session_Std').val(),
-                Out_Type_Std : $('#form_Out_Type_Std').val(),
-                Out_Time_Std :(form_Out_Time_Std!='' &&  form_Out_Time_Std!=null &&  form_Out_Time_Std!=0) ?  form_Out_Time_Std : 0,
-                In_Session_Lec : $('#form_In_Session_Lec').val(),
-                In_Type_Lec : $('#form_In_Type_Lec').val(),
-                In_Time_Lec : (form_In_Time_Lec!='' && form_In_Time_Lec!=null && form_In_Time_Lec!=0) ? form_In_Time_Lec : 0,
-                Out_Session_Lec : $('#form_Out_Session_Lec').val(),
-                Out_Type_Lec : $('#form_Out_Type_Lec').val(),
-                Out_Time_Lec :( form_Out_Time_Lec!='' &&  form_Out_Time_Lec!=null &&  form_Out_Time_Lec!=0) ?  form_Out_Time_Lec : 0,
-                Out_User_Lec : JSON.stringify(Out_User_Lec),
-                DefaultAttendance : $("input[name=form_DefaultAttendance]:checked").val(),
-                ModifyAttendance : ($('#ModifyAttendance').datepicker("getDate")!=null)
-                    ? moment($('#ModifyAttendance').datepicker("getDate")).format('YYYY-MM-DD')
-                    : moment($('#kuliah_end').datepicker("getDate")).format('YYYY-MM-DD'),
-                UpdateBy : sessionNIP,
-                UpdateAt : dateTimeNow()
-            }
-        };
 
-        loading_button('#btnSaveDetail');
-        $('.form-tahun-akademik,#btnBack').prop('disabled',true);
-
-        var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'api/__crudDataDetailTahunAkademik';
-        $.post(url,{token:token},function (data) {
-            toastr.success('Data saved','Success!');
-            setTimeout(function () {
-                $('#btnSaveDetail').prop('disabled',false).html('Save');
-                $('.form-tahun-akademik,#btnBack').prop('disabled',false);
-            },2000);
-        });
 
     });
 
     function loadData(ID) {
         var url = base_url_js+'api/__crudDataDetailTahunAkademik';
         var data = {
-            action : 'read',
+            action : 'readDetailAcademicYear',
             ID : ID
         };
         var token = jwt_encode(data,'UAP)(*');
@@ -641,6 +670,11 @@
             }
 
 
+            if(data.OnlineClass.length>0){
+                $('#OnlineForum').prop('checked',(parseInt(data.OnlineClass[0].Forum)==1) ? true : false);
+                $('#OnlineTask').prop('checked',(parseInt(data.OnlineClass[0].Task)==1) ? true : false);
+                $('#OnlineQuiz').prop('checked',(parseInt(data.OnlineClass[0].Quiz)==1) ? true : false);
+            }
 
 
 
