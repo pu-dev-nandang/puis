@@ -204,7 +204,7 @@
                        } else {
                            $('#formRoom,#formSeat,#formSeatForExam,#btnCloseClassroom').prop('disabled',false);
                            $('#btnSaveClassroom').prop('disabled',false).html('Save');
-                           toastr.warning('Room is exist','Warning');
+                           toastr.warning('Something wrong, please check all fields are required','Warning');
                        }
                    },1000);
 
