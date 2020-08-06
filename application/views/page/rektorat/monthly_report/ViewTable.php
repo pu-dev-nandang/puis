@@ -1,29 +1,46 @@
 <?php if (count($auth) > 0): ?>
 	<div class="row">
-	    <div class="col-md-3 col-md-offset-4">
+	    <div class="col-md-6 col-md-offset-3">
 	        <div class="well">
-	            <label>Department</label>
-				   <select class="select2-select-00 full-width-fix" id="Division">
-				   	<?php if ($DivisionID == "NA.12" || $DivisionID == 'NA.2'): ?>
+	        	<div class="row">
+	        		<div class="col-md-4">
+	        			<label>Department</label>
+						   <select class="select2-select-00 full-width-fix" id="Division">
+						   	<?php if ($DivisionID == "NA.12" || $DivisionID == 'NA.2'|| $DivisionID == 'NA.41'): ?>
+						   		<option value="%" selected > ALL </option>
+						   	<?php endif ?>
+			                  
+			                <?php for($i = 0; $i < count($G_division); $i++): ?>
+			                	<?php if ($DivisionID == "NA.12" || $DivisionID == 'NA.2'|| $DivisionID == 'NA.41'): ?>
+			                		<option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>
+			                	<?php else: ?>
+			                		<?php if ($G_division[$i]['Code'] == $DivisionID): ?>
+			                		<option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>	
+			                		<?php endif ?>
+			                	<?php endif ?>
+			                	
+	                  
+	                		<?php endfor ?>
+	               			</select>
+	        		</div>
+	        		<div class="col-md-4">
+	        			<label>Month</label>
+				   		<select class="select2-select-00 full-width-fix" id="Bulan">
 				   		<option value="%" selected > ALL </option>
-				   	<?php endif ?>
-	                  
-	                <?php for($i = 0; $i < count($G_division); $i++): ?>
-	                	<?php if ($DivisionID == "NA.12" || $DivisionID == 'NA.2'): ?>
-	                		<option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>
-	                	<?php else: ?>
-	                		<?php if ($G_division[$i]['Code'] == $DivisionID): ?>
-	                		<option value="<?php echo $G_division[$i]['Code'] ?>" > <?php echo $G_division[$i]['Name2'] ?> </option>	
-	                		<?php endif ?>
-	                	<?php endif ?>
-	                	
-	                  
-	                <?php endfor ?>
-	               </select>
+	               		</select>
+	        		</div>
+	        		<div class="col-md-4">
+	        			<label>Year</label>
+				   		<select class="select2-select-00 full-width-fix" id="Tahun">
+				   		<option value="%" selected > ALL </option>
+	               		</select>
+	        		</div>
+	        	</div>
 	        </div>
-	        <hr/>
 	    </div>
 	</div>
+	
+
 	<div class="row">    
 	    <div class="col-md-12">
 	    	<table class="table" id = "TBLMonthly_Report">
@@ -33,7 +50,7 @@
 	    				<th>Title</th>
 	    				<th>Department / Prodi</th>
 	    				<th>Description</th>
-	    				<th>Date Report</th>
+	    				<th>Monthly Report</th>
 	    				<th>File</th>
 	    				<th>Updated at</th> 	
 	    				<th>Updated by</th>
