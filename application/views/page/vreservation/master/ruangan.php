@@ -156,7 +156,8 @@
         var DeretForExam = $('#formDeretForExam').val(); var processDeretForExam = (DeretForExam!='' && $.isNumeric(DeretForExam) && Math.floor(DeretForExam)==DeretForExam) ? true : errorInput('#formDeretForExam') ;
         var LectureDesk = $('#formLectureDesk').val(); process = (LectureDesk=='') ? errorInput('#formLectureDesk') : true ;
         var formCategoryRoom = $("#formCategoryRoom").val();
-        if(Room!='' && processSeat && processSeatForExam){
+        var fileData = document.getElementById("ExFile").files[0];
+        if(Room!='' && processSeat && processSeatForExam && fileData !== undefined){
             $('#formRoom,#formSeat,#formSeatForExam,#btnCloseClassroom').prop('disabled',true);
             loading_button('#btnSaveClassroom');
             loading_page('#viewClassroom');
@@ -178,7 +179,6 @@
             };
 
             var form_data = new FormData();
-            var fileData = document.getElementById("ExFile").files[0];
             var url = base_url_js + "api/__crudClassroomVreservation"
             var token = jwt_encode(data,"UAP)(*");
             form_data.append('token',token);
@@ -204,7 +204,7 @@
                        } else {
                            $('#formRoom,#formSeat,#formSeatForExam,#btnCloseClassroom').prop('disabled',false);
                            $('#btnSaveClassroom').prop('disabled',false).html('Save');
-                           toastr.warning('Room is exist','Warning');
+                           toastr.warning('Something wrong, room already exist','Warning');
                        }
                    },1000);
 
