@@ -157,7 +157,11 @@
         var LectureDesk = $('#formLectureDesk').val(); process = (LectureDesk=='') ? errorInput('#formLectureDesk') : true ;
         var formCategoryRoom = $("#formCategoryRoom").val();
         var fileData = document.getElementById("ExFile").files[0];
-        if(Room!='' && processSeat && processSeatForExam && fileData !== undefined){
+        if(Room!='' && processSeat && processSeatForExam ){
+            if (action == 'add' && fileData === undefined) {
+                toastr.error('Form Required','Error!');
+                return;
+            }
             $('#formRoom,#formSeat,#formSeatForExam,#btnCloseClassroom').prop('disabled',true);
             loading_button('#btnSaveClassroom');
             loading_page('#viewClassroom');
