@@ -17,13 +17,13 @@
               <div class="form-group">
                   <div class="row">
                     <div class="col-md-12" style="text-align: center;">
-                      <label><u>Date Report</u></label>
+                      <label><u>Monthly Report</u></label>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-md-6">
                       <div class="form-group">
-                        <label>Bulan</label>
+                        <label>Month</label>
                         <select class="select2-select-00 full-width-fix select2-offscreen input" name = "Bulan">
                           
                         </select>
@@ -31,7 +31,7 @@
                     </div>
                     <div class="col-md-6">
                       <div class="form-group">
-                        <label>Tahun</label>
+                        <label>Year</label>
                         <select class="select2-select-00 full-width-fix select2-offscreen input" name = "Tahun">
                           
                         </select>
@@ -93,7 +93,7 @@
     }
 
     el.empty();
-    el.append('<option value="'+'all'+'" '+'selected'+'>'+'--No Filtering Year--'+'</option>');
+    el.append('<option value="'+'all'+'" '+'selected'+'>'+'-'+'</option>');
 
     for (var i = 0; i < arr.length; i++) {
       el.append('<option value="'+ arr[i] +'" '+''+'>'+arr[i]+'</option>');

@@ -62,7 +62,7 @@ class C_monthly_report extends Globalclass {
             // get Nav Dept
             $Nav = $this->m_master->getSessionDepartmentPU();
             if ($DivisionID == '%') {
-                if ($Nav == 'NA.12' || $Nav == 'NA.2') {
+                if ($Nav == 'NA.12' || $Nav == 'NA.2' || $Nav == 'NA.41') {
                     $Where = '';
                 }
                 else
