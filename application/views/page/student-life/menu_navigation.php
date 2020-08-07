@@ -49,7 +49,38 @@
                 </a>
             </li>
         </ul>
+        <div class="sidebar-title">
+            <span>PORTAL ALUMNI LIVE</span>
+        </div>
+        <ul id="nav">
 
+            <li class="<?php if($this->uri->segment(2)=='banner'){echo"current";}?>">
+                <a href="<?php echo base_url('student-life/banner');?>">
+                    <i class="fa fa-picture-o"></i>
+                    Banner Slider
+                </a>
+            </li>
+                       
+            <li class="<?php if($this->uri->segment(2)=='event'){echo"current";}?>">
+                <a href="<?php echo base_url('student-life/event');?>">
+                    <i class="fa fa-calendar"></i>
+                    Event
+                </a>
+            </li>
+
+            <li class="<?php if($this->uri->segment(2)=='about'){echo"current";}?>">
+                <a href="<?php echo base_url('student-life/about');?>">
+                    <i class="fa fa-life-ring"></i>
+                    About Us
+                </a>
+            </li> 
+
+            <li class="<?php if($this->uri->segment(2)=='contact'){echo"current";}?>">
+                <a href="<?php echo base_url('student-life/contact');?>">
+                    <i class="fa fa-address-book-o"></i>
+                    Contact Us
+                </a>
+            </li>
 
 
         <div class="sidebar-widget align-center">

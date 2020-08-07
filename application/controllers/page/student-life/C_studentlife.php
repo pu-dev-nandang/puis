@@ -9,6 +9,7 @@ class C_studentlife extends Student_Life {
     {
         parent::__construct();
         $this->load->model('student-life/m_studentlife','stdlife');
+        $this->load->model('student-life/m_alumni');
     }
 
     private function __setting_rest_alumni(){
@@ -174,6 +175,198 @@ class C_studentlife extends Student_Life {
         $page = $this->load->view('page/'.$this->varClass['department'].'/tracer-alumni/testimony',$this->varClass,true);
         $this->menu_stracert_alumni($page);
     }
+
+
+    // ------------Menu Alumni Live---------//
+    // Yamin
+    // 03/08/2020
+
+    public function menu_content(){
+        // $data['page'] = $page;
+        $data['department'] = parent::__getDepartement();
+        // $data['category'] = $this->m_alumni->get_category();
+        $content = $this->load->view('page/'.$data['department'].'/portal-alumni/menu_content',$data,true);
+        $this->temp($content);
+    }
+
+    ## table load /list
+
+    public function ajax_list()
+    {
+        $type=$this->uri->segment(2);
+        $list = $this->m_alumni->get_datatables($type);
+        $data = array();        
+        $no = $_POST['start'];
+       
+        foreach ($list as $m) {
+            $no++;
+            $row = array();
+            $row[] = $m->TitleContent;
+            
+            $row[] = $m->Description;
+            $row[] = $m->Status;
+            $row[] = $m->UpdatedAt; 
+            //add html for action
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_alumni('."'".$m->ID_Content."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_alumni('."'".$m->ID_Content."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 
+            $data[] = $row;
+        }
+       
+        $output = array(
+                "draw" => $_POST['draw'],
+                "recordsTotal" => $this->m_alumni->count_all(),
+                "recordsFiltered" => $this->m_alumni->count_filtered(),
+                "data" => $data,
+                );
+        //output to json format
+        echo json_encode($output);
+    }
+
+    public function ajax_edit($id)
+    {
+        $data = $this->m_alumni->get_by_id($id);
+        // print_r($data);die();
+        echo json_encode($data);
+    }
+ 
+    public function ajax_add()
+    {
+        $this->_validate();
+        $data = array(
+                // 'IDType' => $this->input->post('type'),
+                'TitleContent' => $this->input->post('title'),
+                'IDSubCat' => $this->input->post('idsubcategory'),
+                'Description' => $this->input->post('description'),
+                'Meta_description' => $this->input->post('meta_des'),
+                'Meta_keywords' => $this->input->post('meta_key'),
+                'Lang' => $this->input->post('lang'),
+                'AddDate' => $this->input->post('date'),
+                'Status' => $this->input->post('status'),
+                'CreateAt' => date('Y-m-d H:i:s'),
+                'CreateBy' => $this->session->userdata('NIP'),
+            );
+
+        if(!empty($_FILES['photo']['name']))
+        {
+            $upload = $this->_do_upload();
+            $data['File'] = $upload;
+        }
+        $type = $this->input->post('type');
+        $insert = $this->m_alumni->save($data,$type);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    // Content 
+    public function ajax_update()
+    {
+        $this->_validate();
+        $data = array(
+                'TitleContent' => $this->input->post('title'),
+                'IDSubCat' => $this->input->post('category'),
+                'Description' => $this->input->post('description'),
+                'Meta_description' => $this->input->post('meta_des'),
+                'Meta_keywords' => $this->input->post('meta_key'),
+                // 'Lang' => $this->input->post('lang'),
+                'AddDate' => $this->input->post('date'),
+                'Status' => $this->input->post('status'),
+                'UpdatedAt' => date('Y-m-d H:i:s'),
+                'UpdatedBy' => $this->session->userdata('NIP'),
+            );
+
+        if(!empty($_FILES['photo']['name']))
+        {
+            $upload = $this->_do_upload();
+             
+            //delete file
+            $alumni = $this->m_alumni->get_by_id($this->input->post('id'));
+            if(file_exists('./uploads/alumni/'.$alumni->File) && $alumni->File)
+                unlink('./uploads/alumni/'.$alumni->File);
+ 
+            $data['File'] = $upload;
+        }
+
+        $this->m_alumni->update(array('ID_Content' => $this->input->post('id')), $data);
+        echo json_encode(array("status" => TRUE));
+    }
+    
+    public function ajax_delete($id)
+    {
+        //delete file
+        $alumni = $this->m_alumni->get_by_id($id);
+        if(file_exists('./uploads/alumni/'.$alumni->File) && $alumni->File)
+            unlink('./uploads/alumni/'.$alumni->File);
+
+        $this->m_alumni->delete_by_id($id);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    private function _do_upload()
+    {
+        $config['upload_path']          = './uploads/alumni';
+        $config['allowed_types']        = 'gif|jpg|png|jpeg|pdf';
+        $config['max_size']             = 2048000; //set max size allowed in Kilobyte 2mb
+        $config['max_width']            = 1600; // set max width image allowed
+        $config['max_height']           = 600; // set max height allowed
+        $config['file_name']            = round(microtime(true) * 1000); //just milisecond timestamp fot unique name
+ 
+        $this->load->library('upload', $config);
+        $this->upload->initialize($config);
+
+        if(!$this->upload->do_upload('photo')) //upload and validate
+        {
+            $data['inputerror'][] = 'photo';
+            $data['error_string'][] = 'Upload error: '.$this->upload->display_errors('',''); //show ajax error
+            $data['status'] = FALSE;
+            echo json_encode($data);
+            exit();
+        }
+        return $this->upload->data('file_name');
+    }
+
+    private function _validate()
+    {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;
+ 
+        if($this->input->post('title') == '')
+        {
+            $data['inputerror'][] = 'title';
+            $data['error_string'][] = 'Title is required';
+            $data['status'] = FALSE;
+        }
+ 
+        // if($this->input->post('description') == '')
+        // {
+        //     $data['inputerror'][] = 'description';
+        //     $data['error_string'][] = 'Description is required';
+        //     $data['status'] = FALSE;
+        // }
+ 
+        if($this->input->post('status') == '')
+        {
+            $data['inputerror'][] = 'status';
+            $data['error_string'][] = 'Status is required';
+            $data['status'] = FALSE;
+        }
+ 
+        // if($this->input->post('lang') == '')
+        // {
+        //     $data['inputerror'][] = 'lang';
+        //     $data['error_string'][] = 'Please select language';
+        //     $data['status'] = FALSE;
+        // }
+        
+ 
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
+        }
+    }
+
 
 
 }
