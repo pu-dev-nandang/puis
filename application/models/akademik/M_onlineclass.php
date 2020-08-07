@@ -118,9 +118,17 @@ class M_onlineclass extends CI_Model {
                                                          AND qq.Session = "'.$Session.'" ')->result_array()[0]['Total'];
 
 
-                $Task = ($dataSetting[0]['Task']=='1' && $dataTask>0) ? true : false;
-                $Forum = ($dataSetting[0]['Forum']=='1' && $dataForum>0) ? true : false;
-                $Quiz = ($dataSetting[0]['Quiz']=='1' && $dataQuiz>0) ? true : false;
+                $Task = ($dataSetting[0]['Task']=='1')
+                    ? ($dataTask>0) ? true : false
+                    : true;
+
+                $Forum = ($dataSetting[0]['Forum']=='1')
+                    ? ($dataForum>0) ? true : false
+                    : true;
+
+                $Quiz = ($dataSetting[0]['Quiz']=='1')
+                    ? ($dataQuiz>0) ? true : false
+                    : true;
 
                 if($Task && $Forum && $Quiz){
 

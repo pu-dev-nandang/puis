@@ -241,6 +241,7 @@
             if(jsonResult.Student.length>0){
                 $.each(jsonResult.Student,function (i,v) {
                     var Forum = (parseInt(v.TotalComment)>0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
+                    var Quiz = (parseInt(v.TotalQuiz)>0) ? '<i class="fa fa-check" style="color: green;"></i>' : '-';
 
                     var btnRemoveTask = (parseInt(PanelActive)==1 && v.TotalTask.length>0)
                         ? '<a href="javascript:void(0);" class="btnRemoveTask" data-id="'+v.TotalTask[0].ID+'">Remove</a></div>'
@@ -276,10 +277,6 @@
                             '</div></div>';
                     }
 
-
-
-
-
                     viewStd = viewStd+'<tr>' +
                         '<td>'+(i+1)+'</td>' +
                         '<td style="text-align: left;">'+viewRevisiTask+'<b>'+v.Name+'</b><br/>'+v.NPM+'' +
@@ -287,6 +284,7 @@
                         '</td>' +
                         '<td>'+Forum+'</td>' +
                         '<td>'+Task+'</td>' +
+                        '<td>'+Quiz+'</td>' +
                         '<td>'+isPresent+'</td>' +
                         '</tr>';
                 });
@@ -300,6 +298,7 @@
                 '        <th>Student</th>' +
                 '        <th style="width: 10%;">Forum</th>' +
                 '        <th style="width: 10%;">Task</th>' +
+                '        <th style="width: 10%;">Quiz</th>' +
                 '        <th style="width: 17%;">Attendance</th>' +
                 '    </tr>' +
                 '    </thead>' +
