@@ -482,50 +482,54 @@ class C_api4 extends CI_Controller {
             $ScheduleID = $data_arr['ScheduleID'];
             $Session = $data_arr['Session'];
 
+            $dataCk = $this->m_oc->checkOnlineAttendance($NPM,$ScheduleID,$Session);
+
+            return print_r(json_encode(array('Status'=>$dataCk)));
+
             // Task
-            $dataTask = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task_student sts 
-                                                        LEFT JOIN  db_academic.schedule_task st
-                                                        ON (sts.IDST = st.ID)
-                                                        WHERE sts.NPM = "'.$NPM.'" AND 
-                                                        st.ScheduleID = "'.$ScheduleID.'" AND
-                                                        st.Session = "'.$Session.'"
-                                                           ')->result_array()[0]['Total'];
+//            $dataTask = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.schedule_task_student sts
+//                                                        LEFT JOIN  db_academic.schedule_task st
+//                                                        ON (sts.IDST = st.ID)
+//                                                        WHERE sts.NPM = "'.$NPM.'" AND
+//                                                        st.ScheduleID = "'.$ScheduleID.'" AND
+//                                                        st.Session = "'.$Session.'"
+//                                                           ')->result_array()[0]['Total'];
+//
+//
+//            // Forum
+//            $dataForum = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.counseling_comment cc
+//                                                        LEFT JOIN db_academic.counseling_topic ct
+//                                                        ON (ct.ID = cc.TopicID)
+//                                                        WHERE cc.UserID = "'.$NPM.'"
+//                                                        AND ct.ScheduleID = "'.$ScheduleID.'"
+//                                                         AND ct.Sessions = "'.$Session.'" ')
+//                                    ->result_array()[0]['Total'];
+//
+//            if($dataTask>0 && $dataForum>0){
+//                $ArrAttdID = (array) $data_arr['ArrAttdID'];
+//
+////                print_r($ArrAttdID);exit();
+//
+//                if(count($ArrAttdID)>0){
+//                    for($i=0;$i<count($ArrAttdID);$i++){
+//                        $IDAttd = $ArrAttdID[$i]->ID;
+//
+//                        $this->db->where(array(
+//                            'ID_Attd' => $IDAttd,
+//                            'NPM' => $NPM
+//                        ));
+//                        $this->db->update('db_academic.attendance_students',
+//                            array(
+//                                'M'.$Session => '1',
+//                                'IsOnline'.$Session => 1
+//                            ));
+//
+//                    }
+//                }
+//
+//            }
 
-
-            // Forum
-            $dataForum = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.counseling_comment cc
-                                                        LEFT JOIN db_academic.counseling_topic ct 
-                                                        ON (ct.ID = cc.TopicID)
-                                                        WHERE cc.UserID = "'.$NPM.'" 
-                                                        AND ct.ScheduleID = "'.$ScheduleID.'"
-                                                         AND ct.Sessions = "'.$Session.'" ')
-                                    ->result_array()[0]['Total'];
-
-            if($dataTask>0 && $dataForum>0){
-                $ArrAttdID = (array) $data_arr['ArrAttdID'];
-
-//                print_r($ArrAttdID);exit();
-
-                if(count($ArrAttdID)>0){
-                    for($i=0;$i<count($ArrAttdID);$i++){
-                        $IDAttd = $ArrAttdID[$i]->ID;
-
-                        $this->db->where(array(
-                            'ID_Attd' => $IDAttd,
-                            'NPM' => $NPM
-                        ));
-                        $this->db->update('db_academic.attendance_students',
-                            array(
-                                'M'.$Session => '1',
-                                'IsOnline'.$Session => 1
-                            ));
-
-                    }
-                }
-
-            }
-
-            return print_r(1);
+//            return print_r(1);
         }
         else if($data_arr['action']=='updateDateOnline'){
 
