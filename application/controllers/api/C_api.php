@@ -1748,7 +1748,8 @@ class C_api extends CI_Controller {
                 // Class Online
                 $dataOnlineClass = (array) $data_arr['dataOnlineClass'];
                 $cekOnlineClass = $this->db->select('ID')
-                    ->get_where('db_academic.setting_online_class')
+                    ->get_where('db_academic.setting_online_class',
+                        array('SemesterID'=>$SemesterID))
                     ->result_array();
 
                 if(count($cekOnlineClass)>0){
