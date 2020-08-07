@@ -286,6 +286,16 @@ class C_api4 extends CI_Controller {
                                                                                  ORDER BY stsr.ID ASC')
                                                             ->result_array();
 
+                    // Quiz
+                    $dataStd[$i]['TotalQuiz'] = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.q_quiz_students qqs
+                                                        LEFT JOIN db_academic.q_quiz qq 
+                                                        ON (qq.ID = qqs.QuizID)
+                                                        WHERE qqs.NPM = "'.$d['NPM'].'"
+                                                        AND qqs.WorkDuration IS NOT NULL
+                                                        AND qqs.WorkDuration > 0
+                                                        AND qq.ScheduleID = "'.$ScheduleID.'"
+                                                         AND qq.Session = "'.$Session.'" ')->result_array()[0]['Total'];
+
 
 
 
