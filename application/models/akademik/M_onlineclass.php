@@ -80,7 +80,7 @@ class M_onlineclass extends CI_Model {
     public function checkOnlineAttendance($NPM,$ScheduleID,$Session){
 
         // Get SemesterID
-        $dataSetting = $this->db->quesry('SELECT soc.*, s.OnlineLearning FROM db_academic.schedule.setting_online_class soc 
+        $dataSetting = $this->db->query('SELECT soc.*, s.OnlineLearning FROM db_academic.setting_online_class soc 
                                     LEFT JOIN db_academic.schedule s ON (s.SemesterID = soc.SemesterID)
                                     WHERE s.ID = "'.$ScheduleID.'" ')->result_array();
 
