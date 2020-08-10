@@ -1041,29 +1041,6 @@ class C_rest extends CI_Controller {
                     // Cek attendace online
                     $this->m_onlineclass->checkOnlineAttendance($UserID,$ScheduleID,$Sessions);
 
-                    // Cek apakah sudah membuat tugas
-//                    $sc_t = $this->db->query('SELECT COUNT(*) AS Total
-//                                        FROM (SELECT stt.ID FROM db_academic.schedule_task_student stt
-//                                        LEFT JOIN db_academic.schedule_task st ON (st.ID = stt.IDST)
-//                                        WHERE st.ScheduleID = "'.$ScheduleID.'"
-//                                        AND st.Session = "'.$Sessions.'"
-//                                        AND stt.NPM = "'.$UserID.'" ) xx ')->result_array();
-//
-//                    if($sc_t[0]['Total']>0){
-//
-//                        $dataArrAttd = $this->m_onlineclass->getArrIDAttd($ScheduleID);
-//
-//                        $data_arr_attd = array(
-//                            'ArrIDAttd' => $dataArrAttd,
-//                            'Meet' => $Sessions,
-//                            'Attendance' => '1',
-//                            'NPM' => $UserID
-//                        );
-//
-//                        $this->m_onlineclass->setAttendanceStudent($data_arr_attd);
-//                    }
-
-
                 }
 
 
@@ -1432,6 +1409,12 @@ class C_rest extends CI_Controller {
                          }
                      }
                     $dataCkSession[0]['Details'] = $Details;
+
+                     // Cek totak soal
+                    $dataCkSession[0]['TotalQuestion'] = $this->db->query('SELECT COUNT(*) AS Total 
+                                                                    FROM db_academic.q_quiz_details
+                                                                    WHERE QuizID = "'.$dataCkSession[0]['ID'].'" ')
+                                                                    ->result_array()[0]['Total'];
                 }
 
                 $result = array(
@@ -1450,7 +1433,7 @@ class C_rest extends CI_Controller {
 
                 $data = $this->db->query('SELECT q.ID, q.Duration , qs.ID AS QuizStudentID,   
                                                     qs.StartSession, qs.EndSession,
-                                                    qs.WorkDuration
+                                                    qs.WorkDuration, q.NotesForStudents
                                                     FROM db_academic.q_quiz q
                                                     LEFT JOIN db_academic.q_quiz_students qs 
                                                     ON (qs.QuizID = q.ID AND qs.NPM = "'.$NPM.'")
