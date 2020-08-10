@@ -1827,7 +1827,7 @@ class C_api4 extends CI_Controller {
                                   <ul class="dropdown-menu" style="left: -114px;">
                                     <li><a href="javascript:void(0);" class="addToQuizFromMyQuestion" data-id="'.$row['ID'].'">Add to quiz</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="javascript:void(0);" class="editQuestion" data-tqid="'.$row['QTID'].'" data-id="'.$row['ID'].'">Edit</a></li>
+                                    <li class="hide"><a href="javascript:void(0);" class="editQuestion" data-tqid="'.$row['QTID'].'" data-id="'.$row['ID'].'">Edit</a></li>
                                     <li><a href="javascript:void(0);" class="removeQuestion" data-tqid="'.$row['QTID'].'" data-id="'.$row['ID'].'">Remove</a></li>
                                   </ul>
                                 </div>
