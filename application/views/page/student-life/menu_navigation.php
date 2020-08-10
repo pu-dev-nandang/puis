@@ -75,12 +75,12 @@
                 </a>
             </li> 
 
-            <li class="<?php if($this->uri->segment(2)=='contact'){echo"current";}?>">
+            <!-- <li class="<?php if($this->uri->segment(2)=='contact'){echo"current";}?>">
                 <a href="<?php echo base_url('student-life/contact');?>">
                     <i class="fa fa-address-book-o"></i>
                     Contact Us
                 </a>
-            </li>
+            </li> -->
 
 
         <div class="sidebar-widget align-center">
