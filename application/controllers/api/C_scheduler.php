@@ -101,7 +101,16 @@ class C_scheduler extends CI_Controller {
           //$this->__s3b7();
           break;
         case 's4':
-          $this->__s4();
+          //$this->__s4();
+          break;
+        case 's5a':
+          $this->__s5a();
+          break;
+        case 's5b':
+          $this->__s5b();
+          break;
+        case 's5c':
+          $this->__s5c();
           break;
         default:
           # code...
@@ -588,6 +597,7 @@ class C_scheduler extends CI_Controller {
     }
 
     private function __s3b1(){
+
       $this->db->insert('aps_apt_rekap.log',[
         'RunTime' => date('Y-m-d H:i:s'),
         'TableName' => 's3b1'
@@ -1186,6 +1196,246 @@ class C_scheduler extends CI_Controller {
 
     }
 
+    public function __s5a(){
+      $this->db->insert('aps_apt_rekap.log',[
+         'RunTime' => date('Y-m-d H:i:s'),
+         'TableName' => 's5a'
+      ]);
 
+      $ID = $this->db->insert_id();
+      $dataProdi = $this->getProdi();
+      // $dataProdi = array(['ID' => 4]);
+      $tableFill = 'aps_apt_rekap.s5a';
+
+      // get Curiculum First
+      $urlCuriculum = base_url().'api/__getKurikulumSelectOption';
+      $apiCuriculum = json_decode($this->m_master->postApiPHP($urlCuriculum,['null' => null]),true) ;
+
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+      for ($i=0; $i < count($dataProdi); $i++) { 
+        $ProdiID = $dataProdi[$i]['ID'];
+        $ProdiName = $dataProdi[$i]['Name'];
+        // remove old data first by years and month
+        $this->db->query(
+         'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'" and ProdiID = '.$ProdiID
+        );
+
+        // loop curiculum
+        for ($j=0; $j < count($apiCuriculum) ; $j++) { 
+          $CurriculumID = $apiCuriculum[$j]['ID'];
+          $CurriculumIDParameter = $apiCuriculum[$j]['ID'].'.'.$apiCuriculum[$j]['Year'];
+          $param =  [
+            'ProdiID' => $ProdiID,
+            'ProdiName' =>$ProdiName ,
+            'Kurikulum' => $CurriculumIDParameter,
+            'auth' => 's3Cr3T-G4N',
+            'mode' => 'KurikulumCapaianRencana'
+          ];
+
+          $token = $this->jwt->encode($param,"UAP)(*");
+          $data_post = [
+            'token' => $token,
+            'start' => 0,
+            'length' => 10000,
+            'search[value]' => '',
+            'search[regex]' => false,
+            'draw' => 1,
+          ];
+
+          $urlPostCurl =  base_url().'rest3/__get_APS_CrudAgregatorTB7';
+          $postCurl = $this->m_master->postApiPHP($urlPostCurl,$data_post);
+          $result = (array) json_decode($postCurl,true);
+          $dataResult  = $result['data'];
+          for ($z=0; $z < count($dataResult); $z++) { 
+            $dataSave = [
+              'ProdiID' => $ProdiID,
+              'CurriculumID' => $CurriculumID,
+              'SemesterTo' => $dataResult[$z][1] ,
+              'KodeMataKuliah' => $dataResult[$z][2],
+              'NamaMataKuliah' => $dataResult[$z][3],
+              'MataKuliahKompetensi' => $dataResult[$z][4],
+              'Kuliah_responsi_tutorial' => $dataResult[$z][5],
+              'Seminar' => $dataResult[$z][6],
+              'Pratikum' => $dataResult[$z][7],
+              'KonversiKreditKeJam' => $dataResult[$z][8],
+              'Sikap' => $dataResult[$z][9],
+              'Pengetahuan' => $dataResult[$z][10],
+              'KeterampilanUmum' => $dataResult[$z][11],
+              'KeterampilanKhusus' => $dataResult[$z][12],
+              'DokumenRencanaPembelajaran' => $dataResult[$z][13],
+              'UnitPenyelenggara' => $dataResult[$z][14],
+              'DateCreated' => $DateCreated,
+            ];
+
+             $this->db->insert($tableFill,$dataSave);
+          }
+        }
+
+
+      }
+
+      $this->data['status'] = 1;
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      } 
+
+
+    }
+
+    private function __s5b(){
+      $this->db->insert('aps_apt_rekap.log',[
+         'RunTime' => date('Y-m-d H:i:s'),
+         'TableName' => 's5b'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $dataProdi = $this->getProdi();
+      // $dataProdi = array(['ID' => 4]);
+      $tableFill = 'aps_apt_rekap.s5b';
+
+      // get Semester First
+      $urlSemester =  base_url().'api/__crudSemester';
+      $dataParamSemester = [
+        'token' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3Rpb24iOiJyZWFkIiwib3JkZXIiOiJERVNDIn0.CO53uPRekFICOPQSjaWhF2R-eYtplw2IHlUePrmsCBw'
+      ];
+
+      $apiSemester = json_decode($this->m_master->postApiPHP($urlSemester,$dataParamSemester),true);
+
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+      for ($i=0; $i < count($dataProdi); $i++) { 
+         $ProdiID = $dataProdi[$i]['ID'];
+         // remove old data first by years and month
+         $this->db->query(
+          'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'" and ProdiID = '.$ProdiID
+         );
+
+         for ($j=0; $j < count($apiSemester); $j++) { 
+           $SemesterID = $apiSemester[$j]['ID'];
+           $param = [
+              'mode' => 'Integrasi_penelitian_dkm',
+              'auth' => 's3Cr3T-G4N',
+              'ProdiID' => $ProdiID.'.'.$dataProdi[$i]['Code'],
+              'FilterSemester' => $SemesterID.'.'.$apiSemester[$j]['Year'].'.'.$apiSemester[$j]['Code']  ,
+           ];
+           $token = $this->jwt->encode($param,"UAP)(*");
+           $data_post = [
+             'token' => $token,
+           ];
+
+           $urlPostCurl =  base_url().'rest3/__get_APS_CrudAgregatorTB5';
+           $postCurl = $this->m_master->postApiPHP($urlPostCurl,$data_post);
+           $result = (array) json_decode($postCurl,true);
+           for ($z=0; $z < count($result) ; $z++) { 
+             $dataSave = [
+                'ProdiID' => $ProdiID,
+                'SemesterID' => $SemesterID,
+                'JudulPenelitian' => $result[$z][1]  ,
+                'NamaDosen' => $result[$z][2] ,
+                'MataKuliah' => $result[$z][3] ,
+                'BentukIntegrasi' => $result[$z][4] ,
+                'Tahun' => $result[$z][5] ,
+                'DateCreated' => $DateCreated,
+             ];
+
+             $this->db->insert($tableFill,$dataSave);
+
+           }
+
+         }
+
+      }
+
+      $this->data['status'] = 1;
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      } 
+
+    }
+
+    private function __s5c(){
+      $this->db->insert('aps_apt_rekap.log',[
+         'RunTime' => date('Y-m-d H:i:s'),
+         'TableName' => 's5c'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $dataProdi = $this->getProdi();
+      // $dataProdi = array(['ID' => 4]);
+      $tableFill = 'aps_apt_rekap.s5c';
+
+      // get Semester First
+      $urlSemester =  base_url().'api/__crudSemester';
+      $dataParamSemester = [
+        'token' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3Rpb24iOiJyZWFkIiwib3JkZXIiOiJERVNDIn0.CO53uPRekFICOPQSjaWhF2R-eYtplw2IHlUePrmsCBw'
+      ];
+      
+      $apiSemester = json_decode($this->m_master->postApiPHP($urlSemester,$dataParamSemester),true);
+
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d'); 
+
+      for ($i=0; $i < count($dataProdi); $i++) { 
+         $ProdiID = $dataProdi[$i]['ID'];
+         // remove old data first by years and month
+         $this->db->query(
+          'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'" and ProdiID = '.$ProdiID
+         );
+
+         for ($j=0; $j < count($apiSemester); $j++) { 
+           $SemesterID = $apiSemester[$j]['ID'];
+           $param = [
+              'mode' => 'kepuasan_mhs',
+              'auth' => 's3Cr3T-G4N',
+              'ProdiID' => $ProdiID.'.'.$dataProdi[$i]['Code'],
+              'FilterSemester' => $SemesterID.'.'.$apiSemester[$j]['Year'].'.'.$apiSemester[$j]['Code']  ,
+           ];
+           $token = $this->jwt->encode($param,"UAP)(*");
+           $data_post = [
+             'token' => $token,
+           ];
+
+           $urlPostCurl =  base_url().'rest3/__get_APS_CrudAgregatorTB5';
+           $postCurl = $this->m_master->postApiPHP($urlPostCurl,$data_post);
+           $result = (array) json_decode($postCurl,true);
+           $dataResult =  $result['data'];
+
+           for ($z=0; $z < count($dataResult); $z++) { 
+              $dataSave = [
+                'ProdiID' => $ProdiID,
+                'SemesterID' => $SemesterID,
+                'AspekRatio' => $dataResult[$z][1] ,
+                'TingkatKepuasanSangatBaik' => $dataResult[$z][2] ,
+                'TingkatKepuasanBaik' => $dataResult[$z][3] ,
+                'TingkatKepuasanCukup' => $dataResult[$z][4] ,
+                'TingkatKepuasanKurang' => $dataResult[$z][5] ,
+                'RencanaTindakLanjutUPPSorPS' => $dataResult[$z][6] ,
+                'DateCreated' => $DateCreated ,
+              ];
+
+              $this->db->insert($tableFill,$dataSave);
+           }
+
+         }
+
+
+
+      }
+
+      $this->data['status'] = 1;
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      } 
+
+    }
 
 }
