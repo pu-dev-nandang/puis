@@ -41,6 +41,7 @@ document/*
 /uploads/vreservation/*.pdf
 **/uploads/files/
 **/uploads/finance/
+**/uploads/certificate/
 
 /uploads/budgeting/catalog/*.jpeg
 /uploads/budgeting/catalog/*.jpg
