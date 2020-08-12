@@ -308,6 +308,42 @@
 					                                </div>
 					                            </div>
 					                        </div>
+					                        <?php if (isset($request->certificate_request)): ?>
+					                        <div class="row">
+					                         	<div class="col-md-12">
+					                         		<div class="well">
+					                         		    <div style="padding: 15;">
+					                         		        <h2>Certificate</h2>
+					                         		        <br/>
+					                         		            <table class="table">
+					                         		                <thead>
+					                         		                    <tr>
+					                         		                        <th>No</th>
+					                         		                        <th>Certificate</th>
+					                         		                        <th>Publication Year</th>
+					                         		                        <th>DueDate</th>
+					                         		                        <th>Scale</th>
+					                         		                        <th>File</th>
+					                         		                    </tr>
+					                         		                </thead>
+					                         		                <tbody>
+					                         		                    <?php for ($i=0; $i < count($request->certificate_request); $i++) : ?>
+					                         		                        <tr>
+					                         		                            <td><?php echo $i+1 ?></td>
+					                         		                            <td><?php echo $request->certificate_request[$i]->Certificate ?></td>
+					                         		                            <td><?php echo $request->certificate_request[$i]->PublicationYear ?></td>
+					                         		                            <td><?php echo ($request->certificate_request[$i]->Lifetime == '1') ? 'Lifetime' : $request->certificate_request[$i]->Duedate ?></td>
+					                         		                            <td><?php echo $request->certificate_request[$i]->Scale ?></td>
+					                         		                            <td><a class="btn btn-sm btn-default" target="_blank" href="<?php echo base_url().'uploads/certificate/'.$request->certificate_request[$i]->File ?>">Download</a></td>
+					                         		                        </tr>
+					                         		                    <?php endfor ?>
+					                         		                </tbody>
+					                         		            </table>
+					                         		    </div>
+					                         		</div>
+					                         	</div>
+					                        </div>
+					                        <?php endif ?>
 					                    </div>
 			    					</div>
 			    				</div>

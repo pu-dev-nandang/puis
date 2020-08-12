@@ -890,6 +890,27 @@ class C_employees extends HR_Controler {
                             $Logs->Signature= $filenameSignature;
                         }
 
+                        // for certificate
+                        if (isset($Logs->certificate_request) && !empty($Logs->certificate_request)) {
+                            $data =  $Logs->certificate_request;
+                            for ($index=0; $index < count($data); $index++) { 
+                                $dataSave = [
+                                    'NIP' => $data[$index]->NIP ,
+                                    'Certificate' => $data[$index]->Certificate ,
+                                    'PublicationYear' => $data[$index]->PublicationYear ,
+                                    'Duedate' => $data[$index]->Duedate ,
+                                    'Lifetime' => $data[$index]->Lifetime ,
+                                    'Scale' => $data[$index]->Scale ,
+                                    'File' => $data[$index]->File ,
+                                ];
+
+                                $this->db->insert('db_employees.employees_certificate',$dataSave);
+                            }
+
+
+                        }
+
+
                         $Logs->Logs = null;
                         $Logs->isApproved = null;
                         $Logs->NoteApproved = null;
