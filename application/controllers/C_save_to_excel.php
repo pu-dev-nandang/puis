@@ -11,6 +11,7 @@ class C_save_to_excel extends CI_Controller
 //        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         date_default_timezone_set("Asia/Jakarta");
         $this->load->model('report/m_save_to_excel');
+        $this->load->model('m_rest');
 
     }
 
@@ -2560,12 +2561,13 @@ class C_save_to_excel extends CI_Controller
             $IPS = 0; $IPK=0; $Credit=0;
             foreach ($results AS $item){
                 // Buat header tabel nya pada baris ke 3
-                $getGPA = $this->Globalinformation_model->fetchStudentTranscript($item->NPM);
-                if(!empty($getGPA)){
-                    $IPS = $getGPA['GPA']['IPS'];
-                    $IPK = $getGPA['GPA']['IPK'];
-                    $Credit = $getGPA['GPA']['TotalCredit'];
-                }
+//                $getGPA = $this->Globalinformation_model->fetchStudentTranscript($item->NPM);
+                $getGPA = $this->m_rest->getTranscript($data_arr['Year'],$item->NPM,'ASC');
+                $IPS = $getGPA['dataIPK']['Last_IPS'];
+                $IPK = $getGPA['dataIPK']['IPK'];
+                $Credit = $getGPA['dataIPK']['TotalSKS'];
+
+
                 $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $item->NPM);
                 $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, ucwords(strtolower($item->Name)));
                 $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, ucwords(strtolower($item->ProdiNameEng)));
