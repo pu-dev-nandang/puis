@@ -1625,17 +1625,19 @@ class C_rest extends CI_Controller {
                     $this->db->reset_query();
                 }
 
-                // return quiz
-                $dataReturn = $this->db->query('SELECT q.ScheduleID, q.Session,qs.NPM FROM db_academic.q_quiz q 
-                                                        LEFT JOIN db_academic.q_quiz_students qs 
-                                                        ON (qs.QuizID = q.ID )
-                                                        WHERE qs.ID = "'.$dataToken['QuizStudentID'].'" ')
-                    ->result_array()[0];
-
-
                 // Cek attendace online
                 $this->m_onlineclass->checkOnlineAttendance($dataReturn['NPM'],
                     $dataReturn['ScheduleID'],$dataReturn['Session']);
+
+                // return quiz
+                $dataReturn = $this->db->query('SELECT s.SemesterID, q.ScheduleID, q.Session,qs.NPM  
+                                                FROM db_academic.q_quiz q
+                                                LEFT JOIN db_academic.q_quiz_students qs 
+                                                    ON (qs.QuizID = q.ID )
+                                                LEFT JOIN db_academic.schedule s 
+                                                    ON (s.ID = q.ScheduleID)
+                                                WHERE qs.ID = "'.$dataToken['QuizStudentID'].'" ')
+                    ->result_array()[0];
 
                 return print_r(json_encode($dataReturn));
 
