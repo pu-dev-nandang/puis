@@ -8,7 +8,7 @@
     <div class="col-xs-12" >
         <div class="panel panel-primary">
             <div class="panel-heading clearfix">
-                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Set Cicilan</h4>
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Set Potongan Lain</h4>
             </div>
             <div class="panel-body">
                <div class="row" style="margin-top: 30px;">
@@ -48,10 +48,10 @@
                            <tbody id="dataRow"></tbody>
                        </table>
                        <hr>
-                       <div id = "inputCicilan" class="hide">
+                       <div id = "inputPotongan" class="hide">
                          <div class="widget box">
                              <div class="widget-header">
-                                 <h4 class="header"><i class="icon-reorder"></i>Input Cicilan</h4>
+                                 <h4 class="header"><i class="icon-reorder"></i></h4>
                              </div>
                              <div class="widget-content">
                                  <!--  -->
@@ -75,7 +75,6 @@
     window.dataa = '';
     window.dataaModal = '';
     window.get_Invoice = '';
-    window.max_cicilan = '<?php echo $max_cicilan ?>';
     var checkApprove = 0;
     $(document).ready(function () {
         
@@ -105,7 +104,7 @@
     function loadData(page,NPM) {
         var NIM = NPM;
         $(".widget-content").empty();
-        $("#inputCicilan").addClass('hide');
+        $("#inputPotongan").addClass('hide');
         $('#datatable2').addClass('hide');
 
         $('#NotificationModal .modal-header').addClass('hide');
@@ -217,34 +216,6 @@
 
                     if(Data_mhs.length > 0)
                     {
-                      // if(Data_mhs[0]['StatusPayment'] == 0) {// menandakan belum approve
-                      //   if (Data_mhs[0]['DetailPayment'].length == 1) {
-                      //        checkApprove = 1;
-                      //         $('#datatable2').removeClass('hide');
-                      //         // var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
-                      //         //                    ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
-                      //         // for (var l = 2; l <= max_cicilan; l++) {
-                      //         //     sss += ' <option value = "'+l+'">'+l+'</option>'
-                      //         // }
-
-                      //         // sss += '</select>';                   
-
-                      //         // var aaa = '<div class = "row">'+
-                      //         //         '<div class="form-group">'+
-                      //         //             '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
-                      //         //             '<div class = "col-xs-2">'+
-                      //         //                sss+
-                      //         //             '</div>'+  
-                      //         //         '</div>'+    
-                      //         //     '</div><br>'+
-                      //         //     '<div class = "row" id="pageSetCicilan">'+
-                      //         //     '</div>'
-                      //         // $(".widget-content").html(aaa);
-                      //         // $("#inputCicilan").removeClass('hide');
-
-                      //   } 
-                      // }
-
                       checkApprove = 1;
                        $('#datatable2').removeClass('hide');
                         
@@ -286,286 +257,174 @@
       return def.promise();
     }
 
+    const htmlPotonganDynamic = (withButton = 0) => {
+    	let htmlViewSelector = $('#contentPotongan');
+    	let htmlScript = '<div class = "row"><div class = "col-xs-3">'+
+    						'<div class = "form-group">'+
+    							'<label>DiscountName</label>'+
+    							'<input type="text"  class = "form-control frmInput" name = "DiscountName" rule = "required">'+
+    						'</div>'+	
+    					 '</div>'+
+    					 '<div class = "col-xs-3">'+
+    						'<div class = "form-group">'+
+    							'<label>Value</label>'+
+    							'<input type="text"  class = "form-control frmInput" name = "DiscountValue" rule = "required">'+
+    						'</div>'+	
+    					 '</div>'+
+    					 '<div class = "col-xs-4">'+
+    						'<div class = "form-group">'+
+    							'<label>Description</label>'+
+    							'<textarea class = "form-control frmInput" name = "Description" rule = ""></textarea>'+
+    						'</div>'+
+    					 '</div>'+
+    					 (
+    						(withButton == 1) ? '<div class = "col-xs-2"><button class = "btn btn-danger deleteInputPotongan" style = "margin-top:25px;">Delete</button>' : ''	) + '</div>'+
+
+    				'</div>';
+    	return htmlScript;				 
+
+    }
+
+    const viewPotonganInput = (NPM,PTID,SemesterID) => {
+    	const htmlViewSelector = $('#inputPotongan').find('.widget-content');
+    	let htmlScript = '<div id  = "contentPotongan" npm = "'+NPM+'" ptid = "'+PTID+'" SemesterID = "'+SemesterID+'" style = "margin:10px;">'+ 
+    						'<div style = "margin-bottom:10px;">'+
+    							'<button class = "btn btn-default" id = "addPotongan">Add</button>'+
+    						'</div>'+
+    							
+    					 '<div>';
+    	htmlViewSelector.html(htmlScript);
+    	$("#inputPotongan").removeClass('hide');
+    	$('#contentPotongan').append(htmlPotonganDynamic());
+    	$('.frmInput[name="DiscountValue"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+    	$('.frmInput[name="DiscountValue"]').maskMoney('mask', '9894');
+    	$('.frmInput[name="DiscountName"]').focus();
+    	$('#inputPotongan').find('hr:last').after('<div style = "padding : 10px;text-align:right;"><span id = "viewTotal" style = "color:green;">Total : Rp.0 </span> <button class = "btn btn-primary" id= "btnSavePotongan" style = "margin-left:10px;">Save</button></div>');
+    }
+
+    $(document).on('click','.deleteInputPotongan',function(e){
+    	$(this).closest('.row').remove();
+    	countDiscountValue();
+    })
+
+    $(document).on('click','#addPotongan',function(e){
+    	$('#contentPotongan').append(htmlPotonganDynamic(1));
+    	$('.frmInput[name="DiscountValue"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+    	$('.frmInput[name="DiscountValue"]').maskMoney('mask', '9894');
+    	$('.frmInput[name="DiscountName"]:last').focus();
+    })
+
     $(document).on('click','.uniform', function () {
       $('input.uniform').prop('checked', false);
       $(this).prop('checked',true);
       var PTID = $(this).attr('ptid');
       var SemesterID = $(this).attr('semester');
-      get_Invoice = $(this).attr('invoice');
-      var n = get_Invoice.indexOf(".");
-      get_Invoice = get_Invoice.substring(0, n);
-      var paymentid = $(this).attr('paymentid');
-      if (PTID == 5 || PTID == 6) {
-        ajax_data_deadline_semester_antara(SemesterID).then(function(data){
-            if (data.status == 1) {
-              var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
-                                 ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
-              for (var l = 2; l <= max_cicilan; l++) {
-                  sss += ' <option value = "'+l+'">'+l+'</option>'
-              }
-
-              sss += '</select>';                   
-
-              var aaa = '<div class = "row">'+
-                      '<div class="form-group">'+
-                          '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
-                          '<div class = "col-xs-2">'+
-                             sss+
-                          '</div>'+  
-                      '</div>'+    
-                  '</div><br>'+
-                  '<div class = "row" id="pageSetCicilan">'+
-                  '</div>'
-              $(".widget-content").html(aaa);
-              $("#inputCicilan").removeClass('hide');
-              dataa = {ID : paymentid,PTID : PTID,SemesterID : SemesterID};
-            }
-            else{
-             toastr.info('Tanggal KRS Semester Antara belum berakhir Period('+data.StartKRS+' - '+data.EndKRS+'), tidak bisa melakukan action '); 
-            }          
-        })
-      }
-      else
-      {
-       var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
-                          ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
-       for (var l = 2; l <= max_cicilan; l++) {
-           sss += ' <option value = "'+l+'">'+l+'</option>'
-       }
-
-       sss += '</select>';                   
-
-       var aaa = '<div class = "row">'+
-               '<div class="form-group">'+
-                   '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
-                   '<div class = "col-xs-2">'+
-                      sss+
-                   '</div>'+  
-               '</div>'+    
-           '</div><br>'+
-           '<div class = "row" id="pageSetCicilan">'+
-           '</div>'
-       $(".widget-content").html(aaa);
-       $("#inputCicilan").removeClass('hide');
-       dataa = {ID : paymentid,PTID : PTID,SemesterID : SemesterID};
-      }
+      var NPM = $(this).val();
+      viewPotonganInput(NPM,PTID,SemesterID);
       
     });
 
+    const valueOnly = (valData) => {
+    	let arr = valData.split('.');
+    	let str = '';
+    	for (var i = 0; i < arr.length; i++) {
+    		str += arr[i];
+    	}
+    	return str;
+    };
 
-    $(document).on('change','#jml_cicilan', function () {
-        $("#btn-div").remove();
-        var setMinimal = 500000;
-        var Val = $(this).val();
-        var splitcicilan = parseInt(get_Invoice) / parseInt(Val);
-        var splitcicilan = parseInt(splitcicilan);
-        if (Val != " " && Val != null ) 
-        {
-            var input = '<div class="form-group">';
-            var cost = 0;
-            var cost_value = splitcicilan;
-           for (var i = 1 ; i <= Val; i++) {
-                if (i == Val) {
-                    cost_value = parseInt(get_Invoice) - parseInt(cost);
-                }
-                input += '<label class="col-xs-1 control-label">Cicilan '+i+'</label><div class="col-xs-2"><input type="text" id = "cost'+i+'" value = "'+cost_value+'" class = "form-control costInput"><br>Deadline<div id="datetimepicker'+i+'" class="input-group input-append date datetimepicker">'+
-                            '<input data-format="yyyy-MM-dd hh:mm:ss" class="form-control" id="datetime_deadline'+i+'" type="text"></input>'+
-                            '<span class="input-group-addon add-on">'+
-                              '<i data-time-icon="icon-time" data-date-icon="icon-calendar">'+
-                              '</i>'+
-                            '</span>'+
-                        '</div></div>';
-                cost = cost + cost_value;
-            }
+    const countDiscountValue = () => {
+    	let total = 0;
+    	$('.frmInput[name="DiscountValue"]').each(function(e){
+    		total += parseInt(valueOnly($(this).val()));
+    	})
+    	$('#viewTotal').html(formatRupiah(total));
+    }
 
-            input += '</div>';
+    $(document).on('keyup','.frmInput[name="DiscountValue"]',function(e){
+    	countDiscountValue();
+    })
 
-           $("#pageSetCicilan").html(input);
-           $("#pageSetCicilan").after('<br><div class = "col-xs-12" align = "right" id="btn-div"><button class="btn btn-success btn-notification btn-Save" id="btn-Save"><i class="icon-pencil icon-white"></i> Submit</button></div>');
+    $(document).on('click','#btnSavePotongan',async function(e){
+    	const itsme = $(this);
+    	let data = {};
+    	let tempArr = [];
+    	let obj = {};
+    	let booleanCheck = true;
+    	let x =1;
+    	$('.frmInput').each(function(e){
+    		const name = $(this).attr('name');
+    		const rule = $(this).attr('rule');
+    		const valueData = (name == 'DiscountValue') ? valueOnly($(this).val()) : $(this).val();
+    		if (name == 'DiscountValue') {
+    			if (parseInt(valueData) <= 0) {
+    				booleanCheck = false;
+    				return;
+    			}
+    		}
+    		else if(name == 'Description'){
+    			// no code
+    		}
+    		else
+    		{
+    		 	const check = Validation_required(valueData,'');
+    		 	if(check['status'] == 0){
+    		 		booleanCheck = false;
+    				return;
+    		 	}
+    		}
 
-           $('.costInput').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-           $('.costInput').maskMoney('mask', '9894');
+    		if (x == 3) {
+    			obj[name] = valueData;
+    			tempArr.push(obj);
+    			obj = {};
+    			x = 0;
 
-           Date.prototype.addDays = function(days) {
-               var date = new Date(this.valueOf());
-               date.setDate(date.getDate() + days);
-               return date;
-           }
-           var date = new Date();
-           for (var i = 1 ; i <= Val; i++) {
-              $('#datetimepicker'+i).datetimepicker({
-               // startDate: today,
-               // startDate: '+2d',
-               startDate: date.addDays(i),
-              });
+    		}
+    		else
+    		{
+    			obj[name] = valueData;
+    		}
 
-              $('#datetime_deadline'+i).prop('readonly',true);
-           } 
-           
-        }
-    });
+    		x++;
 
-    $(document).on('keyup','.costInput', function () {
-        var arrTemp = [];
-        var setMinimal = 500000;
-        $('.costInput').each(function(){
-            var temp = findAndReplace($(this).val(), ".","");
-            /*if (temp < setMinimal) {
-                $(this).val(setMinimal);
-            }*/
-            var arr2 = {
-                id : $(this).attr('id'),
-                valuee : $(this).val(),
-            }
-            arrTemp.push(arr2);
-        })
+    	})
 
-        var arrValue = [];
-        var count = 0;
-        for (var i = 0; i < arrTemp.length; i++) {
-            var temp = findAndReplace(arrTemp[i]['valuee'], ".","");
-            if (count > get_Invoice) {
-                var splitcicilan = parseInt(get_Invoice) / parseInt(arrTemp.length);
-                var splitcicilan = (splitcicilan < setMinimal) ? setMinimal : parseInt(splitcicilan);
-                var cost = 0;
-                var cost_value = splitcicilan;
-                for (var j = 0; j < arrTemp.length; j++) {
+    	if (!booleanCheck) {
+    		toastr.info('All form are required and value must be more than 0')
+    		return;
+    	}
 
-                   if (j == (arrTemp.length - 1)) {
-                       cost_value = parseInt(get_Invoice) - parseInt(cost);
-                   }
-                   var getID = parseInt(j) + 1;
-                   $("#cost"+getID).val(cost_value);
-                   cost = cost + cost_value; 
-                }
-            }
-            else
-            {
-                if ((arrTemp.length - 1) == i) {
-                    var getID = parseInt(i) + 1;
-                    $("#cost"+getID).val(parseInt(get_Invoice) - parseInt(count));
-                }
-            }
-            count += parseInt(temp);
-        }
-        $('.costInput').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-        $('.costInput').maskMoney('mask', '9894');
-    });
+    	data = {
+    		NPM : $('#contentPotongan').attr('npm'),
+    		PTID : $('#contentPotongan').attr('ptid'),
+    		SemesterID : $('#contentPotongan').attr('semesterid'),
+    		data : tempArr
+    	}
 
-    $(document).on('click','#btn-Save', function () {
-        loading_button('#btn-Save');
-        var arrTemp = [];
-        $('.costInput').each(function(){
-            var valuee = $(this).val();
-            for(i = 0; i <valuee.length; i++) {
-             
-             valuee = valuee.replace(".", "");
-             
-            }
+    	const url = base_url_js+'finance/tagihan-mhs/set-potongan-lain/submit';
+    	var token = jwt_encode(data,"UAP)(*");	
+    	loading_button2(itsme)
+    	try{
+    		const response = await AjaxSubmitFormPromises(url,token);
+    		if (response.status != 1) {
+    			toastr.error(response.msg);
+    			end_loading_button2(itsme);
+    		}
+    		else
+    		{
+    			toastr.success('Saved');
+    			location.reload();
+    		}
+    	}	
+    	catch(err){
+    		toastr.error('something wrong');
+    		end_loading_button2(itsme);
+    	}
 
-            var SID = $(this).attr('id');
-            var SID = SID.substr(SID.length - 1); // => "1"
-            var Deadline = $("#datetime_deadline"+SID).val();
-            data = {
-              Deadline : Deadline,
-              Payment  : valuee,
-              ID       : dataa.ID,
-              PTID     : dataa.PTID,
-              SemesterID : dataa.SemesterID
-            }
-            arrTemp.push(data);
-        })
+    	
 
-        // check cicilan != 0 dan Deadline is empty
-        var bool = true;
-        var msg = '';
-        for (var i = 0; i < arrTemp.length; i++) {
-          if (arrTemp[i].Payment == 0) {
-            msg = 'Price Cicilan tidak boleh 0';
-            bool = false
-            break;
-          }
-
-          if (arrTemp[i].Deadline == "") {
-            msg = 'Deadline belum diisi';
-            bool = false
-            break;
-          }  
-        }
-          /*var startDate = moment("28.04.2016", "DD.MM.YYYY");
-          var endDate = moment("26.04.2016", "DD.MM.YYYY");
-
-          var result = 'Diff: ' + endDate.diff(startDate, 'days');
-          console.log(result);*/
-
-        if (bool) {
-          // hitung tanggal tidak boleh melewati cicilan sebelumnya
-            var bool2 = true;
-            for (var i = 0; i < arrTemp.length; i++) {
-              var date1 = arrTemp[i].Deadline;
-              date1 = date1.substring(0, 10);
-               for (var j = 0; j < arrTemp.length; j++) {
-                if (i < j) {
-                   var date2 = arrTemp[j].Deadline;
-                   date2 = date2.substring(0, 10);
-
-                   var startDate = moment(date1, "YYYY-MM-DD");
-                   var endDate = moment(date2, "YYYY-MM-DD");
-                   var result = endDate.diff(startDate, 'days');
-                   result = parseInt(result);
-                   console.log(result);
-                   if (result <= 0) {
-                    bool2 = false;
-                    console.log('i ' + date1 + '< j : ' + date2);
-                    break;
-                   } 
-                }
-                
-               }
-
-               if (!bool2) {
-                  break;
-                  console.log('i < j');
-               }
-
-            }
-          // hitung tanggal tidak boleh melewati cicilan sebelumnya
-
-          if (bool2) {
-            var url = base_url_js + "finance/tagihan-mhs/set-cicilan-tagihan-mhs/submit";
-            var data = arrTemp
-            var token = jwt_encode(data,"UAP)(*");
-            $.post(url,{token:token},function (data_json) {
-                // jsonData = data_json;
-                var obj = JSON.parse(data_json); 
-                if(obj != ''){
-                    $('#btn-Save').prop('disabled',false).html('Submit');  
-                    toastr.error(obj, 'Failed!!');
-                }
-                else
-                {
-                    window.location.reload(true); 
-                }
-
-            }).done(function() {
-              // $('#btn-Save').prop('disabled',false).html('Submit');
-            }).fail(function() {
-              $('#btn-Save').prop('disabled',false).html('Submit');  
-              toastr.error('The Database connection error, please try again', 'Failed!!');
-            }).always(function() {
-             $('#btn-Save').prop('disabled',false).html('Submit');
-            });
-          } else {
-            toastr.error('Tanggal Deadline cicilan tidak boleh mendahului tanggal cicilan sebelumnya', 'Failed!!');
-            $('#btn-Save').prop('disabled',false).html('Submit');
-          }
-
-        } else {
-          toastr.error(msg, 'Failed!!');
-          $('#btn-Save').prop('disabled',false).html('Submit');
-        }
-
-    });
+    })
 
     $(document).on('click','.DetailPayment', function () {
         var NPM = $(this).attr('NPM');
@@ -590,7 +449,6 @@
           if(dataaModal[i]['NPM'] == NPM)
           {
             CancelPayment = dataaModal[i]['cancelPay'];
-            dataPotonganLain = dataaModal[i]['potonganLain'];
             var totCancelPayment = CancelPayment.length;
             var DetailPaymentArr = dataaModal[i]['DetailPayment'];
             var Nama = dataaModal[i]['Nama'];
@@ -640,36 +498,6 @@
         if (CancelPayment.length > 0) {
           html += htmlReason;
         }
-
-        // potongan lain
-        var htmlPotonganLain = '<div class = "row"><div class= col-md-12><h5>List Potongan Lain</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
-                      '<thead>'+
-                          '<tr>'+
-                              '<th style="width: 5px;">No</th>'+
-                              '<th style="width: 55px;">Nama Potongan</th>'+
-                              '<th style="width: 55px;">Nominal</th>'+
-                              '<th style="width: 55px;">Desc</th>'+
-                              '<th style="width: 55px;">By & At</th>';
-        htmlPotonganLain += '</tr>' ;  
-        htmlPotonganLain += '</thead>' ; 
-        htmlPotonganLain += '<tbody>' ;
-        for (var i = 0; i < dataPotonganLain.length; i++) {
-          var No = parseInt(i) + 1;
-          htmlPotonganLain += '<tr>'+
-                '<td>'+ (i+1) + '</td>'+
-                '<td>'+ dataPotonganLain[i]['DiscountName'] + '</td>'+
-                '<td>'+ '<span style = "color:blue">'+formatRupiah(dataPotonganLain[i]['DiscountValue'])+'</span>' + '</td>'+
-                '<td>'+ dataPotonganLain[i]['Description'] + '</td>'+
-                '<td>'+ '<span style = "color:green">'+dataPotonganLain[i]['Name']+ '<br/>' + dataPotonganLain[i]['UpdateAt']+'</span>' + '</td>'+
-              '<tr>'; 
-        }
-
-        htmlPotonganLain += '</tbody>' ; 
-        htmlPotonganLain += '</table></div></div>' ;
-        if (dataPotonganLain.length > 0) {
-          html += htmlPotonganLain;
-        }
-
 
         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
             '';

@@ -179,6 +179,12 @@
                         Set Tagihan
                         </a>
                     </li>
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-potongan-lain"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/set-potongan-lain'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Set Potongan Lain
+                        </a>
+                    </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-cicilan-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/set-cicilan-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>

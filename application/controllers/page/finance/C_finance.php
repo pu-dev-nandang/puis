@@ -714,6 +714,18 @@ class C_finance extends Finnance_Controler {
         $this->temp($content);
     }
 
+    public function page_set_potongan_lain(){
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_set_potongan_lain',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function ajax_set_potongan_lain(){
+        $rs = ['status' => 0,'msg' => ''];
+        $dataToken = json_decode(json_encode($this->getInputToken()),true) ;
+        $rs = $this->m_finance->save_potongan($dataToken);
+        echo json_encode($rs);
+    }
+
     public function get_tagihan_mhs()
     {
         $input = $this->getInputToken();
