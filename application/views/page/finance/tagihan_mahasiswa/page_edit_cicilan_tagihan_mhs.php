@@ -280,7 +280,14 @@
 
                     }
                 } else {
-                  toastr.error('Error', 'Failed!!');
+                  if (Data_mhs.length == 0) {
+                    toastr.info('No result data');
+                  }
+                  else
+                  {
+                    toastr.error('Error', 'Failed!!');
+                  }
+                  
                 }
             }).fail(function() {
               

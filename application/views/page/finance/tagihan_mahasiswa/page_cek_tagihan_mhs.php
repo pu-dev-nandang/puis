@@ -427,7 +427,7 @@
                    var btn_edit = '';
                    //var btn_view = '<button class = "btn btn-default DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-search" aria-hidden="true"></i> View</button>';
                    btn_edit = '<br><br> <button class = "btn btn-default edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
-                   var btn_view = '<button class = " btn btn-primary DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Pembayaran Manual </button>';
+                   var btn_view = '<button class = " btn btn-primary DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Bayar dan Detail </button>';
                    <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
                      // btn_edit = '<br><br> <button class = "btn btn-default edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
                      // var btn_view = '<button class = " btn btn-primary DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Pembayaran Manual </button>';
@@ -573,6 +573,36 @@
         table += '</table>' ;
 
         html += table;
+
+        // potongan lain
+        var dataPotonganLain = dataaModal[i]['potonganLain'];
+        var htmlPotonganLain = '<div class = "row"><div class= col-md-12><h5>List Potongan Lain</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">No</th>'+
+                              '<th style="width: 55px;">Nama Potongan</th>'+
+                              '<th style="width: 55px;">Nominal</th>'+
+                              '<th style="width: 55px;">Desc</th>'+
+                              '<th style="width: 55px;">By & At</th>';
+        htmlPotonganLain += '</tr>' ;  
+        htmlPotonganLain += '</thead>' ; 
+        htmlPotonganLain += '<tbody>' ;
+        for (var index = 0; index < dataPotonganLain.length; index++) {
+          var No = parseInt(index) + 1;
+          htmlPotonganLain += '<tr>'+
+                '<td>'+ (index+1) + '</td>'+
+                '<td>'+ dataPotonganLain[index]['DiscountName'] + '</td>'+
+                '<td>'+ '<span style = "color:blue">'+formatRupiah(dataPotonganLain[index]['DiscountValue'])+'</span>' + '</td>'+
+                '<td>'+ dataPotonganLain[index]['Description'] + '</td>'+
+                '<td>'+ '<span style = "color:green">'+dataPotonganLain[index]['Name']+ '<br/>' + dataPotonganLain[index]['UpdateAt']+'</span>' + '</td>'+
+              '<tr>'; 
+        }
+
+        htmlPotonganLain += '</tbody>' ; 
+        htmlPotonganLain += '</table></div></div>' ;
+        if (dataPotonganLain.length > 0) {
+          html += htmlPotonganLain;
+        }
 
         // for Verify Bukti Bayar
             var htmlPaymentProof = '<div class = "row" style = "margin-top : 10px">'+
