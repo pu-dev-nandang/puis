@@ -720,13 +720,20 @@
 
             for(var s=0;s<jsonResult.length;s++){
 
-                var koma = (s!=0 && s==(jsonResult.length - 1)) ? ',' : '';
-                Email = Email+''+koma+''+jsonResult[s].Email;
+                if (s == (jsonResult.length - 1)) {
+                    Email += jsonResult[s].Email;
+                }
+                else
+                {
+                    Email += jsonResult[s].Email+',';
+                }
+                // var koma = (s!=0 && s==(jsonResult.length - 1)) ? ',' : '';
+                // Email = Email+''+koma+''+jsonResult[s].Email;
 
             }
         }
 
-        // console.log(Email);
+        // console.log(Email);return;
 
         var data = {
             to : Email,
