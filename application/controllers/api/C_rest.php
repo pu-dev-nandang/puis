@@ -1661,6 +1661,7 @@ class C_rest extends CI_Controller {
     }
 
     public function getPaymentStudent(){
+        $this->load->model('finance/m_finance');
         $dataToken = $this->getInputToken();
         $cekUser = $this->cekAuthAPI($dataToken['auth']);
 
@@ -1698,6 +1699,9 @@ class C_rest extends CI_Controller {
                     //Cek Bukti Upload
                         $payment_proof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$data[$i]['ID']);
                         $data[$i]['payment_proof'] = $payment_proof;
+
+                    // potongan lain
+                        $data[$i]['potonganLain'] = $this->m_finance->getPotonganLain($data[$i]['PTID'],$data[$i]['SemesterID'],$data[$i]['NPM']);
 
                     if(count($dataSmt)>0){
                         $data[$i]['Semester'] = count($dataSmt);
