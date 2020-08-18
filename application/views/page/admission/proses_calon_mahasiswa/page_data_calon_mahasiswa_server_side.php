@@ -51,6 +51,7 @@
                                   <option value="Lunas" >Lunas</option>
                                   <option value="-100" >Belum Bayar Formulir</option>
                                   <option value="100" >Sudah Bayar Formulir</option>
+                                  <option value="Intake" >Intake</option>
                               </select>
                             </div>
                           </div>
@@ -151,6 +152,7 @@
               selector.find('option[value="-"]').attr('disabled',false);
               selector.find('option[value="-100"]').attr('disabled',false);
               selector.find('option[value="100"]').attr('disabled',false);
+              selector.find('option[value="Intake"]').attr('disabled',false);
                $("#dataPageLoad").empty();
                var table = '<table class="table table-bordered datatable2" id = "datatable2">'+
                            '<thead>'+
@@ -235,9 +237,10 @@
                 selector.find('option[value="-"]').attr('disabled',true);
                 selector.find('option[value="-100"]').attr('disabled',true);
                 selector.find('option[value="100"]').attr('disabled',true);
+                selector.find('option[value="Intake"]').attr('disabled',true);
                 var S_StatusPayment = selector.find('option:selected').val();
                 // console.log(S_StatusPayment);
-                if (S_StatusPayment == '-' || S_StatusPayment == '-100' || S_StatusPayment == '100' ) {
+                if (S_StatusPayment == '-' || S_StatusPayment == '-100' || S_StatusPayment == '100' || S_StatusPayment == 'Intake'  ) {
                   // selector.find('option[value="%"]').attr('selected',true);
                   $("#selectStatusPayment option").filter(function() {
                      //may want to use $.trim in here
