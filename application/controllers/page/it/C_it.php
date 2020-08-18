@@ -251,11 +251,18 @@ class C_it extends It_Controler {
 
     public function routes()
     {
-      $this->data['input_routes'] = $this->load->view('page/'.$this->data['department'].'/console-developer/input_routes',$this->data,true);
-      $this->data['table_routes_local'] = $this->load->view('page/'.$this->data['department'].'/console-developer/table_routes_local',$this->data,true);
-      $this->data['table_routes_live'] = $this->load->view('page/'.$this->data['department'].'/console-developer/table_routes_live',$this->data,true);
-      $content = $this->load->view('page/'.$this->data['department'].'/console-developer/routes',$this->data,true);
-      $this->menu_developer($content);
+        $this->data['input_routes'] = $this->load->view('page/'.$this->data['department'].'/console-developer/input_routes',$this->data,true);
+        $this->data['table_routes_local'] = $this->load->view('page/'.$this->data['department'].'/console-developer/table_routes_local',$this->data,true);
+        $this->data['table_routes_live'] = $this->load->view('page/'.$this->data['department'].'/console-developer/table_routes_live',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/console-developer/routes',$this->data,true);
+        $this->menu_developer($content);
+    }
+
+    public function share_menu()
+    {
+        $data[''] = '';
+        $content = $this->load->view('page/'.$this->data['department'].'/console-developer/share_menu',$data,true);
+        $this->menu_developer($content);
     }
 
     public function submit_routes()

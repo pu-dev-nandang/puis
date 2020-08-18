@@ -176,52 +176,6 @@
              ?>
         </ul>
 
-        <?php if(count($dataMenuShare)>0) { ?>
-
-            <div class="sidebar-title">
-                <span>Shared Menu</span>
-            </div>
-            <ul id="nav">
-                <?php foreach ($dataMenuShare AS $item){ ?>
-
-                    <li class="<?php if($this->uri->segment(2)=='version'){echo"current";}?>">
-
-                        <?php
-                            // Cek apakah ada turunan atau tidak
-                        if(isset($item['DataLevel_1'])){ ?>
-                            <a href="javascript:void(0);">
-                                <?= $item['Icon']; ?>
-                                <?= $item['Name']; ?>
-                                <i class="arrow <?= ($this->uri->segment(2)=='academic') ? 'icon-angle-down' : 'icon-angle-left'?>"></i>
-                            </a>
-                            <ul class="sub-menu">
-                                <?php foreach ($item['DataLevel_1'] AS $item1) { ?>
-                                    <li class="<?= ($this->uri->segment(3)=='redundancy-krs-online') ? "current open" : ""?>">
-                                        <a href="<?= base_url( $item1['Route']) ?>">
-                                            <i class="icon-angle-right"></i>
-                                            <?= $item1['Name']; ?>
-                                        </a>
-                                    </li>
-                                <?php } ?>
-                            </ul>
-                        <?php } else { ?>
-
-                            <a href="<?php echo base_url($item['Route']);?>">
-                                <?= $item['Icon']; ?>
-                                <?= $item['Name']; ?>
-                            </a>
-
-                        <?php  } ?>
-
-
-                    </li>
-
-                <?php } ?>
-            </ul>
-
-         <?php } ?>
-
-
         <div class="sidebar-title">
             <span>Manual Menu</span>
         </div>
@@ -304,7 +258,7 @@
             </li>
             <li class="<?php if($this->uri->segment(2)=='console-developer'){echo"current";}?>">
                 <a href="<?php echo base_url('it/console-developer');?>">
-                    <i class="fa fa-angellist"></i>
+                    <i class="fa fa-codiepie"></i>
                     Console Developer
                 </a>
             </li>
@@ -324,6 +278,51 @@
             <!-- END ADDED BY FEBRI @ JAN 2020 -->
 
         </ul>
+
+        <?php if(count($dataMenuShare)>0) { ?>
+
+            <div class="sidebar-title">
+                <span>Shared Menu</span>
+            </div>
+            <ul id="nav">
+                <?php foreach ($dataMenuShare AS $item){ ?>
+
+                    <li class="<?php if($this->uri->segment(2)=='version'){echo"current";}?>">
+
+                        <?php
+                        // Cek apakah ada turunan atau tidak
+                        if(isset($item['DataLevel_1'])){ ?>
+                            <a href="javascript:void(0);">
+                                <?= $item['Icon']; ?>
+                                <?= $item['Name']; ?>
+                                <i class="arrow <?= ($this->uri->segment(2)=='academic') ? 'icon-angle-down' : 'icon-angle-left'?>"></i>
+                            </a>
+                            <ul class="sub-menu">
+                                <?php foreach ($item['DataLevel_1'] AS $item1) { ?>
+                                    <li class="<?= ($this->uri->segment(3)=='redundancy-krs-online') ? "current open" : ""?>">
+                                        <a href="<?= base_url( $item1['Route']) ?>">
+                                            <i class="icon-angle-right"></i>
+                                            <?= $item1['Name']; ?>
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                            </ul>
+                        <?php } else { ?>
+
+                            <a href="<?php echo base_url($item['Route']);?>">
+                                <?= $item['Icon']; ?>
+                                <?= $item['Name']; ?>
+                            </a>
+
+                        <?php  } ?>
+
+
+                    </li>
+
+                <?php } ?>
+            </ul>
+
+        <?php } ?>
 
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
