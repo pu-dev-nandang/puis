@@ -1094,7 +1094,10 @@ class C_admission extends Admission_Controler {
                   ) as chklunas,
                 (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
                 ,xx.Name as NameSales,
-                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,a.StatusReg
+                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,a.StatusReg,
+                if(
+                  (select count(*) as total from db_finance.payment_pre where `Status` = 1 and ID_register_formulir = e.ID ) > 0,"Intake","Not Intake"
+                ) as CekIntake
                 from db_admission.register as a
                 LEFT join db_admission.school as b
                 on a.SchoolID = b.ID
@@ -1120,13 +1123,16 @@ class C_admission extends Admission_Controler {
               ) ccc
             ';
         if ($StatusPayment != '%') {
-           // $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
           if ($StatusPayment == '-100') {
             
             $AddWhere2 .= ' and (FormulirCode = "" or FormulirCode is NULL ) ';
           }
           elseif ($StatusPayment == '100') {
              $AddWhere2 .= ' and FormulirCode != "" and FormulirCode is not NULL  ';
+          }
+          elseif($StatusPayment == 'Intake')
+          {
+              $AddWhere2 .= ' and CekIntake = "Intake"  ';
           }
           else{
             $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
