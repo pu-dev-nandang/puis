@@ -22,9 +22,28 @@
     .radio, .checkbox {
         margin-top: 0px;
     }
+
+    .panel-input-share-bkd {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+
+    .panel-input-share-bkd input {
+        width: 77px;
+        display: initial;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
 </style>
 
-<div class="row">
+<div class="row" style="margin-bottom: 50px;">
 
 
     <div class="col-md-8 col-md-offset-2">
@@ -154,6 +173,18 @@
                             size="5" multiple id="formTeamTeaching"></select>
                 </td>
             </tr>
+
+            <tr style="border-top: 1px solid #ccc;">
+                <td>Point Credit BKD</td>
+                <td>:</td>
+                <td>
+                    <input id="valTotalCredit" class="hide">
+                    <textarea id="valShareCreditBKD_Ori" class="hide"></textarea>
+                    <textarea id="valShareCreditBKD" class="hide"></textarea>
+                    <div id="viewListShareCredit"></div>
+                </td>
+            </tr>
+
             <tr>
                 <td colspan="3">
                     <div style="text-align: right;">
@@ -177,6 +208,16 @@
 
         loadSelectOptionBaseProdi('#formBaseProdi');
     });
+
+
+    function searchShareCredit(nameKey, myArray){
+        for (var i=0; i < myArray.length; i++) {
+            if (myArray[i].NIP === nameKey) {
+                return myArray[i];
+            }
+        }
+    }
+
 
     function checkAccessToEditTimeTable(){
 
@@ -481,7 +522,6 @@
                        '<td style="background: lightyellow;">'+d.Offerto+'</td>' +
                        '<td>'+d.TotalStd_Plan.length+'</td>' +
                        '<td>'+d.TotalStd_Approve.length+'</td>' +btnActCourse+
-
                        '</tr>');
                }
            }
@@ -542,15 +582,37 @@
 
     $('#btnSaveEditInfo').click(function () {
 
+
+
         var SemesterID = parseInt("<?php echo $SemesterID ?>");
         var ScheduleID = parseInt("<?php echo $ScheduleID ?>");
+
+        var totalCreditShare = 0;
+        var dataCreditSahre = [];
+        $('.input-share-credit').each(function (i,v) {
+            var val = $(this).val();
+            var NIP = $(this).attr('data-nip');
+            var CreditOri = $(this).attr('data-credit-ori');
+            var Credit = $(this).attr('data-credit');
+            totalCreditShare = totalCreditShare + parseFloat(val);
+
+            var arr = {
+                ScheduleID : ScheduleID,
+                NIP : NIP,
+                ShareCredit : val,
+                CreditOri : parseFloat(CreditOri),
+                Credit : parseFloat(Credit)
+            };
+            dataCreditSahre.push(arr);
+        });
 
         var formClassGroup = $('#formClassGroup').val();
         var formCoordinator = $('#formCoordinator').val();
         var formTeamTeaching = $('#formTeamTeaching').val();
 
         if(formClassGroup!='' && formClassGroup!=null &&
-            formCoordinator!='' && formCoordinator!=null){
+            formCoordinator!='' && formCoordinator!=null &&
+            totalCreditShare == 100){
 
             loading_button('#btnSaveEditInfo');
 
@@ -584,6 +646,7 @@
                     TeamTeaching : TeamTeaching
                 },
                 dataTeamTeaching : dataTeamTeaching,
+                dataCreditSahre : dataCreditSahre,
                 UpdateLog : {
                     UpdateBy : sessionNIP,
                     UpdateAt : dateTimeNow()
@@ -616,6 +679,8 @@
                 },500);
             });
 
+        } else if (totalCreditShare!=100){
+            toastr.warning('Total Credit BKD must be equal 100','Warning');
         }
 
     });
@@ -650,20 +715,201 @@
             $('#formClassGroup').val(s.ClassGroup);
             $('#formScheduleID').val(s.ScheduleID);
 
+
             loadSelectOptionLecturersSingle('#formCoordinator',s.Coordinator);
             $('#formCoordinator').select2({allowClear: true});
 
+
+
             var team = '';
             if(s.TeamTeaching==1) {
-                team = s.detailTeamTeaching;
+                team = s.TeamTeachingNIP;
             }
             loadSelectOptionLecturersSingle('#formTeamTeaching',team);
             $('#formTeamTeaching').select2({allowClear: true});
+
+            $('#formCoordinator').change(function () {
+                var valShareCreditBKD = $('#valShareCreditBKD').val();
+
+                if(valShareCreditBKD!='' && valShareCreditBKD!=null){
+                    var d = JSON.parse(valShareCreditBKD);
+                    // Perubahan
+                    var formCoordinator = $('#formCoordinator').val();
+
+                    if(formCoordinator!='' && formCoordinator!=null){
+                        if(formCoordinator!=d.Coordinator.NIP){
+                            d.Coordinator.NIP = formCoordinator;
+                            var formCoordinatorName = $('#formCoordinator option:selected').text();
+                            d.Coordinator.Name = formCoordinatorName.split('|')[1];
+                        }
+                    } else {
+                        d.Coordinator.NIP = '';
+                        d.Coordinator.Name = '<span style="color: red;">Coordinator are required</span>';
+                    }
+
+                    $('#valShareCreditBKD').val(JSON.stringify(d));
+
+                }
+
+                loadShareCreditBKD();
+            });
+
+            $('#formTeamTeaching').change(function () {
+
+                var valShareCreditBKD = $('#valShareCreditBKD_Ori').val();
+
+                if(valShareCreditBKD!=''){
+                    var d = JSON.parse(valShareCreditBKD);
+                    var dataTeam = d.Team;
+                    // Perubahan
+                    var formTeamTeaching = $('#formTeamTeaching').val();
+
+                    var newTeam = [];
+
+                    if(formTeamTeaching!='' && formTeamTeaching!=null){
+                        for(var i=0;i<formTeamTeaching.length;i++){
+                            var NIP = formTeamTeaching[i];
+
+                            if(dataTeam.length>0){
+                                var resultObject = searchShareCredit(NIP, dataTeam);
+                                if(typeof resultObject!=="undefined"){
+                                    newTeam.push(resultObject);
+                                } else {
+                                    var formTeamTeachingName = $('#formTeamTeaching option[value="'+NIP+'"]').text().split('|')[1];
+                                    var newArr = {
+                                        Name : formTeamTeachingName,
+                                        NIP : NIP,
+                                        ShareCredit : 0
+                                    };
+                                    newTeam.push(newArr);
+                                }
+                            }
+
+
+                        }
+                    }
+
+                    if(newTeam.length>0){
+                        d.Team = newTeam;
+                        $('#valShareCreditBKD').val(JSON.stringify(d));
+                        loadShareCreditBKD();
+                    }
+
+
+                }
+
+            });
+
+            var arr_valShareCreditBKD = {
+                Coordinator : {
+                    NIP : s.Coordinator,
+                    Name : s.CoordinatorName,
+                    ShareCredit : s.CoordinatorCreditPoint
+                },
+                Team : s.TeamTeachingDetail
+            };
+
+            $('#valShareCreditBKD').val(JSON.stringify(arr_valShareCreditBKD));
+            $('#valShareCreditBKD_Ori').val(JSON.stringify(arr_valShareCreditBKD));
+
+            $('#valTotalCredit').val(s.TotalCredit);
+
+            loadShareCreditBKD();
 
 
         });
 
     }
+
+    function loadShareCreditBKD() {
+
+        loading_page('#viewListShareCredit');
+
+        // Cek setelah dilakuakn change
+
+        var valShareCreditBKD = $('#valShareCreditBKD').val();
+
+        var valTotalCredit = $('#valTotalCredit').val();
+
+        if(valShareCreditBKD!=''){
+            var d = JSON.parse(valShareCreditBKD);
+
+            var listTeam = '';
+
+            var TotalPointCredit = 0;
+
+            if(d.Team.length>0){
+                $.each(d.Team,function (i,v) {
+                    var valCr = (v.ShareCredit!='' && v.ShareCredit!=null) ? parseFloat(v.ShareCredit) : 0;
+
+                    var CreditOri = (valCr>0) ? (valCr / 100) * parseInt(valTotalCredit) : 0;
+                    var CreditResult = (CreditOri>0) ? parseFloat(CreditOri).toFixed(2) : 0;
+
+                    listTeam = listTeam+'<li class="list-group-item">'+v.NIP+' | '+v.Name+'' +
+                        '                           <div class="panel-input-share-bkd">' +
+                        '                               <input class="form-control input-sm input-share-credit" data-credit-ori="'+CreditOri+'" data-credit="'+CreditResult+'" data-nip="'+v.NIP+'" value="'+valCr+'" type="number">' +
+                        '  <span id="crdt_'+v.NIP+'"> | '+CreditOri+' | ' +CreditResult+'</span>'+
+                        '                           </div>' +
+                        '                        </li>';
+
+                    TotalPointCredit = TotalPointCredit + valCr;
+
+                });
+            }
+
+            setTimeout(function () {
+
+                var valCr = (d.Coordinator.ShareCredit!='' && d.Coordinator.ShareCredit!=null) ? d.Coordinator.ShareCredit : 0;
+                var CreditOri = (valCr>0) ? (valCr / 100) * parseInt(valTotalCredit) : 0;
+                var CreditResult = (CreditOri>0) ? parseFloat(CreditOri).toFixed(2) : 0;
+
+                var NIP = (d.Coordinator.NIP!='' && d.Coordinator.NIP!=null) ? d.Coordinator.NIP+' | ' : '';
+
+                TotalPointCredit = TotalPointCredit + parseFloat(valCr);
+
+                $('#viewListShareCredit').html('' +
+                    '<ul class="list-group">' +
+                    '                        <li class="list-group-item">'+NIP+d.Coordinator.Name+'' +
+                    '                           <div class="panel-input-share-bkd">' +
+                    '                               <input class="form-control input-sm input-share-credit" data-credit-ori="'+CreditOri+'" data-credit="'+CreditResult+'" data-nip="'+d.Coordinator.NIP+'" value="'+valCr+'" type="number">' +
+                    '  <span id="crdt_'+d.Coordinator.NIP+'"> | ' +CreditOri+' | '+CreditResult+'</span>'+
+                    '                           </div>' +
+                    '                        </li>' +listTeam+
+                    '                    </ul>Total Point : <span id="viewTotalPointCredit">'+TotalPointCredit+'</span>');
+
+            },500);
+
+        }
+
+    }
+
+    $(document).on('keyup','.input-share-credit',function () {
+        var valTotalCredit = $('#valTotalCredit').val();
+        var NIP = $(this).attr('data-nip');
+        var valCr = $(this).val();
+
+        var CreditOri = 0;
+        var CreditResult =  0;
+
+        if(parseFloat(valCr)>0){
+            CreditOri = (valCr>0) ? (valCr / 100) * parseInt(valTotalCredit) : 0;
+            CreditResult = (CreditOri>0) ? parseFloat(CreditOri).toFixed(2) : 0;
+        }
+
+        $(this).attr('data-credit-ori',CreditOri);
+        $(this).attr('data-credit',CreditResult);
+
+        $('#crdt_'+NIP).html(' | '+CreditOri+' | '+CreditResult);
+
+        var TotalPointCredit = 0;
+        $('.input-share-credit').each(function (i,v) {
+            var val = $(this).val();
+            TotalPointCredit = TotalPointCredit + parseFloat(val);
+        });
+
+        $('#viewTotalPointCredit').html(TotalPointCredit);
+
+    });
 
 
 

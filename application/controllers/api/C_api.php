@@ -2319,13 +2319,16 @@ class C_api extends CI_Controller {
                 $ScheduleID = $data_arr['ScheduleID'];
 
                 $dataProgram = $this->db->query('SELECT s.ID AS ScheduleID, s.ProgramsCampusID, sem.Name AS SemesterName,
-                                                              s.ClassGroup, s.Coordinator, s.TeamTeaching,
+                                                              s.ClassGroup, s.Coordinator, em.Name AS CoordinatorName, 
+                                                              ssc.ShareCredit AS CoordinatorCreditPoint, s.TeamTeaching,
                                                              s.SemesterID, s.Attendance, s.OnlineLearning, mk.NameEng AS CourseEng, cd.TotalSKS AS TotalCredit
                                                             FROM db_academic.schedule s
                                                             LEFT JOIN db_academic.semester sem ON (sem.ID = s.SemesterID)
                                                             LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                            LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                            LEFT JOIN db_academic.schedule_share_credit ssc ON (ssc.ScheduleID = sdc.ScheduleID AND ssc.NIP = s.Coordinator)
                                                             WHERE s.ID = "'.$ScheduleID.'" AND SemesterID = "'.$SemesterID.'"
                                                              GROUP BY s.ID ')
                     ->result_array();
@@ -2333,14 +2336,19 @@ class C_api extends CI_Controller {
 
                 if(count($dataProgram)>0){
                     $detailTeamTeaching = [];
-                    $dataTTC = $this->db->select('NIP')->get_where('db_academic.schedule_team_teaching',array('ScheduleID'=>$dataProgram[0]['ScheduleID']))
+                    $dataTTC = $this->db->query('SELECT em.NIP, em.Name, ssc.ShareCredit FROM db_academic.schedule_team_teaching stt  
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                    LEFT JOIN db_academic.schedule_share_credit ssc ON (stt.ScheduleID = ssc.ScheduleID AND ssc.NIP = stt.NIP)
+                                                    WHERE stt.ScheduleID = "'.$dataProgram[0]['ScheduleID'].'" ')
                         ->result_array();
                     if(count($dataTTC)>0){
                         foreach ($dataTTC as $item){
                             array_push($detailTeamTeaching,$item['NIP']);
                         }
                     }
-                    $dataProgram[0]['detailTeamTeaching'] = $detailTeamTeaching;
+                    $dataProgram[0]['TeamTeachingNIP'] = $detailTeamTeaching;
+
+                    $dataProgram[0]['TeamTeachingDetail'] = $dataTTC;
 
                 }
 
@@ -2465,6 +2473,24 @@ class C_api extends CI_Controller {
                     $UpdateLog = (array) $data_arr['UpdateLog'];
                     $this->db->where('ID', $data_arr['ScheduleID']);
                     $this->db->update('db_academic.schedule',$UpdateLog);
+                    $this->db->reset_query();
+
+
+                    $dataCreditSahre = $data_arr['dataCreditSahre'];
+                    if(count($dataCreditSahre)>0){
+                        // Update Credit Share
+                        $this->db->where('ScheduleID',$data_arr['ScheduleID']);
+                        $this->db->delete('db_academic.schedule_share_credit');
+                        $this->db->reset_query();
+
+                        for($i=0;$i<count($dataCreditSahre);$i++){
+                            $dataInsertCreditShare = (array) $dataCreditSahre[$i];
+                            $this->db->insert('db_academic.schedule_share_credit',$dataInsertCreditShare);
+                        }
+
+                    }
+
+
 
                     $result = array(
                         'Status' => 1
