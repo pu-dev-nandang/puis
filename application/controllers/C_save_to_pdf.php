@@ -6269,17 +6269,19 @@ Phone: (021) 29200456';
             $thn = ($dateGen!='') ? explode('-',$dateGen)[0] : '';
 
             // Get Mata kuliah
-            $dataMK = $this->db->query('SELECT mk.NameEng, cd.TotalSKS AS Credit FROM db_academic.schedule s
+            $dataMK = $this->db->query('SELECT mk.NameEng, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule s
                                                   LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                   LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                  LEFT JOIN db_academic.schedule_share_credit ssc ON (ssc.ScheduleID = s.ID AND ssc.NIP = s.Coordinator)
                                                   WHERE s.SemesterID = "'.$SemesterID.'" AND s.Coordinator = "'.$NIP.'" GROUP BY s.ID
                                                   UNION ALL
-                                                  SELECT mk2.NameEng, cd.TotalSKS AS Credit FROM db_academic.schedule_details_course sdc2
+                                                  SELECT mk2.NameEng, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule_details_course sdc2
                                                   LEFT JOIN db_academic.schedule s2 ON (s2.ID = sdc2.ScheduleID)
                                                   LEFT JOIN db_academic.mata_kuliah mk2 ON (mk2.ID = sdc2.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc2.CDID)
                                                   LEFT JOIN db_academic.schedule_team_teaching stt ON (sdc2.ScheduleID = stt.ScheduleID)
+                                                  LEFT JOIN db_academic.schedule_share_credit ssc ON (ssc.ScheduleID = s2.ID AND ssc.NIP = stt.NIP)
                                                   WHERE s2.SemesterID = "'.$SemesterID.'" AND stt.NIP = "'.$NIP.'" GROUP BY s2.ID ')->result_array();
 
 
@@ -6355,9 +6357,12 @@ Phone: (021) 29200456';
 
             $no=1;
             foreach ($dataMK AS $item){
+
+                $Credit = ($item['CreditResult']!='' && $item['CreditResult']!=null) ? $item['CreditResult'] : '-' ;
+
                 $pdf->Cell(10,$h,$no,1,0,'C');
                 $pdf->Cell(150,$h,$item['NameEng'],1,0,'L');
-                $pdf->Cell(15,$h,$item['Credit'],1,0,'C');
+                $pdf->Cell(15,$h,$Credit,1,0,'C');
                 $pdf->Cell(15,$h,'14',1,1,'C');
 
                 $no++;
