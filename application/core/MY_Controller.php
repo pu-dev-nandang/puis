@@ -130,7 +130,61 @@ abstract class Globalclass extends MyAbstract{
     protected function menu_navigation(){
         $nav = $this->__getDepartement();
         $data['departement'] = $nav;
-        $page = $this->load->view('page/'.$data['departement'].'/menu_navigation','',true);
+
+        $IDdepartementNavigation = $this->session->userdata('IDdepartementNavigation');
+        // Cek apakah mempunyai menu share atau tidak
+        $dataMenu = $this->db->query('SELECT sm.* FROM db_it.sm_menu sm 
+                                            LEFT JOIN db_it.sm_user smu 
+                                            ON (smu.IDSM = sm.ID)
+                                            WHERE 
+                                            smu.IDDivision = "'.$IDdepartementNavigation.'" ')
+                                ->result_array();
+
+        if(count($dataMenu)>0){
+            for ($i=0;$i<count($dataMenu);$i++){
+                $d = $dataMenu[$i];
+                // cek level pertama
+                $dataLevel1 = $this->db->get_where('db_it.sm_menu_details',array(
+                    'IDSM' => $d['ID']
+                ))->result_array();
+
+                if(count($dataLevel1)>0){
+
+                    // cek apakah punya level 2 nya
+                    for($a=0;$a<count($dataLevel1);$a++){
+
+
+
+                        $dataLevel2 = $this->db->get_where('db_it.sm_menu_details',array(
+                            'IDSMDetail' => $dataLevel1[$a]['ID']
+                        ))->result_array();
+
+                        if(count($dataLevel2)>0){
+                            $dataLevel1[$a]['DataLevel_2'] = $dataLevel2;
+                        }
+
+                        if($dataLevel1[$a]['IDSMDetail']!=null
+                            && $dataLevel1[$a]['IDSMDetail']!=''){
+                            unset($dataLevel1[$a]);
+                        }
+
+
+                    }
+
+                    $dataMenu[$i]['DataLevel_1'] = $dataLevel1;
+
+                }
+
+
+            }
+        }
+
+//        print_r($dataMenu);
+//        exit();
+
+        $data['dataMenuShare'] = $dataMenu;
+
+        $page = $this->load->view('page/'.$data['departement'].'/menu_navigation',$data,true);
         return $page;
     }
 
