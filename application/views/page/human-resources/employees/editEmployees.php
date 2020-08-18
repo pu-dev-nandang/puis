@@ -1682,17 +1682,24 @@
             if(jsonResult.length>0){
                 $.each(jsonResult,function (i,v) {
 
-                    var btnAct = '<div class="btn-group">' +
-                        '  <button type="button" class="btn btn-default dropdown-toggle btnAct" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                        '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
-                        '  </button>' +
-                        '  <ul class="dropdown-menu">' +
-                        '    <li><a href="javascript:void(0);" class="btnEditCerti" data-id="'+v.ID+'">Edit</a></li>' +
-                        '    <li role="separator" class="divider"></li>' +
-                        '    <li><a href="javascript:void(0);" class="btnDelCerti" data-id="'+v.ID+'">Remove</a></li>' +
-                        '  </ul>' +
-                        '</div>' +
-                        '<textarea class="hide" id="dataEditCerti_'+v.ID+'">'+JSON.stringify(v)+'</textarea>';
+                    var btnAct = '';
+                    if (v["StatusEdit"] !== undefined && v["StatusEdit"] == 0 ) {
+                       btnAct = '<span style = "color:blue;">Awaiting Edit Process</span>';
+                    }
+                    else
+                    {
+                       btnAct = '<div class="btn-group">' +
+                           '  <button type="button" class="btn btn-default dropdown-toggle btnAct" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                           '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
+                           '  </button>' +
+                           '  <ul class="dropdown-menu">' +
+                           '    <li><a href="javascript:void(0);" class="btnEditCerti" data-id="'+v.ID+'" data-token="'+jwt_encode(v,'UAP)(*')+'">Edit</a></li>' +
+                           '    <li role="separator" class="divider"></li>' +
+                           '    <li><a href="javascript:void(0);" class="btnDelCerti" data-id="'+v.ID+'">Remove</a></li>' +
+                           '  </ul>' +
+                           '</div>' +
+                           '<textarea class="hide" id="dataEditCerti_'+v.ID+'">'+JSON.stringify(v)+'</textarea>';
+                    }
 
                     var p = (v.PublicationYear!='' && v.PublicationYear!=null)
                         ? moment(v.PublicationYear).format('DD MMM YYYY') : '';

@@ -894,6 +894,7 @@ class C_employees extends HR_Controler {
                         if (isset($Logs->certificate_request) && !empty($Logs->certificate_request)) {
                             $data =  $Logs->certificate_request;
                             for ($index=0; $index < count($data); $index++) { 
+                                $ID_certificate_employees = $data[$index]->ID;
                                 $dataSave = [
                                     'NIP' => $data[$index]->NIP ,
                                     'Certificate' => $data[$index]->Certificate ,
@@ -901,10 +902,50 @@ class C_employees extends HR_Controler {
                                     'Duedate' => $data[$index]->Duedate ,
                                     'Lifetime' => $data[$index]->Lifetime ,
                                     'Scale' => $data[$index]->Scale ,
-                                    'File' => $data[$index]->File ,
+                                    //'File' => $data[$index]->File ,
                                 ];
 
-                                $this->db->insert('db_employees.employees_certificate',$dataSave);
+                                if (isset($data[$index]->File)) {
+
+                                    // delete file old
+                                    $getDataCertificate = $this->m_master->caribasedprimary('db_employees.employees_certificate','ID',$ID_certificate_employees);
+                                    // delete first
+                                    if (count($getDataCertificate) > 0) {
+                                        $pathFile = './uploads/certificate/'.$getDataCertificate[0]['File'];
+                                        if (file_exists($pathFile)) {
+                                           unlink($pathFile);
+                                        }
+                                    }
+                                    
+
+                                    $dataSave['File'] = $data[$index]->File;
+                                }
+
+                                if ($data[$index]->status == 'Approve') {
+                                     if ($data[$index]->action == 'edit') {
+                                         $this->db->where('ID',$ID_certificate_employees);
+                                         $dataSave['StatusEdit'] = 1;
+                                         $this->db->update('db_employees.employees_certificate',$dataSave);  
+                                     }
+                                     elseif($data[$index]->action == 'delete')
+                                     {
+                                        $getDataCertificate = $this->m_master->caribasedprimary('db_employees.employees_certificate','ID',$ID_certificate_employees);
+                                        // delete first
+                                        $pathFile = './uploads/certificate/'.$getDataCertificate[0]['File'];
+                                        if (file_exists($pathFile)) {
+                                           unlink($pathFile);
+                                        }
+                                        $this->db->where('ID',$ID_certificate_employees);
+                                        $this->db->delete('db_employees.employees_certificate'); 
+                                     }
+                                        
+                                }
+                                else
+                                {
+                                    $this->db->insert('db_employees.employees_certificate',$dataSave);
+                                }
+
+                                
                             }
 
 
