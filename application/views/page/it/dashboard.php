@@ -1,9 +1,9 @@
 <!--<h1>Dashboard</h1>-->
 
 <!--<legend>Data Session</legend>-->
-<pre>
-    <?php print_r($this->session->all_userdata()); ?>
-</pre>
+<!--<pre>-->
+<!--    --><?php //print_r($this->session->all_userdata()); ?>
+<!--</pre>-->
 <!-- <pre><?php print_r($this->session->userdata('menu_admission_grouping')) ?></pre> -->
 
 <div class="col-md-12" style="text-align: center;margin-top: 50px;">
