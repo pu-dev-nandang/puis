@@ -6267,7 +6267,25 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='readCertificateLec_request'){
+                $rs = ['dataApprove' => [],'dataRequest' => [] ];
+                $data = $this->db->get_where('db_employees.employees_certificate',array(
+                    'NIP' => $data_arr['NIP']
+                ))->result_array();
+                $rs['dataApprove'] = $data;
+                // get certificate request di log field and adding
+                    $dataEMP = $this->db->get_where('db_employees.employees',array(
+                        'NIP' => $data_arr['NIP']
+                    ))->result_array()[0];
 
+
+                    if (!empty($dataEMP['Logs'])) {
+                        $jsonExtract = json_decode($dataEMP['Logs'],true);
+                        $rs['dataRequest']= $jsonExtract['certificate_request'];
+                    }
+
+                return print_r(json_encode($rs));
+            }
             else if($data_arr['action']=='addEmployees'){
                 $rs = array('msg' => '','status' => 1);
                 $formInsert = (array) $data_arr['formInsert'];
