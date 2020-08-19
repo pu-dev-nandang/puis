@@ -847,7 +847,7 @@
 
                     listTeam = listTeam+'<li class="list-group-item">'+v.NIP+' | '+v.Name+'' +
                         '                           <div class="panel-input-share-bkd">' +
-                        '                               <input class="form-control input-sm input-share-credit" data-credit-ori="'+CreditOri+'" data-credit="'+CreditResult+'" data-nip="'+v.NIP+'" value="'+valCr+'" type="number">' +
+                        '                              <i class="fa fa-percent"></i> <input class="form-control input-sm input-share-credit" data-credit-ori="'+CreditOri+'" data-credit="'+CreditResult+'" data-nip="'+v.NIP+'" value="'+valCr+'" type="number">' +
                         '  <span id="crdt_'+v.NIP+'"> | '+CreditOri+' | ' +CreditResult+'</span>'+
                         '                           </div>' +
                         '                        </li>';
@@ -871,7 +871,7 @@
                     '<ul class="list-group">' +
                     '                        <li class="list-group-item">'+NIP+d.Coordinator.Name+'' +
                     '                           <div class="panel-input-share-bkd">' +
-                    '                               <input class="form-control input-sm input-share-credit" data-credit-ori="'+CreditOri+'" data-credit="'+CreditResult+'" data-nip="'+d.Coordinator.NIP+'" value="'+valCr+'" type="number">' +
+                    '                               <i class="fa fa-percent"></i> <input class="form-control input-sm input-share-credit" data-credit-ori="'+CreditOri+'" data-credit="'+CreditResult+'" data-nip="'+d.Coordinator.NIP+'" value="'+valCr+'" type="number">' +
                     '  <span id="crdt_'+d.Coordinator.NIP+'"> | ' +CreditOri+' | '+CreditResult+'</span>'+
                     '                           </div>' +
                     '                        </li>' +listTeam+
