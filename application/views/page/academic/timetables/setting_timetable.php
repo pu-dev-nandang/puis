@@ -1030,217 +1030,228 @@
 <script>
     $('#btnSavejadwal').click(function () {
 
-        var process = [];
 
-        var filterSemester = $('#filterSemester').val();
-        var SemesterID = filterSemester.split('.')[0];
-        var ProgramsCampusID = $('#formProgramsCampusID').val();
-        var CombinedClasses = (dataProdi>1) ? '1' : '0';
+        if(confirm('Are you sure?')){
 
-        var schedule_details_course=[];
-        var arrCDID = [];
+            var process = [];
 
-        for(var p=1;p<=dataProdi;p++){
-            var formBaseProdi = $('#formBaseProdi'+p).val();
-            var formMataKuliah = $('#formMataKuliah'+p).val();
+            var filterSemester = $('#filterSemester').val();
+            var SemesterID = filterSemester.split('.')[0];
+            var ProgramsCampusID = $('#formProgramsCampusID').val();
+            var CombinedClasses = (dataProdi>1) ? '1' : '0';
 
-            var viewGroupProdi = parseInt($('#viewGroupProdi'+p).val());
-            var formGroupProdi = $('#formGroupProdi'+p).val();
+            var schedule_details_course=[];
+            var arrCDID = [];
 
-            // Jika Prodi memiliki Group Prodi
-            if(viewGroupProdi==1){
-                if(formBaseProdi!=null && formBaseProdi!='' &&
-                    formMataKuliah!=null && formMataKuliah!='' &&
-                    formGroupProdi!=null && formGroupProdi!=''){
+            for(var p=1;p<=dataProdi;p++){
+                var formBaseProdi = $('#formBaseProdi'+p).val();
+                var formMataKuliah = $('#formMataKuliah'+p).val();
 
-                    var CDID = formMataKuliah.split('|')[0];
+                var viewGroupProdi = parseInt($('#viewGroupProdi'+p).val());
+                var formGroupProdi = $('#formGroupProdi'+p).val();
 
-                    if($.inArray(CDID,arrCDID)==-1){
-                        var cdArr = {
-                            ScheduleID : 0,
-                            ProdiID : formBaseProdi.split('.')[0],
-                            ProdiGroupID : formGroupProdi,
-                            CDID : CDID,
-                            MKID : formMataKuliah.split('|')[1]
-                        };
-                        schedule_details_course.push(cdArr);
-                        arrCDID.push(CDID);
-                    } else {
-                        toastr.error('Please check course, course can not same','Error');
-                        process.push(0);
-                    }
+                // Jika Prodi memiliki Group Prodi
+                if(viewGroupProdi==1){
+                    if(formBaseProdi!=null && formBaseProdi!='' &&
+                        formMataKuliah!=null && formMataKuliah!='' &&
+                        formGroupProdi!=null && formGroupProdi!=''){
 
-                } else {
-                    requiredForm('#formBaseProdi'+p);
-                    requiredForm('#formGroupProdi'+p);
-                    requiredForm('#s2id_formMataKuliah'+p+' a');
-                    process.push(0);
-                }
-            }
-            // Jika Prodi TIDAK memiliki Group Prodi
-            else {
-                if(formBaseProdi!=null && formBaseProdi!='' &&
-                    formMataKuliah!=null && formMataKuliah!=''){
+                        var CDID = formMataKuliah.split('|')[0];
 
-                    var CDID = formMataKuliah.split('|')[0];
-
-                    if($.inArray(CDID,arrCDID)==-1){
-                        var cdArr = {
-                            ScheduleID : 0,
-                            ProdiID : formBaseProdi.split('.')[0],
-                            CDID : CDID,
-                            MKID : formMataKuliah.split('|')[1]
-                        };
-                        schedule_details_course.push(cdArr);
-                        arrCDID.push(CDID);
-                    } else {
-                        toastr.error('Please check course, course can not same','Error');
-                        process.push(0);
-                    }
-
-                }
-                else {
-                    requiredForm('#formBaseProdi'+p);
-                    requiredForm('#s2id_formMataKuliah'+p+' a');
-                    process.push(0);
-                }
-            }
-
-
-        }
-
-        var ClassGroup = $('#formClassGroupCadangan').val();
-        if(ClassGroup=='' || ClassGroup==null){
-            requiredForm('#formClassGroupCadangan');
-                process.push(0);
-        }
-
-        var Coordinator = $('#formCoordinator').val();
-
-        var TeamTeaching = $('input[name=formteamTeaching]:checked').val();
-        var UpdateBy = sessionNIP;
-        var UpdateAt = dateTimeNow();
-
-        var teamTeachingArray = [];
-
-        if(TeamTeaching==1){
-            var formTeamTeaching = $('#formTeamTeaching').val();
-            if(formTeamTeaching!=null){
-                for(var t=0;t<formTeamTeaching.length;t++){
-                    if(Coordinator!=formTeamTeaching[t]){
-                        var dt = {
-                            ScheduleID : 0,
-                            NIP :  formTeamTeaching[t],
-                            Status : '0'
-                        };
-                        teamTeachingArray.push(dt);
-                    } else {
-                        toastr.error('Teamteching and Coordinator can not same NIP/Lecturer','Error');
-                        process.push(0);
-                    }
-                }
-            }
-        }
-
-
-        // schedule_sesi ---
-        var textTotalSKSMK = $('#textTotalSKSMK').val();
-        var dataScheduleDetailsArray = [];
-        var totalCredit = 0;
-        for(var i=1;i<=dataSesi;i++){
-            var ClassroomID = $('#formClassroom'+i).val();
-            var DayID = $('#formDay'+i).val();
-            var Credit = $('#formCredit'+i).val(); if(Credit==''){process.push(0); requiredForm('#formCredit'+dataSesi);}
-            var TimePerCredit = $('#formTimePerCredit'+i).val();
-            var StartSessions = $('#formSesiAwal'+i).val(); if(StartSessions==''){process.push(0); requiredForm('#formSesiAwal'+dataSesi);}
-            var EndSessions = $('#formSesiAkhir'+i).val();if(EndSessions==''){process.push(0); requiredForm('#formSesiAkhir'+dataSesi);}
-
-            totalCredit = parseInt(totalCredit) + parseInt(Credit);
-            var arrSesi = {
-                ScheduleID : 0,
-                ClassroomID : ClassroomID,
-                Credit : Credit,
-                DayID : DayID,
-                TimePerCredit : TimePerCredit,
-                StartSessions : StartSessions,
-                EndSessions : EndSessions
-            };
-
-            dataScheduleDetailsArray.push(arrSesi);
-        }
-
-        // if(textTotalSKSMK<totalCredit){
-        //     process.push(0);
-        //     toastr.error('Credit must be less than equal '+textTotalSKSMK,'Error');
-        // }
-
-        if($.inArray(0,process)==-1){
-            var formAllowClassGroup = parseInt($('#formAllowClassGroup').val());
-            // Untuk mengecek group exist or not exist
-            if(formAllowClassGroup==1){
-                loading_button('#btnSavejadwal');
-                $('#removeNewSesi,#addNewSesi').prop('disabled',true);
-                var SubSesi = (dataSesi>1) ? '1' : '0';
-
-                var Attendance = ($('#formAttendance').is(':checked')) ? '1' : '0';
-
-                var data = {
-                    action : 'add',
-                    ID : '',
-                    formData :
-                        {
-                            schedule : {
-                                SemesterID : SemesterID,
-                                ProgramsCampusID : ProgramsCampusID,
-                                CombinedClasses : CombinedClasses,
-                                ClassGroup : ClassGroup,
-                                Coordinator : Coordinator,
-                                TeamTeaching : TeamTeaching,
-                                SubSesi : SubSesi,
-                                TotalAssigment : 5,
-                                IsSemesterAntara : ''+SemesterAntara,
-                                Attendance : Attendance,
-                                UpdateBy : UpdateBy,
-                                UpdateAt : UpdateAt
-                            },
-                            schedule_details : dataScheduleDetailsArray,
-                            schedule_details_course : schedule_details_course,
-                            schedule_team_teaching : teamTeachingArray
-
+                        if($.inArray(CDID,arrCDID)==-1){
+                            var cdArr = {
+                                ScheduleID : 0,
+                                ProdiID : formBaseProdi.split('.')[0],
+                                ProdiGroupID : formGroupProdi,
+                                CDID : CDID,
+                                MKID : formMataKuliah.split('|')[1]
+                            };
+                            schedule_details_course.push(cdArr);
+                            arrCDID.push(CDID);
+                        } else {
+                            toastr.error('Please check course, course can not same','Error');
+                            process.push(0);
                         }
+
+                    } else {
+                        requiredForm('#formBaseProdi'+p);
+                        requiredForm('#formGroupProdi'+p);
+                        requiredForm('#s2id_formMataKuliah'+p+' a');
+                        process.push(0);
+                    }
+                }
+                // Jika Prodi TIDAK memiliki Group Prodi
+                else {
+                    if(formBaseProdi!=null && formBaseProdi!='' &&
+                        formMataKuliah!=null && formMataKuliah!=''){
+
+                        var CDID = formMataKuliah.split('|')[0];
+
+                        if($.inArray(CDID,arrCDID)==-1){
+                            var cdArr = {
+                                ScheduleID : 0,
+                                ProdiID : formBaseProdi.split('.')[0],
+                                CDID : CDID,
+                                MKID : formMataKuliah.split('|')[1]
+                            };
+                            schedule_details_course.push(cdArr);
+                            arrCDID.push(CDID);
+                        } else {
+                            toastr.error('Please check course, course can not same','Error');
+                            process.push(0);
+                        }
+
+                    }
+                    else {
+                        requiredForm('#formBaseProdi'+p);
+                        requiredForm('#s2id_formMataKuliah'+p+' a');
+                        process.push(0);
+                    }
+                }
+
+
+            }
+
+            var ClassGroup = $('#formClassGroupCadangan').val();
+            if(ClassGroup=='' || ClassGroup==null){
+                requiredForm('#formClassGroupCadangan');
+                process.push(0);
+            }
+
+            var Coordinator = $('#formCoordinator').val();
+
+            var TeamTeaching = $('input[name=formteamTeaching]:checked').val();
+            var UpdateBy = sessionNIP;
+            var UpdateAt = dateTimeNow();
+
+            var teamTeachingArray = [];
+
+            if(TeamTeaching==1){
+                var formTeamTeaching = $('#formTeamTeaching').val();
+                if(formTeamTeaching!=null){
+                    for(var t=0;t<formTeamTeaching.length;t++){
+                        if(Coordinator!=formTeamTeaching[t]){
+                            var dt = {
+                                ScheduleID : 0,
+                                NIP :  formTeamTeaching[t],
+                                Status : '0'
+                            };
+                            teamTeachingArray.push(dt);
+                        } else {
+                            toastr.error('Teamteching and Coordinator can not same NIP/Lecturer','Error');
+                            process.push(0);
+                        }
+                    }
+                }
+            }
+
+
+            // schedule_sesi ---
+            var textTotalSKSMK = $('#textTotalSKSMK').val();
+            var dataScheduleDetailsArray = [];
+            var totalCredit = 0;
+            for(var i=1;i<=dataSesi;i++){
+                var ClassroomID = $('#formClassroom'+i).val();
+                var DayID = $('#formDay'+i).val();
+                var Credit = $('#formCredit'+i).val(); if(Credit==''){process.push(0); requiredForm('#formCredit'+dataSesi);}
+                var TimePerCredit = $('#formTimePerCredit'+i).val();
+                var StartSessions = $('#formSesiAwal'+i).val(); if(StartSessions==''){process.push(0); requiredForm('#formSesiAwal'+dataSesi);}
+                var EndSessions = $('#formSesiAkhir'+i).val();if(EndSessions==''){process.push(0); requiredForm('#formSesiAkhir'+dataSesi);}
+
+                totalCredit = parseInt(totalCredit) + parseInt(Credit);
+                var arrSesi = {
+                    ScheduleID : 0,
+                    ClassroomID : ClassroomID,
+                    Credit : Credit,
+                    DayID : DayID,
+                    TimePerCredit : TimePerCredit,
+                    StartSessions : StartSessions,
+                    EndSessions : EndSessions
                 };
 
-                var token = jwt_encode(data,'UAP)(*');
-                var url = base_url_js+'api/__crudSchedule';
-                $.post(url,{token:token},function (result) {
-                    resetFormSetSchedule();
-                    toastr.success('Schedule Saved','Success!!');
-
-                    var arrToken = {
-                        Subject : 'Adding Timetable | Group : '+ClassGroup,
-                        URL : 'academic/timetables/list',
-                        From : sessionName,
-                        Icon : sessionUrlPhoto
-                    };
-
-                    var dataToken = jwt_encode(arrToken,'UAP)(*');
-
-                    addNotification(dataToken,null);
-
-                    setTimeout(function () {
-                        $('#btnSavejadwal').html('Save');
-                        $('#btnSavejadwal,#removeNewSesi,#addNewSesi').prop('disabled',false);
-                    },500);
-                });
-            } else {
-                toastr.error('Group is Exist','Error');
+                dataScheduleDetailsArray.push(arrSesi);
             }
 
+            // if(textTotalSKSMK<totalCredit){
+            //     process.push(0);
+            //     toastr.error('Credit must be less than equal '+textTotalSKSMK,'Error');
+            // }
+
+            if($.inArray(0,process)==-1){
+
+                loading_modal_show();
+
+                var formAllowClassGroup = parseInt($('#formAllowClassGroup').val());
+                // Untuk mengecek group exist or not exist
+                if(formAllowClassGroup==1){
+                    loading_button('#btnSavejadwal');
+                    $('#removeNewSesi,#addNewSesi').prop('disabled',true);
+                    var SubSesi = (dataSesi>1) ? '1' : '0';
+
+                    var Attendance = ($('#formAttendance').is(':checked')) ? '1' : '0';
+
+                    var data = {
+                        action : 'add',
+                        ID : '',
+                        formData :
+                            {
+                                schedule : {
+                                    SemesterID : SemesterID,
+                                    ProgramsCampusID : ProgramsCampusID,
+                                    CombinedClasses : CombinedClasses,
+                                    ClassGroup : ClassGroup,
+                                    Coordinator : Coordinator,
+                                    TeamTeaching : TeamTeaching,
+                                    SubSesi : SubSesi,
+                                    TotalAssigment : 5,
+                                    IsSemesterAntara : ''+SemesterAntara,
+                                    Attendance : Attendance,
+                                    UpdateBy : UpdateBy,
+                                    UpdateAt : UpdateAt
+                                },
+                                schedule_details : dataScheduleDetailsArray,
+                                schedule_details_course : schedule_details_course,
+                                schedule_team_teaching : teamTeachingArray
+
+                            }
+                    };
+
+                    var token = jwt_encode(data,'UAP)(*');
+                    var url = base_url_js+'api/__crudSchedule';
+                    $.post(url,{token:token},function (result) {
+                        resetFormSetSchedule();
+                        toastr.success('Schedule Saved','Success!!');
+
+                        var arrToken = {
+                            Subject : 'Adding Timetable | Group : '+ClassGroup,
+                            URL : 'academic/timetables/list',
+                            From : sessionName,
+                            Icon : sessionUrlPhoto
+                        };
+
+                        var dataToken = jwt_encode(arrToken,'UAP)(*');
+
+                        addNotification(dataToken,null);
+
+                        setTimeout(function () {
+                            $('#btnSavejadwal').html('Save');
+                            $('#btnSavejadwal,#removeNewSesi,#addNewSesi').prop('disabled',false);
+
+                            loading_modal_hide();
+
+                        },500);
+                    });
+                } else {
+                    toastr.error('Group is Exist','Error');
+                }
 
 
 
-        } else {
-            toastr.info('Form Required','Info');
+
+            } else {
+                toastr.info('Form Required','Info');
+            }
+
         }
 
 
