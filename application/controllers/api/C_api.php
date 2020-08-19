@@ -11444,8 +11444,8 @@ class C_api extends CI_Controller {
                         <i class="fa fa-edit"></i> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a href="'.base_url('academic/timetables/list/edit/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Course</a></li>
-                        <li><a href="'.base_url('academic/timetables/list/edit-schedule/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Schedule</a></li>
+                        <li><a target="_blank" href="'.base_url('academic/timetables/list/edit/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Course</a></li>
+                        <li><a target="_blank" href="'.base_url('academic/timetables/list/edit-schedule/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Schedule</a></li>
 
                         <li role="separator" class="divider"></li>
                         <li><a href="javascript:void(0);" class="btnTimetablesEditDelete" data-group="'.$row['ClassGroup'].'" data-id="'.$row['ID'].'">Delete</a></li>

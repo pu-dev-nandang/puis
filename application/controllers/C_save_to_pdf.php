@@ -6346,8 +6346,9 @@ Phone: (021) 29200456';
             $pdf->SetFillColor(38, 75, 135);
             $pdf->SetTextColor(255, 255, 255);
             $pdf->Cell(10,$h,'No',1,0,'C',true);
-            $pdf->Cell(150,$h,'Nama Mata Kuliah',1,0,'C',true);
-            $pdf->Cell(15,$h,'SKS',1,0,'C',true);
+            $pdf->Cell(125,$h,'Nama Mata Kuliah',1,0,'C',true);
+            $pdf->Cell(20,$h,'SKS MK',1,0,'C',true);
+            $pdf->Cell(20,$h,'SKS BKD',1,0,'C',true);
             $pdf->Cell(15,$h,'Sesi',1,1,'C',true);
 
             //Living the Family Business/Social Entrepreneurship Experience
@@ -6361,8 +6362,9 @@ Phone: (021) 29200456';
                 $Credit = ($item['CreditResult']!='' && $item['CreditResult']!=null) ? $item['CreditResult'] : '-' ;
 
                 $pdf->Cell(10,$h,$no,1,0,'C');
-                $pdf->Cell(150,$h,$item['NameEng'],1,0,'L');
-                $pdf->Cell(15,$h,$Credit,1,0,'C');
+                $pdf->Cell(125,$h,$item['NameEng'],1,0,'L');
+                $pdf->Cell(20,$h,$item['Credit'],1,0,'C');
+                $pdf->Cell(20,$h,$Credit,1,0,'C');
                 $pdf->Cell(15,$h,'14',1,1,'C');
 
                 $no++;
