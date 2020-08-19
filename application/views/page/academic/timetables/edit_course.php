@@ -875,7 +875,7 @@
                     '  <span id="crdt_'+d.Coordinator.NIP+'"> | ' +CreditOri+' | '+CreditResult+'</span>'+
                     '                           </div>' +
                     '                        </li>' +listTeam+
-                    '                    </ul>Total Point : <span id="viewTotalPointCredit">'+TotalPointCredit+'</span>');
+                    '                    </ul>Total Point : <span id="viewTotalPointCredit">'+TotalPointCredit+'</span> | Total Credit : '+valTotalCredit);
 
             },500);
 

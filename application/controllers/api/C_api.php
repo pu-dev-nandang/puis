@@ -1900,10 +1900,12 @@ class C_api extends CI_Controller {
                 $insert_id = $this->db->insert_id();
 
                 // schedule_details
+                $CreditDefaultMK = 0;
                 $dataScheduleDetails = (array) $formData['schedule_details'];
                 for($s=0;$s<count($dataScheduleDetails);$s++){
                     $arr = (array) $dataScheduleDetails[$s];
                     $arr['ScheduleID'] = $insert_id;
+                    $CreditDefaultMK = $arr['Credit'];
                     $this->db->insert('db_academic.schedule_details',$arr);
                     $insert_id_SD = $this->db->insert_id();
 
@@ -1928,15 +1930,46 @@ class C_api extends CI_Controller {
 
 
                 //schedule_team_teaching
+                $dataTemaTeaching = (array) $formData['schedule_team_teaching'];
+
+                // ==== Insert to pembagian BKD ====
+                $TotalDosen = 1 + count($dataTemaTeaching);
+                $ShareCredit = 100 / $TotalDosen;
+                $CreditOri = $CreditDefaultMK / $TotalDosen;
+                $CreditResult = round($CreditOri,2);
+
+                $insertShareCoord = array(
+                    'ScheduleID' => $insert_id,
+                    'NIP' => $insertSchedule['Coordinator'],
+                    'ShareCredit' => $ShareCredit,
+                    'CreditOri' => $CreditOri,
+                    'Credit' => $CreditResult
+                );
+                $this->db->insert('db_academic.schedule_share_credit',$insertShareCoord);
+
+
                 if($insertSchedule['TeamTeaching']==1){
-                    $dataTemaTeaching = (array) $formData['schedule_team_teaching'];
                     for($t=0;$t<count($dataTemaTeaching);$t++){
                         $arr = (array) $dataTemaTeaching[$t];
                         $arr['ScheduleID'] = $insert_id;
-
                         $this->db->insert('db_academic.schedule_team_teaching',$arr);
+
+                        // ==== Insert to pembagian BKD ====
+                        $insertShareCoord = array(
+                            'ScheduleID' => $insert_id,
+                            'NIP' => $arr['NIP'],
+                            'ShareCredit' => $ShareCredit,
+                            'CreditOri' => $CreditOri,
+                            'Credit' => $CreditResult
+                        );
+                        $this->db->insert('db_academic.schedule_share_credit',$insertShareCoord);
+
                     }
                 }
+
+
+
+
 
 
 
