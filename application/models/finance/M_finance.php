@@ -4726,6 +4726,16 @@ class M_finance extends CI_Model {
             select a.ID,a.ID_ProgramStudy,o.Name as NamePrody,a.FullName,0,"","",a.Price_Form,"",1,"",a.DateFin,""
             from db_admission.sale_formulir_offline as a join db_academic.program_study  as o on
             a.ID_ProgramStudy = o.ID where a.DateFin like "'.$DailyTgl.'%" and SUBSTRING(a.FormulirCodeOffline, 1, 2) = "'.substr($Year, 2,4).'"
+            UNION
+              select a.ID as ID_register_formulir2,a.ID_program_study,o.Name as NamePrody,d.Name,1 as StatusTbl,"","", (0 - rr.Price),"",1,"",rr.UpdateAt,rr.UpdateAt
+              from db_admission.register_formulir as a 
+              JOIN db_admission.register_verified as b ON a.ID_register_verified = b.ID 
+              JOIN db_admission.register_verification as c ON b.RegVerificationID = c.ID 
+              JOIN db_admission.register as d ON c.RegisterID = d.ID 
+              join db_academic.program_study as o on o.ID = a.ID_program_study
+              join db_finance.register_refund as rr on rr.ID_register_formulir = a.ID 
+              where d.SetTa = "'.$Year.'" and rr.UpdateAt like "'.$DailyTgl.'%"
+              group by a.ID 
             ) bb ORDER BY ID_program_study asc ,ID_register_formulir asc,ID asc
         ';
         // print_r($sql);die();

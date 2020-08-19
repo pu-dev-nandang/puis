@@ -580,9 +580,11 @@
             // jsonData = data_json;
             // var obj = JSON.parse(data_json); 
             // console.log(obj);
+
         }).done(function() {
-          //loadMenuPrevileges(loadDatamenuPrevileges);
-          //loadSubMenu();
+          loadMenuPrevileges(loadDatamenuPrevileges);
+          loadSubMenu();
+          toastr.info('finish');
         }).fail(function() {
           toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {

@@ -2990,4 +2990,39 @@ class C_admission extends Admission_Controler {
 
     }
 
+    public function pageRefundData(){
+      if ($this->input->is_ajax_request()) {
+        $dataToken =  $this->getInputToken();
+        $action = $dataToken['action'];
+        switch ($action) {
+          case 'read':
+            $requestData = $_REQUEST;
+            $classOf = $dataToken['data']->classOf;
+            $process = $this->m_admission->loadRefundData($classOf,$requestData);
+            echo json_encode($process);
+          default:
+            # code...
+            break;
+        }
+      }
+      else
+      {
+        $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/refundData',$this->data,true);
+        $this->temp($content);
+      }
+    
+    }
+
+    public function pageSetRefund(){
+      if ($this->input->is_ajax_request()) {
+        
+      }
+      else
+      {
+        $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/setRefund',$this->data,true);
+        $this->temp($content);
+      }
+      
+    }
+
 }
