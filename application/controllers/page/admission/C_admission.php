@@ -1132,7 +1132,15 @@ class C_admission extends Admission_Controler {
           }
           elseif($StatusPayment == 'Intake')
           {
-              $AddWhere2 .= ' and CekIntake = "Intake"  ';
+              // $AddWhere2 .= ' and CekIntake = "Intake"  ';
+              $AddWhere2 .= ' and CekIntake = "Intake" and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+                join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+                join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+                join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+                join db_admission.register as reg on reg.ID = rve.RegisterID
+                where reg.SetTa = "'.$reqTahun.'"
+
+              ) ';
           }
           else{
             $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
@@ -1251,7 +1259,12 @@ class C_admission extends Admission_Controler {
       $No = $requestData['start'] + 1;
       $totalData = $this->m_admission->getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun,$FormulirType,$StatusPayment);
       $AddWhere = '';
-      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") and CekIntake = "Intake" ';
+      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") and CekIntake = "Intake" and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+              join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+              join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+              join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+              join db_admission.register as reg on reg.ID = rve.RegisterID
+              where reg.SetTa = "'.$reqTahun.'" ) ';
       if ($FormulirType != '%') {
          $AddWhere .= ' and a.StatusReg = '.$FormulirType.' ';
       }
@@ -1354,6 +1367,7 @@ class C_admission extends Admission_Controler {
           }
           $nestedData[] = $cicilan;
           $nestedData[] = $row['chklunas'];
+          $nestedData[] = $this->jwt->encode($row,"UAP)(*");
           $data[] = $nestedData;
           $No++;
       }
@@ -2988,6 +3002,80 @@ class C_admission extends Admission_Controler {
       ]);
       echo json_encode(1);
 
+    }
+
+    public function pageRefundData(){
+      if ($this->input->is_ajax_request()) {
+        $dataToken =  $this->getInputToken();
+        $action = $dataToken['action'];
+        switch ($action) {
+          case 'read':
+            $requestData = $_REQUEST;
+            $classOf = $dataToken['data']->classOf;
+            $process = $this->m_admission->loadRefundData($classOf,$requestData);
+            echo json_encode($process);
+            break;
+          case 'delete':
+            // setTA
+            $ID_register_formulir =  $dataToken['ID_register_formulir'];
+            $dataGet = $this->m_admission->getDataPersonal($ID_register_formulir);
+            if ($this->data['academic_year_admission'] == $dataGet[0]['SetTa']) {
+              
+              $this->db->where('ID_register_formulir',$ID_register_formulir);
+              $this->db->delete('db_finance.register_refund');  
+              echo json_encode( ['status' => 1,'msg' => 'success'] );
+            }
+            else
+            {
+              echo json_encode(['status' => 0,'msg' => 'Periode academic yg berjalan sekarang adalah  '.$this->data['academic_year_admission'].' , data tidak bisa dihapus']);
+            }
+            break;
+          default:
+            # code...
+            break;
+        }
+      }
+      else
+      {
+        $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/refundData',$this->data,true);
+        $this->temp($content);
+      }
+    
+    }
+
+    public function pageSetRefund(){
+      if ($this->input->is_ajax_request()) {
+        $dataToken =  $this->getInputToken();
+        $action = $dataToken['action'];
+        switch ($action) {
+          case 'setRefund':
+            $dataSave = $dataToken['data'];
+            $ID_register_formulir = $dataSave->ID_register_formulir;
+            $dataGet = $this->m_admission->getDataPersonal($ID_register_formulir);
+            if ($this->data['academic_year_admission'] == $dataGet[0]['SetTa']) {
+             $dataSave->UpdateBy = $this->session->userdata('NIP');
+             $dataSave->UpdateAt = date('Y-m-d H:i:s');
+             $this->db->insert('db_finance.register_refund',$dataSave);
+             echo json_encode(['status' => 1,'msg'=>'']);
+            }
+            else
+            {
+              echo json_encode(['status' => 0,'msg' => 'Periode academic yg berjalan sekarang adalah  '.$this->data['academic_year_admission'].' , data tidak bisa create']);
+            }
+
+            break;
+          
+          default:
+            # code...
+            break;
+        }
+      }
+      else
+      {
+        $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/setRefund',$this->data,true);
+        $this->temp($content);
+      }
+      
     }
 
 }

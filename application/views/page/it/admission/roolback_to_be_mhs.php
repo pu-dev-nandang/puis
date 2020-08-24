@@ -105,7 +105,7 @@
         $.post(url,{token:token},function (jsonResult) {
             MakeDataTable(jsonResult);
             if (MakeDataSelected == "") {
-                MakeDataSelected();
+                MakeDataSelectedFunction();
             }
              
             
@@ -159,7 +159,7 @@
         S_Table = table;
     }
 
-    function MakeDataSelected()
+    function MakeDataSelectedFunction()
     {
         var htmlTable = '<table class = "table table-bordered" id = "tblStatMHS">'+
                         '<thead>'+
@@ -203,7 +203,7 @@
 			}
 		}); // exit each function
 
-        MakeDataSelected();
+        MakeDataSelectedFunction();
     })
 
     $(document).off('click', '.btn-save').on('click', '.btn-save',function(e) {
@@ -222,7 +222,7 @@
                         loading_button('.btn-save');
                         $.post(url,{token:token},function (resultJson) {
                             DataSelected = resultJson.Dt;
-                            MakeDataSelected();
+                            MakeDataSelectedFunction();
                             LoadDataForTable("1");  // not load dataselected
                             S_Table.$('input[type="checkbox"]').each(function(){
 			                    if(this.checked){
