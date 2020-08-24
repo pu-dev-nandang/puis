@@ -31,4 +31,9 @@ class C_survey extends Globalclass {
         $this->menu_survey($page);
     }
 
+    public function create_question(){
+        $page = $this->load->view('page/share-menu/survey/create_question','',true);
+        $this->menu_survey($page);
+    }
+
 }

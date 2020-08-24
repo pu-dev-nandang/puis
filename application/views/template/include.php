@@ -354,6 +354,7 @@
     window.base_url_img_student = "<?php echo base_url('uploads/students/'); ?>";
     window.sessionNIP = "<?php echo $this->session->userdata('NIP'); ?>";
     window.sessionName = "<?php echo $this->session->userdata('Name'); ?>";
+    window.sessionIDdepartementNavigation = "<?php echo $this->session->userdata('IDdepartementNavigation'); ?>";
     window.timePerCredits = "<?php echo $this->session->userdata('timePerCredits'); ?>";
 
     window.sessionUrlPhoto = "<?php echo $imgProfile = (file_exists('./uploads/employees/'.$this->session->userdata('Photo')))
@@ -1190,6 +1191,22 @@
                     .val(selected).trigger('change');
             }
         });
+    }
+
+    function loadSelectOptionSurvQuestionType(element,selected) {
+
+        var data = {action : 'getSurvQuestionType'};
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $.post(url,{token:token},function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+                var sc = (selected==v.ID) ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+            });
+        });
+
     }
 
     function loadSelectOptionConf(element,jenis,selected) {
