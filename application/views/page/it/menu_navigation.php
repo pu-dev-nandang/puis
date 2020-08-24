@@ -182,6 +182,13 @@
         <ul id="nav">
 
             <li class="<?php if($this->uri->segment(2)=='version'){echo"current";}?>">
+                <a href="<?php echo base_url('survey/list-survey');?>">
+                    <i class="fa fa-copyright"></i>
+                    Survey
+                </a>
+            </li>
+
+            <li class="<?php if($this->uri->segment(2)=='version'){echo"current";}?>">
                 <a href="<?php echo base_url('it/version');?>">
                     <i class="fa fa-copyright"></i>
                     Master Version
