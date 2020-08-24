@@ -144,36 +144,9 @@ abstract class Globalclass extends MyAbstract{
             for ($i=0;$i<count($dataMenu);$i++){
                 $d = $dataMenu[$i];
                 // cek level pertama
-                $dataLevel1 = $this->db->get_where('db_it.sm_menu_details',array(
+                $dataMenu[$i]['DataLevel_1'] = $this->db->get_where('db_it.sm_menu_details',array(
                     'IDSM' => $d['ID']
                 ))->result_array();
-
-                if(count($dataLevel1)>0){
-
-                    // cek apakah punya level 2 nya
-                    for($a=0;$a<count($dataLevel1);$a++){
-
-
-
-                        $dataLevel2 = $this->db->get_where('db_it.sm_menu_details',array(
-                            'IDSMDetail' => $dataLevel1[$a]['ID']
-                        ))->result_array();
-
-                        if(count($dataLevel2)>0){
-                            $dataLevel1[$a]['DataLevel_2'] = $dataLevel2;
-                        }
-
-                        if($dataLevel1[$a]['IDSMDetail']!=null
-                            && $dataLevel1[$a]['IDSMDetail']!=''){
-                            unset($dataLevel1[$a]);
-                        }
-
-
-                    }
-
-                    $dataMenu[$i]['DataLevel_1'] = $dataLevel1;
-
-                }
 
 
             }
