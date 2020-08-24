@@ -14,6 +14,9 @@
 									
 								</select>
 							</div>
+							<div style="padding-left: 10px;">
+								<pre style="color: red;">Refund data tidak termasuk kategori intake</pre>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -170,7 +173,8 @@
 		          'orderable': false,
 		          'className': 'dt-body-center',
 		          'render': function (data, type, full, meta){
-		            let html = '';
+		          	const ID_register_formulir = full[2][0]['ID_register_formulir'];
+		            let html = '<button class = "btn btn-danger btnDeleteRefundData" ID_register_formulir = "'+ID_register_formulir+'">Delete</button>';
 		            return html;
 		           }
 		        },
@@ -194,4 +198,37 @@
 	$(document).on('change','#searchClassOf',function(e){
 		oTableRefund.ajax.reload(null, false);
 	})
+
+	$(document).on('click','.btnDeleteRefundData',function(e){
+		const itsme = $(this);
+		const ID_register_formulir = itsme.attr('id_register_formulir');
+		deleteActionData(itsme,ID_register_formulir);
+	})
+
+	const deleteActionData = async(selector,ID_register_formulir) => {
+		const data = {
+			action : 'delete',
+			ID_register_formulir : ID_register_formulir
+		};
+
+		const token = jwt_encode(data, "UAP)(*");
+		if (confirm('Are you sure ?')) {
+			loading_button2(selector);
+			try{
+				const response = await AjaxSubmitFormPromises(getUrl,token);
+				if (response.status == 1) {
+					toastr.success('Success');
+					oTableRefund.ajax.reload(null, false);
+				}
+				else
+				{
+					toastr.info(response.msg);
+				}
+			}catch(err){
+				toastr.error('something wrong');
+			}
+
+			end_loading_button2(selector,'Delete');
+		}
+	};
 </script>

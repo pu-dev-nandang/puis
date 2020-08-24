@@ -3178,7 +3178,12 @@ class M_admission extends CI_Model {
     public function getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun,$FormulirType = '%',$StatusPayment = '%')
     {
       $AddWhere = '';
-      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") and CekIntake = "Intake" ';
+      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") and CekIntake = "Intake" and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+              join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+              join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+              join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+              join db_admission.register as reg on reg.ID = rve.RegisterID
+              where reg.SetTa = "'.$reqTahun.'" ) ';
       if ($FormulirType != '%') {
          $AddWhere .= ' and a.StatusReg = '.$FormulirType.' ';
       }
@@ -3287,7 +3292,7 @@ class M_admission extends CI_Model {
                 on e.ID = xy.ID_register_formulir
                 LEFT JOIN db_admission.register_dsn_type_m as xq
                 on xq.ID = xy.TypeBeasiswa
-                where a.SetTa = "'.$reqTahun.'" '.$AddWhere.'
+                where a.SetTa = "'.$reqTahun.'"  '.$AddWhere.'
               ) ccc';
       if ($StatusPayment != '%') {
         if ($StatusPayment == '-100') {
@@ -3299,7 +3304,14 @@ class M_admission extends CI_Model {
         }
         elseif($StatusPayment == 'Intake')
         {
-            $AddWhere2 .= ' and CekIntake = "Intake"  ';
+            $AddWhere2 .= ' and CekIntake = "Intake" and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+              join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+              join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+              join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+              join db_admission.register as reg on reg.ID = rve.RegisterID
+              where reg.SetTa = "'.$reqTahun.'"
+
+            ) ';
         }
         else{
           $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
@@ -4033,7 +4045,14 @@ class M_admission extends CI_Model {
                         LEFT join db_academic.program_study as d on e.ID_program_study = d.ID
                         left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                          where a.SetTa = "'.($Year-1).'"
-                        ) ccc where ID_program_study = ? and C_bayar > 0';
+                        ) ccc where ID_program_study = ? and C_bayar > 0
+                        and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+              join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+              join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+              join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+              join db_admission.register as reg on reg.ID = rve.RegisterID
+              where SetTa = "'.($Year-1).'" and rr.UpdateAt <= "'.$DateFiltering2.'" )
+                        ';
                         $query=$this->db->query($sql, array($ProdiID))->result_array();
                          $total = $query[0]['total'];
                          $c1 = $total;
@@ -4065,7 +4084,14 @@ class M_admission extends CI_Model {
                         LEFT join db_academic.program_study as d on e.ID_program_study = d.ID
                         left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                          where a.SetTa = "'.$Year.'"
-                        ) ccc where ID_program_study = ? and C_bayar > 0';
+                        ) ccc where ID_program_study = ? and C_bayar > 0
+                                  and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+                        join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+                        join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+                        join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+                        join db_admission.register as reg on reg.ID = rve.RegisterID
+                        where SetTa = "'.$Year.'" and rr.UpdateAt <= "'.$DateFiltering.'" )
+                        ';
 
                         $query=$this->db->query($sql, array($ProdiID))->result_array();
                         $total = $query[0]['total'];
@@ -4097,7 +4123,15 @@ class M_admission extends CI_Model {
                           LEFT join db_academic.program_study as d on e.ID_program_study = d.ID
                           left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                            where a.SetTa = "'.$Year.'"
-                          ) ccc where ID_program_study = ? and C_bayar > 0';
+                          ) ccc where ID_program_study = ? and C_bayar > 0
+                                    and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+                          join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+                          join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+                          join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+                          join db_admission.register as reg on reg.ID = rve.RegisterID
+                          where SetTa = "'.$Year.'" and rr.UpdateAt <= DATE_SUB("'.$DateFiltering.'", INTERVAL 7 DAY) )
+
+                          ';
 
                           $query=$this->db->query($sql, array($ProdiID))->result_array();
                           $total = $query[0]['total'];
