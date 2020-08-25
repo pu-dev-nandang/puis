@@ -307,14 +307,24 @@ $(document).ready(function(){
                                 <th>Education</th>
                                 <th>:</th>
                                 <td>
-                                    <input class="form-control" id="formEducationFather">
+                                    <!-- <input class="form-control" id="formEducationFather"> -->
+                                    <select class="form-control" id = "formEducationFather">
+                                        <?php for ($i=0;$i<count($Arr_edu);$i++): ?>
+                                            <option value="<?php echo $Arr_edu[$i]['edu_name'] ?>" ><?php echo $Arr_edu[$i]['edu_name'] ?></option>
+                                        <?php endfor ?>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Occupation</th>
                                 <th>:</th>
                                 <td>
-                                    <input class="form-control" id="formOccuFather">
+                                    <!-- <input class="form-control" id="formOccuFather"> -->
+                                    <select class="form-control" id = "formOccuFather">
+                                        <?php for ($i=0;$i<count($Arr_ocu);$i++): ?>
+                                            <option value="<?php echo $Arr_ocu[$i]['ocu_name'] ?>" ><?php echo $Arr_ocu[$i]['ocu_name'] ?></option>
+                                        <?php endfor ?>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
@@ -361,14 +371,24 @@ $(document).ready(function(){
                                 <th>Education</th>
                                 <th>:</th>
                                 <td>
-                                    <input class="form-control" id="formEducationMother">
+                                    <!-- <input class="form-control" id="formEducationMother"> -->
+                                    <select class="form-control" id = "formEducationMother">
+                                        <?php for ($i=0;$i<count($Arr_edu);$i++): ?>
+                                            <option value="<?php echo $Arr_edu[$i]['edu_name'] ?>" ><?php echo $Arr_edu[$i]['edu_name'] ?></option>
+                                        <?php endfor ?>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Occupation</th>
                                 <th>:</th>
                                 <td>
-                                    <input class="form-control" id="formOccupationMother">
+                                    <!-- <input class="form-control" id="formOccupationMother"> -->
+                                    <select class="form-control" id = "formOccupationMother">
+                                        <?php for ($i=0;$i<count($Arr_ocu);$i++): ?>
+                                            <option value="<?php echo $Arr_ocu[$i]['ocu_name'] ?>" ><?php echo $Arr_ocu[$i]['ocu_name'] ?></option>
+                                        <?php endfor ?>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>

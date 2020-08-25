@@ -238,6 +238,16 @@
                         <td colspan="3" class="<?=($detail_req->OccupationMother != $detail_ori->OccupationMother) ? 'different':'' ?>"><?=$detail_req->OccupationMother?></td>
                       </tr>
                       <tr>
+                        <th>Phone</th>
+                        <td colspan="2" class="<?=($detail_req->PhoneFather != $detail_ori->PhoneFather) ? 'different':'' ?>"><?=$detail_req->PhoneFather?></td>
+                        <td colspan="3" class="<?=($detail_req->PhoneMother != $detail_ori->PhoneMother) ? 'different':'' ?>"><?=$detail_req->PhoneMother?></td>
+                      </tr>
+                      <tr>
+                        <th>Email</th>
+                        <td colspan="2" class="<?=($detail_req->EmailFather != $detail_ori->EmailFather) ? 'different':'' ?>"><?=$detail_req->EmailFather?></td>
+                        <td colspan="3" class="<?=($detail_req->EmailMother != $detail_ori->EmailMother) ? 'different':'' ?>"><?=$detail_req->EmailMother?></td>
+                      </tr>
+                      <tr>
                         <th>Address</th>
                         <td colspan="2" class="<?=(trim($detail_req->AddressFather) != trim($detail_ori->AddressFather)) ? 'different':'' ?>"><?=$detail_req->AddressFather?></td>
                         <td colspan="3" class="<?=(trim($detail_req->AddressMother) != trim($detail_ori->AddressMother)) ? 'different':'' ?>"><?=$detail_req->AddressMother?></td>

@@ -508,7 +508,10 @@ class C_database extends Globalclass {
                         }
                         else
                         {
-                           rename("./uploads/students/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo, "./uploads/students/ta_".$data_arr['TA']."/".$NewName); 
+                            if (file_exists("./uploads/students/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo)) {
+                               rename("./uploads/students/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo, "./uploads/students/ta_".$data_arr['TA']."/".$NewName); 
+                            }
+                          
                         }
 
                         // update to ta
