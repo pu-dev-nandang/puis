@@ -7,7 +7,7 @@
         <h4 class="modal-title" id="myModalLabel">Merging Student Data</h4>
       </div>
       <div class="modal-body" style="overflow:auto;height:600px">
-      	<div class="row">
+        <div class="row">
           <div class="col-sm-6">
             <div class="panel panel-default">
               <div class="panel-heading">
@@ -32,7 +32,7 @@
                     <tbody>                      
                       <tr>
                         <td>
-                        <?php $url_image = 'uploads/students/ta_'.$TA.'/'.$detail_ori->Photo;
+                        <?php $url_image = base_url().'uploads/students/ta_'.$TA.'/'.$detail_ori->Photo;
                           $srcImg =  base_url('images/icon/userfalse.png');
                           if (!$this->m_master->is_url_exist($url_image)) {
                             $srcImg = ( @file_get_contents($url_image,0,NULL,0,1) ) ? $url_image : base_url('images/icon/userfalse.png') ;
@@ -153,9 +153,15 @@
                       <tr>
                         <td>
                           <?php if(!empty($detail_req->Photo)){ 
-                            $url_image = 'uploads/students/ta_'.$TA.'/'.$detail_req->Photo;
-                            $srcImg = (file_exists($url_image)) ? base_url('/uploads/students/ta_'.$TA.'/'.$detail_req->Photo)
-                                    : base_url('images/icon/userfalse.png') ;
+                            $url_image = base_url().'uploads/students/ta_'.$TA.'/'.$detail_req->Photo;
+                            $srcImg =  base_url('images/icon/userfalse.png');
+                            if (!$this->m_master->is_url_exist($url_image)) {
+                              $srcImg = ( @file_get_contents($url_image,0,NULL,0,1) ) ? $url_image : base_url('images/icon/userfalse.png') ;
+                            }
+                            else
+                            {
+                               $srcImg = $url_image;
+                            }
                           ?>
                           <img class="im-pp" style="width:100%" src="<?=$srcImg?>" alt="<?=$detail_req->Name?>">
                           <?php }else{ 
@@ -243,37 +249,37 @@
               </div>
             </div>
           </div>
-      	</div>
-  	  </div>
-  	  <div class="modal-footer">
-      	<div class="row">
-      		<div class="col-sm-12 ">
-      			<form id="form-approval-req" autocomplete="off">
-      				<div class="form-group" style="text-align:left">
-					    <label>Note</label>
-					    <textarea class="form-control" name="note" placeholder="Write your review here.."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="row">
+          <div class="col-sm-12 ">
+            <form id="form-approval-req" autocomplete="off">
+              <div class="form-group" style="text-align:left">
+              <label>Note</label>
+              <textarea class="form-control" name="note" placeholder="Write your review here.."></textarea>
               <span class="message-error"></span>
-				  	</div>
-				  	<div class="text-center">
-				  		<button class="btn btn-sm btn-primary btn-act" type="button" data-act="1" data-npm="<?=$NPM?>" data-ta="<?=$TA?>" ><i class="fa fa-check"></i> Accept</button>
-				  		<button class="btn btn-sm btn-danger btn-act" type="button" data-act="3" data-npm="<?=$NPM?>" data-ta="<?=$TA?>" ><i class="fa fa-times"></i> Reject</button>
+            </div>
+            <div class="text-center">
+              <button class="btn btn-sm btn-primary btn-act" type="button" data-act="1" data-npm="<?=$NPM?>" data-ta="<?=$TA?>" ><i class="fa fa-check"></i> Accept</button>
+              <button class="btn btn-sm btn-danger btn-act" type="button" data-act="3" data-npm="<?=$NPM?>" data-ta="<?=$TA?>" ><i class="fa fa-times"></i> Reject</button>
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				  	</div>
-      			</form>
-      		</div>
-      	</div>
+            </div>
+            </form>
+          </div>
+        </div>
       </div>
       </div>
     </div>
   </div>
 </div>
 <script type="text/javascript">
-	$(document).ready(function(){
-		$("#modal-merge-req").modal("show");
-		$("#modal-merge-req").on("click",".btn-act",function(){
-			var itsme = $(this);
-			var name = itsme.text();
-			var ACT = itsme.data("act");
+  $(document).ready(function(){
+    $("#modal-merge-req").modal("show");
+    $("#modal-merge-req").on("click",".btn-act",function(){
+      var itsme = $(this);
+      var name = itsme.text();
+      var ACT = itsme.data("act");
 
       var NPM = itsme.data("npm");
       var TA = itsme.data("ta");
@@ -328,7 +334,7 @@
           });
         }
       }
-			
-		});
-	});
+      
+    });
+  });
 </script>
