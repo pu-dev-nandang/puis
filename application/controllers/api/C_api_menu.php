@@ -127,6 +127,99 @@ class C_api_menu extends CI_Controller {
 
             return print_r(json_encode($result));
         }
+        else if($data_arr['action']=='readDataQuestion'){
+            $ID = $data_arr['ID'];
+            $data = $this->db->get_where('db_it.surv_question',
+                array('ID' => $ID))->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='getBankQuestion'){
+
+            $requestData = $_REQUEST;
+
+            $Type = $data_arr['Type'];
+            $QuestionCategory = $data_arr['QuestionCategory'];
+
+            $dataWhere = '';
+            if($Type!='' || $QuestionCategory!=''){
+                $w_Type = ($Type!='')
+                    ? 'AND sq.QTID = "'.$Type.'" ' : '';
+                $w_QuestionCategory = ($QuestionCategory!='')
+                    ? 'AND sq.QCID = "'.$QuestionCategory.'" ' : '';
+
+                $w = $w_Type.$w_QuestionCategory;
+                $dataWhere = ' WHERE '.substr($w,3);
+            }
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataScr = 'sq.Question LIKE "%'.$search.'%"';
+                $dataSearch = ($Type!='' || $QuestionCategory!='')
+                    ? ' AND ('.$dataScr.')'
+                    : ' WHERE '.$dataScr;
+            }
+
+            $queryDefault = 'SELECT sq.ID, sq.Question, sq.IsRequired, sq.AnswerType,  
+                                             sqc.Description AS QuestionCategory, 
+                                             sqt.Description AS QuestionType FROM db_it.surv_question sq
+                                            LEFT JOIN db_it.surv_question_category sqc ON (sqc.ID = sq.QCID)
+                                            LEFT JOIN db_it.surv_question_type sqt ON (sqt.ID = sq.QTID) 
+                                            '. $dataWhere.$dataSearch;
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                $tokenID = $this->jwt->encode(array('ID'=>$row['ID']),'UAP)(*');
+
+                $btnAct = '<div class="btn-group">
+                          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-pencil"></i> <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li><a href="#">Add to survey</a></li>
+                            <li><a href="'.base_url('survey/create-question?tkn='.$tokenID).'" target="_blank">Edit</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">Remove</a></li>
+                          </ul>
+                        </div>';
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Question'].'</div>';
+                $nestedData[] = $btnAct;
+                $nestedData[] = '<div>'.$row['QuestionCategory'].'<br/>
+                                    <span class="label label-success">'.$row['QuestionType'].'</span></div>';
+
+                $data[] = $nestedData;
+                $no++;
+
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval( $queryDefaultRow),
+                "data"            => $data,
+                "dataQuery"            => $query
+            );
+            echo json_encode($json_data);
+
+
+        }
         else if($data_arr['action']=='updateDataQuestion'){
 
             $ID = $data_arr['ID'];

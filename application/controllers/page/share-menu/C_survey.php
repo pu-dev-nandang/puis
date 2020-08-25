@@ -36,4 +36,9 @@ class C_survey extends Globalclass {
         $this->menu_survey($page);
     }
 
+    public function bank_question(){
+        $page = $this->load->view('page/share-menu/survey/bank_question','',true);
+        $this->menu_survey($page);
+    }
+
 }
