@@ -3270,7 +3270,10 @@ class M_admission extends CI_Model {
                 if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,
                 if(
                   (select count(*) as total from db_finance.payment_pre where `Status` = 1 and ID_register_formulir = e.ID ) > 0,"Intake","Not Intake"
-                ) as CekIntake
+                ) as CekIntake,
+                if(
+                  (select count(*) as total from db_finance.register_refund where ID_register_formulir = e.ID ) > 0,"Refund",""
+                ) as CekRefund
                 from db_admission.register as a
                 join db_admission.school as b
                 on a.SchoolID = b.ID
