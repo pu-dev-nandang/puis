@@ -325,13 +325,6 @@ $(document).ready(function(){
                                 </td>
                             </tr>
                             <tr>
-                                <th>HP</th>
-                                <th>:</th>
-                                <td>
-                                    <input class="form-control" id="formHpFather">
-                                </td>
-                            </tr>
-                            <tr>
                                 <th>Email</th>
                                 <th>:</th>
                                 <td>
@@ -383,13 +376,6 @@ $(document).ready(function(){
                                 <th>:</th>
                                 <td>
                                     <input class="form-control" id="formPhoneMother">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>HP</th>
-                                <th>:</th>
-                                <td>
-                                    <input class="form-control" id="formHpMother">
                                 </td>
                             </tr>
                             <tr>
@@ -656,6 +642,20 @@ $(document).ready(function(){
                     Email : formEmail,
                     Address : formAddress,
                     Jacket : formJacket,
+                    Father : $('#formNameFather').val() ,
+                    StatusFather : $('#formStatusFather').val() ,
+                    PhoneFather : $('#formPhoneFather').val() ,
+                    OccupationFather : $('#formOccuFather').val() ,
+                    EducationFather : $('#formEducationFather').val() ,
+                    AddressFather : $('#formAddressFather').val() ,
+                    EmailFather : $('#formEmailFather').val() ,
+                    Mother : $('#formNameMother').val() ,
+                    StatusMother : $('#formStatusMother').val() ,
+                    PhoneMother : $('#formPhoneMother').val() ,
+                    OccupationMother : $('#formOccupationMother').val() ,
+                    EducationMother : $('#formEducationMother').val() ,
+                    AddressMother : $('#formAddressMother').val() ,
+                    EmailMother : $('#formEmailMother').val() ,
 
                 },
                 dataAuth : {

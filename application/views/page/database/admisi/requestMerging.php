@@ -33,8 +33,15 @@
                       <tr>
                         <td>
                         <?php $url_image = 'uploads/students/ta_'.$TA.'/'.$detail_ori->Photo;
-                            $srcImg = (file_exists($url_image)) ? base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)
-                                    : base_url('images/icon/userfalse.png') ; ?>
+                          $srcImg =  base_url('images/icon/userfalse.png');
+                          if (!$this->m_master->is_url_exist($url_image)) {
+                            $srcImg = ( @file_get_contents($url_image,0,NULL,0,1) ) ? $url_image : base_url('images/icon/userfalse.png') ;
+                          }
+                          else
+                          {
+                             $srcImg = $url_image;
+                          }
+                         ?>
                           <img class="im-pp" style="width:100%" src="<?=$srcImg?>" alt="<?=$detail_ori->Name?>">
                         </td>
                         <td><p class="npm"><?=$detail_ori->NPM?></p>
