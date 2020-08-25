@@ -255,7 +255,7 @@
 		    'backdrop' : 'static'
 		});
 
-		actionCountPayment = (procePayment.Invoice + procePayment.Pay);
+		actionCountPayment = procePayment.Pay;
 
 		$('.frmInput[name="Price"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		$('.frmInput[name="Price"]').maskMoney('mask', '9894');
@@ -278,7 +278,7 @@
 		let Desc = $('.frmInput[name="Desc"]').val();
 		if (Price != '' && Price > 0) {
 			if (Price > actionCountPayment) {
-				toastr.info('Refund tidak boleh lebih besar dari (Invoice+Bayar)');
+				toastr.info('Refund tidak boleh lebih besar dari (Total Bayar)');
 				return;
 			}
 
