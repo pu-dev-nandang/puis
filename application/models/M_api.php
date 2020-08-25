@@ -4085,7 +4085,7 @@ class M_api extends CI_Model {
     public function getDataAuthStudent($NPM){
 
         $data = $this->db->query('SELECT auts.NPM,auts.Name,auts.ProgramID,auts.ProdiID,auts.Year, ps.NameEng,
-                                              em.Name AS MentorName, em.NIP AS MentorNIP
+                                              em.Name AS MentorName, em.NIP AS MentorNIP, auts.ProdiGroupID
                                               FROM db_academic.auth_students auts
                                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
                                               LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
@@ -4186,6 +4186,13 @@ class M_api extends CI_Model {
 
     private function getDetailScheduleByCDID($SemesterID,$NPM,$student_DB,$CDID){
 
+        // Cek group student
+        $dataGroupID =
+            $this->db->select('ProdiGroupID')
+                ->get_where('db_academic.auth_students',array('NPM'=>$NPM))->result_array()[0]['ProdiGroupID'];
+
+        $whereProdiGroup = ($dataGroupID!='' && $dataGroupID!=null) ? ' AND sdc.ProdiGroupID = "'.$dataGroupID.'" ' : '';
+
         $data = $this->db->query('SELECT s.ID, s.SemesterID, s.TeamTeaching, s.ClassGroup,
                                             cd.ID AS CDID, cd.MKType, cd.Semester ,cd.TotalSKS AS Credit, cd.StatusPrecondition, cd.DataPrecondition,
                                             mk.ID AS MKID, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng,
@@ -4196,7 +4203,7 @@ class M_api extends CI_Model {
                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
                                             WHERE sdc.CDID = "'.$CDID.'"
-                                            AND s.SemesterID = "'.$SemesterID.'"')->result_array();
+                                            AND s.SemesterID = "'.$SemesterID.'" '.$whereProdiGroup)->result_array();
 
         $result = [];
         if(count($data)>0){
