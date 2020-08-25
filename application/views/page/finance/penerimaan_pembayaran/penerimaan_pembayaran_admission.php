@@ -241,6 +241,7 @@
          var resultJson = jQuery.parseJSON(resultJson);
          var DetailPaymentArr = resultJson['data'];
          var action = resultJson['action'];
+         dataRefund =  resultJson['dataRefund'];
          var isi = '';
          for (var j = 0; j < DetailPaymentArr.length; j++) {
            var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
@@ -249,6 +250,10 @@
            if(action == 1)
            {
             btn_bayar = (DetailPaymentArr[j]['Status'] == 0) ? '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "1">Bayar</button>' : '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "0">Tidak Bayar</button>';
+           }
+           if(action == 2)
+           {
+            btn_bayar = 'Already Refund';
            }
 
            var PaymentDate = (DetailPaymentArr[j]['DatePayment'] == '' || DetailPaymentArr[j]['DatePayment'] == null || DetailPaymentArr[j]['DatePayment'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['DatePayment'];
@@ -275,6 +280,45 @@
          table += '</table>' ;
 
          html += table;
+
+         if (dataRefund.length > 0) {
+              html  += '<br/>';
+              html += '<div class = "row">'+
+                   '<div class = "col-md-12">'+
+                     '<div class = "well" style = "padding:10px;">'+
+                         '<div class = "row">'+
+                           '<div class = "col-md-12">'+
+                             '<h4 style = "color:red;">Refund</h4>'+
+                           '</div>'+
+                           '<div class = "col-md-12">'+
+                             '<table class = "table">'+
+                               '<tr>'+
+                                 '<td style = "font-weight:bold;">Price</td>'+
+                                 '<td>:</td>'+
+                                 '<td style = "color:blue;">'+formatRupiah(dataRefund[0].Price)+'</td>'+
+                               '</tr>'+
+                               '<tr>'+
+                                 '<td style = "font-weight:bold;">Desc</td>'+
+                                 '<td>:</td>'+
+                                 '<td style = "color:blue;">'+dataRefund[0].Desc+'</td>'+
+                               '</tr>'+
+                               '<tr>'+
+                                 '<td style = "font-weight:bold;">By</td>'+
+                                 '<td>:</td>'+
+                                 '<td style = "color:blue;">'+dataRefund[0].NameEMP+'</td>'+
+                               '</tr>'+
+                               '<tr>'+
+                                 '<td style = "font-weight:bold;">At</td>'+
+                                 '<td>:</td>'+
+                                 '<td style = "color:blue;">'+dataRefund[0].UpdateAt+'</td>'+
+                               '</tr>'+
+                             '</table>'+
+                           '</div>'+
+                         '</div>'+
+                     '</div>'+
+                   '</div>'+
+                 '</div>';
+         }
 
          var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
              '';

@@ -52,6 +52,7 @@
                                   <option value="-100" >Belum Bayar Formulir</option>
                                   <option value="100" >Sudah Bayar Formulir</option>
                                   <option value="Intake" >Intake</option>
+                                  <option value="Refund" >Refund</option>
                               </select>
                             </div>
                           </div>
@@ -153,6 +154,7 @@
               selector.find('option[value="-100"]').attr('disabled',false);
               selector.find('option[value="100"]').attr('disabled',false);
               selector.find('option[value="Intake"]').attr('disabled',false);
+              selector.find('option[value="Refund"]').attr('disabled',false);
                $("#dataPageLoad").empty();
                var table = '<table class="table table-bordered datatable2" id = "datatable2">'+
                            '<thead>'+
@@ -238,9 +240,10 @@
                 selector.find('option[value="-100"]').attr('disabled',true);
                 selector.find('option[value="100"]').attr('disabled',true);
                 selector.find('option[value="Intake"]').attr('disabled',true);
+                selector.find('option[value="Refund"]').attr('disabled',true);
                 var S_StatusPayment = selector.find('option:selected').val();
                 // console.log(S_StatusPayment);
-                if (S_StatusPayment == '-' || S_StatusPayment == '-100' || S_StatusPayment == '100' || S_StatusPayment == 'Intake'  ) {
+                if (S_StatusPayment == '-' || S_StatusPayment == '-100' || S_StatusPayment == '100' || S_StatusPayment == 'Intake' || S_StatusPayment == 'Refund'  ) {
                   // selector.find('option[value="%"]').attr('selected',true);
                   $("#selectStatusPayment option").filter(function() {
                      //may want to use $.trim in here
@@ -442,9 +445,15 @@
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token},function (resultJson) {
            var DetailPaymentArr = jQuery.parseJSON(resultJson);
-
+           let dataRefund = [];
            var isi = '';
            for (var j = 0; j < DetailPaymentArr.length; j++) {
+
+            // declare refund data
+              if (j == 0 && DetailPaymentArr[0]["Refund"] !== undefined) {
+                dataRefund = DetailPaymentArr[0]["Refund"]
+              }
+
              var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
              var status = (DetailPaymentArr[j]['Status'] == 0) ? 'Belum Bayar' : 'Sudah Bayar';
              isi += '<tr>'+
@@ -462,6 +471,46 @@
            table += '</table>' ;
 
            html += table;
+
+           if (dataRefund.length > 0) {
+                html  += '<br/>';
+                html += '<div class = "row">'+
+                     '<div class = "col-md-12">'+
+                       '<div class = "well" style = "padding:10px;">'+
+                           '<div class = "row">'+
+                             '<div class = "col-md-12">'+
+                               '<h4 style = "color:red;">Refund</h4>'+
+                             '</div>'+
+                             '<div class = "col-md-12">'+
+                               '<table class = "table">'+
+                                 '<tr>'+
+                                   '<td style = "font-weight:bold;">Price</td>'+
+                                   '<td>:</td>'+
+                                   '<td style = "color:blue;">'+formatRupiah(dataRefund[0].Price)+'</td>'+
+                                 '</tr>'+
+                                 '<tr>'+
+                                   '<td style = "font-weight:bold;">Desc</td>'+
+                                   '<td>:</td>'+
+                                   '<td style = "color:blue;">'+dataRefund[0].Desc+'</td>'+
+                                 '</tr>'+
+                                 '<tr>'+
+                                   '<td style = "font-weight:bold;">By</td>'+
+                                   '<td>:</td>'+
+                                   '<td style = "color:blue;">'+dataRefund[0].NameEMP+'</td>'+
+                                 '</tr>'+
+                                 '<tr>'+
+                                   '<td style = "font-weight:bold;">At</td>'+
+                                   '<td>:</td>'+
+                                   '<td style = "color:blue;">'+dataRefund[0].UpdateAt+'</td>'+
+                                 '</tr>'+
+                               '</table>'+
+                             '</div>'+
+                           '</div>'+
+                       '</div>'+
+                     '</div>'+
+                   '</div>';
+           }
+           
 
            var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                '';

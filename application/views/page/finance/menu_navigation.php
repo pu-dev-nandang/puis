@@ -136,6 +136,12 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "registration-list"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/admission/registration-list'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Registration List
+                        </a>
+                    </li>
                     <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "report"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/admission/report'); ?>">
                         <i class="icon-angle-right"></i>

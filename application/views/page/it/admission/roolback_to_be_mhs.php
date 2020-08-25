@@ -229,9 +229,17 @@
                                     $(this).closest('tr').remove();
 	                            }
 		                    });
-                            $('.btn-save').prop('disabled',false).html('Roolback To Be Intake');
+                            if (resultJson.Status == 1) {
+                                $('.btn-save').prop('disabled',false).html('Roolback To Be Intake');
+                                toastr.success('success');
+                            }
+                            else
+                            {
+                                toastr.info('somedata has error, please see status progress');
+                            }
+                            
                         }).fail(function() {
-                            toastr.info('No Result Data'); 
+                            toastr.info('something wrong'); 
                         }).always(function() {
                             S_Table.$('input[type="checkbox"]').attr('disabled',false);              
                         });

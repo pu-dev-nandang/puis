@@ -313,6 +313,17 @@ class M_finance extends CI_Model {
    {
     $sql = 'select * from db_finance.payment_pre where ID_register_formulir = ? order by ID asc';
     $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
+    // for ($i=0; $i < count($query); $i++) { 
+    //   $query[$i]['Refund'] = $this->m_master->caribasedprimary('db_finance.register_refund','ID_register_formulir',$query[$i]['ID_register_formulir']);
+    // }
+    if (count($query) > 0) {
+      $query[0]['Refund'] = $this->db->query(
+          'select rr.*,emp.Name as NameEMP from  db_finance.register_refund as rr join db_employees.employees as emp on emp.NIP = rr.UpdateBy
+          where ID_register_formulir = '.$query[0]['ID_register_formulir'].'
+           '
+      )->result_array();
+    }
+    
     return $query;
    }
 
@@ -327,12 +338,24 @@ class M_finance extends CI_Model {
     // find formulir code pada db_admission.to_be_mhs
     $this->load->model('master/m_master');
     $get = $this->m_master->caribasedprimary('db_admission.to_be_mhs','FormulirCode',$FormulirCode);
+    $RefundChk = $this->db->query(
+          'select rr.*,emp.Name as NameEMP from  db_finance.register_refund as rr join db_employees.employees as emp on emp.NIP = rr.UpdateBy
+          where ID_register_formulir = '.$ID_register_formulir.'
+           '
+      )->result_array();
     if (count($get) > 0) {
-      $arr_result = array('data' => $query,'action' => 0);
+      $arr_result = array('data' => $query,'action' => 0,'dataRefund' => $RefundChk); // already generate
     }
     else
     {
-      $arr_result = array('data' => $query,'action' => 1);
+      if (count($RefundChk) > 0) {
+        $arr_result = array('data' => $query,'action' => 2,'dataRefund' => $RefundChk); // refund
+      }
+      else
+      {
+        $arr_result = array('data' => $query,'action' => 1,'dataRefund' => $RefundChk); 
+      }
+
     }
 
     return $arr_result;
@@ -3618,7 +3641,7 @@ class M_finance extends CI_Model {
 
    public function getCountAllPayment_admission()
    {
-    $sql = 'select count(*) as total from db_finance.register_admisi where Status = "Approved" ';
+    $sql = 'select count(*) as total from db_finance.register_admisi where Status = "Approved" and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund) ';
     $query=$this->db->query($sql, array())->result_array();
     return $query[0]['total'];
    }
