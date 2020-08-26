@@ -137,7 +137,7 @@
             </div>
 
             <div class="panel-footer text-right">
-                <button class="btn btn-success">Save</button>
+                <button class="btn btn-success" id="btnSave">Save</button>
             </div>
 
         </div>
@@ -162,6 +162,10 @@
         } else {
             $('#panelCustomStd').addClass('hide');
         }
+    });
+
+    $('#btnSave').click(function () {
+
     });
 
 

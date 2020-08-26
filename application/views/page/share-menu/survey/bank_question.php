@@ -39,7 +39,6 @@
         loadSelectOptionSurvQuestionCategory('#filterQuestionCategory','');
 
         loadDataBankQuestion();
-
     });
 
     $('.filter-table').change(function () {
