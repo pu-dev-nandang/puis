@@ -1209,6 +1209,23 @@
 
     }
 
+    function loadSelectOptionSurvQuestionCategory(element,selected) {
+
+        var data = { action : 'getQuestionCategory', DepartmentID : sessionIDdepartementNavigation };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+        $.post(url,{token:token},function (jsonResult) {
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+                    var sc = (selected==v.ID) ? 'selected' : '';
+                    $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+                })
+            }
+        });
+
+    }
+
     function loadSelectOptionConf(element,jenis,selected) {
 
         var table = jenis;

@@ -1625,9 +1625,7 @@ class C_rest extends CI_Controller {
                     $this->db->reset_query();
                 }
 
-                // Cek attendace online
-                $this->m_onlineclass->checkOnlineAttendance($dataReturn['NPM'],
-                    $dataReturn['ScheduleID'],$dataReturn['Session']);
+
 
                 // return quiz
                 $dataReturn = $this->db->query('SELECT s.SemesterID, q.ScheduleID, q.Session,qs.NPM  
@@ -1638,6 +1636,10 @@ class C_rest extends CI_Controller {
                                                     ON (s.ID = q.ScheduleID)
                                                 WHERE qs.ID = "'.$dataToken['QuizStudentID'].'" ')
                     ->result_array()[0];
+
+                // Cek attendace online
+                $this->m_onlineclass->checkOnlineAttendance($dataReturn['NPM'],
+                    $dataReturn['ScheduleID'],$dataReturn['Session']);
 
                 return print_r(json_encode($dataReturn));
 

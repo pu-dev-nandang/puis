@@ -28,6 +28,26 @@
                             <select class="form-control" id="formType"></select>
                             <input class="hide" id="formID" value="">
                             <input class="hide" id="formDepartmentID" value="<?= $this->session->userdata('IDdepartementNavigation'); ?>">
+
+                            <div id="dataFormEssay" class="hide" style="margin-top: 30px;">
+                                <div class="form-group">
+                                    <label>Answer Type</label>
+                                    <select class="form-control" id="AnswerType" style="max-width: 200px;">
+                                        <option value="textarea">Textarea</option>
+                                        <option value="input">Input</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="showRate" class="" style="margin-top: 30px;">
+                                <ul style="list-style-type:none;color: #ffa622;">
+                                    <li><i class="fa fa-star" aria-hidden="true"></i> Kurang</li>
+                                    <li><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> Sedang</li>
+                                    <li><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> Cukup</li>
+                                    <li><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> Baik</li>
+                                </ul>
+                            </div>
+
                         </div>
                         <div class="col-md-4">
                             <label>Question Category</label>
@@ -47,19 +67,10 @@
                 <div class="form-group">
                     <label>Description / Question</label>
                     <textarea id="formDescription"></textarea>
-                    <input class="hide" id="formID">
                     <input class="hide" id="formSummernoteID">
                 </div>
 
-                <div id="dataFormEssay" class="hide">
-                    <div class="form-group">
-                        <label>Answer Type</label>
-                        <select class="form-control" id="AnswerType" style="max-width: 200px;">
-                            <option value="textarea">Textarea</option>
-                            <option value="input">Input</option>
-                        </select>
-                    </div>
-                </div>
+
 
 
             </div>
@@ -72,9 +83,6 @@
     </div>
 </div>
 
-
-
-
 <script>
     $(document).ready(function () {
 
@@ -82,12 +90,13 @@
 
         loadQuestionCategory();
 
-        var ID = getUrlParameter('id');
+        var tkn = getUrlParameter('tkn');
         var UnixMoment = moment().unix();
 
-        if(typeof ID !== 'undefined'){
+        if(typeof tkn !== 'undefined'){
             loading_modal_show();
-            getDataEula(ID);
+            var dataToken = jwt_decode(tkn,'UAP)(*');
+            getDataQuestion(dataToken.ID);
         } else {
             $('#formSummernoteID').val(sessionNIP+'_Survey_'+UnixMoment);
             $('#viewAction').html('Create');
@@ -304,9 +313,7 @@
             toastr.warning('All form are required','Warning');
         }
 
-
     });
-
 
     $('#formType').change(function () {
         loadQuestionType();
@@ -316,95 +323,53 @@
         var formType = $('#formType').val();
         if(formType=='4'){
             $('#dataFormEssay').addClass('hide');
+            $('#showRate').removeClass('hide');
         } else {
             $('#dataFormEssay').removeClass('hide');
+            $('#showRate').addClass('hide');
         }
 
     }
 
-    function getDataEula(ID){
+    function getDataQuestion(ID) {
+
         var data = {
-            action : 'getDataEula',
+            action : 'readDataQuestion',
             ID : ID
         };
-
         var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'api4/__crudEula';
+        var url = base_url_js+'apimenu/__crudSurvey';
+
         $.post(url,{token:token},function (jsonResult) {
 
             if(jsonResult.length>0){
-                $('#viewAction').html('Edit');
-
                 var d = jsonResult[0];
 
-
-                $('#formTitle').val(d.Title);
                 $('#formID').val(d.ID);
+
+                $('#formType').val(d.QTID);
+                $('#formDepartmentID').val(d.DepartmentID);
+
+                $('#AnswerType').val(d.AnswerType);
+
+                $('#formQuestionCategory').val(d.QCID);
+
+                $('#formIsRequired').val(d.IsRequired);
+                $('#formDescription').val(d.Question);
                 $('#formSummernoteID').val(d.SummernoteID);
 
-                $('#formDescription').summernote('code',d.Description);
-
             } else {
-                $('#viewAction').html('Create');
+
             }
 
             setTimeout(function () {
                 loading_modal_hide();
-            },1000);
+            },500);
+
         });
+
     }
 
-    $('#btnSaveNQueue').click(function () {
-
-        var formDescription = $('#formDescription').val();
-
-
-        if(formDescription!='' && formDescription!=null){
-
-            loading_modal_show();
-
-            var formID = $('#formID').val();
-            var formSummernoteID = $('#formSummernoteID').val();
-
-            var formIsRequired = $('#formIsRequired').val();
-            var formType = $('#formType').val();
-            var AnswerType = $('#AnswerType').val();
-
-            var data = {
-                action : 'updateDataSurvey',
-                ID : (formID!='' && formID!=null) ? formID : '',
-                QTID : formType,
-                IsRequired : formIsRequired,
-                AnswerType : AnswerType,
-                Question : formDescription,
-                SummernoteID : formSummernoteID
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'apimenu/__crudSurvey';
-
-            $.post(url,{token:token},function (jsonResult) {
-
-                if(formID==''){
-                    $('#formTitle').val('');
-                    $('#formDescription').summernote('reset');
-                }
-
-                toastr.success('Data saved','Success');
-
-                setTimeout(function () {
-                    loading_modal_hide();
-                },500);
-
-                // loadSetQuery(EmpDate,StdDate,jsonResult.ID);
-            });
-
-        } else {
-            toastr.warning('Title & Description are required','Warning');
-        }
-
-
-    });
 
 
 
