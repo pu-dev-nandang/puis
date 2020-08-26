@@ -7,7 +7,7 @@
                 <li class="<?= ($this->uri->segment(2) == 'list-survey' ) ? 'active' : '' ?>">
                     <a href="<?php echo base_url('survey/list-survey'); ?>">List Survey</a>
                 </li>
-                <li class="<?= ($this->uri->segment(2) == 'create-survey') ? 'active' : '' ?>">
+                <li class="hide <?= ($this->uri->segment(2) == 'create-survey') ? 'active' : '' ?>">
                     <a href="<?php echo base_url('survey/create-survey'); ?>">Create Survey</a>
                 </li>
                 <li class="<?= ($this->uri->segment(2) == 'bank-question') ? 'active' : '' ?>">

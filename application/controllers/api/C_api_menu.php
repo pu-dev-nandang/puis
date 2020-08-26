@@ -205,8 +205,6 @@ class C_api_menu extends CI_Controller {
 
                 $data[] = $nestedData;
                 $no++;
-
-
             }
 
             $json_data = array(
@@ -239,6 +237,200 @@ class C_api_menu extends CI_Controller {
 
             return print_r(1);
         }
+        else if($data_arr['action']=='updateSurvey'){
+
+            $ID = $data_arr['ID'];
+            $dataSurvey = (array) $data_arr['dataSurvey'];
+
+            if($ID!=''){
+                // Update
+                $dataSurvey['UpdatedBy'] = $data_arr['NIP'];
+                $dataSurvey['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID', $ID);
+                $this->db->update('db_it.surv_survey',$dataSurvey);
+            } else {
+                // Insert
+                $dataSurvey['CreatedBy'] = $data_arr['NIP'];
+                $this->db->insert('db_it.surv_survey',$dataSurvey);
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='getListSurvey'){
+
+            $requestData = $_REQUEST;
+
+            $dataWhere = '';
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataScr = 'sq.Question LIKE "%'.$search.'%"';
+                $dataSearch = '';
+            }
+
+            $queryDefault = 'SELECT ss.* FROM db_it.surv_survey ss WHERE ss.DepartmentID = "'.$data_arr['DepartmentID'].'"  '. $dataWhere.$dataSearch;
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                $Range = date('d M Y',strtotime($row['StartDate'])).' - '.
+                    date('d M Y',strtotime($row['EndDate']));
+
+
+                $Status = '<span class="label label-warning">Unpublish</span>';
+                $btnClose = 'hide';
+                $btnPublish = '';
+                $btnRemove = '';
+                if($row['Status']=='1'){
+                    $Status = '<span class="label label-success">Publish</span>';
+                    $btnClose = '';
+                    $btnPublish = 'hide';
+                    $btnRemove = 'hide';
+                } else if ($row['Status']=='2'){
+                    $Status = '<span class="label label-danger">Close</span>';
+                    $btnClose = 'hide';
+                    $btnPublish = 'hide';
+                    $btnRemove = 'hide';
+                }
+
+                $btnAct = '<div class="btn-group">
+                              <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-pencil"></i> <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li class="'.$btnPublish.'" id="li_btn_Publish_'.$row['ID'].'">
+                                        <a href="javascript:void(0);" class="btnPublishSurvey" data-id="'.$row['ID'].'">Publish</a>
+                                        </li>
+                                <li class="'.$btnClose.'" id="li_btn_Close_'.$row['ID'].'">
+                                        <a href="javascript:void(0);" class="btnCloseSurvey" data-id="'.$row['ID'].'" style="color: red;">Close</a>
+                                 </li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="javascript:void(0);" class="btnEditSurvey" data-id="'.$row['ID'].'">View Survey</a></li>
+                                <li><a href="javascript:void(0);" class="btnManageTarget" data-id="'.$row['ID'].'">Manage Targets</a></li>
+                                <li><a href="#">Manage Question</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li class="'.$btnRemove.'"><a href="#">Remove</a></li>
+                              </ul>
+                            </div>';
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Title'].'</div>';
+                $nestedData[] = '<div>'.$btnAct.'</div>';
+                $nestedData[] = '<div>'.$Range.'</div>';
+                $nestedData[] = '<div id="viewStatusSurvey_'.$row['ID'].'">'.$Status.'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval( $queryDefaultRow),
+                "data"            => $data,
+                "dataQuery"            => $query
+            );
+            echo json_encode($json_data);
+
+        }
+
+        else if($data_arr['action']=='getOneDataSurvey'){
+            $ID = $data_arr['ID'];
+            $data = $this->db->get_where('db_it.surv_survey',array('ID' => $ID))->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='setStatusSurvey'){
+
+            $dataFmQuiz['Status'] = $data_arr['Status'];
+            $dataFmQuiz['UpdatedBy'] = $data_arr['NIP'];
+            $dataFmQuiz['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+            $this->db->where('ID', $data_arr['ID']);
+            $this->db->update('db_it.surv_survey',$dataFmQuiz);
+
+            $row_Status = $data_arr['Status'];
+            $Status = '<span class="label label-warning">Unpublish</span>';
+            if($row_Status=='1'){
+                $Status = '<span class="label label-success">Publish</span>';
+            } else if ($row_Status=='2'){
+                $Status = '<span class="label label-danger">Close</span>';
+            }
+
+            return print_r(json_encode(array('Status'=>1,'Label' => $Status)));
+
+        }
+
+        else if($data_arr['action']=='updateTargetSurvey'){
+
+            $ID = $data_arr['ID'];
+
+            // ======= Employees ========
+
+            $surv_survey_usr_emp = $data_arr['surv_survey_usr_emp'];
+            // Remove data sebelumnya
+            $this->db->where('SurveyID',$ID);
+            $this->db->delete('db_it.surv_survey_usr_emp');
+            $this->db->reset_query();
+
+            if($surv_survey_usr_emp!='-1' && $surv_survey_usr_emp!=-1){
+                $this->db->insert('db_it.surv_survey_usr_emp',
+                    array('SurveyID' => $ID,'TypeUser' => $surv_survey_usr_emp));
+                $this->db->reset_query();
+            }
+
+            // ====== Student ========
+            $surv_survey_usr_std = $data_arr['surv_survey_usr_std'];
+
+            // Remove data sebelumnya
+            $dataCk = $this->db->select('ID')->get_where('db_it.surv_survey_usr_std',
+                array('SurveyID' => $ID))->result_array();
+
+            if(count($dataCk)>0){
+                $SUSID = $dataCk[0]['ID'];
+                $this->db->where('SUSID',$SUSID);
+                $this->db->delete('db_it.surv_survey_usr_std_details');
+                $this->db->reset_query();
+
+                $this->db->where('ID',$SUSID);
+                $this->db->delete('db_it.surv_survey_usr_std');
+                $this->db->reset_query();
+            }
+
+            if($surv_survey_usr_std!='-1' && $surv_survey_usr_std!=-1){
+                $this->db->insert('db_it.surv_survey_usr_std',
+                    array('SurveyID' => $ID,'TypeUser' => $surv_survey_usr_std));
+                $this->db->reset_query();
+            }
+
+            return print_r(1);
+
+
+        }
+
+        else if($data_arr['action']=='getDataTargetSurvey'){
+            $ID = $data_arr['ID'];
+
+            $data = '';
+
+            return print_r(1);
+
+
+        }
+
     }
 
 

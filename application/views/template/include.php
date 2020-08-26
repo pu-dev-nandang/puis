@@ -980,13 +980,19 @@
         });
     }
 
-    function loadSelectOptionClassOf_DESC(element,selected) {
+    function loadSelectOptionClassOf_DESC(element,selected,label='') {
         var url = base_url_js+"api/__getKurikulumSelectOptionDSC";
+
+        var viewLabel = 'Class of - ';
+        if(label=='HideLabel'){
+            viewLabel = '';
+        }
+
         $.get(url,function (data_json) {
             // console.log(data_json);
             for(var i=0;i<data_json.length;i++){
                 var sc = (data_json[i].Year==selected) ? 'selected' : '';
-                $(element).append('<option value="'+data_json[i].Year+'" '+sc+'>Class of - '+data_json[i].Year+'</option>');
+                $(element).append('<option value="'+data_json[i].Year+'" '+sc+'>'+viewLabel+data_json[i].Year+'</option>');
             }
         });
     }
