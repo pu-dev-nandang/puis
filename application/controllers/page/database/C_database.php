@@ -404,6 +404,7 @@ class C_database extends Globalclass {
         $data['companyInsurance'] = $this->General_model->fetchData("db_employees.master_company",array("IndustryID"=>33,"IsActive"=>1),"Name","ASC")->result();
         $data['Arr_edu'] =  $this->m_master->showData_array('db_admission.education');
         $data['Arr_ocu'] =  $this->m_master->showData_array('db_admission.occupation');
+        $data['Arr_jacketSize'] =  $this->m_master->showData_array('db_admission.register_jacket_size_m');
         $content = $this->load->view('page/database/students/editStudent',$data,true);
         $this->temp($content);
     }
