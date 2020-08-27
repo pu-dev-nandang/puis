@@ -157,7 +157,12 @@ $(document).ready(function(){
                                 <th>Jacket</th>
                                 <th>:</th>
                                 <td>
-                                    <input class="form-control formBiodata" id="formJacket">
+                                    <!-- <input class="form-control formBiodata" id="formJacket"> -->
+                                    <select class="form-control" id = "formJacket">
+                                        <?php for ($i=0;$i<count($Arr_jacketSize);$i++): ?>
+                                            <option value="<?php echo $Arr_jacketSize[$i]['JacketSize'] ?>" ><?php echo $Arr_jacketSize[$i]['JacketSize'] ?></option>
+                                        <?php endfor ?>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
@@ -660,8 +665,8 @@ $(document).ready(function(){
                     Phone : formPhone,
                     HP : formHP,
                     Email : formEmail,
-                    Address : formAddress,
-                    Jacket : formJacket,
+                    Address : $('#formAddress').val(),
+                    Jacket : $('#formJacket').val(),
                     Father : $('#formNameFather').val() ,
                     StatusFather : $('#formStatusFather').val() ,
                     PhoneFather : $('#formPhoneFather').val() ,
