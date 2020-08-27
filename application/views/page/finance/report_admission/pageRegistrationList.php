@@ -43,8 +43,6 @@
                          <br>
                          <div class="row">
                            <div class="col-md-12">
-                             <p style="color: red;">* Detail resend email : history resend email tentang pembayaran formulir</p>
-                             <p style="color: red;">* Resend email : Resend email tentang pembayaran formulir</p>
                              <p  style="color: red;">* <i class="fa fa-circle" style="color:#bdc80e;"></i> <span style="color: #bdc80e;">Online</span></p>
                              <p  style="color: red;"> * <i class="fa fa-circle" style="color:#db4273;"></i> <span style="color: #db4273;">Offline</span></p>
                            </div>

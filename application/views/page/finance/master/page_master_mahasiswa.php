@@ -255,7 +255,8 @@
                            '<td>'+Data_mhs[i]['StatusStudentName']+'</td>' +
                            // '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
                            // '<td>'+Data_mhs[i]['HP']+'</td>' +
-                           '<td>'+selecTOptionBintang+'</td>' +
+                           // '<td>'+selecTOptionBintang+'</td>' +
+                           '<td>'+bintang+'</td>' +
                            '<td>'+selecTOption+'</td>' +
                            '<td>'+selecTOptionCredit+'</td>' +
                            '</tr>');
