@@ -218,6 +218,119 @@ class C_api_menu extends CI_Controller {
 
 
         }
+
+        else if($data_arr['action']=='getMasterQuestion'){
+
+            $requestData = $_REQUEST;
+
+            $Type = $data_arr['Type'];
+            $QuestionCategory = $data_arr['QuestionCategory'];
+
+            $dataWhere = '';
+            if($Type!='' || $QuestionCategory!=''){
+                $w_Type = ($Type!='')
+                    ? 'AND sq.QTID = "'.$Type.'" ' : '';
+                $w_QuestionCategory = ($QuestionCategory!='')
+                    ? 'AND sq.QCID = "'.$QuestionCategory.'" ' : '';
+
+                $dataWhere = $w_Type.$w_QuestionCategory;
+            }
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataScr = 'sq.Question LIKE "%'.$search.'%"';
+
+                $dataSearch = ' AND ('.$dataScr.')';
+            }
+
+            $queryDefault = 'SELECT sq.ID, sq.Question, sq.IsRequired, sq.AnswerType,  
+                                             sqc.Description AS QuestionCategory, 
+                                             sqt.Description AS QuestionType FROM db_it.surv_question sq
+                                            LEFT JOIN db_it.surv_question_category sqc ON (sqc.ID = sq.QCID)
+                                            LEFT JOIN db_it.surv_question_type sqt ON (sqt.ID = sq.QTID)
+                                            WHERE sq.DepartmentID = "'.$data_arr['DepartmentID'].'" 
+                                            '.$dataWhere.$dataSearch;
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                $btnAct = '<div style="margin-bottom: 10px;">
+                                <button class="btn btn-info btn-sm btnAddToSurvey" data-id="'.$row['ID'].'"><i class="fa fa-arrow-left margin-right"></i> Add to survey</button></div>';
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$btnAct.$row['Question'].'</div>';
+                $nestedData[] = '<div>'.$row['QuestionCategory'].'<br/>
+                                    <span class="label label-success">'.$row['QuestionType'].'</span></div>';
+
+                $data[] = $nestedData;
+                $no++;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval( $queryDefaultRow),
+                "data"            => $data,
+                "dataQuery"            => $query
+            );
+            echo json_encode($json_data);
+        }
+
+        else if($data_arr['action']=='addQuestionToSurvey'){
+
+            $dataInsrt = array(
+                'SurveyID' => $data_arr['SurveyID'],
+                'QuestionID' => $data_arr['QuestionID']
+            );
+
+            // Cek apakah sudah ada atau blm
+            $dataCk = $this->db->get_where('db_it.surv_survey_detail',$dataInsrt)->result_array();
+
+            $result = array('Status'=>0);
+
+            if(count($dataCk)<=0){
+                // Dapetin urutan
+                $TotalQuestion = $this->db->query('SELECT COUNT(*) AS Total 
+                                        FROM db_it.surv_survey_detail 
+                                        WHERE SurveyID = "'.$data_arr['SurveyID'].'" ')
+                    ->result_array()[0]['Total'];
+
+                $dataInsrt['Queue'] = $TotalQuestion + 1;
+                $this->db->insert('db_it.surv_survey_detail',$dataInsrt);
+                $result = array('Status'=>1);
+            }
+
+            return print_r(json_encode($result));
+
+
+        }
+
+        else if($data_arr['action']=='QuestionInMySurvey'){
+
+            $SurveyID = $data_arr['SurveyID'];
+
+            $data = $this->db->query('SELECT sq.Question, sqc.Description, ssd.Queue FROM db_it.surv_survey_detail ssd 
+                                            LEFT JOIN db_it.surv_question sq ON (sq.ID = ssd.QuestionID)
+                                            LEFT JOIN db_it.surv_question_category sqc ON (sqc.ID = sq.QCID)
+                                            WHERE ssd.SurveyID = "'.$SurveyID.'" ORDER BY ssd.Queue ASC')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+
         else if($data_arr['action']=='updateDataQuestion'){
 
             $ID = $data_arr['ID'];
@@ -307,6 +420,8 @@ class C_api_menu extends CI_Controller {
                     $btnRemove = 'hide';
                 }
 
+                $tokenBtn = $this->jwt->encode(array('ID' => $row['ID']),"UAP)(*");
+
                 $btnAct = '<div class="btn-group">
                               <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-pencil"></i> <span class="caret"></span>
@@ -321,7 +436,7 @@ class C_api_menu extends CI_Controller {
                                 <li role="separator" class="divider"></li>
                                 <li><a href="javascript:void(0);" class="btnEditSurvey" data-id="'.$row['ID'].'">View Survey</a></li>
                                 <li><a href="javascript:void(0);" class="btnManageTarget" data-id="'.$row['ID'].'">Manage Targets</a></li>
-                                <li><a href="#">Manage Question</a></li>
+                                <li><a href="'.base_url('survey/manage-question/'.$tokenBtn).'" target="_blank">Manage Question</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li class="'.$btnRemove.'"><a href="#">Remove</a></li>
                               </ul>
@@ -395,39 +510,128 @@ class C_api_menu extends CI_Controller {
             // ====== Student ========
             $surv_survey_usr_std = $data_arr['surv_survey_usr_std'];
 
-            // Remove data sebelumnya
-            $dataCk = $this->db->select('ID')->get_where('db_it.surv_survey_usr_std',
-                array('SurveyID' => $ID))->result_array();
+            if($surv_survey_usr_std!=0 && $surv_survey_usr_std!='0'){
+                // Remove data sebelumnya
+                $dataCk = $this->db->select('ID')->get_where('db_it.surv_survey_usr_std',
+                    array('SurveyID' => $ID))->result_array();
 
-            if(count($dataCk)>0){
-                $SUSID = $dataCk[0]['ID'];
-                $this->db->where('SUSID',$SUSID);
-                $this->db->delete('db_it.surv_survey_usr_std_details');
-                $this->db->reset_query();
+                if(count($dataCk)>0){
+                    $SUSID = $dataCk[0]['ID'];
+                    $this->db->where('SUSID',$SUSID);
+                    $this->db->delete('db_it.surv_survey_usr_std_details');
+                    $this->db->reset_query();
 
-                $this->db->where('ID',$SUSID);
-                $this->db->delete('db_it.surv_survey_usr_std');
-                $this->db->reset_query();
+                    $this->db->where('ID',$SUSID);
+                    $this->db->delete('db_it.surv_survey_usr_std');
+                    $this->db->reset_query();
+                }
+
+                if($surv_survey_usr_std!='-1' && $surv_survey_usr_std!=-1){
+                    $this->db->insert('db_it.surv_survey_usr_std',
+                        array('SurveyID' => $ID,'TypeUser' => $surv_survey_usr_std));
+                    $this->db->reset_query();
+                }
             }
 
-            if($surv_survey_usr_std!='-1' && $surv_survey_usr_std!=-1){
-                $this->db->insert('db_it.surv_survey_usr_std',
-                    array('SurveyID' => $ID,'TypeUser' => $surv_survey_usr_std));
-                $this->db->reset_query();
-            }
+
 
             return print_r(1);
 
 
         }
 
-        else if($data_arr['action']=='getDataTargetSurvey'){
-            $ID = $data_arr['ID'];
+        else if($data_arr['action']=='setDataTargetUsrtStdDetail'){
 
-            $data = '';
+            // cek apakah ID sudah ada di table surv_survey_usr_std
+            $dataCk = $this->db->select('ID')->get_where('db_it.surv_survey_usr_std',
+                array('SurveyID' => $data_arr['ID']))
+                ->result_array();
+
+
+
+            if(count($dataCk)>0){
+                $SUSID = $dataCk[0]['ID'];
+                $this->db->where('ID', $SUSID);
+                $this->db->update('db_it.surv_survey_usr_std'
+                    ,array('TypeUser' => '0'));
+            } else {
+                $dataIns = array(
+                    'SurveyID' => $data_arr['ID'],
+                    'TypeUser' => '0'
+                );
+                $this->db->insert('db_it.surv_survey_usr_std',$dataIns);
+                $SUSID = $this->db->insert_id();
+            }
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['SUSID'] = $SUSID;
+
+            $dataCk2 = $this->db->select('ID')
+                ->get_where('db_it.surv_survey_usr_std_details',$dataForm)
+                ->result_array();
+
+            $result = array('Status' => 0);
+
+            if(count($dataCk2)<=0) {
+                $result = array('Status' => 1);
+                $this->db->insert('db_it.surv_survey_usr_std_details', $dataForm);
+            }
+
+
+            return print_r(json_encode($result));
+
+        }
+
+        else if($data_arr['action']=='removeDataFromTargetUsrtStdDetail'){
+
+            $this->db->where('ID', $data_arr['ID']);
+            $this->db->delete('db_it.surv_survey_usr_std_details');
 
             return print_r(1);
 
+        }
+
+        else if($data_arr['action']=='getDataTargetSurvey'){
+            $ID = $data_arr['ID'];
+
+            // Data survey
+            $dataSurv = $this->db->get_where('db_it.surv_survey',
+                array('ID' => $ID))->result_array();
+
+            $dataEmp = $this->db->get_where('db_it.surv_survey_usr_emp',
+                            array('SurveyID' => $ID))->result_array();
+
+            $dataStd = $this->db->get_where('db_it.surv_survey_usr_std',
+                            array('SurveyID' => $ID))->result_array();
+
+            $dataSurv[0]['Employee'] = $dataEmp;
+            $dataSurv[0]['Student'] = $dataStd;
+
+            return print_r(json_encode($dataSurv[0]));
+
+        }
+        else if($data_arr['action']=='getDataTargetCustomStudent'){
+            $ID = $data_arr['ID'];
+            $dataStd = $this->db->get_where('db_it.surv_survey_usr_std',
+                array('SurveyID' => $ID))->result_array();
+
+            $result =[];
+
+            if(count($dataStd)>0){
+                $d = $dataStd[0];
+                $result = $this->db
+                    ->query('SELECT ssusd.ID AS TargetUserID, ssusd.ClassOf, ps.NameEng AS Prodi, ss.Description 
+                                    FROM db_it.surv_survey_usr_std_details ssusd
+                                    LEFT JOIN db_academic.program_study ps 
+                                    ON (ps.ID = ssusd.ProdiID)
+                                    LEFT JOIN db_academic.status_student ss 
+                                    ON (ss.ID = ssusd.StatusStudentID)
+                                    WHERE ssusd.SUSID = "'.$d['ID'].'" 
+                                    ORDER BY ps.NameEng ASC, ssusd.ClassOf DESC, ss.ID ASC ')
+                    ->result_array();
+            }
+
+            return print_r(json_encode($result));
 
         }
 

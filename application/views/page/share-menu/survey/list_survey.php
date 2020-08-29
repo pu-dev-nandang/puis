@@ -11,6 +11,8 @@
 </div>
 
 
+
+
 <script>
 
     $(document).ready(function () {
@@ -256,7 +258,11 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
-            var btnSave = '<button class="btn btn-success" id="btnSaveTarget" data-id="'+ID+'">Save</button>';
+            // 0 = Unpublish, 1 = Publish, 2 = Close
+            var btnSave = (parseInt(jsonResult.Status)<=0)
+                ? '<button class="btn btn-success" id="btnSaveTarget" data-id="'+ID+'">Save</button>' : '';
+
+            var disabledForm = (parseInt(jsonResult.Status)<=0) ? '' : 'disabled';
 
             $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
                 '<h4 class="modal-title">Manage Target</h4>');
@@ -270,22 +276,22 @@
                 '            <div class="panel-body">' +
                 '                <div style="color: blue;border-bottom: 1px solid #ccc;padding-bottom: 10px;margin-bottom: 10px;">' +
                 '                    <label class="radio-inline">' +
-                '                        <input type="radio" name="survUserEmp" id="inlineRadio4" value="-1" checked> Bukan untuk Dosen & Tenaga Pendidik' +
+                '                        <input type="radio" name="survUserEmp" '+disabledForm+' value="-1" checked> Bukan untuk Dosen & Tenaga Pendidik' +
                 '                    </label>' +
                 '                </div>' +
                 '                <div>' +
                 '                    <label class="radio-inline">' +
-                '                        <input type="radio" name="survUserEmp" id="inlineRadio1" value="1"> Semua Dosen & Tenga Pendidik' +
+                '                        <input type="radio" name="survUserEmp" '+disabledForm+' value="1"> Semua Dosen & Tenga Pendidik' +
                 '                    </label>' +
                 '                </div>' +
                 '                <div>' +
                 '                    <label class="radio-inline">' +
-                '                        <input type="radio" name="survUserEmp" id="inlineRadio2" value="2"> Semua Dosen (selain tenaga pendidik)' +
+                '                        <input type="radio" name="survUserEmp" '+disabledForm+' value="2"> Semua Dosen (selain tenaga pendidik)' +
                 '                    </label>' +
                 '                </div>' +
                 '                <div>' +
                 '                    <label class="radio-inline">' +
-                '                        <input type="radio" name="survUserEmp" id="inlineRadio3" value="3"> Semua Tenga Pendidik (selain dosen)' +
+                '                        <input type="radio" name="survUserEmp" '+disabledForm+' value="3"> Semua Tenga Pendidik (selain dosen)' +
                 '                    </label>' +
                 '                </div>' +
                 '            </div>' +
@@ -300,32 +306,32 @@
                 '                <div style="margin-bottom: 15px;">' +
                 '                    <div style="color: blue;border-bottom: 1px solid #ccc;padding-bottom: 10px;margin-bottom: 10px;">' +
                 '                        <label class="radio-inline">' +
-                '                            <input type="radio" name="surv_std_TypeUser" value="-1" checked> Bukan untuk mahasiswa' +
+                '                            <input type="radio" name="surv_std_TypeUser" '+disabledForm+' value="-1" checked> Bukan untuk mahasiswa' +
                 '                        </label>' +
                 '                    </div>' +
                 '                    <div>' +
                 '                        <label class="radio-inline">' +
-                '                            <input type="radio" name="surv_std_TypeUser" value="1"> Semua mahasiswa' +
+                '                            <input type="radio" name="surv_std_TypeUser" '+disabledForm+' value="1"> Semua mahasiswa' +
                 '                        </label>' +
                 '                    </div>' +
                 '                    <div>' +
                 '                        <label class="radio-inline">' +
-                '                            <input type="radio" name="surv_std_TypeUser" value="2"> Semua mahasiswa aktif' +
+                '                            <input type="radio" name="surv_std_TypeUser" '+disabledForm+' value="2"> Semua mahasiswa aktif' +
                 '                        </label>' +
                 '                    </div>' +
                 '                    <div>' +
                 '                        <label class="radio-inline">' +
-                '                            <input type="radio" name="surv_std_TypeUser" value="3"> Semua Alumni' +
+                '                            <input type="radio" name="surv_std_TypeUser" '+disabledForm+' value="3"> Semua Alumni' +
                 '                        </label>' +
                 '                    </div>' +
                 '                    <div>' +
                 '                        <label class="radio-inline">' +
-                '                            <input type="radio" name="surv_std_TypeUser" value="0"> Custom' +
+                '                            <input type="radio" name="surv_std_TypeUser" '+disabledForm+' value="0"> Custom' +
                 '                        </label>' +
                 '                    </div>' +
                 '                </div>' +
                 '                <div id="panelCustomStd" class="hide">' +
-                '                    <div class="well">' +
+                '                    <div class="well" id="panelAddCustomStd">' +
                 '                        <div class="row">' +
                 '                            <div class="col-md-3">' +
                 '                                <label>Class Of</label>' +
@@ -342,24 +348,12 @@
                 '                        </div>' +
                 '                        <div class="row" style="margin-top: 10px;">' +
                 '                            <div class="col-md-12 text-right">' +
-                '                                <button class="btn btn-sm btn-primary">Add</button>' +
+                '                                <button id="btnAddCustomTargetStd" data-id="'+ID+'" class="btn btn-sm btn-primary">Add</button>' +
                 '                            </div>' +
                 '                        </div>' +
                 '                    </div>' +
-                '                    <table class="table table-bordered">' +
-                '                        <thead>' +
-                '                        <tr>' +
-                '                            <th style="width: 1%;">No</th>' +
-                '                            <th>Target</th>' +
-                '                        </tr>' +
-                '                        </thead>' +
-                '                        <tbody>' +
-                '                        <tr>' +
-                '                            <td>1</td>' +
-                '                            <td>All student</td>' +
-                '                        </tr>' +
-                '                        </tbody>' +
-                '                    </table>' +
+                '                   <input class="hide" id="dataStatusSurvey" value="'+jsonResult.Status+'"/>' +
+                '                    <div id="viewTableTargetCustom"></div>' +
                 '                </div>' +
                 '' +
                 '            </div>' +
@@ -367,9 +361,32 @@
 
             $('#GlobalModal .modal-body').html(htmlss);
 
-            loadSelectOptionClassOf_DESC('#formUsr_ClassOf','','HideLabel');
-            loadSelectOptionBaseProdi('#formUsr_ProdiID','');
-            loadSelectOptionStatusStudent('#formUsr_StatusStudentID',3);
+            // Employees
+            var dataEmployee = jsonResult.Employee;
+            if(dataEmployee.length>0){
+                $('input[name=survUserEmp][value='+dataEmployee[0].TypeUser+']').attr('checked',true);
+            }
+
+            var dataStudent = jsonResult.Student;
+            if(dataStudent.length>0){
+                $('input[name=surv_std_TypeUser][value='+dataStudent[0].TypeUser+']').attr('checked',true);
+                if(dataStudent[0].TypeUser==0 || dataStudent[0].TypeUser=='0'){
+                    $('#panelCustomStd').removeClass('hide');
+                } else {
+                    $('#panelCustomStd').addClass('hide');
+                }
+                loadDataTargetCustomStudent(ID);
+            }
+
+            if( (parseInt(jsonResult.Status)<=0)){
+                loadSelectOptionClassOf_DESC('#formUsr_ClassOf','','HideLabel');
+                loadSelectOptionBaseProdi('#formUsr_ProdiID','');
+                loadSelectOptionStatusStudent('#formUsr_StatusStudentID',3);
+            } else {
+                $('#panelAddCustomStd').remove();
+            }
+
+
 
             $('#GlobalModal .modal-footer').html('' +
                 '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> '+btnSave+
@@ -389,6 +406,57 @@
 
     });
 
+    function loadDataTargetCustomStudent(ID){
+
+        var data = {
+            action : 'getDataTargetCustomStudent',
+            ID : ID
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        loading_page('#viewTableTargetCustom');
+        var dataStatusSurvey = $('#dataStatusSurvey').val();
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            var tr = '';
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    var btnRemove = (parseInt(dataStatusSurvey)<=0)
+                        ? '<button class="btn btn-danger btn-sm removeCustomTargetStudent" ' +
+                        'data-id="'+v.TargetUserID+'" data-id-survey="'+ID+'"><i class="fa fa-trash"></i></button>'
+                        : '-';
+
+                    tr = tr+'<tr>' +
+                        '<td>'+(i+1)+'</td>' +
+                        '<td style="text-align: left;"><b>'+v.Prodi+'</b><br/>'+v.ClassOf+' - '+v.Description+'</td>' +
+                        '<td>'+btnRemove+'</td>' +
+                        '</tr>';
+                });
+            } else {
+                tr = '<tr><td colspan="3">No data</td></tr>'
+            }
+
+            setTimeout(function () {
+                $('#viewTableTargetCustom').html('<div class="table-responsive">' +
+                    '    <table class="table table-bordered table-striped table-centre">' +
+                    '        <thead>' +
+                    '        <tr>' +
+                    '            <th style="width: 3%;">No</th>' +
+                    '            <th>Program Study</th>' +
+                    '            <th style="width: 10%;"><i class="fa fa-cog"></i></th>' +
+                    '        </tr>' +
+                    '        </thead>' +
+                    '       <tbody>'+tr+'</tbody>' +
+                    '    </table>' +
+                    '</div>');
+            },500);
+        });
+
+    }
+
     $(document).on('change','input[type=radio][name="surv_std_TypeUser"]',function () {
         var val = $('input[type=radio][name="surv_std_TypeUser"]:checked').val();
         if(val=='0'){
@@ -399,6 +467,9 @@
     });
 
     $(document).on('click','#btnSaveTarget',function () {
+
+        loading_button('#btnSaveTarget');
+
         var ID = $(this).attr('data-id');
         var survUserEmp = $('input[name=survUserEmp]:checked').val();
         var survUserStd = $('input[type=radio][name="surv_std_TypeUser"]:checked').val();
@@ -413,9 +484,79 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
-        });
+            toastr.success('Data saved','Success');
 
+            setTimeout(function () {
+                $('#btnSaveTarget').html('Save').prop('disabled',false);
+            },500);
+
+        });
+    });
+
+    $(document).on('click','#btnAddCustomTargetStd',function () {
+
+        var ID = $(this).attr('data-id');
+
+        var formUsr_ClassOf = $('#formUsr_ClassOf').val();
+        var formUsr_ProdiID = $('#formUsr_ProdiID').val();
+        var formUsr_StatusStudentID = $('#formUsr_StatusStudentID').val();
+
+        if(formUsr_ClassOf!='' && formUsr_ClassOf!=null &&
+            formUsr_ProdiID!='' && formUsr_ProdiID!=null &&
+        formUsr_StatusStudentID!='' && formUsr_StatusStudentID!=null) {
+
+            var ClassOf = formUsr_ClassOf;
+            var ProdiID = formUsr_ProdiID.split('.')[0];
+            var StatusStudentId = formUsr_StatusStudentID;
+
+            var data = {
+                action : 'setDataTargetUsrtStdDetail',
+                ID : ID,
+                dataForm : {
+                    ClassOf : ClassOf,
+                    ProdiID : ProdiID,
+                    StatusStudentId : StatusStudentId
+                }
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'apimenu/__crudSurvey';
+
+            $.post(url,{token:token},function (jsonResult) {
+                if(jsonResult.Status==1){
+                    loadDataTargetCustomStudent(ID);
+                    toastr.success('Data saved','Success');
+                } else {
+                    toastr.warning('Data has been entered','Warning');
+                }
+            });
+
+
+        } else {
+            toastr.warning('All form are required','Warning');
+        }
 
     });
+
+    $(document).on('click','.removeCustomTargetStudent',function () {
+        if(confirm('Are you sure?')){
+
+            $('.removeCustomTargetStudent').prop('disabled',true);
+
+            var TargetUserID = $(this).attr('data-id');
+            var ID = $(this).attr('data-id-survey');
+            var data = {
+                action : 'removeDataFromTargetUsrtStdDetail',
+                ID : TargetUserID
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'apimenu/__crudSurvey';
+
+            $.post(url,{token:token},function (jsonResult) {
+                loadDataTargetCustomStudent(ID);
+                toastr.success('Removed Data','Success');
+            });
+        }
+    });
+
 
 </script>
