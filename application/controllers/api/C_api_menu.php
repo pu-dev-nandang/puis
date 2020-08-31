@@ -249,6 +249,22 @@ class C_api_menu extends CI_Controller {
             $Status = 0;
 
             if($dataCk<=0){
+
+                $dataQuestion = $this->db->query('SELECT sq.SummernoteID FROM db_it.surv_question sq 
+                                        WHERE sq.ID = "'.$QuestionID.'" ')
+                    ->result_array();
+
+                if(count($dataQuestion)>0){
+                    for($i=0;$i<count($dataQuestion);$i++){
+
+                        $SummernoteID = $dataQuestion[$i]['SummernoteID'];
+
+                        $this->m_rest
+                            ->checkImageSummernote('delete',$SummernoteID,
+                                'db_it.surv_question','Question');
+                    }
+                }
+
                 $this->db->where('ID', $QuestionID);
                 $this->db->delete('db_it.surv_question');
                 $Status = 1;
@@ -409,17 +425,41 @@ class C_api_menu extends CI_Controller {
 
             if($ID!=''){
                 // Update
-                $dataQuestion['UpdatedBy'] = $data_arr['NIP'];
-                $dataQuestion['UpdatedAt'] = $this->m_rest->getDateTimeNow();
-                $this->db->where('ID', $ID);
-                $this->db->update('db_it.surv_question',$dataQuestion);
-            } else {
+                // Cek apakah pertanyaan sudah di assign ke dalam survey atau blm
+                $dataCk = $this->db->query('SELECT COUNT(*) AS Total 
+                                            FROM db_it.surv_survey_detail 
+                                            WHERE QuestionID = "'.$ID.'" ')
+                    ->result_array()[0]['Total'];
+
+                if($dataCk<=0) {
+                    $dataQuestion['UpdatedBy'] = $data_arr['NIP'];
+                    $dataQuestion['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->where('ID', $ID);
+                    $this->db->update('db_it.surv_question',$dataQuestion);
+                    $Status = 1;
+                } else {
+                    $Status = 0;
+                }
+
+            }
+            else {
                 // Insert
                 $dataQuestion['CreatedBy'] = $data_arr['NIP'];
                 $this->db->insert('db_it.surv_question',$dataQuestion);
+
+                $Status = 1;
             }
 
-            return print_r(1);
+            if($Status==1 || $Status=='1'){
+
+                $SummernoteID = $dataQuestion['SummernoteID'];
+                // Cek image in summernote
+                $this->m_rest
+                    ->checkImageSummernote('insert',$SummernoteID,'db_it.surv_question','Question');
+
+            }
+
+            return print_r(json_encode(array('Status'=> $Status)));
         }
         else if($data_arr['action']=='updateSurvey'){
 
