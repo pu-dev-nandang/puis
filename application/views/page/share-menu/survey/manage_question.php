@@ -1,5 +1,41 @@
 
 
+<style>
+
+    #listQuestion {
+        padding-inline-start: 15px;
+    }
+
+    .item-question:hover {
+        cursor: pointer;
+    }
+
+    .item-question:hover div {
+        background: lightyellow;
+    }
+
+    .item-question {
+        position: relative;
+    }
+
+    .item-question div {
+        border: 1px solid #ccc;
+        padding: 10px 10px 0px 10px;
+        border-radius: 5px;
+        width: 90%;
+        margin-bottom: 9px;
+
+        max-height: 100px;
+        overflow: auto;
+    }
+
+    .item-question button {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+    }
+</style>
+
 <div class="row">
     <div class="col-md-10 col-md-offset-1">
         <h1
@@ -27,6 +63,11 @@
             </tr>
             </tbody>
         </table>
+
+        <div class="alert alert-info" style="margin-top: 20px;">
+            Questions can only be changed if the survey status is <b>unpublished</b>
+        </div>
+
     </div>
 </div>
 
@@ -41,7 +82,7 @@
                 <h4 class="panel-title">List Question</h4>
             </div>
             <div class="panel-body" style="min-height: 100px;">
-
+                <div id="viewListQuestion"></div>
             </div>
         </div>
     </div>
@@ -87,6 +128,7 @@
 
         loadListQuestion();
     });
+
     $('.filter-table').change(function () {
         loadMasterQuestion();
     });
@@ -142,25 +184,34 @@
 
     $(document).on('click','.btnAddToSurvey',function () {
 
-        var ID = $(this).attr('data-id');
+        var Status = "<?= $dataSurvey['Status']; ?>";
+        if(parseInt(Status)<=0){
 
-        var data = {
-            action : 'addQuestionToSurvey',
-            SurveyID : '<?= $dataSurvey['ID']; ?>',
-            QuestionID : ID,
-        };
-        var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'apimenu/__crudSurvey';
+            var ID = $(this).attr('data-id');
 
-        $.post(url,{token:token},function (jsonResult) {
+            var data = {
+                action : 'addQuestionToSurvey',
+                SurveyID : '<?= $dataSurvey['ID']; ?>',
+                QuestionID : ID,
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'apimenu/__crudSurvey';
 
-            if(parseInt(jsonResult.Status)>0){
-                toastr.success('Question added','Success');
-            } else {
-                toastr.warning('Question already exist','Success');
-            }
+            $.post(url,{token:token},function (jsonResult) {
 
-        });
+                if(parseInt(jsonResult.Status)>0){
+                    toastr.success('Question added','Success');
+                    loadListQuestion();
+                } else {
+                    toastr.warning('Question already exist','Success');
+                }
+            });
+
+        } else {
+            toastr.error('The list of questions cannot be changed','Error');
+        }
+
+
 
 
     });
@@ -174,12 +225,104 @@
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'apimenu/__crudSurvey';
 
+        loading_page_simple('#viewListQuestion','center');
+
         $.post(url,{token:token},function (jsonResult) {
 
+            console.log(jsonResult);
 
+            var li = '';
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    li = li+'<li class="item-question" data-id="'+v.ID+'">' +
+                        '<div>'+
+                        '<span class="label label-default">'+v.Category+'</span>' +
+                        v.Question+'</div>' +
+                        '<button data-id="'+v.ID+'" class="btn btn-sm btn-danger btnRemoveQuestion">' +
+                        '<i class="fa fa-trash"></i></button></li>';
+
+                });
+            }
+
+            setTimeout(function () {
+
+                if(jsonResult.length>0){
+                    $('#viewListQuestion').html('<ol id="listQuestion">'+li+'</ol>');
+
+                    var StatusSurvey = "<?= $dataSurvey['Status']; ?>";
+
+                    if(parseInt(StatusSurvey)<=0){
+                        $('#listQuestion').sortable({
+                            axis: 'y',
+                            update: function (event, ui) {
+                                var No = 1;
+                                $('#listQuestion li.item-question').each(function () {
+                                    var ID = $(this).attr('data-id');
+                                    updateQueue(ID,No);
+                                    No += 1;
+                                });
+
+                                // $('#dataTempQuiz').val(JSON.stringify(dataUpdate));
+
+                            }
+                        });
+                    }
+
+
+                } else {
+                    $('#viewListQuestion').html('No question');
+                }
+
+            },500);
 
         });
 
     }
 
+    $(document).on('click','.btnRemoveQuestion',function () {
+
+        var Status = "<?= $dataSurvey['Status']; ?>";
+
+        if(parseInt(Status)<=0){
+            if(confirm('Are you sure?')){
+
+                var ID = $(this).attr('data-id');
+
+                var data = {
+                    action : 'removeQUestionFromSurvey',
+                    ID : ID
+                };
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'apimenu/__crudSurvey';
+
+                $.post(url,{token:token},function (result) {
+                    loadListQuestion();
+                    toastr.success('Question removed from survey','Success');
+                });
+
+            }
+        } else {
+            toastr.error('The list of questions cannot be changed','Error');
+        }
+
+
+
+    });
+
+    function updateQueue(ID,Queue) {
+
+        var data = {
+            action : 'updateQueueQuestion',
+            ID : ID,
+            Queue : Queue
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $.post(url,{token:token},function (result) {
+            // toastr.success('Question removed from survey','Success');
+        });
+
+    }
 </script>
