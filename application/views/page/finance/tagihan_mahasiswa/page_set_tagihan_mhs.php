@@ -493,7 +493,7 @@
       var Discount = $(this).val();
       var Npm = $(this).attr('npm');
       var Invoice = $(this).attr('invoice');
-      value_cost = Invoice - ((Discount/100)*Invoice);
+      value_cost = parseInt(Invoice - ((Discount/100)*Invoice));
       if (PTID == 3) {
         var CreditBr = $(this).attr('creditbr');
         var CreditUl = $(this).attr('creditul');
