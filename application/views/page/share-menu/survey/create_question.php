@@ -100,21 +100,22 @@
         } else {
             $('#formSummernoteID').val(sessionNIP+'_Survey_'+UnixMoment);
             $('#viewAction').html('Create');
+            $('#formDescription').summernote({
+                placeholder: 'Text your description',
+                height: 300,
+                callbacks: {
+                    onImageUpload: function(image) {
+                        var formSummernoteID = $('#formSummernoteID').val();
+                        summernote_UploadImage('#formDescription',image[0],formSummernoteID);
+                    },
+                    onMediaDelete : function(target) {
+                        summernote_DeleteImage(target[0].src);
+                    }
+                }
+            });
         }
 
-        $('#formDescription').summernote({
-            placeholder: 'Text your description',
-            height: 300,
-            callbacks: {
-                onImageUpload: function(image) {
-                    var formSummernoteID = $('#formSummernoteID').val();
-                    summernote_UploadImage('#formDescription',image[0],formSummernoteID);
-                },
-                onMediaDelete : function(target) {
-                    summernote_DeleteImage(target[0].src);
-                }
-            }
-        });
+
 
     });
 
@@ -300,12 +301,21 @@
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'apimenu/__crudSurvey';
 
-            $.post(url,{token:token},function () {
+            $.post(url,{token:token},function (jsonResult) {
 
-                toastr.success('Question saved','Success');
-                setTimeout(function () {
-                    window.location.href='';
-                },500);
+                if(jsonResult.Status==1 || jsonResult.Status=='1'){
+                    toastr.success('Question saved','Success');
+                    setTimeout(function () {
+                        window.location.href='';
+                    },500);
+                } else {
+                    toastr.warning('This question cannot edit','Warning');
+                    setTimeout(function () {
+                        loading_modal_hide();
+                    },500);
+                }
+
+
 
             });
 
@@ -345,9 +355,14 @@
             if(jsonResult.length>0){
                 var d = jsonResult[0];
 
+                $('#viewAction').html('Edit');
+
                 $('#formID').val(d.ID);
 
                 $('#formType').val(d.QTID);
+
+                loadQuestionType();
+
                 $('#formDepartmentID').val(d.DepartmentID);
 
                 $('#AnswerType').val(d.AnswerType);
@@ -357,6 +372,21 @@
                 $('#formIsRequired').val(d.IsRequired);
                 $('#formDescription').val(d.Question);
                 $('#formSummernoteID').val(d.SummernoteID);
+
+                $('#formDescription').summernote({
+                    placeholder: 'Text your description',
+                    height: 300,
+                    callbacks: {
+                        onImageUpload: function(image) {
+                            var formSummernoteID = $('#formSummernoteID').val();
+                            summernote_UploadImage('#formDescription',image[0],formSummernoteID);
+                        },
+                        onMediaDelete : function(target) {
+                            summernote_DeleteImage(target[0].src);
+                        }
+                    }
+                });
+
 
             } else {
 
