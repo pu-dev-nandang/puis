@@ -1793,6 +1793,47 @@ class M_admission extends CI_Model {
       }
      }
 
+
+     private function excecuteSchemaTuitionFee($ID_program_study,$getBintangMaster,$CreditDefaultSmt1)
+     {
+      $arr = [];
+      for ($i=0; $i < count($getBintangMaster); $i++) { 
+        $JumlahBintang = $getBintangMaster[$i]['ID_bintang'];
+        $Name = $getBintangMaster[$i]['Name'];
+        $Desc = $getBintangMaster[$i]['Desc'];
+        $getPayment = $this->getPaymentType_Cost($ID_program_study,$JumlahBintang);
+        $detail = [];
+        if (count($getPayment) > 0) {
+          for ($j=0; $j < count($getPayment); $j++) { 
+            if ($getPayment[$j]['Abbreviation'] == 'Credit') {
+               $detail = $detail + array($getPayment[$j]['Abbreviation'] => (int)$getPayment[$j]['Cost'] * (int) $CreditDefaultSmt1.'.00');
+             }
+             else
+             {
+              $detail = $detail + array($getPayment[$j]['Abbreviation'] => $getPayment[$j]['Cost']);
+             }
+          }
+        }
+        else
+        {
+          $PaymentType = $this->m_master->caribasedprimary('db_finance.payment_type','Type','0');
+          for ($j=0; $j < count($PaymentType); $j++) { 
+            $detail = $detail + array($PaymentType[$j]['Abbreviation'] => '0.00');
+          }
+        }
+
+        $arr[] = [
+          'JumlahBintang' => $JumlahBintang,
+          'Name' => $Name,
+          'Desc' => $Desc,
+          'TuitionFee' => $detail,
+        ];
+
+      }
+
+      return $arr;
+     }
+
      public function getDataCalonMhsTuitionFee($limit, $start,$FormulirCode)
      {
       if($FormulirCode != '%') {
@@ -1855,6 +1896,10 @@ class M_admission extends CI_Model {
       $getDiscount = $this->m_master->showData_array('db_finance.discount');
       $getBeasiswa = $this->m_master->showData_array('db_admission.register_dsn_type_m');
       $getMaxCicilan = $this->m_master->showData_array('db_admission.cfg_cicilan');
+
+      // get Bintang
+       $getBintangMaster  =  $this->m_master->showData_array('db_finance.tuition_fee_schema');
+
       for ($i=0; $i < count($query); $i++) {
 
         // get SKS
@@ -1876,6 +1921,7 @@ class M_admission extends CI_Model {
                }
 
             }
+
           $Attachment = '';
           // get All Files Uploaded
              $Document = $this->getDataDokumentRegister($query[$i]['ID_register_formulir']);
@@ -1887,6 +1933,9 @@ class M_admission extends CI_Model {
                if (count($dataGet) != 0) {
                 $NoteRev = $dataGet[$arr_Count]['Note'];
                }
+
+        // get schema payment
+          $arrSchema = $this->excecuteSchemaTuitionFee($query[$i]['ID_program_study'],$getBintangMaster,$Credit);
 
         if ($query[$i]['status1'] == 'Rapor') {
           // check rangking
@@ -1920,6 +1969,7 @@ class M_admission extends CI_Model {
               'Email' => $query[$i]['Email'],
               'getMaxCicilan' => $getMaxCicilan,
               'NoteRev' => $NoteRev,
+              'SchemaPayment' => $arrSchema,
             );
         }
         else
@@ -1941,6 +1991,7 @@ class M_admission extends CI_Model {
               'Email' => $query[$i]['Email'],
               'getMaxCicilan' => $getMaxCicilan,
               'NoteRev' => $NoteRev,
+              'SchemaPayment' => $arrSchema,
             );
         }
 
@@ -1950,21 +2001,26 @@ class M_admission extends CI_Model {
 
      }
 
-     public function getPaymentType_Cost($ID_program_study)
+     public function getPaymentType_Cost($ID_program_study,$selectedBintang = NULL) // get master tagihan
      {
       $this->load->model('master/m_master');
       // getTA
       $Q_ta = $this->m_master->showData_array('db_admission.set_ta');
-      // $year = date('Y');
       $year = $Q_ta[0]['Ta'];
+
+      $whereBintang = '';
+      if ($selectedBintang !== NULL) {
+        $whereBintang  = ' and a.Pay_Cond = '.$selectedBintang;
+      }
+
       $sql = 'select a.PTID,a.ProdiID,a.ClassOf,a.Cost,b.Description,b.Abbreviation from db_finance.tuition_fee as a join db_finance.payment_type as b
-              on a.PTID = b.ID where a.ProdiID = "'.$ID_program_study.'" and a.ClassOf = '.$year.'
+              on a.PTID = b.ID where a.ProdiID = "'.$ID_program_study.'" and a.ClassOf = '.$year.' '.$whereBintang.'
               order by b.ID asc';
       $query=$this->db->query($sql, array())->result_array();
       return $query;
      }
 
-     public function getPaymentType_Cost_created($ID_register_formulir)
+     public function getPaymentType_Cost_created($ID_register_formulir) // get tagihan yg telah dibuat
      {
       $sql = 'select a.*,b.Description,b.Abbreviation,c.Pay_tuition_fee,
       c.Discount from db_finance.payment_admisi as c join db_finance.payment_type as b on c.PTID = b.ID join db_finance.register_admisi as a on c.ID_register_formulir = a.ID_register_formulir where a.ID_register_formulir = ?';
