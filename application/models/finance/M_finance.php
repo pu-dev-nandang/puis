@@ -1066,11 +1066,14 @@ class M_finance extends CI_Model {
              $getPaymentType_Cost = $this->getPaymentType_Cost_created_calon_mhs($query[$i]['ID_register_formulir']);
              $arr_temp2 = array();
              for ($k=0; $k < count($getPaymentType_Cost); $k++) {
-               // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
+               
+               // check meiliki potongan lain atau tidak
+              $getPotonganLain =  $this->m_master->caribasedprimary('db_finance.payment_admisi_potongan_lain','ID_payment_admisi',$getPaymentType_Cost[$k]['ID']);
+
                $arr_temp2 = $arr_temp2 + array(
-                 // $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
                  $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
                  'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount'],
+                 'PotonganLain-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPotonganLain,
                );
              }
 
@@ -1095,7 +1098,7 @@ class M_finance extends CI_Model {
                  }
 
               // cicilan
-              $Cicilan = $this->checkPayment_admisi($query[$i]['ID_register_formulir']);
+              // $Cicilan = $this->checkPayment_admisi($query[$i]['ID_register_formulir']); // nggk ke pake disini
 
 
          if ($query[$i]['status1'] == 'Rapor') {

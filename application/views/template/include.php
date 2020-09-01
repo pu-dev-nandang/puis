@@ -2815,6 +2815,17 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    const setBintangFinance = (JmlBintang) => {
+        let html = '';
+        let str = '';
+        for (var i = 1; i <= JmlBintang; i++) {
+           str += '*';
+        }
+
+        html = '<span style = "color:red;">'+str+'</span>';
+        return html;
+    };
+
 
     /*ADDED BY FEBRI @ FEB 2020*/
     function loadSelectOptionCountry(element,selected) {

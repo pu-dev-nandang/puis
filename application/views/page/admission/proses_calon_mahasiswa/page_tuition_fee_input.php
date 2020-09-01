@@ -82,7 +82,7 @@
 			}	
 			var cost = '<input class="form-control costInput getDom" id="cost_'+dataFilter['ID_register_formulir']+'" id-formulir = "'+dataFilter['ID_register_formulir']+'" value = "'+value_cost+'" payment-type = "'+payment_type[j]['Abbreviation']+'" payment-type_ID = "'+payment_type[j]['ID']+'" readonly style = "color:blue;">';
 
-			var btnSetPotonganLain = '<button class = "btn btn-sm btn-primary btnSetPotonganLain" id-formulir = "'+dataFilter['ID_register_formulir']+'" payment-type = "'+payment_type[j]['Abbreviation']+'" payment-type_ID = "'+payment_type[j]['ID']+'" style = "color: #151414;background-color: #86b746;">Set Potongan Lain</button>';
+			var btnSetPotonganLain = '<div class = "row contentPotonganLain"><div class = "col-md-12"><button class = "btn btn-sm btn-primary btnSetPotonganLain" id-formulir = "'+dataFilter['ID_register_formulir']+'" payment-type = "'+payment_type[j]['Abbreviation']+'" payment-type_ID = "'+payment_type[j]['ID']+'" style = "color: #151414;background-color: #86b746;width:100%;">Set Potongan Lain</button></div></div>';
 
 			isi_payment += '<td>'+selecTOption+'<div class = "form-group"><label style = "color:green;">Harga</label> '+cost+'</div>'+btnSetPotonganLain+'</td>';
 		}
@@ -241,6 +241,14 @@
 		itsme.closest('tr').find('td:eq(3)').after(isi_payment);
 		$('.costInput').maskMoney({thousands:'.', decimal:',', precision:2,allowZero: true});
 		$('.costInput').maskMoney('mask', '9894');
+
+		// clear data potongan lain
+		dataInputPotonganLain = dataInputPotonganLain.filter(x => {
+		    if (x.ID_register_formulir === id_formulir) {
+		        return false;
+		    }
+		    return true;
+		});
 
 	})
 

@@ -11,7 +11,7 @@
                     <div id="panel_web" class="" style="padding:30px;padding-top:0px;">
                         <ul class="nav nav-tabs">
                             <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee/1">Input Tuition Fee</a></li>
-                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_delete/1">Delete Tuition Fee</a></li>
+                            <!-- <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_delete/1">Delete Tuition Fee</a></li> -->
                             <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_approved/1">Tuition Fee Approved</a></li>
                         </ul>
                         <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
@@ -337,8 +337,12 @@
                         var getDokumen = $('#getDokumen'+Uniformvaluee).val();
                         var ket = $('#ket'+Uniformvaluee).val();
                         var pt = payment_type.split('-');
+
                         if (pt.length == 1) {
                             var Discount = $("#"+payment_type+Uniformvaluee).val();
+                            // get bintang
+                            var Pay_Cond =  $('.selectBintang[id-formulir="'+Uniformvaluee+'"]').val();
+                            // console.log(Pay_Cond);return;
                             if (id_formulir == Uniformvaluee) {
                                 arrTemp = {
                                         id_formulir : id_formulir,
@@ -349,7 +353,8 @@
                                         getDokumen : getDokumen,
                                         ket : ket,
                                         Nama : Nama,
-                                        Discount : Discount
+                                        Discount : Discount,
+                                        Pay_Cond : Pay_Cond,
                                 };
                                 arrcheklist.push(arrTemp);
                             }
@@ -447,6 +452,7 @@
             arrTemp['getBeasiswa'] = data[i]['getBeasiswa'];
             arrTemp['ket'] = data[i]['ket'];
             arrTemp['Nama'] = data[i]['Nama'];
+            arrTemp['Pay_Cond'] = data[i]['Pay_Cond'];
             for (var j = i + 1; j < data.length; j++) {
                 if (data[i]['id_formulir'] == data[j]['id_formulir']) {
                     arrTemp[data[j]['payment_type']] = data[j]['valuee'];
@@ -465,7 +471,7 @@
 
     function domHTMLCicilan(data)
     {
-        // console.log(data);
+        // console.log(data);return;
         //console.log(payment_type);
         //console.log(max_cicilan);
         max_cicilanString = max_cicilan[0]['max_cicilan'];
@@ -700,8 +706,10 @@
                 var url = base_url_js + "admission/proses-calon-mahasiswa/set_input_tuition_fee_submit";
                 var data = {
                     data1 : arrTemp,
-                    data2 : dataa
+                    data2 : dataa,
+                    dataInputPotonganLain : dataInputPotonganLain,
                 }
+
                 var token = jwt_encode(data,"UAP)(*");
                 $.post(url,{token:token},function (data_json) {
                     // jsonData = data_json;
@@ -716,6 +724,7 @@
                         $('.uniform[value="'+dataa[0]['id_formulir']+'"]').remove();
                         toastr.success('Data berhasil disimpan', 'Success!');
                         $('tr[id="id_formulir'+dataa[0]['id_formulir']+'"]').remove();
+                        dataInputPotonganLain = [];
                     }
 
                 }).done(function() {
@@ -884,12 +893,16 @@
             return str;
         },
 
-        savePotonganLain : (itsme) => {
+        savePotonganLain : async (itsme) => {
             let data = {};
             let tempArr = [];
             let obj = {};
             let booleanCheck = true;
             let x =1;
+            const ID_register_formulir = $('#contentPotongan').attr('id_formulir');
+            const PTID = $('#contentPotongan').attr('ptid');
+            const PTName = $('#contentPotongan').attr('ptname');
+            const selectorTD = $('.btnSetPotonganLain[id-formulir="'+ID_register_formulir+'"][payment-type_id="'+PTID+'"][payment-type="'+PTName+'"]').closest('td');
             $('#contentPotongan').find('.frmInput').each(function(e){
                 const name = $(this).attr('name');
                 const rule = $(this).attr('rule');
@@ -933,16 +946,121 @@
                 return;
             }
 
+            loading_button2(itsme);
+
             data = {
-                ID_register_formulir : $('#contentPotongan').attr('id_formulir'),
-                PTID : $('#contentPotongan').attr('ptid'),
-                PTName : $('#contentPotongan').attr('ptname'),
+                ID_register_formulir : ID_register_formulir,
+                PTID : PTID,
+                PTName : PTName,
                 data : tempArr
             }
 
-            console.log(dataInputPotonganLain)
+            // update value harga ke harga sebelumnya
+                const dataOld =  dataInputPotonganLain.filter(x => {
+                    if (x.ID_register_formulir === data.ID_register_formulir && x.PTID === data.PTID ) {
+                        return true;
+                    }
 
-            
+                    return false;
+                });
+
+
+                potonganLainInput.updateHargaColumn(selectorTD,dataOld,'prev');
+
+
+            // hapus data old
+            dataInputPotonganLain = dataInputPotonganLain.filter(x => {
+                // console.log(data)
+                // console.log(x)
+                if (x.ID_register_formulir === data.ID_register_formulir && x.PTID === data.PTID ) {
+                    return false;
+                }
+
+                return true;
+            });
+
+             dataInputPotonganLain.push(data);
+
+             const dataUpdate = dataInputPotonganLain.filter(x => {
+                 if (x.ID_register_formulir === data.ID_register_formulir && x.PTID === data.PTID ) {
+                     return true;
+                 }
+
+                 return false;
+             });
+
+             // update value harga
+            potonganLainInput.updateHargaColumn(selectorTD,dataUpdate,'next');
+
+             $('#GlobalModalLarge').modal('hide');
+
+        },
+
+        updateHargaColumn : (selector,dataparam,event) => {
+            let totalParam = 0;
+            let x = findAndReplace(selector.find('input').val(),',00','');
+            x = findAndReplace(x, '.', '');
+            let valueInput = parseInt(x);
+            let ID_register_formulir = selector.find('input').attr('id-formulir');
+            let PTID = selector.find('input').attr('payment-type_id');
+
+            let rsValue = 0;
+            for (var i = 0; i < dataparam.length; i++) {
+                const getDataPotongan = dataparam[i].data;
+                for (var j = 0; j < getDataPotongan.length; j++) {
+                    totalParam += parseInt(getDataPotongan[j].DiscountValue);
+                }
+            }
+
+            if (event == 'next') {
+                // console.log('Next => ' + valueInput);
+                rsValue =  valueInput - totalParam;
+                if (rsValue <= 0) {
+                     dataInputPotonganLain = dataInputPotonganLain.filter(x => {
+                         if (x.ID_register_formulir === ID_register_formulir && x.PTID === PTID ) {
+                             return false;
+                         }
+                         return true;
+                     });
+
+
+                    selector.find('.contentPotonganLain').find('.viewPotonganLain').remove();
+                    toastr.info('Potongan melebihi harga, data akan di reset');
+                    return;
+                }
+                else
+                {
+                    let htmlviewPotonganLain = '<div class = "col-md-12 viewPotonganLain" style = "border: 2px solid #eee;margin-left:10px;margin-right:10px;width:80%;color:blue;">Potongan Lain';
+                    const dataGet = dataInputPotonganLain.filter(x => {
+                        if (x.ID_register_formulir === ID_register_formulir && x.PTID === PTID ) {
+                            return true;
+                        }
+
+                        return false;
+                    })[0].data;
+
+                    for (var i = 0; i < dataGet.length; i++) {
+                        htmlviewPotonganLain += '<li>'+dataGet[i].DiscountName+' : '+formatRupiah(dataGet[i].DiscountValue)+'</li>';
+                    }
+
+                    htmlviewPotonganLain += '</div>';
+
+                    selector.find('.contentPotonganLain').append(htmlviewPotonganLain);
+                }
+            }
+            else
+            {
+                // reset
+                selector.find('.contentPotonganLain').find('.viewPotonganLain').remove();
+                rsValue =  valueInput + totalParam;
+            }
+
+            rsValue = rsValue.toFixed(2);
+            // console.log(rsValue);
+
+            selector.find('input').val(rsValue);
+            selector.find('input').maskMoney({thousands:'.', decimal:',', precision:2,allowZero: true});
+            selector.find('input').maskMoney('mask', '9894');
 
         }
     };
