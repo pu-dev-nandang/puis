@@ -3178,7 +3178,12 @@ class M_admission extends CI_Model {
     public function getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun,$FormulirType = '%',$StatusPayment = '%')
     {
       $AddWhere = '';
-      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") and CekIntake = "Intake" ';
+      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") and CekIntake = "Intake" and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+              join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+              join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+              join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+              join db_admission.register as reg on reg.ID = rve.RegisterID
+              where reg.SetTa = "'.$reqTahun.'" ) ';
       if ($FormulirType != '%') {
          $AddWhere .= ' and a.StatusReg = '.$FormulirType.' ';
       }
@@ -3262,7 +3267,13 @@ class M_admission extends CI_Model {
                   ) as chklunas,
                 (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
                 ,xx.Name as NameSales,
-                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref
+                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,
+                if(
+                  (select count(*) as total from db_finance.payment_pre where `Status` = 1 and ID_register_formulir = e.ID ) > 0,"Intake","Not Intake"
+                ) as CekIntake,
+                if(
+                  (select count(*) as total from db_finance.register_refund where ID_register_formulir = e.ID ) > 0,"Refund",""
+                ) as CekRefund
                 from db_admission.register as a
                 join db_admission.school as b
                 on a.SchoolID = b.ID
@@ -3284,7 +3295,7 @@ class M_admission extends CI_Model {
                 on e.ID = xy.ID_register_formulir
                 LEFT JOIN db_admission.register_dsn_type_m as xq
                 on xq.ID = xy.TypeBeasiswa
-                where a.SetTa = "'.$reqTahun.'" '.$AddWhere.'
+                where a.SetTa = "'.$reqTahun.'"  '.$AddWhere.'
               ) ccc';
       if ($StatusPayment != '%') {
         if ($StatusPayment == '-100') {
@@ -3293,6 +3304,17 @@ class M_admission extends CI_Model {
         }
         elseif ($StatusPayment == '100') {
            $AddWhere2 .= ' and FormulirCode != "" or FormulirCode is not NULL  ';
+        }
+        elseif($StatusPayment == 'Intake')
+        {
+            $AddWhere2 .= ' and CekIntake = "Intake" and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+              join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+              join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+              join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+              join db_admission.register as reg on reg.ID = rve.RegisterID
+              where reg.SetTa = "'.$reqTahun.'"
+
+            ) ';
         }
         else{
           $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
@@ -4026,7 +4048,14 @@ class M_admission extends CI_Model {
                         LEFT join db_academic.program_study as d on e.ID_program_study = d.ID
                         left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                          where a.SetTa = "'.($Year-1).'"
-                        ) ccc where ID_program_study = ? and C_bayar > 0';
+                        ) ccc where ID_program_study = ? and C_bayar > 0
+                        and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+              join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+              join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+              join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+              join db_admission.register as reg on reg.ID = rve.RegisterID
+              where SetTa = "'.($Year-1).'" and rr.UpdateAt <= "'.$DateFiltering2.'" )
+                        ';
                         $query=$this->db->query($sql, array($ProdiID))->result_array();
                          $total = $query[0]['total'];
                          $c1 = $total;
@@ -4058,7 +4087,14 @@ class M_admission extends CI_Model {
                         LEFT join db_academic.program_study as d on e.ID_program_study = d.ID
                         left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                          where a.SetTa = "'.$Year.'"
-                        ) ccc where ID_program_study = ? and C_bayar > 0';
+                        ) ccc where ID_program_study = ? and C_bayar > 0
+                                  and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+                        join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+                        join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+                        join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+                        join db_admission.register as reg on reg.ID = rve.RegisterID
+                        where SetTa = "'.$Year.'" and rr.UpdateAt <= "'.$DateFiltering.'" )
+                        ';
 
                         $query=$this->db->query($sql, array($ProdiID))->result_array();
                         $total = $query[0]['total'];
@@ -4090,7 +4126,15 @@ class M_admission extends CI_Model {
                           LEFT join db_academic.program_study as d on e.ID_program_study = d.ID
                           left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                            where a.SetTa = "'.$Year.'"
-                          ) ccc where ID_program_study = ? and C_bayar > 0';
+                          ) ccc where ID_program_study = ? and C_bayar > 0
+                                    and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+                          join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+                          join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+                          join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+                          join db_admission.register as reg on reg.ID = rve.RegisterID
+                          where SetTa = "'.$Year.'" and rr.UpdateAt <= DATE_SUB("'.$DateFiltering.'", INTERVAL 7 DAY) )
+
+                          ';
 
                           $query=$this->db->query($sql, array($ProdiID))->result_array();
                           $total = $query[0]['total'];
@@ -4487,6 +4531,149 @@ class M_admission extends CI_Model {
       }
 
       return $rs;
+    }
+
+    private function getCountloadRefundData($ClassOf,$requestData){
+     return  $q =  $this->db->query(
+        'select count(*) as total from (
+            select yy.* from (
+                select a.ID as RegisterID,a.Name,a.SchoolID,a.Phone,b.SchoolName,a.Email,a.RegisterAT,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,
+                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,a.StatusReg,
+                if(
+                  (select count(*) as total from db_finance.payment_pre where `Status` = 1 and ID_register_formulir = e.ID ) > 0,"Intake","Not Intake"
+                ) as CekIntake
+                from db_admission.register as a
+                LEFT join db_admission.school as b
+                on a.SchoolID = b.ID
+                LEFT JOIN db_admission.register_verification as z
+                on a.ID = z.RegisterID
+                LEFT JOIN db_admission.register_verified as c
+                on z.ID = c.RegVerificationID
+                LEFT JOIN db_admission.register_formulir as e
+                on c.ID = e.ID_register_verified
+                LEFT join db_academic.program_study as d
+                on e.ID_program_study = d.ID
+                LEFT join db_admission.register_rangking as f
+                on e.ID = f.ID_register_formulir
+                left join db_admission.sale_formulir_offline as xz
+                  on c.FormulirCode = xz.FormulirCodeOffline
+                LEFT JOIN db_employees.employees as xx
+                on xz.PIC = xx.NIP
+                LEFT JOIN db_finance.register_admisi as xy
+                on e.ID = xy.ID_register_formulir
+                LEFT JOIN db_admission.register_dsn_type_m as xq
+                on xq.ID = xy.TypeBeasiswa
+                where a.SetTa = "'.$ClassOf.'"
+            ) as yy
+            join db_finance.register_refund as rr on yy.ID_register_formulir = rr.ID_register_formulir
+            join db_employees.employees as EMP on rr.UpdateBy = EMP.NIP
+            where yy.CekIntake = "Intake" and 
+            (
+              yy.Name LIKE "'.$requestData['search']['value'].'%" or yy.NamePrody LIKE "%'.$requestData['search']['value'].'%" or yy.FormulirCode LIKE "'.$requestData['search']['value'].'%"      
+                      or yy.No_Ref LIKE "'.$requestData['search']['value'].'%"
+            )
+         )xx;
+
+        '
+      )->result_array()[0]['total'];
+    }
+
+    public function loadRefundData($ClassOf,$requestData){
+      $this->load->model('finance/m_finance');
+      $No = $requestData['start'] + 1;
+      $totalData = $this->getCountloadRefundData($ClassOf,$requestData);
+
+      $sql = 'select yy.*,rr.Price as RefundPrice,rr.Desc as RefundDesc,EMP.Name as NameEMP_by,rr.UpdateAt from (
+              select a.ID as RegisterID,a.Name,a.SchoolID,a.Phone,b.SchoolName,a.Email,a.RegisterAT,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
+              xq.DiscountType,
+              if(f.Rangking > 0 ,f.Rangking,"-") as Rangking,
+              if(
+                  (select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = e.ID limit 1) = 0 ,
+                      if((select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID limit 1)
+                           > 0 ,"Lunas","-"
+                        )
+                      ,
+                      "Belum Lunas"
+                ) as chklunas,
+              (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
+              ,xx.Name as NameSales,
+              if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,a.StatusReg,
+              if(
+                (select count(*) as total from db_finance.payment_pre where `Status` = 1 and ID_register_formulir = e.ID ) > 0,"Intake","Not Intake"
+              ) as CekIntake
+              from db_admission.register as a
+              LEFT join db_admission.school as b
+              on a.SchoolID = b.ID
+              LEFT JOIN db_admission.register_verification as z
+              on a.ID = z.RegisterID
+              LEFT JOIN db_admission.register_verified as c
+              on z.ID = c.RegVerificationID
+              LEFT JOIN db_admission.register_formulir as e
+              on c.ID = e.ID_register_verified
+              LEFT join db_academic.program_study as d
+              on e.ID_program_study = d.ID
+              LEFT join db_admission.register_rangking as f
+              on e.ID = f.ID_register_formulir
+              left join db_admission.sale_formulir_offline as xz
+                on c.FormulirCode = xz.FormulirCodeOffline
+              LEFT JOIN db_employees.employees as xx
+              on xz.PIC = xx.NIP
+              LEFT JOIN db_finance.register_admisi as xy
+              on e.ID = xy.ID_register_formulir
+              LEFT JOIN db_admission.register_dsn_type_m as xq
+              on xq.ID = xy.TypeBeasiswa
+              where a.SetTa = "'.$ClassOf.'"
+            ) yy
+            join db_finance.register_refund as rr on yy.ID_register_formulir = rr.ID_register_formulir
+            join db_employees.employees as EMP on rr.UpdateBy = EMP.NIP
+          ';
+
+        $sql.= 'where yy.CekIntake = "Intake" and 
+            (
+              yy.Name LIKE "'.$requestData['search']['value'].'%" 
+              or yy.NamePrody LIKE "%'.$requestData['search']['value'].'%" 
+              or yy.FormulirCode LIKE "'.$requestData['search']['value'].'%"      
+              or yy.No_Ref LIKE "'.$requestData['search']['value'].'%"
+            )
+                ';
+        $sql.= ' ORDER BY RegisterID DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' '; 
+
+        $query = $this->db->query($sql)->result_array();
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+            $nestedData[] = $No;
+            $nestedData[] = [
+              'No_Ref' => $row['No_Ref'],
+              'FormulirCode' => $row['FormulirCode'],
+              'Name' => $row['Name'],
+              'Email' => $row['Email'],
+            ];
+            $ID_register_formulir =  $row['ID_register_formulir'];
+            $__Payment = function($ID_register_formulir){
+              $d = $this->m_finance->checkPayment_admisi($ID_register_formulir);
+              return $d;
+            };
+
+            $nestedData[] = $__Payment($ID_register_formulir);
+            $nestedData[] = $row['RefundPrice'];
+            $nestedData[] = $row['RefundDesc'];
+            $nestedData[] = $row['NameEMP_by'];
+            $nestedData[] = $row['UpdateAt'];
+            $nestedData[] = [];
+            $data[] = $nestedData;
+            $No++;
+
+        }
+
+        return $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        
     }
 
 }

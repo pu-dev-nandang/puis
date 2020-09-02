@@ -3446,6 +3446,7 @@ class C_api3 extends CI_Controller {
         ))->result_array();
 
         if(count($data)>0){
+            $arrCertificateType = ['Profesional','Profesi','Industri','Kompetensi'];
             for($i=0;$i<count($data);$i++){
 
                 // Total Employees
@@ -3461,6 +3462,25 @@ class C_api3 extends CI_Controller {
 
 
                 $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti;
+
+                for ($y=0; $y < count($arrCertificateType) ; $y++) { 
+                   $data[$i]['Certificate_'.$arrCertificateType[$y]] = [];
+                }
+
+                for ($x=0; $x < count($dataEmpCerti); $x++) { 
+                   for ($z=0; $z < count($arrCertificateType); $z++) { 
+                       $dt = $this->db->query(
+                           'select a.*,"'.$dataEmpCerti[$x]['Name'].'" as NameDosen, "'.$dataEmpCerti[$x]['NIDN'].'" as NIDN from db_employees.employees_certificate as a where a.NIP = "'.$dataEmpCerti[$x]['NIP'].'" 
+                            and a.StatusEdit = 1 and a.Certificate = "'.$arrCertificateType[$z].'"
+
+                           '
+                       )->result_array();
+
+                       if (count($dt) > 0) {
+                           $data[$i]['Certificate_'.$arrCertificateType[$z]] = $data[$i]['Certificate_'.$arrCertificateType[$z]] + $dt;
+                       }
+                   }
+                }
 
             }
         }

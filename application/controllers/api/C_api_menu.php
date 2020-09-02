@@ -183,6 +183,13 @@ class C_api_menu extends CI_Controller {
                 $nestedData = array();
                 $row = $query[$i];
 
+
+                // Total link
+                $dataTotalLink = $this->db->query('SELECT COUNT(*) AS Total 
+                                            FROM db_it.surv_survey_detail 
+                                            WHERE QuestionID = "'.$row['ID'].'" ')
+                    ->result_array()[0]['Total'];
+
                 $tokenID = $this->jwt->encode(array('ID'=>$row['ID']),'UAP)(*');
 
                 $btnAct = '<div class="btn-group">
@@ -190,18 +197,28 @@ class C_api_menu extends CI_Controller {
                             <i class="fa fa-pencil"></i> <span class="caret"></span>
                           </button>
                           <ul class="dropdown-menu">
-                            <li><a href="#">Add to survey</a></li>
                             <li><a href="'.base_url('survey/create-question?tkn='.$tokenID).'" target="_blank">Edit</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="#">Remove</a></li>
+                            <li><a href="javascript:void(0)" data-id="'.$row['ID'].'" class="removeThisQuestion">Remove</a></li>
                           </ul>
                         </div>';
 
+                $showBtnAct = ($dataTotalLink<=0)
+                    ? $btnAct : '-';
+
+
+                $isRequied = ($row['IsRequired']=='1')
+                    ? '<span class="label label-danger">Required</span>'
+                    : '<span class="label label-warning">Optional</span>';
+
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$row['Question'].'</div>';
-                $nestedData[] = $btnAct;
+                $nestedData[] = '<a href="javascript:void(0);" 
+                                    class="showLinkSurvey" data-id="'.$row['ID'].'">'.$dataTotalLink.'</a>';
+                $nestedData[] = $showBtnAct;
                 $nestedData[] = '<div>'.$row['QuestionCategory'].'<br/>
-                                    <span class="label label-success">'.$row['QuestionType'].'</span></div>';
+                                    <span class="label label-success">'.$row['QuestionType'].'</span>
+                                    '.$isRequied.'</div>';
 
                 $data[] = $nestedData;
                 $no++;
@@ -216,6 +233,59 @@ class C_api_menu extends CI_Controller {
             );
             echo json_encode($json_data);
 
+
+        }
+
+        else if($data_arr['action']=='removeQuestion'){
+
+            $QuestionID = $data_arr['ID'];
+
+            // Cek apakah pertanyaan di gunakan dalam survey ?
+            $dataCk = $this->db->query('SELECT COUNT(*) AS Total 
+                                            FROM db_it.surv_survey_detail 
+                                            WHERE QuestionID = "'.$QuestionID.'" ')
+                            ->result_array()[0]['Total'];
+
+            $Status = 0;
+
+            if($dataCk<=0){
+
+                $dataQuestion = $this->db->query('SELECT sq.SummernoteID FROM db_it.surv_question sq 
+                                        WHERE sq.ID = "'.$QuestionID.'" ')
+                    ->result_array();
+
+                if(count($dataQuestion)>0){
+                    for($i=0;$i<count($dataQuestion);$i++){
+
+                        $SummernoteID = $dataQuestion[$i]['SummernoteID'];
+
+                        $this->m_rest
+                            ->checkImageSummernote('delete',$SummernoteID,
+                                'db_it.surv_question','Question');
+                    }
+                }
+
+                $this->db->where('ID', $QuestionID);
+                $this->db->delete('db_it.surv_question');
+                $Status = 1;
+            }
+
+            return print_r(json_encode(array('Status' => $Status)));
+
+        }
+
+        else if($data_arr['action']=='showLinkQuestion'){
+
+            $QuestionID = $data_arr['ID'];
+
+            // Cek apakah pertanyaan di gunakan dalam survey ?
+            $data = $this->db->query('SELECT ss.Title, ss.StartDate, ss.EndDate, ss.Status  
+                                            FROM db_it.surv_survey_detail ssd
+                                            LEFT JOIN db_it.surv_survey ss ON (ss.ID = ssd.SurveyID) 
+                                            WHERE ssd.QuestionID = "'.$QuestionID.'" ')
+                ->result_array();
+
+            return print_r(json_encode($data));
 
         }
 
@@ -322,13 +392,30 @@ class C_api_menu extends CI_Controller {
 
             $SurveyID = $data_arr['SurveyID'];
 
-            $data = $this->db->query('SELECT sq.Question, sqc.Description, ssd.Queue FROM db_it.surv_survey_detail ssd 
+            $data = $this->db->query('SELECT ssd.ID, sq.ID AS QuestionID , sq.Question,   
+                                            sqc.Description AS Category, ssd.Queue
+                                            FROM db_it.surv_survey_detail ssd
                                             LEFT JOIN db_it.surv_question sq ON (sq.ID = ssd.QuestionID)
                                             LEFT JOIN db_it.surv_question_category sqc ON (sqc.ID = sq.QCID)
                                             WHERE ssd.SurveyID = "'.$SurveyID.'" ORDER BY ssd.Queue ASC')->result_array();
 
             return print_r(json_encode($data));
 
+        }
+        else if($data_arr['action']=='removeQUestionFromSurvey'){
+
+            $this->db->where('ID',$data_arr['ID']);
+            $this->db->delete('db_it.surv_survey_detail');
+
+            return print_r(1);
+
+        }
+
+        else if($data_arr['action']=='updateQueueQuestion'){
+            $this->db->where('ID', $data_arr['ID']);
+            $this->db->update('db_it.surv_survey_detail'
+                ,array('Queue' => $data_arr['Queue']));
+            return print_r(1);
         }
 
         else if($data_arr['action']=='updateDataQuestion'){
@@ -338,17 +425,41 @@ class C_api_menu extends CI_Controller {
 
             if($ID!=''){
                 // Update
-                $dataQuestion['UpdatedBy'] = $data_arr['NIP'];
-                $dataQuestion['UpdatedAt'] = $this->m_rest->getDateTimeNow();
-                $this->db->where('ID', $ID);
-                $this->db->update('db_it.surv_question',$dataQuestion);
-            } else {
+                // Cek apakah pertanyaan sudah di assign ke dalam survey atau blm
+                $dataCk = $this->db->query('SELECT COUNT(*) AS Total 
+                                            FROM db_it.surv_survey_detail 
+                                            WHERE QuestionID = "'.$ID.'" ')
+                    ->result_array()[0]['Total'];
+
+                if($dataCk<=0) {
+                    $dataQuestion['UpdatedBy'] = $data_arr['NIP'];
+                    $dataQuestion['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->where('ID', $ID);
+                    $this->db->update('db_it.surv_question',$dataQuestion);
+                    $Status = 1;
+                } else {
+                    $Status = 0;
+                }
+
+            }
+            else {
                 // Insert
                 $dataQuestion['CreatedBy'] = $data_arr['NIP'];
                 $this->db->insert('db_it.surv_question',$dataQuestion);
+
+                $Status = 1;
             }
 
-            return print_r(1);
+            if($Status==1 || $Status=='1'){
+
+                $SummernoteID = $dataQuestion['SummernoteID'];
+                // Cek image in summernote
+                $this->m_rest
+                    ->checkImageSummernote('insert',$SummernoteID,'db_it.surv_question','Question');
+
+            }
+
+            return print_r(json_encode(array('Status'=> $Status)));
         }
         else if($data_arr['action']=='updateSurvey'){
 

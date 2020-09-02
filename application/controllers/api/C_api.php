@@ -758,25 +758,20 @@ class C_api extends CI_Controller {
 
         $db_ = 'ta_'.$dataYear;
 
-        $dataWhere = ($dataProdiID != '' && $dataProdiID != null && !empty($dataProdiID)) ? 'WHERE s.ProdiID = "'.$dataProdiID.'"' : '';
+        $dataWhere = '';
         $arryWhere = array('ProdiID' => $dataProdiID);
-        if($dataStatus!='' && $dataStatus!=null){
-            if ($dataProdiID != '' && $dataProdiID != null && !empty($dataProdiID) ) {
-                $arryWhere = array(
-                    'ProdiID' => $dataProdiID,
-                    'StatusStudentID' => $dataStatus
-                );
-                $dataWhere = 'WHERE s.ProdiID = "'.$dataProdiID.'" AND s.StatusStudentID = "'.$dataStatus.'" ';
-            }
-            else
-            {
-                $arryWhere = array(
-                    'StatusStudentID' => $dataStatus
-                );
-                $dataWhere = 'WHERE  s.StatusStudentID = "'.$dataStatus.'" ';
-            }
 
+        if($dataStatus!='' && $dataStatus!=null){
+            $WhereOrAnd = (empty($dataWhere)) ? ' where ' : ' and ';
+            $dataWhere = $WhereOrAnd.' s.StatusStudentID = "'.$dataStatus.'" ';
         }
+
+        if ($dataProdiID != '' && $dataProdiID != null && !empty($dataProdiID) ) {
+            $WhereOrAnd = (empty($dataWhere)) ? ' where ' : ' and ';
+            $dataWhere = $WhereOrAnd.' s.ProdiID = "'.$dataProdiID.'" ';
+        }
+
+        // print_r($dataWhere);die();
 
         // -------------total data---------- //
         $sqlSelectData  = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, ps.Name AS ProdiNameInd,s.StatusStudentID,
@@ -800,8 +795,8 @@ class C_api extends CI_Controller {
                           LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
                           ';
         if( !empty($requestData['search']['value']) ) {
-            $dataWhere = (empty($dataWhere)) ? ' where ' : ' and ';
-            $sql.= '  '.$dataWhere.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
+            $WhereOrAnd = (empty($dataWhere)) ? ' where ' : ' and ';
+            $sql.= '  '.$dataWhere.' '.$WhereOrAnd.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
             $sql.= ' OR asx.FormulirCode LIKE "'.$requestData['search']['value'].'%" ';
@@ -6326,7 +6321,25 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='readCertificateLec_request'){
+                $rs = ['dataApprove' => [],'dataRequest' => [] ];
+                $data = $this->db->get_where('db_employees.employees_certificate',array(
+                    'NIP' => $data_arr['NIP']
+                ))->result_array();
+                $rs['dataApprove'] = $data;
+                // get certificate request di log field and adding
+                    $dataEMP = $this->db->get_where('db_employees.employees',array(
+                        'NIP' => $data_arr['NIP']
+                    ))->result_array()[0];
 
+
+                    if (!empty($dataEMP['Logs'])) {
+                        $jsonExtract = json_decode($dataEMP['Logs'],true);
+                        $rs['dataRequest']= $jsonExtract['certificate_request'];
+                    }
+
+                return print_r(json_encode($rs));
+            }
             else if($data_arr['action']=='addEmployees'){
                 $rs = array('msg' => '','status' => 1);
                 $formInsert = (array) $data_arr['formInsert'];
