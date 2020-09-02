@@ -333,6 +333,7 @@ class M_finance extends CI_Model {
     $sql = 'select * from db_finance.payment_pre where ID_register_formulir = ? order by ID asc';
     $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
     $this->load->model('admission/m_admission');
+    $dataTuitionFee =  $this->m_admission->tuitionFeeIntake_ALL($ID_register_formulir);
     $getFormulirCode = $this->m_admission->getDataPersonal($ID_register_formulir);
     $FormulirCode = $getFormulirCode[0]['FormulirCode'];
     // find formulir code pada db_admission.to_be_mhs
@@ -357,6 +358,8 @@ class M_finance extends CI_Model {
       }
 
     }
+
+    $arr_result['dataTuitionFee'] = $dataTuitionFee;
 
     return $arr_result;
    }
@@ -1060,9 +1063,13 @@ class M_finance extends CI_Model {
        $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
        // print_r($query);die();
        $this->load->model('master/m_master');
+       $this->load->model('admission/m_admission');
        for ($i=0; $i < count($query); $i++) {
          $DiskonSPP = 0;
          // get Price
+
+              // $arr_temp2 = $this->m_admission->tuitionFeeIntake_ALL($query[$i]['ID_register_formulir']);
+         
              $getPaymentType_Cost = $this->getPaymentType_Cost_created_calon_mhs($query[$i]['ID_register_formulir']);
              $arr_temp2 = array();
              for ($k=0; $k < count($getPaymentType_Cost); $k++) {

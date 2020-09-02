@@ -2325,6 +2325,42 @@ class M_admission extends CI_Model {
       return $query[0]['total'];
      }
 
+     public function tuitionFeeIntake_ALL($ID_register_formulir){
+        $getPaymentType_Cost = $this->getPaymentType_Cost_created($ID_register_formulir);
+        $arr_temp2 = array();
+        for ($k=0; $k < count($getPaymentType_Cost); $k++) {
+           
+            // check meiliki potongan lain atau tidak
+           $getPotonganLain =  $this->m_master->caribasedprimary('db_finance.payment_admisi_potongan_lain','ID_payment_admisi',$getPaymentType_Cost[$k]['ID_payment_admisi']);
+
+          $arr_temp2 = $arr_temp2 + array(
+            $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
+            'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount'],
+            'PotonganLain-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPotonganLain,
+          );
+        }
+
+        return $arr_temp2;
+      }
+
+      public function tuitionFeeIntake_ALL2($ID_register_formulir){
+       $getPaymentType_Cost = $this->getPaymentType_Cost_created($ID_register_formulir);
+       $arr_temp2 = array();
+       for ($k=0; $k < count($getPaymentType_Cost); $k++) {
+          
+           // check meiliki potongan lain atau tidak
+          $getPotonganLain =  $this->m_master->caribasedprimary('db_finance.payment_admisi_potongan_lain','ID_payment_admisi',$getPaymentType_Cost[$k]['ID_payment_admisi']);
+
+         $arr_temp2 = $arr_temp2 + array(
+           $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
+           'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount'],
+           'PotonganLain-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPotonganLain,
+         );
+       }
+
+      return $arr_temp2;
+     }
+
     public function getDataCalonMhsTuitionFee_approved($limit, $start,$FormulirCode,$Status = 'p.Status = "Created" or p.Status = "Approved"')
     {
       if($FormulirCode != '%') {
@@ -2375,19 +2411,20 @@ class M_admission extends CI_Model {
      for ($i=0; $i < count($query); $i++) {
        $DiskonSPP = 0;
        // get Price
-           $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
-           $arr_temp2 = array();
-           for ($k=0; $k < count($getPaymentType_Cost); $k++) {
+          $arr_temp2 = $this->tuitionFeeIntake_ALL($query[$i]['ID_register_formulir']);
+           // $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
+           // $arr_temp2 = array();
+           // for ($k=0; $k < count($getPaymentType_Cost); $k++) {
               
-               // check meiliki potongan lain atau tidak
-              $getPotonganLain =  $this->m_master->caribasedprimary('db_finance.payment_admisi_potongan_lain','ID_payment_admisi',$getPaymentType_Cost[$k]['ID_payment_admisi']);
+           //     // check meiliki potongan lain atau tidak
+           //    $getPotonganLain =  $this->m_master->caribasedprimary('db_finance.payment_admisi_potongan_lain','ID_payment_admisi',$getPaymentType_Cost[$k]['ID_payment_admisi']);
 
-             $arr_temp2 = $arr_temp2 + array(
-               $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
-               'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount'],
-               'PotonganLain-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPotonganLain,
-             );
-           }
+           //   $arr_temp2 = $arr_temp2 + array(
+           //     $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
+           //     'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount'],
+           //     'PotonganLain-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPotonganLain,
+           //   );
+           // }
 
            // get file dan type beasiswa
             $getBeasiswa = $this->m_master->caribasedprimary('db_admission.register_dsn_type_m','ID',$query[$i]['TypeBeasiswa']);
@@ -4002,15 +4039,16 @@ class M_admission extends CI_Model {
      for ($i=0; $i < count($query); $i++) {
        $DiskonSPP = 0;
        // get Price
-           $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
-           $arr_temp2 = array();
-           for ($k=0; $k < count($getPaymentType_Cost); $k++) {
-             // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
-             $arr_temp2 = $arr_temp2 + array(
-               $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
-               'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount']
-             );
-           }
+          $arr_temp2 = $this->tuitionFeeIntake_ALL2($query[$i]['ID_register_formulir']);
+           // $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
+           // $arr_temp2 = array();
+           // for ($k=0; $k < count($getPaymentType_Cost); $k++) {
+           //   // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
+           //   $arr_temp2 = $arr_temp2 + array(
+           //     $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
+           //     'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount']
+           //   );
+           // }
 
            // get file dan type beasiswa
             $getBeasiswa = $this->m_master->caribasedprimary('db_admission.register_dsn_type_m','ID',$query[$i]['TypeBeasiswa']);
@@ -4871,6 +4909,15 @@ class M_admission extends CI_Model {
             "data"            => $data
         );
         
+    }
+
+    public function sumPotonganLainBydata($data){
+      $total = 0;
+      for ($i=0; $i < count($data); $i++) { 
+        $total += $data[$i]['DiscountValue'];
+      }
+
+      return $total;
     }
 
 }

@@ -1994,7 +1994,7 @@ class C_finance extends Finnance_Controler {
                 f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
                 n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
                 if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-                as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
+                as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Pay_Cond,
                 if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
                 if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref,
                 if(
@@ -2046,7 +2046,7 @@ class C_finance extends Finnance_Controler {
             // $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
             $nestedData[] = $No;
             $nestedData[] = $row['NamePrody'];
-            $nestedData[] = $row['Name'].'<br>'.$row['Email'];
+            $nestedData[] = $this->m_master->setBintang_HTML($row['Pay_Cond']).'<br/>'.$row['Name'].'<br>'.$row['Email'];
             $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
             $nestedData[] = $FormulirCode;
 
@@ -2067,7 +2067,7 @@ class C_finance extends Finnance_Controler {
             }
 
             $nestedData[] = $row['StatusPayment'].$refundShow;
-            $nestedData[] = '<button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
+            $nestedData[] = '<button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Action</button>';
            
             $data[] = $nestedData;
             $No++;
@@ -2093,7 +2093,7 @@ class C_finance extends Finnance_Controler {
                 f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
                 n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
                 if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-                as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
+                as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Pay_Cond,
                 if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
                 if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref,p.RevID,
                 if(
@@ -2145,7 +2145,7 @@ class C_finance extends Finnance_Controler {
 
             $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">';
             $nestedData[] = $row['NamePrody'];
-            $nestedData[] = $row['Name'].'<br>'.$row['Email'];
+            $nestedData[] = $this->m_master->setBintang_HTML($row['Pay_Cond']).'<br/>'.$row['Name'].'<br>'.$row['Email'];
             $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
             $nestedData[] = $FormulirCode;
             // get tagihan
