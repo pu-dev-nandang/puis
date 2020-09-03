@@ -70,4 +70,70 @@ class C_tuition_fee extends Finnance_Controler {
         $this->m_finance->deleteTagihanMHSByProdiYear($input);
     }
 
+    public function SwitchBintang($tokenURL){
+        if ($this->input->is_ajax_request()) {
+            $dataToken = $this->getInputToken();
+            $action = $dataToken['action'];
+            switch ($action) {
+                case 'LoadBintangOption':
+                    $rs = [];
+                    $dataParam = $dataToken['data'];
+                    $NPM = $dataParam->NPM;
+                    $ProdiID = $dataParam->ProdiID;
+                    $Classof = $dataParam->Classof;
+                    $rs['auth_std'] = $this->m_master->caribasedprimary('db_academic.auth_students','NPM',$NPM)[0];
+                    $rs['OptionBintang'] = $this->db->query(
+                        'select distinct(Pay_Cond) from db_finance.tuition_fee 
+                         where ProdiID = '.$ProdiID.' and Classof = '.$Classof.' 
+                        '
+                    )->result_array();
+                    echo json_encode($rs);
+                    break;
+                case 'LoadloG' :
+                    $dataParam = $dataToken['data'];
+                    $NPM = $dataParam->NPM;
+                    $query = $this->m_master->caribasedprimary('db_finance.m_tuition_fee_updated','NPM',$NPM);
+                    $rs = [];
+                    for ($i=0; $i < count($query); $i++) { 
+                        $nestedData=array();
+                        $row = $query[$i];
+                        foreach ($row as $key => $value) {
+                            $nestedData[] = $value;
+                        }
+                        $nestedData['token'] = $this->jwt->encode($row,'UAP)(*');
+                        $rs[] = $nestedData;
+                    }
+
+                    $json_data = array(
+                        "draw"            => intval(count($query)),
+                        "recordsTotal"    => intval(count($query)),
+                        "recordsFiltered" => intval(count($query)),
+                        "data"            => $rs,
+                    );
+                    echo json_encode($json_data);
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+        }
+        else
+        {
+            try {
+                $this->data['tokenURL'] = $tokenURL;
+                $dataDecodeToken = $this->jwt->decode($tokenURL,'UAP)(*');
+                $this->data['NPM'] = $dataDecodeToken->NPM;
+                $this->data['Name'] = $dataDecodeToken->Namemhs;
+                $this->data['Prodiname'] = $dataDecodeToken->Prodiname;
+                $content = $this->load->view('page/'.$this->data['department'].'/master/SwitchBintang',$this->data,true);
+                $this->temp($content);
+            } catch (Exception $e) {
+                
+            }
+            
+
+        }
+       
+    }
+
 }

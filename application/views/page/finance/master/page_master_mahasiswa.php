@@ -242,7 +242,7 @@
                             Credit = 0
                         }
 
-                        var btnSwitchBintang = '<button class = "btn btn-primary btn-sm btnSwitchBintang" npm = "'+Data_mhs[i]['NPM']+'" ClassOf = "'+Data_mhs[i]['ClassOf']+'" pay_cond = "'+Data_mhs[i]['Pay_Cond']+'" namemhs = "'+Data_mhs[i]['Name']+'" prodiname = "'+Data_mhs[i]['ProdiEng']+'" > <i class="fa fa-hand-o-right" aria-hidden="true"></i> </button>'
+                        var btnSwitchBintang = '<button class = "btn btn-primary btn-sm btnSwitchBintang" npm = "'+Data_mhs[i]['NPM']+'" ClassOf = "'+Data_mhs[i]['ClassOf']+'" pay_cond = "'+Data_mhs[i]['Pay_Cond']+'" namemhs = "'+Data_mhs[i]['Name']+'" prodiname = "'+Data_mhs[i]['ProdiEng']+'" ProdiID = "'+Data_mhs[i]['ProdiID']+'"> <i class="fa fa-hand-o-right" aria-hidden="true"></i> </button>'
 
                        $('#dataRow').append('<tr>' +
                            '<td>'+Data_mhs[i]['No']+'</td>' +
@@ -403,7 +403,20 @@
     });
 
     $(document).on('click','.btnSwitchBintang',function(e){
-
+      const NPM = $(this).attr('npm');
+      const Classof = $(this).attr('classof');
+      const Namemhs = $(this).attr('namemhs');
+      const NameOfProdi =  $(this).attr('prodiname');
+      const ProdiID = $(this).attr('ProdiID');
+      const data = {
+        NPM : NPM,
+        Classof : Classof,
+        Namemhs : Namemhs,
+        Prodiname : NameOfProdi,
+        ProdiID : ProdiID,
+      };
+      var token = jwt_encode(data,'UAP)(*');
+      window.location.href = base_url_js+'finance/mahasiswa/SwitchBintang/'+token;
     })
 
 </script>
