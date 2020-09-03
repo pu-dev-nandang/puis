@@ -1368,7 +1368,7 @@ class M_finance extends CI_Model {
       $queryAdd = ' and a.NPM in (select NPM from db_finance.payment where PTID = 2 and SemesterID = '.$Semester.' and Status = "1")';
     }
     if ($prodi == '') {
-     $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
+     $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount,b.Pay_Cond from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
              on a.NPM = c.NPM
              where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
                order by a.NPM asc
@@ -1377,7 +1377,7 @@ class M_finance extends CI_Model {
     }
     else
     {
-      $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
+      $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount,b.Pay_Cond from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
               on a.NPM = c.NPM
               where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
                 order by a.NPM asc
@@ -1397,7 +1397,7 @@ class M_finance extends CI_Model {
       }
 
       if ($prodi == '') {
-       $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a
+       $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount,b.Pay_Cond from '.$db.' as a
                 join db_academic.auth_students as b on a.NPM = b.NPM
                 join db_academic.sa_student as sast on sast.NPM = b.NPM
                 join db_finance.m_tuition_fee as c
@@ -1410,7 +1410,7 @@ class M_finance extends CI_Model {
       }
       else
       {
-        $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a
+        $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount,b.Pay_Cond from '.$db.' as a
                 join db_academic.auth_students as b on a.NPM = b.NPM
                 join db_academic.sa_student as sast on sast.NPM = b.NPM
                 join db_finance.m_tuition_fee as c

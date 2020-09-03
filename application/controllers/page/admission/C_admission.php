@@ -1108,7 +1108,8 @@ class C_admission extends Admission_Controler {
               if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,a.StatusReg,
               if(
                 (select count(*) as total from db_finance.payment_pre where `Status` = 1 and ID_register_formulir = e.ID ) > 0,"Intake","Not Intake"
-              ) as CekIntake
+              ) as CekIntake,
+              xy.Pay_Cond
               from db_admission.register as a
               join db_admission.school as b
               on a.SchoolID = b.ID
@@ -1162,7 +1163,7 @@ class C_admission extends Admission_Controler {
           }
 
           $nestedData[] = $No.' &nbsp <input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
-          $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'].'<br/>'.$stFormulirAct;
+          $nestedData[] = $this->m_master->setBintang_HTML($row['Pay_Cond']).'<br/>'.$row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'].'<br/>'.$stFormulirAct;
           $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
           $nestedData[] = $row['NamePrody'].'<br>'.$FormulirCode.'<br>'.$row['VA_number'];
           $nestedData[] = $row['NameSales'];

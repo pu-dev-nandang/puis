@@ -422,8 +422,8 @@
                    }
 
                    // show bintang
-                   var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
-
+                   // var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
+                   var bintang = setBintangFinance(Data_mhs[i]['Pay_Cond']);
                    var btn_edit = '';
                    //var btn_view = '<button class = "btn btn-default DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-search" aria-hidden="true"></i> View</button>';
                    btn_edit = '<br><br> <button class = "btn btn-default edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
@@ -457,7 +457,7 @@
                        '<td>'+inputCHK+'</td>' +
                        '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                        // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                       '<td>'+bintang+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
+                       '<td>'+bintang+'<br/>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                        // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                        // '<td>'+Data_mhs[i]['Year']+'</td>' +
                        '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +

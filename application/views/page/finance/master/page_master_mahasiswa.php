@@ -226,8 +226,8 @@
                             }
                         selecTOptionCredit += '</select>';
 
-                        // show bintang
-                        var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
+                        // show bintang Data_mhs[i]['Pay_Cond']
+                        var bintang = setBintangFinance(Data_mhs[i]['Pay_Cond']);
                         var IPS = 0
                         var IPK = 0
                         var Credit = 0
@@ -245,7 +245,7 @@
                            '<td>'+Data_mhs[i]['No']+'</td>' +
                            '<td>'+Data_mhs[i]['ProdiEng']+'</td>' +
                            // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                           '<td>'+bintang+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
+                           '<td>'+bintang+'<br/>'+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                            // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                            // '<td>'+Data_mhs[i]['ClassOf']+'</td>' +
                            '<td>'+img+'</td>' +
