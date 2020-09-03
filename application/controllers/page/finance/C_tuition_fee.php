@@ -39,6 +39,7 @@ class C_tuition_fee extends Finnance_Controler {
         $this->data['action'] = $input['Action'];
         $this->data['id'] = $input['CDID'];
         $this->data['selectCurriculum'] = $input['selectCurriculum'];
+        $this->data['selectBintang'] = $this->m_master->showData_array('db_finance.tuition_fee_schema');
         echo $this->load->view('page/'.$this->data['department'].'/master/modalform_tuition_fee',$this->data,true);
     }
 

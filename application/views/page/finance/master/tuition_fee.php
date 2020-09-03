@@ -341,7 +341,8 @@
                                         '<i class="fa fa-pencil-square-o"></i> Edit'+
                                        '</span>';
                    var tt = '';
-                   var bintang = '*';
+                   var bintang = '<span style = "color:red;">'+'*'+'</span>';
+                   var bintang2 = '*';
                    for (var j = 0; j < 4; j++) {
                        var vv = '<td>-</td>';
                        for (var k = 0; k < dataProdi.Detail.length; k++) {
@@ -349,7 +350,8 @@
                          if(ss == dataProdi.Detail[k].PTID)
                          {
                           vv = '<td id = "RID_'+dataProdi.Detail[k].ID+'" Cost = "'+dataProdi.Detail[k].Cost+'" class = "C_'+i+'">'+formatRupiah(parseInt(dataProdi.Detail[k].Cost))+'</td>';
-                          bintang = (dataProdi.Detail[k].Pay_Cond == 1) ? '*' : '**';
+                          bintang2 = (dataProdi.Detail[k].Pay_Cond == 1) ? '*' : '**';
+                          bintang = setBintangFinance(dataProdi.Detail[k].Pay_Cond);
                           break;
                          }
                        }
@@ -360,7 +362,7 @@
                        tt += vv;
                    }
 
-                   var btn_delete = '<span data-prodi="'+dataProdi.ProdiID+'" bintang = "'+bintang+'"  class="btn btn-xs btn-delete">'+
+                   var btn_delete = '<span data-prodi="'+dataProdi.ProdiID+'" bintang = "'+bintang2+'"  class="btn btn-xs btn-delete">'+
                                          '<i class="fa fa-trash"></i> Delete'+
                                         '</span>';         
 
