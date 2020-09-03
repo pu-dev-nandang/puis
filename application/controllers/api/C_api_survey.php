@@ -49,7 +49,7 @@ class C_api_survey extends CI_Controller {
             if(count($data)>0){
 
                 $data[0]['Quesions'] = $this->db->query('SELECT sq.Question, sq.IsRequired, sq.AnswerType, 
-                                                        sq.QTID
+                                                        sq.QTID, ssd.QuestionID
                                                         FROM db_it.surv_survey_detail ssd 
                                                         LEFT JOIN db_it.surv_question sq ON (sq.ID = ssd.QuestionID)
                                                         WHERE ssd.SurveyID = "'.$SurveyID.'" 
@@ -59,6 +59,32 @@ class C_api_survey extends CI_Controller {
             }
 
             return print_r(json_encode($result));
+        }
+        else if($data_arr['action']=='setDataSurvey'){
+
+            // Insert to survey answer
+            $InsAnswer = (array) $data_arr['InsAnswer'];
+            $this->db->insert('db_it.surv_answer',$InsAnswer);
+            $insert_id = $this->db->insert_id();
+
+            $dataAnsw = (array) $data_arr['dataAnsw'];
+
+            for($i=0;$i<count($dataAnsw);$i++){
+
+                $d = (array) $dataAnsw[$i];
+                $d['AnswerID'] = $insert_id;
+                $this->db->insert('db_it.surv_answer_detail',$d);
+
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='getListDirection'){
+
+            $data = $this->db->get_where('db_it.surv_direct',array('Username'=>$data_arr['Username']))->result_array()[0];
+
+            return print_r(json_encode($data));
         }
 
 
