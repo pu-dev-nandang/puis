@@ -16,6 +16,7 @@
 <script>
 
     $(document).ready(function () {
+        setLoadFullPage();
         loadTableSurveyList();
     });
 
@@ -25,8 +26,10 @@
             '            <tr style="background: #eceff1;">' +
             '                <th style="width: 3%;">No</th>' +
             '                <th>Title</th>' +
-            '                <th style="width: 9%;"><i class="fa fa-cog"></i></th>' +
-            '                <th style="width: 25%;">Publication Date</th>' +
+            '                <th style="width: 5%;">Question</th>' +
+            '                <th style="width: 5%;"><i class="fa fa-users"></i></th>' +
+            '                <th style="width: 7%;"><i class="fa fa-cog"></i></th>' +
+            '                <th style="width: 20%;">Publication Date</th>' +
             '                <th style="width: 5%;">Status</th>' +
             '            </tr>' +
             '            </thead>' +
@@ -65,6 +68,133 @@
 
 
     }
+
+    $(document).on('click','.showQuestionList',function () {
+
+        var ID = $(this).attr('data-id');
+        var data = {
+            action : 'showQuestionInSurvey',
+            SurveyID : ID,
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Show Question</h4>');
+
+        var htmlss = '<div id="panelShowQuestion"></div>';
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        loading_page('#panelShowQuestion');
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+
+                var tr = '';
+                $.each(jsonResult,function (i,v) {
+                    tr = tr+'<tr>' +
+                        '<td>'+(i + 1)+'</td>' +
+                        '<td style="text-align: left;"><span class="label label-primary">'+v.Category+'</span>' +
+                        ' <span class="label label-success">'+v.Type+'</span>' +
+                        '       <dvi>'+v.Question+'</div></td>' +
+                        '<td>'+v.AverageRate+'</td>' +
+                        '</tr>';
+                })
+
+            }
+
+            var dataListQuestion = '<div>' +
+                '    <table class="table table-bordered table-striped table-centre">' +
+                '        <thead>' +
+                '        <tr>' +
+                '            <th style="width: 3%">No</th>' +
+                '            <th>Question</th>' +
+                '            <th style="width: 13%">Average</th>' +
+                '        </tr>' +
+                '        </thead>' +
+                '        <tbody>'+tr+'</tbody>' +
+                '    </table>' +
+                '</div>';
+
+            setTimeout(function () {
+                $('#panelShowQuestion').html(dataListQuestion);
+            },500);
+
+        });
+
+
+
+    });
+
+    $(document).on('click','.showAlreadyFillOut',function () {
+
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Show Detail Already Fill Out</h4>');
+
+        var htmlss = '<div class="">' +
+            '    <table class="table table-bordered table-striped table-centre" id="tableShowUserAlreadyFillOut">' +
+            '        <thead>' +
+            '        <tr>' +
+            '            <th style="width: 1%;">No</th>' +
+            '            <th>User</th>' +
+            '            <th style="width: 10%;">Type</th>' +
+            '            <th style="width: 25%;">Entred At</th>' +
+            '        </tr>' +
+            '        </thead>' +
+            '    </table>' +
+            '</div>';
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        var ID = $(this).attr('data-id');
+        var data = {
+            action : 'showUserAlreadyFill',
+            SurveyID : ID,
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+
+        var dataTable = $('#tableShowUserAlreadyFillOut').DataTable( {
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "language": {
+                "searchPlaceholder": "Username, Name..."
+            },
+            "ajax":{
+                url :url, // json datasource
+                data : {token:token},
+                ordering : false,
+                type: "post",  // method  , by default get
+                error: function(){  // error handling
+                    loading_modal_hide();
+                    $(".employee-grid-error").html("");
+                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#employee-grid_processing").css("display","none");
+                }
+            }
+        } );
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+    });
 
     $('#btnAddSurvey').click(function () {
         updateSurvey('');
@@ -150,10 +280,6 @@
             '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> '+btnSave+
             '' +
             '');
-
-        $('#GlobalModal').on('shown.bs.modal', function () {
-            $('#formSimpleSearch').focus();
-        });
 
         $('#GlobalModal').modal({
             'show' : true,

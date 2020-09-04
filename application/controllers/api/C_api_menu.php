@@ -553,8 +553,20 @@ class C_api_menu extends CI_Controller {
                               </ul>
                             </div>';
 
+                // Cek jumlah yang sudah mengisi survey
+                $TotalYgUdahIsiSurvey = $this->db->from('db_it.surv_answer')->where('SurveyID',$row['ID'])->count_all_results();
+                $btnTotalAlreadyFillOut = ($TotalYgUdahIsiSurvey>0)
+                    ? '<a href="javascript:void(0)" class="showAlreadyFillOut" data-id="'.$row['ID'].'">'.$TotalYgUdahIsiSurvey.'</a>'
+                    : '0';
+
+                $TotalQuestion = $this->db->from('db_it.surv_survey_detail')->where('SurveyID',$row['ID'])->count_all_results();
+                $btnShowTotalQuestion = ($TotalQuestion>0) ? '<a href="javascript:void(0)" class="showQuestionList" data-id="'.$row['ID'].'">'.$TotalQuestion.'</a>' : '0';
+
+
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$row['Title'].'</div>';
+                $nestedData[] = $btnShowTotalQuestion;
+                $nestedData[] = $btnTotalAlreadyFillOut;
                 $nestedData[] = '<div>'.$btnAct.'</div>';
                 $nestedData[] = '<div>'.$Range.'</div>';
                 $nestedData[] = '<div id="viewStatusSurvey_'.$row['ID'].'">'.$Status.'</div>';
@@ -572,6 +584,116 @@ class C_api_menu extends CI_Controller {
                 "dataQuery"            => $query
             );
             echo json_encode($json_data);
+
+        }
+
+        else if($data_arr['action']=='showQuestionInSurvey'){
+
+            $SurveyID = $data_arr['SurveyID'];
+
+            $data = $this->db->query('SELECT ssd.QuestionID, sq.Question, sq.QTID, sqc.Description AS Category, 
+                                                 sqt.Description AS Type
+                                                FROM db_it.surv_survey_detail ssd
+                                                LEFT JOIN db_it.surv_question sq ON (sq.ID = ssd.QuestionID)
+                                                LEFT JOIN db_it.surv_question_category sqc ON (sqc.ID = sq.QCID)
+                                                LEFT JOIN db_it.surv_question_type sqt ON (sqt.ID = sq.QTID)
+                                                WHERE ssd.SurveyId = "'.$SurveyID.'" ORDER BY ssd.Queue ASC ')
+                                    ->result_array();
+
+            if(count($data)>0){
+                for($i=0;$i<count($data);$i++){
+
+                    $AverageRate = '';
+
+                    if($data[$i]['QTID']=='4' || $data[$i]['QTID']==4){
+                        // Cek berapa yang udah jawab
+                        $dataTotalJawaban = $this->db->get_where('db_it.surv_answer_detail',
+                            array(
+                                'SurveyID' => $SurveyID,
+                                'QuestionID' => $data[$i]['QuestionID'],
+                                'QTID' => $data[$i]['QTID']
+                            ))->result_array();
+
+                        if(count($dataTotalJawaban)>0){
+                            $TotalRate = 0;
+                            for($r=0;$r<count($dataTotalJawaban);$r++){
+                                $TotalRate = $TotalRate+$dataTotalJawaban[$r]['Rate'];
+                            }
+                            $AverageRate = number_format(round($TotalRate / count($dataTotalJawaban)),2);
+                        }
+
+
+
+                    }
+
+                    $data[$i]['AverageRate'] = $AverageRate;
+                }
+            }
+
+
+            return print_r(json_encode($data));
+
+
+        }
+
+        else if($data_arr['action']=='showUserAlreadyFill'){
+
+            $requestData = $_REQUEST;
+            $dataWhere = '';
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataScr = ' AND (sa.Username LIKE "%'.$search.'%" OR 
+                                em.Name LIKE "%'.$search.'%"  OR 
+                                ats.Name LIKE "%'.$search.'%")';
+                $dataSearch = $dataScr;
+            }
+
+            $queryDefault = 'SELECT sa.*,  CASE WHEN  em.Name IS NOT NULL THEN em.Name
+                                                ELSE ats.Name END AS "Name" FROM db_it.surv_answer sa 
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = sa.Username)
+                                                LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sa.Username)
+                                        WHERE sa.SurveyID = "'.$data_arr['SurveyID'].'"  '.
+                                        $dataWhere.$dataSearch;
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                $Type = ($row['Type']=='std')
+                    ? '<span class="label label-primary">Student</span>'
+                    : '<span class="label label-success">Emp / Lec</span>';
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['Username'].'</div>';
+                $nestedData[] = '<div>'.$Type.'</div>';
+                $nestedData[] = '<div>'.date('d M Y H:i',strtotime($row['EntredAt'])).'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval( $queryDefaultRow),
+                "data"            => $data,
+                "dataQuery"            => $query
+            );
+            echo json_encode($json_data);
+
 
         }
 
