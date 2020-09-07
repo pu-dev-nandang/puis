@@ -1,4 +1,12 @@
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
+<style type="text/css">
+  h3.header-blue{
+      margin-top: 0px;
+      border-left: 7px solid #2196F3;
+      padding-left: 10px;
+      font-weight: bold;
+  }
+</style>
 <div class="row">
     <div class="col-xs-12" >
         <div class="panel panel-primary">
@@ -21,7 +29,12 @@
                         <hr/>
                         <div align="right">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-info copyLastTf" id = "copyLastTf">
+                                <button type="button" class="btn btn-default btnCRUDBintang" id = "btnCRUDBintang">
+                                  <span class="fa fa-briefcase"></span> Bintang / Schema Payment
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success copyLastTf" id = "copyLastTf">
                                   <span class="glyphicon glyphicon-plus"></span> Copy Last Tuition Fee
                                 </button>
                             </div>
@@ -377,4 +390,212 @@
             });
         }
     }
+
+
+    // schema payment
+    const getUrl = window.location.href;
+
+    class Class_bintangSchemaPayment {
+      constructor() {
+        this.data = {};
+      }
+      formInputHtml = (action='add',dataForm={ID_bintang: 0,Name:'',Desc:''} ) => {
+        let html = '';
+        html = '<div class = "row">'+
+                  '<div class = "col-md-12">'+
+                      '<div class = "thumbnail" style = "padding:10px;">'+
+                        '<div style="padding: 15px;">'+
+                            '<h3 class="header-blue">Mode '+action+'</h3>'+
+                        '</div>'+
+                        '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                                  '<div class = "form-group">'+
+                                    '<label>Jumlah Bintang</label>'+
+                                    '<input type = "text" class = "form-control frmInput" name = "ID_bintang" rule = "required,moreZero" value = "'+dataForm.ID_bintang+'" />'+
+                                  '</div>'+
+                                  '<div class = "form-group">'+
+                                    '<label>Nama Bintang</label>'+
+                                    '<input type = "text" class = "form-control frmInput" name = "Name" rule = "required" value = "'+dataForm.Name+'" />'+
+                                  '</div>'+
+                                  '<div class = "form-group">'+
+                                    '<label>Desc</label>'+
+                                    '<textarea class = "form-control frmInput" name = "Desc" rule= "">'+dataForm.Desc+'</textarea>'+
+                                  '</div>'+
+                            '</div>'+
+                        '</div>'
+                      '</div>'+
+                  '</div>'+
+                '</div>';
+         $('#GlobalModalLarge .modal-footer').html('<button class = "btn btn-success btnSaveDataBintang" action = "'+action+'" idData = "'+dataForm.ID_bintang+'" >Save</button> <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button> ');
+
+         $('#GlobalModalLarge .modal-body').find('.pageFormInputBintang').html(html);
+
+         $('.frmInput[name="ID_bintang"]').maskMoney({thousands:'', decimal:'', precision:0,allowZero: false});
+         $('.frmInput[name="ID_bintang"]').maskMoney('mask', '9894'); 
+
+         return this;
+         
+      }
+
+      modalTemplate = () => {
+        let html = '<div class = "row">'+
+                      '<div class = "col-md-6 pageFormInputBintang">'+
+
+                      '</div>'+
+
+                      '<div class = "col-md-6 pageTableBintang">'+
+
+                      '</div>'+
+                   '</div>';
+        $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Form Bintang / Master Schema'+'</h4>');
+        $('#GlobalModalLarge .modal-body').html(html);
+        return this;
+
+      }
+
+      tableHtml = () => {
+        let html = '<div class = "row">'+
+                       '<div class = "col-md-12">'+
+                        '<div class = "thumbnail" style = "padding:10px;">'+
+                          '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                                '<table class = "table">'+
+                                    '<thead>'+
+                                        '<tr>'+
+                                            '<th>Bintang</th>'+
+                                            '<th>Name</th>'+
+                                            '<th>Desc</th>'+
+                                            '<th>Action</th>'+
+                                        '</tr>'+
+                                    '</thead>'+
+                                    '<tbody></tbody>'+
+                                '</table>'+
+                            '</div>'+
+                          '</div>'+
+                        '</div>'+
+                       '</div>'+ 
+                   '</div>';
+          $('#GlobalModalLarge .modal-body').find('.pageTableBintang').html(html);
+          return this;
+      }
+
+      showModal = () => {
+        $('#GlobalModalLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+      }
+
+      LoadTable = async() => {
+        const data = {
+          action : 'read'
+        }
+
+        let token = jwt_encode(data,'UAP)(*');
+
+        try{
+          const ajax = await AjaxSubmitFormPromises(getUrl,token);
+          this.data.responseTable = ajax;
+        }
+        catch(err){
+          toastr.info('something wrong');
+        }
+
+        return this;
+
+      }
+
+      writeTable = () => {
+        const selectorTable = $('#GlobalModalLarge .modal-body').find('.pageTableBintang').find('.table');
+        selectorTable.find('tbody').empty();
+        const dataResponse =  this.data.responseTable;
+        for (var i = 0; i < dataResponse.length; i++) {
+          const dataDecode  = jwt_encode(dataResponse[i],'UAP)(*');
+          selectorTable.find('tbody').append(
+              '<tr>'+
+                '<td>'+setBintangFinance(dataResponse[i].ID_bintang)+'</td>'+
+                '<td>'+dataResponse[i].Name+'</td>'+
+                '<td>'+dataResponse[i].Desc+'</td>'+
+                '<td>'+'<button class = "btn btn-sm btnEditBintang btn-info" dataDecode = "'+dataDecode+'"><span class = "fa fa-pencil-square-o"></span></button> <button class = "btn btn-sm btn-danger btnDeleteBintang" dataDecode = "'+dataDecode+'"><span class = "fa fa-times"></span></button>'+'</td>'+
+              '</tr>'
+            );
+        }
+      }
+
+      
+    }
+
+    const def_bintangSchemaPayment = new Class_bintangSchemaPayment();
+
+    const BintangSchemaPayment = {
+      default : async() => {
+        def_bintangSchemaPayment.modalTemplate().formInputHtml().tableHtml().showModal();
+        (await def_bintangSchemaPayment.LoadTable()).writeTable();
+      },
+
+      action : async(action,idData,selector) => {
+        const htmlButton = selector.html();
+        const getSelector = $('#GlobalModalLarge .modal-body').find('.frmInput');
+        if (action != 'delete') {
+          const chk = ValidationGenerate.initializeProcess(getSelector);
+          if (!chk) {
+            return;
+          }
+        }
+        const dataForm  = {};
+        getSelector.each(function(e){
+          const Name = $(this).attr('name');
+          const val = $(this).val();
+          dataForm[Name]= val;
+        })
+        const data = {
+          action : action,
+          dataForm : dataForm,
+          idData: idData,
+        }
+
+        let token = jwt_encode(data,'UAP)(*');
+        loading_button2(selector);
+        try{
+          const ajax = await AjaxSubmitFormPromises(getUrl,token);
+          if (ajax.status == 1) {
+            def_bintangSchemaPayment.modalTemplate().formInputHtml().tableHtml();
+            (await def_bintangSchemaPayment.LoadTable()).writeTable();
+          }
+          else
+          {
+            toastr.error(ajax.msg);
+          }
+        }
+        catch(err){
+          toastr.info('something wrong');
+        }
+
+        end_loading_button2(selector,htmlButton);
+
+        
+      },
+    };
+
+    $(document).on('click','#btnCRUDBintang',function(e){
+      BintangSchemaPayment.default();
+    })
+
+    $(document).on('click','.btnSaveDataBintang',function(e){
+      const itsme = $(this);
+      const action = itsme.attr('action');
+      const idData = itsme.attr('idData');
+      BintangSchemaPayment.action(action,idData,itsme);
+    })
+
+    $(document).on('click','.btnEditBintang ',function(e){
+      const dataDecode = jwt_decode($(this).attr('datadecode'));
+      def_bintangSchemaPayment.formInputHtml('edit',dataDecode);
+    })
+
+    $(document).on('click','.btnDeleteBintang ',function(e){
+      const itsme = $(this)
+      const dataDecode = jwt_decode(itsme.attr('datadecode'));
+      BintangSchemaPayment.action('delete',dataDecode.ID_bintang,itsme);
+    })
 </script>

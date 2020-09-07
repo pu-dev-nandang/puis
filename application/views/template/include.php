@@ -2920,4 +2920,62 @@
     }
     /*END ADDED BY FEBRI @ FEB 2020*/
 
+    /*ADDED BY Adhi @ Sep 2020*/
+    const ValidationGenerate = {
+        required : (val,theName) => {
+          const chk = Validation_required(val,theName);
+          if (chk.status == 0) {
+            toastr.info(chk.messages);
+            return false;
+          }
+          return true
+        },
+
+        moreZero : (val,theName) => {
+          try{
+            if (parseInt(val) <= 0) {
+              toastr.info(theName + ' have to more than zero');
+              return false;
+            }
+
+          }
+          catch(err){
+            return false;
+          }
+
+          return true;
+        },
+
+        initializeProcess : (selector) => {
+            let BoolProcess = true;
+            selector.each(function(e){
+              const rule =  ($(this).attr('rule')).split(',');
+              const valueData = $(this).val();
+              const theName = $(this).attr('name');
+              for (var i = 0; i < rule.length; i++) {
+                const nameRule = rule[i];
+                if (nameRule != '' && nameRule !== undefined) {
+                  try{
+                    const pr = ValidationGenerate[nameRule](valueData,theName);
+                    if (!pr) {
+                      BoolProcess = false;
+                      return;
+                    }
+                  }
+                  catch(err){
+                    BoolProcess = false;
+                    return;
+                  }
+                }
+              }
+            })
+
+            if (!BoolProcess) {
+              return false;
+            }
+            return true;
+        }
+    }
+    /*END ADDED BY Adhi @ Sep 2020*/
+
 </script>
