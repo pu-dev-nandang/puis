@@ -3,7 +3,7 @@
 
         <!--=== Navigation ===-->
         <ul id="nav">
-            <?php 
+            <?php
                 $getData  = $this->session->userdata('menu_lpmi_grouping');
             ?>
             <!-- <pre><?php //print_r($getData);exit; ?></pre> -->
@@ -13,13 +13,13 @@
                     $chkSubMenu1 = 0;
                     $Slug = '';
                     $uri = '';
-                    $uriSubMenu1 = ''; 
-                    $uriSubMenu2 = ''; 
+                    $uriSubMenu1 = '';
+                    $uriSubMenu2 = '';
                     // check data  memiliki submenu1 dan submenu2
                         #Submenu 1
                         $SubMenu1_arr = $getData[$i]['Submenu'];
                         for ($j=0; $j < count($SubMenu1_arr); $j++) {
-                            $temp2 = array(); 
+                            $temp2 = array();
                             if ($SubMenu1_arr[$j]['SubMenu1']  != 'Empty') {
                                 $chkSubMenu1++;
                                 $temp2 = array('SubMenu1' => $SubMenu1_arr[$j]['SubMenu1']);
@@ -29,7 +29,7 @@
                             $chkSubMenu2 = 0;
                             $SubMenu2_arr = $SubMenu1_arr[$j]['Submenu'];
                             $data = array();
-                            for ($k=0; $k < count($SubMenu2_arr); $k++) { 
+                            for ($k=0; $k < count($SubMenu2_arr); $k++) {
                                 if ($SubMenu2_arr[$k]['SubMenu2'] != 'Empty') {
                                     $data[] = array(
                                         'ID' => $SubMenu2_arr[$k]['ID'],
@@ -73,12 +73,12 @@
                                 $temp2 = $temp2 + array('CountSubMenu2' => $chkSubMenu2,'data' =>$data);
                             }
 
-                            $temp[] = $temp2;   
-                            
+                            $temp[] = $temp2;
+
                         }
 
                         $open = (count($temp) > 0) ? 'open' : '';
-                    // closed php tag    
+                    // closed php tag
                     ?>
                     <?php $uriSubMenu1 = $SubMenu1_arr[0]['Submenu'][0]['Slug'] ?>
                     <?php $uriSubMenu1 = explode('/', $uriSubMenu1)  ?>
@@ -108,14 +108,14 @@
                                                         <?php $Uri3 = $countS2[$x]['Slug'] ?>
                                                         <?php $t = explode('/', $Uri3)  ?>
                                                         <?php $Uri3 = $t[3]  ?>
-                                                        <?php 
+                                                        <?php
                                                         $URI_Slug = $countS2[$x]['Slug'];
                                                         $URI_Slug = explode('/', $URI_Slug);
                                                         $URISlug = $countS2[$x]['Slug'];
                                                         if (in_array('(:any)', $URI_Slug)) {
                                                            $a = count($URI_Slug) - 1;
                                                            $URISlug = '';
-                                                           for ($ii=0; $ii < $a; $ii++) { 
+                                                           for ($ii=0; $ii < $a; $ii++) {
                                                             $URISlug .= $URI_Slug[$ii].'/';
                                                            }
                                                            $URISlug = $URISlug.'1';
@@ -128,21 +128,21 @@
                                                                 <?php echo $countS2[$x]['SubMenu2'] ?>
                                                             </a>
                                                         </li>
-                                                    <?php endfor ?>      
+                                                    <?php endfor ?>
                                                 </ul>
                                             </li>
                                         <?php else: ?>
                                             <?php $uriSubMenu2 = $temp[$z]['data'][0]['Slug'] ?>
                                             <?php $uriSubMenu2 = explode('/', $temp[$z]['data'][0]['Slug'])  ?>
                                             <?php $uriSubMenu2 = $uriSubMenu2[2]  ?>
-                                            <?php 
+                                            <?php
                                             $URI_Slug = $temp[$z]['data'][0]['Slug'];
                                             $URI_Slug = explode('/', $URI_Slug);
                                             $URISlug = $temp[$z]['data'][0]['Slug'];
                                             if (in_array('(:any)', $URI_Slug)) {
                                                $a = count($URI_Slug) - 1;
                                                $URISlug = '';
-                                               for ($i=0; $i < $a; $i++) { 
+                                               for ($i=0; $i < $a; $i++) {
                                                 $URISlug .= $URI_Slug[$i].'/';
                                                }
                                                $URISlug = $URISlug.'1';
@@ -150,16 +150,16 @@
 
                                              ?>
                                             <li segment2 = "<?php echo $uriSubMenu1 ?>" segment3  = "<?php echo $uriSubMenu2 ?>" class="<?php if($this->uri->segment(2)==$uriSubMenu1 && $this->uri->segment(3) == $uriSubMenu2 ){echo "current";} ?>">
-                                                <a href="<?php echo base_url($URISlug); ?>"> 
+                                                <a href="<?php echo base_url($URISlug); ?>">
                                                     <i class="icon-angle-right"></i>
                                                         <?php echo $temp[$z]['SubMenu1'] ?>
                                                 </a>
-                                            </li>                           
+                                            </li>
                                         <?php endif ?>
-                                    <?php endfor ?>    
-                                </ul>        
+                                    <?php endfor ?>
+                                </ul>
                             <?php endif ?>
-                        </li>     
+                        </li>
                     <?php else: ?>
                         <?php //echo json_encode($uriSubMenu1) ?>
                         <?php $uri1 = $uriSubMenu1[1];   ?>
@@ -171,9 +171,9 @@
                             </a>
                         </li>
                     <?php endif ?>
-            <?php         
+            <?php
 
-                }    
+                }
 
              ?>
         </ul>
@@ -266,7 +266,7 @@
                     Partner
                 </a>
             </li>
-            
+
 
         </ul>
         <ul id="nav">
@@ -276,8 +276,15 @@
                     Lecturer Evaluation
                 </a>
             </li>
+
+            <li class="<?php if($this->uri->segment(2)=='version'){echo"current";}?>">
+                <a href="<?php echo base_url('survey/list-survey');?>">
+                    <i class="fa fa-tasks"></i>
+                    Survey
+                </a>
+            </li>
         </ul>
-        
+
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
                 <label class="btn active">
