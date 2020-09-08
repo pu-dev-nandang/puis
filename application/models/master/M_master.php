@@ -2941,10 +2941,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         if ($k == 1) {
                            $Invoice = $Invoice_Q;
                            $Discount = $Discount_Q;
-                           // if ($PTID == 3) { // karena hitung satu sks
-                           //     $Invoice = $query1[0]['Cost'];
-                           //     $Discount = $Discount_Q;
-                           // }
+                           if ($PTID == 3) { // karena hitung satu sks
+                               $Invoice = $query1[0]['Cost'];
+                               $Discount = $Discount_Q;
+                           }
                         }
                         break;
                     default:
