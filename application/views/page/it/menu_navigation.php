@@ -300,7 +300,7 @@
                         // Cek apakah ada turunan atau tidak
                         if(isset($item['DataLevel_1'])){ ?>
                             <a href="javascript:void(0);">
-                                <?= $item['Icon']; ?>
+                                <i class="<?= $item['Icon']; ?>"></i>
                                 <?= $item['Name']; ?>
                                 <i class="arrow <?= ($this->uri->segment(2)=='academic') ? 'icon-angle-down' : 'icon-angle-left'?>"></i>
                             </a>

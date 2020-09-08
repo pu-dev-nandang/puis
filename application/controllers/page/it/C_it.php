@@ -8,6 +8,7 @@ class C_it extends It_Controler {
     {
         parent::__construct();
         $this->load->model('m_sendemail');
+        $this->load->model('m_sm_menu');
         $this->data['department'] = parent::__getDepartement(); 
         $this->load->model('m_api');
         // $this->load->model('master/m_master');
@@ -261,9 +262,155 @@ class C_it extends It_Controler {
     public function share_menu()
     {
         $data[''] = '';
+        $data['sm'] = $this->m_sm_menu->getAllSm_menu();
         $content = $this->load->view('page/'.$this->data['department'].'/console-developer/share_menu',$data,true);
         $this->menu_developer($content);
     }
+
+     public function edit_share_menu($id)
+    {
+        $condition = array('ID' => $id);
+        $data['sm_menu'] = $this->m_sm_menu->getSm_menu($condition);
+        $data['sm_child'] = $this->m_sm_menu->getIDSM_child($data['sm_menu']['ID']);
+        $content = $this->load->view('page/'.$this->data['department'].'/console-developer/edit_share_menu',$data,true);
+        $this->menu_developer($content);
+    }
+
+    public function ShareMenuCRUD()
+    {
+      $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
+      $datatoken =  $this->getInputToken();
+      $datatoken = json_decode(json_encode($datatoken),true);
+      $action = $datatoken['action'];
+   
+    switch ($action) {
+      case 'createShareMenu':
+      
+        $createBy = $this->session->userdata('Name');
+        $formData = $datatoken['dataShareMenu'];
+
+        $formData =  $formData + [
+            'CreatedAt' => date('Y-m-d H:i:s'),
+            'CreatedBy' => $createBy,
+        ];
+        $this->m_sm_menu->insertSm_menu($formData);
+        $rs['status'] = 1;    
+        break;
+
+      case 'createAllData':
+
+        $createBy = $this->session->userdata('Name');
+        $formData = $datatoken['dataShareMenu'];
+
+        $formData =  $formData + [
+            'CreatedAt' => date('Y-m-d H:i:s'),
+            'CreatedBy' => $createBy,
+        ];
+
+        $saveSM = $this->m_sm_menu->insertSm_menu($formData);
+        $idsm = $saveSM;
+        $dataChild = $datatoken['dataChild'];
+          for ( $i=0 ; $i < count($dataChild) ; $i++ ) 
+          {
+            $insert = array(
+              'Name' => $dataChild[$i]['Name'],
+              'Route' => $dataChild[$i]['Route'],
+              'IDSM' => $idsm,
+            );
+            $this->m_sm_menu->insertSm_child($insert);
+          }
+
+        $rs['status'] = 1;    
+        break;
+
+        case 'updateShareMenu':
+
+        $UpdatedBy = $this->session->userdata('Name');
+        $formData = $datatoken['dataShareMenu'];
+        $id = $formData['ID'];
+
+        $formData =  $formData + [
+            'UpdatedAt' => date('Y-m-d H:i:s'),
+            'UpdatedBy' => $UpdatedBy,
+        ];
+
+        $this->m_sm_menu->updateSm_menu($id, $formData);
+        
+        $rs['status'] = 1;    
+        break;
+
+        case 'updateAllData':
+
+        $UpdatedBy = $this->session->userdata('Name');
+        $formData = $datatoken['dataShareMenu'];
+        $id = $formData['ID'];
+
+        $this->m_sm_menu->deleteChild_byIDSM($id);
+
+        $formData =  $formData + [
+            'UpdatedAt' => date('Y-m-d H:i:s'),
+            'UpdatedBy' => $UpdatedBy,
+        ];
+
+        $this->m_sm_menu->updateSm_menu($id, $formData);
+      
+        $dataChild = $datatoken['dataChild'];
+          for ( $i=0 ; $i < count($dataChild) ; $i++ ) 
+          {
+            $insert = array(
+              'Name' => $dataChild[$i]['Name'],
+              'Route' => $dataChild[$i]['Route'],
+              'IDSM' => $id,
+            );
+            $this->m_sm_menu->insertSm_child($insert);
+          }
+        
+        $rs['status'] = 1;    
+        break;
+      
+        case 'deleteChild':
+
+        $formData = $datatoken['dataShareMenu'];
+        $id = $formData['ID'];
+        $this->m_sm_menu->deleteSm_child($id);
+        $rs['status'] = 1;    
+        break;
+
+        case 'deleteShareMenu':
+        
+        $formData = $datatoken['dataShareMenu'];
+        $id = $formData['ID'];
+        $this->m_sm_menu->deleteChild_byIDSM($id);
+        $this->m_sm_menu->deleteSm_menu($id);
+        $rs['status'] = 1;    
+        break;
+    }
+
+      echo json_encode($rs);
+    }
+
+    public function selectDivision()
+    {
+
+      $EntredBy = $this->session->userdata('Name');
+      $insert = array(
+        'IDSM' => $_POST["idsm"],
+        'IDDivision' => $_POST["id"],
+        'EntredAt' => date('Y-m-d H:i:s'),
+        'EntredBy' => $EntredBy,
+      );
+      $this->m_sm_menu->insertSm_user($insert);
+
+    }
+    
+    public function cancelDivision()
+    {
+        $iddiv = $_POST["id"];
+        $idsm = $_POST["idsm"];
+        $this->m_sm_menu->deletesm_user($iddiv,$idsm);
+    }
+
+
 
     public function submit_routes()
     {
