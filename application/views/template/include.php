@@ -354,6 +354,7 @@
     window.base_url_img_student = "<?php echo base_url('uploads/students/'); ?>";
     window.sessionNIP = "<?php echo $this->session->userdata('NIP'); ?>";
     window.sessionName = "<?php echo $this->session->userdata('Name'); ?>";
+    window.sessionIDdepartementNavigation = "<?php echo $this->session->userdata('IDdepartementNavigation'); ?>";
     window.timePerCredits = "<?php echo $this->session->userdata('timePerCredits'); ?>";
 
     window.sessionUrlPhoto = "<?php echo $imgProfile = (file_exists('./uploads/employees/'.$this->session->userdata('Photo')))
@@ -979,13 +980,19 @@
         });
     }
 
-    function loadSelectOptionClassOf_DESC(element,selected) {
+    function loadSelectOptionClassOf_DESC(element,selected,label='') {
         var url = base_url_js+"api/__getKurikulumSelectOptionDSC";
+
+        var viewLabel = 'Class of - ';
+        if(label=='HideLabel'){
+            viewLabel = '';
+        }
+
         $.get(url,function (data_json) {
             // console.log(data_json);
             for(var i=0;i<data_json.length;i++){
                 var sc = (data_json[i].Year==selected) ? 'selected' : '';
-                $(element).append('<option value="'+data_json[i].Year+'" '+sc+'>Class of - '+data_json[i].Year+'</option>');
+                $(element).append('<option value="'+data_json[i].Year+'" '+sc+'>'+viewLabel+data_json[i].Year+'</option>');
             }
         });
     }
@@ -1190,6 +1197,39 @@
                     .val(selected).trigger('change');
             }
         });
+    }
+
+    function loadSelectOptionSurvQuestionType(element,selected) {
+
+        var data = {action : 'getSurvQuestionType'};
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $.post(url,{token:token},function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+                var sc = (selected==v.ID) ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+            });
+        });
+
+    }
+
+    function loadSelectOptionSurvQuestionCategory(element,selected) {
+
+        var data = { action : 'getQuestionCategory', DepartmentID : sessionIDdepartementNavigation };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+        $.post(url,{token:token},function (jsonResult) {
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+                    var sc = (selected==v.ID) ? 'selected' : '';
+                    $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+                })
+            }
+        });
+
     }
 
     function loadSelectOptionConf(element,jenis,selected) {

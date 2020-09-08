@@ -3245,8 +3245,16 @@ class C_save_to_excel extends CI_Controller
         $SumTotalTagihan = 0;
         $SumTotalPembayaran = 0;
         $SumTotalSisaTagihan = 0;
+        $SumTotalRefunds = 0;
         for ($i=0; $i < count($getData); $i++) {
             $ID_register_formulir = $getData[$i]['ID_register_formulir'];
+
+            // refunds
+            $getDataRefunds = $this->m_master->caribasedprimary('db_finance.register_refund','ID_register_formulir',$ID_register_formulir);
+             $refundsValue = (count($getDataRefunds) == 0) ? "Rp ".number_format(0,2,',','.') : "Rp ".number_format($getDataRefunds[0]['Price'],2,',','.');
+
+             $SumTotalRefunds += (count($getDataRefunds) == 0) ? 0 : $getDataRefunds[0]['Price'];
+
             $output = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$ID_register_formulir);
             $no = $i + 1;
             $FormulirCode = ($getData[$i]['No_Ref'] == "" || $getData[$i]['No_Ref'] == null) ? $getData[$i]['FormulirCode'] : $getData[$i]['No_Ref'];
@@ -3380,8 +3388,10 @@ class C_save_to_excel extends CI_Controller
             $excel3->setCellValue('AO'.$a, $TotalAll);
             $excel3->setCellValue('AP'.$a, $TotalBayar);
             $excel3->setCellValue('AQ'.$a, $SisaTagihan);
-            $excel3->setCellValue('AR'.$a, ($SisaTagihan > 0) ? "Belum lunas" : "Lunas" );
-            $excel3->setCellValue('AS'.$a, $getData[$i]['Event']);
+            $excel3->setCellValue('AR'.$a, $refundsValue);
+
+            $excel3->setCellValue('AS'.$a, ($SisaTagihan > 0) ? "Belum lunas" : "Lunas" );
+            $excel3->setCellValue('AT'.$a, $getData[$i]['Event']);
 
             // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
             $excel3->getStyle('A'.$a)->applyFromArray($style_row);
@@ -3419,12 +3429,14 @@ class C_save_to_excel extends CI_Controller
             $excel3->getStyle('AQ'.$a)->applyFromArray($style_row);
             $excel3->getStyle('AR'.$a)->applyFromArray($style_row);
             $excel3->getStyle('AS'.$a)->applyFromArray($style_row);
+            $excel3->getStyle('AT'.$a)->applyFromArray($style_row);
             $a = $a + 1;
         }
 
         $excel3->setCellValue('AO'.$a, $SumTotalTagihan);
         $excel3->setCellValue('AP'.$a, $SumTotalPembayaran);
         $excel3->setCellValue('AQ'.$a, $SumTotalSisaTagihan);
+        $excel3->setCellValue('AR'.$a, $SumTotalRefunds);
 
         foreach(range('A','AZ') as $columnID) {
             $excel2->getActiveSheet()->getColumnDimension($columnID)
@@ -3629,6 +3641,7 @@ class C_save_to_excel extends CI_Controller
         $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
         $arrxx = array();
         $Total = 0;
+        // print_r($getData);die();
         for ($i=0; $i < count($getData); $i++) {
             $data =$getData[$i]['data'];
             $excel3->setCellValue('A'.$a, 'No');
@@ -3654,7 +3667,17 @@ class C_save_to_excel extends CI_Controller
                 $excel3->setCellValue('D'.$a, (string)1);
                 $excel3->setCellValue('E'.$a, $data[$j]['NamePrody']);
                 $Pembayaranke = 'ke'.$this->m_master->moneySay($data[$j]['Pembayaranke']);
-                $ket = ($data[$j]['StatusTbl'] == 1) ? 'Cicilan '.$Pembayaranke : 'Pembayaran Formulir';
+                
+                if ($data[$j]['Invoice'] < 0) {
+                    $ket = "Refund";
+                    // get deskripsi dari register_refund
+                    $getRegisterRefund = $this->m_master->caribasedprimary('db_finance.register_refund','ID_register_formulir',$data[$j]['ID_register_formulir2']);
+                    $ket .=  (!empty($getRegisterRefund[0]['Desc'])) ? " \n".$getRegisterRefund[0]['Desc'] : "";
+                }
+                else
+                {
+                    $ket = ($data[$j]['StatusTbl'] == 1) ? 'Cicilan '.$Pembayaranke : 'Pembayaran Formulir';
+                }
                 $excel3->setCellValue('F'.$a, $ket);
                 $excel3->setCellValue('G'.$a, $data[$j]['Invoice']);
 

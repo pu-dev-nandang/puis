@@ -129,7 +129,12 @@ class M_statistik extends CI_Model {
                             LEFT join db_academic.program_study as d on e.ID_program_study = d.ID 
                             left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
                              where a.SetTa = "'.$Year.'" 
-                            ) ccc where MONTH(intakedate) = "'.$monthQ.'" and Year(intakedate) = "'.$YearQ.'" and ID_program_study = ? and C_bayar > 0';
+                            ) ccc where MONTH(intakedate) = "'.$monthQ.'" and Year(intakedate) = "'.$YearQ.'" and ID_program_study = ? and C_bayar > 0 and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+              join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+              join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+              join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+              join db_admission.register as reg on reg.ID = rve.RegisterID
+              where reg.SetTa = "'.$Year.'" )';
                             $query=$this->db->query($sql, array($ProdiID))->result_array();
                             $total = $query[0]['total'];
                             $datasave[$field[$j]] = $total;
@@ -175,7 +180,14 @@ class M_statistik extends CI_Model {
                     LEFT join db_academic.program_study as d on e.ID_program_study = d.ID 
                     left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
                      where a.SetTa = "'.$Year.'" 
-                    ) ccc where ID_program_study = ? and C_bayar > 0';
+                    ) ccc where ID_program_study = ? and C_bayar > 0 
+                    and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+                                  join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+                                  join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+                                  join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+                                  join db_admission.register as reg on reg.ID = rve.RegisterID
+                                  where reg.SetTa = "'.$Year.'" )
+                    ';
                     $query=$this->db->query($sql, array($ProdiID))->result_array();
                     $total = $query[0]['total'];
                     $datasave['Total'] = $total;
@@ -412,7 +424,13 @@ class M_statistik extends CI_Model {
                         join db_finance.payment_admisi as f on e.ID = f.ID_register_formulir    
                         join db_finance.register_admisi as g on e.ID = g.ID_register_formulir
                          where a.SetTa = "'.$Year.'"  and g.`Status` = "Approved" and f.Discount = '.$p.' and e.ID_program_study = ?
-                        ) cc where C_bayar > 0';
+                         group by ID_register_formulir
+                        ) cc where C_bayar > 0 and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+              join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+              join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+              join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+              join db_admission.register as reg on reg.ID = rve.RegisterID
+              where reg.SetTa = "'.$Year.'" )';
                         $query=$this->db_statistik->query($sql, array($ProdiID))->result_array();
                         $fieldPersen[$NmP] = $query[0]['total'];
             }
@@ -494,6 +512,12 @@ class M_statistik extends CI_Model {
                                         left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
                                          where a.SetTa = "'.$Year.'" and b.ProvinceID = "'.$Prov.'"
                                         ) cc where C_bayar > 0
+                                        and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+                                                      join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+                                                      join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+                                                      join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+                                                      join db_admission.register as reg on reg.ID = rve.RegisterID
+                                                      where reg.SetTa = "'.$Year.'" )
             ';
               $query=$this->db_statistik->query($sql, array())->result_array();
               $Qty = $query[0]['total'];
@@ -520,6 +544,12 @@ class M_statistik extends CI_Model {
                                                       left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
                                                        where a.SetTa = "'.$Year.'" and b.CityID = "'.$RegionID.'"
                                                       ) cc where C_bayar > 0
+                                                      and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+                                                                    join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+                                                                    join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+                                                                    join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+                                                                    join db_admission.register as reg on reg.ID = rve.RegisterID
+                                                                    where reg.SetTa = "'.$Year.'" )
                           ';
                             $query=$this->db_statistik->query($sql, array())->result_array();
                             $Detail[$RegionID] = $query[0]['total'];

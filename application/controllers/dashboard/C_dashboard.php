@@ -950,7 +950,24 @@ class C_dashboard extends Globalclass {
 
             $queryTuitionFee=$this->db->query($sqlTuitionFee, array($Ta))->result_array();
 
-        $arr_json = array('Formulir'=> ($query[0]['total'] == null || $query[0]['total'] == "") ? 0 : $query[0]['total'],'tuition_fee' => ($queryTuitionFee[0]['total'] == null || $queryTuitionFee[0]['total'] == "") ? 0 : $queryTuitionFee[0]['total']);
+
+            $queryRefund = $this->db->query(
+                'select sum(Price) as total from(
+                        select e.Price
+                        from db_admission.register_formulir as a
+                        left JOIN db_admission.register_verified as b
+                        ON a.ID_register_verified = b.ID
+                        left JOIN db_admission.register_verification as c
+                        ON b.RegVerificationID = c.ID
+                        left JOIN db_admission.register as d
+                        ON c.RegisterID = d.ID
+                        left join db_finance.register_refund as e
+                        on a.ID = e.ID_register_formulir
+                        where d.SetTa = '.$Ta.'
+                    ) subquery'
+            )->result_array();
+
+        $arr_json = array('Formulir'=> ($query[0]['total'] == null || $query[0]['total'] == "") ? 0 : $query[0]['total'],'tuition_fee' => ($queryTuitionFee[0]['total'] == null || $queryTuitionFee[0]['total'] == "") ? 0  : $queryTuitionFee[0]['total'],'refunds' => ($queryRefund[0]['total'] == null || $queryRefund[0]['total'] == "") ? 0  : $queryRefund[0]['total'] );
         echo json_encode($arr_json);
     }
 

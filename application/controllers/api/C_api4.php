@@ -1384,7 +1384,6 @@ class C_api4 extends CI_Controller {
                                             LEFT JOIN db_academic.auth_students ats ON (ats.NPM = eu.Username) '.
                                             $dataWhere.$dataSearch;
 
-//            print_r($queryDefault);exit();
 
             $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
 
