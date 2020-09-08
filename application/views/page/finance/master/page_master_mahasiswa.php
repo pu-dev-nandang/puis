@@ -59,7 +59,7 @@
                             <th style="width: 5%;">Status</th>
                             <!-- <th style="width: 15%;">Email PU</th> -->
                             <!-- <th style="width: 5%;">No HP</th> -->
-                            <th style="width: 5%;">Bintang</th>
+                            <th style="width: 5%;">Switch Bintang</th>
                             <th style="width: 5%;">Beasiswa BPP</th>
                             <th style="width: 5%;">Beasiswa Credit</th>
                         </tr>
@@ -226,8 +226,8 @@
                             }
                         selecTOptionCredit += '</select>';
 
-                        // show bintang
-                        var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
+                        // show bintang Data_mhs[i]['Pay_Cond']
+                        var bintang = setBintangFinance(Data_mhs[i]['Pay_Cond']);
                         var IPS = 0
                         var IPK = 0
                         var Credit = 0
@@ -241,11 +241,14 @@
                             IPK = 0
                             Credit = 0
                         }
+
+                        var btnSwitchBintang = '<button class = "btn btn-primary btn-sm btnSwitchBintang" npm = "'+Data_mhs[i]['NPM']+'" ClassOf = "'+Data_mhs[i]['ClassOf']+'" pay_cond = "'+Data_mhs[i]['Pay_Cond']+'" namemhs = "'+Data_mhs[i]['Name']+'" prodiname = "'+Data_mhs[i]['ProdiEng']+'" ProdiID = "'+Data_mhs[i]['ProdiID']+'"> <i class="fa fa-hand-o-right" aria-hidden="true"></i> </button>'
+
                        $('#dataRow').append('<tr>' +
                            '<td>'+Data_mhs[i]['No']+'</td>' +
                            '<td>'+Data_mhs[i]['ProdiEng']+'</td>' +
                            // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                           '<td>'+bintang+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
+                           '<td>'+bintang+'<br/>'+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                            // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                            // '<td>'+Data_mhs[i]['ClassOf']+'</td>' +
                            '<td>'+img+'</td>' +
@@ -255,7 +258,8 @@
                            '<td>'+Data_mhs[i]['StatusStudentName']+'</td>' +
                            // '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
                            // '<td>'+Data_mhs[i]['HP']+'</td>' +
-                           '<td>'+selecTOptionBintang+'</td>' +
+                           // '<td>'+selecTOptionBintang+'</td>' +
+                           '<td style = "text-align:center;">'+btnSwitchBintang+'</td>' +
                            '<td>'+selecTOption+'</td>' +
                            '<td>'+selecTOptionCredit+'</td>' +
                            '</tr>');
@@ -397,5 +401,22 @@
           });
       })
     });
+
+    $(document).on('click','.btnSwitchBintang',function(e){
+      const NPM = $(this).attr('npm');
+      const Classof = $(this).attr('classof');
+      const Namemhs = $(this).attr('namemhs');
+      const NameOfProdi =  $(this).attr('prodiname');
+      const ProdiID = $(this).attr('ProdiID');
+      const data = {
+        NPM : NPM,
+        Classof : Classof,
+        Namemhs : Namemhs,
+        Prodiname : NameOfProdi,
+        ProdiID : ProdiID,
+      };
+      var token = jwt_encode(data,'UAP)(*');
+      window.location.href = base_url_js+'finance/mahasiswa/SwitchBintang/'+token;
+    })
 
 </script>

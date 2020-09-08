@@ -2838,6 +2838,96 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    const setBintangFinance = (JmlBintang) => {
+        let html = '';
+        let str = '';
+        for (var i = 1; i <= JmlBintang; i++) {
+           str += '*';
+        }
+
+        html = '<span style = "color:red;">'+str+'</span>';
+        return html;
+    };
+
+
+    const IntakePaymentDetailDiscount = {
+        htmlWr : (dataTuitionFee) => {
+            const PaymentTypeData = IntakePaymentDetailDiscount.getPaymentTypeData(dataTuitionFee);
+            let html = '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                                '<table class ="table table-striped table-bordered table-hover table-checkable tableData">'+
+                                    '<thead>'+
+                                        '<tr>';
+                                            html += '<th>@</th>'
+                                            for (var i = 0; i < PaymentTypeData.length; i++) {
+                                                html += '<th>'+PaymentTypeData[i]+'</th>';
+                                            }
+
+                                html+=  '</tr>'+
+                                    '</thead>'+
+                                    '<tbody>'+
+                                        '<tr>'+
+                                            '<td>Harga</td>';
+                                            for (var i = 0; i < PaymentTypeData.length; i++) {
+                                                for(key in dataTuitionFee){
+                                                    if (key == PaymentTypeData[i]) {
+                                                        html += '<td style = "color:green;">Rp. '+dataTuitionFee[key]+'</td>';
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                html += '</tr>';
+                                html += '<tr>'+
+                                            '<td>Discount</td>';
+                                            for (var i = 0; i < PaymentTypeData.length; i++) {
+                                                for(key in dataTuitionFee){
+                                                    const s = key.split('-');
+
+                                                    if (s[0] == 'Discount' && s[1] == PaymentTypeData[i]) {
+                                                        html += '<td style = "font-weight:bold;">'+dataTuitionFee[key]+'%</td>';
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                html += '</tr>';
+
+                                html += '<tr>'+
+                                            '<td>PotonganLain</td>';
+                                            for (var i = 0; i < PaymentTypeData.length; i++) {
+                                                for(key in dataTuitionFee){
+                                                    const s = key.split('-');
+
+                                                    if (s[0] == 'PotonganLain' && s[1] == PaymentTypeData[i]) {
+                                                        const dataPotongan = dataTuitionFee[key];
+                                                        let liPot = '';
+                                                        for (var z = 0; z < dataPotongan.length; z++) {
+                                                            liPot += '<li style = "color:blue;">'+dataPotongan[z].DiscountName+ ' : '+formatRupiah(dataPotongan[z].DiscountValue)+'</li>';
+                                                        }
+                                                        html += '<td>'+liPot+'</td>';
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                html += '</tr>';
+                            html += '</tbody>'+
+                                    '</table>'+
+                                '</div>'+
+                            '</div>';
+                return html;            
+        },
+
+        getPaymentTypeData : (dataTuitionFee) => {
+            let PaymentTypeData = [];
+            for(key in dataTuitionFee){
+                const s =  key.split('-');
+                if (s[0] == 'Discount') {
+                    PaymentTypeData.push(s[1]);
+                }
+            }
+            return PaymentTypeData;
+        },
+    };
+
 
     /*ADDED BY FEBRI @ FEB 2020*/
     function loadSelectOptionCountry(element,selected) {
@@ -2852,5 +2942,63 @@
         });
     }
     /*END ADDED BY FEBRI @ FEB 2020*/
+
+    /*ADDED BY Adhi @ Sep 2020*/
+    const ValidationGenerate = {
+        required : (val,theName) => {
+          const chk = Validation_required(val,theName);
+          if (chk.status == 0) {
+            toastr.info(chk.messages);
+            return false;
+          }
+          return true
+        },
+
+        moreZero : (val,theName) => {
+          try{
+            if (parseInt(val) <= 0) {
+              toastr.info(theName + ' have to more than zero');
+              return false;
+            }
+
+          }
+          catch(err){
+            return false;
+          }
+
+          return true;
+        },
+
+        initializeProcess : (selector) => {
+            let BoolProcess = true;
+            selector.each(function(e){
+              const rule =  ($(this).attr('rule')).split(',');
+              const valueData = $(this).val();
+              const theName = $(this).attr('name');
+              for (var i = 0; i < rule.length; i++) {
+                const nameRule = rule[i];
+                if (nameRule != '' && nameRule !== undefined) {
+                  try{
+                    const pr = ValidationGenerate[nameRule](valueData,theName);
+                    if (!pr) {
+                      BoolProcess = false;
+                      return;
+                    }
+                  }
+                  catch(err){
+                    BoolProcess = false;
+                    return;
+                  }
+                }
+              }
+            })
+
+            if (!BoolProcess) {
+              return false;
+            }
+            return true;
+        }
+    }
+    /*END ADDED BY Adhi @ Sep 2020*/
 
 </script>

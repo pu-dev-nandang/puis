@@ -3212,6 +3212,7 @@ class C_save_to_excel extends CI_Controller
     {
         $GetDateNow = date('Y-m-d');
         $this->load->model('master/m_master');
+        $this->load->model('admission/m_admission');
         $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
         // print_r($input['Data']);die();
 
@@ -3262,7 +3263,15 @@ class C_save_to_excel extends CI_Controller
             $Beasiswa = ($getData[$i]['getBeasiswa'] == "-") ? "" : "Beasiswa ".$getData[$i]['getBeasiswa']."\n";
             $Discount = "";
             if ($getData[$i]['Discount-SPP'] > 0) {
-                $Discount .= 'SPP : '.$getData[$i]['Discount-SPP'].'%';
+                $Discount .= 'Discount-SPP : '.$getData[$i]['Discount-SPP'].'%';
+            }
+
+            if ( count($getData[$i]['PotonganLain-SPP']) > 0) {
+                $aa = "";
+                if ($Discount != "") {
+                    $aa = "\n";
+                }
+                 $Discount .= $aa.'PotonganLain-SPP : '."Rp ".number_format($this->m_admission->sumPotonganLainBydata($getData[$i]['PotonganLain-SPP']),2,',','.');
             }
 
             if ($getData[$i]['Discount-BPP'] > 0) {
@@ -3270,7 +3279,15 @@ class C_save_to_excel extends CI_Controller
                 if ($Discount != "") {
                     $aa = "\n";
                 }
-                $Discount .= $aa.'BPP : '.$getData[$i]['Discount-BPP'].'%';
+                $Discount .= $aa.'Discount-BPP : '.$getData[$i]['Discount-BPP'].'%';
+            }
+
+            if ( count($getData[$i]['PotonganLain-BPP']) > 0) {
+                $aa = "";
+                if ($Discount != "") {
+                    $aa = "\n";
+                }
+                 $Discount .= $aa.'PotonganLain-BPP : '."Rp ".number_format($this->m_admission->sumPotonganLainBydata($getData[$i]['PotonganLain-BPP']),2,',','.') ;
             }
 
             if ($getData[$i]['Discount-Credit'] > 0) {
@@ -3278,7 +3295,15 @@ class C_save_to_excel extends CI_Controller
                 if ($Discount != "") {
                     $aa = "\n";
                 }
-                $Discount .= $aa.'SKS : '.$getData[$i]['Discount-Credit'].'%';
+                $Discount .= $aa.'Discount-SKS : '.$getData[$i]['Discount-Credit'].'%';
+            }
+
+            if ( count($getData[$i]['PotonganLain-Credit']) > 0) {
+                $aa = "";
+                if ($Discount != "") {
+                    $aa = "\n";
+                }
+                 $Discount .= $aa.'PotonganLain-SKS : '."Rp ".number_format($this->m_admission->sumPotonganLainBydata($getData[$i]['PotonganLain-Credit']),2,',','.') ;
             }
 
             if ($getData[$i]['Discount-Another'] > 0) {
@@ -3286,7 +3311,15 @@ class C_save_to_excel extends CI_Controller
                 if ($Discount != "") {
                     $aa = "\n";
                 }
-                $Discount .= $aa.'Lain-lain : '.$getData[$i]['Discount-Another'].'%';
+                $Discount .= $aa.'Discount-Lain-lain : '.$getData[$i]['Discount-Another'].'%';
+            }
+
+            if ( count($getData[$i]['PotonganLain-Another']) > 0) {
+                $aa = "";
+                if ($Discount != "") {
+                    $aa = "\n";
+                }
+                 $Discount .= $aa.'PotonganLain-Lain-lain : '."Rp ".number_format($this->m_admission->sumPotonganLainBydata($getData[$i]['PotonganLain-Another']),2,',','.') ;
             }
 
             $excel3->setCellValue('A'.$a, $no);

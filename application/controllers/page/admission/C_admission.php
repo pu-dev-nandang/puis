@@ -1108,7 +1108,8 @@ class C_admission extends Admission_Controler {
               if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,a.StatusReg,
               if(
                 (select count(*) as total from db_finance.payment_pre where `Status` = 1 and ID_register_formulir = e.ID ) > 0,"Intake","Not Intake"
-              ) as CekIntake
+              ) as CekIntake,
+              xy.Pay_Cond
               from db_admission.register as a
               join db_admission.school as b
               on a.SchoolID = b.ID
@@ -1162,7 +1163,7 @@ class C_admission extends Admission_Controler {
           }
 
           $nestedData[] = $No.' &nbsp <input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
-          $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'].'<br/>'.$stFormulirAct;
+          $nestedData[] = $this->m_master->setBintang_HTML($row['Pay_Cond']).'<br/>'.$row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'].'<br/>'.$stFormulirAct;
           $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
           $nestedData[] = $row['NamePrody'].'<br>'.$FormulirCode.'<br>'.$row['VA_number'];
           $nestedData[] = $row['NameSales'];
@@ -1247,6 +1248,8 @@ class C_admission extends Admission_Controler {
 
 
             $data2 = $this->m_admission->getDataPersonal($arrInputID[$i]);
+
+            $getRegisterAdmisi = $this->m_master->caribasedprimary('db_finance.register_admisi','ID_register_formulir',$arrInputID[$i]);
 
             // Update Intake CRM
              if (count($data2) > 0) {
@@ -1563,6 +1566,7 @@ class C_admission extends Admission_Controler {
                 'ProdiID' => $ProdiID,
                 'ProgramID' => 1,
                 'KTPNumber' => $KTPNumber,
+                'Pay_Cond' => $getRegisterAdmisi[0]['Pay_Cond'],
             );
 
             $arr_insert_auth[] = $temp2;
@@ -1611,6 +1615,7 @@ class C_admission extends Admission_Controler {
 
               // get payment
                  $getPaymentAdmisi = $this->m_master->caribasedprimary('db_finance.payment_admisi','ID_register_formulir',$arrInputID[$i]);
+                 
                  $PayFee = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$arrInputID[$i]);
                  $hitung = 0;
                  for ($x=0; $x < count($PayFee); $x++) {
@@ -1635,7 +1640,7 @@ class C_admission extends Admission_Controler {
                      $insert_id = $this->db->insert_id();
 
                      // insert to m_tuition_fee
-                     $this->m_master->insert_m_tuition_fee($NPM,$getPaymentAdmisi[$z]['PTID'],$ProdiID,$YearAuth,$Invoice,$getPaymentAdmisi[$z]['Discount']);
+                     $this->m_master->insert_m_tuition_fee($NPM,$getPaymentAdmisi[$z]['PTID'],$ProdiID,$YearAuth,$Invoice,$getPaymentAdmisi[$z]['Discount'],$getRegisterAdmisi[0]['Pay_Cond']);
 
 
                      // cek lunas atau tidak
@@ -1692,11 +1697,16 @@ class C_admission extends Admission_Controler {
                               Username : '.$NPM.'<br>
                               Password : '.$pasword_old.'<br><br>
                           ';
-                  $to = $Email;
-                  $subject = "Podomoro University Registration";
                   $ServerName = $_SERVER['SERVER_NAME'];
+                  $to = ($ServerName == 'pcam.podomorouniversity.ac.id') ? $Email : 'alhadi.rahman@podomorouniversity.ac.id';
+                  $subject = "Podomoro University Registration";
+            
                   if ($ServerName == 'pcam.podomorouniversity.ac.id') {
-                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,null,'admission@podomorouniversity.ac.id');
+                  }
+                  else
+                  {
+                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,null,'alhadi.rahman@podomorouniversity.ac.id');
                   }
 
             $aa++;

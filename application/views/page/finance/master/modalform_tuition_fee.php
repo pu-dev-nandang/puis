@@ -15,7 +15,7 @@
                     <label class="control-label">Pilih Tipe Pembayaran:</label>
                 </div>    
                 <div class="col-sm-6">
-                   <select class="select2-select-00 col-md-4 full-width-fix" id="selectTypePembayaran">
+                   <select class="select2-select-00 col-md-4 full-width-fix form-control" id="selectTypePembayaran">
                         <!-- <option></option> -->
                     </select>
                 </div>
@@ -30,7 +30,7 @@
                     <label class="control-label">Pilih Program Studi:</label>
                 </div>    
                 <div class="col-sm-6">
-                   <select class="select2-select-00 col-md-4 full-width-fix" id="selectProdi">
+                   <select class="select2-select-00 col-md-4 full-width-fix form-control" id="selectProdi">
                         <!-- <option></option> -->
                     </select>
                 </div>
@@ -42,7 +42,7 @@
                     <label class="control-label">Pilih Tahun Angkatan :</label>
                 </div>    
                 <div class="col-sm-6">
-                   <select class="select2-select-00 col-md-4 full-width-fix" id="selectClassOf">
+                   <select class="select2-select-00 col-md-4 full-width-fix form-control" id="selectClassOf">
                         <!-- <option></option> -->
                     </select>
                 </div>
@@ -64,9 +64,17 @@
                     <label class="control-label">Bintang :</label>
                 </div>    
                 <div class="col-sm-6">
-                   <select class="select2-select-00 col-md-4 full-width-fix" id="selectPay_Cond">
-                        <option value="1">*</option>
-                        <option value="2">**</option>
+                   <select class="select2-select-00 col-md-4 full-width-fix form-control" id="selectPay_Cond">
+                        <?php for ($i=0;$i<count($selectBintang);$i++): ?>
+                                <?php 
+                                    $strBintang = '';
+                                    $ID_bintang = $selectBintang[$i]['ID_bintang'];
+                                    for ($z=1; $z <= $ID_bintang; $z++) { 
+                                        $strBintang .='*';
+                                    }
+                                 ?>
+                                 <option value="<?php echo $ID_bintang ?>"><?php echo $strBintang ?></option>
+                        <?php endfor ?>
                     </select>
                 </div>
             </div>

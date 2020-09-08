@@ -433,44 +433,61 @@
                               '<th style="width: 55px;">BilingID</th>'+
                               '<th style="width: 55px;">Status</th>'+
                               '<th style="width: 55px;">Deadline</th>'+
+                              '<th style="width: 55px;">Payment Date</th>'+
                               '<th style="width: 55px;">UpdateAt</th>';
-        table += '</tr>' ;
-        table += '</thead>' ;
+        table += '</tr>' ;  
+        table += '</thead>' ; 
         table += '<tbody>' ;
 
-        var url = base_url_js+'finance/getPayment_detail_admission';
+        var url = base_url_js+'finance/getPayment_detail_admission2';
         var data = {
             ID_register_formulir : ID_register_formulir,
         };
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token},function (resultJson) {
-           var DetailPaymentArr = jQuery.parseJSON(resultJson);
-           let dataRefund = [];
+           var resultJson = jQuery.parseJSON(resultJson);
+           var DetailPaymentArr = resultJson['data'];
+           var action = resultJson['action'];
+           dataRefund =  resultJson['dataRefund'];
+           const dataTuitionFee =  resultJson['dataTuitionFee'];
            var isi = '';
            for (var j = 0; j < DetailPaymentArr.length; j++) {
-
-            // declare refund data
-              if (j == 0 && DetailPaymentArr[0]["Refund"] !== undefined) {
-                dataRefund = DetailPaymentArr[0]["Refund"]
-              }
-
              var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
              var status = (DetailPaymentArr[j]['Status'] == 0) ? 'Belum Bayar' : 'Sudah Bayar';
+             var btn_bayar = 'Already Generated';
+             if(action == 1)
+             {
+              btn_bayar = (DetailPaymentArr[j]['Status'] == 0) ? '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "1">Bayar</button>' : '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "0">Tidak Bayar</button>';
+             }
+             if(action == 2)
+             {
+              btn_bayar = 'Already Refund';
+             }
+
+             var PaymentDate = (DetailPaymentArr[j]['DatePayment'] == '' || DetailPaymentArr[j]['DatePayment'] == null || DetailPaymentArr[j]['DatePayment'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['DatePayment'];
+             var Deadline = (DetailPaymentArr[j]['Deadline'] == '' || DetailPaymentArr[j]['Deadline'] == null || DetailPaymentArr[j]['Deadline'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['Deadline'];
+             var UpdateAt = (DetailPaymentArr[j]['UpdateAt'] == '' || DetailPaymentArr[j]['UpdateAt'] == null || DetailPaymentArr[j]['UpdateAt'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['UpdateAt']
+             
              isi += '<tr>'+
                    '<td>'+ (j+1) + '</td>'+
                    // '<td>'+ Nama + '</td>'+
                    '<td>'+ yy + '</td>'+
                    '<td>'+ DetailPaymentArr[j]['BilingID'] + '</td>'+
                    '<td>'+ status + '</td>'+
-                   '<td>'+ DetailPaymentArr[j]['Deadline'] + '</td>'+
-                   '<td>'+ DetailPaymentArr[j]['UpdateAt'] + '</td>'+
-                 '<tr>';
+                   '<td>'+ Deadline + '</td>'+
+                   '<td>'+ PaymentDate + '</td>'+
+                   '<td>'+ UpdateAt + '</td>'+
+                 '<tr>'; 
            }
 
-           table += isi+'</tbody>' ;
+           table += isi+'</tbody>' ; 
            table += '</table>' ;
 
            html += table;
+
+           html += '<hr/>';
+
+           html += IntakePaymentDetailDiscount.htmlWr(dataTuitionFee);
 
            if (dataRefund.length > 0) {
                 html  += '<br/>';
@@ -510,7 +527,6 @@
                      '</div>'+
                    '</div>';
            }
-           
 
            var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                '';
@@ -521,10 +537,10 @@
            $('#GlobalModalLarge').modal({
                'show' : true,
                'backdrop' : 'static'
-           });
+           });   
 
         }).fail(function() {
-          toastr.info('No Action...');
+          toastr.info('No Action...'); 
           // toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {
 
