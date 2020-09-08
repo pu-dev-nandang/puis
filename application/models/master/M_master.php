@@ -2917,11 +2917,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
 
 
-    public function insert_m_tuition_fee($NPM,$PTID_Q,$ProdiID,$YearAuth,$Invoice_Q,$Discount_Q)
+    public function insert_m_tuition_fee($NPM,$PTID_Q,$ProdiID,$YearAuth,$Invoice_Q,$Discount_Q,$Pay_Cond = '1')
     {
         // untuk semester data diambil dari set tagihan awal, semester lainnya akan baca payment per prodi dan discount sama dengan = 0
-        $sql1 = 'select * from db_finance.tuition_fee where PTID = ? and ProdiID = ? and ClassOf = ?';
-        $query1=$this->db->query($sql1, array($PTID_Q,$ProdiID,$YearAuth))->result_array();
+        $sql1 = 'select * from db_finance.tuition_fee where PTID = ? and ProdiID = ? and ClassOf = ? and Pay_Cond = ? ';
+        $query1=$this->db->query($sql1, array($PTID_Q,$ProdiID,$YearAuth,$Pay_Cond))->result_array();
         $PTID = $query1[0]['PTID'];
         for ($k=1; $k <= 14; $k++) {
                 $st = $k;
@@ -4389,6 +4389,20 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $rs = (array) json_decode($pr,true);
         curl_close ($ch);
         return $rs;
+    }
+
+    public function setBintang_HTML($JmlBintang){
+        $html = '';
+        $str = '';
+        if (!empty($JmlBintang)) {
+           for ($i=1; $i <= $JmlBintang; $i++) { 
+               $str .= '*';
+           }
+        }
+
+        $html = '<span style = "color:red;">'.$str.'</span>';
+        return $html;
+
     }
 
 

@@ -9,8 +9,8 @@
                 <div class="row">
                     <div id="panel_web" class="" style="padding:30px;padding-top:0px;">
                         <ul class="nav nav-tabs">
-                            <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee/1">Approval Tuition Fee</a></li>
-                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_approved/1">Tuition Fee Approved</a></li>
+                            <!-- <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee/1">Approval Tuition Fee</a></li> -->
+                            <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_approved/1">Tuition Fee Approved</a></li>
                         </ul>
                     </div>
                 </div>
@@ -44,7 +44,8 @@
             $('#panel_web').addClass('wrap');
             $('#panel_web').css({"padding": "0px", "padding-right": "20px"});
         }
-        loadPage('tuition_fee/1');
+        // loadPage('tuition_fee/1');
+        loadPage('tuition_fee_approved/1');
         FuncSearch();
     });
 

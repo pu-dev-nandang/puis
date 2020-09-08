@@ -172,16 +172,85 @@ class C_save_to_pdf2 extends CI_Controller {
             if ($key[0] == 'Discount') {
                 if ($value > 0 ) {
                    $chkDiscount = 1;
-                   $arr_discount[$key[1]] = $value;
+                   $arr_discount[$key[1]]['discount'] = $value;
                 }
-                $arr_discount2[$key[1]] = $value;
+                $arr_discount2[$key[1]]['discount'] = $value;
             }
         }
+
+        // get potongan lain
+          foreach ($Personal[0] as $key => $value) {
+            $key = explode('-', $key);
+             if ($key[0] == 'PotonganLain') {
+                $ptname = $key[1];
+                $str_arr_discount = '';
+                $TotalPotonganLain = 0;
+                $BoolFindKey = false;
+                foreach ($arr_discount as $keya => $valuea) {
+                  if ($keya == $ptname) {
+                    $dataPotongan =  $value;
+                    if (count($dataPotongan) > 0) {
+                      $str_arr_discount .= $dataPotongan[0]['DiscountName'].'('.$ptname.')'.' : '.number_format($dataPotongan[0]['DiscountValue'],2,',','.');
+                      $TotalPotonganLain += $dataPotongan[0]['DiscountValue'];
+                      for ($zz=1; $zz < count($dataPotongan); $zz++) { 
+                        $str_arr_discount .= ', '.$dataPotongan[$zz]['DiscountName'].' : '.number_format($dataPotongan[$zz]['DiscountValue'],2,',','.');
+                        $TotalPotonganLain += $dataPotongan[$zz]['DiscountValue'];
+                      }
+                    }
+                    $BoolFindKey = true;
+                    break;
+                  }
+                }
+
+                if ($BoolFindKey) {
+                  if ($str_arr_discount != '') {
+                    if (array_key_exists($ptname, $arr_discount)) {
+                        $arr_discount[$ptname]['potonganLain'] = ' dan '.$str_arr_discount;
+                        $arr_discount2[$ptname]['totalPotonganLain'] = $TotalPotonganLain;
+                    }
+                    else
+                    {
+                      $arr_discount[$ptname]['potonganLain'] = $str_arr_discount;
+                      $arr_discount2[$ptname]['totalPotonganLain'] = $TotalPotonganLain;
+                    }
+
+                    $chkDiscount = 1;
+                  }
+                }
+                else
+                {
+                    $dataPotongan =  $value;
+                    if (count($dataPotongan) > 0) {
+                      $str_arr_discount .= $dataPotongan[0]['DiscountName'].'('.$ptname.')'.' : '.number_format($dataPotongan[0]['DiscountValue'],2,',','.');
+                      $TotalPotonganLain += $dataPotongan[0]['DiscountValue'];
+                      for ($zz=1; $zz < count($dataPotongan); $zz++) { 
+                        $str_arr_discount .= ', '.$dataPotongan[$zz]['DiscountName'].' : '.number_format($dataPotongan[$zz]['DiscountValue'],2,',','.');
+                        $TotalPotonganLain += $dataPotongan[$zz]['DiscountValue'];
+                      }
+
+                      if ($str_arr_discount != '') {
+                        if (array_key_exists($ptname, $arr_discount)) {
+                            $arr_discount[$ptname]['potonganLain'] = ' dan '.$str_arr_discount;
+                            $arr_discount2[$ptname]['totalPotonganLain'] = $TotalPotonganLain;
+                        }
+                        else
+                        {
+                          $arr_discount[$ptname]['potonganLain'] = $str_arr_discount;
+                          $arr_discount2[$ptname]['totalPotonganLain'] = $TotalPotonganLain;
+                        }
+
+                        $chkDiscount = 1;
+                      }
+                    }
+                }
+            }
+
+          }
 
         if ($chkDiscount == 1) {
             $Status = 'rata-rata raport kelas XI';
             if ($Personal[0]['RangkingRapor'] != 0) {
-                $Status = 'Rangking paralel '.$Personal[0]['RangkingRapor'].' kelas XI';
+                $Status = 'berdasarkan Rangking paralel '.$Personal[0]['RangkingRapor'].' kelas XI';
             }
 
             $setXvalue = $setX;
@@ -190,11 +259,11 @@ class C_save_to_pdf2 extends CI_Controller {
             $this->mypdf->SetTextColor(0,0,0);
             $this->mypdf->SetFont('Arial','',$setFont);
             // MultiCell( 140, 2, $arr_value[$getRowDB], 0,'L');
-            $this->mypdf->MultiCell(0, 5, 'Selamat, Anda mendapatkan beasiswa potongan di Podomoro University tahun akademik '.$Personal[0]['NamaTahunAkademik'].' berdasarkan '.$Status.', dengan rincian sebagai berikut:', 0,'L');
+            $this->mypdf->MultiCell(0, 5, 'Selamat, Anda mendapatkan beasiswa potongan di Podomoro University tahun akademik '.$Personal[0]['NamaTahunAkademik'].' '.$Status.', dengan rincian sebagai berikut:', 0,'L');
 
             $setY = $setY + 10;
             $height = 5;
-            $this->mypdf->SetXY($setX,$setY); 
+            $this->mypdf->SetXY($setX,$setY);
             $this->mypdf->SetFillColor(255, 255, 255);
             $this->mypdf->Cell(50,$height,'Nama Lengkap - Nomor Formulir',1,0,'C',true);
             $this->mypdf->Cell(40,$height,'Program Study',1,0,'C',true);
@@ -203,12 +272,20 @@ class C_save_to_pdf2 extends CI_Controller {
             $ProdiTbl = $Personal[0]['NamePrody'];
             foreach ($arr_discount as $key => $value) {
                 $setY = $setY + $height;
-                $this->mypdf->SetXY($setX,$setY); 
+                $this->mypdf->SetXY($setX,$setY);
                 $this->mypdf->SetFillColor(255, 255, 255);
                 $this->mypdf->Cell(50,$height,$NameTbl,1,0,'C',true);
                 $this->mypdf->Cell(40,$height,$ProdiTbl,1,0,'C',true);
-                $this->mypdf->Cell(80,$height,'Beasiswa Pot '.$key.' '.(int)$value.'%',1,1,'C',true);
-            } 
+                $rsShow = '';
+                if (array_key_exists('discount', $value)) {
+                   $rsShow = 'Beasiswa Pot '.$key.' '.(int)$value['discount'].'%';
+                }
+               
+                if (array_key_exists('potonganLain', $value)) {
+                  $rsShow .= $value['potonganLain'];
+                }
+                $this->mypdf->Cell(80,$height,$rsShow,1,1,'C',true);
+            }
 
         }
 
@@ -221,25 +298,25 @@ class C_save_to_pdf2 extends CI_Controller {
 
         $setY = $setY + 5;
         $height = 5;
-        
-        $this->mypdf->SetXY($setX,$setY); 
+
+        $this->mypdf->SetXY($setX,$setY);
         $this->mypdf->SetFillColor(255, 255, 255);
         $this->mypdf->SetFont('Arial','B',$setFont);
         $this->mypdf->Cell(50,$height,'Pembayaran Semester 1',1,0,'C',true);
         $this->mypdf->Cell(25,$height,'SPP',1,0,'C',true);
-        $this->mypdf->Cell(25,$height,'BPP Semester',1,0,'C',true); 
-        $this->mypdf->Cell(25,$height,'Biaya SKS',1,0,'C',true); 
-        $this->mypdf->Cell(25,$height,'Lain-lain',1,0,'C',true); 
-        $this->mypdf->Cell(25,$height,'Total Biaya',1,1,'C',true); 
+        $this->mypdf->Cell(25,$height,'BPP Semester',1,0,'C',true);
+        $this->mypdf->Cell(25,$height,'Biaya SKS',1,0,'C',true);
+        $this->mypdf->Cell(25,$height,'Lain-lain',1,0,'C',true);
+        $this->mypdf->Cell(25,$height,'Total Biaya',1,1,'C',true);
 
         $setY = $setY + $height;
-        $this->mypdf->SetXY($setX,$setY); 
+        $this->mypdf->SetXY($setX,$setY);
         $this->mypdf->SetFillColor(255, 255, 255);
         $this->mypdf->SetFont('Arial','',$setFont);
         $this->mypdf->Cell(50,$height,'Biaya Normal',1,0,'L',true);
-        
+
         // get tuition fee
-        
+
            $sql23 = 'select a.Abbreviation,b.Cost from db_finance.payment_type as a join db_finance.tuition_fee as b on a.ID = b.PTID where ClassOf = ? and ProdiID = ?';
            $query23=$this->db->query($sql23, array($Personal[0]['SetTa'],$Personal[0]['ID_program_study']))->result_array();
            $totalTuitionFee = 0;
@@ -262,19 +339,20 @@ class C_save_to_pdf2 extends CI_Controller {
                     $this->mypdf->Cell(25,$height,number_format($keya['Cost'],2,',','.'),1,0,'L',true);
                     $totalTuitionFee = $totalTuitionFee + $keya['Cost'];
                 }
-                
+
             }
             // total
                  $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true);
 
 
             $setY = $setY + $height;
-            $this->mypdf->SetXY($setX,$setY); 
+            $this->mypdf->SetXY($setX,$setY);
             $this->mypdf->SetFillColor(255, 255, 255);
             $this->mypdf->SetFont('Arial','',$setFont);
             $this->mypdf->Cell(50,$height,'Beasiswa yang diterima',1,0,'L',true);
 
             $totalTuitionFee = 0;
+            // print_r($arr_discount2);die();
             foreach ($arr_discount2 as $key => $value) {
 
                 foreach ($arr_pay as $keya => $valuea) {
@@ -282,20 +360,37 @@ class C_save_to_pdf2 extends CI_Controller {
                     if ($keya == $key) {
                         if ($key == 'Credit') {
                             $cost = $Credit * $valuea;
-                            $cost = $value * $cost / 100;
+                            if (array_key_exists('discount', $value)) {
+                               $cost = $value['discount'] * $cost / 100;
+                            }
+                          
+                            // check ada potongan lain atau tidak
+                              if (array_key_exists('totalPotonganLain', $arr_discount2[$key])) {
+                                $cost = $cost +  $arr_discount2[$key]['totalPotonganLain'];
+                              }
+
                             $this->mypdf->Cell(25,$height,number_format($cost,2,',','.'),1,0,'L',true);
                         }
                         else
                         {
-                            $cost = $value * $valuea / 100;
+                            $cost = $valuea;
+                            if (array_key_exists('discount', $value)) {
+                               $cost = $value['discount'] * $cost / 100;
+                            }
+
+                            // check ada potongan lain atau tidak
+                              if (array_key_exists('totalPotonganLain', $arr_discount2[$key])) {
+                                $cost = $cost +  $arr_discount2[$key]['totalPotonganLain'];
+                              }
+
                             $this->mypdf->Cell(25,$height,number_format($cost,2,',','.'),1,0,'L',true);
                         }
                         $totalTuitionFee = $totalTuitionFee + $cost;
                     }
                 }
-                
+
             }
-            $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true); 
+            $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true);
 
 
         $setY = $setY + $height;

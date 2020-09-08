@@ -11,7 +11,7 @@
                     <div id="panel_web" class="" style="padding:30px;padding-top:0px;">
                         <ul class="nav nav-tabs">
                             <li role="presentation" class="active"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee/1">Input Tuition Fee</a></li>
-                            <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_delete/1">Delete Tuition Fee</a></li>
+                            <!-- <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_delete/1">Delete Tuition Fee</a></li> -->
                             <li role="presentation"><a href="javascript:void(0)" class="tab-btn-tuition-fee" data-page="tuition_fee_approved/1">Tuition Fee Approved</a></li>
                         </ul>
                         <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
@@ -42,6 +42,7 @@
 <script type="text/javascript">
     window.pageHtml = '';
     window.max_cicilan = 4;
+    window.dataInputPotonganLain= [];
     $(document).ready(function () {
         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
             $('#panel_web').addClass('wrap');
@@ -145,121 +146,6 @@
          break;
         }
     });
-
-    // $(document).on("change", ".getBeasiswa", function(event){
-    //     var fillitem = $(this).closest('tr');
-    //     var fillTD = $(this).closest('td');
-    //     if ($(this).val() ==  5) {
-    //         var ID_register_formulir = fillitem.find('td:eq(0)').find('.uniform').val();
-    //         var Email = fillitem.find('td:eq(0)').find('.uniform').attr('email');
-    //         var Nama = fillitem.find('td:eq(0)').find('.uniform').attr('nama');
-    //         fillTD.append('<button class = "btn btn-primary btn-show" id-register-formulir = "'+ID_register_formulir+'" email = "'+Email+'" nama = "'+Nama+'" >Doc & Exam</button>');
-    //     }
-    //     else
-    //     {
-    //         fillTD.find('.btn-show').remove();
-    //     }
-        
-    // });
-
-    // $(document).on('click','.btn-show', function () {
-    //     var ID_register_formulir = $(this).attr('id-register-formulir');
-    //     var Email = $(this).attr('email');
-    //     var Nama = $(this).attr('nama');
-    //     var url = base_url_js+"api/__getDocument2";
-    //     var data = {
-    //         ID_register_formulir : ID_register_formulir,
-    //         Email : Email,
-    //     };
-    //     var token = jwt_encode(data,"UAP)(*");
-    //     $.post(url,{ token:token }, function (json) {
-    //         var doc = json['doc'];
-    //         $('#GlobalModal .modal-header').html('<h4 class="modal-title">'+'Document '+Nama+'</h4>');
-    //         var html = '<div class = "row">'+
-    //                       '<div class ="col-md-12">';
-    //         var table = '';
-    //         table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
-    //         '<thead>'+
-    //             '<tr>'+
-    //                 '<th style="width: 5px;">No</th>'+
-    //                 '<th style="width: 55px;">Dokumen</th>'+
-    //                 '<th style="width: 55px;">Required</th>'+
-    //                 '<th style="width: 55px;">Attachment</th>'+
-    //                 '<th style="width: 55px;">Status</th>';
-              
-    //         table += '</tr>' ;  
-    //         table += '</thead>' ; 
-    //         table += '<tbody>' ;
-    //         for (var i =0; i < doc.length; i++) {
-    //           table += '<tr>'+
-    //                       '<td>'+ (i+1)+'</td>'+
-    //                       '<td>'+doc[i]['DocumentChecklist'] +'</td>'+
-    //                       '<td>'+doc[i]['Required'] +'</td>'+
-    //                       // '<td>'+'<a href = "<?php echo url_registration ?>document/'+Email+'/'+json[i]['Attachment']+'" target="_blank">File</a></td>'+
-    //                       '<td>'+'<a href="javascript:void(0)" class="show_a_href" id = "show'+Email+'" filee = "'+doc[i]['Attachment']+'" Email = "'+Email+'">File</a></td>'+
-    //                       '<td>'+doc[i]['Status'] +'</td>'
-    //                       ; 
-    //         }
-             
-    //         table += '</tbody>' ; 
-    //         table += '</table>' ;
-    //         html += table;
-    //         html += '</div></div>'; // end document
-
-    //         var ujian = json['ujian'];
-    //         if (ujian.length > 0) {
-    //           var kelulusan = json['kelulusan'];
-    //           html += '<div class= "row" style = "margin-top ; 5px">'+
-    //                     '<div class = "col- md-12">'+
-    //                       '<h5>Exam Result</h5>'+
-    //                       '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
-    //                                   '<thead>'+
-    //                                       '<tr>'+
-    //                                           '<th style="width: 5px;">No</th>'+
-    //                                           '<th style="width: 55px;">Exam Name</th>'+
-    //                                           '<th style="width: 55px;">Bobot</th>'+
-    //                                           '<th style="width: 55px;">Value</th>';
-    //           html += '</tr>' ;  
-    //           html += '</thead>' ; 
-    //           html += '<tbody>' ;
-              
-    //           var jmlbobot = 0;
-    //           var Nilai_bobot = 0;
-    //           var nilai = 0;
-    //           for (var i =0; i < ujian.length; i++) {
-    //             html += '<tr>'+
-    //                         '<td>'+ (i+1)+'</td>'+
-    //                         '<td>'+ujian[i]['NamaUjian'] +'</td>'+
-    //                         '<td>'+ujian[i]['Bobot'] +'</td>'+
-    //                         '<td>'+ujian[i]['Value'] +'</td>'; 
-
-    //             jmlbobot = parseInt(jmlbobot)  + parseInt(ujian[i]['Bobot']);
-    //             Nilai_bobot = parseInt(Nilai_bobot) + ( (parseInt(ujian[i]['Value']) * parseInt(ujian[i]['Bobot']) ) )
-    //           }
-              
-    //            nilai = parseInt(Nilai_bobot) / parseInt(jmlbobot); 
-
-    //           html += '</tbody>' ; 
-    //           html += '</table>' ;
-
-    //           html += '<p>Jumlah Bobot : '+jmlbobot+'</p>'+
-    //                   '<p>Nilai * Bobot : '+Nilai_bobot+'</p>'+
-    //                   '<p>Nilai Akhir : '+nilai+'</p>'+
-    //                   '<p>Status : '+kelulusan[0]['Kelulusan']+'</p>';
-
-    //         }
-
-    //         var footer = '<div class="col-sm-12" id="BtnFooter">'+
-    //                         '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
-    //                       '</div>';
-    //         $('#GlobalModal .modal-body').html(html);
-    //         $('#GlobalModal .modal-footer').html(footer);
-    //         $('#GlobalModal').modal({
-    //             'show' : true,
-    //             'backdrop' : 'static'
-    //         });
-    //     })
-    // });
 
     function process_tuition_fee_delete()
     {
@@ -422,6 +308,7 @@
 
     // event cheklist
     $(document).on('change','.tableData input[type=checkbox]', function () {
+
         var Uniformvaluee = $(this).val();
         switch(pageHtml)
         {
@@ -434,6 +321,8 @@
                 $('.widget_delete').remove();
                 $('.getDom').prop('disabled', false);
                 $('.getDom[id-formulir="'+Uniformvaluee+'"]').prop('disabled', true);
+                $('.selectBintang[id-formulir="'+Uniformvaluee+'"]').prop('disabled', true);
+                $('.btnSetPotonganLain[id-formulir="'+Uniformvaluee+'"]').prop('disabled', true);
                 var Nama = $(this).attr('nama');
                 if (Uniformvaluee != 'nothing') {
                     // get data to make dom
@@ -448,8 +337,12 @@
                         var getDokumen = $('#getDokumen'+Uniformvaluee).val();
                         var ket = $('#ket'+Uniformvaluee).val();
                         var pt = payment_type.split('-');
+
                         if (pt.length == 1) {
                             var Discount = $("#"+payment_type+Uniformvaluee).val();
+                            // get bintang
+                            var Pay_Cond =  $('.selectBintang[id-formulir="'+Uniformvaluee+'"]').val();
+                            // console.log(Pay_Cond);return;
                             if (id_formulir == Uniformvaluee) {
                                 arrTemp = {
                                         id_formulir : id_formulir,
@@ -460,14 +353,15 @@
                                         getDokumen : getDokumen,
                                         ket : ket,
                                         Nama : Nama,
-                                        Discount : Discount
+                                        Discount : Discount,
+                                        Pay_Cond : Pay_Cond,
                                 };
                                 arrcheklist.push(arrTemp);
                             }
                         }
                         
                     })
-                    console.log(arrcheklist); 
+                    
                     var arrResult =  generateArr(arrcheklist);
                     domHTMLCicilan(arrResult);  
                 }
@@ -477,6 +371,8 @@
             {
                 $(".widget_"+Uniformvaluee).remove();
                 $('.getDom').prop('disabled', false);
+                $('.selectBintang[id-formulir="'+Uniformvaluee+'"]').prop('disabled', false);
+                $('.btnSetPotonganLain[id-formulir="'+Uniformvaluee+'"]').prop('disabled', false);
             }
          break;
          case  "tuition_fee_approved" :      
@@ -556,6 +452,7 @@
             arrTemp['getBeasiswa'] = data[i]['getBeasiswa'];
             arrTemp['ket'] = data[i]['ket'];
             arrTemp['Nama'] = data[i]['Nama'];
+            arrTemp['Pay_Cond'] = data[i]['Pay_Cond'];
             for (var j = i + 1; j < data.length; j++) {
                 if (data[i]['id_formulir'] == data[j]['id_formulir']) {
                     arrTemp[data[j]['payment_type']] = data[j]['valuee'];
@@ -574,7 +471,7 @@
 
     function domHTMLCicilan(data)
     {
-        console.log(data);
+        // console.log(data);return;
         //console.log(payment_type);
         //console.log(max_cicilan);
         max_cicilanString = max_cicilan[0]['max_cicilan'];
@@ -625,7 +522,7 @@
             get_Invoice = parseInt(get_Invoice)+ parseInt(x);
         }
 
-        console.log(get_Invoice);
+        // console.log(get_Invoice);
 
         var setMinimal = 500000;
         var Val = $(this).val();
@@ -640,7 +537,7 @@
                 if (i == Val) {
                     cost_value = parseInt(get_Invoice) - parseInt(cost);
                 }
-                input += '<label class="col-md-1 control-label">Cicilan '+i+'</label><div class="col-md-2"><input type="text" id = "cost'+data[0]['id_formulir']+'_'+i+'" value = "'+cost_value+'" class = "form-control costInput2'+'_'+data[0]['id_formulir']+'"><br>Deadline<div id="datetimepicker'+data[0]['id_formulir']+'_'+i+'" class="input-group input-append date datetimepicker">'+
+                input += '<label class="col-md-1 control-label" style = "margin-top:20px;">Cicilan '+i+'</label><div class="col-md-2" style = "margin-top:20px;border: 2px solid #eee;padding:10px;"><input type="text" id = "cost'+data[0]['id_formulir']+'_'+i+'" value = "'+cost_value+'" class = "form-control costInput2'+'_'+data[0]['id_formulir']+'"><br/>Deadline<div id="datetimepicker'+data[0]['id_formulir']+'_'+i+'" class="input-group input-append date datetimepicker">'+
                             '<input data-format="yyyy-MM-dd hh:mm:ss" class="form-control" id="datetime_deadline'+data[0]['id_formulir']+'_'+i+'" type="text"></input>'+
                             '<span class="input-group-addon add-on">'+
                               '<i data-time-icon="icon-time" data-date-icon="icon-calendar">'+
@@ -809,8 +706,10 @@
                 var url = base_url_js + "admission/proses-calon-mahasiswa/set_input_tuition_fee_submit";
                 var data = {
                     data1 : arrTemp,
-                    data2 : dataa
+                    data2 : dataa,
+                    dataInputPotonganLain : dataInputPotonganLain,
                 }
+
                 var token = jwt_encode(data,"UAP)(*");
                 $.post(url,{token:token},function (data_json) {
                     // jsonData = data_json;
@@ -825,6 +724,7 @@
                         $('.uniform[value="'+dataa[0]['id_formulir']+'"]').remove();
                         toastr.success('Data berhasil disimpan', 'Success!');
                         $('tr[id="id_formulir'+dataa[0]['id_formulir']+'"]').remove();
+                        dataInputPotonganLain = [];
                     }
 
                 }).done(function() {
@@ -933,5 +833,293 @@
       });
 
     });
+
+    // --- add Potongan --
+
+    const potonganLainInput = {
+        htmlPotonganDynamic : (withButton = 0) => {
+            let htmlViewSelector = $('#contentPotongan');
+            let htmlScript = '<div class = "row"><div class = "col-xs-3">'+
+                                '<div class = "form-group">'+
+                                    '<label>DiscountName</label>'+
+                                    '<input type="text"  class = "form-control frmInput" name = "DiscountName" rule = "required">'+
+                                '</div>'+   
+                             '</div>'+
+                             '<div class = "col-xs-3">'+
+                                '<div class = "form-group">'+
+                                    '<label>Value</label>'+
+                                    '<input type="text"  class = "form-control frmInput" name = "DiscountValue" rule = "required">'+
+                                '</div>'+   
+                             '</div>'+
+                             '<div class = "col-xs-4">'+
+                                '<div class = "form-group">'+
+                                    '<label>Description</label>'+
+                                    '<textarea class = "form-control frmInput" name = "Description" rule = ""></textarea>'+
+                                '</div>'+
+                             '</div>'+
+                             (
+                                (withButton == 1) ? '<div class = "col-xs-2"><button class = "btn btn-danger deleteInputPotongan" style = "margin-top:25px;">Delete</button>' : ''  ) + '</div>'+
+
+                        '</div>';
+            return htmlScript;
+        },
+
+        addPotongan : () => {
+            $('#contentPotongan').append(potonganLainInput.htmlPotonganDynamic(1));
+            $('.frmInput[name="DiscountValue"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+            $('.frmInput[name="DiscountValue"]').maskMoney('mask', '9894');
+            $('.frmInput[name="DiscountName"]:last').focus();
+        },
+
+        deleteInputPotongan : (selector) => {
+            selector.closest('.row').remove();
+            potonganLainInput.countDiscountValue();
+        },
+
+        countDiscountValue : () => {
+            let total = 0;
+            $('.frmInput[name="DiscountValue"]').each(function(e){
+                total += parseInt(potonganLainInput.valueOnly($(this).val()));
+            })
+            $('#viewTotal').html(formatRupiah(total));
+        },
+
+        valueOnly : (valData) => {
+            let arr = valData.split('.');
+            let str = '';
+            for (var i = 0; i < arr.length; i++) {
+                str += arr[i];
+            }
+            return str;
+        },
+
+        savePotonganLain : async (itsme) => {
+            let data = {};
+            let tempArr = [];
+            let obj = {};
+            let booleanCheck = true;
+            let x =1;
+            const ID_register_formulir = $('#contentPotongan').attr('id_formulir');
+            const PTID = $('#contentPotongan').attr('ptid');
+            const PTName = $('#contentPotongan').attr('ptname');
+            const selectorTD = $('.btnSetPotonganLain[id-formulir="'+ID_register_formulir+'"][payment-type_id="'+PTID+'"][payment-type="'+PTName+'"]').closest('td');
+            $('#contentPotongan').find('.frmInput').each(function(e){
+                const name = $(this).attr('name');
+                const rule = $(this).attr('rule');
+                const valueData = (name == 'DiscountValue') ? potonganLainInput.valueOnly($(this).val()) : $(this).val();
+                if (name == 'DiscountValue') {
+                    if (parseInt(valueData) <= 0) {
+                        booleanCheck = false;
+                        return;
+                    }
+                }
+                else if(name == 'Description'){
+                    // no code
+                }
+                else
+                {
+                    const check = Validation_required(valueData,'');
+                    if(check['status'] == 0){
+                        booleanCheck = false;
+                        return;
+                    }
+                }
+
+                if (x == 3) {
+                    obj[name] = valueData;
+                    tempArr.push(obj);
+                    obj = {};
+                    x = 0;
+
+                }
+                else
+                {
+                    obj[name] = valueData;
+                }
+
+                x++;
+
+            })
+
+            if (!booleanCheck) {
+                toastr.info('All form are required and value must be more than 0')
+                return;
+            }
+
+            loading_button2(itsme);
+
+            data = {
+                ID_register_formulir : ID_register_formulir,
+                PTID : PTID,
+                PTName : PTName,
+                data : tempArr
+            }
+
+            // update value harga ke harga sebelumnya
+                const dataOld =  dataInputPotonganLain.filter(x => {
+                    if (x.ID_register_formulir === data.ID_register_formulir && x.PTID === data.PTID ) {
+                        return true;
+                    }
+
+                    return false;
+                });
+
+
+                potonganLainInput.updateHargaColumn(selectorTD,dataOld,'prev');
+
+
+            // hapus data old
+            dataInputPotonganLain = dataInputPotonganLain.filter(x => {
+                // console.log(data)
+                // console.log(x)
+                if (x.ID_register_formulir === data.ID_register_formulir && x.PTID === data.PTID ) {
+                    return false;
+                }
+
+                return true;
+            });
+
+             dataInputPotonganLain.push(data);
+
+             const dataUpdate = dataInputPotonganLain.filter(x => {
+                 if (x.ID_register_formulir === data.ID_register_formulir && x.PTID === data.PTID ) {
+                     return true;
+                 }
+
+                 return false;
+             });
+
+             // update value harga
+            potonganLainInput.updateHargaColumn(selectorTD,dataUpdate,'next');
+
+             $('#GlobalModalLarge').modal('hide');
+
+        },
+
+        updateHargaColumn : (selector,dataparam,event) => {
+            let totalParam = 0;
+            let x = findAndReplace(selector.find('input').val(),',00','');
+            x = findAndReplace(x, '.', '');
+            let valueInput = parseInt(x);
+            let ID_register_formulir = selector.find('input').attr('id-formulir');
+            let PTID = selector.find('input').attr('payment-type_id');
+
+            let rsValue = 0;
+            for (var i = 0; i < dataparam.length; i++) {
+                const getDataPotongan = dataparam[i].data;
+                for (var j = 0; j < getDataPotongan.length; j++) {
+                    totalParam += parseInt(getDataPotongan[j].DiscountValue);
+                }
+            }
+
+            if (event == 'next') {
+                // console.log('Next => ' + valueInput);
+                rsValue =  valueInput - totalParam;
+                if (rsValue <= 0) {
+                     dataInputPotonganLain = dataInputPotonganLain.filter(x => {
+                         if (x.ID_register_formulir === ID_register_formulir && x.PTID === PTID ) {
+                             return false;
+                         }
+                         return true;
+                     });
+
+
+                    selector.find('.contentPotonganLain').find('.viewPotonganLain').remove();
+                    toastr.info('Potongan melebihi harga, data akan di reset');
+                    return;
+                }
+                else
+                {
+                    let htmlviewPotonganLain = '<div class = "col-md-12 viewPotonganLain" style = "border: 2px solid #eee;margin-left:10px;margin-right:10px;width:80%;color:blue;">Potongan Lain';
+                    const dataGet = dataInputPotonganLain.filter(x => {
+                        if (x.ID_register_formulir === ID_register_formulir && x.PTID === PTID ) {
+                            return true;
+                        }
+
+                        return false;
+                    })[0].data;
+
+                    for (var i = 0; i < dataGet.length; i++) {
+                        htmlviewPotonganLain += '<li>'+dataGet[i].DiscountName+' : '+formatRupiah(dataGet[i].DiscountValue)+'</li>';
+                    }
+
+                    htmlviewPotonganLain += '</div>';
+
+                    selector.find('.contentPotonganLain').append(htmlviewPotonganLain);
+                }
+            }
+            else
+            {
+                // reset
+                selector.find('.contentPotonganLain').find('.viewPotonganLain').remove();
+                rsValue =  valueInput + totalParam;
+            }
+
+            rsValue = rsValue.toFixed(2);
+            // console.log(rsValue);
+
+            selector.find('input').val(rsValue);
+            selector.find('input').maskMoney({thousands:'.', decimal:',', precision:2,allowZero: true});
+            selector.find('input').maskMoney('mask', '9894');
+
+        }
+    };
+
+
+    $(document).on('click','.btnSetPotonganLain',function(e){
+        let itsme = $(this);
+        let id_formulir = $(this).attr('id-formulir');
+        let PTID = $(this).attr('payment-type_id');
+        let PTName = $(this).attr('payment-type');
+        let getData = getDataCalonMhs.filter(x => x.ID_register_formulir === id_formulir)
+
+        $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">'+'Set Potongan Lain <span style = "color:green;">'+PTName+'</span> dari <span style ="color:blue;">'+getData[0]['Name']+'</span></h4>');
+
+        let htmlScript = '<div id  = "contentPotongan" id_formulir = "'+id_formulir+'" ptid = "'+PTID+'" PTName = "'+PTName+'" style = "margin:10px;">'+ 
+                            '<div style = "margin-bottom:10px;">'+
+                                '<button class = "btn btn-default" id = "addPotongan">Add</button>'+
+                            '</div>'+
+                                
+                         '<div>';
+
+        $('#GlobalModalLarge .modal-body').html(htmlScript);
+        $('#contentPotongan').append(potonganLainInput.htmlPotonganDynamic());
+
+        $('#GlobalModalLarge .modal-footer').html('<div class = "col-md-3">' +'<div style = "padding : 10px;text-align:left;"><span id = "viewTotal" style = "color:green;">Total : Rp.0 </span></div></div>'+
+            '<div class = "col-md-9" style ="text-align:right;"><button type="button" class="btn btn-success" id="btnsave_potonganLain">Submit</button> ' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>' +
+            '');
+        $('#GlobalModalLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        $('.frmInput[name="DiscountValue"]').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+        $('.frmInput[name="DiscountValue"]').maskMoney('mask', '9894');
+
+    })
+
+    $(document).on('click','#addPotongan',function(e){
+        potonganLainInput.addPotongan();
+    })
+
+    $(document).on('click','.deleteInputPotongan',function(e){
+        const itsme = $(this);
+        potonganLainInput.deleteInputPotongan(itsme);    
+        potonganLainInput.countDiscountValue();
+    })
+
+    $(document).on('click','#btnsave_potonganLain',function(e){
+        const itsme = $(this);
+        potonganLainInput.savePotonganLain(itsme);
+    })
+
+    $(document).on('keyup','.frmInput[name="DiscountValue"]',function(e){
+        potonganLainInput.countDiscountValue();
+    })
+
+
+    // --- add Potongan --
     
 </script>

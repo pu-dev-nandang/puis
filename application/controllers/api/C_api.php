@@ -5759,7 +5759,7 @@ class C_api extends CI_Controller {
                                                     LEFT JOIN db_finance.payment_type pt ON (tf.PTID = pt.ID)
                                                     LEFT JOIN db_academic.program_study ps ON (tf.ProdiID = ps.ID)
                                                     WHERE tf.ClassOf = "'.$ClassOf.'" AND tf.ProdiID = "'.$prodi[$i]['ID'].'" and tf.Pay_Cond = 1
-                                                    ORDER BY tf.ProdiID, tf.PTID ASC ')->result_array();
+                                                    ORDER BY tf.ProdiID, tf.PTID ASC, tf.Pay_Cond ASC ')->result_array();
                     if(count($data)>0){
                         $data_p = array(
                             'ProdiID' => $prodi[$i]['ID'],
@@ -5776,7 +5776,7 @@ class C_api extends CI_Controller {
                                                     LEFT JOIN db_finance.payment_type pt ON (tf.PTID = pt.ID)
                                                     LEFT JOIN db_academic.program_study ps ON (tf.ProdiID = ps.ID)
                                                     WHERE tf.ClassOf = "'.$ClassOf.'" AND tf.ProdiID = "'.$prodi[$i]['ID'].'" and tf.Pay_Cond = 2
-                                                    ORDER BY tf.ProdiID, tf.PTID ASC ')->result_array();
+                                                    ORDER BY tf.ProdiID, tf.PTID ASC, tf.Pay_Cond ASC ')->result_array();
                     if(count($data)>0){
                         $data_p = array(
                             'ProdiID' => $prodi[$i]['ID'],
