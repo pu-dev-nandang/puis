@@ -232,7 +232,8 @@
                         var selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+Data_mhs[i]['Cost']+'">';
 
                        var value_cost = Data_mhs[i]['Cost'] - ((Data_mhs[i]['Discount']/100)*Data_mhs[i]['Cost']);
-                       var yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
+                       // var yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
+                       var yy = formatRupiah(value_cost);
                        
                        if(PTID == 3 || PTID == 6)
                        {
