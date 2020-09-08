@@ -1015,7 +1015,7 @@
             if (event == 'next') {
                 // console.log('Next => ' + valueInput);
                 rsValue =  valueInput - totalParam;
-                if (rsValue <= 0) {
+                if (rsValue < 0) {
                      dataInputPotonganLain = dataInputPotonganLain.filter(x => {
                          if (x.ID_register_formulir === ID_register_formulir && x.PTID === PTID ) {
                              return false;

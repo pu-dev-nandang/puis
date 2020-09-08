@@ -317,8 +317,8 @@ class C_save_to_pdf2 extends CI_Controller {
 
         // get tuition fee
 
-           $sql23 = 'select a.Abbreviation,b.Cost from db_finance.payment_type as a join db_finance.tuition_fee as b on a.ID = b.PTID where ClassOf = ? and ProdiID = ?';
-           $query23=$this->db->query($sql23, array($Personal[0]['SetTa'],$Personal[0]['ID_program_study']))->result_array();
+           $sql23 = 'select a.Abbreviation,b.Cost from db_finance.payment_type as a join db_finance.tuition_fee as b on a.ID = b.PTID where ClassOf = ? and ProdiID = ? and b.Pay_Cond = ? ';
+           $query23=$this->db->query($sql23, array($Personal[0]['SetTa'],$Personal[0]['ID_program_study'],$Personal[0]['Pay_Cond']))->result_array();
            $totalTuitionFee = 0;
            $arr_pay = array();
 

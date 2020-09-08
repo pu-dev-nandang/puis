@@ -1035,7 +1035,7 @@ class M_finance extends CI_Model {
             if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
             as status1,p.CreateAT,p.CreateBY,d.VA_number,b.FormulirCode,
             a.Address,a.ID_province as IDPRovAddress,a.ID_region as IDRegionAddress,
-            a.PhoneNumber,d.SetTa,px.No_Ref
+            a.PhoneNumber,d.SetTa,px.No_Ref,p.Pay_Cond
             from db_admission.register_formulir as a
             left JOIN db_admission.register_verified as b
             ON a.ID_register_verified = b.ID
@@ -1131,6 +1131,7 @@ class M_finance extends CI_Model {
                'NamaTahunAkademik' => $NamaTahunAkademik,
                'ID_program_study' => $query[$i]['ID_program_study'],
                'SetTa' => $query[$i]['SetTa'],
+               'Pay_Cond' => $query[$i]['Pay_Cond']
 
              );
          }
@@ -1154,6 +1155,7 @@ class M_finance extends CI_Model {
                'NamaTahunAkademik' => $NamaTahunAkademik,
                'ID_program_study' => $query[$i]['ID_program_study'],
                'SetTa' => $query[$i]['SetTa'],
+               'Pay_Cond' => $query[$i]['Pay_Cond']
 
              );
          }
