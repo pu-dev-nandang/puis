@@ -143,12 +143,16 @@ class C_admission extends Admission_Controler {
        $status = $input['selectStatus'];
 
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->totalDataFormulir_online(),15,5);
+       $config = $this->config_pagination_default_ajax($this->m_admission->totalDataFormulir_online($tahun,$NomorFormulir,$status),15,5);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(5);
        $start = ($page - 1) * $config["per_page"];
        $this->data['datadb'] = $this->m_admission->selectDataDitribusiFormulirOnline($config["per_page"], $start,$tahun,$NomorFormulir,$status);
-      // $content = $this->load->view('page/'.$this->data['department'].'/distribusi_formulir/tabel_formulir_online',$this->data,true);
+      // print_r($this->session->userdata('IDdepartementNavigation'));die(); 
+      if ($this->session->userdata('IDdepartementNavigation') == 12) {
+         $this->data['action'] ='actionColoumn';
+      } 
+      
       $content = $this->load->view('page/'.'admission'.'/distribusi_formulir/tabel_formulir_online',$this->data,true);
 
        $output = array(

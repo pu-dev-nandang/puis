@@ -68,7 +68,9 @@
     	   /* code to run below */
     	 loadData(1);
 	  
-	 });
+	});
+
+
 
 	function loadData(page)
 	{
@@ -115,7 +117,7 @@
     {
     	var academic_year_admission = "<?php echo $academic_year_admission ?>"; 
     	var thisYear = (new Date()).getFullYear();
-      	var startTahun = parseInt(thisYear);
+      	var startTahun = parseInt(thisYear) - 1;
      	 var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
      	 for (var i = 0; i <= selisih; i++) {
           var selected = (( parseInt(startTahun) + parseInt(i) )==academic_year_admission) ? 'selected' : '';
@@ -131,24 +133,39 @@
         });
     }
 
-    $(document).off('dblclick', '.tableData tbody tr td').on('dblclick', '.tableData tbody tr td',function(e) {
-    	var ev = $(this).closest('tr');
-    	var td = $(this).html();
-    	var index = $(this).index();
-    	var data_id = ev.attr('data-id');
-    	var DataToken = ev.attr('token');
-    	var selector = $('#form-input');
-    	//console.log(td);
-    	//console.log(index);
+    $(document).on('click','.btnActionITAdmission',function(e){
+        var ev = $(this).closest('tr');
+        var td = $(this).html();
+        var index = $(this).index();
+        var data_id = ev.attr('data-id');
+        var DataToken = ev.attr('token');
+        var selector = $('#form-input');
+        if (data_id != null && data_id != 'null' && data_id !== undefined && data_id != '') {
+            loadingStart();
+            ev_click_td(data_id,DataToken,selector);
+            loadingEnd(500);
+            $('html, body').animate({ scrollTop: $("#content-input-edit").offset().top }, 'slow');
+        }
+    })
+
+    // $(document).off('dblclick', '.tableData tbody tr td').on('dblclick', '.tableData tbody tr td',function(e) {
+    // 	var ev = $(this).closest('tr');
+    // 	var td = $(this).html();
+    // 	var index = $(this).index();
+    // 	var data_id = ev.attr('data-id');
+    // 	var DataToken = ev.attr('token');
+    // 	var selector = $('#form-input');
+    // 	//console.log(td);
+    // 	//console.log(index);
     	
-    	if (data_id != null && data_id != 'null') {
-    		loadingStart();
-    		ev_click_td(data_id,DataToken,selector);
-    		loadingEnd(500);
-    	}
+    // 	if (data_id != null && data_id != 'null') {
+    // 		loadingStart();
+    // 		ev_click_td(data_id,DataToken,selector);
+    // 		loadingEnd(500);
+    // 	}
     	
 
-    })
+    // })
 
 
     function ev_click_td(data_id,DataToken,selector)
@@ -163,26 +180,28 @@
     									'<div style = "padding:15px;">'+
     										'<h2>Edit Number Formulir</h2>'+
     									'</div>'+	
-    									'<div id="content-input-edit"></div>'+
+    									'<div id="content-input-edit" style = "padding:15px;"></div>'+
     								'</div>'+
-    						'</div>'+
-    						'<div class = "col-xs-6">'+
-    							'<div class = "thumbnail">'+
-    								'<div style = "padding:15px;">'+
-    									'<h2>Exchange Number Formulir</h2>'+
-    								'</div>'+	
-    								'<div id="content-input-exchange"></div>'+
-    							'</div>'+
-    						'</div>'+
-    						// '<div class = "col-xs-4">'+
-    						// 	'<div class = "thumbnail">'+
-    						// 		'<div style = "padding:15px;">'+
-    						// 			'<h2>Set TA</h2>'+
-    						// 		'</div>'+	
-    						// 		'<div id="content-input-set_ta"></div>'+
-    						// 	'</div>'+
-    						// '</div>'+
-    					'</div>'+
+    						    '</div>'+
+        						'<div class = "col-xs-6">'+
+        							'<div class = "thumbnail">'+
+        								'<div style = "padding:15px;">'+
+        									'<h2>Exchange Number Formulir</h2>'+
+        								'</div>'+	
+        								'<div id="content-input-exchange" style = "padding:15px;"></div>'+
+        							'</div>'+
+        						'</div>'+
+    					    '</div>'+
+                            '<div class = "row" style = "margin-top:10px;">'+
+                                '<div class = "col-xs-8 col-md-offset-2">'+
+                                    '<div class = "thumbnail">'+
+                                        '<div style = "padding:15px;">'+
+                                            '<h2>Unsell Number Formulir</h2>'+
+                                        '</div>'+   
+                                        '<div id="content-input-unsell" style = "padding:15px;"></div>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
     				'</div>'+
     			'</div>';
 
@@ -190,8 +209,71 @@
     	var selector_edit = $('#content-input-edit');
     	form_edit(data_id,DataToken,selector_edit);
     	var selector_edit = $('#content-input-exchange');					
-    	form_exchange(data_id,DataToken,selector_edit);					
+        form_exchange(data_id,DataToken,selector_edit);                 
+    	formUnsell.writeHtml(data_id,DataToken);					
     }
+
+
+    const formUnsell = {
+        writeHtml : (data_id,DataToken) => {
+            let html = '';
+            var dt = jwt_decode(DataToken);
+            console.log(dt)
+            const selectorPage = $('#content-input-unsell');
+            html = '<div class = "row">'+
+                        '<div class = "col-md-12" >'+
+                            '<div style="background: lightyellow; border: 1px solid #ccc;padding: 15px;color: green;margin-bottom: 20px;">'+
+                                '<b>FormulirCode : '+dt['FormulirCode']+' / '+dt['No_Ref']+' , <span style = "color:blue;">Name : '+dt['NameCandidate']+'</span> , School : '+dt['SchoolName']+'</b>'+
+                            '</div>'+
+                        '</div>'+
+                   '</div>'+
+                   '<div class = "row">'+
+                        '<div class = "col-md-12" >'+
+                            '<button class = "btn btn-success btnUnsellFormulir" DataToken = "'+DataToken+'" style ="width:100%;" >Save</button>'+
+                        '</div>'+
+                   '</div>';
+            selectorPage.html(html);
+        },
+
+        saveUnsell : async(selector,...formulirKodeArr) => {
+            var url = base_url_js+"it/admission/submit-change-kode-formulir-online";
+            const data = {
+                action : 'Unsell',
+                data : formulirKodeArr
+            }
+
+            var token = jwt_encode(data,"UAP)(*");
+            loading_button2(selector);
+
+            try{
+                const response = await AjaxSubmitFormPromises(url,token);
+                if (response.Status == 1) {
+                    toastr.success('Saved');
+                    location.reload();
+                }
+                else
+                {
+                    toastr.error(response.msg,'!!Failed');
+                }
+            }
+            catch(err){
+                toastr.info('something wrong');
+            }
+
+            end_loading_button2(selector);
+        },
+    }
+
+    $(document).on('click','.btnUnsellFormulir',function(e){
+        const itsme = $(this);
+        const dt  = jwt_decode($(this).attr('DataToken'));
+        const dataFormulir = {
+            FormulirCode : dt['FormulirCode'],
+            No_Ref : dt['No_Ref'],
+        }
+
+        formUnsell.saveUnsell(itsme,dataFormulir);
+    })
 
     function load_formulir_(Year,Status = '')
     {
@@ -220,7 +302,7 @@
     {
     	var html = '';
     	var dt = jwt_decode(DataToken);
-    	console.log(dt);
+    	// console.log(dt);
     	html += '<div class = "row" style = "margin-top:10px;">'+
     				'<div class = "col-xs-4">'+
     					'<div class = "form-group">'+
@@ -273,7 +355,7 @@
     {	
     	var html = '';
     	var dt = jwt_decode(DataToken);
-    	console.log(dt);
+    	// console.log(dt);
     	html += '<div class = "row" style = "margin-top:10px;">'+
     				'<div class = "col-xs-4">'+
     					'<div class = "form-group">'+

@@ -224,6 +224,46 @@ class C_it extends It_Controler {
 
           echo json_encode($rs);
           break;
+        case 'Unsell' : 
+            $data = $Input['data'];
+            $FormulirCode =  $data->FormulirCode;
+            $No_Ref =  $data->No_Ref;
+            // check data telah tuition fee atau belum
+            $ID_resgister_verified = $this->m_master->caribasedprimary('db_admission.register_verified','FormulirCode',$FormulirCode);
+            $sqlCheckData= $this->db->query(
+              'select count(*) as total from (
+                select 1 from db_admission.register_verified as regve
+                join db_admission.register_formulir as regfo on regfo.ID_register_verified =  regve.ID
+                where regfo.ID not in(
+                  select ID_register_formulir from db_admission.register_nilai
+                )
+                and regve.FormulirCode = "'.$FormulirCode.'"
+              )xx 
+              '
+            )->result_array()[0]['total'];
+            if ($sqlCheckData == 0) {
+              $rs['msg'] = 'Data nilai telah diisi, tidak bisa unsell';
+            }
+            else
+            {
+              /* 
+                1.remove document if existing file dan db
+                2.remove nilai
+                3.remove biodata in register_formulir,register_verified,register_verification
+                -formulir_number_online_m ( fields : status, no kwitansi, no_ref)
+                -formulir_number_global
+              */
+
+               $dataQuery = $this->db->query(
+                'select reg.* from db_admission.register as reg
+                 join db_admission.register_verification as regve2 on regve2.RegisterID = reg.ID
+                 join db_admission.register_verified as regve1 on regve1.RegVerificationID = regve2.ID
+                 where regve1.FormulirCode = "'.$FormulirCode.'"
+                '
+               )->result_array(); 
+
+            }
+          break;
         default:
           # code...
           break;

@@ -493,10 +493,12 @@ class M_admission extends CI_Model {
       return $conVertINT;
     }
 
-    public function totalDataFormulir_online()
+    public function totalDataFormulir_online($tahun = NULL,$NomorFormulir = NULL,$status = NULL)
     {
+      $AddWhere = '';
+
       $sql = "select count(*) as total from (
-              select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
+              select c.FormulirCode
               from db_admission.register as a
               join db_admission.register_verification as b
               on a.ID = b.RegisterID
@@ -505,9 +507,26 @@ class M_admission extends CI_Model {
               join db_admission.school as z
               on z.ID = a.SchoolID
               where a.StatusReg = 0
-              ) as a right JOIN db_admission.formulir_number_online_m as b
-              on a.FormulirCode = b.FormulirCode
+              ) as a right JOIN (
+                select * from db_admission.formulir_number_online_m as b  where b.Years = ".$tahun."
+              )as b on a.FormulirCode = b.FormulirCode
+              left join db_admission.formulir_number_global as c on b.No_Ref = c.FormulirCodeGlobal
               ";
+        
+
+        if(!empty($NomorFormulir)){
+          $WhereORAnd = ($AddWhere != '') ? ' Where ' : ' And ';
+          $AddWhere .=  $WhereORAnd.' (b.FormulirCode like "'.$NomorFormulir.'" or b.No_Ref like "'.$NomorFormulir.'")'; // set for all query conditions
+        } 
+
+        if(!empty($status)){
+          $WhereORAnd = ($AddWhere != '') ? ' Where ' : ' And ';
+          if($status != '%') {
+            $AddWhere = $WhereORAnd.' b.Status = '.$status;
+          }
+        }
+
+        $sql .= $AddWhere;       
       $query=$this->db->query($sql, array())->result_array();
       $conVertINT = (int) $query[0]['total'];
       return $conVertINT;
@@ -544,10 +563,12 @@ class M_admission extends CI_Model {
           left join db_admission.school as z
           on z.ID = a.SchoolID
           where a.StatusReg = 0
-          ) as a right JOIN db_admission.formulir_number_online_m as b
+          ) as a right JOIN (
+            select * from db_admission.formulir_number_online_m as b  where b.Years = "'.$tahun.'"
+          )as b
           on a.FormulirCode = b.FormulirCode
           left join db_admission.formulir_number_global as c on b.No_Ref = c.FormulirCodeGlobal
-          where b.Years = "'.$tahun.'" and (b.FormulirCode like '.$NomorFormulir.' or b.No_Ref like '.$NomorFormulir.')'.$status.' LIMIT '.$start. ', '.$limit;
+          where (b.FormulirCode like '.$NomorFormulir.' or b.No_Ref like '.$NomorFormulir.')'.$status.' LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }
