@@ -86,6 +86,8 @@
 <script>
     $(document).ready(function () {
 
+        setLoadFullPage();
+
         loadSelectOptionSurvQuestionType('#formType',4);
 
         loadQuestionCategory();
@@ -331,11 +333,14 @@
 
     function loadQuestionType() {
         var formType = $('#formType').val();
-        if(formType=='4'){
+        if(formType=='3'){
+            $('#dataFormEssay').removeClass('hide');
+            $('#showRate').addClass('hide');
+        } else if(formType=='4') {
             $('#dataFormEssay').addClass('hide');
             $('#showRate').removeClass('hide');
-        } else {
-            $('#dataFormEssay').removeClass('hide');
+        } else if(formType=='5') {
+            $('#dataFormEssay').addClass('hide');
             $('#showRate').addClass('hide');
         }
 
