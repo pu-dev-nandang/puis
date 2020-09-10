@@ -4941,4 +4941,93 @@ class M_admission extends CI_Model {
       return $total;
     }
 
+    public function checkStepAfterFormulir($ID_register_verified = NULL,$FormulirCode=NULL){
+      $param = ['ID_register_verified'=> $ID_register_verified,'FormulirCode' => $FormulirCode,'ID_register_formulir' => ''];
+      $arr_Tbl_WhereSearch = [
+        [
+           'tbl' => 'db_admission.register_formulir',
+           'primary' => 'ID_register_verified',
+           'desc' => 'Process Data Formulir',
+           'required' => 1,
+           'relationTbl' => [],
+           'return' => 'ID_register_formulir',
+           'status' => ['status' => 0,'msg' => ''],
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_admission.register_document',
+           'primary' => 'ID_register_formulir',
+           'desc' => 'Process Data Document',
+           'required' => 0,
+           'relationTbl' => [],
+           'return' => '',
+           'status' => ['status' => 0,'msg' => ''],
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_admission.register_nilai',
+           'primary' => 'ID_register_formulir',
+           'desc' => 'Process Data Nilai',
+           'required' => 1,
+           'relationTbl' => ['db_admission.register_rangking','db_admission.register_nilai_fin'], 
+           'return' => '',
+           'status' => ['status' => 0,'msg' => ''],
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_finance.register_admisi',
+           'primary' => 'ID_register_formulir',
+           'desc' => 'Process Data Tuition Fee',
+           'required' => 1,
+           'relationTbl' => [
+              'db_finance.payment_admisi','db_finance.payment_pre','db_finance.register_admisi_rev'
+           ],
+           'return' => '', 
+           'status' => ['status' => 0,'msg' => ''], 
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_admission.to_be_mhs',
+           'primary' => 'FormulirCode',
+           'desc' => 'Process Data To Be MHS',
+           'required' => 1,
+           'relationTbl' => [],
+           'return' => '',
+           'status' => ['status' => 0,'msg' => ''],  
+           'action' => 'No Action',
+        ],
+        
+      ];
+
+      for ($i=0; $i < count($arr_Tbl_WhereSearch); $i++) { 
+        $arrTable = $arr_Tbl_WhereSearch[$i];
+        $tbl = $arrTable['tbl'];
+        $primary = $arrTable['primary'];
+        $desc = $arrTable['desc'];
+        $required = $arrTable['required'];
+        $relationTbl = $arrTable['relationTbl'];
+        
+        $getData =  $this->m_master->caribasedprimary($tbl,$primary,$param[$primary]);
+        // print_r($tbl);
+        if (count($getData) > 0) {
+          if ($arrTable['return'] != '') {
+            $param[$arrTable['return']] = ($tbl == 'db_admission.register_formulir') ? $getData[0]['ID'] :$getData[0][$arrTable['return']];
+          }
+
+          $arr_Tbl_WhereSearch[$i]['status']['status'] = 1;
+          $arr_Tbl_WhereSearch[$i]['status']['msg'] = $desc .' finish';
+
+          $arr_Tbl_WhereSearch[$i]['param'] = $param;
+        }
+        else
+        {
+          $arr_Tbl_WhereSearch[$i]['status']['msg'] = $desc .' unfinish';
+          $arr_Tbl_WhereSearch[$i]['param'] = $param;
+        }
+
+      }
+
+      return $arr_Tbl_WhereSearch;
+    }
+
 }

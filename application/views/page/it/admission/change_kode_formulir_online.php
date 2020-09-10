@@ -231,11 +231,22 @@
                         '<div class = "col-md-12" >'+
                             '<button class = "btn btn-success btnUnsellFormulir" DataToken = "'+DataToken+'" style ="width:100%;" >Save</button>'+
                         '</div>'+
+                   '</div>'+
+                   '<div class = "row" style = "margin-top:10px">'+
+                        '<div class = "col-md-12" >'+
+                            '<div class = "thumbnail resultUnsell" style = "padding:10px;min-height:100px;border: 2px solid #2eb67deb;">'+
+                                '<div class = "row">'+
+                                    '<div class = "col-md-12">'+
+                                        '<p style = "color:red;text-align:center;">No action</p>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
                    '</div>';
             selectorPage.html(html);
         },
 
-        saveUnsell : async(selector,...formulirKodeArr) => {
+        saveUnsell : async(selector,formulirKodeArr) => {
             var url = base_url_js+"it/admission/submit-change-kode-formulir-online";
             const data = {
                 action : 'Unsell',
@@ -243,25 +254,63 @@
             }
 
             var token = jwt_encode(data,"UAP)(*");
-            loading_button2(selector);
+            if (confirm('Are you sure ?')) {
+                loading_button2(selector);
 
-            try{
-                const response = await AjaxSubmitFormPromises(url,token);
-                if (response.Status == 1) {
-                    toastr.success('Saved');
-                    location.reload();
-                }
-                else
-                {
-                    toastr.error(response.msg,'!!Failed');
-                }
-            }
-            catch(err){
-                toastr.info('something wrong');
-            }
+                try{
+                    const response = await AjaxSubmitFormPromises(url,token);
+                    if (response.Status == 1) {
+                        toastr.success(response.msg);
+                        selector.remove();
+                        loadData(1);
+                    }
+                    else
+                    {
+                        toastr.error(response.msg,'!!Failed');
+                    }
 
-            end_loading_button2(selector);
+                    const callbackData  = response.callback;
+                    formUnsell.showResultAction(callbackData,response.msg)
+                }
+                catch(err){
+                    toastr.info('something wrong');
+                }
+
+                end_loading_button2(selector);
+            }
+            
         },
+
+        showResultAction : (dataResult,msg) => {
+            const selectorPage = $('.resultUnsell').find('.col-md-12');
+            let htmlTbody = '';
+            for (var i = 0; i < dataResult.length; i++) {
+                let rel = '';
+                const d = dataResult[i].relationTbl;
+                for (var z = 0; z < d.length; z++) {
+                    rel += '<li>'+d[z]+'</li>';
+                }
+                htmlTbody += '<tr>'+
+                                   '<td>'+ dataResult[i].tbl+'</td>'+
+                                   '<td>'+ rel+'</td>'+
+                                   '<td>'+ dataResult[i]['status']['msg']+'</td>'+
+                                   '<td>'+ dataResult[i].action+'</td>'+
+                             '</tr>'
+            }
+            let html = '<table class = " table">'+
+                            '<caption><span style = "color:blue;">'+msg+'</span></caption>'+
+                            '<thead>'+
+                                '<tr>'+
+                                    '<th>Table</th>'+
+                                    '<th>Relation Table</th>'+
+                                    '<th>Step Status</th>'+
+                                    '<th>Action</th>'+
+                                '</tr>'+
+                            '</thead>'+
+                            '<tbody>'+htmlTbody+'</tbody>'+
+                       '</table>';
+            selectorPage.html(html)
+        }
     }
 
     $(document).on('click','.btnUnsellFormulir',function(e){
