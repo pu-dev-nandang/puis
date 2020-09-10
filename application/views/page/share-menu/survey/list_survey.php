@@ -100,18 +100,18 @@
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'apimenu/__crudSurvey';
 
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+        $('#GlobalModalXtraLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Show Question</h4>');
 
         var htmlss = '<div id="panelShowQuestion"></div>';
 
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModalXtraLarge .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
-        $('#GlobalModal .modal-body').html(htmlss);
+        $('#GlobalModalXtraLarge .modal-body').html(htmlss);
 
         loading_page('#panelShowQuestion');
 
-        $('#GlobalModal').modal({
+        $('#GlobalModalXtraLarge').modal({
             'show' : true,
             'backdrop' : 'static'
         });
@@ -126,7 +126,7 @@
                         '<td>'+(i + 1)+'</td>' +
                         '<td style="text-align: left;"><span class="label label-primary">'+v.Category+'</span>' +
                         ' <span class="label label-success">'+v.Type+'</span>' +
-                        '       <dvi class="q-scroll">'+v.Question+'</div></td>' +
+                        '       <div class="q-scroll">'+v.Question+'</div></td>' +
                         '<td>'+v.AverageRate+'</td>' +
                         '</tr>';
                 })
@@ -134,9 +134,9 @@
             }
 
             var dataListQuestion = '<div class="table-responsive">' +
-                '    <table class="table table-bordered table-striped table-centre">' +
+                '    <table class="table table-bordered table-centre">' +
                 '        <thead>' +
-                '        <tr>' +
+                '        <tr style="background: #eceff1;">' +
                 '            <th style="width: 3%">No</th>' +
                 '            <th>Question</th>' +
                 '            <th style="width: 13%">Average</th>' +
@@ -357,7 +357,7 @@
 
         if(formSurveyTitle!='' && formSurveyTitle!=null &&
             formSurveyStartDate!='' && formSurveyStartDate!=null &&
-        formSurveyEndDate!='' && formSurveyEndDate!=null){
+            formSurveyEndDate!='' && formSurveyEndDate!=null){
 
             loading_button('#btnCreateSurvey');
 
@@ -650,7 +650,7 @@
 
         if(formUsr_ClassOf!='' && formUsr_ClassOf!=null &&
             formUsr_ProdiID!='' && formUsr_ProdiID!=null &&
-        formUsr_StatusStudentID!='' && formUsr_StatusStudentID!=null) {
+            formUsr_StatusStudentID!='' && formUsr_StatusStudentID!=null) {
 
             var ClassOf = formUsr_ClassOf;
             var ProdiID = formUsr_ProdiID.split('.')[0];
