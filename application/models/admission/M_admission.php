@@ -493,10 +493,12 @@ class M_admission extends CI_Model {
       return $conVertINT;
     }
 
-    public function totalDataFormulir_online()
+    public function totalDataFormulir_online($tahun = NULL,$NomorFormulir = NULL,$status = NULL)
     {
+      $AddWhere = '';
+
       $sql = "select count(*) as total from (
-              select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
+              select c.FormulirCode
               from db_admission.register as a
               join db_admission.register_verification as b
               on a.ID = b.RegisterID
@@ -505,9 +507,26 @@ class M_admission extends CI_Model {
               join db_admission.school as z
               on z.ID = a.SchoolID
               where a.StatusReg = 0
-              ) as a right JOIN db_admission.formulir_number_online_m as b
-              on a.FormulirCode = b.FormulirCode
+              ) as a right JOIN (
+                select * from db_admission.formulir_number_online_m as b  where b.Years = ".$tahun."
+              )as b on a.FormulirCode = b.FormulirCode
+              left join db_admission.formulir_number_global as c on b.No_Ref = c.FormulirCodeGlobal
               ";
+        
+
+        if(!empty($NomorFormulir)){
+          $WhereORAnd = ($AddWhere != '') ? ' Where ' : ' And ';
+          $AddWhere .=  $WhereORAnd.' (b.FormulirCode like "'.$NomorFormulir.'" or b.No_Ref like "'.$NomorFormulir.'")'; // set for all query conditions
+        } 
+
+        if(!empty($status)){
+          $WhereORAnd = ($AddWhere != '') ? ' Where ' : ' And ';
+          if($status != '%') {
+            $AddWhere = $WhereORAnd.' b.Status = '.$status;
+          }
+        }
+
+        $sql .= $AddWhere;       
       $query=$this->db->query($sql, array())->result_array();
       $conVertINT = (int) $query[0]['total'];
       return $conVertINT;
@@ -544,10 +563,12 @@ class M_admission extends CI_Model {
           left join db_admission.school as z
           on z.ID = a.SchoolID
           where a.StatusReg = 0
-          ) as a right JOIN db_admission.formulir_number_online_m as b
+          ) as a right JOIN (
+            select * from db_admission.formulir_number_online_m as b  where b.Years = "'.$tahun.'"
+          )as b
           on a.FormulirCode = b.FormulirCode
           left join db_admission.formulir_number_global as c on b.No_Ref = c.FormulirCodeGlobal
-          where b.Years = "'.$tahun.'" and (b.FormulirCode like '.$NomorFormulir.' or b.No_Ref like '.$NomorFormulir.')'.$status.' LIMIT '.$start. ', '.$limit;
+          where (b.FormulirCode like '.$NomorFormulir.' or b.No_Ref like '.$NomorFormulir.')'.$status.' LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }
@@ -4918,6 +4939,95 @@ class M_admission extends CI_Model {
       }
 
       return $total;
+    }
+
+    public function checkStepAfterFormulir($ID_register_verified = NULL,$FormulirCode=NULL){
+      $param = ['ID_register_verified'=> $ID_register_verified,'FormulirCode' => $FormulirCode,'ID_register_formulir' => ''];
+      $arr_Tbl_WhereSearch = [
+        [
+           'tbl' => 'db_admission.register_formulir',
+           'primary' => 'ID_register_verified',
+           'desc' => 'Process Data Formulir',
+           'required' => 1,
+           'relationTbl' => [],
+           'return' => 'ID_register_formulir',
+           'status' => ['status' => 0,'msg' => ''],
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_admission.register_document',
+           'primary' => 'ID_register_formulir',
+           'desc' => 'Process Data Document',
+           'required' => 0,
+           'relationTbl' => [],
+           'return' => '',
+           'status' => ['status' => 0,'msg' => ''],
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_admission.register_nilai',
+           'primary' => 'ID_register_formulir',
+           'desc' => 'Process Data Nilai',
+           'required' => 1,
+           'relationTbl' => ['db_admission.register_rangking','db_admission.register_nilai_fin'], 
+           'return' => '',
+           'status' => ['status' => 0,'msg' => ''],
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_finance.register_admisi',
+           'primary' => 'ID_register_formulir',
+           'desc' => 'Process Data Tuition Fee',
+           'required' => 1,
+           'relationTbl' => [
+              'db_finance.payment_admisi','db_finance.payment_pre','db_finance.register_admisi_rev'
+           ],
+           'return' => '', 
+           'status' => ['status' => 0,'msg' => ''], 
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_admission.to_be_mhs',
+           'primary' => 'FormulirCode',
+           'desc' => 'Process Data To Be MHS',
+           'required' => 1,
+           'relationTbl' => [],
+           'return' => '',
+           'status' => ['status' => 0,'msg' => ''],  
+           'action' => 'No Action',
+        ],
+        
+      ];
+
+      for ($i=0; $i < count($arr_Tbl_WhereSearch); $i++) { 
+        $arrTable = $arr_Tbl_WhereSearch[$i];
+        $tbl = $arrTable['tbl'];
+        $primary = $arrTable['primary'];
+        $desc = $arrTable['desc'];
+        $required = $arrTable['required'];
+        $relationTbl = $arrTable['relationTbl'];
+        
+        $getData =  $this->m_master->caribasedprimary($tbl,$primary,$param[$primary]);
+        // print_r($tbl);
+        if (count($getData) > 0) {
+          if ($arrTable['return'] != '') {
+            $param[$arrTable['return']] = ($tbl == 'db_admission.register_formulir') ? $getData[0]['ID'] :$getData[0][$arrTable['return']];
+          }
+
+          $arr_Tbl_WhereSearch[$i]['status']['status'] = 1;
+          $arr_Tbl_WhereSearch[$i]['status']['msg'] = $desc .' finish';
+
+          $arr_Tbl_WhereSearch[$i]['param'] = $param;
+        }
+        else
+        {
+          $arr_Tbl_WhereSearch[$i]['status']['msg'] = $desc .' unfinish';
+          $arr_Tbl_WhereSearch[$i]['param'] = $param;
+        }
+
+      }
+
+      return $arr_Tbl_WhereSearch;
     }
 
 }
