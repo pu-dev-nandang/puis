@@ -35,6 +35,7 @@
 <script>
 
     $(document).ready(function () {
+        setLoadFullPage();
         loadSelectOptionSurvQuestionType('#filterType','');
         loadSelectOptionSurvQuestionCategory('#filterQuestionCategory','');
 

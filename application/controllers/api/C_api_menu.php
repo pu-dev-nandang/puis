@@ -549,6 +549,8 @@ class C_api_menu extends CI_Controller {
                                 <li><a href="javascript:void(0);" class="btnManageTarget" data-id="'.$row['ID'].'">Manage Targets</a></li>
                                 <li><a href="'.base_url('survey/manage-question/'.$tokenBtn).'" target="_blank">Manage Question</a></li>
                                 <li role="separator" class="divider"></li>
+                                <li class="btnShareToPublic" data-id="'.$row['ID'].'"><a href="#">Share to the public</a></li>
+                                <li role="separator" class="divider"></li>
                                 <li class="'.$btnRemove.'"><a href="#">Remove</a></li>
                               </ul>
                             </div>';
@@ -587,6 +589,11 @@ class C_api_menu extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='setPublicSurvey'){
+            $ID = $data_arr['ID'];
+            $KeyPublic = $this->m_api->checkCodeSurvey();
+        }
+
         else if($data_arr['action']=='showQuestionInSurvey'){
 
             $SurveyID = $data_arr['SurveyID'];
@@ -605,28 +612,58 @@ class C_api_menu extends CI_Controller {
 
                     $AverageRate = '';
 
+                    $dataWhere = array(
+                        'SurveyID' => $SurveyID,
+                        'QuestionID' => $data[$i]['QuestionID'],
+                        'QTID' => $data[$i]['QTID']
+                    );
+
                     if($data[$i]['QTID']=='4' || $data[$i]['QTID']==4){
                         // Cek berapa yang udah jawab
-                        $dataTotalJawaban = $this->db->get_where('db_it.surv_answer_detail',
-                            array(
-                                'SurveyID' => $SurveyID,
-                                'QuestionID' => $data[$i]['QuestionID'],
-                                'QTID' => $data[$i]['QTID']
-                            ))->result_array();
+//                        $dataTotalJawaban = $this->db->get_where('db_it.surv_answer_detail',$dataWhere)->result_array();
 
-                        if(count($dataTotalJawaban)>0){
-                            $TotalRate = 0;
-                            for($r=0;$r<count($dataTotalJawaban);$r++){
-                                $TotalRate = $TotalRate+$dataTotalJawaban[$r]['Rate'];
-                            }
-                            $AverageRate = number_format(round($TotalRate / count($dataTotalJawaban)),2);
-                        }
+                        $dataWhere['Rate'] = 1;
+                        $R_1 = $this->db->from('db_it.surv_answer_detail')->where($dataWhere)->count_all_results();
 
+                        $dataWhere['Rate'] = 2;
+                        $R_2 = $this->db->from('db_it.surv_answer_detail')->where($dataWhere)->count_all_results();
+
+                        $dataWhere['Rate'] = 3;
+                        $R_3 = $this->db->from('db_it.surv_answer_detail')->where($dataWhere)->count_all_results();
+
+                        $dataWhere['Rate'] = 4;
+                        $R_4 = $this->db->from('db_it.surv_answer_detail')->where($dataWhere)->count_all_results();
+
+                        $AverageRate = '<div>B1 : '.$R_1.'</div>
+                                        <div>B2 : '.$R_2.'</div>
+                                        <div>B3 : '.$R_3.'</div>
+                                        <div>B4 : '.$R_4.'</div>';
+
+//                        $dataWhere['Rate'] = 5;
+//                        $R_1 = $this->db->from('db_it.surv_answer_detail')->where($dataWhere)->count_all_results();
+
+//                        if(count($dataTotalJawaban)>0){
+//                            $TotalRate = 0;
+//                            for($r=0;$r<count($dataTotalJawaban);$r++){
+//                                $TotalRate = $TotalRate+$dataTotalJawaban[$r]['Rate'];
+//                            }
+//                            $AverageRate = number_format(round($TotalRate / count($dataTotalJawaban)),2);
+//                        }
+                    }
+                    else if($data[$i]['QTID']=='5' || $data[$i]['QTID']==5){
+
+                        $dataWhere['IsTrue'] = '1';
+                        $TotalYes = $this->db->from('db_it.surv_answer_detail')->where($dataWhere)->count_all_results();
+
+                        $dataWhere['IsTrue'] = '0';
+                        $TotalNo = $this->db->from('db_it.surv_answer_detail')->where($dataWhere)->count_all_results();
+
+                        $AverageRate = '<div>Y : '.$TotalYes.'</div><div>N : '.$TotalNo.'</div>';
 
 
                     }
 
-                    $data[$i]['AverageRate'] = $AverageRate;
+                    $data[$i]['AverageRate'] = '<div style="text-align: left;">'.$AverageRate.'</div>';
                 }
             }
 
