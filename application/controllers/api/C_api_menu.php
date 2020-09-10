@@ -148,17 +148,15 @@ class C_api_menu extends CI_Controller {
                 $w_QuestionCategory = ($QuestionCategory!='')
                     ? 'AND sq.QCID = "'.$QuestionCategory.'" ' : '';
 
-                $w = $w_Type.$w_QuestionCategory;
-                $dataWhere = ' WHERE '.substr($w,3);
+                $dataWhere = $w_Type.$w_QuestionCategory;
             }
 
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
                 $dataScr = 'sq.Question LIKE "%'.$search.'%"';
-                $dataSearch = ($Type!='' || $QuestionCategory!='')
-                    ? ' AND ('.$dataScr.')'
-                    : ' WHERE '.$dataScr;
+
+                $dataSearch = ' AND ('.$dataScr.')';
             }
 
             $queryDefault = 'SELECT sq.ID, sq.Question, sq.IsRequired, sq.AnswerType,  
@@ -166,6 +164,7 @@ class C_api_menu extends CI_Controller {
                                              sqt.Description AS QuestionType FROM db_it.surv_question sq
                                             LEFT JOIN db_it.surv_question_category sqc ON (sqc.ID = sq.QCID)
                                             LEFT JOIN db_it.surv_question_type sqt ON (sqt.ID = sq.QTID) 
+                                            WHERE sq.DepartmentID = "'.$data_arr['DepartmentID'].'" 
                                             '. $dataWhere.$dataSearch;
 
             $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';

@@ -66,7 +66,8 @@
         var data = {
             action : 'getBankQuestion',
             Type : filterType,
-            QuestionCategory : filterQuestionCategory
+            QuestionCategory : filterQuestionCategory,
+            DepartmentID : sessionIDdepartementNavigation
         };
 
         var token = jwt_encode(data,'UAP)(*');
