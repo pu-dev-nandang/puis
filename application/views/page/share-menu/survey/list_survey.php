@@ -1,4 +1,10 @@
 
+<style>
+    .q-scroll {
+        overflow: auto;
+        max-height: 250px;
+    }
+</style>
 
 <div class="row" style="margin-bottom: 15px;">
     <div class="col-md-12">
@@ -69,6 +75,21 @@
 
     }
 
+    $(document).on('click','.btnShareToPublic',function () {
+        var ID = $(this).attr('data-id');
+        var data = {
+            action : 'setPublicSurvey',
+            SurveyID : ID,
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+        });
+
+    });
+
     $(document).on('click','.showQuestionList',function () {
 
         var ID = $(this).attr('data-id');
@@ -105,14 +126,14 @@
                         '<td>'+(i + 1)+'</td>' +
                         '<td style="text-align: left;"><span class="label label-primary">'+v.Category+'</span>' +
                         ' <span class="label label-success">'+v.Type+'</span>' +
-                        '       <dvi>'+v.Question+'</div></td>' +
+                        '       <dvi class="q-scroll">'+v.Question+'</div></td>' +
                         '<td>'+v.AverageRate+'</td>' +
                         '</tr>';
                 })
 
             }
 
-            var dataListQuestion = '<div>' +
+            var dataListQuestion = '<div class="table-responsive">' +
                 '    <table class="table table-bordered table-striped table-centre">' +
                 '        <thead>' +
                 '        <tr>' +
