@@ -4,6 +4,14 @@
         overflow: auto;
         max-height: 250px;
     }
+    .panel-link {
+        font-size: 16px;
+        font-weight: 500;
+        color: #1189e9;
+        background: #ebe9e9;
+        padding: 10px;
+        border-radius: 8px;
+    }
 </style>
 
 <div class="row" style="margin-bottom: 15px;">
@@ -85,6 +93,25 @@
         var url = base_url_js+'apimenu/__crudSurvey';
 
         $.post(url,{token:token},function (jsonResult) {
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Share to public</h4>');
+
+            var htmlss = '<div class="form-group">' +
+                '<label>Link</label>' +
+                '<div class="panel-link">'+base_url_sign_out+'form/'+jsonResult.Key+'</div>'+
+                '</div>';
+
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+            $('#GlobalModal .modal-body').html(htmlss);
+
+
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+
 
         });
 

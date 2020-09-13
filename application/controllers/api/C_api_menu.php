@@ -589,8 +589,31 @@ class C_api_menu extends CI_Controller {
         }
 
         else if($data_arr['action']=='setPublicSurvey'){
-            $ID = $data_arr['ID'];
-            $KeyPublic = $this->m_api->checkCodeSurvey();
+            $ID = $data_arr['SurveyID'];
+
+            // Cek apakah sudah mempunyai key atau blm
+            $dataCk = $this->db->select('Key')->get_where('db_it.surv_survey',array(
+                'ID' => $ID
+            ))->result_array();
+
+            if($dataCk[0]['Key']!='' && $dataCk[0]['Key']!=null) {
+                $KeyPublic = $dataCk[0]['Key'];
+            } else {
+                $KeyPublic = $this->m_api->checkCodeSurvey();
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('db_it.surv_survey',
+                    array('Key'=>$KeyPublic));
+            }
+
+
+
+            return print_r(json_encode(
+                array(
+                    'Status' => 1,
+                    'Key' => $KeyPublic)
+            ));
+
         }
 
         else if($data_arr['action']=='showQuestionInSurvey'){
