@@ -88,6 +88,7 @@
         var data = {
             action : 'setPublicSurvey',
             SurveyID : ID,
+            NIP : sessionNIP
         };
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'apimenu/__crudSurvey';
