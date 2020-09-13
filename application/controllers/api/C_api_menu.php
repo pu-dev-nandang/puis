@@ -601,9 +601,12 @@ class C_api_menu extends CI_Controller {
             } else {
                 $KeyPublic = $this->m_api->checkCodeSurvey();
                 // Update
+                $dataUpdate['Key'] = $KeyPublic;
+                $dataUpdate['UpdatedBy'] = $data_arr['NIP'];
+                $dataUpdate['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+
                 $this->db->where('ID', $ID);
-                $this->db->update('db_it.surv_survey',
-                    array('Key'=>$KeyPublic));
+                $this->db->update('db_it.surv_survey',$dataUpdate);
             }
 
 
