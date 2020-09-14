@@ -11,7 +11,7 @@
 				<h4><i class="icon-reorder"></i><?php echo $NameMenu ?></h4>
 			</div>
 			<div class="widget-content">
-				<div class = "row">	
+				<div class = "row">
 					<div class="col-md-2" style="">
 						Angkatan
 						<select class="select2-select-00 col-md-4 full-width-fix" id="selectTahun">
@@ -30,7 +30,7 @@
 						    <option value= "1">Yes</option>
 						</select>
 					</div>
-					<div  class="col-md-4 col-md-offset-2" align="right" id="pagination_link"></div>	
+					<div  class="col-md-4 col-md-offset-2" align="right" id="pagination_link"></div>
 					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
 				</div>
 				<div class="row" style="margin-top: 10px">
@@ -44,7 +44,7 @@
 </div>
 <div id = "form-input">
 
-</div>	
+</div>
 
 <script type="text/javascript">
 	$(document).ready(function () {
@@ -67,7 +67,7 @@
     	if( this.value.length < 3 && this.value.length != 0 ) return;
     	   /* code to run below */
     	 loadData(1);
-	  
+
 	});
 
 
@@ -86,19 +86,19 @@
 					selectTahun : selectTahun,
 					NomorFormulir : NomorFormulir,
 					NamaStaffAdmisi : NamaStaffAdmisi,
-					selectStatus : selectStatus,					
+					selectStatus : selectStatus,
 					};
-		var token = jwt_encode(data,"UAP)(*");			
+		var token = jwt_encode(data,"UAP)(*");
 		$.post(url,{token:token},function (data_json) {
 		    // jsonData = data_json;
-		    var obj = JSON.parse(data_json); 
+		    var obj = JSON.parse(data_json);
 		    // console.log(obj);
 		    setTimeout(function () {
 	       	    $("#formulir_online_table").html(obj.tabel_formulir_online);
 	            $("#pagination_link").html(obj.pagination_link);
 		    },500);
 		}).done(function() {
-	      
+
 	    }).fail(function() {
 	      toastr.error('The Database connection error, please try again', 'Failed!!');;
 	    }).always(function() {
@@ -115,7 +115,7 @@
 
 	function loadTahun()
     {
-    	var academic_year_admission = "<?php echo $academic_year_admission ?>"; 
+    	var academic_year_admission = "<?php echo $academic_year_admission ?>";
     	var thisYear = (new Date()).getFullYear();
       	var startTahun = parseInt(thisYear) - 1;
      	 var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
@@ -157,13 +157,13 @@
     // 	var selector = $('#form-input');
     // 	//console.log(td);
     // 	//console.log(index);
-    	
+
     // 	if (data_id != null && data_id != 'null') {
     // 		loadingStart();
     // 		ev_click_td(data_id,DataToken,selector);
     // 		loadingEnd(500);
     // 	}
-    	
+
 
     // })
 
@@ -173,13 +173,13 @@
     	var html = '';
     	html += '<div class = "row" style = "margin-top : 10px;">'+
     				'<div class = "col-xs-12">'+
-    					'<div class = "well">'+	
+    					'<div class = "well">'+
     						'<div class = "row">'+
     							'<div class = "col-xs-6">'+
     								'<div class = "thumbnail">'+
     									'<div style = "padding:15px;">'+
     										'<h2>Edit Number Formulir</h2>'+
-    									'</div>'+	
+    									'</div>'+
     									'<div id="content-input-edit" style = "padding:15px;"></div>'+
     								'</div>'+
     						    '</div>'+
@@ -187,7 +187,7 @@
         							'<div class = "thumbnail">'+
         								'<div style = "padding:15px;">'+
         									'<h2>Exchange Number Formulir</h2>'+
-        								'</div>'+	
+        								'</div>'+
         								'<div id="content-input-exchange" style = "padding:15px;"></div>'+
         							'</div>'+
         						'</div>'+
@@ -196,8 +196,8 @@
                                 '<div class = "col-xs-8 col-md-offset-2">'+
                                     '<div class = "thumbnail">'+
                                         '<div style = "padding:15px;">'+
-                                            '<h2>Unsell Number Formulir</h2>'+
-                                        '</div>'+   
+                                            '<h2>Unsale Number Formulir</h2>'+
+                                        '</div>'+
                                         '<div id="content-input-unsell" style = "padding:15px;"></div>'+
                                     '</div>'+
                                 '</div>'+
@@ -208,9 +208,9 @@
     	selector.html(html);
     	var selector_edit = $('#content-input-edit');
     	form_edit(data_id,DataToken,selector_edit);
-    	var selector_edit = $('#content-input-exchange');					
-        form_exchange(data_id,DataToken,selector_edit);                 
-    	formUnsell.writeHtml(data_id,DataToken);					
+    	var selector_edit = $('#content-input-exchange');
+        form_exchange(data_id,DataToken,selector_edit);
+    	formUnsell.writeHtml(data_id,DataToken);
     }
 
 
@@ -278,7 +278,7 @@
 
                 end_loading_button2(selector);
             }
-            
+
         },
 
         showResultAction : (dataResult,msg) => {
@@ -335,15 +335,15 @@
     	};
     	var token = jwt_encode(data,"UAP)(*");
     	$.post(url,{ token:token },function (resultJson) {
-    		
+
     	}).done(function(resultJson) {
     		def.resolve(resultJson);
     	}).fail(function() {
     	  toastr.info('No Result Data');
-    	  def.reject();  
+    	  def.reject();
     	}).always(function() {
-    	                
-    	});	
+
+    	});
     	return def.promise();
     }
 
@@ -381,7 +381,7 @@
     					'<div class = "form-group">'+
     						'<button class="btn btn-block btn-success" id="btnSave_edit_ex" data-id="'+data_id+'" token = "'+DataToken+'">Save</button>'+
     					'</div>'+
-    				'</div>'		
+    				'</div>'
     			'</div>';
     	selector.html(html);
 
@@ -401,7 +401,7 @@
     }
 
     function form_edit(data_id,DataToken,selector)
-    {	
+    {
     	var html = '';
     	var dt = jwt_decode(DataToken);
     	// console.log(dt);
@@ -434,7 +434,7 @@
     					'<div class = "form-group">'+
     						'<button class="btn btn-block btn-success" id="btnSave_edit_number" data-id="'+data_id+'" token = "'+DataToken+'">Save</button>'+
     					'</div>'+
-    				'</div>'		
+    				'</div>'
     			'</div>';
     	selector.html(html);
 
@@ -450,12 +450,12 @@
     		$('#No_Ref_Replacement').select2({
     		  // allowClear: true
     		});
-    	})				
+    	})
     }
 
     function loadTahun2(selector)
     {
-    	var academic_year_admission = "<?php echo $academic_year_admission ?>"; 
+    	var academic_year_admission = "<?php echo $academic_year_admission ?>";
     	var thisYear = (new Date()).getFullYear();
       	var startTahun = parseInt(thisYear);
      	 var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
@@ -523,7 +523,7 @@
 	    				toastr.error('Error','!!Failed');
 	    			}
 
-	    			$('#btnSave_edit_number').prop('disabled',false).html('Save');	
+	    			$('#btnSave_edit_number').prop('disabled',false).html('Save');
 	    		})
     		}
     	}
@@ -583,11 +583,11 @@
 	    				toastr.error('Error','!!Failed');
 	    			}
 
-	    			$('#btnSave_edit_ex').prop('disabled',false).html('Save');	
+	    			$('#btnSave_edit_ex').prop('disabled',false).html('Save');
 	    		})
     		}
     	}
     })
-    
-    
+
+
 </script>
