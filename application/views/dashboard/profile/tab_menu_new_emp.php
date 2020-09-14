@@ -363,7 +363,7 @@ $(document).ready(function(){
         $("#ProfilePicture,#imgThumbnail").attr("src",window.sessionUrlPhoto);
 
 
-        $("#form-employee").on("click","#multiple-field .btn-add",function(){
+        $("#form-employee").on("click","#multiple-field .btn-add,#multiple-field .btn-add2",function(){
             var itsme = $(this);
             var parent = itsme.parent().parent().parent().parent();
             var fieldName = parent.data("source");
