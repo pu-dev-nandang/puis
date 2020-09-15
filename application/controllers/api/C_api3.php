@@ -3460,6 +3460,10 @@ class C_api3 extends CI_Controller {
                                           WHERE em.ProdiID = "'.$data[$i]['ID'].'" AND em.Serdos="1"
                                           AND (em.StatusForlap = "1" || em.StatusForlap = "2")  ')->result_array();
 
+                // untuk certified tanpa serdos
+                $dataEmpCerti2 = $this->db->query('SELECT em.NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em
+                                          WHERE em.ProdiID = "'.$data[$i]['ID'].'"
+                                          AND (em.StatusForlap = "1" || em.StatusForlap = "2")  ')->result_array();
 
                 $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti;
 
@@ -3467,10 +3471,10 @@ class C_api3 extends CI_Controller {
                    $data[$i]['Certificate_'.$arrCertificateType[$y]] = [];
                 }
 
-                for ($x=0; $x < count($dataEmpCerti); $x++) { 
+                for ($x=0; $x < count($dataEmpCerti2); $x++) { 
                    for ($z=0; $z < count($arrCertificateType); $z++) { 
                        $dt = $this->db->query(
-                           'select a.*,"'.$dataEmpCerti[$x]['Name'].'" as NameDosen, "'.$dataEmpCerti[$x]['NIDN'].'" as NIDN from db_employees.employees_certificate as a where a.NIP = "'.$dataEmpCerti[$x]['NIP'].'" 
+                           'select a.*,"'.$dataEmpCerti2[$x]['Name'].'" as NameDosen, "'.$dataEmpCerti2[$x]['NIDN'].'" as NIDN from db_employees.employees_certificate as a where a.NIP = "'.$dataEmpCerti2[$x]['NIP'].'" 
                             and a.StatusEdit = 1 and a.Certificate = "'.$arrCertificateType[$z].'"
 
                            '
