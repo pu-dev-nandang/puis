@@ -1,24 +1,24 @@
 <div class="tab-pane fade active in" id="list" role="tabpanel" aria-labelledby="list-tab">
-					<div class="table-responsive">
-					  <table class="table table-condensed">
-					      <thead>
-					        <tr>
-					          <th>#</th>
-					          <th>Title</th>
-					          <th>Text</th>
-					          <th>Publish</th>
-					          <th>Date Update</th>
-					        </tr>
-					      </thead>
-					      <tbody id="viewDatalist">
-					        
-					      </tbody>
-					    </table>
-					</div>
-				</div>
+	<div class="table-responsive">
+	  <table class="table table-condensed">
+	      <thead>
+	        <tr>
+	          <th>#</th>
+	          <th>Title</th>
+	          <th>Text</th>
+	          <th>Publish</th>
+	          <th>Date Update</th>
+	        </tr>
+	      </thead>
+	      <tbody id="viewDatalist">
+	        
+	      </tbody>
+	    </table>
+	</div>
+</div>
 
 
-				<script>
+<script>
     $(document).ready(function () {
 
         window.G_Type = '3';
