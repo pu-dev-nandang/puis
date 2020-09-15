@@ -106,8 +106,8 @@
                         '<td style="border-left: 1px solid #ccc;">'+viewLectCerd+'</td>' +
                         '<td style="border-left: 1px solid #ccc;">'+viewCertificate_Profesional+'</td>' +
                         '<td style="border-left: 1px solid #ccc;">'+viewCertificate_Profesi+'</td>' +
-                        '<td style="border-left: 1px solid #ccc;">'+viewCertificate_Kompetensi+'</td>' +
                         '<td style="border-left: 1px solid #ccc;">'+viewCertificate_Industri+'</td>' +
+                        '<td style="border-left: 1px solid #ccc;">'+viewCertificate_Kompetensi+'</td>' +
                         '</tr>');
 
                     ds = ds + parseInt(v.TotalLecturer.length);
