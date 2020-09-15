@@ -3446,7 +3446,7 @@ class C_api3 extends CI_Controller {
         ))->result_array();
 
         if(count($data)>0){
-            $arrCertificateType = ['Profesional','Profesi','Kompetensi','Industri'];
+            $arrCertificateType = ['Profesional','Profesi','Industri','Kompetensi'];
             for($i=0;$i<count($data);$i++){
 
                 // Total Employees
