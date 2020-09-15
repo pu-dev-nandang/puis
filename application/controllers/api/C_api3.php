@@ -3461,28 +3461,32 @@ class C_api3 extends CI_Controller {
                                           AND (em.StatusForlap = "1" || em.StatusForlap = "2")  ')->result_array();
 
                 // untuk certified tanpa serdos
-                $dataEmpCerti2 = $this->db->query('SELECT em.NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em
-                                          WHERE em.ProdiID = "'.$data[$i]['ID'].'"
-                                          AND (em.StatusForlap = "1" || em.StatusForlap = "2")  ')->result_array();
+                $dataEmpCerti2 = $dataEmp;
 
                 $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti;
 
                 for ($y=0; $y < count($arrCertificateType) ; $y++) { 
                    $data[$i]['Certificate_'.$arrCertificateType[$y]] = [];
                 }
-
+                
                 for ($x=0; $x < count($dataEmpCerti2); $x++) { 
                    for ($z=0; $z < count($arrCertificateType); $z++) { 
-                       $dt = $this->db->query(
-                           'select a.*,"'.$dataEmpCerti2[$x]['Name'].'" as NameDosen, "'.$dataEmpCerti2[$x]['NIDN'].'" as NIDN from db_employees.employees_certificate as a where a.NIP = "'.$dataEmpCerti2[$x]['NIP'].'" 
+                        $sql = 'select a.*,"'.$dataEmpCerti2[$x]['Name'].'" as NameDosen, "'.$dataEmpCerti2[$x]['NIDN'].'" as NIDN from db_employees.employees_certificate as a where a.NIP = "'.$dataEmpCerti2[$x]['NIP'].'" 
                             and a.StatusEdit = 1 and a.Certificate = "'.$arrCertificateType[$z].'"
 
-                           '
+                           ';
+                       $dt = $this->db->query(
+                           $sql
                        )->result_array();
 
+
                        if (count($dt) > 0) {
-                           $data[$i]['Certificate_'.$arrCertificateType[$z]] = $data[$i]['Certificate_'.$arrCertificateType[$z]] + $dt;
+
+                           // $data[$i]['Certificate_'.$arrCertificateType[$z]] = $data[$i]['Certificate_'.$arrCertificateType[$z]] + $dt;
+                            $data[$i]['Certificate_'.$arrCertificateType[$z]] = array_merge($data[$i]['Certificate_'.$arrCertificateType[$z]],$dt);
                        }
+
+                       
                    }
                 }
 
