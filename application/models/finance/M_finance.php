@@ -3594,7 +3594,7 @@ class M_finance extends CI_Model {
 
     $queryAdd = '';
     if ($prodi == '') {
-     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
+     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,b.PaymentShow,b.PaymentShowTextMSG from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
              where a.StatusStudentID like "%%"   '.$NPM.$queryAdd.'
              order by a.NPM asc
              LIMIT '.$start. ', '.$limit;
@@ -3603,7 +3603,7 @@ class M_finance extends CI_Model {
     }
     else
     {
-      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
+      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,b.PaymentShow,b.PaymentShowTextMSG from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
               where a.StatusStudentID like "%%"  and a.ProdiID = ? '.$NPM.$queryAdd.'
               order by a.NPM asc
               LIMIT '.$start. ', '.$limit;
