@@ -12,6 +12,15 @@
         padding: 10px;
         border-radius: 8px;
     }
+
+    #tableData tr td:nth-child(4), #tableData tr td:nth-child(5)
+    {
+        background: #e7f7ff !important;
+    }
+    #tableData tr td:nth-child(6){
+        background: #eeffdb !important;
+    }
+
 </style>
 
 <div class="row" style="margin-bottom: 15px;">
@@ -41,7 +50,9 @@
             '                <th style="width: 3%;">No</th>' +
             '                <th>Title</th>' +
             '                <th style="width: 5%;">Question</th>' +
-            '                <th style="width: 5%;"><i class="fa fa-users"></i></th>' +
+            '                <th style="width: 5%; color: #2196f3;">Internal</th>' +
+            '                <th style="width: 5%; color: #ffa013;">External</th>' +
+            '                <th style="width: 5%;">Total</th>' +
             '                <th style="width: 7%;"><i class="fa fa-cog"></i></th>' +
             '                <th style="width: 20%;">Publication Date</th>' +
             '                <th style="width: 5%;">Status</th>' +
@@ -208,9 +219,11 @@
         $('#GlobalModal .modal-body').html(htmlss);
 
         var ID = $(this).attr('data-id');
+        var Type = $(this).attr('data-type');
         var data = {
             action : 'showUserAlreadyFill',
             SurveyID : ID,
+            Type : Type
         };
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'apimenu/__crudSurvey';

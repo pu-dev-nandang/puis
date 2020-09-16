@@ -489,11 +489,13 @@ class C_api_menu extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataScr = 'sq.Question LIKE "%'.$search.'%"';
-                $dataSearch = '';
+                $dataSearch = ' AND ( ss.Title LIKE "%'.$search.'%" )';
+//                $dataSearch = '';
             }
 
-            $queryDefault = 'SELECT ss.* FROM db_it.surv_survey ss WHERE ss.DepartmentID = "'.$data_arr['DepartmentID'].'"  '. $dataWhere.$dataSearch;
+            $queryDefault = 'SELECT ss.* FROM db_it.surv_survey ss WHERE 
+                            ss.DepartmentID = "'.$data_arr['DepartmentID'].'"  '.
+                            $dataWhere.$dataSearch;
 
             $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
 
@@ -548,6 +550,8 @@ class C_api_menu extends CI_Controller {
                                 <li><a href="javascript:void(0);" class="btnManageTarget" data-id="'.$row['ID'].'">Manage Targets</a></li>
                                 <li><a href="'.base_url('survey/manage-question/'.$tokenBtn).'" target="_blank">Manage Question</a></li>
                                 <li role="separator" class="divider"></li>
+                                <li><a href="'.base_url('save2excel/survey/'.$row['ID']).'" target="_blank">Download Report</a></li>
+                                <li role="separator" class="divider"></li>
                                 <li class="btnShareToPublic" data-id="'.$row['ID'].'"><a href="#">Share to the public</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li class="'.$btnRemove.'"><a href="#">Remove</a></li>
@@ -555,19 +559,34 @@ class C_api_menu extends CI_Controller {
                             </div>';
 
                 // Cek jumlah yang sudah mengisi survey
-                $TotalYgUdahIsiSurvey = $this->db->from('db_it.surv_answer')->where('SurveyID',$row['ID'])->count_all_results();
+                $TotalYgUdahIsiSurvey = $this->db->from('db_it.surv_answer')
+                    ->where(array('SurveyID' => $row['ID'],'FormType' => 'internal'))->count_all_results();
                 $btnTotalAlreadyFillOut = ($TotalYgUdahIsiSurvey>0)
-                    ? '<a href="javascript:void(0)" class="showAlreadyFillOut" data-id="'.$row['ID'].'">'.$TotalYgUdahIsiSurvey.'</a>'
+                    ? '<a href="javascript:void(0)" class="showAlreadyFillOut" data-type="internal" data-id="'.$row['ID'].'">'.$TotalYgUdahIsiSurvey.'</a>'
+                    : '0';
+
+                // Cek jumlah yang sudah mengisi survey external
+                $TotalYgUdahIsiSurvey_Ext = $this->db->from('db_it.surv_answer')
+                    ->where(array('SurveyID' => $row['ID'],'FormType' => 'external'))->count_all_results();
+                $btnTotalAlreadyFillOut_ext = ($TotalYgUdahIsiSurvey_Ext>0)
+                    ? '<a href="javascript:void(0)" class="showAlreadyFillOut" data-type="external" data-id="'.$row['ID'].'">'.$TotalYgUdahIsiSurvey_Ext.'</a>'
                     : '0';
 
                 $TotalQuestion = $this->db->from('db_it.surv_survey_detail')->where('SurveyID',$row['ID'])->count_all_results();
                 $btnShowTotalQuestion = ($TotalQuestion>0) ? '<a href="javascript:void(0)" class="showQuestionList" data-id="'.$row['ID'].'">'.$TotalQuestion.'</a>' : '0';
+
+                $TotalFillOut = $TotalYgUdahIsiSurvey + $TotalYgUdahIsiSurvey_Ext;
+                $ShowTotalFillOut = ($TotalFillOut>0)
+                    ? '<a href="javascript:void(0)" class="showAlreadyFillOut" data-type="all" data-id="'.$row['ID'].'">'.$TotalFillOut.'</a>'
+                    : '0';
 
 
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$row['Title'].'</div>';
                 $nestedData[] = $btnShowTotalQuestion;
                 $nestedData[] = $btnTotalAlreadyFillOut;
+                $nestedData[] = $btnTotalAlreadyFillOut_ext;
+                $nestedData[] = '<b>'.$ShowTotalFillOut.'</b>';
                 $nestedData[] = '<div>'.$btnAct.'</div>';
                 $nestedData[] = '<div>'.$Range.'</div>';
                 $nestedData[] = '<div id="viewStatusSurvey_'.$row['ID'].'">'.$Status.'</div>';
@@ -701,7 +720,9 @@ class C_api_menu extends CI_Controller {
         else if($data_arr['action']=='showUserAlreadyFill'){
 
             $requestData = $_REQUEST;
-            $dataWhere = '';
+
+            $dataWhere = ($data_arr['Type']=='all') ? '' : ' AND sa.FormType = "'.$data_arr['Type'].'" ';
+
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
