@@ -1634,10 +1634,39 @@ class C_finance extends Finnance_Controler {
 
     public function mahasiswa()
     {
-        $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
-        $data['getSemester'] = $getSemester;
-        $content = $this->load->view('page/'.$this->data['department'].'/master/page_master_mahasiswa',$this->data,true);
-        $this->temp($content);
+        if ($this->input->is_ajax_request()) {
+            $dataToken = $this->getInputToken();
+            $action = $dataToken['action'];
+            switch ($action) {
+                case 'SaveMenuPayment':
+                    $rs = ['status' => 0,'msg' => ''];
+                    $NPM = $dataToken['NPM'];
+                    $data = $dataToken['data'];
+                    $this->db->where('NPM',$NPM);
+                    $this->db->update('db_academic.auth_students',$data);
+                    if ($this->db->affected_rows() > 0 ){
+                        $rs['status'] = 1;
+                    }
+                    else
+                    {
+                        $rs['msg'] = 'Data cannot be save, please contact IT';
+                    }
+                    echo json_encode($rs);
+                    break;
+                
+                default:
+                    # code...
+                    break;
+            }
+        }
+        else
+        {
+            $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+            $data['getSemester'] = $getSemester;
+            $content = $this->load->view('page/'.$this->data['department'].'/master/page_master_mahasiswa',$this->data,true);
+            $this->temp($content);
+        }
+        
     }
 
     public function mahasiswa_list($page = null)

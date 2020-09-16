@@ -51,7 +51,7 @@
                             <th style="width: 1%;">No</th>
                             <th style="width: 12%;">Program Study</th>
                             <!-- <th style="width: 10%;">Semester</th> -->
-                            <th style="width: 20%;">Nama,NPM & VA</th>
+                            <th style="width: 10%;">Nama,NPM & VA</th>
                             <th style="width: 5%;">Foto</th>
                             <th style="width: 5%;">IPS</th>
                             <th style="width: 5%;">IPK</th>
@@ -60,6 +60,7 @@
                             <!-- <th style="width: 15%;">Email PU</th> -->
                             <!-- <th style="width: 5%;">No HP</th> -->
                             <th style="width: 5%;">Switch Bintang</th>
+                            <th style="width: 20%;">Hide / Show Payment</th>
                             <th style="width: 5%;">Beasiswa BPP</th>
                             <th style="width: 5%;">Beasiswa Credit</th>
                         </tr>
@@ -75,12 +76,105 @@
 </div>
 
 <script>
+    const getUrl = window.location.href;
+    const __MenuPayment = (NPM,PaymentShow = '1',PaymentShowTextMSG = null) => {
+      let html  = '<div class = "MenuPaymentShow" style = "pading:3px;">';
+      let arrShow = [
+        {
+          value : '0',
+          text : 'Hide'
+        },
+        {
+          value : '1',
+          text : 'Show'
+        },
+      ];
+
+      let showText = (PaymentShowTextMSG == null || PaymentShowTextMSG == '') ? '' : PaymentShowTextMSG;
+      let htmlSelectOP = '<select class = "form-control PaymentShow" NPM = "'+NPM+'">';
+          for (var i = 0; i < arrShow.length; i++) {
+            let selected = (arrShow[i].value == PaymentShow) ? 'selected' : '';
+            htmlSelectOP += '<option value = "'+arrShow[i].value+'" '+selected+'>'+arrShow[i].text+'</option>';
+          }
+
+          htmlSelectOP += '</select>';
+      let InputMSG = '<div class = "form-group">'+ 
+                          '<label>Messages</label>'+
+                          '<input type = "text" class = "form-control PaymentShowTextMSG" value = "'+showText+'" placeholder = "input pesan untuk student" />'+
+                     '</div>';
+
+
+      let btnSaveMenuPayment = '<div style = "margin-top:5px;">'+
+                                  '<button class = "btn btn-success btnSaveMenuPayment" NPM = "'+NPM+'">Save</button>'+
+                                '</div>';
+      if (PaymentShow == '1') {
+        InputMSG = '';
+      }                           
+
+      let divInput = '<div>'+
+                      '<div class = "form-group">'+
+                          '<label>Choose</label>'+
+                          htmlSelectOP + 
+                      '</div>'+      
+                      InputMSG+
+                     '</div>';
+      html += divInput + btnSaveMenuPayment;                
+      html += '</div>'; 
+
+      return html;
+    }
+
     $(document).ready(function () {
         loadSelectOptionCurriculum2('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
         // $("#btn-submit").addClass('hide');
         FuncbtnStdDownloadtoExcel();
     });
+
+    $(document).on('change','.PaymentShow',function(e){
+      const itsme = $(this);
+      const valData = itsme.find('option:selected').val();
+      const NPM = itsme.attr('npm');
+      itsme.closest('td').html(__MenuPayment(NPM,valData,''));
+    })
+
+    $(document).on('click','.btnSaveMenuPayment',async function(e){
+      const itsme = $(this);
+      const NPM = $(this).attr('npm');
+      const PaymentShow = itsme.closest('.MenuPaymentShow').find('.PaymentShow option:selected').val();
+      const PaymentShowTextMSG = itsme.closest('.MenuPaymentShow').find('.PaymentShowTextMSG').val();
+      const dataForm = {
+        action : 'SaveMenuPayment',
+        NPM : NPM,
+        data :{
+          PaymentShow : PaymentShow,
+          PaymentShowTextMSG : PaymentShowTextMSG
+        }
+        
+      };
+      var token = jwt_encode(dataForm,'UAP)(*');
+      if (confirm('Are you sure ?')) {
+         loading_button2(itsme);
+         try{
+          const response = await AjaxSubmitFormPromises(getUrl,token);
+          if (response.status == 1) {
+            itsme.closest('td').html(__MenuPayment(NPM,PaymentShow,PaymentShowTextMSG));
+            toastr.success('Saved');
+          }
+          else
+          {
+            toastr.info(response.msg);
+          }
+         }
+         catch(err){
+          toastr.info('something wrong');
+         }
+
+         end_loading_button2(itsme,'Save');
+      }
+     
+
+    })
 
     function FuncbtnStdDownloadtoExcel()
     {
@@ -242,7 +336,9 @@
                             Credit = 0
                         }
 
-                        var btnSwitchBintang = '<button class = "btn btn-primary btn-sm btnSwitchBintang" npm = "'+Data_mhs[i]['NPM']+'" ClassOf = "'+Data_mhs[i]['ClassOf']+'" pay_cond = "'+Data_mhs[i]['Pay_Cond']+'" namemhs = "'+Data_mhs[i]['Name']+'" prodiname = "'+Data_mhs[i]['ProdiEng']+'" ProdiID = "'+Data_mhs[i]['ProdiID']+'"> <i class="fa fa-hand-o-right" aria-hidden="true"></i> </button>'
+                        var btnSwitchBintang = '<button class = "btn btn-primary btn-sm btnSwitchBintang" npm = "'+Data_mhs[i]['NPM']+'" ClassOf = "'+Data_mhs[i]['ClassOf']+'" pay_cond = "'+Data_mhs[i]['Pay_Cond']+'" namemhs = "'+Data_mhs[i]['Name']+'" prodiname = "'+Data_mhs[i]['ProdiEng']+'" ProdiID = "'+Data_mhs[i]['ProdiID']+'"> <i class="fa fa-hand-o-right" aria-hidden="true"></i> </button>';
+
+                        const MenuPaymentShow = __MenuPayment(Data_mhs[i]['NPM'],Data_mhs[i]['PaymentShow'],Data_mhs[i]['PaymentShowTextMSG']);
 
                        $('#dataRow').append('<tr>' +
                            '<td>'+Data_mhs[i]['No']+'</td>' +
@@ -258,8 +354,8 @@
                            '<td>'+Data_mhs[i]['StatusStudentName']+'</td>' +
                            // '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
                            // '<td>'+Data_mhs[i]['HP']+'</td>' +
-                           // '<td>'+selecTOptionBintang+'</td>' +
                            '<td style = "text-align:center;">'+btnSwitchBintang+'</td>' +
+                           '<td>'+MenuPaymentShow+'</td>' +
                            '<td>'+selecTOption+'</td>' +
                            '<td>'+selecTOptionCredit+'</td>' +
                            '</tr>');
