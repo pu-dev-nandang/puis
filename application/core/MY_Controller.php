@@ -78,7 +78,7 @@ abstract class Globalclass extends MyAbstract{
 
     }
 
-    public function template($content)
+    public function template($content,$ClassContainerTemplate = '')
     {
 
         $data['include'] = $this->load->view('template/include','',true);
@@ -88,7 +88,9 @@ abstract class Globalclass extends MyAbstract{
             $data['header'] = $this->menu_header();
             $data['navigation'] = $this->menu_navigation();
             $data['crumbs'] = $this->crumbs();
-
+            if (!empty($ClassContainerTemplate)) {
+                 $data['ClassContainer'] = $ClassContainerTemplate;
+            }
             $data['content'] = $content;
             $this->load->view('template/template',$data);
         } else {
@@ -253,7 +255,7 @@ abstract class Globalclass extends MyAbstract{
                 if(
                   (select count(*) as total from db_finance.register_refund where ID_register_formulir = e.ID ) > 0,"Refund",""
                 ) as CekRefund,
-                ra.Pay_Cond
+                ra.Pay_Cond,ra.PaymentShow,ra.PaymentShowTextMSG
                 from db_admission.register as a
                 LEFT join db_admission.school as b
                 on a.SchoolID = b.ID
@@ -397,7 +399,7 @@ abstract class Globalclass extends MyAbstract{
             '; 
 
              $nestedData[] = $actionCol;
-
+             $nestedData['dataToken'] = $this->jwt->encode($row,"UAP)(*");
 
             $data[] = $nestedData;
             $No++;
@@ -488,9 +490,9 @@ abstract class Admission_Controler extends Globalclass{
         }
     }
 
-    public function temp($content)
+    public function temp($content,$ClassContainer = '')
     {
-        $this->template($content);
+        $this->template($content,$ClassContainer);
     }
 
 

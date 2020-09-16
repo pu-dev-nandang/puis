@@ -788,9 +788,38 @@ class C_admission extends Admission_Controler {
 
     public function page_data_calon_mahasiswa()
     {
-      // $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_data_calon_mahasiswa',$this->data,true);
-      $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_data_calon_mahasiswa_server_side',$this->data,true);
-      $this->temp($content);
+      if ($this->input->is_ajax_request()) {
+          $dataToken = $this->getInputToken();
+          $action = $dataToken['action'];
+          switch ($action) {
+              case 'SaveMenuPayment':
+                  $rs = ['status' => 0,'msg' => ''];
+                  $ID_register_formulir = $dataToken['ID_register_formulir'];
+                  $data = $dataToken['data'];
+                  $this->db->where('ID_register_formulir',$ID_register_formulir);
+                  $this->db->update('db_finance.register_admisi',$data);
+                  if ($this->db->affected_rows() > 0 ){
+                      $rs['status'] = 1;
+                  }
+                  else
+                  {
+                      $rs['msg'] = 'Data cannot be save, please contact IT';
+                  }
+                  echo json_encode($rs);
+                  break;
+              
+              default:
+                  # code...
+                  break;
+          }
+      }
+      else
+      {
+        $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_data_calon_mahasiswa_server_side',$this->data,true);
+        $ClassContainerTemplate = 'sidebar-closed';
+        $this->temp($content,$ClassContainerTemplate);
+      }
+      
     }
 
     public function data_calon_mahasiswa($page = null)
