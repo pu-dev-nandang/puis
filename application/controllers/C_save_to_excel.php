@@ -2767,7 +2767,7 @@ class C_save_to_excel extends CI_Controller
 
 
         foreach(range('A','Z') as $columnID) {
-            if($columnID!='H'){
+            if($columnID!='H' && $columnID!='J'){
                 $excel->getActiveSheet()->getColumnDimension($columnID)
                     ->setAutoSize(true);
             }
