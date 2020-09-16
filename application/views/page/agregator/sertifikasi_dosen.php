@@ -184,19 +184,21 @@
     $(document).on('click','.showDetailSertifikat',function () {
         var  tokenLect = $(this).attr('data-lec');
         var d = jwt_decode(tokenLect,'UAP)(*');
+        // console.log(d);
         var modalTitle = $(this).attr('title');
         let tr  = '';
 
         for (var i = 0; i < d.length; i++) {
             const r  = d[i];
+            const dueDateShow = (r.Lifetime == 1 || r.Lifetime == '1') ? 'Lifetime' : ((r.Duedate!='' && r.Duedate!=null)
+                        ? moment(r.Duedate).format('DD MMM YYYY') : '');
             tr += '<tr>'+
                         '<td>'+(i+1)+'</td>'+
                         '<td>'+r.NIDN+'</td>'+
                         '<td>'+r.NameDosen+'</td>'+
                         '<td>'+((r.PublicationYear!='' && r.PublicationYear!=null)
                         ? moment(r.PublicationYear).format('DD MMM YYYY') : '')+'</td>'+
-                        '<td>'+((r.Duedate!='' && r.Duedate!=null)
-                        ? moment(r.Duedate).format('DD MMM YYYY') : '')+'</td>'+
+                        '<td>'+dueDateShow+'</td>'+
                         '<td>'+((r.File!='' && r.File!=null) ? '<a class="btn btn-sm btn-default" target="_blank" href="'+base_url_js+'uploads/certificate/'+r.File+'">Download</a>' : '')+'</td>'+
                   '</tr>';
         }
