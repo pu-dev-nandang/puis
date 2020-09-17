@@ -360,6 +360,8 @@
         var ID = $(this).attr('data-id');
         updateStatusSurvey(ID,'2',
             'If the survey is closed, the user cannot fill out your survey, are you sure?');
+
+        loadTableSurveyList();
     });
 
     function updateStatusSurvey(ID,Status,msg){
