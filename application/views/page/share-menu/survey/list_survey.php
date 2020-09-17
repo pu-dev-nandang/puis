@@ -54,7 +54,8 @@
             '                <th style="width: 5%; color: #ffa013;">External</th>' +
             '                <th style="width: 5%;">Total</th>' +
             '                <th style="width: 7%;"><i class="fa fa-cog"></i></th>' +
-            '                <th style="width: 20%;">Publication Date</th>' +
+            '                <th style="width: 17%;">Publication Date</th>' +
+            '                <th style="width: 5%;">Publication</th>' +
             '                <th style="width: 5%;">Status</th>' +
             '            </tr>' +
             '            </thead>' +
@@ -744,6 +745,143 @@
                 toastr.success('Removed Data','Success');
             });
         }
+    });
+    
+    
+    $(document).on('click','.btnAddNewDate',function () {
+
+        var ID = $(this).attr('data-id');
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Add New Date</h4>');
+
+        var htmlss = '<div class="form-group">' +
+            '                    <div class="row">' +
+            '                        <div class="col-md-6">' +
+            '                            <label>Start</label>' +
+            '                            <input id="formSurveyStartDate" class="form-control" type="date">' +
+            '                           <input id="formSurveyID" class="hide" value="'+ID+'">' +
+            '                        </div>' +
+            '                        <div class="col-md-6">' +
+            '                            <label>End</label>' +
+            '                            <input id="formSurveyEndDate" class="form-control" type="date">' +
+            '                        </div>' +
+            '                    </div>' +
+            '                </div>';
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        $('#formSurveyTitle,#formSurveyStartDate,#formSurveyEndDate,#formSurveyNote').css('color','#333');
+
+        $('#GlobalModal .modal-footer').html('' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> '+
+            '<button class="btn btn-success" id="btnSubmitNewDate">Submit</button>');
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+
+        $(document).off('click','#btnSubmitNewDate').on('click','#btnSubmitNewDate',function () {
+
+            loading_button('#btnSubmitNewDate');
+
+            var formSurveyStartDate = $('#formSurveyStartDate').val();
+            var formSurveyEndDate = $('#formSurveyEndDate').val();
+
+            if(formSurveyStartDate!='' && formSurveyStartDate!=null &&
+                formSurveyEndDate!='' && formSurveyEndDate!=null){
+
+                var data = {
+                    action : 'createNewDateSurvey',
+                    SurveyID : ID,
+                    StartDate : formSurveyStartDate,
+                    EndDate : formSurveyEndDate,
+                    NIP : sessionNIP
+                };
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'apimenu/__crudSurvey';
+
+                $.post(url,{token:token},function (jsonResult) {
+                    loadTableSurveyList();
+                    setTimeout(function () {
+                        $('#GlobalModal').modal('hide');
+                    },500);
+                });
+
+            } else {
+                toastr.warning('Range of date are required','Warning');
+            }
+        });
+
+    });
+
+    $(document).on('click','.showAllPublication',function () {
+
+        var ID = $(this).attr('data-id');
+
+        var data = {
+            action : 'dataAllPublication',
+            SurveyID : ID
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            var tr = '';
+
+            $.each(jsonResult,function (i,v) {
+
+                var Start = moment(v.StartDate).format('DD MMM YYYY');
+                var End = moment(v.EndDate).format('DD MMM YYYY');
+
+                tr = tr+'<tr>' +
+                    '<td>'+(i+1)+'</td>' +
+                    '<td>'+v.Question+'</td>' +
+                    '<td>'+Start+' - '+End+'</td>' +
+                    '<td>'+v.TotalAnswer+'</td>' +
+                    '<td>' +
+                    '   <a href="'+base_url_js+'save2excel/survey/'+v.SurveyID+'/'+v.RecapID+'" class="btn btn-sm btn-default"><i class="fa fa-download"></i></a>' +
+                    '   <button class="btn btn-sm btn-default"><i class="fa fa-mail-forward"></i></button>' +
+                    '</td>' +
+                    '</tr>';
+            });
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">List Of Publication Dates</h4>');
+
+            var htmlss = '<table class="table table-bordered table-centre table-striped">' +
+                '<thead>' +
+                '<tr style="background: #eceff1;">' +
+                '   <td style="width: 1%;">No</td>' +
+                '   <td style="width: 5%;">Question</td>' +
+                '   <td>Publication Date</td>' +
+                '   <td style="width: 5%;"><i class="fa fa-users"></i></td>' +
+                '   <td style="width: 25%;">Report</td>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>'+tr+'</tbody>' +
+                '</table>';
+
+            $('#GlobalModal .modal-body').html(htmlss);
+
+            $('#formSurveyTitle,#formSurveyStartDate,#formSurveyEndDate,#formSurveyNote').css('color','#333');
+
+            $('#GlobalModal .modal-footer').html('' +
+                '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+
+        });
+
+
+
+
     });
 
 
