@@ -2716,13 +2716,13 @@ class C_save_to_excel extends CI_Controller
                                              sq.Question, sqc.Description AS QuestionCategory,
                                              sad.EntredAt
                                             FROM db_it.surv_answer_detail sad
+                                            RIGHT JOIN db_it.surv_answer sa ON (sa.ID = sad.AnswerID)
                                             LEFT JOIN db_it.surv_question sq ON (sq.ID = sad.QuestionID)
                                             LEFT JOIN db_it.surv_question_category sqc ON (sqc.ID = sq.QCID)
-                                            LEFT JOIN db_it.surv_answer sa ON (sa.ID = sad.AnswerID AND sa.RecapID = "'.$RecapID.'")
                                             LEFT JOIN db_employees.employees em ON (em.NIP = sa.Username)
                                             LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sa.Username)
                                             LEFT JOIN db_it.surv_external_user seu ON (seu.ID = sa.Username)
-                                            WHERE sad.SurveyID = "'.$SurveyID.'"')->result_array();
+                                            WHERE sa.RecapID = "'.$RecapID.'" AND sad.SurveyID = "'.$SurveyID.'"')->result_array();
 
         $numrow = 6; // Set baris pertama untuk isi tabel adalah baris ke 4
         if(count($data)>0){
