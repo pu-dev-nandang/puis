@@ -748,8 +748,8 @@
             });
         }
     });
-    
-    
+
+
     $(document).on('click','.btnAddNewDate',function () {
 
         var ID = $(this).attr('data-id');
@@ -832,6 +832,8 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
+            console.log(jsonResult);
+
             var tr = '';
 
             $.each(jsonResult,function (i,v) {
@@ -839,14 +841,47 @@
                 var Start = moment(v.StartDate).format('DD MMM YYYY');
                 var End = moment(v.EndDate).format('DD MMM YYYY');
 
+                var tokenRecap = jwt_encode({
+                    SurveyID : v.SurveyID,
+                    RecapID : v.RecapID
+                },'UAP)(*');
+
                 tr = tr+'<tr>' +
                     '<td>'+(i+1)+'</td>' +
                     '<td>'+v.Question+'</td>' +
                     '<td>'+Start+' - '+End+'</td>' +
                     '<td>'+v.TotalAnswer+'</td>' +
                     '<td>' +
-                    '   <a href="'+base_url_js+'save2excel/survey/'+v.SurveyID+'/'+v.RecapID+'" class="btn btn-sm btn-default"><i class="fa fa-download"></i></a>' +
-                    '   <button class="btn btn-sm btn-default"><i class="fa fa-mail-forward"></i></button>' +
+                    '   <a href="'+base_url_js+'save2excel/survey/'+tokenRecap+'" class="btn btn-sm btn-default"><i class="fa fa-download"></i></a>' +
+                    '   <button class="btn btn-sm btn-default" role="button" data-toggle="collapse" href="#collapseExample_'+i+'" aria-expanded="false" aria-controls="collapseExample_'+i+'"><i class="fa fa-mail-forward"></i></button>' +
+                    '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td colspan="5" class="collapse" id="collapseExample_'+i+'">' +
+                    '<div class="row" style="margin-top: 15px;margin-bottom: 15px;">' +
+                    '   <div class="col-md-5">' +
+                    '       <input placeholder="Name..." class="form-control" id="formName_'+i+'" /> ' +
+                    '       <input value="'+tokenRecap+'" id="formtokenRecap_'+i+'" class="hide" /> ' +
+                    '   </div>' +
+                    '   <div class="col-md-5">' +
+                    '       <input placeholder="Email..." id="formEmail_'+i+'" class="form-control" /> ' +
+                    '   </div>' +
+                    '   <div class="col-md-2">' +
+                    '       <button class="btn btn-sm btn-default btn-block btnSentMail" data-i="'+i+'">Sent</button>' +
+                    '   </div>' +
+                    '</div>' +
+                    '<div class="row" style="margin-bottom: 15px;">' +
+                    '   <div class="col-md-12">' +
+                    '       <div class="text-right">' +
+                    '           <a role="button" data-toggle="collapse" href="#detailHistory_'+i+'" aria-expanded="false" aria-controls="detailHistory_'+i+'">Email delivery history</a>' +
+                    '       </div>' +
+                    '       <div class="collapse" id="detailHistory_'+i+'">' +
+                    '           <ol>' +
+                    '               <li>Nandang (nandang.mulyadi@podomorouniversity.ac.id)</li>' +
+                    '           </ol>' +
+                    '       </div>' +
+                    '   </div>' +
+                    '</div>' +
                     '</td>' +
                     '</tr>';
             });
@@ -881,10 +916,62 @@
 
         });
 
+    });
+
+    function loadList(SurveyID,RecapID){
+        var data = {
+            action : 'getListHistorySendEmail',
+            SurveyID : SurveyID,
+            RecapID : RecapID
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $.post(url,{token:token},function () {
+
+        });
+    }
+
+    $(document).on('click','.btnSentMail',function () {
+       var i = $(this).attr('data-i');
+        var formName = $('#formName_'+i).val();
+        var tokenRecap = $('#formtokenRecap_'+i).val();
+        var formEmail = $('#formEmail_'+i).val();
+
+        if(formName!='' && formName!=null &&
+            tokenRecap!='' && tokenRecap!=null &&
+        formEmail!='' && formEmail!=null) {
+
+            $('.btnSentMail').prop('disabled',true);
+            loading_button('.btnSentMail[data-i="'+i+'"]');
+
+            var data = {
+                action : 'shareRecap2email',
+                tokenRecap : tokenRecap,
+                Name : formName,
+                Email : formEmail,
+                NIP : sessionNIP,
+                SentBy : sessionName,
+                SentAt : getDateTimeNow()
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'apimenu/__crudSurvey';
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                setTimeout(function () {
+                    $('.btnSentMail').prop('disabled',false);
+                    $('.btnSentMail[data-i="'+i+'"]').html('Sent');
+                },500);
+
+            })
 
 
-
+        } else {
+            toastr.warning('Name & Email are required','Warning');
+        }
     });
 
 
 </script>
+

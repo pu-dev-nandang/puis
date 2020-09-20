@@ -2606,7 +2606,12 @@ class C_save_to_excel extends CI_Controller
 
     // ===== PENUTUP REKAP IPS IPK ======
 
-    public function survey($SurveyID,$RecapID){
+    public function survey($token){
+
+        $data_arr = $this->getInputToken($token);
+
+        $SurveyID = $data_arr['SurveyID'];
+        $RecapID = $data_arr['RecapID'];
 
 
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
