@@ -610,7 +610,7 @@ class C_api_menu extends CI_Controller {
                 $TotalPublication = (($StatusPublicationNow) > 0)
                     ? '<a href="javascript:void(0)" class="showAllPublication" data-id="'.$row['ID'].'">'.$StatusPublicationNow.'</a>' : 0;
 
-                $nestedData[] = '<div>'.$no.' -> '.$row['ID'].'</div>';
+                $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$row['Title'].'</div>';
                 $nestedData[] = $btnShowTotalQuestion;
                 $nestedData[] = $btnTotalAlreadyFillOut;
