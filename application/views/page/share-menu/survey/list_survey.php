@@ -26,6 +26,7 @@
 <div class="row" style="margin-bottom: 15px;">
     <div class="col-md-12">
         <button class="btn btn-success pull-right" id="btnAddSurvey">Create Survey</button>
+        <button class="btn btn-default pull-right hide" id="btnRecapSurvey">Recap Semua Survey</button>
     </div>
 </div>
 
@@ -33,14 +34,26 @@
     <div class="col-md-12" id="loadTable"></div>
 </div>
 
-
-
-
 <script>
 
     $(document).ready(function () {
         setLoadFullPage();
         loadTableSurveyList();
+    });
+
+    $('#btnRecapSurvey').click(function () {
+
+        var data = {
+            action : 'genrateClose'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $.post(url,{token:token},function () {
+
+        });
+
     });
 
     function loadTableSurveyList(){
@@ -220,10 +233,12 @@
         $('#GlobalModal .modal-body').html(htmlss);
 
         var ID = $(this).attr('data-id');
+        var Status = $(this).attr('data-status');
         var Type = $(this).attr('data-type');
         var data = {
             action : 'showUserAlreadyFill',
             SurveyID : ID,
+            Status : Status,
             Type : Type
         };
         var token = jwt_encode(data,'UAP)(*');
@@ -361,7 +376,6 @@
         updateStatusSurvey(ID,'2',
             'If the survey is closed, the user cannot fill out your survey, are you sure?');
 
-        loadTableSurveyList();
     });
 
     function updateStatusSurvey(ID,Status,msg){
@@ -377,14 +391,17 @@
             var url = base_url_js+'apimenu/__crudSurvey';
 
             $.post(url,{token:token},function (jsonResult) {
-                $('#viewStatusSurvey_'+ID).html(jsonResult.Label);
 
-                if(Status==1){
-                    $('#li_btn_Publish_'+ID).remove();
-                    $('#li_btn_Close_'+ID).removeClass('hide');
-                } else if(Status==2){
-                    $('#li_btn_Publish_'+ID+',#li_btn_Close_'+ID).remove();
-                }
+                loadTableSurveyList();
+
+                // $('#viewStatusSurvey_'+ID).html(jsonResult.Label);
+                //
+                // if(Status==1){
+                //     $('#li_btn_Publish_'+ID).remove();
+                //     $('#li_btn_Close_'+ID).removeClass('hide');
+                // } else if(Status==2){
+                //     $('#li_btn_Publish_'+ID+',#li_btn_Close_'+ID).remove();
+                // }
 
 
 
@@ -846,6 +863,8 @@
                     RecapID : v.RecapID
                 },'UAP)(*');
 
+                var hideShare = (parseInt(v.Status)==2) ? '' : 'hide';
+
                 tr = tr+'<tr>' +
                     '<td>'+(i+1)+'</td>' +
                     '<td>'+v.Question+'</td>' +
@@ -853,7 +872,7 @@
                     '<td>'+v.TotalAnswer+'</td>' +
                     '<td>' +
                     '   <a href="'+base_url_js+'save2excel/survey/'+tokenRecap+'" class="btn btn-sm btn-default"><i class="fa fa-download"></i></a>' +
-                    '   <button class="btn btn-sm btn-default" role="button" data-toggle="collapse" href="#collapseExample_'+i+'" aria-expanded="false" aria-controls="collapseExample_'+i+'"><i class="fa fa-mail-forward"></i></button>' +
+                    '   <button class="btn btn-sm btn-default '+hideShare+'" role="button" data-toggle="collapse" href="#collapseExample_'+i+'" aria-expanded="false" aria-controls="collapseExample_'+i+'"><i class="fa fa-mail-forward"></i></button>' +
                     '</td>' +
                     '</tr>' +
                     '<tr>' +
@@ -873,13 +892,13 @@
                     '<div class="row" style="margin-bottom: 15px;">' +
                     '   <div class="col-md-12">' +
                     '       <div class="text-right">' +
-                    '           <a role="button" data-toggle="collapse" href="#detailHistory_'+i+'" aria-expanded="false" aria-controls="detailHistory_'+i+'">Email delivery history</a>' +
+                    '           <a role="button" data-toggle="collapse" ' +
+                    '                   data-i="'+i+'" ' +
+                    '                   href="#detailHistory_'+i+'" ' +
+                    '                   aria-expanded="false" ' +
+                    '                   aria-controls="detailHistory_'+i+'" class="showListSendMail">Email delivery history</a>' +
                     '       </div>' +
-                    '       <div class="collapse" id="detailHistory_'+i+'">' +
-                    '           <ol>' +
-                    '               <li>Nandang (nandang.mulyadi@podomorouniversity.ac.id)</li>' +
-                    '           </ol>' +
-                    '       </div>' +
+                    '       <div class="collapse" id="detailHistory_'+i+'"></div>' +
                     '   </div>' +
                     '</div>' +
                     '</td>' +
@@ -918,7 +937,15 @@
 
     });
 
-    function loadList(SurveyID,RecapID){
+    $(document).on('click','.showListSendMail',function () {
+        var i = $(this).attr('data-i');
+        var formtokenRecap = $('#formtokenRecap_'+i).val();
+        var d = jwt_decode(formtokenRecap,'UAP)(*');
+        console.log(d);
+        loadList(i,d.SurveyID,d.RecapID);
+    });
+
+    function loadList(i,SurveyID,RecapID){
         var data = {
             action : 'getListHistorySendEmail',
             SurveyID : SurveyID,
@@ -927,7 +954,21 @@
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'apimenu/__crudSurvey';
 
-        $.post(url,{token:token},function () {
+        $('#detailHistory_'+i).empty();
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            var li = '';
+            $.each(jsonResult,function (i,v) {
+                var dateSent = moment(v.EntredAt).format('DD MMM YYYY HH.mm');
+                li = li+'<li><div style="text-align: left;margin-bottom: 10px;">' +
+                    '<b>'+v.Name+'</b> ('+v.Email+')' +
+                    '<br/><span style="color: #a9a9a9;">Sent by : '+v.EntredByName+' | ' +dateSent+'</span>'+
+                    '</div>' +
+                    '</li>';
+            });
+
+            $('#detailHistory_'+i).html('<ol>'+li+'</ol>');
 
         });
     }
@@ -943,7 +984,7 @@
         formEmail!='' && formEmail!=null) {
 
             $('.btnSentMail').prop('disabled',true);
-            loading_button('.btnSentMail[data-i="'+i+'"]');
+            loading_buttonSm('.btnSentMail[data-i="'+i+'"]');
 
             var data = {
                 action : 'shareRecap2email',
@@ -959,12 +1000,14 @@
 
             $.post(url,{token:token},function (jsonResult) {
 
+                loadList(i,jsonResult.SurveyID,jsonResult.RecapID);
+
                 setTimeout(function () {
                     $('.btnSentMail').prop('disabled',false);
                     $('.btnSentMail[data-i="'+i+'"]').html('Sent');
                 },500);
 
-            })
+            });
 
 
         } else {
