@@ -679,6 +679,77 @@ class C_api_menu extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='shareRecap2email'){
+
+            $this->load->model('m_sendemail');
+
+            $to = $data_arr['Email'];
+//        $to = 'nndg.ace3@gmail.com';
+
+
+            // Get survey title
+            $dataSurv = (array) $this->jwt->decode($data_arr['tokenRecap'],'UAP)(*');
+            $dataSurvey = $this->db->get_where('db_it.surv_survey',
+                array('ID' => $dataSurv['SurveyID']))->result_array();
+            $dataPublishDate = $this->db->get_where('db_it.surv_recap',
+                array('ID' => $dataSurv['RecapID']))
+                ->result_array();
+
+
+            // http://localhost/puis/save2excel/survey/1/1
+
+            $PublicationDate = date('d M Y',strtotime($dataPublishDate[0]['StartDate'])).' - '.
+                date('d M Y',strtotime($dataPublishDate[0]['EndDate']));
+
+            $subject = 'Recap - '.$dataSurvey[0]['Title'].' | '.$PublicationDate;
+
+            $text = 'Dear <strong style="color: blue;">'.$data_arr['Name'].'</strong>,
+
+                <p style="color: #673AB7;">Recap survey <strong>"'.$dataSurvey[0]['Title'].'"</strong>
+                <br/> Publication Date :  '.$PublicationDate.'</p>
+
+                <table width="178" cellspacing="0" cellpadding="12" border="0">
+                    <tbody>
+                    <tr>
+                        <td bgcolor="#4caf50" align="center">
+                            <a href="'.base_url('save2excel/survey/'.$data_arr['tokenRecap']).'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color:#4caf50" target="_blank" >Download Recap</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <br/>
+
+                <p>Send by : '.$data_arr['SentBy'].' | '.date('d M Y H:i',strtotime($data_arr['SentAt'])).'</p>';
+
+            $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,'Recap Survey');
+
+            // surv_share_with_email
+            $arrIns = array(
+                'SurveyID' => $dataSurv['SurveyID'],
+                'RecapID' => $dataSurv['RecapID'],
+                'Name' => $data_arr['Name'],
+                'Email' => $data_arr['Email'],
+                'EntredBy' => $data_arr['NIP']
+            );
+
+            $this->db->insert('db_it.surv_share_with_email',$arrIns);
+
+            return print_r(1);
+
+        }
+
+        else if($data_arr['action']=='getListHistorySendEmail'){
+
+            $data = $this->db->query('SELECT swe.*, em.Name AS EntredByName FROM d_it.surv_share_with_email swe 
+                                            LEFT JOIN db_employees.employees em 
+                                            ON (swe.EntredBy = em.NIP)
+                                            WHERE swe.SurveyID = "'.$data_arr['SurveyID'].'"
+                                             AND swe.RecapID = "'.$data_arr['RecapID'].'"')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+
         else if($data_arr['action']=='setPublicSurvey'){
             $ID = $data_arr['SurveyID'];
 
