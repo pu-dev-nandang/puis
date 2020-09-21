@@ -1253,8 +1253,18 @@ class M_ticketing extends CI_Model {
             $query[$i]['data_received'] = $data_received;
 
             if ($query[$i]['Files'] != '' && $query[$i]['Files'] != null) {
-                $token = $this->jwt->encode($query[$i]['Files'],"UAP)(*");
-                $url = url_files."fileGetAnyToken/".$token;
+                try {
+                    // get last url for get token
+                    $uri_path = parse_url($query[$i]['Files'], PHP_URL_PATH);
+                    $uri_segments = explode('/', $uri_path);
+                    $getToken = $uri_segments[count($uri_segments) - 1];
+                    $decodeToken = $this->jwt->decode($getToken,"UAP)(*");
+                    $url = $query[$i]['Files'];
+                } catch (Exception $e) {
+                    $token = $this->jwt->encode($query[$i]['Files'],"UAP)(*");
+                    $url = url_files."fileGetAnyToken/".$token;
+                }
+                
                 $query[$i]['Files'] = $url;
             }
 
