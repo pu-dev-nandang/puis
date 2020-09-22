@@ -3548,7 +3548,7 @@ class C_api3 extends CI_Controller {
                     }
 
                     // condition dosen tetap tidak mengajar
-                    if ($Status=='99' || $Status == 99) {
+                    if ($Status=='99' || $Status == 99 || $Status == 0 || $Status == '0')  {
                          $dataSchedule = $this->db->query(' select * from (
                                                         SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap FROM db_academic.schedule_details_course sdc
                                                               LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
@@ -3571,6 +3571,15 @@ class C_api3 extends CI_Controller {
                                                                 )
                                                                 AND em.ProdiID = "'.$data[$i]['ID'].'"
                                                                    '.$StatusFolap.'
+                                                                and (SPLIT_STR(em.PositionMain, ".", 1) =   "14"
+                                                                     or
+                                                                     SPLIT_STR(em.PositionOther1, ".", 1) =  "14" 
+                                                                     or
+                                                                     SPLIT_STR(em.PositionOther2, ".", 1) =  "14"
+                                                                     or 
+                                                                     SPLIT_STR(em.PositionOther3, ".", 1) =  "14"  
+                                                                    )
+                                                                and em.StatusEmployeeID = 1
                                                         )xx
                                                                 GROUP BY NIP ')->result_array();
                     }
