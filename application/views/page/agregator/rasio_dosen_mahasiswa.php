@@ -18,10 +18,10 @@
         </div>
         <div class="col-md-2">
             <select class="form-control" id="filterDosen">
-                <option value="0">Semua</option>
-                <option value="99">ALL Dosen Tetap (NIDN/NIDK)</option>
-                <option value="1">Dosen Tetap (NIDN/NIDK) Mengajar</option>
-                <option value="2">Dosen Tidak Tetap (NUP)</option>
+                <option value="0">All Dosen (NIDN/NIDK/NUP)</option>
+                <option value="99">Dosen Tetap (NIDN/NIDK) Forlap</option>
+                <option value="1">Dosen Tetap Aktif (NIDN/NIDK)</option>
+                <option value="2">Dosen Tidak Tetap Aktif(NUP)</option>
             </select>
         </div>
         <div class="col-md-4">
