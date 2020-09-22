@@ -70,16 +70,93 @@ class C_api_survey extends CI_Controller {
             $dataAnsw = (array) $data_arr['dataAnsw'];
 
             for($i=0;$i<count($dataAnsw);$i++){
-
                 $d = (array) $dataAnsw[$i];
                 $d['AnswerID'] = $insert_id;
                 $this->db->insert('db_it.surv_answer_detail',$d);
+            }
 
+            // Send email
+            if($InsAnswer['SendFeedbackToEmail']==1 || $InsAnswer['SendFeedbackToEmail']=='1'){
+                $Email = $InsAnswer['Email'];
+                if($Email!='' && $Email!=null){
+
+                    $this->load->model('m_sendemail');
+
+                    $to = $Email;
+//                    $to = 'nndg.ace3@gmail.com';
+                    $SurveyID = $InsAnswer['SurveyID'];
+
+                    // Get survey title
+                    $dataSurvey = $this->db->get_where('db_it.surv_survey',
+                        array('ID' => $SurveyID))->result_array();
+
+                    $subject = 'Feedback - '.$dataSurvey[0]['Title'].' | '.$this->m_rest->getDateTimeNow();
+
+                    $key = "s3Cr3T-G4N";
+                    $tokenUser = $this->jwt->encode(array('AnswerID' => $insert_id),$key);
+
+                    $text = '<p style="color: #673AB7;text-align: center;"><strong>"'.$dataSurvey[0]['Title'].'"</strong></p>
+                        <table width="178" cellspacing="0" cellpadding="12" border="0">
+                            <tbody>
+                            <tr>
+                                <td bgcolor="#4caf50" align="center">
+                                    <a href="'.url_sign_out.'survey/my-answer/'.$tokenUser.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color:#4caf50" target="_blank" >Show My Answer</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <br/>';
+
+                    $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,'Recap Survey');
+
+                }
             }
 
             return print_r(1);
 
         }
+
+        else if($data_arr['action']=='getEmailUserSurvey'){
+
+            $Type = $data_arr['Type'];
+
+            $Email = '';
+
+            if($Type=='emp'){
+                $data = $this->db->query('SELECT CASE 
+                                            WHEN EmailPU IS NOT NULL AND EmailPU != "" THEN EmailPU
+                                            WHEN Email IS NOT NULL  AND Email != "" THEN  Email
+                                            ELSE "" END AS Email
+                                            FROM db_employees.employees 
+                        WHERE NIP = "'.$data_arr['Username'].'" ')->result_array();
+
+                $Email = (count($data)>0) ? $data[0]['Email'] : '';
+            } else if($Type=='std'){
+
+                $data = $this->db->select('EmailPU')->get_where('db_academic.auth_students',array(
+                    'NPM' => $data_arr['Username']
+                ))->result_array();
+
+                $Email = (count($data)>0) ? $data[0]['EmailPU'] : '';
+
+            } else if($Type=='other'){
+
+                $data = $this->db->select('Email')
+                    ->get_where('db_it.surv_external_user',
+                        array('ID' => $data_arr['Username']))->result_array();
+
+                $Email = (count($data)>0) ? $data[0]['Email'] : '';
+
+            }
+
+            $Status = ($Email!='') ? 1 : 0;
+
+            return print_r(json_encode(array(
+                'Status' => $Status,
+                'Email' => $Email))) ;
+
+        }
+
         else if($data_arr['action']=='getListDirection'){
 
             $data = $this->db->get_where('db_it.surv_direct',array('Username'=>$data_arr['Username']))->result_array()[0];
