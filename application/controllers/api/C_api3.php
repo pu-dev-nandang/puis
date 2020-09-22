@@ -3548,7 +3548,7 @@ class C_api3 extends CI_Controller {
                     }
 
                     // condition dosen tetap tidak mengajar
-                    if ($Status=='99' || $Status == 99 || $Status == 0 || $Status == '0')  {
+                    if ($Status=='99' || $Status == 99 )  {
                          $dataSchedule = $this->db->query(' select * from (
                                                         SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap FROM db_academic.schedule_details_course sdc
                                                               LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
