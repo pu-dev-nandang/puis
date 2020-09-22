@@ -10944,7 +10944,7 @@ class C_api extends CI_Controller {
                           </button>
                           <ul class="dropdown-menu">
                             <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' id="btnResetPass'.$row['NIP'].'" class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password (Send Email)</a></li>
-                            <li class="'.$disDateOfBirth.'"><a href="javascript:void(0);" '.$disDateOfBirth.' class="resetpassBirthDay '.$disDateOfBirth.'" data-nip="'.$row['NIP'].'" data-day="'.$DateOfBirth.'">Reset Password (DDMMYY)</a></li>
+                            <!--<li class="'.$disDateOfBirth.'"><a href="javascript:void(0);" '.$disDateOfBirth.' class="resetpassBirthDay '.$disDateOfBirth.'" data-nip="'.$row['NIP'].'" data-day="'.$DateOfBirth.'">Reset Password (DDMMYY)</a></li>-->
                             <li><a href="javascript:void(0);" class="btn-update-email" id="btnUpdateEmail'.$row['NIP'].'" data-name="'.$row['Name'].'" data-nip="'.$row['NIP'].'" data-empid="'.$row['StatusEmployeeID'].'" data-email="'.$Email.'">Update Email</a></li>
                             <li><a class = "PrintIDCard" href="javascript:void(0);" type = "employees" data-npm="'.$row['NIP'].'" data-name="'.ucwords(strtolower($row['Name'])).'" path = '.$srcImg.' email = "'.$row['EmailPU'].'">Print ID Card</a></li>
                           </ul>
