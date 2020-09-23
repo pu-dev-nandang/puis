@@ -726,7 +726,7 @@ class C_api_menu extends CI_Controller {
                     <tbody>
                     <tr>
                         <td bgcolor="#4caf50" align="center">
-                            <a href="'.base_url('save2excel/survey/'.$data_arr['tokenRecap']).'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color:#4caf50" target="_blank" >Download Recap</a>
+                            <a href="'.base_url('save2excel/survey/'.$data_arr['tokenRecap']).'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color:#4caf50" target="_blank" >Download Survey Result</a>
                         </td>
                     </tr>
                     </tbody>
@@ -735,7 +735,7 @@ class C_api_menu extends CI_Controller {
 
                 <p>Send by : '.$data_arr['SentBy'].' | '.date('d M Y H:i',strtotime($data_arr['SentAt'])).'</p>';
 
-            $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,'Recap Survey');
+            $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,'Survey Result');
 
             // surv_share_with_email
             $arrIns = array(
