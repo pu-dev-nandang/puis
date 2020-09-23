@@ -107,7 +107,7 @@ class C_api_survey extends CI_Controller {
                         </table>
                         <br/>';
 
-                    $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,'Recap Survey');
+                    $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,'Survey Result');
 
                 }
             }
