@@ -2713,10 +2713,10 @@ class C_save_to_excel extends CI_Controller
                                             WHEN  ats.Name IS NOT NULL THEN ats.Name
                                             ELSE seu.FullName END AS "Name",
                                             CASE
-                                             WHEN sa.FormType = "other" THEN seu.Email
+                                             WHEN sa.Type = "other" THEN seu.Email
                                              ELSE "" END AS "Email",
                                              CASE
-                                             WHEN sa.FormType = "other" THEN seu.Phone
+                                             WHEN sa.Type = "other" THEN seu.Phone
                                              ELSE "" END AS "Phone",
                                              sq.Question, sqc.Description AS QuestionCategory,
                                              sad.EntredAt

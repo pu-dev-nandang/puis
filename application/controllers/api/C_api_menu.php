@@ -903,10 +903,12 @@ class C_api_menu extends CI_Controller {
                 ' AND sa.RecapID = (SELECT MAX(RecapID) FROM db_it.surv_answer WHERE SurveyID= "'.$data_arr['SurveyID'].'")'
                 : ' AND sa.Status = "1" ';
 
-            $queryDefault = 'SELECT sa.*,  CASE WHEN  em.Name IS NOT NULL THEN em.Name
-                                                ELSE ats.Name END AS "Name" FROM db_it.surv_answer sa 
+            $queryDefault = 'SELECT sa.*,  CASE WHEN  sa.Type = "emp" THEN em.Name
+                                                WHEN  sa.Type = "std" THEN ats.Name
+                                                ELSE exu.FullName END AS "Name" FROM db_it.surv_answer sa 
                                                 LEFT JOIN db_employees.employees em ON (em.NIP = sa.Username)
                                                 LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sa.Username)
+                                                LEFT JOIN db_it.surv_external_user exu ON (exu.ID = sa.Username)
                                         WHERE sa.SurveyID = "'.$data_arr['SurveyID'].'" '.$whereAnswerSurvey.
                                         $dataWhere.$dataSearch;
 
@@ -925,9 +927,15 @@ class C_api_menu extends CI_Controller {
                 $nestedData = array();
                 $row = $query[$i];
 
-                $Type = ($row['Type']=='std')
-                    ? '<span class="label label-primary">Student</span>'
-                    : '<span class="label label-success">Emp / Lec</span>';
+//                $Type = ($row['Type']=='std')
+//                    ? '<span class="label label-primary">Student</span>'
+//                    : '<span class="label label-success">Emp / Lec</span>';
+                $Type = '<span class="label label-warning">Other</span>';
+                if($row['Type'] == 'emp') {
+                    $Type = '<span class="label label-primary">Std</span>';
+                } else if($row['Type'] == 'std'){
+                    $Type = '<span class="label label-success">Emp / Lec</span>';
+                }
 
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['Username'].'</div>';
