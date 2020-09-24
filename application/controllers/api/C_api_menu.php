@@ -931,9 +931,9 @@ class C_api_menu extends CI_Controller {
 //                    ? '<span class="label label-primary">Student</span>'
 //                    : '<span class="label label-success">Emp / Lec</span>';
                 $Type = '<span class="label label-warning">Other</span>';
-                if($row['Type'] == 'emp') {
+                if($row['Type'] == 'std') {
                     $Type = '<span class="label label-primary">Std</span>';
-                } else if($row['Type'] == 'std'){
+                } else if($row['Type'] == 'emp'){
                     $Type = '<span class="label label-success">Emp / Lec</span>';
                 }
 
