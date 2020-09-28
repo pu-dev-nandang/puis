@@ -259,6 +259,36 @@ class C_it extends It_Controler {
         $this->menu_developer($content);
     }
 
+    public function request_changepass()
+    {
+      $department = parent::__getDepartement();
+      $data['resetpass'] = $this->db->where('Status', '0')->get('db_it.reset_password');
+      $content = $this->load->view('page/'.$department.'/request-changepass/request_change_password',$data,true);
+      $this->temp($content);  
+    }
+
+    public function finish_changepass()
+    {
+      $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
+      $datatoken =  $this->getInputToken();
+      $datatoken = json_decode(json_encode($datatoken),true);
+      $formData = $datatoken['datarequest'];
+      $requestid = $formData['ID'];
+      $ActionBy = $this->session->userdata('Name');
+      
+      $updates = array(
+        'Status' => '1',
+        'ActionAt' => date('Y-m-d H:i:s'),
+        'ActionBy' => $ActionBy,
+      );
+    
+      $this->db->where('ID', $requestid);
+      $this->db->update('db_it.reset_password', $updates);
+        
+      $rs['status'] = 1;  
+      echo json_encode($rs);
+    }
+
     public function share_menu()
     {
         $data[''] = '';

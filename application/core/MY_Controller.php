@@ -156,7 +156,7 @@ abstract class Globalclass extends MyAbstract{
 //        exit();
 
         $data['dataMenuShare'] = $dataMenu;
-
+        $data['resetpassmenu'] = $this->db->where('Status', '0')->from('db_it.reset_password')->count_all_results();
         $page = $this->load->view('page/'.$data['departement'].'/menu_navigation',$data,true);
         return $page;
     }
