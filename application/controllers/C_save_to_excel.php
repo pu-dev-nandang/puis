@@ -2436,7 +2436,8 @@ class C_save_to_excel extends CI_Controller
         if(!empty($data_arr['Year'])){
             $Tyear = $data_arr['Year'];
             $param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$data_arr['Year']." ","filter"=>"AND",);    
-        }else{
+        }
+        else{
             $Tyear = date("Y");
         }
         if(!empty($data_arr['ProdiID'])){
@@ -2604,6 +2605,191 @@ class C_save_to_excel extends CI_Controller
     }
 
     // ===== PENUTUP REKAP IPS IPK ======
+
+    public function survey($token){
+
+        $data_arr = $this->getInputToken($token);
+
+        $SurveyID = $data_arr['SurveyID'];
+        $RecapID = $data_arr['RecapID'];
+
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+
+        // Get survey title
+        $dataSurvey = $this->db->get_where('db_it.surv_survey',array('ID' => $SurveyID))->result_array();
+
+        $pr = (count($dataSurvey)>0) ? $dataSurvey[0]['Title'] : 'REKAP SURVEY';
+
+        $excel->getProperties()->setCreator('IT PU')
+            ->setLastModifiedBy('IT PU')
+            ->setTitle($pr)
+            ->setSubject($pr)
+            ->setDescription($pr)
+            ->setKeywords($pr);
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => '33cccc')
+            )
+        );
+
+        $style_col_fill = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A1', $pr); // Set kolom A1 dengan tulisan "DATA KARYAWAN"
+        $excel->getActiveSheet()->mergeCells('A1:L1'); // Set Merge Cell pada kolom A1 sampai O1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
+
+
+        $HeaderColumn = 5;
+        // Buat header tabel nya pada baris ke 3
+        $excel->setActiveSheetIndex(0)->setCellValue('A'.$HeaderColumn, "No");
+        $excel->setActiveSheetIndex(0)->setCellValue('B'.$HeaderColumn, "User Type");
+        $excel->setActiveSheetIndex(0)->setCellValue('C'.$HeaderColumn, "Username");
+        $excel->setActiveSheetIndex(0)->setCellValue('D'.$HeaderColumn, "Nama");
+        $excel->setActiveSheetIndex(0)->setCellValue('E'.$HeaderColumn, "Email");
+        $excel->setActiveSheetIndex(0)->setCellValue('F'.$HeaderColumn, "Phone");
+        $excel->setActiveSheetIndex(0)->setCellValue('G'.$HeaderColumn, "Form Type");
+        $excel->setActiveSheetIndex(0)->setCellValue('H'.$HeaderColumn, "Question");
+        $excel->setActiveSheetIndex(0)->setCellValue('I'.$HeaderColumn, "Rate");
+        $excel->setActiveSheetIndex(0)->setCellValue('J'.$HeaderColumn, "Answer (Essay)");
+        $excel->setActiveSheetIndex(0)->setCellValue('K'.$HeaderColumn, "1 = Yes | 0 = No");
+        $excel->setActiveSheetIndex(0)->setCellValue('L'.$HeaderColumn, "Entred At");
+
+
+        // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+        $excel->getActiveSheet()->getStyle('A'.$HeaderColumn)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('B'.$HeaderColumn)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('C'.$HeaderColumn)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('D'.$HeaderColumn)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('E'.$HeaderColumn)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('F'.$HeaderColumn)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('G'.$HeaderColumn)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('H'.$HeaderColumn)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('I'.$HeaderColumn)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('J'.$HeaderColumn)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('K'.$HeaderColumn)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('L'.$HeaderColumn)->applyFromArray($style_col);
+
+
+
+        // get Data
+        // nip, nama, email, nomor hp
+
+        $data = $this->db->query('SELECT sad.Rate, sad.Answer, sad.IsTrue, sa.Username,  
+                                            sa.Type AS TypeUser, sa.FormType, sa.Username, 
+                                            CASE 
+                                            WHEN  em.Name IS NOT NULL THEN em.Name
+                                            WHEN  ats.Name IS NOT NULL THEN ats.Name
+                                            ELSE seu.FullName END AS "Name",
+                                            CASE
+                                             WHEN sa.Type = "other" THEN seu.Email
+                                             ELSE "" END AS "Email",
+                                             CASE
+                                             WHEN sa.Type = "other" THEN seu.Phone
+                                             ELSE "" END AS "Phone",
+                                             sq.Question, sqc.Description AS QuestionCategory,
+                                             sad.EntredAt
+                                            FROM db_it.surv_answer_detail sad
+                                            RIGHT JOIN db_it.surv_answer sa ON (sa.ID = sad.AnswerID)
+                                            LEFT JOIN db_it.surv_question sq ON (sq.ID = sad.QuestionID)
+                                            LEFT JOIN db_it.surv_question_category sqc ON (sqc.ID = sq.QCID)
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = sa.Username)
+                                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sa.Username)
+                                            LEFT JOIN db_it.surv_external_user seu ON (seu.ID = sa.Username)
+                                            WHERE sa.RecapID = "'.$RecapID.'" AND sad.SurveyID = "'.$SurveyID.'"')->result_array();
+
+        $numrow = 6; // Set baris pertama untuk isi tabel adalah baris ke 4
+        if(count($data)>0){
+
+            // Internal : With Login Portal | External : With Public Link
+            $excel->setActiveSheetIndex(0)->setCellValue('G3', 'Form Type = Internal : With Login Portal | External : With Public Link or QRCode');
+            $excel->getActiveSheet()->mergeCells('G3:L3');
+            $NO = 1;
+            foreach ($data AS $item){
+
+                $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $NO++);
+                $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, $item['TypeUser']);
+                $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, $item['Username']);
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow, ucwords(strtolower($item['Name'])));
+                $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow, $item['Email']);
+                $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $item['Phone']);
+                $excel->setActiveSheetIndex(0)->setCellValue('G'.$numrow, $item['FormType']);
+                $excel->setActiveSheetIndex(0)->setCellValue('H'.$numrow, strip_tags($item['Question']));
+                $excel->setActiveSheetIndex(0)->setCellValue('I'.$numrow, $item['Rate']);
+                $excel->setActiveSheetIndex(0)->setCellValue('J'.$numrow, $item['Answer']);
+                $excel->setActiveSheetIndex(0)->setCellValue('K'.$numrow, $item['IsTrue']);
+                $excel->setActiveSheetIndex(0)->setCellValue('L'.$numrow, $item['EntredAt']);
+
+                // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+                $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('B'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('C'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('D'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('E'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('F'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('G'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('H'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('I'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('J'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('K'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('L'.$numrow)->applyFromArray($style_col_fill);
+                $numrow += 1;
+            };
+
+        }
+
+
+
+        foreach(range('A','Z') as $columnID) {
+            if($columnID!='H' && $columnID!='J'){
+                $excel->getActiveSheet()->getColumnDimension($columnID)
+                    ->setAutoSize(true);
+            }
+
+        }
+
+        // Proses file excel
+        $filename = str_replace(' ','_',$pr).".xlsx";
+        //$FILEpath = "./dokument/".$filename;
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename='.$filename); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+
+    }
 
     // ===== DATA STUDENT ======
 
@@ -3212,6 +3398,7 @@ class C_save_to_excel extends CI_Controller
     {
         $GetDateNow = date('Y-m-d');
         $this->load->model('master/m_master');
+        $this->load->model('admission/m_admission');
         $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
         // print_r($input['Data']);die();
 
@@ -3262,7 +3449,15 @@ class C_save_to_excel extends CI_Controller
             $Beasiswa = ($getData[$i]['getBeasiswa'] == "-") ? "" : "Beasiswa ".$getData[$i]['getBeasiswa']."\n";
             $Discount = "";
             if ($getData[$i]['Discount-SPP'] > 0) {
-                $Discount .= 'SPP : '.$getData[$i]['Discount-SPP'].'%';
+                $Discount .= 'Discount-SPP : '.$getData[$i]['Discount-SPP'].'%';
+            }
+
+            if ( count($getData[$i]['PotonganLain-SPP']) > 0) {
+                $aa = "";
+                if ($Discount != "") {
+                    $aa = "\n";
+                }
+                 $Discount .= $aa.'PotonganLain-SPP : '."Rp ".number_format($this->m_admission->sumPotonganLainBydata($getData[$i]['PotonganLain-SPP']),2,',','.');
             }
 
             if ($getData[$i]['Discount-BPP'] > 0) {
@@ -3270,7 +3465,15 @@ class C_save_to_excel extends CI_Controller
                 if ($Discount != "") {
                     $aa = "\n";
                 }
-                $Discount .= $aa.'BPP : '.$getData[$i]['Discount-BPP'].'%';
+                $Discount .= $aa.'Discount-BPP : '.$getData[$i]['Discount-BPP'].'%';
+            }
+
+            if ( count($getData[$i]['PotonganLain-BPP']) > 0) {
+                $aa = "";
+                if ($Discount != "") {
+                    $aa = "\n";
+                }
+                 $Discount .= $aa.'PotonganLain-BPP : '."Rp ".number_format($this->m_admission->sumPotonganLainBydata($getData[$i]['PotonganLain-BPP']),2,',','.') ;
             }
 
             if ($getData[$i]['Discount-Credit'] > 0) {
@@ -3278,7 +3481,15 @@ class C_save_to_excel extends CI_Controller
                 if ($Discount != "") {
                     $aa = "\n";
                 }
-                $Discount .= $aa.'SKS : '.$getData[$i]['Discount-Credit'].'%';
+                $Discount .= $aa.'Discount-SKS : '.$getData[$i]['Discount-Credit'].'%';
+            }
+
+            if ( count($getData[$i]['PotonganLain-Credit']) > 0) {
+                $aa = "";
+                if ($Discount != "") {
+                    $aa = "\n";
+                }
+                 $Discount .= $aa.'PotonganLain-SKS : '."Rp ".number_format($this->m_admission->sumPotonganLainBydata($getData[$i]['PotonganLain-Credit']),2,',','.') ;
             }
 
             if ($getData[$i]['Discount-Another'] > 0) {
@@ -3286,7 +3497,15 @@ class C_save_to_excel extends CI_Controller
                 if ($Discount != "") {
                     $aa = "\n";
                 }
-                $Discount .= $aa.'Lain-lain : '.$getData[$i]['Discount-Another'].'%';
+                $Discount .= $aa.'Discount-Lain-lain : '.$getData[$i]['Discount-Another'].'%';
+            }
+
+            if ( count($getData[$i]['PotonganLain-Another']) > 0) {
+                $aa = "";
+                if ($Discount != "") {
+                    $aa = "\n";
+                }
+                 $Discount .= $aa.'PotonganLain-Lain-lain : '."Rp ".number_format($this->m_admission->sumPotonganLainBydata($getData[$i]['PotonganLain-Another']),2,',','.') ;
             }
 
             $excel3->setCellValue('A'.$a, $no);

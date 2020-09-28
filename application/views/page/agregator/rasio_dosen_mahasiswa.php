@@ -18,9 +18,10 @@
         </div>
         <div class="col-md-2">
             <select class="form-control" id="filterDosen">
-                <option value="0">Semua</option>
-                <option value="1">Dosen Tetap (NIDN/NIDK)</option>
-                <option value="2">Dosen Tidak Tetap (NUP)</option>
+                <option value="0">All Dosen Aktif(NIDN/NIDK/NUP)</option>
+                <option value="99">Dosen Tetap (NIDN/NIDK) Forlap</option>
+                <option value="1">Dosen Tetap Aktif (NIDN/NIDK)</option>
+                <option value="2">Dosen Tidak Tetap Aktif(NUP)</option>
             </select>
         </div>
         <div class="col-md-4">
@@ -37,7 +38,7 @@
             <table class="table dataTable2Excel" data-name="Rasio_Dosen_terhadap_Mahasiswa" id="tableData">
                 <thead>
                 <tr>
-                    <th colspan="5">2019/2020 Ganjil</th>
+                    <th colspan="5" class="txtValueSemester">..Loading..</th>
                 </tr>
                 <tr>
                     <th style="width: 1%;">No</th>
@@ -56,9 +57,13 @@
 
 <script>
     var passToExcel = [];
+
+    const autoChangeLabelSemester = () => {
+        $('.txtValueSemester').html($('#filterSemester option:selected').text()); // show label semester
+    }
+
     $(document).ready(function () {
         loSelectOptionSemester('#filterSemester','');
-
         var firstLoad = setInterval(function () {
             var filterSemester = $('#filterSemester').val();
             if(filterSemester!='' && filterSemester!=null){
@@ -86,6 +91,7 @@
 
         var filterSemester = $('#filterSemester').val();
         if(filterSemester!='' && filterSemester!=null){
+            autoChangeLabelSemester();
 
             loading_modal_show();
 

@@ -1,8 +1,32 @@
 
+<style>
+    .q-scroll {
+        overflow: auto;
+        max-height: 250px;
+    }
+    .panel-link {
+        font-size: 16px;
+        font-weight: 500;
+        color: #1189e9;
+        background: #ebe9e9;
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    #tableData tr td:nth-child(4), #tableData tr td:nth-child(5)
+    {
+        background: #e7f7ff !important;
+    }
+    #tableData tr td:nth-child(6){
+        background: #eeffdb !important;
+    }
+
+</style>
 
 <div class="row" style="margin-bottom: 15px;">
     <div class="col-md-12">
         <button class="btn btn-success pull-right" id="btnAddSurvey">Create Survey</button>
+        <button class="btn btn-default pull-right hide" id="btnRecapSurvey">Recap Semua Survey</button>
     </div>
 </div>
 
@@ -10,14 +34,26 @@
     <div class="col-md-12" id="loadTable"></div>
 </div>
 
-
-
-
 <script>
 
     $(document).ready(function () {
         setLoadFullPage();
         loadTableSurveyList();
+    });
+
+    $('#btnRecapSurvey').click(function () {
+
+        var data = {
+            action : 'genrateClose'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $.post(url,{token:token},function () {
+
+        });
+
     });
 
     function loadTableSurveyList(){
@@ -27,9 +63,12 @@
             '                <th style="width: 3%;">No</th>' +
             '                <th>Title</th>' +
             '                <th style="width: 5%;">Question</th>' +
-            '                <th style="width: 5%;"><i class="fa fa-users"></i></th>' +
+            '                <th style="width: 5%; color: #2196f3;">Internal</th>' +
+            '                <th style="width: 5%; color: #ffa013;">External</th>' +
+            '                <th style="width: 5%;">Total</th>' +
             '                <th style="width: 7%;"><i class="fa fa-cog"></i></th>' +
-            '                <th style="width: 20%;">Publication Date</th>' +
+            '                <th style="width: 17%;">Publication Date</th>' +
+            '                <th style="width: 5%;">Publication</th>' +
             '                <th style="width: 5%;">Status</th>' +
             '            </tr>' +
             '            </thead>' +
@@ -69,6 +108,41 @@
 
     }
 
+    $(document).on('click','.btnShareToPublic',function () {
+        var ID = $(this).attr('data-id');
+        var data = {
+            action : 'setPublicSurvey',
+            SurveyID : ID,
+            NIP : sessionNIP
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Share to public</h4>');
+
+            var htmlss = '<div class="form-group">' +
+                '<label>Link</label>' +
+                '<div class="panel-link">'+base_url_sign_out+'form/'+jsonResult.Key+'</div>'+
+                '</div>';
+
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+            $('#GlobalModal .modal-body').html(htmlss);
+
+
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+
+
+        });
+
+    });
+
     $(document).on('click','.showQuestionList',function () {
 
         var ID = $(this).attr('data-id');
@@ -79,18 +153,18 @@
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'apimenu/__crudSurvey';
 
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+        $('#GlobalModalXtraLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Show Question</h4>');
 
         var htmlss = '<div id="panelShowQuestion"></div>';
 
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModalXtraLarge .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
-        $('#GlobalModal .modal-body').html(htmlss);
+        $('#GlobalModalXtraLarge .modal-body').html(htmlss);
 
         loading_page('#panelShowQuestion');
 
-        $('#GlobalModal').modal({
+        $('#GlobalModalXtraLarge').modal({
             'show' : true,
             'backdrop' : 'static'
         });
@@ -105,17 +179,17 @@
                         '<td>'+(i + 1)+'</td>' +
                         '<td style="text-align: left;"><span class="label label-primary">'+v.Category+'</span>' +
                         ' <span class="label label-success">'+v.Type+'</span>' +
-                        '       <dvi>'+v.Question+'</div></td>' +
+                        '       <div class="q-scroll">'+v.Question+'</div></td>' +
                         '<td>'+v.AverageRate+'</td>' +
                         '</tr>';
                 })
 
             }
 
-            var dataListQuestion = '<div>' +
-                '    <table class="table table-bordered table-striped table-centre">' +
+            var dataListQuestion = '<div class="table-responsive">' +
+                '    <table class="table table-bordered table-centre">' +
                 '        <thead>' +
-                '        <tr>' +
+                '        <tr style="background: #eceff1;">' +
                 '            <th style="width: 3%">No</th>' +
                 '            <th>Question</th>' +
                 '            <th style="width: 13%">Average</th>' +
@@ -159,9 +233,13 @@
         $('#GlobalModal .modal-body').html(htmlss);
 
         var ID = $(this).attr('data-id');
+        var Status = $(this).attr('data-status');
+        var Type = $(this).attr('data-type');
         var data = {
             action : 'showUserAlreadyFill',
             SurveyID : ID,
+            Status : Status,
+            Type : Type
         };
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'apimenu/__crudSurvey';
@@ -297,6 +375,7 @@
         var ID = $(this).attr('data-id');
         updateStatusSurvey(ID,'2',
             'If the survey is closed, the user cannot fill out your survey, are you sure?');
+
     });
 
     function updateStatusSurvey(ID,Status,msg){
@@ -312,14 +391,17 @@
             var url = base_url_js+'apimenu/__crudSurvey';
 
             $.post(url,{token:token},function (jsonResult) {
-                $('#viewStatusSurvey_'+ID).html(jsonResult.Label);
 
-                if(Status==1){
-                    $('#li_btn_Publish_'+ID).remove();
-                    $('#li_btn_Close_'+ID).removeClass('hide');
-                } else if(Status==2){
-                    $('#li_btn_Publish_'+ID+',#li_btn_Close_'+ID).remove();
-                }
+                loadTableSurveyList();
+
+                // $('#viewStatusSurvey_'+ID).html(jsonResult.Label);
+                //
+                // if(Status==1){
+                //     $('#li_btn_Publish_'+ID).remove();
+                //     $('#li_btn_Close_'+ID).removeClass('hide');
+                // } else if(Status==2){
+                //     $('#li_btn_Publish_'+ID+',#li_btn_Close_'+ID).remove();
+                // }
 
 
 
@@ -336,7 +418,7 @@
 
         if(formSurveyTitle!='' && formSurveyTitle!=null &&
             formSurveyStartDate!='' && formSurveyStartDate!=null &&
-        formSurveyEndDate!='' && formSurveyEndDate!=null){
+            formSurveyEndDate!='' && formSurveyEndDate!=null){
 
             loading_button('#btnCreateSurvey');
 
@@ -629,7 +711,7 @@
 
         if(formUsr_ClassOf!='' && formUsr_ClassOf!=null &&
             formUsr_ProdiID!='' && formUsr_ProdiID!=null &&
-        formUsr_StatusStudentID!='' && formUsr_StatusStudentID!=null) {
+            formUsr_StatusStudentID!='' && formUsr_StatusStudentID!=null) {
 
             var ClassOf = formUsr_ClassOf;
             var ProdiID = formUsr_ProdiID.split('.')[0];
@@ -685,4 +767,254 @@
     });
 
 
+    $(document).on('click','.btnAddNewDate',function () {
+
+        var ID = $(this).attr('data-id');
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Add New Date</h4>');
+
+        var htmlss = '<div class="form-group">' +
+            '                    <div class="row">' +
+            '                        <div class="col-md-6">' +
+            '                            <label>Start</label>' +
+            '                            <input id="formSurveyStartDate" class="form-control" type="date">' +
+            '                           <input id="formSurveyID" class="hide" value="'+ID+'">' +
+            '                        </div>' +
+            '                        <div class="col-md-6">' +
+            '                            <label>End</label>' +
+            '                            <input id="formSurveyEndDate" class="form-control" type="date">' +
+            '                        </div>' +
+            '                    </div>' +
+            '                </div>';
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        $('#formSurveyTitle,#formSurveyStartDate,#formSurveyEndDate,#formSurveyNote').css('color','#333');
+
+        $('#GlobalModal .modal-footer').html('' +
+            '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> '+
+            '<button class="btn btn-success" id="btnSubmitNewDate">Submit</button>');
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+
+        $(document).off('click','#btnSubmitNewDate').on('click','#btnSubmitNewDate',function () {
+
+            loading_button('#btnSubmitNewDate');
+
+            var formSurveyStartDate = $('#formSurveyStartDate').val();
+            var formSurveyEndDate = $('#formSurveyEndDate').val();
+
+            if(formSurveyStartDate!='' && formSurveyStartDate!=null &&
+                formSurveyEndDate!='' && formSurveyEndDate!=null){
+
+                var data = {
+                    action : 'createNewDateSurvey',
+                    SurveyID : ID,
+                    StartDate : formSurveyStartDate,
+                    EndDate : formSurveyEndDate,
+                    NIP : sessionNIP
+                };
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'apimenu/__crudSurvey';
+
+                $.post(url,{token:token},function (jsonResult) {
+                    loadTableSurveyList();
+                    setTimeout(function () {
+                        $('#GlobalModal').modal('hide');
+                    },500);
+                });
+
+            } else {
+                toastr.warning('Range of date are required','Warning');
+            }
+        });
+
+    });
+
+    $(document).on('click','.showAllPublication',function () {
+
+        var ID = $(this).attr('data-id');
+
+        var data = {
+            action : 'dataAllPublication',
+            SurveyID : ID
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            console.log(jsonResult);
+
+            var tr = '';
+
+            $.each(jsonResult,function (i,v) {
+
+                var Start = moment(v.StartDate).format('DD MMM YYYY');
+                var End = moment(v.EndDate).format('DD MMM YYYY');
+
+                var tokenRecap = jwt_encode({
+                    SurveyID : v.SurveyID,
+                    RecapID : v.RecapID
+                },'UAP)(*');
+
+                var hideShare = (parseInt(v.Status)==2) ? '' : 'hide';
+
+                tr = tr+'<tr>' +
+                    '<td>'+(i+1)+'</td>' +
+                    '<td>'+v.Question+'</td>' +
+                    '<td>'+Start+' - '+End+'</td>' +
+                    '<td>'+v.TotalAnswer+'</td>' +
+                    '<td>' +
+                    '   <a href="'+base_url_js+'save2excel/survey/'+tokenRecap+'" class="btn btn-sm btn-default"><i class="fa fa-download"></i></a>' +
+                    '   <button class="btn btn-sm btn-default '+hideShare+'" role="button" data-toggle="collapse" href="#collapseExample_'+i+'" aria-expanded="false" aria-controls="collapseExample_'+i+'"><i class="fa fa-mail-forward"></i></button>' +
+                    '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td colspan="5" class="collapse" id="collapseExample_'+i+'">' +
+                    '<div class="row" style="margin-top: 15px;margin-bottom: 15px;">' +
+                    '   <div class="col-md-5">' +
+                    '       <input placeholder="Name..." class="form-control" id="formName_'+i+'" /> ' +
+                    '       <input value="'+tokenRecap+'" id="formtokenRecap_'+i+'" class="hide" /> ' +
+                    '   </div>' +
+                    '   <div class="col-md-5">' +
+                    '       <input placeholder="Email..." id="formEmail_'+i+'" class="form-control" /> ' +
+                    '   </div>' +
+                    '   <div class="col-md-2">' +
+                    '       <button class="btn btn-sm btn-default btn-block btnSentMail" data-i="'+i+'">Sent</button>' +
+                    '   </div>' +
+                    '</div>' +
+                    '<div class="row" style="margin-bottom: 15px;">' +
+                    '   <div class="col-md-12">' +
+                    '       <div class="text-right">' +
+                    '           <a role="button" data-toggle="collapse" ' +
+                    '                   data-i="'+i+'" ' +
+                    '                   href="#detailHistory_'+i+'" ' +
+                    '                   aria-expanded="false" ' +
+                    '                   aria-controls="detailHistory_'+i+'" class="showListSendMail">Email delivery history</a>' +
+                    '       </div>' +
+                    '       <div class="collapse" id="detailHistory_'+i+'"></div>' +
+                    '   </div>' +
+                    '</div>' +
+                    '</td>' +
+                    '</tr>';
+            });
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">List Of Publication Dates</h4>');
+
+            var htmlss = '<table class="table table-bordered table-centre table-striped">' +
+                '<thead>' +
+                '<tr style="background: #eceff1;">' +
+                '   <td style="width: 1%;">No</td>' +
+                '   <td style="width: 5%;">Question</td>' +
+                '   <td>Publication Date</td>' +
+                '   <td style="width: 5%;"><i class="fa fa-users"></i></td>' +
+                '   <td style="width: 25%;">Report</td>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>'+tr+'</tbody>' +
+                '</table>';
+
+            $('#GlobalModal .modal-body').html(htmlss);
+
+            $('#formSurveyTitle,#formSurveyStartDate,#formSurveyEndDate,#formSurveyNote').css('color','#333');
+
+            $('#GlobalModal .modal-footer').html('' +
+                '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+
+        });
+
+    });
+
+    $(document).on('click','.showListSendMail',function () {
+        var i = $(this).attr('data-i');
+        var formtokenRecap = $('#formtokenRecap_'+i).val();
+        var d = jwt_decode(formtokenRecap,'UAP)(*');
+        console.log(d);
+        loadList(i,d.SurveyID,d.RecapID);
+    });
+
+    function loadList(i,SurveyID,RecapID){
+        var data = {
+            action : 'getListHistorySendEmail',
+            SurveyID : SurveyID,
+            RecapID : RecapID
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $('#detailHistory_'+i).empty();
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            var li = '';
+            $.each(jsonResult,function (i,v) {
+                var dateSent = moment(v.EntredAt).format('DD MMM YYYY HH.mm');
+                li = li+'<li><div style="text-align: left;margin-bottom: 10px;">' +
+                    '<b>'+v.Name+'</b> ('+v.Email+')' +
+                    '<br/><span style="color: #a9a9a9;">Sent by : '+v.EntredByName+' | ' +dateSent+'</span>'+
+                    '</div>' +
+                    '</li>';
+            });
+
+            $('#detailHistory_'+i).html('<ol>'+li+'</ol>');
+
+        });
+    }
+
+    $(document).on('click','.btnSentMail',function () {
+       var i = $(this).attr('data-i');
+        var formName = $('#formName_'+i).val();
+        var tokenRecap = $('#formtokenRecap_'+i).val();
+        var formEmail = $('#formEmail_'+i).val();
+
+        if(formName!='' && formName!=null &&
+            tokenRecap!='' && tokenRecap!=null &&
+        formEmail!='' && formEmail!=null) {
+
+            $('.btnSentMail').prop('disabled',true);
+            loading_buttonSm('.btnSentMail[data-i="'+i+'"]');
+
+            var data = {
+                action : 'shareRecap2email',
+                tokenRecap : tokenRecap,
+                Name : formName,
+                Email : formEmail,
+                NIP : sessionNIP,
+                SentBy : sessionName,
+                SentAt : getDateTimeNow()
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'apimenu/__crudSurvey';
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                loadList(i,jsonResult.SurveyID,jsonResult.RecapID);
+
+                setTimeout(function () {
+                    $('.btnSentMail').prop('disabled',false);
+                    $('.btnSentMail[data-i="'+i+'"]').html('Sent');
+                },500);
+
+            });
+
+
+        } else {
+            toastr.warning('Name & Email are required','Warning');
+        }
+    });
+
+
 </script>
+

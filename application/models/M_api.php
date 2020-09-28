@@ -4414,7 +4414,7 @@ class M_api extends CI_Model {
 
     public function chekCodeReport(){
 
-        $rand = $this->genrateCode();
+        $rand = $this->genrateCode(false,9);
 
         $d = $this->db->get_where('db_ticketing.ss_report',array('ReportNumber' => $rand))->result_array();
         if(count($d)>0){
@@ -4426,7 +4426,7 @@ class M_api extends CI_Model {
     }
 
     public function checkCodeIjazah(){
-        $rand = $this->genrateCode();
+        $rand = $this->genrateCode(false,9);
 
         $d = $this->db->get_where('db_academic.ijazah',array('Code' => $rand))->result_array();
         if(count($d)>0){
@@ -4436,14 +4436,25 @@ class M_api extends CI_Model {
         }
     }
 
-    private function genrateCode(){
+    public function checkCodeSurvey(){
+        $rand = $this->genrateCode(true,15);
 
-        $k = 'abcdefghijklmnopqrstuvwxyz';
-        $seed = str_split('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'); // and any other characters
+        $d = $this->db->get_where('db_it.surv_survey',array('Key' => $rand))->result_array();
+        if(count($d)>0){
+            $this->checkCodeSurvey();
+        } else {
+            return $rand;
+        }
+    }
+
+    private function genrateCode($casesensitive,$length){
+
+        $k = ($casesensitive) ? 'abcdefghijklmnopqrstuvwxyz' : '';
+        $seed = str_split('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'.$k); // and any other characters
 
         shuffle($seed); // probably optional since array_is randomized; this may be redundant
         $rand = '';
-        foreach (array_rand($seed, 9) as $k) $rand .= $seed[$k];
+        foreach (array_rand($seed, $length) as $key) $rand .= $seed[$key];
 
         return $rand;
     }

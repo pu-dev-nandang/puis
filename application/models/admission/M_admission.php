@@ -493,10 +493,12 @@ class M_admission extends CI_Model {
       return $conVertINT;
     }
 
-    public function totalDataFormulir_online()
+    public function totalDataFormulir_online($tahun = NULL,$NomorFormulir = NULL,$status = NULL)
     {
+      $AddWhere = '';
+
       $sql = "select count(*) as total from (
-              select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
+              select c.FormulirCode
               from db_admission.register as a
               join db_admission.register_verification as b
               on a.ID = b.RegisterID
@@ -505,9 +507,26 @@ class M_admission extends CI_Model {
               join db_admission.school as z
               on z.ID = a.SchoolID
               where a.StatusReg = 0
-              ) as a right JOIN db_admission.formulir_number_online_m as b
-              on a.FormulirCode = b.FormulirCode
+              ) as a right JOIN (
+                select * from db_admission.formulir_number_online_m as b  where b.Years = ".$tahun."
+              )as b on a.FormulirCode = b.FormulirCode
+              left join db_admission.formulir_number_global as c on b.No_Ref = c.FormulirCodeGlobal
               ";
+        
+
+        if(!empty($NomorFormulir)){
+          $WhereORAnd = ($AddWhere != '') ? ' Where ' : ' And ';
+          $AddWhere .=  $WhereORAnd.' (b.FormulirCode like "'.$NomorFormulir.'" or b.No_Ref like "'.$NomorFormulir.'")'; // set for all query conditions
+        } 
+
+        if(!empty($status)){
+          $WhereORAnd = ($AddWhere != '') ? ' Where ' : ' And ';
+          if($status != '%') {
+            $AddWhere = $WhereORAnd.' b.Status = '.$status;
+          }
+        }
+
+        $sql .= $AddWhere;       
       $query=$this->db->query($sql, array())->result_array();
       $conVertINT = (int) $query[0]['total'];
       return $conVertINT;
@@ -544,10 +563,12 @@ class M_admission extends CI_Model {
           left join db_admission.school as z
           on z.ID = a.SchoolID
           where a.StatusReg = 0
-          ) as a right JOIN db_admission.formulir_number_online_m as b
+          ) as a right JOIN (
+            select * from db_admission.formulir_number_online_m as b  where b.Years = "'.$tahun.'"
+          )as b
           on a.FormulirCode = b.FormulirCode
           left join db_admission.formulir_number_global as c on b.No_Ref = c.FormulirCodeGlobal
-          where b.Years = "'.$tahun.'" and (b.FormulirCode like '.$NomorFormulir.' or b.No_Ref like '.$NomorFormulir.')'.$status.' LIMIT '.$start. ', '.$limit;
+          where (b.FormulirCode like '.$NomorFormulir.' or b.No_Ref like '.$NomorFormulir.')'.$status.' LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }
@@ -1793,6 +1814,47 @@ class M_admission extends CI_Model {
       }
      }
 
+
+     private function excecuteSchemaTuitionFee($ID_program_study,$getBintangMaster,$CreditDefaultSmt1)
+     {
+      $arr = [];
+      for ($i=0; $i < count($getBintangMaster); $i++) { 
+        $JumlahBintang = $getBintangMaster[$i]['ID_bintang'];
+        $Name = $getBintangMaster[$i]['Name'];
+        $Desc = $getBintangMaster[$i]['Desc'];
+        $getPayment = $this->getPaymentType_Cost($ID_program_study,$JumlahBintang);
+        $detail = [];
+        if (count($getPayment) > 0) {
+          for ($j=0; $j < count($getPayment); $j++) { 
+            if ($getPayment[$j]['Abbreviation'] == 'Credit') {
+               $detail = $detail + array($getPayment[$j]['Abbreviation'] => (int)$getPayment[$j]['Cost'] * (int) $CreditDefaultSmt1.'.00');
+             }
+             else
+             {
+              $detail = $detail + array($getPayment[$j]['Abbreviation'] => $getPayment[$j]['Cost']);
+             }
+          }
+        }
+        else
+        {
+          $PaymentType = $this->m_master->caribasedprimary('db_finance.payment_type','Type','0');
+          for ($j=0; $j < count($PaymentType); $j++) { 
+            $detail = $detail + array($PaymentType[$j]['Abbreviation'] => '0.00');
+          }
+        }
+
+        $arr[] = [
+          'JumlahBintang' => $JumlahBintang,
+          'Name' => $Name,
+          'Desc' => $Desc,
+          'TuitionFee' => $detail,
+        ];
+
+      }
+
+      return $arr;
+     }
+
      public function getDataCalonMhsTuitionFee($limit, $start,$FormulirCode)
      {
       if($FormulirCode != '%') {
@@ -1855,6 +1917,10 @@ class M_admission extends CI_Model {
       $getDiscount = $this->m_master->showData_array('db_finance.discount');
       $getBeasiswa = $this->m_master->showData_array('db_admission.register_dsn_type_m');
       $getMaxCicilan = $this->m_master->showData_array('db_admission.cfg_cicilan');
+
+      // get Bintang
+       $getBintangMaster  =  $this->m_master->showData_array('db_finance.tuition_fee_schema');
+
       for ($i=0; $i < count($query); $i++) {
 
         // get SKS
@@ -1876,6 +1942,7 @@ class M_admission extends CI_Model {
                }
 
             }
+
           $Attachment = '';
           // get All Files Uploaded
              $Document = $this->getDataDokumentRegister($query[$i]['ID_register_formulir']);
@@ -1887,6 +1954,9 @@ class M_admission extends CI_Model {
                if (count($dataGet) != 0) {
                 $NoteRev = $dataGet[$arr_Count]['Note'];
                }
+
+        // get schema payment
+          $arrSchema = $this->excecuteSchemaTuitionFee($query[$i]['ID_program_study'],$getBintangMaster,$Credit);
 
         if ($query[$i]['status1'] == 'Rapor') {
           // check rangking
@@ -1920,6 +1990,7 @@ class M_admission extends CI_Model {
               'Email' => $query[$i]['Email'],
               'getMaxCicilan' => $getMaxCicilan,
               'NoteRev' => $NoteRev,
+              'SchemaPayment' => $arrSchema,
             );
         }
         else
@@ -1941,6 +2012,7 @@ class M_admission extends CI_Model {
               'Email' => $query[$i]['Email'],
               'getMaxCicilan' => $getMaxCicilan,
               'NoteRev' => $NoteRev,
+              'SchemaPayment' => $arrSchema,
             );
         }
 
@@ -1950,23 +2022,28 @@ class M_admission extends CI_Model {
 
      }
 
-     public function getPaymentType_Cost($ID_program_study)
+     public function getPaymentType_Cost($ID_program_study,$selectedBintang = NULL) // get master tagihan
      {
       $this->load->model('master/m_master');
       // getTA
       $Q_ta = $this->m_master->showData_array('db_admission.set_ta');
-      // $year = date('Y');
       $year = $Q_ta[0]['Ta'];
+
+      $whereBintang = '';
+      if ($selectedBintang !== NULL) {
+        $whereBintang  = ' and a.Pay_Cond = '.$selectedBintang;
+      }
+
       $sql = 'select a.PTID,a.ProdiID,a.ClassOf,a.Cost,b.Description,b.Abbreviation from db_finance.tuition_fee as a join db_finance.payment_type as b
-              on a.PTID = b.ID where a.ProdiID = "'.$ID_program_study.'" and a.ClassOf = '.$year.'
+              on a.PTID = b.ID where a.ProdiID = "'.$ID_program_study.'" and a.ClassOf = '.$year.' '.$whereBintang.'
               order by b.ID asc';
       $query=$this->db->query($sql, array())->result_array();
       return $query;
      }
 
-     public function getPaymentType_Cost_created($ID_register_formulir)
+     public function getPaymentType_Cost_created($ID_register_formulir) // get tagihan yg telah dibuat
      {
-      $sql = 'select a.*,b.Description,b.Abbreviation,c.Pay_tuition_fee,
+      $sql = 'select a.*,b.Description,b.Abbreviation,c.ID as ID_payment_admisi,c.Pay_tuition_fee,
       c.Discount from db_finance.payment_admisi as c join db_finance.payment_type as b on c.PTID = b.ID join db_finance.register_admisi as a on c.ID_register_formulir = a.ID_register_formulir where a.ID_register_formulir = ?';
       $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
       return $query;
@@ -2269,6 +2346,42 @@ class M_admission extends CI_Model {
       return $query[0]['total'];
      }
 
+     public function tuitionFeeIntake_ALL($ID_register_formulir){
+        $getPaymentType_Cost = $this->getPaymentType_Cost_created($ID_register_formulir);
+        $arr_temp2 = array();
+        for ($k=0; $k < count($getPaymentType_Cost); $k++) {
+           
+            // check meiliki potongan lain atau tidak
+           $getPotonganLain =  $this->m_master->caribasedprimary('db_finance.payment_admisi_potongan_lain','ID_payment_admisi',$getPaymentType_Cost[$k]['ID_payment_admisi']);
+
+          $arr_temp2 = $arr_temp2 + array(
+            $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
+            'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount'],
+            'PotonganLain-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPotonganLain,
+          );
+        }
+
+        return $arr_temp2;
+      }
+
+      public function tuitionFeeIntake_ALL2($ID_register_formulir){
+       $getPaymentType_Cost = $this->getPaymentType_Cost_created($ID_register_formulir);
+       $arr_temp2 = array();
+       for ($k=0; $k < count($getPaymentType_Cost); $k++) {
+          
+           // check meiliki potongan lain atau tidak
+          $getPotonganLain =  $this->m_master->caribasedprimary('db_finance.payment_admisi_potongan_lain','ID_payment_admisi',$getPaymentType_Cost[$k]['ID_payment_admisi']);
+
+         $arr_temp2 = $arr_temp2 + array(
+           $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
+           'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount'],
+           'PotonganLain-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPotonganLain,
+         );
+       }
+
+      return $arr_temp2;
+     }
+
     public function getDataCalonMhsTuitionFee_approved($limit, $start,$FormulirCode,$Status = 'p.Status = "Created" or p.Status = "Approved"')
     {
       if($FormulirCode != '%') {
@@ -2284,7 +2397,7 @@ class M_admission extends CI_Model {
              f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
              n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
              if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-             as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Desc,
+             as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Desc,p.Pay_Cond,
              if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref,p.RevID
              from db_admission.register_formulir as a
              left JOIN db_admission.register_verified as b
@@ -2319,15 +2432,20 @@ class M_admission extends CI_Model {
      for ($i=0; $i < count($query); $i++) {
        $DiskonSPP = 0;
        // get Price
-           $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
-           $arr_temp2 = array();
-           for ($k=0; $k < count($getPaymentType_Cost); $k++) {
-             // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
-             $arr_temp2 = $arr_temp2 + array(
-               $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
-               'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount']
-             );
-           }
+          $arr_temp2 = $this->tuitionFeeIntake_ALL($query[$i]['ID_register_formulir']);
+           // $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
+           // $arr_temp2 = array();
+           // for ($k=0; $k < count($getPaymentType_Cost); $k++) {
+              
+           //     // check meiliki potongan lain atau tidak
+           //    $getPotonganLain =  $this->m_master->caribasedprimary('db_finance.payment_admisi_potongan_lain','ID_payment_admisi',$getPaymentType_Cost[$k]['ID_payment_admisi']);
+
+           //   $arr_temp2 = $arr_temp2 + array(
+           //     $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
+           //     'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount'],
+           //     'PotonganLain-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPotonganLain,
+           //   );
+           // }
 
            // get file dan type beasiswa
             $getBeasiswa = $this->m_master->caribasedprimary('db_admission.register_dsn_type_m','ID',$query[$i]['TypeBeasiswa']);
@@ -2373,6 +2491,7 @@ class M_admission extends CI_Model {
             'Desc' => $query[$i]['Desc'],
             'Rev' => count($rev),
             'CreateAT' => $this->m_master->getIndoBulan($query[$i]['CreateAT']),
+            'Pay_Cond' => $query[$i]['Pay_Cond'],
            );
        }
        else
@@ -2394,6 +2513,7 @@ class M_admission extends CI_Model {
              'Rev'  =>count($rev),
              'CreateAT' => $query[$i]['CreateAT'],
              'CreateAT' => $this->m_master->getIndoBulan($query[$i]['CreateAT']),
+             'Pay_Cond' => $query[$i]['Pay_Cond'],
            );
        }
 
@@ -2604,19 +2724,35 @@ class M_admission extends CI_Model {
         return $arr_result;
     }
 
+    private function searchDataPotonganObject($ID_register_formulir,$PTID,$dataInputPotonganLain){
+      $arr = [];
+
+      for ($i=0; $i < count($dataInputPotonganLain); $i++) { 
+        if ($dataInputPotonganLain[$i]->ID_register_formulir == $ID_register_formulir && $dataInputPotonganLain[$i]->PTID == $PTID) {
+          $arr[] = $dataInputPotonganLain[$i];
+        }
+      }
+
+      return $arr;
+
+    }
+
     public function set_input_tuition_fee_submit($input)
     {
+      // print_r($input);die();
       $this->load->model('finance/m_finance');
       //save data to payment_register
       $this->load->model('master/m_master');
       $data2 = $input['data2'][0];
-      $arr = [];
+      $dataInputPotonganLain = $input['dataInputPotonganLain'];
+
       $temp = array();
       $temp2 = array();
       $temp['ID_register_formulir'] = $data2->id_formulir;
       $temp['TypeBeasiswa'] = $data2->getBeasiswa;
       $temp['FileBeasiswa'] = $data2->getDokumen;
       $temp['Desc'] = $data2->ket;
+      $temp['Pay_Cond'] = $data2->Pay_Cond;
       $temp['CreateAT'] = date('Y-m-d');
       $temp['CreateBY'] = $this->session->userdata('NIP');
       $this->db->insert('db_finance.register_admisi', $temp);
@@ -2631,11 +2767,35 @@ class M_admission extends CI_Model {
               $temp2['PTID'] = $get[0]['ID'];
               $temp2['ID_register_formulir'] = $data2->id_formulir;
 
-              $arr[] = $temp2;
+              $this->db->insert('db_finance.payment_admisi', $temp2);
+              $ID_payment_admisi = $this->db->insert_id();
+
+              // insert payment_admisi_potongan_lain
+                $searchDataPotongan =  $this->searchDataPotonganObject($temp2['ID_register_formulir'],$temp2['PTID'],$dataInputPotonganLain);
+                // print_r($searchDataPotongan);die();
+                if (count($searchDataPotongan) > 0) {
+                  $dataPotongan = $searchDataPotongan[0]->data;
+                  for ($y=0; $y < count($dataPotongan); $y++) { 
+                    $dataSavePotonganLain = [
+                      'ID_payment_admisi' => $ID_payment_admisi,
+                      'DiscountName' => $dataPotongan[$y]->DiscountName ,
+                      'DiscountValue' => $dataPotongan[$y]->DiscountValue,
+                      'Description' => $dataPotongan[$y]->Description,
+                      'UpdatedBy' => $this->session->userdata('NIP'),
+                      'UpdateAt' => date('Y-m-d H:i:s') ,
+                    ];
+
+                    $this->db->insert('db_finance.payment_admisi_potongan_lain', $dataSavePotonganLain);
+
+                  }
+                }
+                
+                
+
+
             }
 
       }
-      $this->db->insert_batch('db_finance.payment_admisi', $arr);
 
 
       // save data cicilan pada table payment_pre
@@ -2811,16 +2971,85 @@ class M_admission extends CI_Model {
             if ($key[0] == 'Discount') {
                 if ($value > 0 ) {
                    $chkDiscount = 1;
-                   $arr_discount[$key[1]] = $value;
+                   $arr_discount[$key[1]]['discount'] = $value;
                 }
-                $arr_discount2[$key[1]] = $value;
+                $arr_discount2[$key[1]]['discount'] = $value;
             }
         }
+
+        // get potongan lain
+          foreach ($Personal[0] as $key => $value) {
+            $key = explode('-', $key);
+             if ($key[0] == 'PotonganLain') {
+                $ptname = $key[1];
+                $str_arr_discount = '';
+                $TotalPotonganLain = 0;
+                $BoolFindKey = false;
+                foreach ($arr_discount as $keya => $valuea) {
+                  if ($keya == $ptname) {
+                    $dataPotongan =  $value;
+                    if (count($dataPotongan) > 0) {
+                      $str_arr_discount .= $dataPotongan[0]['DiscountName'].'('.$ptname.')'.' : '.number_format($dataPotongan[0]['DiscountValue'],2,',','.');
+                      $TotalPotonganLain += $dataPotongan[0]['DiscountValue'];
+                      for ($zz=1; $zz < count($dataPotongan); $zz++) { 
+                        $str_arr_discount .= ', '.$dataPotongan[$zz]['DiscountName'].' : '.number_format($dataPotongan[$zz]['DiscountValue'],2,',','.');
+                        $TotalPotonganLain += $dataPotongan[$zz]['DiscountValue'];
+                      }
+                    }
+                    $BoolFindKey = true;
+                    break;
+                  }
+                }
+
+                if ($BoolFindKey) {
+                  if ($str_arr_discount != '') {
+                    if (array_key_exists($ptname, $arr_discount)) {
+                        $arr_discount[$ptname]['potonganLain'] = ' dan '.$str_arr_discount;
+                        $arr_discount2[$ptname]['totalPotonganLain'] = $TotalPotonganLain;
+                    }
+                    else
+                    {
+                      $arr_discount[$ptname]['potonganLain'] = $str_arr_discount;
+                      $arr_discount2[$ptname]['totalPotonganLain'] = $TotalPotonganLain;
+                    }
+
+                    $chkDiscount = 1;
+                  }
+                }
+                else
+                {
+                    $dataPotongan =  $value;
+                    if (count($dataPotongan) > 0) {
+                      $str_arr_discount .= $dataPotongan[0]['DiscountName'].'('.$ptname.')'.' : '.number_format($dataPotongan[0]['DiscountValue'],2,',','.');
+                      $TotalPotonganLain += $dataPotongan[0]['DiscountValue'];
+                      for ($zz=1; $zz < count($dataPotongan); $zz++) { 
+                        $str_arr_discount .= ', '.$dataPotongan[$zz]['DiscountName'].' : '.number_format($dataPotongan[$zz]['DiscountValue'],2,',','.');
+                        $TotalPotonganLain += $dataPotongan[$zz]['DiscountValue'];
+                      }
+
+                      if ($str_arr_discount != '') {
+                        if (array_key_exists($ptname, $arr_discount)) {
+                            $arr_discount[$ptname]['potonganLain'] = ' dan '.$str_arr_discount;
+                            $arr_discount2[$ptname]['totalPotonganLain'] = $TotalPotonganLain;
+                        }
+                        else
+                        {
+                          $arr_discount[$ptname]['potonganLain'] = $str_arr_discount;
+                          $arr_discount2[$ptname]['totalPotonganLain'] = $TotalPotonganLain;
+                        }
+
+                        $chkDiscount = 1;
+                      }
+                    }
+                }
+            }
+
+          }
 
         if ($chkDiscount == 1) {
             $Status = 'rata-rata raport kelas XI';
             if ($Personal[0]['RangkingRapor'] != 0) {
-                $Status = 'Rangking paralel '.$Personal[0]['RangkingRapor'].' kelas XI';
+                $Status = 'berdasarkan Rangking paralel '.$Personal[0]['RangkingRapor'].' kelas XI';
             }
 
             $setXvalue = $setX;
@@ -2829,7 +3058,7 @@ class M_admission extends CI_Model {
             $this->mypdf->SetTextColor(0,0,0);
             $this->mypdf->SetFont('Arial','',$setFont);
             // MultiCell( 140, 2, $arr_value[$getRowDB], 0,'L');
-            $this->mypdf->MultiCell(0, 5, 'Selamat, Anda mendapatkan beasiswa potongan di Podomoro University tahun akademik '.$Personal[0]['NamaTahunAkademik'].' berdasarkan '.$Status.', dengan rincian sebagai berikut:', 0,'L');
+            $this->mypdf->MultiCell(0, 5, 'Selamat, Anda mendapatkan beasiswa potongan di Podomoro University tahun akademik '.$Personal[0]['NamaTahunAkademik'].' '.$Status.', dengan rincian sebagai berikut:', 0,'L');
 
             $setY = $setY + 10;
             $height = 5;
@@ -2846,7 +3075,15 @@ class M_admission extends CI_Model {
                 $this->mypdf->SetFillColor(255, 255, 255);
                 $this->mypdf->Cell(50,$height,$NameTbl,1,0,'C',true);
                 $this->mypdf->Cell(40,$height,$ProdiTbl,1,0,'C',true);
-                $this->mypdf->Cell(80,$height,'Beasiswa Pot '.$key.' '.(int)$value.'%',1,1,'C',true);
+                $rsShow = '';
+                if (array_key_exists('discount', $value)) {
+                   $rsShow = 'Beasiswa Pot '.$key.' '.(int)$value['discount'].'%';
+                }
+               
+                if (array_key_exists('potonganLain', $value)) {
+                  $rsShow .= $value['potonganLain'];
+                }
+                $this->mypdf->Cell(80,$height,$rsShow,1,1,'C',true);
             }
 
         }
@@ -2879,8 +3116,8 @@ class M_admission extends CI_Model {
 
         // get tuition fee
 
-           $sql23 = 'select a.Abbreviation,b.Cost from db_finance.payment_type as a join db_finance.tuition_fee as b on a.ID = b.PTID where ClassOf = ? and ProdiID = ?';
-           $query23=$this->db->query($sql23, array($Personal[0]['SetTa'],$Personal[0]['ID_program_study']))->result_array();
+           $sql23 = 'select a.Abbreviation,b.Cost from db_finance.payment_type as a join db_finance.tuition_fee as b on a.ID = b.PTID where ClassOf = ? and ProdiID = ? and b.Pay_Cond = ? ';
+           $query23=$this->db->query($sql23, array($Personal[0]['SetTa'],$Personal[0]['ID_program_study'],$Personal[0]['Pay_Cond']))->result_array();
            $totalTuitionFee = 0;
            $arr_pay = array();
 
@@ -2914,6 +3151,7 @@ class M_admission extends CI_Model {
             $this->mypdf->Cell(50,$height,'Beasiswa yang diterima',1,0,'L',true);
 
             $totalTuitionFee = 0;
+            // print_r($arr_discount2);die();
             foreach ($arr_discount2 as $key => $value) {
 
                 foreach ($arr_pay as $keya => $valuea) {
@@ -2921,12 +3159,29 @@ class M_admission extends CI_Model {
                     if ($keya == $key) {
                         if ($key == 'Credit') {
                             $cost = $Credit * $valuea;
-                            $cost = $value * $cost / 100;
+                            if (array_key_exists('discount', $value)) {
+                               $cost = $value['discount'] * $cost / 100;
+                            }
+                          
+                            // check ada potongan lain atau tidak
+                              if (array_key_exists('totalPotonganLain', $arr_discount2[$key])) {
+                                $cost = $cost +  $arr_discount2[$key]['totalPotonganLain'];
+                              }
+
                             $this->mypdf->Cell(25,$height,number_format($cost,2,',','.'),1,0,'L',true);
                         }
                         else
                         {
-                            $cost = $value * $valuea / 100;
+                            $cost = $valuea;
+                            if (array_key_exists('discount', $value)) {
+                               $cost = $value['discount'] * $cost / 100;
+                            }
+
+                            // check ada potongan lain atau tidak
+                              if (array_key_exists('totalPotonganLain', $arr_discount2[$key])) {
+                                $cost = $cost +  $arr_discount2[$key]['totalPotonganLain'];
+                              }
+
                             $this->mypdf->Cell(25,$height,number_format($cost,2,',','.'),1,0,'L',true);
                         }
                         $totalTuitionFee = $totalTuitionFee + $cost;
@@ -3805,15 +4060,16 @@ class M_admission extends CI_Model {
      for ($i=0; $i < count($query); $i++) {
        $DiskonSPP = 0;
        // get Price
-           $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
-           $arr_temp2 = array();
-           for ($k=0; $k < count($getPaymentType_Cost); $k++) {
-             // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
-             $arr_temp2 = $arr_temp2 + array(
-               $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
-               'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount']
-             );
-           }
+          $arr_temp2 = $this->tuitionFeeIntake_ALL2($query[$i]['ID_register_formulir']);
+           // $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
+           // $arr_temp2 = array();
+           // for ($k=0; $k < count($getPaymentType_Cost); $k++) {
+           //   // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
+           //   $arr_temp2 = $arr_temp2 + array(
+           //     $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
+           //     'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount']
+           //   );
+           // }
 
            // get file dan type beasiswa
             $getBeasiswa = $this->m_master->caribasedprimary('db_admission.register_dsn_type_m','ID',$query[$i]['TypeBeasiswa']);
@@ -4674,6 +4930,104 @@ class M_admission extends CI_Model {
             "data"            => $data
         );
         
+    }
+
+    public function sumPotonganLainBydata($data){
+      $total = 0;
+      for ($i=0; $i < count($data); $i++) { 
+        $total += $data[$i]['DiscountValue'];
+      }
+
+      return $total;
+    }
+
+    public function checkStepAfterFormulir($ID_register_verified = NULL,$FormulirCode=NULL){
+      $param = ['ID_register_verified'=> $ID_register_verified,'FormulirCode' => $FormulirCode,'ID_register_formulir' => ''];
+      $arr_Tbl_WhereSearch = [
+        [
+           'tbl' => 'db_admission.register_formulir',
+           'primary' => 'ID_register_verified',
+           'desc' => 'Process Data Formulir',
+           'required' => 1,
+           'relationTbl' => [],
+           'return' => 'ID_register_formulir',
+           'status' => ['status' => 0,'msg' => ''],
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_admission.register_document',
+           'primary' => 'ID_register_formulir',
+           'desc' => 'Process Data Document',
+           'required' => 0,
+           'relationTbl' => [],
+           'return' => '',
+           'status' => ['status' => 0,'msg' => ''],
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_admission.register_nilai',
+           'primary' => 'ID_register_formulir',
+           'desc' => 'Process Data Nilai',
+           'required' => 1,
+           'relationTbl' => ['db_admission.register_rangking','db_admission.register_nilai_fin'], 
+           'return' => '',
+           'status' => ['status' => 0,'msg' => ''],
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_finance.register_admisi',
+           'primary' => 'ID_register_formulir',
+           'desc' => 'Process Data Tuition Fee',
+           'required' => 1,
+           'relationTbl' => [
+              'db_finance.payment_admisi','db_finance.payment_pre','db_finance.register_admisi_rev'
+           ],
+           'return' => '', 
+           'status' => ['status' => 0,'msg' => ''], 
+           'action' => 'No Action',
+        ],
+        [
+           'tbl' => 'db_admission.to_be_mhs',
+           'primary' => 'FormulirCode',
+           'desc' => 'Process Data To Be MHS',
+           'required' => 1,
+           'relationTbl' => [],
+           'return' => '',
+           'status' => ['status' => 0,'msg' => ''],  
+           'action' => 'No Action',
+        ],
+        
+      ];
+
+      for ($i=0; $i < count($arr_Tbl_WhereSearch); $i++) { 
+        $arrTable = $arr_Tbl_WhereSearch[$i];
+        $tbl = $arrTable['tbl'];
+        $primary = $arrTable['primary'];
+        $desc = $arrTable['desc'];
+        $required = $arrTable['required'];
+        $relationTbl = $arrTable['relationTbl'];
+        
+        $getData =  $this->m_master->caribasedprimary($tbl,$primary,$param[$primary]);
+        // print_r($tbl);
+        if (count($getData) > 0) {
+          if ($arrTable['return'] != '') {
+            $param[$arrTable['return']] = ($tbl == 'db_admission.register_formulir') ? $getData[0]['ID'] :$getData[0][$arrTable['return']];
+          }
+
+          $arr_Tbl_WhereSearch[$i]['status']['status'] = 1;
+          $arr_Tbl_WhereSearch[$i]['status']['msg'] = $desc .' finish';
+
+          $arr_Tbl_WhereSearch[$i]['param'] = $param;
+        }
+        else
+        {
+          $arr_Tbl_WhereSearch[$i]['status']['msg'] = $desc .' unfinish';
+          $arr_Tbl_WhereSearch[$i]['param'] = $param;
+        }
+
+      }
+
+      return $arr_Tbl_WhereSearch;
     }
 
 }

@@ -11,7 +11,7 @@ class C_it extends It_Controler {
         $this->load->model('m_sm_menu');
         $this->data['department'] = parent::__getDepartement(); 
         $this->load->model('m_api');
-        // $this->load->model('master/m_master');
+        $this->load->model('admission/m_admission');
     }
 
     
@@ -159,7 +159,7 @@ class C_it extends It_Controler {
     {
       $Input = $this->getInputToken();
       $action = $Input['action'];
-      $rs = ['msg' => '','Status' => 0];
+      $rs = ['msg' => '','Status' => 0,'callback' => []];
       switch ($action) {
         case 'EditNumberFormulir':
         $FormulirCodeOnline = $Input['FormulirCodeOnline'];
@@ -224,6 +224,141 @@ class C_it extends It_Controler {
            $rs['Status'] = 1;
 
           echo json_encode($rs);
+          break;
+        case 'Unsell' : 
+            $data = $Input['data'];
+            // print_r($data);die();
+            $FormulirCode =  $data->FormulirCode;
+            $No_Ref =  $data->No_Ref;
+            $get_register_verified = $this->m_master->caribasedprimary('db_admission.register_verified','FormulirCode',$FormulirCode);
+            /* 
+              1.remove document if existing file dan db
+              2.remove nilai
+              3.remove biodata in register_formulir,register_verified,register_verification
+              -formulir_number_online_m ( fields : status, no kwitansi, no_ref)
+              -formulir_number_global
+            */
+            if (count($get_register_verified) > 0) {
+                $ID_register_verified = $get_register_verified[0]['ID'];
+                $RegVerificationID = $get_register_verified[0]['RegVerificationID'];
+                $getRegisterID = $this->m_master->caribasedprimary('db_admission.register_verification','ID',$RegVerificationID);
+                $RegisterID = $getRegisterID[0]['RegisterID'];
+                $checkStep = $this->m_admission->checkStepAfterFormulir($ID_register_verified,$FormulirCode);
+                
+                $boolCheck = true;
+                for ($i=0; $i < count($checkStep); $i++) { 
+                  $r = $checkStep[$i];
+                  if ($r['tbl'] == 'db_finance.register_admisi' && $r['status']['status'] == 1) 
+                  {
+                    $boolCheck = false;
+                    $rs['msg'] = $r['status']['msg'].' , cannot be unsell';
+                    break;
+                  }
+                }
+
+                if ($boolCheck) {
+                    for ($i=0; $i < count($checkStep); $i++) { 
+                      $r = $checkStep[$i];
+                      $tbl = $r['tbl'];
+                      $primary = $r['primary'];
+                      $relationTbl =  $r['relationTbl'];
+                      $param = $r['param'];
+
+                      if (count($relationTbl) > 0) {
+                        for ($z=0; $z < count($relationTbl); $z++) { 
+                          $this->db->where($primary,$param[$primary]);
+                          $this->db->delete($relationTbl[$z]);
+                        }
+                      }
+
+                      $this->db->where($primary,$param[$primary]);
+                      $this->db->delete($tbl);
+                      if ($this->db->affected_rows() > 0) {
+                        $checkStep[$i]['action'] = 'Proses deleted has been finished';
+                      }
+                      
+                    }
+
+                    // update formuli global dengan status = 0 unused
+                      $this->db->where('FormulirCodeGlobal',$No_Ref);
+                      $this->db->update('db_admission.formulir_number_global',['Status' => 0]);
+                      $checkStep[] = [
+                        'tbl' => 'db_admission.formulir_number_global',
+                        'primary' => 'FormulirCodeGlobal',
+                        'desc' => 'Process Data Formulir',
+                        'required' => 1,
+                        'relationTbl' => [],
+                        'return' => 'No_Ref',
+                        'status' => ['status' => 1,'msg' => 'Process Data finish'],
+                        'action' => ($this->db->affected_rows() > 0) ? 'Update Status = 0 (In) finish ' : 'No Action',
+                      ];
+                    // update formulir_number_online_m (Status = 0 / in,NoKwitansi = NULL,No_Ref = '')
+                        $this->db->where('No_Ref',$No_Ref);
+                        $this->db->update('db_admission.formulir_number_online_m',[
+                          'Status' => 0,
+                          'NoKwitansi' => NULL,
+                          'No_Ref' => ''
+                        ]);
+
+                        $checkStep[] = [
+                          'tbl' => 'db_admission.formulir_number_online_m',
+                          'primary' => 'No_Ref',
+                          'desc' => 'Process Data Formulir',
+                          'required' => 1,
+                          'relationTbl' => [],
+                          'return' => 'No_Ref',
+                          'status' => ['status' => 1,'msg' => 'Process Data finish'],
+                          'action' => ($this->db->affected_rows() > 0) ? 'Update Status = 0 (in),NoKwitansi = NULL,No_Ref = "" finish ' : 'No Action',
+                        ];
+
+                    // delete data register_verified dan register_verification
+                        $this->db->where('FormulirCode',$FormulirCode);
+                        $this->db->delete('db_admission.register_verified');
+                        $checkStep[] = [
+                          'tbl' => 'db_admission.register_verified',
+                          'primary' => 'FormulirCode',
+                          'desc' => 'Process Data Formulir',
+                          'required' => 1,
+                          'relationTbl' => [],
+                          'return' => 'RegVerificationID',
+                          'status' => ['status' => 1,'msg' => 'Process Data finish'],
+                          'action' => ($this->db->affected_rows() > 0) ? 'Proses deleted has been finished' : 'No Action',
+                        ];
+
+                        $this->db->where('ID',$RegVerificationID);
+                        $this->db->delete('db_admission.register_verification');
+                        $checkStep[] = [
+                          'tbl' => 'db_admission.register_verification',
+                          'primary' => 'FormulirCode',
+                          'desc' => 'Process Data Formulir',
+                          'required' => 1,
+                          'relationTbl' => [],
+                          'return' => 'RegisterID',
+                          'status' => ['status' => 1,'msg' => 'Process Data finish'],
+                          'action' => ($this->db->affected_rows() > 0) ? 'Proses deleted has been finished' : 'No Action',
+                        ];
+
+                        // insert register_unsell_formulir
+                        $this->db->insert('db_admission.register_unsell_formulir',[
+                          'RegisterID' => $RegisterID,
+                          'TodoAction' => json_encode($checkStep),
+                          'UpdatedBy' => $this->session->userdata('NIP'),
+                          'UpdatedAt' => date('Y-m-d H:i:s'),
+                        ]);
+
+
+                    $rs['Status'] = 1;
+                    $rs['msg'] = 'Unsell Success';
+                }
+
+                $rs['callback'] = $checkStep;
+               
+            }
+            else{
+              $rs['msg'] = 'Data cannot be unsell, formulir does not exist';
+            }  
+        
+            echo json_encode($rs);
           break;
         default:
           # code...

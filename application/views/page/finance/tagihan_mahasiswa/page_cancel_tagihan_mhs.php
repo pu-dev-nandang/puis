@@ -282,13 +282,14 @@
                       // if (Data_mhs[i]['DetailPayment'].length == 1) 
                       if (Data_mhs[i]['DetailPayment'].length > 0) { 
                         // show bintang
-                        var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
+                        // var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
+                        var bintang = setBintangFinance(Data_mhs[i]['Pay_Cond']);
                         t_array.push(Data_mhs[i]['Nama']);
                         $('#dataRow').append(tr +
                                                '<td>'+inputCHK+'</td>' +
                                                '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                                                // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                                               '<td>'+bintang+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
+                                               '<td>'+bintang+'<br/>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                                                // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                                                // '<td>'+Data_mhs[i]['Year']+'</td>' +
                                                '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +

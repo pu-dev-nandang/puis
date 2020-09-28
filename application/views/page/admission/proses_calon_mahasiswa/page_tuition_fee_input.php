@@ -1,4 +1,7 @@
 <div class="col-md-12">
+	<div style="padding: 10px;">
+		<p style="color: red;">Note : <br/>Tagihan berdasarkan <b>Tahun Akademik Admisi</b> </p>
+	</div>
 	<div id = "divTableData"></div>
 </div>
 <script type="text/javascript">
@@ -44,14 +47,47 @@
 	    	table += '</tbody>' ;	
 	    	table += '</table>' ;	
 	    	$("#divTableData").html(div+table+enddiv);
-	    	/*$("#divTableData").append(
-	    		'<div class="col-xs-12" align = "right">'+
-	   				'<button class="btn btn-inverse btn-notification btn-Save hide" id="btn-Save">Submit</button>'+
-				'</div>'
-	    		);*/
 	    	callback();
 	    }
 	    
+	}
+
+	function generateIsiPayment(dataFilter,dataDiscount,DiskonSPP){
+		var isi_payment = '';
+		for (var j = 0; j < payment_type.length; j++) {
+			var selecTOption = '<div class = "form-group" ><label>Discount </label> <select class="selecTOption getDom" id="'+payment_type[j]['Abbreviation']+dataFilter['ID_register_formulir']+'" id-formulir = "'+dataFilter['ID_register_formulir']+'" payment-type = "Discount-'+payment_type[j]['Abbreviation']+'" payment-type_ID = "'+payment_type[j]['ID']+'">';
+			var value_cost = 0;
+				for(var key in dataFilter) {
+					if (key == payment_type[j]['Abbreviation']) {
+						value_cost = dataFilter[key];
+					}
+				}
+			$('#'+payment_type[j]['Abbreviation']+dataFilter['ID_register_formulir']).empty();			
+			for (var k = 0; k < dataDiscount.length; k++) {
+				if (payment_type[j]['Abbreviation'] == 'SPP') {
+					var selected = (dataDiscount[k]['Discount']==DiskonSPP) ? 'selected' : '';
+				}
+				else
+				{
+					var selected = (dataDiscount[k]['Discount']==0) ? 'selected' : '';
+				}
+
+				selecTOption += '<option value="'+dataDiscount[k]['Discount']+'" '+selected+'>'+dataDiscount[k]['Discount']+'%'+'</option>';
+			}	
+			selecTOption += '</select></div>';
+			
+			if (payment_type[j]['Abbreviation'] == 'SPP') {
+				value_cost = value_cost - ((DiskonSPP/100)*value_cost);
+				value_cost = value_cost.toFixed(2);
+			}	
+			var cost = '<input class="form-control costInput getDom" id="cost_'+dataFilter['ID_register_formulir']+'" id-formulir = "'+dataFilter['ID_register_formulir']+'" value = "'+value_cost+'" payment-type = "'+payment_type[j]['Abbreviation']+'" payment-type_ID = "'+payment_type[j]['ID']+'" readonly style = "color:blue;">';
+
+			var btnSetPotonganLain = '<div class = "row contentPotonganLain"><div class = "col-md-12"><button class = "btn btn-sm btn-primary btnSetPotonganLain" id-formulir = "'+dataFilter['ID_register_formulir']+'" payment-type = "'+payment_type[j]['Abbreviation']+'" payment-type_ID = "'+payment_type[j]['ID']+'" style = "color: #151414;background-color: #86b746;width:100%;">Set Potongan Lain</button></div></div>';
+
+			isi_payment += '<td>'+selecTOption+'<div class = "form-group"><label style = "color:green;">Harga</label> '+cost+'</div>'+btnSetPotonganLain+'</td>';
+		}
+
+		return isi_payment;
 	}
 
 	function loadDataTable()
@@ -60,56 +96,10 @@
 		max_cicilan = getDataCalonMhs[0]['getMaxCicilan'];
 		for (var i = 0; i < getDataCalonMhs.length; i++) {
 			var DiskonSPP = getDataCalonMhs[i]['DiskonSPP'];
-			var isi_payment = '';
 			var getDiscount = getDataCalonMhs[i]['getDiscount'];
 			var getBeasiswa = getDataCalonMhs[i]['getBeasiswa'];
 			var getDocument = getDataCalonMhs[i]['Document'];
-				for (var j = 0; j < payment_type.length; j++) {
-					/*var selecTOption = '<select class="select2-select-00 col-md-4 full-width-fix" id="'+payment_type[j]['Abbreviation']+getDataCalonMhs[i]['ID_register_formulir']+'">'+
-								    '<option></option>'+
-								'</select>';*/
-					var selecTOption = '<select class="selecTOption getDom" id="'+payment_type[j]['Abbreviation']+getDataCalonMhs[i]['ID_register_formulir']+'" id-formulir = "'+getDataCalonMhs[i]['ID_register_formulir']+'" payment-type = "Discount-'+payment_type[j]['Abbreviation']+'" payment-type_ID = "'+payment_type[j]['ID']+'">';
-					var value_cost = 0;
-						for(var key in getDataCalonMhs[i]) {
-							// console.log('key = ' + key + '? ' + 'getDataCalonMhs[i][key] = ' + getDataCalonMhs[i][key]);
-							if (key == payment_type[j]['Abbreviation']) {
-								value_cost = getDataCalonMhs[i][key];
-							}
-						}
-					$('#'+payment_type[j]['Abbreviation']+getDataCalonMhs[i]['ID_register_formulir']).empty();			
-					/*for (var k = 0; k <= 100; k=k+5) {
-						if (payment_type[j]['Abbreviation'] == 'SPP') {
-							var selected = (k==DiskonSPP) ? 'selected' : '';
-						}
-						else
-						{
-							var selected = (k==0) ? 'selected' : '';
-						}
-
-						selecTOption += '<option value="'+k+'" '+selected+'>'+k+'%'+'</option>';
-					}*/
-					for (var k = 0; k < getDiscount.length; k++) {
-						if (payment_type[j]['Abbreviation'] == 'SPP') {
-							var selected = (getDiscount[k]['Discount']==DiskonSPP) ? 'selected' : '';
-						}
-						else
-						{
-							var selected = (getDiscount[k]['Discount']==0) ? 'selected' : '';
-						}
-
-						selecTOption += '<option value="'+getDiscount[k]['Discount']+'" '+selected+'>'+getDiscount[k]['Discount']+'%'+'</option>';
-					}	
-					selecTOption += '</select>';
-					
-					if (payment_type[j]['Abbreviation'] == 'SPP') {
-						value_cost = value_cost - ((DiskonSPP/100)*value_cost);
-						value_cost = value_cost.toFixed(2);
-						// console.log(value_cost);
-					}	
-					var cost = '<input class="form-control costInput getDom" id="cost_'+getDataCalonMhs[i]['ID_register_formulir']+'" id-formulir = "'+getDataCalonMhs[i]['ID_register_formulir']+'" value = "'+value_cost+'" payment-type = "'+payment_type[j]['Abbreviation']+'" payment-type_ID = "'+payment_type[j]['ID']+'" readonly>';
-					isi_payment += '<td>'+selecTOption+'<br><br>'+cost+'</td>';
-					//isi_payment += '<td>'+selecTOption+'</td>';
-				}
+			var isi_payment = generateIsiPayment(getDataCalonMhs[i],getDiscount,DiskonSPP);
 
 			var selecTOption = '<select class="getBeasiswa" id-formulir = "'+getDataCalonMhs[i]['ID_register_formulir']+'" id = "getBeasiswa'+getDataCalonMhs[i]['ID_register_formulir']+'" >';
 			for (var k = 0; k < getBeasiswa.length; k++) {
@@ -118,7 +108,6 @@
 				}
 				else
 				{
-					//var selected = (k==0) ? 'selected' : '';
 					if (k == 0) {
 						selecTOption += '<option value="'+'0'+'" '+selected+'>'+'Tidak Beasiswa'+''+'</option>';
 					}
@@ -149,12 +138,28 @@
 
 			var Code = (getDataCalonMhs[i]['No_Ref'] != '') ? getDataCalonMhs[i]['FormulirCode'] + ' / ' + getDataCalonMhs[i]['No_Ref'] : getDataCalonMhs[i]['FormulirCode'];
 			var Rangking = (getDataCalonMhs[i]['RangkingRapor'] != 0) ? 'Rangking : '+getDataCalonMhs[i]['RangkingRapor'] : "";
+
+			// select option bintang
+				let selectOptionBintang = '<select style = "color:orange;" class = "form-control selectBintang" id-formulir = "'+getDataCalonMhs[i]['ID_register_formulir']+'">';
+				const dataSchemaPayment =  getDataCalonMhs[i].SchemaPayment;
+				for (var z = 0; z < dataSchemaPayment.length; z++) {
+					const selectedBintangDefault = (z == 0) ? 'selected' : '';
+					const JumlahBintang = dataSchemaPayment[z].JumlahBintang;
+					let bintang = '';
+					for (var zz = 1; zz <= JumlahBintang; zz++) {
+						bintang += '*';
+					}
+					selectOptionBintang += '<option value = "'+JumlahBintang+'" '+selectedBintangDefault+' >Schema payment '+bintang+'</option>';
+				}
+
+				selectOptionBintang += '</select>';
+
 			$(".tableData tbody").append(
 					'<tr id = "id_formulir'+getDataCalonMhs[i]['ID_register_formulir']+'">'+
 						'<td align= "center">'+no+'&nbsp<input type="checkbox" nama ="'+getDataCalonMhs[i]['Name']+'" class="uniform" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'" email ="'+getDataCalonMhs[i]['Email']+'">'+'</td>'+
 						'<td>'+getDataCalonMhs[i]['Name']+'<br>'+getDataCalonMhs[i]['NamePrody']+'<br>'+getDataCalonMhs[i]['SchoolName']+'</td>'+
 						'<td>'+Code+'</td>'+
-						'<td>'+selecTOption+'<br><br>'+selecTOption2+'<br><br>'+Rangking+'<br><br>'+showFile+'</td>'+
+						'<td>'+selecTOption+'<br><br>'+selecTOption2+'<br><br>'+selectOptionBintang+'<br><br>'+Rangking+'<br><br>'+showFile+'</td>'+
 						//'<td>'+getDataCalonMhs[i]['NamePrody']+'</td>'+
 						//'<td>'+getDataCalonMhs[i]['SchoolName']+'</td>'+
 						isi_payment+
@@ -193,14 +198,14 @@
 		for (var i = 0; i < getDataCalonMhs.length; i++) {
 			if (id_formulir == getDataCalonMhs[i]['ID_register_formulir']) {
 				for(var key in getDataCalonMhs[i]) {
-					// console.log('key = ' + key + '? ' + 'getDataCalonMhs[i][key] = ' + getDataCalonMhs[i][key]);
 					var keyTemp = 'Discount-'+key;
 					if (keyTemp == payment_type) {
 						value_cost = getDataCalonMhs[i][key];
 					}
 				}
 			}
-		}	
+		}
+		
 		value_cost = value_cost - ((valuee/100)*value_cost);
 		value_cost = value_cost.toFixed(2);
 		var payment_type_input = payment_type.split("-");
@@ -208,4 +213,43 @@
 		$('.costInput').maskMoney({thousands:'.', decimal:',', precision:2,allowZero: true});
 		$('.costInput').maskMoney('mask', '9894');
 	});
+
+	$(document).on('change','.selectBintang',function(e){
+		const itsme =  $(this);
+		let id_formulir = $(this).attr('id-formulir');
+		let selectedBintang  = $(this).val();
+		let getData = getDataCalonMhs.filter(x => x.ID_register_formulir === id_formulir)
+		let getIndex = getDataCalonMhs.findIndex(x => x.ID_register_formulir === id_formulir)
+
+		let SchemaPayment = (getData[0].SchemaPayment).filter(x=>x.JumlahBintang === selectedBintang)
+		let getTuitionFee = SchemaPayment[0].TuitionFee;
+		
+		for(key in getTuitionFee){
+			getDataCalonMhs[getIndex][key] = getTuitionFee[key];
+		}
+
+		// remove
+		const d = 4;
+		for (var i = 0; i < 4; i++) {
+			itsme.closest('tr').find('td:eq('+d+')').remove();
+		}
+
+		var DiskonSPP = getDataCalonMhs[getIndex]['DiskonSPP'];
+		var getDiscount = getDataCalonMhs[getIndex]['getDiscount'];
+		var isi_payment = generateIsiPayment(getDataCalonMhs[getIndex],getDiscount,DiskonSPP);
+		// create it
+		itsme.closest('tr').find('td:eq(3)').after(isi_payment);
+		$('.costInput').maskMoney({thousands:'.', decimal:',', precision:2,allowZero: true});
+		$('.costInput').maskMoney('mask', '9894');
+
+		// clear data potongan lain
+		dataInputPotonganLain = dataInputPotonganLain.filter(x => {
+		    if (x.ID_register_formulir === id_formulir) {
+		        return false;
+		    }
+		    return true;
+		});
+
+	})
+
 </script>

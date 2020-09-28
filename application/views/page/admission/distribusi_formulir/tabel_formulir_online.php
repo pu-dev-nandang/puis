@@ -31,6 +31,9 @@
 					<th>Email</th>
 					<th>Phone</th>
 					<th>Sekolah</th>
+					<?php if (isset($action) && $action == 'actionColoumn' ): ?>
+						<th>Action</th>	
+					<?php endif ?>
 				</tr>
 			</thead>
 			<tbody> 
@@ -63,6 +66,9 @@
 							 	<td><?php echo $datadb[$i]['Email'] ?></td>
 							 	<td><?php echo ($datadb[$i]['Phone'] != '') ? '+'.$datadb[$i]['Phone'] : '' ?></td>
 							 	<td><?php echo $datadb[$i]['SchoolName'] ?></td>
+							 	<?php if (isset($action) && $action == 'actionColoumn' ): ?>
+							 		<td> <button class="btn btn-default btnActionITAdmission">Action</button> </td>
+							 	<?php endif ?>
 							 </tr>
 				<?php endfor; ?>
 			</tbody>

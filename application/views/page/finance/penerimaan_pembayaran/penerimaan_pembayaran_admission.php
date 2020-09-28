@@ -80,7 +80,7 @@
                         '<th>Cicilan</th>'+
                         '<th>Document</th>'+
                         '<th>Status</th>'+
-                        '<th>Detail Payment</th>'+
+                        '<th>Action</th>'+
                     '</tr>'+
                     '</thead>'+
                     '<tbody id="dataRow"></tbody>'+
@@ -242,6 +242,7 @@
          var DetailPaymentArr = resultJson['data'];
          var action = resultJson['action'];
          dataRefund =  resultJson['dataRefund'];
+         const dataTuitionFee =  resultJson['dataTuitionFee'];
          var isi = '';
          for (var j = 0; j < DetailPaymentArr.length; j++) {
            var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
@@ -280,6 +281,10 @@
          table += '</table>' ;
 
          html += table;
+
+         html += '<hr/>';
+
+         html += IntakePaymentDetailDiscount.htmlWr(dataTuitionFee);
 
          if (dataRefund.length > 0) {
               html  += '<br/>';

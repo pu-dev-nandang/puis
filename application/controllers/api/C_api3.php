@@ -3460,25 +3460,33 @@ class C_api3 extends CI_Controller {
                                           WHERE em.ProdiID = "'.$data[$i]['ID'].'" AND em.Serdos="1"
                                           AND (em.StatusForlap = "1" || em.StatusForlap = "2")  ')->result_array();
 
+                // untuk certified tanpa serdos
+                $dataEmpCerti2 = $dataEmp;
 
                 $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti;
 
                 for ($y=0; $y < count($arrCertificateType) ; $y++) { 
                    $data[$i]['Certificate_'.$arrCertificateType[$y]] = [];
                 }
-
-                for ($x=0; $x < count($dataEmpCerti); $x++) { 
+                
+                for ($x=0; $x < count($dataEmpCerti2); $x++) { 
                    for ($z=0; $z < count($arrCertificateType); $z++) { 
-                       $dt = $this->db->query(
-                           'select a.*,"'.$dataEmpCerti[$x]['Name'].'" as NameDosen, "'.$dataEmpCerti[$x]['NIDN'].'" as NIDN from db_employees.employees_certificate as a where a.NIP = "'.$dataEmpCerti[$x]['NIP'].'" 
+                        $sql = 'select a.*,"'.$dataEmpCerti2[$x]['Name'].'" as NameDosen, "'.$dataEmpCerti2[$x]['NIDN'].'" as NIDN from db_employees.employees_certificate as a where a.NIP = "'.$dataEmpCerti2[$x]['NIP'].'" 
                             and a.StatusEdit = 1 and a.Certificate = "'.$arrCertificateType[$z].'"
 
-                           '
+                           ';
+                       $dt = $this->db->query(
+                           $sql
                        )->result_array();
 
+
                        if (count($dt) > 0) {
-                           $data[$i]['Certificate_'.$arrCertificateType[$z]] = $data[$i]['Certificate_'.$arrCertificateType[$z]] + $dt;
+
+                           // $data[$i]['Certificate_'.$arrCertificateType[$z]] = $data[$i]['Certificate_'.$arrCertificateType[$z]] + $dt;
+                            $data[$i]['Certificate_'.$arrCertificateType[$z]] = array_merge($data[$i]['Certificate_'.$arrCertificateType[$z]],$dt);
                        }
+
+                       
                    }
                 }
 
@@ -3531,15 +3539,45 @@ class C_api3 extends CI_Controller {
                 //
                 if($SemesterID>=13){
 
-                    $StatusFolap = '';
-                    if($Status=='1' || $Status==1){
+                    $StatusFolap = ''; // value status all(0) 
+                    if($Status=='1' || $Status==1 || $Status=='99' || $Status==99){
                         $StatusFolap = ' AND (em.StatusForlap = "1" OR em.StatusForlap = "2")';
                     }
                     else if($Status=='2' || $Status==2){
                         $StatusFolap = ' AND em.StatusForlap = "0"';
                     }
 
-                    $dataSchedule = $this->db->query('SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap FROM db_academic.schedule_details_course sdc
+                    // condition dosen tetap tidak mengajar
+                    if ($Status=='99' || $Status == 99 )  {
+                         $dataSchedule = $this->db->query(' select * from (
+                                                        SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap FROM db_academic.schedule_details_course sdc
+                                                              LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
+                                                              LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
+                                                               WHERE sc.SemesterID = "'.$SemesterID.'"
+                                                               AND sdc.ProdiID = "'.$data[$i]['ID'].'"
+                                                               AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                               '.$StatusFolap.'
+                                                        UNION
+                                                            Select em.NIP,em.NUP, em.NIDN, em.NIDK, em.Name,em.StatusForlap from
+                                                            db_employees.employees as em 
+                                                                where em.NIP not in (
+                                                                    select sc.Coordinator from db_academic.schedule_details_course as sdc
+                                                                    join db_academic.schedule as sc ON (sc.ID = sdc.ScheduleID)
+                                                                    join db_employees.employees as em on sc.Coordinator = em.NIP
+                                                                    where 
+                                                                    sc.SemesterID = "'.$SemesterID.'" AND
+                                                                    em.ProdiID = "'.$data[$i]['ID'].'"
+                                                                    '.$StatusFolap.'
+                                                                )
+                                                                AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                                   '.$StatusFolap.'
+                                                                
+                                                        )xx
+                                                                GROUP BY NIP ')->result_array();
+                    }
+                    else
+                    { // Tidak All
+                        $dataSchedule = $this->db->query('SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap FROM db_academic.schedule_details_course sdc
                                                               LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
                                                               LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
                                                                WHERE sc.SemesterID = "'.$SemesterID.'"
@@ -3547,6 +3585,9 @@ class C_api3 extends CI_Controller {
                                                                AND em.ProdiID = "'.$data[$i]['ID'].'"
                                                                '.$StatusFolap.'
                                                                 GROUP BY sc.Coordinator ')->result_array();
+                    }
+
+                    
 
                     $data[$i]['Lecturer_Sch_Co'] = $dataSchedule;
 

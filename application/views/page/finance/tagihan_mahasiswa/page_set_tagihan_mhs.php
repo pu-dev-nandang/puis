@@ -232,7 +232,8 @@
                         var selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+Data_mhs[i]['Cost']+'">';
 
                        var value_cost = Data_mhs[i]['Cost'] - ((Data_mhs[i]['Discount']/100)*Data_mhs[i]['Cost']);
-                       var yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
+                       // var yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
+                       var yy = formatRupiah(value_cost);
                        
                        if(PTID == 3 || PTID == 6)
                        {
@@ -270,8 +271,9 @@
                         var priceLabel = (Data_mhs[i]['Cost'] != '') ? formatRupiah(Data_mhs[i]['Cost']) : '-';
 
                         // show bintang
-                        var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
-
+                        // var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
+                        var bintang = setBintangFinance(Data_mhs[i]['Pay_Cond']);
+                        // console.log(Data_mhs[i]['Pay_Cond']);
                         var inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Name']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+res[1]+'">';
                         if (yy == '-') {
                           inputCHK = '';
@@ -298,7 +300,7 @@
                            // '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                            '<td>'+Data_mhs[i]['ProdiEng']+'</td>' +
                            // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                           '<td>'+bintang+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
+                           '<td>'+bintang+'<br/>'+Data_mhs[i]['Name']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                            // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                            // '<td>'+Data_mhs[i]['ClassOf']+'</td>' +
                            '<td>'+img+'</td>' +

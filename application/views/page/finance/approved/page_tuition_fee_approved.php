@@ -74,19 +74,27 @@
 			var isi_payment = '';
 			for (var j = 0; j < payment_type.length; j++) {
 				var value_cost = 0;
+				var potonganLain = '';
 					for(var key in getDataCalonMhs[i]) {
 						// var keyDiscount = 
 						if (key == payment_type[j]['Abbreviation']) {
 							value_cost = getDataCalonMhs[i][key];
 							DiskonSPP = getDataCalonMhs[i]['Discount-'+key];
+							const dataPotongan = getDataCalonMhs[i]['PotonganLain-'+key];
+							if (dataPotongan.length > 0) {
+								potonganLain = '<br/><br/><label>Potongan Lain</label>';
+								for (var zz = 0; zz < dataPotongan.length; zz++) {
+									potonganLain += '<li style = "color:blue;">'+dataPotongan[zz]['DiscountName']+' : '+formatRupiah(dataPotongan[zz]['DiscountValue'])+'</li>'
+								}
+							}
 						}
 					}
-				isi_payment += '<td>Invoice : '+value_cost+'<br> Discount : '+DiskonSPP+'%</td>';
+				isi_payment += '<td style = "color:green;">Invoice : '+value_cost+'<br> Discount : '+DiskonSPP+'%'+potonganLain+'</td>';
 				//isi_payment += '<td>'+DiskonSPP+'%</td>';
 			}
 
 			if (getDataCalonMhs[i]['getFile'] != '-') {
-				showFile = '<a href="javascript:void(0)" class="show_a_href" id = "show'+getDataCalonMhs[i]['ID_register_formulir']+'" filee = "'+getDataCalonMhs[i]['getFile']+'" Email = "'+getDataCalonMhs[i]['Email']+'">File</a>';
+				showFile = '<a href="javascript:void(0)" class="show_a_href" id = "show'+getDataCalonMhs[i]['ID_register_formulir']+'" filee = "'+getDataCalonMhs[i]['getFile']+'" Email = "'+getDataCalonMhs[i]['Email']+'">Show</a>';
 			}
 			else
 			{
@@ -96,12 +104,12 @@
 			var Code = (getDataCalonMhs[i]['No_Ref'] != '') ? getDataCalonMhs[i]['FormulirCode'] + ' / ' + getDataCalonMhs[i]['No_Ref'] : getDataCalonMhs[i]['FormulirCode'];
 			var Code2 = (getDataCalonMhs[i]['No_Ref'] != '') ? getDataCalonMhs[i]['No_Ref'] : getDataCalonMhs[i]['FormulirCode'];
 			var Rangking = (getDataCalonMhs[i]['RangkingRapor'] != 0) ? 'Rangking : '+getDataCalonMhs[i]['RangkingRapor'] : "";
-			var btn_print = '<span data-smt="'+Code2+'" class="btn btn-xs btn-print btn-read" id-register-formulir="'+getDataCalonMhs[i]['ID_register_formulir']+'"><i class="fa fa-print"></i> Print</span>'
+			var btn_print = '<span data-smt="'+Code2+'" class="btn btn-xs btn-print btn-read" id-register-formulir="'+getDataCalonMhs[i]['ID_register_formulir']+'"><i class="fa fa-print"></i> Print</span>';
 			var RevID = (getDataCalonMhs[i]['Rev'] == 0) ? '' : '<br><a href="javascript:void(0)" class="showModal" id-register-formulir="'+getDataCalonMhs[i]['ID_register_formulir']+'">Revision '+getDataCalonMhs[i]['Rev']+'x</a>'
 			$(".tableData tbody").append(
 					'<tr>'+
 						'<td align= "center">'+no+'&nbsp<input type="checkbox" class="uniform" nama ="'+getDataCalonMhs[i]['Name']+'" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'" </td>'+
-						'<td>'+'<span style="color: #c77905;">'+getDataCalonMhs[i]['Name']+'</span>'+'<br>'+'<span style="color: #c77905;">'+getDataCalonMhs[i]['NamePrody']+'</span>'+'<br>'+getDataCalonMhs[i]['SchoolName']+'<br>'+'<span style="color: #20525a;">'+getDataCalonMhs[i]['CreateAT']+'</span>'+'</td>'+
+						'<td>'+setBintangFinance(getDataCalonMhs[i]['Pay_Cond'])+'<br/>'+'<span style="color: #c77905;">'+getDataCalonMhs[i]['Name']+'</span>'+'<br>'+'<span style="color: #c77905;">'+getDataCalonMhs[i]['NamePrody']+'</span>'+'<br>'+getDataCalonMhs[i]['SchoolName']+'<br>'+'<span style="color: #20525a;">'+getDataCalonMhs[i]['CreateAT']+'</span>'+'</td>'+
 						'<td>'+Code+'</td>'+
 						'<td>'+getDataCalonMhs[i]['getBeasiswa']+'<br><br>'+Rangking+'<br><br>'+showFile+'</td>'+
 						isi_payment+

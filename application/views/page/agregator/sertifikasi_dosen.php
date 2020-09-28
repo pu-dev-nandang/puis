@@ -88,16 +88,16 @@
                     var viewLectCerd = (v.TotalLecturerCertifies.length>0) ? '<a href="javascript:void(0);" class="showDetailLect" data-lec="'+tokenLect_2+'">'+v.TotalLecturerCertifies.length+'</a>' : v.TotalLecturerCertifies.length;
                     
                     var tokenCertificate_Profesional = jwt_encode(v.Certificate_Profesional,'UAP)(*');
-                    var viewCertificate_Profesional = (v.Certificate_Profesional.length>0) ? '<a href="javascript:void(0);" class="showDetailSertifikat" data-lec="'+tokenCertificate_Profesional+'">'+v.Certificate_Profesional.length+'</a>' : v.Certificate_Profesional.length;
+                    var viewCertificate_Profesional = (v.Certificate_Profesional.length>0) ? '<a href="javascript:void(0);" class="showDetailSertifikat" data-lec="'+tokenCertificate_Profesional+'" title = "'+v.Name+' - '+'Profesional'+'">'+v.Certificate_Profesional.length+'</a>' : v.Certificate_Profesional.length;
 
                     var tokenCertificate_Profesi = jwt_encode(v.Certificate_Profesi,'UAP)(*');
-                    var viewCertificate_Profesi = (v.Certificate_Profesi.length>0) ? '<a href="javascript:void(0);" class="showDetailSertifikat" data-lec="'+tokenCertificate_Profesi+'">'+v.Certificate_Profesi.length+'</a>' : v.Certificate_Profesi.length;
+                    var viewCertificate_Profesi = (v.Certificate_Profesi.length>0) ? '<a href="javascript:void(0);" class="showDetailSertifikat" data-lec="'+tokenCertificate_Profesi+'" title = "'+v.Name+' - '+'Profesi'+'">'+v.Certificate_Profesi.length+'</a>' : v.Certificate_Profesi.length;
 
                     var tokenCertificate_Kompetensi = jwt_encode(v.Certificate_Kompetensi,'UAP)(*');
-                    var viewCertificate_Kompetensi = (v.Certificate_Kompetensi.length>0) ? '<a href="javascript:void(0);" class="showDetailSertifikat" data-lec="'+tokenCertificate_Kompetensi+'">'+v.Certificate_Kompetensi.length+'</a>' : v.Certificate_Kompetensi.length;
+                    var viewCertificate_Kompetensi = (v.Certificate_Kompetensi.length>0) ? '<a href="javascript:void(0);" class="showDetailSertifikat" data-lec="'+tokenCertificate_Kompetensi+'" title = "'+v.Name+' - '+'Kompetensi'+'">'+v.Certificate_Kompetensi.length+'</a>' : v.Certificate_Kompetensi.length;
 
                     var tokenCertificate_Industri = jwt_encode(v.Certificate_Industri,'UAP)(*');
-                    var viewCertificate_Industri = (v.Certificate_Industri.length>0) ? '<a href="javascript:void(0);" class="showDetailSertifikat" data-lec="'+tokenCertificate_Industri+'">'+v.Certificate_Industri.length+'</a>' : v.Certificate_Industri.length;
+                    var viewCertificate_Industri = (v.Certificate_Industri.length>0) ? '<a href="javascript:void(0);" class="showDetailSertifikat" data-lec="'+tokenCertificate_Industri+'" title = "'+v.Name+' - '+'Industri'+'">'+v.Certificate_Industri.length+'</a>' : v.Certificate_Industri.length;
 
                     $('#listData').append('<tr>' +
                         '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
@@ -106,8 +106,8 @@
                         '<td style="border-left: 1px solid #ccc;">'+viewLectCerd+'</td>' +
                         '<td style="border-left: 1px solid #ccc;">'+viewCertificate_Profesional+'</td>' +
                         '<td style="border-left: 1px solid #ccc;">'+viewCertificate_Profesi+'</td>' +
-                        '<td style="border-left: 1px solid #ccc;">'+viewCertificate_Kompetensi+'</td>' +
                         '<td style="border-left: 1px solid #ccc;">'+viewCertificate_Industri+'</td>' +
+                        '<td style="border-left: 1px solid #ccc;">'+viewCertificate_Kompetensi+'</td>' +
                         '</tr>');
 
                     ds = ds + parseInt(v.TotalLecturer.length);
@@ -184,25 +184,27 @@
     $(document).on('click','.showDetailSertifikat',function () {
         var  tokenLect = $(this).attr('data-lec');
         var d = jwt_decode(tokenLect,'UAP)(*');
-
+        // console.log(d);
+        var modalTitle = $(this).attr('title');
         let tr  = '';
 
         for (var i = 0; i < d.length; i++) {
             const r  = d[i];
+            const dueDateShow = (r.Lifetime == 1 || r.Lifetime == '1') ? 'Lifetime' : ((r.Duedate!='' && r.Duedate!=null)
+                        ? moment(r.Duedate).format('DD MMM YYYY') : '');
             tr += '<tr>'+
                         '<td>'+(i+1)+'</td>'+
                         '<td>'+r.NIDN+'</td>'+
                         '<td>'+r.NameDosen+'</td>'+
                         '<td>'+((r.PublicationYear!='' && r.PublicationYear!=null)
                         ? moment(r.PublicationYear).format('DD MMM YYYY') : '')+'</td>'+
-                        '<td>'+((r.Duedate!='' && r.Duedate!=null)
-                        ? moment(r.Duedate).format('DD MMM YYYY') : '')+'</td>'+
+                        '<td>'+dueDateShow+'</td>'+
                         '<td>'+((r.File!='' && r.File!=null) ? '<a class="btn btn-sm btn-default" target="_blank" href="'+base_url_js+'uploads/certificate/'+r.File+'">Download</a>' : '')+'</td>'+
                   '</tr>';
         }
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">'+d.Prodi+' - '+d.Desc+'</h4>');
+            '<h4 class="modal-title">'+modalTitle+'</h4>');
         $('#GlobalModal .modal-body').html('<div class="row">' +
             '    <div class="col-md-12">' +
             '        <table class="table table-striped" id="tableLect" style="margin-bottom: 0px;">' +

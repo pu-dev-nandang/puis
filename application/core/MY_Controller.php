@@ -78,7 +78,7 @@ abstract class Globalclass extends MyAbstract{
 
     }
 
-    public function template($content)
+    public function template($content,$ClassContainerTemplate = '')
     {
 
         $data['include'] = $this->load->view('template/include','',true);
@@ -88,7 +88,9 @@ abstract class Globalclass extends MyAbstract{
             $data['header'] = $this->menu_header();
             $data['navigation'] = $this->menu_navigation();
             $data['crumbs'] = $this->crumbs();
-
+            if (!empty($ClassContainerTemplate)) {
+                 $data['ClassContainer'] = $ClassContainerTemplate;
+            }
             $data['content'] = $content;
             $this->load->view('template/template',$data);
         } else {
@@ -252,7 +254,8 @@ abstract class Globalclass extends MyAbstract{
                 ) as CekIntake,
                 if(
                   (select count(*) as total from db_finance.register_refund where ID_register_formulir = e.ID ) > 0,"Refund",""
-                ) as CekRefund
+                ) as CekRefund,
+                ra.Pay_Cond,ra.PaymentShow,ra.PaymentShowTextMSG
                 from db_admission.register as a
                 LEFT join db_admission.school as b
                 on a.SchoolID = b.ID
@@ -274,6 +277,7 @@ abstract class Globalclass extends MyAbstract{
                 on e.ID = xy.ID_register_formulir
                 LEFT JOIN db_admission.register_dsn_type_m as xq
                 on xq.ID = xy.TypeBeasiswa
+                LEFT JOIN db_finance.register_admisi as ra on ra.ID_register_formulir = e.ID
                 where a.SetTa = "'.$reqTahun.'" '.$AddWhere.'
               ) ccc
             ';
@@ -330,7 +334,7 @@ abstract class Globalclass extends MyAbstract{
             $Code = ($row['No_Ref'] != "") ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
             $nestedData[] = $No;
 
-            $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['Phone'].'<br>'.$row['SchoolName'].'<br/>'.$stFormulirAct;
+            $nestedData[] = $this->m_master->setBintang_HTML($row['Pay_Cond']).'<br/>'.$row['Name'].'<br>'.$row['Email'].'<br>'.$row['Phone'].'<br>'.$row['SchoolName'].'<br/>'.$stFormulirAct;
             $nestedData[] = $row['NamePrody'].'<br>'.$Code.'<br>'.$row['VA_number'];
             $nestedData[] = $row['NameSales'];
             $nestedData[] = $row['Rangking'];
@@ -395,7 +399,7 @@ abstract class Globalclass extends MyAbstract{
             '; 
 
              $nestedData[] = $actionCol;
-
+             $nestedData['dataToken'] = $this->jwt->encode($row,"UAP)(*");
 
             $data[] = $nestedData;
             $No++;
@@ -486,9 +490,9 @@ abstract class Admission_Controler extends Globalclass{
         }
     }
 
-    public function temp($content)
+    public function temp($content,$ClassContainer = '')
     {
-        $this->template($content);
+        $this->template($content,$ClassContainer);
     }
 
 

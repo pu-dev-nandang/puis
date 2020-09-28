@@ -148,17 +148,15 @@ class C_api_menu extends CI_Controller {
                 $w_QuestionCategory = ($QuestionCategory!='')
                     ? 'AND sq.QCID = "'.$QuestionCategory.'" ' : '';
 
-                $w = $w_Type.$w_QuestionCategory;
-                $dataWhere = ' WHERE '.substr($w,3);
+                $dataWhere = $w_Type.$w_QuestionCategory;
             }
 
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
                 $dataScr = 'sq.Question LIKE "%'.$search.'%"';
-                $dataSearch = ($Type!='' || $QuestionCategory!='')
-                    ? ' AND ('.$dataScr.')'
-                    : ' WHERE '.$dataScr;
+
+                $dataSearch = ' AND ('.$dataScr.')';
             }
 
             $queryDefault = 'SELECT sq.ID, sq.Question, sq.IsRequired, sq.AnswerType,  
@@ -166,6 +164,7 @@ class C_api_menu extends CI_Controller {
                                              sqt.Description AS QuestionType FROM db_it.surv_question sq
                                             LEFT JOIN db_it.surv_question_category sqc ON (sqc.ID = sq.QCID)
                                             LEFT JOIN db_it.surv_question_type sqt ON (sqt.ID = sq.QTID) 
+                                            WHERE sq.DepartmentID = "'.$data_arr['DepartmentID'].'" 
                                             '. $dataWhere.$dataSearch;
 
             $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
@@ -490,11 +489,12 @@ class C_api_menu extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataScr = 'sq.Question LIKE "%'.$search.'%"';
-                $dataSearch = '';
+                $dataSearch = ' AND ( ss.Title LIKE "%'.$search.'%" )';
             }
 
-            $queryDefault = 'SELECT ss.* FROM db_it.surv_survey ss WHERE ss.DepartmentID = "'.$data_arr['DepartmentID'].'"  '. $dataWhere.$dataSearch;
+            $queryDefault = 'SELECT ss.* FROM db_it.surv_survey ss WHERE 
+                            ss.DepartmentID = "'.$data_arr['DepartmentID'].'"  '.
+                            $dataWhere.$dataSearch;
 
             $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
 
@@ -533,6 +533,13 @@ class C_api_menu extends CI_Controller {
 
                 $tokenBtn = $this->jwt->encode(array('ID' => $row['ID']),"UAP)(*");
 
+                $showBtnAddNewDate = ($row['Status']=='2')
+                    ? '<li class="" id="li_btn_Close_'.$row['ID'].'">
+                                        <a href="javascript:void(0);" class="btnAddNewDate" data-id="'.$row['ID'].'">Add new date 
+                                            <i style="color: #FFC107;padding-top: 3px;" class="fa fa-circle pull-right"></i></a>
+                                 </li>'
+                    : '';
+
                 $btnAct = '<div class="btn-group">
                               <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-pencil"></i> <span class="caret"></span>
@@ -544,31 +551,74 @@ class C_api_menu extends CI_Controller {
                                 <li class="'.$btnClose.'" id="li_btn_Close_'.$row['ID'].'">
                                         <a href="javascript:void(0);" class="btnCloseSurvey" data-id="'.$row['ID'].'" style="color: red;">Close</a>
                                  </li>
+                                 '.$showBtnAddNewDate.'
                                 <li role="separator" class="divider"></li>
                                 <li><a href="javascript:void(0);" class="btnEditSurvey" data-id="'.$row['ID'].'">View Survey</a></li>
                                 <li><a href="javascript:void(0);" class="btnManageTarget" data-id="'.$row['ID'].'">Manage Targets</a></li>
                                 <li><a href="'.base_url('survey/manage-question/'.$tokenBtn).'" target="_blank">Manage Question</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li class="btnShareToPublic" data-id="'.$row['ID'].'"><a href="#">Share to the public</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li class="'.$btnRemove.'"><a href="#">Remove</a></li>
                               </ul>
                             </div>';
 
                 // Cek jumlah yang sudah mengisi survey
-                $TotalYgUdahIsiSurvey = $this->db->from('db_it.surv_answer')->where('SurveyID',$row['ID'])->count_all_results();
+
+                // ketika survey blm close dan sudah close
+
+                $whereAnswerSurvey = ($row['Status']=='2') ? ' AND RecapID = (SELECT MAX(RecapID) FROM db_it.surv_answer WHERE SurveyID= "'.$row['ID'].'")'
+                    : ' AND Status = "1" ';
+                $TotalYgUdahIsiSurvey = $this->db->query('SELECT COUNT(*) AS Total FROM db_it.surv_answer 
+                                                                    WHERE SurveyID= "'.$row['ID'].'" AND 
+                                                                      FormType = "internal" '.$whereAnswerSurvey)->result_array()[0]['Total'];
+//                $TotalYgUdahIsiSurvey = $this->db->from('db_it.surv_answer')
+//                    ->where(array('SurveyID' => $row['ID'],
+//                        'FormType' => 'internal',
+//                        'Status' => '1'))->count_all_results();
                 $btnTotalAlreadyFillOut = ($TotalYgUdahIsiSurvey>0)
-                    ? '<a href="javascript:void(0)" class="showAlreadyFillOut" data-id="'.$row['ID'].'">'.$TotalYgUdahIsiSurvey.'</a>'
+                    ? '<a href="javascript:void(0)" class="showAlreadyFillOut" data-type="internal" data-status="'.$row['Status'].'" data-id="'.$row['ID'].'">'.$TotalYgUdahIsiSurvey.'</a>'
+                    : '0';
+
+                // Cek jumlah yang sudah mengisi survey external
+                $TotalYgUdahIsiSurvey_Ext = $this->db->query('SELECT COUNT(*) AS Total FROM db_it.surv_answer 
+                                                                    WHERE SurveyID= "'.$row['ID'].'" AND 
+                                                                      FormType = "external" '.$whereAnswerSurvey)->result_array()[0]['Total'];
+//                $TotalYgUdahIsiSurvey_Ext = $this->db->from('db_it.surv_answer')
+//                    ->where(array('SurveyID' => $row['ID'],
+//                        'FormType' => 'external',
+//                        'Status' => '1'))->count_all_results();
+                $btnTotalAlreadyFillOut_ext = ($TotalYgUdahIsiSurvey_Ext>0)
+                    ? '<a href="javascript:void(0)" class="showAlreadyFillOut" data-type="external" data-status="'.$row['Status'].'" data-id="'.$row['ID'].'">'.$TotalYgUdahIsiSurvey_Ext.'</a>'
                     : '0';
 
                 $TotalQuestion = $this->db->from('db_it.surv_survey_detail')->where('SurveyID',$row['ID'])->count_all_results();
                 $btnShowTotalQuestion = ($TotalQuestion>0) ? '<a href="javascript:void(0)" class="showQuestionList" data-id="'.$row['ID'].'">'.$TotalQuestion.'</a>' : '0';
 
+                $TotalFillOut = $TotalYgUdahIsiSurvey + $TotalYgUdahIsiSurvey_Ext;
+                $ShowTotalFillOut = ($TotalFillOut>0)
+                    ? '<a href="javascript:void(0)" class="showAlreadyFillOut" data-status="'.$row['Status'].'" data-type="all" data-id="'.$row['ID'].'">'.$TotalFillOut.'</a>'
+                    : '0';
+
+                $TotalRecap = $this->db->from('db_it.surv_recap')
+                                            ->where('SurveyID',$row['ID'])
+                                            ->count_all_results();
+
+                $StatusPublicationNow = ($row['Status']=='1')
+                    ? $TotalRecap + 1 : $TotalRecap;
+
+                $TotalPublication = (($StatusPublicationNow) > 0)
+                    ? '<a href="javascript:void(0)" class="showAllPublication" data-id="'.$row['ID'].'">'.$StatusPublicationNow.'</a>' : 0;
 
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$row['Title'].'</div>';
                 $nestedData[] = $btnShowTotalQuestion;
                 $nestedData[] = $btnTotalAlreadyFillOut;
+                $nestedData[] = $btnTotalAlreadyFillOut_ext;
+                $nestedData[] = '<b>'.$ShowTotalFillOut.'</b>';
                 $nestedData[] = '<div>'.$btnAct.'</div>';
                 $nestedData[] = '<div>'.$Range.'</div>';
+                $nestedData[] = $TotalPublication;
                 $nestedData[] = '<div id="viewStatusSurvey_'.$row['ID'].'">'.$Status.'</div>';
 
                 $data[] = $nestedData;
@@ -584,6 +634,164 @@ class C_api_menu extends CI_Controller {
                 "dataQuery"            => $query
             );
             echo json_encode($json_data);
+
+        }
+
+        else if($data_arr['action']=='dataAllPublication'){
+
+            // Get on recap
+            $SurveyID = $data_arr['SurveyID'];
+
+            $dataRecap = $this->db->query('SELECT sr.ID AS RecapID, 
+                                                sr.SurveyID, sr.StartDate, sr.EndDate 
+                                                    FROM db_it.surv_recap sr
+                                                    WHERE sr.SurveyID = "'.$SurveyID.'"')
+                                ->result_array();
+
+            if(count($dataRecap)>0){
+                for($i=0;$i<count($dataRecap);$i++){
+                    $dataRecap[$i]['Question'] = $this->db->from('db_it.surv_recap_question')
+                        ->where(array('SurveyID' => $SurveyID,
+                            'RecapID' => $dataRecap[$i]['RecapID']))
+                        ->count_all_results();
+
+                    $dataRecap[$i]['TotalAnswer'] = $this->db->from('db_it.surv_answer')
+                        ->where(array('SurveyID' => $SurveyID,
+                            'RecapID' => $dataRecap[$i]['RecapID']))
+                        ->count_all_results();
+
+                    $dataRecap[$i]['Status'] = "2";
+                }
+            }
+
+            // get yg aktif sekarang
+            $dataSurvey = $this->db->select('ID,StartDate,EndDate')->get_where('db_it.surv_survey',
+                                array('ID' => $SurveyID,'Status' => '1'))->result_array();
+
+            if(count($dataSurvey)>0){
+                for($i=0;$i<count($dataSurvey);$i++){
+                    $arrPush = array(
+                        'RecapID' => 0,
+                        'SurveyID' => $dataSurvey[$i]['ID'],
+                        'StartDate' => $dataSurvey[$i]['StartDate'],
+                        'EndDate' => $dataSurvey[$i]['EndDate'],
+                        'Question' => $this->db->from('db_it.surv_survey_detail')
+                            ->where(array('SurveyID' => $SurveyID))
+                            ->count_all_results(),
+                        'TotalAnswer' => $this->db->from('db_it.surv_answer')
+                            ->where(array('SurveyID' => $SurveyID,
+                                'RecapID' => 0))
+                            ->count_all_results(),
+                        'Status' => "1",
+                    );
+
+                    array_push($dataRecap,$arrPush);
+                }
+            }
+
+            return print_r(json_encode($dataRecap));
+
+        }
+
+        else if($data_arr['action']=='shareRecap2email'){
+
+            $this->load->model('m_sendemail');
+
+            $to = $data_arr['Email'];
+//        $to = 'nndg.ace3@gmail.com';
+
+
+            // Get survey title
+            $dataSurv = (array) $this->jwt->decode($data_arr['tokenRecap'],'UAP)(*');
+            $dataSurvey = $this->db->get_where('db_it.surv_survey',
+                array('ID' => $dataSurv['SurveyID']))->result_array();
+            $dataPublishDate = $this->db->get_where('db_it.surv_recap',
+                array('ID' => $dataSurv['RecapID']))
+                ->result_array();
+
+
+            // http://localhost/puis/save2excel/survey/1/1
+
+            $PublicationDate = date('d M Y',strtotime($dataPublishDate[0]['StartDate'])).' - '.
+                date('d M Y',strtotime($dataPublishDate[0]['EndDate']));
+
+            $subject = 'Recap - '.$dataSurvey[0]['Title'].' | '.$PublicationDate;
+
+            $text = 'Dear <strong style="color: blue;">'.$data_arr['Name'].'</strong>,
+
+                <p style="color: #673AB7;">Recap survey <strong>"'.$dataSurvey[0]['Title'].'"</strong>
+                <br/> Publication Date :  '.$PublicationDate.'</p>
+
+                <table width="178" cellspacing="0" cellpadding="12" border="0">
+                    <tbody>
+                    <tr>
+                        <td bgcolor="#4caf50" align="center">
+                            <a href="'.base_url('save2excel/survey/'.$data_arr['tokenRecap']).'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color:#4caf50" target="_blank" >Download Survey Result</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <br/>
+
+                <p>Send by : '.$data_arr['SentBy'].' | '.date('d M Y H:i',strtotime($data_arr['SentAt'])).'</p>';
+
+            $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,'Survey Result');
+
+            // surv_share_with_email
+            $arrIns = array(
+                'SurveyID' => $dataSurv['SurveyID'],
+                'RecapID' => $dataSurv['RecapID'],
+                'Name' => $data_arr['Name'],
+                'Email' => $data_arr['Email'],
+                'EntredBy' => $data_arr['NIP']
+            );
+
+            $this->db->insert('db_it.surv_share_with_email',$arrIns);
+
+            return print_r(json_encode($arrIns));
+
+        }
+
+        else if($data_arr['action']=='getListHistorySendEmail'){
+
+            $data = $this->db->query('SELECT swe.*, em.Name AS EntredByName FROM db_it.surv_share_with_email swe 
+                                            LEFT JOIN db_employees.employees em 
+                                            ON (swe.EntredBy = em.NIP)
+                                            WHERE swe.SurveyID = "'.$data_arr['SurveyID'].'"
+                                             AND swe.RecapID = "'.$data_arr['RecapID'].'"')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+
+        else if($data_arr['action']=='setPublicSurvey'){
+            $ID = $data_arr['SurveyID'];
+
+            // Cek apakah sudah mempunyai key atau blm
+            $dataCk = $this->db->select('Key')->get_where('db_it.surv_survey',array(
+                'ID' => $ID
+            ))->result_array();
+
+            if($dataCk[0]['Key']!='' && $dataCk[0]['Key']!=null) {
+                $KeyPublic = $dataCk[0]['Key'];
+            } else {
+                $KeyPublic = $this->m_api->checkCodeSurvey();
+                // Update
+                $dataUpdate['Key'] = $KeyPublic;
+                $dataUpdate['UpdatedBy'] = $data_arr['NIP'];
+                $dataUpdate['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_it.surv_survey',$dataUpdate);
+            }
+
+
+
+            return print_r(json_encode(
+                array(
+                    'Status' => 1,
+                    'Key' => $KeyPublic)
+            ));
 
         }
 
@@ -605,28 +813,67 @@ class C_api_menu extends CI_Controller {
 
                     $AverageRate = '';
 
+                    $dataWhere = ' sad.SurveyID = "'.$SurveyID.'" 
+                                    AND sad.QuestionID = "'.$data[$i]['QuestionID'].'"
+                                     AND sad.QTID = "'.$data[$i]['QTID'].'"
+                                      AND sa.Status = "1" ';
+
                     if($data[$i]['QTID']=='4' || $data[$i]['QTID']==4){
                         // Cek berapa yang udah jawab
-                        $dataTotalJawaban = $this->db->get_where('db_it.surv_answer_detail',
-                            array(
-                                'SurveyID' => $SurveyID,
-                                'QuestionID' => $data[$i]['QuestionID'],
-                                'QTID' => $data[$i]['QTID']
-                            ))->result_array();
+//                        $dataTotalJawaban = $this->db->get_where('db_it.surv_answer_detail',$dataWhere)->result_array();
 
-                        if(count($dataTotalJawaban)>0){
-                            $TotalRate = 0;
-                            for($r=0;$r<count($dataTotalJawaban);$r++){
-                                $TotalRate = $TotalRate+$dataTotalJawaban[$r]['Rate'];
-                            }
-                            $AverageRate = number_format(round($TotalRate / count($dataTotalJawaban)),2);
-                        }
+                        $whereRate = ' AND sad.Rate = 1';
+                        $R_1 = $this->db->query('SELECT COUNT(*) AS Total 
+                                                        FROM db_it.surv_answer_detail sad 
+                                                        LEFT JOIN db_it.surv_answer sa 
+                                                        ON (sa.ID = sad.AnswerID) 
+                                                        WHERE '.$dataWhere.$whereRate)
+                            ->result_array()[0]['Total'];
 
+                        $whereRate = ' AND sad.Rate = 2';
+                        $R_2 = $this->db->query('SELECT COUNT(*) AS Total 
+                                                        FROM db_it.surv_answer_detail sad 
+                                                        LEFT JOIN db_it.surv_answer sa 
+                                                        ON (sa.ID = sad.AnswerID) 
+                                                        WHERE '.$dataWhere.$whereRate)
+                            ->result_array()[0]['Total'];
+
+                        $whereRate = ' AND sad.Rate = 3';
+                        $R_3 = $this->db->query('SELECT COUNT(*) AS Total 
+                                                        FROM db_it.surv_answer_detail sad 
+                                                        LEFT JOIN db_it.surv_answer sa 
+                                                        ON (sa.ID = sad.AnswerID) 
+                                                        WHERE '.$dataWhere.$whereRate)
+                            ->result_array()[0]['Total'];
+
+                        $whereRate = ' AND sad.Rate = 4';
+                        $R_4 = $this->db->query('SELECT COUNT(*) AS Total 
+                                                        FROM db_it.surv_answer_detail sad 
+                                                        LEFT JOIN db_it.surv_answer sa 
+                                                        ON (sa.ID = sad.AnswerID) 
+                                                        WHERE '.$dataWhere.$whereRate)
+                            ->result_array()[0]['Total'];
+
+                        $AverageRate = '<div>B1 : '.$R_1.'</div>
+                                        <div>B2 : '.$R_2.'</div>
+                                        <div>B3 : '.$R_3.'</div>
+                                        <div>B4 : '.$R_4.'</div>';
+
+                    }
+                    else if($data[$i]['QTID']=='5' || $data[$i]['QTID']==5){
+
+                        $dataWhere['IsTrue'] = '1';
+                        $TotalYes = $this->db->from('db_it.surv_answer_detail')->where($dataWhere)->count_all_results();
+
+                        $dataWhere['IsTrue'] = '0';
+                        $TotalNo = $this->db->from('db_it.surv_answer_detail')->where($dataWhere)->count_all_results();
+
+                        $AverageRate = '<div>Y : '.$TotalYes.'</div><div>N : '.$TotalNo.'</div>';
 
 
                     }
 
-                    $data[$i]['AverageRate'] = $AverageRate;
+                    $data[$i]['AverageRate'] = '<div style="text-align: left;">'.$AverageRate.'</div>';
                 }
             }
 
@@ -639,7 +886,9 @@ class C_api_menu extends CI_Controller {
         else if($data_arr['action']=='showUserAlreadyFill'){
 
             $requestData = $_REQUEST;
-            $dataWhere = '';
+
+            $dataWhere = ($data_arr['Type']=='all') ? '' : ' AND sa.FormType = "'.$data_arr['Type'].'" ';
+
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
@@ -649,11 +898,18 @@ class C_api_menu extends CI_Controller {
                 $dataSearch = $dataScr;
             }
 
-            $queryDefault = 'SELECT sa.*,  CASE WHEN  em.Name IS NOT NULL THEN em.Name
-                                                ELSE ats.Name END AS "Name" FROM db_it.surv_answer sa 
+
+            $whereAnswerSurvey = ($data_arr['Status']=='2') ?
+                ' AND sa.RecapID = (SELECT MAX(RecapID) FROM db_it.surv_answer WHERE SurveyID= "'.$data_arr['SurveyID'].'")'
+                : ' AND sa.Status = "1" ';
+
+            $queryDefault = 'SELECT sa.*,  CASE WHEN  sa.Type = "emp" THEN em.Name
+                                                WHEN  sa.Type = "std" THEN ats.Name
+                                                ELSE exu.FullName END AS "Name" FROM db_it.surv_answer sa 
                                                 LEFT JOIN db_employees.employees em ON (em.NIP = sa.Username)
                                                 LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sa.Username)
-                                        WHERE sa.SurveyID = "'.$data_arr['SurveyID'].'"  '.
+                                                LEFT JOIN db_it.surv_external_user exu ON (exu.ID = sa.Username)
+                                        WHERE sa.SurveyID = "'.$data_arr['SurveyID'].'" '.$whereAnswerSurvey.
                                         $dataWhere.$dataSearch;
 
             $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
@@ -671,9 +927,15 @@ class C_api_menu extends CI_Controller {
                 $nestedData = array();
                 $row = $query[$i];
 
-                $Type = ($row['Type']=='std')
-                    ? '<span class="label label-primary">Student</span>'
-                    : '<span class="label label-success">Emp / Lec</span>';
+//                $Type = ($row['Type']=='std')
+//                    ? '<span class="label label-primary">Student</span>'
+//                    : '<span class="label label-success">Emp / Lec</span>';
+                $Type = '<span class="label label-warning">Other</span>';
+                if($row['Type'] == 'std') {
+                    $Type = '<span class="label label-primary">Std</span>';
+                } else if($row['Type'] == 'emp'){
+                    $Type = '<span class="label label-success">Emp / Lec</span>';
+                }
 
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['Username'].'</div>';
@@ -697,6 +959,87 @@ class C_api_menu extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='createNewDateSurvey'){
+
+            $SurveyID = $data_arr['SurveyID'];
+            // update date nya
+            $this->db->where(array(
+                'ID' => $SurveyID,
+            ));
+            $this->db->update('db_it.surv_survey',array(
+                'StartDate' => $data_arr['StartDate'],
+                'EndDate' => $data_arr['EndDate'],
+                'Status' => '0'
+            ));
+
+            return print_r(1);
+
+        }
+
+        else if($data_arr['action']=='genrateClose'){
+
+            // Cek semua survey yg udah close
+            $data = $this->db->query('SELECT sa.SurveyID, sa.RecapID, s.StartDate, s.EndDate, s.Status FROM db_it.surv_answer sa 
+                                                LEFT JOIN db_it.surv_survey s ON (s.ID = sa.SurveyID)
+                                                WHERE sa.Status = "1" AND s.Status = "2"
+                                                GROUP BY sa.SurveyID')->result_array();
+
+            if(count($data)>0){
+                for($i2=0;$i2<count($data);$i2++){
+
+                    $SurveyID = $data[$i2]['SurveyID'];
+
+                    $insertRecap = array(
+                        'SurveyID' => $SurveyID,
+                        'StartDate' => $data[$i2]['StartDate'],
+                        'EndDate' => $data[$i2]['EndDate'],
+                        'EntredBy' => "2017090"
+                    );
+                    $this->db->insert('db_it.surv_recap',$insertRecap);
+                    $RecapID = $this->db->insert_id();
+
+                    // backup question
+                    $dataQuestion = $this->db->select('QuestionID')
+                        ->get_where('db_it.surv_survey_detail',
+                            array('SurveyID' => $SurveyID))->result_array();
+
+                    if(count($dataQuestion)>0){
+                        for($i=0;$i<count($dataQuestion);$i++){
+                            $insertRecapQuestion = array(
+                                'RecapID' => $RecapID,
+                                'SurveyID' => $SurveyID,
+                                'QuestionID' => $dataQuestion[$i]['QuestionID']
+                            );
+                            $this->db->insert('db_it.surv_recap_question',$insertRecapQuestion);
+                        }
+                    }
+
+                    $this->db->where(array(
+                        'SurveyID' => $SurveyID,
+                        'Status' => '1'
+                    ));
+                    $this->db->update('db_it.surv_answer',array('RecapID' => $RecapID));
+                    $this->db->reset_query();
+
+                    $this->db->where(array(
+                        'SurveyID' => $SurveyID,
+                        'RecapID' => $RecapID
+                    ));
+                    $this->db->update('db_it.surv_answer',array('Status' => '2'));
+                    $this->db->reset_query();
+
+
+                }
+            }
+
+            print_r($data);
+
+
+
+            // cek apakah sudah ke recap atau blm
+
+        }
+
         else if($data_arr['action']=='getOneDataSurvey'){
             $ID = $data_arr['ID'];
             $data = $this->db->get_where('db_it.surv_survey',array('ID' => $ID))->result_array();
@@ -716,6 +1059,55 @@ class C_api_menu extends CI_Controller {
                 $Status = '<span class="label label-success">Publish</span>';
             } else if ($row_Status=='2'){
                 $Status = '<span class="label label-danger">Close</span>';
+
+                // input ke backup
+                $SurveyID = $data_arr['ID'];
+
+                // Get data survey
+                $dataSurvey = $this->db
+                    ->get_where('db_it.surv_survey',
+                        array('ID' => $SurveyID))
+                    ->result_array();
+
+                $insertRecap = array(
+                    'SurveyID' => $SurveyID,
+                    'StartDate' => $dataSurvey[0]['StartDate'],
+                    'EndDate' => $dataSurvey[0]['EndDate'],
+                    'EntredBy' => $data_arr['NIP']
+                );
+                $this->db->insert('db_it.surv_recap',$insertRecap);
+                $RecapID = $this->db->insert_id();
+
+                // backup question
+                $dataQuestion = $this->db->select('QuestionID')
+                    ->get_where('db_it.surv_survey_detail',
+                        array('SurveyID' => $SurveyID))->result_array();
+
+                if(count($dataQuestion)>0){
+                    for($i=0;$i<count($dataQuestion);$i++){
+                        $insertRecapQuestion = array(
+                            'RecapID' => $RecapID,
+                            'SurveyID' => $SurveyID,
+                            'QuestionID' => $dataQuestion[$i]['QuestionID']
+                        );
+                        $this->db->insert('db_it.surv_recap_question',$insertRecapQuestion);
+                    }
+                }
+
+                $this->db->where(array(
+                    'SurveyID' => $SurveyID,
+                    'Status' => '1'
+                ));
+                $this->db->update('db_it.surv_answer',array('RecapID' => $RecapID));
+                $this->db->reset_query();
+
+                $this->db->where(array(
+                    'SurveyID' => $SurveyID,
+                    'RecapID' => $RecapID
+                ));
+                $this->db->update('db_it.surv_answer',array('Status' => '2'));
+                $this->db->reset_query();
+
             }
 
             return print_r(json_encode(array('Status'=>1,'Label' => $Status)));

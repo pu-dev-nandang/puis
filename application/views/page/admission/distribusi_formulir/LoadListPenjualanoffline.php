@@ -60,7 +60,7 @@
     {
       var academic_year_admission = "<?php echo $academic_year_admission ?>"; 
       var thisYear = (new Date()).getFullYear();
-      var startTahun = parseInt(thisYear);
+      var startTahun = parseInt(thisYear) - 1;
        var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
        for (var i = 0; i <= selisih; i++) {
             var selected = (( parseInt(startTahun) + parseInt(i) )==academic_year_admission) ? 'selected' : '';
