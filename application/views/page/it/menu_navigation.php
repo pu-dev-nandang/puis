@@ -283,7 +283,12 @@
                 </a>
             </li>
             <!-- END ADDED BY FEBRI @ JAN 2020 -->
-
+            <li class="<?php if($this->uri->segment(2)=='request-change-password'){echo"current";}?>">
+                <a href="<?php echo base_url('it/request-change-password');?>">
+                   <i class="fa fa-envelope"><span class="badge" style="background-color: red;"><?php echo $resetpassmenu; ?></span></i>
+                    Request Reset Password
+                </a>
+            </li>
         </ul>
 
         <?php if(count($dataMenuShare)>0) { ?>
@@ -300,7 +305,7 @@
                         // Cek apakah ada turunan atau tidak
                         if(isset($item['DataLevel_1'])){ ?>
                             <a href="javascript:void(0);">
-                                <?= $item['Icon']; ?>
+                                <i class="<?= $item['Icon']; ?>"></i>
                                 <?= $item['Name']; ?>
                                 <i class="arrow <?= ($this->uri->segment(2)=='academic') ? 'icon-angle-down' : 'icon-angle-left'?>"></i>
                             </a>
