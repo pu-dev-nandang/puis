@@ -430,6 +430,48 @@ class C_agregator extends Globalclass {
         $this->menu_agregator($page);
     }
 
+    public function APT_getDescription(){
+        if ($this->input->is_ajax_request()) {
+            $Input = $this->getInputToken();
+            $rs = ['data' => ''];
+            $addWhere = '';
+            if (array_key_exists('Year', $Input)) {
+                $whereOrAnd = ($addWhere == '') ? 'where ' : 'and ';    
+                $addWhere .= $whereOrAnd.' Year ='.$Input['Year'];
+            }
+
+            if (array_key_exists('SemesterID', $Input)) {
+                $whereOrAnd = ($addWhere == '') ? 'where ' : 'and ';    
+                $addWhere .= $whereOrAnd.' SemesterID ='.$Input['SemesterID'];
+            }
+
+            $whereOrAnd = ($addWhere == '') ? 'where ' : 'and ';    
+            $addWhere .= $whereOrAnd.' ID_agregator_menu ='.$Input['ID_agregator_menu'];
+
+            $query = $this->db->query(
+                'select * from db_agregator.agregator_menu_description '.$addWhere
+            )->result_array();
+
+            if (count($query) > 0) {
+                $rs['data'] = $query[0]['Description'];
+            }
+
+            echo json_encode($rs);
+        }
+    }
+
+    public function APT_saveDescription(){
+        if ($this->input->is_ajax_request()) {
+            $arrFilter = $this->getInputToken();
+            unset($arrFilter['Description']);
+            // check db for insert or update
+            $addWhere = '';
+            foreach ($arrFilter as $key => $value) {
+                .
+            }
+        }
+    }
+
 
     
 
