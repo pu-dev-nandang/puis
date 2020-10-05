@@ -55,7 +55,7 @@
                     <?php 
 
                       $data = $this->m_sm_menu->getAllDivision();
-                      $no=1;
+                     
                       foreach ($data->result_array() as $division){
                        $sm_div = $this->m_sm_menu->getDivisionIDSM($division['ID'], $row['ID']);
                     ?>
