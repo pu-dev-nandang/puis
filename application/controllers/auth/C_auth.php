@@ -153,61 +153,14 @@ class C_auth extends Globalclass {
 
     }
 
-    public function dataSinta($Year){
+    public function dataSinta(){
+
+        echo "no data";
+        exit();
 
 
-        // Get data mhs active
-
-        $db = 'ta_'.$Year;
-        $SemesterID_lalu = 15;
-        $SemesterID = 16;
-        $data = $this->db->query('SELECT ats.NPM,ats.Name, ps.Name AS Prodi FROM db_academic.auth_students ats 
-                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
-                                        WHERE ats.StatusStudentID = "3" AND ats.Year = "'.$Year.'" ORDER BY ats.NPM ASC ')->result_array();
-
-        if(count($data)>0){
-            for ($i=0;$i<count($data);$i++){
-                $dataSp = $this->db->select('SemesterID, NPM, Credit, GradeValue')->get_where($db.'.study_planning',array(
-                    'SemesterID <= ' => $SemesterID,
-                    'NPM' => $data[$i]['NPM']
-                ))->result_array();
-
-                $TotalSKS = 0;
-                $TotalGradeValue = 0;
-
-                $TotalSKS_lalu = 0;
-                $TotalGradeValue_lalu = 0;
-                if(count($dataSp)>0){
-                    foreach ($dataSp AS $itm){
-                        $TotalSKS = $TotalSKS + $itm['Credit'];
-                        $TotalGradeValue = $TotalGradeValue + ($itm['Credit'] * $itm['GradeValue']);
-
-                        if ($itm['SemesterID'] <= $SemesterID_lalu){
-                            $TotalSKS_lalu = $TotalSKS_lalu + $itm['Credit'];
-                            $TotalGradeValue_lalu = $TotalGradeValue_lalu + ($itm['Credit'] * $itm['GradeValue']);
-                        }
-
-                    }
-                }
-
-                $data[$i]['TotalSKS'] = $TotalSKS;
-                $data[$i]['TotalGradeValue'] = $TotalGradeValue;
-                $data[$i]['IPK_Asli'] = $TotalGradeValue / $TotalSKS;
-                $data[$i]['IPK_Pembulatan'] = number_format(round($TotalGradeValue / $TotalSKS,2),2);
-
-                $data[$i]['Lalu_TotalSKS'] = $TotalSKS_lalu;
-                $data[$i]['Lalu_TotalGradeValue'] = $TotalGradeValue_lalu;
-                $data[$i]['Lalu_IPK_Asli'] = $TotalGradeValue_lalu / $TotalSKS_lalu;
-                $data[$i]['Lalu_IPK_Pembulatan'] = number_format(round($TotalGradeValue_lalu / $TotalSKS_lalu,2),2);
 
 
-//                $data[$i]['Details'] = $dataSp;
-            }
-        }
-
-        $datasc['datasc'] = $data;
-
-        $this->load->view('template/sementara',$datasc);
 //        print_r($data);
 
 //
@@ -247,6 +200,9 @@ class C_auth extends Globalclass {
 
     public function cekFile()
     {
+        echo "no data";
+        exit();
+
         $data = $this->db->query('SELECT f.NIP, em.Name, f.ID AS FID ,f.NameUniversity, u.ID FROM db_employees.files f 
                                             LEFT JOIN db_research.university u ON (f.NameUniversity = u.Code_University)
                                             LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
@@ -271,6 +227,9 @@ class C_auth extends Globalclass {
 
     public function get_auth()
     {
+        echo "no data";
+        exit();
+
         $username = $this->input->post('username');
         $password = $this->input->post('password');
 
@@ -293,6 +252,10 @@ class C_auth extends Globalclass {
     }
 
     public function db($table=''){
+
+        echo "no data";
+        exit();
+
         $max_execution_time = 360;
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
@@ -333,6 +296,10 @@ class C_auth extends Globalclass {
     }
 
     public function parent($ta){
+
+        echo "no data";
+        exit();
+
         $max_execution_time = 360;
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
@@ -509,6 +476,9 @@ class C_auth extends Globalclass {
 
     private function genratePassword($NIP,$Password){
 
+        echo "no data";
+        exit();
+
         $plan_password = $NIP.''.$Password;
         $pas = md5($plan_password);
         $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
@@ -517,6 +487,9 @@ class C_auth extends Globalclass {
     }
 
     public function foto2(){
+
+        echo "no data";
+        exit();
 
         $data = $this->db_server->where('TahunMasuk',2016)->select('ID,NPM,Foto')->get('siak4.mahasiswa')->result_array();
 
@@ -549,6 +522,10 @@ class C_auth extends Globalclass {
     }
 
     public function foto(){
+
+        echo "no data";
+        exit();
+
         $db_ = 'db_employees';
         $data = $this->db->query('SELECT ID,NIP,Photo FROM '.$db_.'.employees ')->result_array();
 
@@ -575,6 +552,9 @@ class C_auth extends Globalclass {
 
     private function getBobot($semesterID,$final){
 
+        echo "no data";
+        exit();
+
         $tb = ($semesterID<7) ? 'siak4.bobot' : 'siak4.bobot2';
         $data = $this->db->query('SELECT Nilai,Bobot FROM '.$tb.' WHERE MinNilai<= "'.$final.'" AND MaxNilai>= "'.$final.'" LIMIT 1 ');
 
@@ -583,6 +563,9 @@ class C_auth extends Globalclass {
     }
 
     public function migrationStudent(){
+
+        echo "no data";
+        exit();
 
         $max_execution_time = 630;
         ini_set('memory_limit', '-1');
@@ -784,8 +767,8 @@ class C_auth extends Globalclass {
 
     public function toStdPlanning($ta,$NIP){
 
-        print_r('Exited');
-        exit;
+        echo "no data";
+        exit();
 
         $max_execution_time = 360;
         ini_set('memory_limit', '-1');

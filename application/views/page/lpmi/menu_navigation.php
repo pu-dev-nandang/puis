@@ -176,8 +176,7 @@
                 }
 
              ?>
-        </ul>
-        <ul id="nav_2">
+
             <li class="<?php if($this->uri->segment(2)=='slider'){echo"current";}?>">
                 <a href="<?php echo base_url('lpmi/slider');?>">
                     <i class="fa fa-desktop"></i>
@@ -268,8 +267,6 @@
             </li>
 
 
-        </ul>
-        <ul id="nav_3">
             <li class="<?php if($this->uri->segment(2)=='list-lecturer'){echo"current";}?>">
                 <a href="<?php echo base_url('lpmi/lecturer-evaluation/list-lecturer');?>">
                     <i class="fa fa-pie-chart"></i>
