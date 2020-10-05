@@ -6600,6 +6600,28 @@ class C_api extends CI_Controller {
                     }
                 }
 
+                    // disabled enabled AD
+                if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
+                // if(true) {
+                    $urlAD = URLAD.'__api/DisableEnable';
+                    $is_url_exist = $this->m_master->is_url_exist($urlAD);
+
+                    if (array_key_exists('StatusEmployeeID', $formUpdate) && $is_url_exist) {
+                        $UserID = explode('@', $formUpdate['EmailPU']);
+                        $UserID = $UserID[0];
+                        $statusGet = ($formUpdate['StatusEmployeeID'] == -1 ||$formUpdate['StatusEmployeeID'] == '-1') ? 'yes' : 'no';
+                        $data = array(
+                            'auth' => 's3Cr3T-G4N',
+                            'UserID' => $UserID,
+                            'statusGet' => $statusGet,
+                        );
+
+                        $urlAD = URLAD.'__api/DisableEnable';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        $this->m_master->apiservertoserver($urlAD,$token);
+                    }
+                }
+                
                 // Cek apakah delete photo atau tidak
                 if($data_arr['DeletePhoto']==1 || $data_arr['DeletePhoto']=='1'){
                     $pathPhoto = './uploads/employees/'.$data_arr['LastPhoto'];
