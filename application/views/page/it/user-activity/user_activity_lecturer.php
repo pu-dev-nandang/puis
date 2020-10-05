@@ -36,7 +36,7 @@
         // var url = base_url_js+'api3/__getDataLogEmployees?u=2017090';
         var url = base_url_js+'api3/__getDataLogLecturer';
 
-        var dataTable = $('#tableDataLog').DataTable( {
+        window.dataTable = $('#tableDataLog').DataTable( {
             "processing": true,
             "serverSide": true,
             "iDisplayLength" : 10,
