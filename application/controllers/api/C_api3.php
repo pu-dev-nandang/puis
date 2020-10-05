@@ -5539,6 +5539,16 @@ class C_api3 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='removeLogging'){
+
+            $table = $data_arr['table'];
+
+            $this->db->query('DELETE FROM '.$table.' WHERE AccessedOn 
+            BETWEEN "'.$data_arr['Start'].' 00:00:00" AND "'.$data_arr['End'].' 23:59:00"');
+
+            return print_r(1);
+
+        }
     }
 
     public function crudFileFinalProject(){
