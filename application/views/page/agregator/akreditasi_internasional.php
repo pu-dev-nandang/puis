@@ -75,6 +75,7 @@
                 }
 
                 loadDataTable();
+                newDescritionInput.getDescription();
                 clearInterval(firstLoad);
             }
             
@@ -397,6 +398,8 @@
         }
     });
 
-
-
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
+    })
 </script>

@@ -133,7 +133,7 @@
             }
 
             if (Years != null && Years !== undefined) {
-                data['Years'] = Years;
+                data['Year'] = Years;
             }
 
             if (SemesterID != null && SemesterID !== undefined) {
@@ -161,20 +161,21 @@
             }
 
             if (Years != null && Years !== undefined) {
-                data['Years'] = Years;
+                data['Year'] = Years;
             }
 
             if (SemesterID != null && SemesterID !== undefined) {
                 data['SemesterID'] = SemesterID;
             }
 
+            var token = jwt_encode(data,"UAP)(*");
 
             if ($('.inputDescription').val() != '' && $('.inputDescription').val() !== undefined && confirm('Are you sure ?') ) {
                 loading_button2(selector);
                 try{
                      const response = await AjaxSubmitFormPromises(url,token);
-                     if (response.Status == 1) {
-                        toastr.success(response.success);
+                     if (response.status == 1) {
+                        toastr.success('Saved');
                      }
                      else
                      {
@@ -182,7 +183,7 @@
                      }
                 }
                 catch(err){
-                    toastr.msg('something wrong');
+                    toastr.error('something wrong');
                 }
 
                 end_loading_button2(selector);
