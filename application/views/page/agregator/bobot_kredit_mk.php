@@ -46,6 +46,10 @@
             var filterCurriculum = $('#filterCurriculum').val();
             if(filterCurriculum!='' && filterCurriculum!=null){
                 loadDataProdi();
+
+                // get year
+                let Year = (($('#filterCurriculum option:selected').val()).split('.'))[1];
+                newDescritionInput.getDescription(Year);
                 clearInterval(firsLoad);
             }
         },1000);
@@ -58,6 +62,8 @@
 
     $('#filterCurriculum').change(function () {
         loadDataProdi();
+        let Year = (($('#filterCurriculum option:selected').val()).split('.'))[1];
+        newDescritionInput.getDescription(Year);
     });
 
     function loadDataProdi() {
@@ -182,5 +188,11 @@
         });
 
     });
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        let Year = (($('#filterCurriculum option:selected').val()).split('.'))[1];
+        newDescritionInput.saveDescription(itsme,Year);
+    })
 
 </script>

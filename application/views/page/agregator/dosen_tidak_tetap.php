@@ -40,6 +40,7 @@
     var passToExcel = [];
     $(document).ready(function () {
         loadData();
+        newDescritionInput.getDescription();
     });
 
     function loadData() {
@@ -177,4 +178,9 @@
         });
 
     });
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
+    })
 </script>

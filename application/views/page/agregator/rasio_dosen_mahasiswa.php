@@ -68,6 +68,10 @@
             var filterSemester = $('#filterSemester').val();
             if(filterSemester!='' && filterSemester!=null){
                 loadLecturerCertificate();
+
+                // get semester 
+                const SemesterID = (($('#filterSemester option:selected').val()).split('.'))[0];
+                newDescritionInput.getDescription(null,SemesterID);
                 clearInterval(firstLoad);
             }
         },1000);
@@ -83,6 +87,8 @@
         var filterSemester = $('#filterSemester').val();
         if(filterSemester!='' && filterSemester!=null){
             loadLecturerCertificate();
+            const SemesterID = (($('#filterSemester option:selected').val()).split('.'))[0];
+            newDescritionInput.getDescription(null,SemesterID);
         }
 
     });
@@ -304,5 +310,11 @@
         });
 
     });
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        const SemesterID = (($('#filterSemester option:selected').val()).split('.'))[0];
+        newDescritionInput.saveDescription(itsme,null,SemesterID);
+    })
 
 </script>
