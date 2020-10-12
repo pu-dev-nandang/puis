@@ -110,11 +110,21 @@
             
         }
 
-        domInput = (valuedata = '') => {
+        domInput = (response) => {
+            let valuedata = '';
+            let UpdatedAt = '-';
+            let UpdatedBy = '-';
+            if (typeof response['data'] != "undefined") {
+               valuedata = response['data'];
+               UpdatedAt = response['UpdatedAt'];
+               UpdatedBy = response['UpdatedBy'];
+            }
             let html = '<div class = "well"><div style="padding-left:15px;padding-right:15px;"><h3 class="header-blue">Input Description</h2></div>'+
                             '<div class = "row" style = "margin-left:15px;margin-right:15px;>'+
                                 '<div class = "col-md-12">'+
                                     '<textarea class = "inputDescription form-control" placeholder = "Input Description" rows = "4"></textarea>'+
+                                    '<br/>'+
+                                    'Updated : <span style = "color:green;">  '+UpdatedBy+ '</span> at <span style = "color : blue;">'+moment(UpdatedAt).format('dddd, DD MMM YYYY HH:mm')+'</span>'+
                                 '</div>'+
                                 '<div class = "col-md-12" style = "margin-top:10px;">'+
                                     '<div style = "text-align:right;">'+
@@ -144,8 +154,7 @@
 
            try{
                const response = await AjaxSubmitFormPromises(url,token);
-               const getData = response.data;
-               this.domInput(getData);
+               this.domInput(response);
            }
            catch(err){
                 toastr.info('something wrong get description');
