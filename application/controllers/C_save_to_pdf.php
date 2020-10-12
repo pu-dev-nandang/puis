@@ -7550,6 +7550,41 @@ Phone: (021) 29200456';
 
     }
 
+    public function shareSurvey($token){
+        $this->load->library('Qrcode/qrlib');
+        $data_arr = $this->getInputToken($token);
+
+        $pdf = new FPDF('P','mm','A4');
+        $pdf->AddFont('dinpromedium','','dinpromedium.php');
+        $pdf->AddFont('dinpromediumitalic','','dinpromediumitalic.php');
+        $pdf->AddFont('dinprolight','','dinprolight.php');
+        $pdf->AddFont('dinlightitalic','','dinlightitalic.php');
+        $pdf->SetMargins(10,10,10);
+        $pdf->AddPage();
+
+//        $pdf->SetFont('dinpromedium','',11);
+//        $pdf->Cell(183,5,'Information Identifying Diploma Supplement Holder',1,1,'L');
+//
+//        $pdf->Cell(91.5,5,'Information Identifying Diploma Supplement Holder',1,1,'L');
+//        $pdf->Cell(58.5,5,'Information ',1,1,'L');
+
+        $URLQrCode = $data_arr['shareLink'];
+
+        $t = QRcode::png($URLQrCode,false,'L', 10, 4);
+        $pic = 'data://text/plain;base64,' . $t;
+        $pdf->Image($pic,68.5,12.5,66,NULL,'png');
+        $pdf->Image('./images/SKPI/frame-qrcode.png',68.5,11,66);
+
+
+
+
+        $StudentName = '123123';
+        $nameF = str_replace(' ','_',$StudentName);
+
+        $pdf->Output('SKPI__'.$nameF.'.pdf','I');
+
+    }
+
     public function recapitulation_salaries(){
 
         $pdf = new FPDF('L','mm','A4');

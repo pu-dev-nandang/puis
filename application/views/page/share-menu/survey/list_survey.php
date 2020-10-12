@@ -123,9 +123,19 @@
             $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
                 '<h4 class="modal-title">Share to public</h4>');
 
+            var shareLink = base_url_sign_out+'form/'+jsonResult.Key;
+
+            var tokenLink = jwt_encode({
+                ID : ID,
+                shareLink : shareLink
+            },'UAP)(*');
+
             var htmlss = '<div class="form-group">' +
                 '<label>Link</label>' +
-                '<div class="panel-link">'+base_url_sign_out+'form/'+jsonResult.Key+'</div>'+
+                '<div class="panel-link">'+shareLink+'</div>'+
+                '</div>' +
+                '<div class="form-group">' +
+                '<a href="'+base_url_js+'save2pdf/share-survey/'+tokenLink+'" target="_blank" class="btn btn-primary">Download QR Code</a>' +
                 '</div>';
 
             $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
