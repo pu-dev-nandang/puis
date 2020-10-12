@@ -4405,5 +4405,46 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     }
 
+       public function UpdatePwdAD($data_arr)
+    {
+        $TypeUser = $data_arr['User'];
+        switch ($TypeUser) {
+            case 'Students':
+                $data = array(
+                    'auth' => 's3Cr3T-G4N',
+                    'Type' => 'Student',
+                    'UserID' => $data_arr['Username'],
+                    'Password' => $data_arr['NewPassword'],
+                );
+
+                $url = URLAD.'__api/ChangePWD';
+                $token = $this->jwt->encode($data,"UAP)(*");
+                $this->apiservertoserver($url,$token);
+                break;
+            case 'Employees':
+                // find email karena email = user ad
+                $sql = 'select * from db_employees.employees where NIP = ?';
+                $query=$this->db->query($sql, array($data_arr['Username']))->result_array();
+                $EmailPU = $query[0]['EmailPU'];
+                // get 
+                    $ex = explode('@', $EmailPU);
+                    $UserID = $ex[0];
+                // end
+                $data = array(
+                    'auth' => 's3Cr3T-G4N',
+                    'Type' => 'Employee',
+                    'UserID' => $UserID,
+                    'Password' => $data_arr['NewPassword'],
+                );
+
+                $url = URLAD.'__api/ChangePWD';
+                $token = $this->jwt->encode($data,"UAP)(*");
+                $this->apiservertoserver($url,$token);
+                break;
+            default:
+                # code...
+                break;
+        }}
+
 
 }

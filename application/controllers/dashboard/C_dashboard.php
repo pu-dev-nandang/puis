@@ -1203,6 +1203,113 @@ class C_dashboard extends Globalclass {
         }else{show_404();}
     }
 
+    public function self_services($NIP){
+        $isExist = $this->isItRealMe($NIP);
+        if(!empty($isExist)){
+            $data['NIP'] = $NIP;
+            $data['detail'] = $this->General_model->fetchData("db_employees.employees",array("NIP"=>$NIP))->row();
+            if (!empty($data['detail']->Password_Curr)) {
+                $key = "UAP)(*";
+                $data['plan'] = (array) $this->jwt->decode($data['detail']->Password_Curr,$key); 
+            }
+
+            $data['req'] = $this->db->limit(1)->order_by('ID', 'DESC')->get_where('db_it.reset_password',
+                array('Username' => $NIP))->row_array();
+            $page = $this->load->view('dashboard/profile/self-service',$data,true);
+            $this->tab_menu_new_emp($page,$NIP);
+        }else{show_404();}
+    }
+
+    public function change_password()
+    {
+
+      $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
+      $data = $this->input->post();
+      $key = "UAP)(*";
+      $data_arr = (array) $this->jwt->decode($data['token'],$key);  
+      $datatoken = json_decode(json_encode($data_arr),true); 
+      $action = $data_arr['action'];
+   
+    switch ($action) {
+        
+        case 'changeportalpass':
+        $formData = $datatoken['dataShareMenu'];
+        $nip = $formData['nip'];
+        $pass = $formData['pass'];
+        $passold = $formData['passold'];
+      
+        $data_arr2 = array(
+                'NPM' => $nip,
+                'plan_password' => $pass
+         );
+
+        $plan2 = $this->jwt->encode($data_arr2,$key);
+        $data_arr = array('User' => 'Employees',
+                'Username' => $nip,
+                'NewPassword' => $pass
+         );
+        $query = $this->db->get_where('db_employees.employees',
+                array('NIP' => $nip))->row_array();
+        $passdb = $query['Password'];
+        $curr = $this->genratePassword($nip,$passold);
+        if ($passdb == $curr) {
+            // if($_SERVER['SERVER_NAME']=='demopcam.podomorouniversity.ac.id') {
+         if(true) {
+            // update for AD
+            $this->m_master->UpdatePwdAD($data_arr);
+        }
+            $plan=$this->genratePassword($nip,$pass);
+
+            $dataUpdate = array(
+                'Password' => $plan,
+                'Password_Curr' => $plan2,
+            );
+
+            $this->db->where('NIP', $nip);
+            $this->db->update('db_employees.employees',$dataUpdate);
+                 
+            $rs['status'] = 1;
+        }else{
+            $rs['status'] = 0;
+        }
+        
+        break;
+
+        case 'changegsuitepass':
+        
+        $formData = $datatoken['dataShareMenu'];
+        $nip = $formData['nip'];
+        $pass = $formData['pass'];
+        $sql = 'SELECT * FROM db_employees.employees WHERE NIP = '.$nip.'';
+        $query = $this->db->query($sql)->row_array();
+         
+        $insertData = array(
+            'Username' => $nip,
+            'Name' => $query['Name'],
+            'Email' => $query['EmailPU'],
+            'NewPassword' => $pass,
+            'Status' => '0',
+            'EnteredAt' => date('Y-m-d H:i:s'),
+        );
+        
+        $this->db->insert('db_it.reset_password',$insertData);
+        $rs['status'] = 1;   
+        break;
+     
+    }
+
+      echo json_encode($rs);
+    }
+
+    private function genratePassword($Username,$Password){
+
+        $plan_password = $Username.''.$Password;
+        $pas = md5($plan_password);
+        $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+
+        return $pass;
+    }
+
 
     public function additionalInfo($NIP){
         $isExist = $this->isItRealMe($NIP);
