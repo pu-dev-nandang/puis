@@ -286,7 +286,7 @@
             <li class="<?php if($this->uri->segment(2)=='request-change-password'){echo"current";}?>">
                 <a href="<?php echo base_url('it/request-change-password');?>">
                    <i class="fa fa-envelope"><span class="badge" style="background-color: red;"><?php echo $resetpassmenu; ?></span></i>
-                    Request Reset Password
+                    Request Change Password
                 </a>
             </li>
         </ul>

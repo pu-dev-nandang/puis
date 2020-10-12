@@ -1,7 +1,7 @@
 
 <div id="generate-edom">
     <div class="row">
-        <div class="col-sm-6 col-md-12">
+        <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title">
@@ -20,12 +20,11 @@
                                             <thead>
                                                  <tr style="background: #3968c6;color: #FFFFFF;">
                                                     <th style="width: 1%;text-align: center;">No</th>
-                                                    <th style="width: 7%;text-align: center;">NPM</th>
-                                                    <th style="width: 28%;text-align: center;">Name</th>
+                                                    <th style="width: 15%;text-align: center;">Username</th>
+                                                    <th style="width: 21%;text-align: center;">Name</th>
                                                     <th style="width: 16%;text-align: center;">Email</th>
                                                     <th style="width: 14%;text-align: center;">New Password</th>
                                                     <th style="width: 16%;text-align: center;">Entered At</th>
-                                                    <th style="width: 1%;text-align: center;">Status</th>
                                                     <th style="width: 8%;text-align: center;">Action</th>                          
                                                 </tr>
                                             </thead>
@@ -37,12 +36,11 @@
                                                 ?>
                                                  <tr>
                                                     <td><?php echo $no++; ?></td>
-                                                    <td><?php echo $res['NPM']; ?></td>
+                                                    <td><?php echo $res['Username'];  ?></td>
                                                     <td><?php echo $res['Name']; ?></td>
                                                     <td><?php echo $res['Email']; ?></td>
                                                     <td><?php echo $res['NewPassword']; ?></td>
-                                                    <td><?php echo $res['EnteredAt']; ?></td>
-                                                    <td><?php echo $res['Status']; ?></td> 
+                                                    <td><?php echo $res['EnteredAt']; ?></td>                                                
                                                     <td>
                                                         <div class="btn-group">
                                                             <button class="btn btn-info btn-sm" onclick="finishbtn(<?php echo $res['ID']; ?>);" title="Finish">Finish</button>
