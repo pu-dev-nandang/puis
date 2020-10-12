@@ -862,11 +862,14 @@ class C_api_menu extends CI_Controller {
                     }
                     else if($data[$i]['QTID']=='5' || $data[$i]['QTID']==5){
 
-                        $dataWhere['IsTrue'] = '1';
-                        $TotalYes = $this->db->from('db_it.surv_answer_detail')->where($dataWhere)->count_all_results();
+                        $dataWhere = $dataWhere.' AND IsTrue = "1"';
 
-                        $dataWhere['IsTrue'] = '0';
-                        $TotalNo = $this->db->from('db_it.surv_answer_detail')->where($dataWhere)->count_all_results();
+                        $TotalYes = $this->db->query('SELECT COUNT(*) AS Total FROM db_it.surv_answer_detail sad LEFT JOIN db_it.surv_answer sa 
+                                                        ON (sa.ID = sad.AnswerID) WHERE '.$dataWhere)->result_array()[0]['Total'];
+
+                        $dataWhere = $dataWhere.' AND IsTrue = "0"';
+                        $TotalNo = $this->db->query('SELECT COUNT(*) AS Total FROM db_it.surv_answer_detail sad LEFT JOIN db_it.surv_answer sa 
+                                                        ON (sa.ID = sad.AnswerID) WHERE '.$dataWhere)->result_array()[0]['Total'];
 
                         $AverageRate = '<div>Y : '.$TotalYes.'</div><div>N : '.$TotalNo.'</div>';
 
