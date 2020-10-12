@@ -90,6 +90,8 @@
             }
 
         });
+
+        newDescritionInput.getDescription(Year);
     }
 
     $(document).on('click','.showDetailStudent',function () {
@@ -140,5 +142,11 @@
 
 
     });
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        const Year = (($('#filterYear option:selected').val()).split('.'))[1];
+        newDescritionInput.saveDescription(itsme,Year);
+    })
 
 </script>

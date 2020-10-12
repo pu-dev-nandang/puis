@@ -43,6 +43,7 @@
         <div class="col-md-9" id = "ViewData">
             <div style="text-align: right;"><button class="btn btn-success" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o margin-right"></i> Excel </button></div> <p></p>
             <div style="min-height: 30px;" id="viewData" class="table-responsive"></div>
+        </div>
 
     </div>
 </div>
@@ -74,6 +75,7 @@
                 }
 
                 loadDataTable();
+                newDescritionInput.getDescription();
                 clearInterval(firstLoad);
             }
             
@@ -396,6 +398,8 @@
         }
     });
 
-
-
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
+    })
 </script>
