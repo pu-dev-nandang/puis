@@ -51,6 +51,8 @@
             var filterYear = $('#filterYear').val();
             if(filterYear!='' && filterYear!=null){
                 loadData();
+                const Year  = (($('#filterYear option:selected').val()).split('.'))[1];
+                newDescritionInput.getDescription(Year);
                 clearInterval(firstLoad);
             }
         },1000);
@@ -141,6 +143,8 @@
         var filterYear = $('#filterYear').val();
         if(filterYear!='' && filterYear!=null){
             loadData();
+            const Year  = (($('#filterYear option:selected').val()).split('.'))[1];
+            newDescritionInput.getDescription(Year);
         }
     });
 
@@ -188,4 +192,10 @@
         });
 
     });
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        const Year  = (($('#filterYear option:selected').val()).split('.'))[1];
+        newDescritionInput.saveDescription(itsme,Year);
+    })
 </script>

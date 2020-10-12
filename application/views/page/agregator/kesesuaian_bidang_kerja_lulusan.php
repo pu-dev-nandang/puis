@@ -64,7 +64,7 @@
         var token = jwt_encode(data,'UAP)(*');
 
         $.post(url,{token:token},function (jsonResult) {
-
+            console.log('sad');
             var Y1 = Year;
             var Y2 = (parseInt(Year) - 1);
             var Y3 = (parseInt(Year) - 2);
@@ -100,6 +100,8 @@
             }
 
         });
+
+        newDescritionInput.getDescription(Year);
     }
 
     $('#filterYear').change(function () {
@@ -157,6 +159,12 @@
         });
 
     });
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        const Year = (($('#filterYear option:selected').val()).split('.'))[1];
+        newDescritionInput.saveDescription(itsme,Year);
+    })
 
 
 </script>

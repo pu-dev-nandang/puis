@@ -3182,7 +3182,7 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='readKesesuaianBidangKerjaLulusan'){
             $Year = $data_arr['Year'];
             $dataEd = $this->db->query('SELECT el.ID, el.Name, el.Description FROM db_academic.education_level el')->result_array();
-
+    
             if(count($dataEd)>0) {
                 for ($j = 0; $j < count($dataEd); $j++) {
 
@@ -3245,6 +3245,7 @@ class C_api3 extends CI_Controller {
 
                 }
             }
+
             return print_r(json_encode($dataEd));
         }
 
