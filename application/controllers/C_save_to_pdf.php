@@ -7562,20 +7562,52 @@ Phone: (021) 29200456';
         $pdf->SetMargins(10,10,10);
         $pdf->AddPage();
 
-//        $pdf->SetFont('dinpromedium','',11);
+
 //        $pdf->Cell(183,5,'Information Identifying Diploma Supplement Holder',1,1,'L');
 //
 //        $pdf->Cell(91.5,5,'Information Identifying Diploma Supplement Holder',1,1,'L');
 //        $pdf->Cell(58.5,5,'Information ',1,1,'L');
 
+        $pdf->Image('./images/FA_letterhead_a4_r2.jpg',0,0,210);
+
+
         $URLQrCode = $data_arr['shareLink'];
 
         $t = QRcode::png($URLQrCode,false,'L', 10, 4);
         $pic = 'data://text/plain;base64,' . $t;
-        $pdf->Image($pic,68.5,12.5,66,NULL,'png');
-        $pdf->Image('./images/SKPI/frame-qrcode.png',68.5,11,66);
+        $pdf->Image($pic,68.5,41,66,NULL,'png');
+        $pdf->Image('./images/SKPI/frame-qrcode.png',68.5,41,66);
 
+        $pdf->setFillColor(230, 236, 255);
+        $pdf->SetFont('dinprolight','',15);
+        $pdf->SetXY(10,130.5);
+        $pdf->Cell(0,15,$URLQrCode,0,1,'C',true);
+//
+        $pdf->SetTextColor(255,0,0);
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->SetXY(10,145.5);
+        $pdf->Cell(0,5,'*) Tidak ada angka 0 (nol) di dalam URL',0,1,'C',true);
+//
+//
+        $pdf->Ln(13);
 
+        $dataSurv = $this->db->get_where('db_it.surv_survey',array('ID'=>$data_arr['ID']))
+            ->result_array();
+
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('dinpromedium','',13);
+        $pdf->Cell(40,5,'Judul',0,0,'L');
+        $pdf->Cell(10,5,':',0,0,'C');
+        $pdf->SetXY(60,$pdf->GetY());
+        $pdf->MultiCell(140,5,$dataSurv[0]['Title'],0);
+
+        $pdf->Ln(5);
+
+        $pdf->Cell(40,5,'Tanggal Publikasi',0,0,'L');
+        $pdf->Cell(10,5,':',0,0,'C');
+        $pdf->SetXY(60,$pdf->GetY());
+        $pdf->MultiCell(140,5,date('d F yy', strtotime($dataSurv[0]['StartDate'])).' - '.
+            date('d F yy', strtotime($dataSurv[0]['EndDate'])),0);
 
 
         $StudentName = '123123';
