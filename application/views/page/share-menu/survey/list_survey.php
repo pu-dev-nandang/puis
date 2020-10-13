@@ -137,7 +137,7 @@
                 '</div>' +
                 '<div class="form-group">' +
                 '<a href="'+base_url_js+'save2pdf/share-survey/'+tokenLink+'" target="_blank" class="btn btn-primary">Download QR Code PDF</a> ' +
-                '<a href="data:image/png;base64,'+jsonResult.Encode+'" download="qr.png" class="btn btn-primary">Download QR Code Image</a>' +
+                '<a href="data:image/png;base64,'+jsonResult.Encode+'" download="QR-Code-'+jsonResult.Key+'.png" class="btn btn-primary">Download QR Code Image</a>' +
                 '</div>' +
                 '</div>';
 
