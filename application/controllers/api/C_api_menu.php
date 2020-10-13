@@ -766,6 +766,9 @@ class C_api_menu extends CI_Controller {
 
         else if($data_arr['action']=='setPublicSurvey'){
             $ID = $data_arr['SurveyID'];
+            $this->load->library('Qrcode/qrlib');
+
+
 
             // Cek apakah sudah mempunyai key atau blm
             $dataCk = $this->db->select('Key')->get_where('db_it.surv_survey',array(
@@ -785,13 +788,19 @@ class C_api_menu extends CI_Controller {
                 $this->db->update('db_it.surv_survey',$dataUpdate);
             }
 
+            $URLQrCode = url_sign_out.'form/'.$KeyPublic;
+
+            $t = QRcode::png($URLQrCode,false,'L', 10, 4);
+            $pic = 'data:image/png;base64,' . $t;
+
+            $result = array(
+                'Status' => 1,
+                'Key' => $KeyPublic,
+                'Encode' => $t,
+                'QRCode' => $pic);
 
 
-            return print_r(json_encode(
-                array(
-                    'Status' => 1,
-                    'Key' => $KeyPublic)
-            ));
+            return print_r(json_encode($result));
 
         }
 
