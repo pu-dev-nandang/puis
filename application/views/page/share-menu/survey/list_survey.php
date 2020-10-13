@@ -130,12 +130,15 @@
                 shareLink : shareLink
             },'UAP)(*');
 
-            var htmlss = '<div class="form-group">' +
-                '<label>Link</label>' +
+            var htmlss = '<div style="text-align: center;">' +
+                '<img src="'+jsonResult.QRCode+'" />' +
+                '<div class="form-group">' +
                 '<div class="panel-link">'+shareLink+'</div>'+
                 '</div>' +
                 '<div class="form-group">' +
-                '<a href="'+base_url_js+'save2pdf/share-survey/'+tokenLink+'" target="_blank" class="btn btn-primary">Download QR Code</a>' +
+                '<a href="'+base_url_js+'save2pdf/share-survey/'+tokenLink+'" target="_blank" class="btn btn-primary">Download QR Code PDF</a> ' +
+                '<a href="data:image/png;base64,'+jsonResult.Encode+'" download="qr.png" class="btn btn-primary">Download QR Code Image</a>' +
+                '</div>' +
                 '</div>';
 
             $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
