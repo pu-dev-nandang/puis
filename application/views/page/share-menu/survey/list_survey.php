@@ -21,6 +21,12 @@
         background: #eeffdb !important;
     }
 
+    .key {
+         background: #e6e6e6;
+         padding: 3px 10px;
+         border-radius: 5px;
+     }
+
 </style>
 
 <div class="row" style="margin-bottom: 15px;">

@@ -489,7 +489,7 @@ class C_api_menu extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataSearch = ' AND ( ss.Title LIKE "%'.$search.'%" )';
+                $dataSearch = ' AND ( ss.Title LIKE "%'.$search.'%" OR ss.Key LIKE "%'.$search.'%" )';
             }
 
             $queryDefault = 'SELECT ss.* FROM db_it.surv_survey ss WHERE 
@@ -557,9 +557,9 @@ class C_api_menu extends CI_Controller {
                                 <li><a href="javascript:void(0);" class="btnManageTarget" data-id="'.$row['ID'].'">Manage Targets</a></li>
                                 <li><a href="'.base_url('survey/manage-question/'.$tokenBtn).'" target="_blank">Manage Question</a></li>
                                 <li role="separator" class="divider"></li>
-                                <li class="btnShareToPublic" data-id="'.$row['ID'].'"><a href="#">Share to the public</a></li>
+                                <li><a href="javascript:void(0);" class="btnShareToPublic" data-id="'.$row['ID'].'">Share to the public</a></li>
                                 <li role="separator" class="divider"></li>
-                                <li class="'.$btnRemove.'"><a href="#">Remove</a></li>
+                                <li class="'.$btnRemove.'"><a href="javascript:void(0);">Remove</a></li>
                               </ul>
                             </div>';
 
@@ -610,8 +610,10 @@ class C_api_menu extends CI_Controller {
                 $TotalPublication = (($StatusPublicationNow) > 0)
                     ? '<a href="javascript:void(0)" class="showAllPublication" data-id="'.$row['ID'].'">'.$StatusPublicationNow.'</a>' : 0;
 
+                $Key = ($row['Key']!='' && $row['Key']!=null) ? '<div style="margin-top: 10px;"><span class="key">'.$row['Key'].'</span></div>' : '';
+
                 $nestedData[] = '<div>'.$no.'</div>';
-                $nestedData[] = '<div style="text-align: left;">'.$row['Title'].'</div>';
+                $nestedData[] = '<div style="text-align: left;"><b>'.$row['Title'].'</b>'.$Key.'</div>';
                 $nestedData[] = $btnShowTotalQuestion;
                 $nestedData[] = $btnTotalAlreadyFillOut;
                 $nestedData[] = $btnTotalAlreadyFillOut_ext;
