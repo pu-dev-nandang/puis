@@ -14,6 +14,7 @@
 <script>
     $(document).ready(function () {
         loadIPK();
+        newDescritionInput.getDescription();
     });
 
     function loadIPK() {
@@ -182,5 +183,10 @@
                 'backdrop' : 'static'
             });
         }
+    })
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
     })
 </script>

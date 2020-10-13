@@ -104,6 +104,9 @@
             if(WaitForLoading == 1 && filterYear!='' && filterYear!=null && filterBaseProdi != '' && filterBaseProdi != null){
                loadDataTable();
                $('#formYear').trigger('change');
+
+               const Year = $('#filterYear option:selected').val();
+               newDescritionInput.getDescription(Year);
                clearInterval(firstLoad2);
             }
 
@@ -131,6 +134,8 @@
 
     $('#filterYear').change(function () {
         loadDataTable();
+        const Year = $('#filterYear option:selected').val();
+        newDescritionInput.getDescription(Year);
     });
 
     function filteryear() {
@@ -500,6 +505,12 @@
                 'backdrop' : 'static'
             });
         }
+    })
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        const Year = $('#filterYear option:selected').val();
+        newDescritionInput.saveDescription(itsme,Year);
     })
 
 </script>

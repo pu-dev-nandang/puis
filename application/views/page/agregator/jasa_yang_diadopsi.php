@@ -88,6 +88,7 @@
             var filterYearDsn = $('#filterYearDsn').val();
             if(filterYearDsn!='' && filterYearDsn!=null){
                 loadDataDsn();
+                newDescritionInput.getDescription();
                 clearInterval(firsld1);
             }
         },1000);
@@ -204,4 +205,9 @@
 
         }
     }
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
+    })
 </script>

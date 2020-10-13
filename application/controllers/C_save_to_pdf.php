@@ -874,7 +874,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Times','',7);
         $pdf->Cell($w_ttd,$h,'Staff SAS',1,0,'C');
         $pdf->Cell($w_ttd,$h,'Kabag. Administrasi Perkuliahan',1,0,'C');
-        $pdf->Cell($w_ttd,$h,'Wakil Rektor I',1,1,'C');
+        $pdf->Cell($w_ttd,$h,'Wakil Rektor I Bidang Akademik',1,1,'C');
 
 
         $pdf->Ln(5);
@@ -3318,7 +3318,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell((3*$w_f)+$w_fv,$h,ucwords(strtolower($dataTempTr['Place'])).', '.$dateT,$border,1,'L');
 
 
-        $ttdb = ($lang=='ind')? 'Pjs. Wakil Rektor I' : 'Acting Vice Rector I';
+        $ttdb = ($lang=='ind')? 'Wakil Rektor I Bidang Akademik' : 'Vice Rector of Academic Affairs';
         $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'',$border,0,'R');
         $pdf->Cell((3*$w_f)+$w_fv,$h,$ttdb,$border,1,'L');
 
@@ -3662,11 +3662,11 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Ln(5);
 
             $pdf->SetFont('dinpromedium','',$font_medium);
-            $pdf->Cell($w_Div+$min,$h,'Wakil Rektor I',$borderttd,0,'L');
+            $pdf->Cell($w_Div+$min,$h,'Wakil Rektor I Bidang Akademik',$borderttd,0,'L');
             $pdf->Cell($w_Div-$min,$h,'Dekan',$borderttd,1,'L');
 
             $pdf->SetFont('dinlightitalic','',$font_medium_i);
-            $pdf->Cell($w_Div+$min,$h,'Vice Rector I',$borderttd,0,'L');
+            $pdf->Cell($w_Div+$min,$h,'Vice Rector of Academic Affairs',$borderttd,0,'L');
             $pdf->Cell($w_Div-$min,$h,'Dean',$borderttd,1,'L');
 
             $pdf->Ln(17);
@@ -3719,11 +3719,11 @@ class C_save_to_pdf extends CI_Controller {
 
             $pdf->SetFont('dinpromedium','',$font_medium);
             $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-            $pdf->Cell($w_Div-$min,$h,'Wakil Rektor I',$borderttd,1,'L');
+            $pdf->Cell($w_Div-$min,$h,'Wakil Rektor I Bidang Akademik',$borderttd,1,'L');
 
             $pdf->SetFont('dinlightitalic','',$font_medium_i);
             $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-            $pdf->Cell($w_Div-$min,$h,'Vice Rector I',$borderttd,1,'L');
+            $pdf->Cell($w_Div-$min,$h,'Vice Rector of Academic Affairs',$borderttd,1,'L');
 
             $pdf->Ln(17);
 
@@ -4485,10 +4485,10 @@ class C_save_to_pdf extends CI_Controller {
         //================ Tanda tangan =======================
         $pdf->SetX($x);
         $pdf->SetFont('Arial','',$fn_b);
-        $pdf->Cell($fillFull,$h,'Wakil Rektor I',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'Wakil Rektor I Bidang Akademik',$border,1,'L');
         $pdf->SetX($x);
         $pdf->SetFont('Arial','I',$fn_i);
-        $pdf->Cell($fillFull,$h,'Vice Rector I',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'Vice Rector of Academic Affairs',$border,1,'L');
         $y = $pdf->GetY()+7;
         $pdf->Ln(15);
         //================ hormat kami ========================
@@ -6002,7 +6002,7 @@ Phone: (021) 29200456';
              $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
              $pdf->AddPage();
              $pdf->SetAutoPageBreak(true, 0);
-           
+
              // $ConverToPath = function($PathURL)
              // {
              //    $rs = '';
@@ -7271,7 +7271,7 @@ Phone: (021) 29200456';
                 if ( empty($d2['Photo']) || $d2['Photo'] == '' || !$this->m_master->is_url_exist($path)   ) {
                     $path = './images/icon/userfalse.png';
                 }
-                
+
                 $pdf->Image($path,10,$pdf->GetY(),25);
 
                 $pdf->SetFont('dinprolight','',$fontBody);
@@ -7484,12 +7484,12 @@ Phone: (021) 29200456';
                 } else {
                     $dataWarek =  $this->db->query(
                         'select * from db_employees.employees
-                         where StatusEmployeeID = 1 
-                         and 
+                         where StatusEmployeeID = 1
+                         and
                          (
                             PositionMain = "2.2" or
                             PositionOther1 = "2.2" or
-                            PositionOther2 = "2.2" or 
+                            PositionOther2 = "2.2" or
                             PositionOther3 = "2.2"
                          )
 
