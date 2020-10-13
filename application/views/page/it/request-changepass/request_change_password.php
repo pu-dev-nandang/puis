@@ -20,11 +20,12 @@
                                             <thead>
                                                  <tr style="background: #3968c6;color: #FFFFFF;">
                                                     <th style="width: 1%;text-align: center;">No</th>
-                                                    <th style="width: 15%;text-align: center;">Username</th>
-                                                    <th style="width: 21%;text-align: center;">Name</th>
-                                                    <th style="width: 16%;text-align: center;">Email</th>
-                                                    <th style="width: 14%;text-align: center;">New Password</th>
-                                                    <th style="width: 16%;text-align: center;">Entered At</th>
+                                                    <th style="width: 11%;text-align: center;">Username</th>
+                                                    <th style="width: 18%;text-align: center;">Name</th>
+                                                    <th style="width: 18%;text-align: center;">Email</th>
+                                                    <th style="width: 12%;text-align: center;">New Password</th>
+                                                    <th style="width: 15%;text-align: center;">Entered At</th>
+                                                    <th style="width: 8%;text-align: center;">Status</th>
                                                     <th style="width: 8%;text-align: center;">Action</th>                          
                                                 </tr>
                                             </thead>
@@ -40,7 +41,14 @@
                                                     <td><?php echo $res['Name']; ?></td>
                                                     <td><?php echo $res['Email']; ?></td>
                                                     <td><?php echo $res['NewPassword']; ?></td>
-                                                    <td><?php echo $res['EnteredAt']; ?></td>                                                
+                                                    <td><?php echo $res['EnteredAt']; ?></td>
+                                                    <td>
+                                                      <?php if ($res['Status']==0): ?>
+                                                        Pending
+                                                      <?php else: ?>
+                                                        Finish
+                                                      <?php endif ?>  
+                                                    </td>                                              
                                                     <td>
                                                         <div class="btn-group">
                                                             <button class="btn btn-info btn-sm" onclick="finishbtn(<?php echo $res['ID']; ?>);" title="Finish">Finish</button>

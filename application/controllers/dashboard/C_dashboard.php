@@ -1253,8 +1253,8 @@ class C_dashboard extends Globalclass {
         $passdb = $query['Password'];
         $curr = $this->genratePassword($nip,$passold);
         if ($passdb == $curr) {
-            // if($_SERVER['SERVER_NAME']=='demopcam.podomorouniversity.ac.id') {
-         if(true) {
+            if($_SERVER['SERVER_NAME']=='demopcam.podomorouniversity.ac.id') {
+         //if(true) {
             // update for AD
             $this->m_master->UpdatePwdAD($data_arr);
         }
