@@ -556,18 +556,21 @@
 
         var token = $(this).attr('data-token');
         var title = $(this).attr('data-title');
+        
         var dataToken = jwt_decode(token,'UAP)(*');
-
         var tr = '';
         if(dataToken.length>0){
             $.each(dataToken,function (i,v) {
 
                 var mkt = (v.MKType=='1') ? '<br/><span class="label label-primary">Required</span>' : '';
 
+                var isTransfer = (parseInt(v.TransferCourse)==1) ? '<div>Transfer</div>' : '';
+
                 tr = tr + '<tr>' +
                     '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
                     '<td>'+v.MKCode+''+mkt+'</td>' +
                     '<td style="text-align: left;"><b>'+v.Course+'</b><br/><i>'+v.CourseEng+'</i></td>' +
+                    '<td>'+v.TypeSchedule+isTransfer+'</td>' +
                     '<td>'+v.Credit+'</td>' +
                     '<td>'+v.Grade+'</td>' +
                     '</tr>'
@@ -585,6 +588,7 @@
             '                <th style="width: 1%;">No</th>' +
             '                <th style="width: 17%;">MKCode</th>' +
             '                <th>Course</th>' +
+            '                <th style="width: 7%;">Type</th>' +
             '                <th style="width: 7%;">Credit</th>' +
             '                <th style="width: 7%;">Grade</th>' +
             '            </tr>' +
