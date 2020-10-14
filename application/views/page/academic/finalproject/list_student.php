@@ -131,7 +131,8 @@
             var token = jwt_encode({action : 'viewYudisiumList',SemesterID:SemesterID,ProdiID : ProdiID, StatusTA : StatusTA},'UAP)(*');
             var url = base_url_js+'api3/__crudYudisium';
 
-            var dataTable = $('#tableData').DataTable( {
+            // window.dataTable.ajax.reload(null, false);
+            window.dataTable = $('#tableData').DataTable( {
                 "processing": true,
                 "serverSide": true,
                 "iDisplayLength" : 10,
@@ -165,7 +166,8 @@
 
             $.post(url,{token:token},function (result) {
 
-                loadData();
+                // loadData();
+                window.dataTable.ajax.reload(null, false);
                 toastr.success('Data saved','Success');
 
             });
@@ -206,7 +208,8 @@
                 success : function(data) {
                     toastr.success('Upload Success','Saved');
                     setTimeout(function () {
-                        loadData();
+                        window.dataTable.ajax.reload(null, false);
+                        // loadData();
                     },500);
 
                 }
@@ -278,16 +281,8 @@
 
                     $.post(url,{token:token},function (result) {
                         toastr.success('Data saved','Success');
-                        loadData();
-
-                        // $('#btnAddMentor_'+ID).attr('data-m1',formMentor1);
-                        // if(formMentor2!='' && formMentor2!=null){
-                        //     $('#btnAddMentor_'+ID).attr('data-m2',formMentor2);
-                        // }
-                        //
-                        // var formMentor1name = (formMentor1!='' && formMentor1!=null) ? '<div>'+$('#formMentor1').select2('data').text+'</div>' : '';
-                        // var formMentor2name = (formMentor2!='' && formMentor2!=null) ? '<div>'+$('#formMentor2').select2('data').text+'</div>' : '';
-                        // $('#viewMentor_'+ID).html(formMentor1name+''+formMentor2name);
+                        // loadData();
+                        window.dataTable.ajax.reload(null, false);
 
                         setTimeout(function () {
                             $('#GlobalModal').modal('hide');
