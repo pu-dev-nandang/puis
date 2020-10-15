@@ -1178,10 +1178,15 @@
 
     messaging.onMessage(function (payload) {
         const title = payload.notification.title;
+        const icon = (typeof payload.notification.icon !== "undefined" && payload.notification.icon !='')
+            ? payload.notification.icon : './images/icon/favicon.png';
         const options = {
-            body : payload.notification.body
+            body : payload.notification.body,
+            icon : icon
         };
-        toastr.info(payload.notification.body,title);
-    })
+        // toastr.info(payload.notification.body,title);
+
+        var notification = new Notification(title,options);
+    });
 
 </script>
