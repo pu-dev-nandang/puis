@@ -1589,6 +1589,17 @@ class M_rest extends CI_Model {
                                 $Grade = (isset($dataScore[0]['Grade']) && $dataScore[0]['Grade']!='' && $dataScore[0]['Grade']!=null && $dataScore[0]['Grade']!='-') ? $dataScore[0]['Grade'] : 'E';
                                 $GradeValue = (isset($dataScore[0]['GradeValue']) && $dataScore[0]['GradeValue']!='' && $dataScore[0]['GradeValue']!=null && $dataScore[0]['GradeValue']!='-') ? $dataScore[0]['GradeValue'] : 0;
 
+                                $dataTRXc = [];
+                                if($d['TransferCourse']=='1'){
+                                    // get matakuliah asal
+                                    $dataTRXc = $this->db->query('SELECT cd.TotalSKS, mk.Name AS MKName, mk.NameEng AS MKNameEng, mk.MKCode  
+                                                                    FROM db_academic.transfer_history_conversion thc
+                                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = thc.CDID_Before)
+                                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
+                                                                    WHERE thc.NPM_After = "'.$NPM.'" 
+                                                                    AND thc.CDID_After = "'.$d['CDID'].'" ')->result_array();
+                                }
+
                                 $arrTr = array(
                                     'SemesterID' => $data[$i]['ID'],
                                     'CDID' => $d['CDID'],
@@ -1600,6 +1611,7 @@ class M_rest extends CI_Model {
                                     'Credit' => $d['Credit'],
                                     'TypeSchedule' => $d['TypeSchedule'],
                                     'TransferCourse' => $d['TransferCourse'],
+                                    'TransferCourseDetails' => $dataTRXc,
                                     'Score' => $Score,
                                     'Grade' => $Grade,
                                     'GradeValue' => $GradeValue,
@@ -1657,8 +1669,8 @@ class M_rest extends CI_Model {
                                     'Course' => $d_sa['Name'],
                                     'CourseEng' => $d_sa['NameEng'],
                                     'Credit' => $d_sa['Credit'],
-                                    'TypeSchedule' => $d_sa['TypeSchedule'],
-                                    'TransferCourse' => $d_sa['TransferCourse'],
+                                    'TypeSchedule' => $d_sa['Type'],
+                                    'TransferCourse' => '0',
                                     'Score' => $Score,
                                     'Grade' => $Grade,
                                     'GradeValue' => $GradeValue,

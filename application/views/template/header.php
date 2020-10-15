@@ -556,15 +556,27 @@
 
         var token = $(this).attr('data-token');
         var title = $(this).attr('data-title');
-        
+
         var dataToken = jwt_decode(token,'UAP)(*');
         var tr = '';
         if(dataToken.length>0){
+            console.log(dataToken);
             $.each(dataToken,function (i,v) {
 
                 var mkt = (v.MKType=='1') ? '<br/><span class="label label-primary">Required</span>' : '';
 
-                var isTransfer = (parseInt(v.TransferCourse)==1) ? '<div>Transfer</div>' : '';
+                var isTransfer = (parseInt(v.TransferCourse)==1) ? '<div>Transfer</div><i class="fa fa-level-down fa-2x"></i>' : '';
+
+                var trConverted = '';
+                if(parseInt(v.TransferCourse)==1) {
+                    var dataCoversion = v.TransferCourseDetails[0];
+                    trConverted = '<tr style="background: #eaeaea;">' +
+                        '<td colspan="2" style="border-top: none;color: #ff493b;font-weight: bold;">Converted from : </td>' +
+                        '<td colspan="2" style="text-align:left;border-top: none;"><b>'+dataCoversion.MKNameEng+'</b><br/><i>'+dataCoversion.MKName+'</i></td>' +
+                        '<td style="border-top: none;">MKCode<br/>'+dataCoversion.MKCode+'</td>' +
+                        '<td style="border-top: none;">SKS<br/>'+dataCoversion.TotalSKS+'</td>' +
+                        '</tr>';
+                }
 
                 tr = tr + '<tr>' +
                     '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
@@ -573,7 +585,7 @@
                     '<td>'+v.TypeSchedule+isTransfer+'</td>' +
                     '<td>'+v.Credit+'</td>' +
                     '<td>'+v.Grade+'</td>' +
-                    '</tr>'
+                    '</tr>'+trConverted;
             });
         }
 
@@ -582,9 +594,9 @@
 
         var htmlss = '<div class="row">' +
             '    <div class="col-md-12">' +
-            '        <table class="table table-centre table-striped">' +
+            '        <table class="table table-centre table-bordered table-hover">' +
             '            <thead>' +
-            '            <tr>' +
+            '            <tr style="background: #dcdcdc;">' +
             '                <th style="width: 1%;">No</th>' +
             '                <th style="width: 17%;">MKCode</th>' +
             '                <th>Course</th>' +
