@@ -19,8 +19,11 @@ const messaging = firebase.messaging();
 messaging.setBackgroundMessageHandler(function(payload) {
     // body...
     const title = payload.notification.title;
+    const icon = (typeof payload.notification.icon !== "undefined" && payload.notification.icon !='')
+        ? payload.notification.icon : './images/icon/favicon.png';
     const options = {
-        body : payload.notification.body
+        body : payload.notification.body,
+        icon : icon
     };
     return self.registration.showNotification(title,options);
-})
+});
