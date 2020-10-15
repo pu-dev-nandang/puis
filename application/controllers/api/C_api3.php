@@ -5554,12 +5554,15 @@ class C_api3 extends CI_Controller {
 
             $dataForm = (array) $data_arr['dataForm'];
             $Username = $dataForm['Username'];
+            $TypeUser = $dataForm['TypeUser'];
+            $arrWhere = array('Username'=>$Username, 'TypeUser' => $TypeUser);
             // cek apakah username sudah ada atau blm
-            $cekUser = $this->db->from('db_it.fcm_token')->where('Username',$Username)->count_all_results();
+            $cekUser = $this->db->from('db_it.fcm_token')->where($arrWhere)->count_all_results();
 
             if($cekUser>0){
                 unset($dataForm['Username']);
-                $this->db->where('Username', $Username);
+                unset($dataForm['TypeUser']);
+                $this->db->where($arrWhere);
                 $this->db->update('db_it.fcm_token',$dataForm);
             } else {
                 $this->db->insert('db_it.fcm_token',$dataForm);
