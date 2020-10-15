@@ -5550,6 +5550,25 @@ class C_api3 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='updateFCMToken'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $Username = $dataForm['Username'];
+            // cek apakah username sudah ada atau blm
+            $cekUser = $this->db->from('db_it.fcm_token')->where('Username',$Username)->count_all_results();
+
+            if($cekUser>0){
+                unset($dataForm['Username']);
+                $this->db->where('Username', $Username);
+                $this->db->update('db_it.fcm_token',$dataForm);
+            } else {
+                $this->db->insert('db_it.fcm_token',$dataForm);
+            }
+
+            return print_r(1);
+
+
+        }
     }
 
     public function crudFileFinalProject(){
