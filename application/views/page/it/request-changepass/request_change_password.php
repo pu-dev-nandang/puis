@@ -16,7 +16,7 @@
                                 
                                 <div class="panel-body">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered">
+                                        <table class="table table-bordered datatable">
                                             <thead>
                                                  <tr style="background: #3968c6;color: #FFFFFF;">
                                                     <th style="width: 1%;text-align: center;">No</th>
@@ -51,7 +51,12 @@
                                                     </td>                                              
                                                     <td>
                                                         <div class="btn-group">
+                                                          <?php if ($res['Status']==0): ?>
                                                             <button class="btn btn-info btn-sm" onclick="finishbtn(<?php echo $res['ID']; ?>);" title="Finish">Finish</button>
+                                                          <?php else: ?>
+                                                            <button class="btn btn-info btn-sm" disabled>Finish</button>
+                                                          <?php endif ?> 
+                                                            
                                                         </div>
                                                     </td>                                   
                                                 </tr>

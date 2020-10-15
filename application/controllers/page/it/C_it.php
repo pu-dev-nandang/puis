@@ -397,7 +397,7 @@ class C_it extends It_Controler {
     public function request_changepass()
     {
       $department = parent::__getDepartement();
-      $data['resetpass'] = $this->db->where('Status', '0')->get('db_it.reset_password');
+      $data['resetpass'] = $this->db->order_by('Status', 'ASC')->get('db_it.reset_password');
       $content = $this->load->view('page/'.$department.'/request-changepass/request_change_password',$data,true);
       $this->temp($content);  
     }
