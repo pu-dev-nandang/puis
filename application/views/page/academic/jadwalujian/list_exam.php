@@ -547,7 +547,7 @@
 
                 var token = jwt_encode(data,'UAP)(*');
 
-                var dataTable = $('#tableShowExam').DataTable( {
+                window.dataTable = $('#tableShowExam').DataTable( {
                     "processing": true,
                     "serverSide": true,
                     "iDisplayLength" : 10,
@@ -843,8 +843,8 @@
 
             $.post(url,function (result) {
 
-                load__DateExam();
-
+                // load__DateExam();
+                window.dataTable.ajax.reload(null, false);
                 toastr.success('Data removed','Success');
                 $('#GlobalModal').modal('hide');
 
@@ -881,7 +881,8 @@
                         if(typeof jsonData.success=='undefined'){
                             alert(jsonData.error);
                         } else {
-                            load__DateExam();
+                            // load__DateExam();
+                            window.dataTable.ajax.reload(null, false);
                             toastr.success('Data saved','Success');
                             $('#GlobalModal').modal('hide');
                         }
