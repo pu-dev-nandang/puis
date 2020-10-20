@@ -67,7 +67,7 @@ var APP_luaran_penelitan_dtps = {
         }).fail(function() {
             toastr.error("Connection Error, Please try again", 'Error!!');
         }).always(function() {
-
+            newDescritionInput.getDescription();
         });
     },
     loaded : function(){
@@ -96,5 +96,10 @@ $('#filterProdi').change(function () {
         $('#viewProdiName').html($('#filterProdi option:selected').text());
     }
 });
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    newDescritionInput.saveDescription(itsme);
+})
 
 </script>

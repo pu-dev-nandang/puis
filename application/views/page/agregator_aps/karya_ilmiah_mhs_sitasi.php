@@ -90,7 +90,8 @@ var App_karya_ilmiah_mhs_sitasi = {
              },
              dom: 'l<"toolbar">frtip',
              initComplete: function(){
-               
+               var Year = $('#FilterTahun option:selected').val();
+               newDescritionInput.getDescription(Year);
             }  
          });
 
@@ -150,4 +151,11 @@ $('#saveToExcel').click(function () {
            saveTable2Excel('dataTable2Excel');
        },1000);
 });
+
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    var Year = $('#FilterTahun option:selected').val();
+    newDescritionInput.saveDescription(itsme,Year);
+})
 </script>
