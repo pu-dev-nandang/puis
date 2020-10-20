@@ -252,6 +252,8 @@ function LoadTableData(filterProdi)
 
         selector.append(html_tbody);
     });
+
+    newDescritionInput.getDescription(null,SemesterID);
 }
 
 $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
@@ -329,6 +331,12 @@ $(document).off('click', '.datadetailCredit').on('click', '.datadetailCredit',fu
             'backdrop' : 'static'
         });
     }
+})
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    let SemesterID = (($('#FilterSemester option:selected').val()).split('.'))[0];
+    newDescritionInput.saveDescription(itsme,null,SemesterID);
 })
     
 </script>

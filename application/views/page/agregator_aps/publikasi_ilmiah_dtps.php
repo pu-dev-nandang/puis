@@ -101,7 +101,7 @@ var App_publikasi_ilmiah_dtps = {
         }).fail(function() {
             toastr.error("Connection Error, Please try again", 'Error!!');
         }).always(function() {
-
+            newDescritionInput.getDescription();
         });
 
     },
@@ -211,5 +211,10 @@ $(document).off('click', '.datadetailpublikasi').on('click', '.datadetailpublika
             'backdrop' : 'static'
         });
     }
+})
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    newDescritionInput.saveDescription(itsme);
 })
 </script>
