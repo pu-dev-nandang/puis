@@ -81,8 +81,19 @@
                     Contact Us
                 </a>
             </li> -->
+        </ul>
+        <div class="sidebar-title">
+            <span>PODIVERS.ORG</span>
+        </div>
+        <ul id="nav">
 
-
+            <li class="<?php if($this->uri->segment(2)=='list-podivers'){echo"current";}?>">
+                <a href="<?php echo base_url('student-life/list-podivers');?>">
+                    <i class="fa fa-university"></i>
+                    Set Podivers
+                </a>
+            </li>
+        </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
                 <label class="btn active">

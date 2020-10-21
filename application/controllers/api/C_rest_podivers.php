@@ -100,7 +100,8 @@ class C_rest_podivers extends CI_Controller {
       }
     }
 
-    public function authPodiversAPISession(){
+    public function authPodiversAPISession(){      
+      // print_r('ok');die();
       $input = $this->getInputToken();
       $action = $input['action'];
       switch ($action) {
