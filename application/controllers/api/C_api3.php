@@ -5570,7 +5570,11 @@ class C_api3 extends CI_Controller {
                 $this->db->insert('db_it.fcm_token',$dataForm);
             }
 
-            $this->subscribeTopic($Username,$TypeUser,$FCMToken);
+            // hanya untuk live
+            if($_SERVER['SERVER_NAME']!='localhost'){
+                $this->subscribeTopic($Username,$TypeUser,$FCMToken);
+            }
+
 
             return print_r(1);
 
