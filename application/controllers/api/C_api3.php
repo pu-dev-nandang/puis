@@ -5664,7 +5664,7 @@ class C_api3 extends CI_Controller {
                                                     LEFT JOIN db_academic.semester s 
                                                     ON (s.ID = sp.SemesterID)
                                                     LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
-                                                     WHERE sp.SemesterID = 1 
+                                                     WHERE s.Status = 1
                                                      AND sp.NPM = "'.$Username.'" ')->result_array();
 
             if(count($dataSch)>0){
