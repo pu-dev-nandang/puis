@@ -2724,9 +2724,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $rs;
     }
 
-    public function http_request($url,$data){
+    public function http_request_post_data($url,$data){
 
-//        $this->load->library('curl');
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);

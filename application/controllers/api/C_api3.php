@@ -5596,7 +5596,7 @@ class C_api3 extends CI_Controller {
         untuk semua mhs (angkatan n) >>> pu_mhs_n (n adalah tahun masuk)
         untuk semua mhs (angkatan n) & prodi x >>> pu_mhs_n_x (n adalah tahun masuk , x adalah prodi id)
         ========================================
-        Topik mata kuliah >>> pu_course_semesterid_groupmk (di subscribe dosen dan mahasiswa)
+        Topik mata kuliah >>> pu_course_ScheduleID (di subscribe dosen dan mahasiswa)
         ========================================
         */
 
@@ -5638,18 +5638,18 @@ class C_api3 extends CI_Controller {
             $array_topic = ['pu_civitas_akademika','pu_lec_emp','pu_lec'];
 
             // get jadwal di semester aktif
-            $dataSch = $this->db->query('SELECT s.SemesterID, s.ClassGroup FROM db_academic.schedule s 
+            $dataSch = $this->db->query('SELECT s.ID AS ScheduleID FROM db_academic.schedule s 
                                                 LEFT JOIN db_academic.semester smt ON (smt.ID = s.SemesterID)
                                                 WHERE smt.Status = 1 AND s.Coordinator = "'.$Username.'" 
                                                 UNION ALL
-                                                SELECT s2.SemesterID, s2.ClassGroup FROM schedule_team_teaching sst 
+                                                SELECT sst.ScheduleID FROM db_academic.schedule_team_teaching sst 
                                                 LEFT JOIN db_academic.schedule s2 ON (s2.ID = sst.ScheduleID)
                                                 LEFT JOIN db_academic.semester smt2 ON (smt2.ID = s2.SemesterID)
                                                 WHERE smt2.Status = 1 AND sst.NIP = "'.$Username.'" ')->result_array();
 
             if(count($dataSch)>0){
                 foreach ($dataSch AS $item){
-                    array_push($array_topic,'pu_course_'.$item['SemesterID'].'_'.$item['ClassGroup']);
+                    array_push($array_topic,'pu_course_'.$item['ScheduleID']);
                 }
             }
 
@@ -5664,16 +5664,14 @@ class C_api3 extends CI_Controller {
 
             $dbstd = 'ta_'.$dataMhs['Year'];
             // get jadwal aktif
-            $dataSch = $this->db->query('SELECT sp.SemesterID, sc.ClassGroup  FROM '.$dbstd.'.study_planning sp 
-                                                    LEFT JOIN db_academic.semester s 
-                                                    ON (s.ID = sp.SemesterID)
-                                                    LEFT JOIN db_academic.schedule sc ON (sc.ID = sp.ScheduleID)
+            $dataSch = $this->db->query('SELECT sp.ScheduleID  FROM '.$dbstd.'.study_planning sp 
+                                                    LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
                                                      WHERE s.Status = 1
                                                      AND sp.NPM = "'.$Username.'" ')->result_array();
 
             if(count($dataSch)>0){
                 foreach ($dataSch AS $item){
-                    array_push($array_topic,'pu_course_'.$item['SemesterID'].'_'.$item['ClassGroup']);
+                    array_push($array_topic,'pu_course_'.$item['ScheduleID']);
                 }
             }
 
@@ -5700,7 +5698,7 @@ class C_api3 extends CI_Controller {
                     $this->db->insert('db_it.fcm_subscribe_topic',$array_check);
                     $dataPostFCM = array('topic' => $array_topic[$i],'token' => $FCMToken);
                     $url = 'https://firebase.podomorouniversity.ac.id/subscribe.php';
-                    $this->m_master->http_request($url,$dataPostFCM);
+                    $this->m_master->http_request_post_data($url,$dataPostFCM);
                 }
 
             }
