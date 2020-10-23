@@ -71,4 +71,25 @@ class C_survey extends Globalclass {
         $this->menu_survey($page);
     }
 
+    public function share_public(){
+        $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
+        $datatoken =  $this->getInputToken();
+        $formData = json_decode(json_encode($datatoken),true);
+      
+      $id = $formData['ID'];
+      $share = $formData['shareAtPublic'];
+  
+      $updates = array(
+        'isPublicSurvey' => (string)$share
+        
+      );
+      print_r($updates);
+    
+     $this->db->where('ID', $id);
+      $this->db->update('db_it.surv_survey', $updates);
+        
+      $rs['status'] = 1;  
+      echo json_encode($rs);
+    }
+
 }
