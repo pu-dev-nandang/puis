@@ -98,7 +98,7 @@ class M_podivers extends CI_Model {
             'podivers_DB'  => 'ta_'.$dataAuth['Year'],
             'podivers_loggedIn' => TRUE
         );
-
+        // print_r($newdata);die();
         return $newdata;
     }
 
