@@ -28,20 +28,31 @@ class M_alumni extends CI_Model {
                 break;
             case 'create':
                 $this->db->db_debug=false;
-                $dataSave = [
-                    'NPM' => $data['NPM'],
-                    'UpdateAt' => date('Y-m-d H:i:s'),
-                    'UpdateBy' => $data['UpdateBy'],
-                ];
-                $query = $this->db->insert($tbl,$dataSave);
-                if( !$query )
-                {
-                   $this->callback['msg'] = json_encode($this->db->error());
+                // get ID judicum list
+                $get = $this->m_master->caribasedprimary('db_academic.judiciums_list','NPM',$data['NPM']);
+                if (count($get) > 0 ) {
+                    $ID_judicium_list = $get[0]['ID'];
+                    $dataSave = [
+                        'NPM' => $data['NPM'],
+                        'UpdateAt' => date('Y-m-d H:i:s'),
+                        'UpdateBy' => $data['UpdateBy'],
+                        'ID_judicium_list' => $ID_judicium_list,
+                    ];
+                    $query = $this->db->insert($tbl,$dataSave);
+                    if( !$query )
+                    {
+                       $this->callback['msg'] = json_encode($this->db->error());
+                    }
+                    else
+                    {
+                     $this->callback['status'] = 1; 
+                    }
                 }
                 else
                 {
-                 $this->callback['status'] = 1; 
+                    $this->callback['msg'] = 'no data in judicium list';
                 }
+                
                 break;
             default:
                 # code...
