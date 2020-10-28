@@ -9,6 +9,25 @@
                     </h4>
                 </div>
                 <div class="panel-body">
+                  <div class="">
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-4">
+                            <div class="well">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label>Status</label>
+                                        <select class="form-control" id="filterType">
+                                            <option value="">--- All Status ---</option>
+                                            <option disabled>-----------------------</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+
+
                     <div class="row">
                        
                         <div class="col-sm-12">
@@ -16,53 +35,8 @@
                                 
                                 <div class="panel-body">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered datatable">
-                                            <thead>
-                                                 <tr style="background: #3968c6;color: #FFFFFF;">
-                                                    <th style="width: 1%;text-align: center;">No</th>
-                                                    <th style="width: 11%;text-align: center;">Username</th>
-                                                    <th style="width: 18%;text-align: center;">Name</th>
-                                                    <th style="width: 18%;text-align: center;">Email</th>
-                                                    <th style="width: 12%;text-align: center;">New Password</th>
-                                                    <th style="width: 15%;text-align: center;">Entered At</th>
-                                                    <th style="width: 8%;text-align: center;">Status</th>
-                                                    <th style="width: 8%;text-align: center;">Action</th>                          
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php 
-                                                  $no=1;
-
-                                                  foreach ($resetpass->result_array() as $res):
-                                                ?>
-                                                 <tr>
-                                                    <td><?php echo $no++; ?></td>
-                                                    <td><?php echo $res['Username'];  ?></td>
-                                                    <td><?php echo $res['Name']; ?></td>
-                                                    <td><?php echo $res['Email']; ?></td>
-                                                    <td><?php echo $res['NewPassword']; ?></td>
-                                                    <td><?php echo $res['EnteredAt']; ?></td>
-                                                    <td>
-                                                      <?php if ($res['Status']==0): ?>
-                                                        Pending
-                                                      <?php else: ?>
-                                                        Finish
-                                                      <?php endif ?>  
-                                                    </td>                                              
-                                                    <td>
-                                                        <div class="btn-group">
-                                                          <?php if ($res['Status']==0): ?>
-                                                            <button class="btn btn-info btn-sm" onclick="finishbtn(<?php echo $res['ID']; ?>);" title="Finish">Finish</button>
-                                                          <?php else: ?>
-                                                            <button class="btn btn-info btn-sm" disabled>Finish</button>
-                                                          <?php endif ?> 
-                                                            
-                                                        </div>
-                                                    </td>                                   
-                                                </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
+                                        
+                                        <div id="loadTable"></div>
                                     </div>
                                 </div>
                             </div>
@@ -107,6 +81,90 @@
 </div> 
 
 <script>
+ $(document).ready(function(){
+     
+        loadSelectOptionRequest('#filterType','');
+       loadDataRequest();
+    });
+
+ $('#filterType').change(function () {
+        loadDataRequest();
+    });
+function loadSelectOptionRequest(element,selected) {
+
+        var data = {action : 'getStatus'};
+
+        var token = jwt_encode(data,'UAP)(*');
+  
+        var url = "<?php echo base_url('it/finish-changepass'); ?>";
+
+        $.post(url,{token:token},function (jsonResult) {
+            $.each(JSON.parse(jsonResult),function (i,v) {
+              
+                var sc = (selected==v.sts) ? 'selected' : '';
+                if (v.sts==0) {
+                  $(element).append('<option value="'+v.sts+'" '+sc+'>Pending</option>');
+                } else {
+                  $(element).append('<option value="'+v.sts+'" '+sc+'>Finish</option>');
+                }
+       
+            });
+        });
+
+    }
+
+ function loadDataRequest() {
+
+        $('#loadTable').html('<table id="tableData" class="table table-bordered table-striped table-centre">' +
+            '               <thead>' +
+            '                <tr style="background: #eceff1;">' +
+            '                    <th style="width: 1%;text-align: center;">No</th>'+
+            '                    <th style="width: 11%;text-align: center;">Username</th>'+
+            '                    <th style="width: 18%;text-align: center;">Name</th>'+
+            '                    <th style="width: 18%;text-align: center;">Email</th>'+
+            '                    <th style="width: 12%;text-align: center;">New Password</th>'+
+            '                    <th style="width: 15%;text-align: center;">Entered At</th>'+
+            '                    <th style="width: 8%;text-align: center;">Status</th>'+
+            '                    <th style="width: 8%;text-align: center;">Action</th>'+ 
+            '                </tr>' +
+            '                </thead>' +
+            '           </table>');
+
+        var filterType = $('#filterType').val();
+     
+
+        var data = {
+            action : 'viewData',
+            filterType : filterType
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = "<?php echo base_url('it/finish-changepass'); ?>";
+
+        var dataTable = $('#tableData').DataTable( {
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "language": {
+                "searchPlaceholder": "Search..."
+            },
+            "ajax":{
+                url :url, // json datasource
+                data : {token:token},
+                ordering : false,
+                type: "post",  // method  , by default get
+                error: function(){  // error handling
+                    loading_modal_hide();
+                    $(".employee-grid-error").html("");
+                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#employee-grid_processing").css("display","none");
+                }
+            }
+        } );
+
+    }
+
  function finishbtn(id)
   {
     $("#ModalConfirm").modal("show");
@@ -122,6 +180,7 @@
     };
 
     var dataAjax = {
+      action : 'finish',
       datarequest : datarequest,
     }
     var token = jwt_encode(dataAjax,'UAP)(*');
