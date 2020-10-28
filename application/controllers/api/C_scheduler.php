@@ -1986,12 +1986,14 @@ class C_scheduler extends CI_Controller {
         );
 
       }
-
-
-
-
     }
 
+    private function __s8f2(){
+      $this->db->insert('aps_apt_rekap.log',[
+         'RunTime' => date('Y-m-d H:i:s'),
+         'TableName' => 's8f1'
+      ]);
+    }    
 
 
 }
