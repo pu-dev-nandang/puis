@@ -24,6 +24,9 @@ class M_alumni extends CI_Model {
                 else
                 {
                  $this->callback['status'] = 1; 
+                 // update status student ke 1 yaitu enable login student
+                  $this->db->where('NPM',$data['NPM']);
+                  $this->db->update('db_academic.auth_students',['Status' => '1']);
                 }
                 break;
             case 'create':
