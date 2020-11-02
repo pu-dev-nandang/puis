@@ -15,7 +15,7 @@
                             <div class="well">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <label>Status</label>
+                                        <label>Need Approve</label>
                                         <select class="form-control" id="filterType">
                                             <option value="">--- All Status ---</option>
                                             <option disabled>-----------------------</option>
