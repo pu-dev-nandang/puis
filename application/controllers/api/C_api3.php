@@ -5581,6 +5581,20 @@ class C_api3 extends CI_Controller {
         }
     }
 
+    function testNotif(){
+        $url = 'https://firebase.podomorouniversity.ac.id/pushnotification.php';
+        $dataPush = array(
+            'type' => 'topic', // topic / token
+//                    'topic' => 'pu_course_'.$dataTopic['ScheduleID'],
+            'topic' => 'pu_emp_12',
+            'title' => 'nandang',
+            'body' => 'ClassGroup NameEng'
+                .' - Create new discussion : Topic'
+                .' - For details, please login to the portal'
+        );
+        $this->m_master->http_request_post_data($url,$dataPush);
+    }
+
     private function subscribeTopic($Username,$TypeUser,$FCMToken){
 
         // SUBSCRIBE TOPIK
@@ -5598,13 +5612,14 @@ class C_api3 extends CI_Controller {
         ========================================
         Topik mata kuliah >>> pu_course_ScheduleID (di subscribe dosen dan mahasiswa)
         ========================================
+        subscribe_username sendiri (NIP / NPM)
         */
 
         $array_topic = [];
 
         if($TypeUser=='emp'){
 
-            $array_topic = ['pu_civitas_akademika','pu_lec_emp','pu_emp'];
+            $array_topic = ['pu_civitas_akademika','pu_lec_emp','pu_emp','pu_user_'.$Username];
 
             // get id divisi
             $dataEmp = $this->db->select('PositionMain,PositionOther1,PositionOther2,PositionOther3')
@@ -5635,7 +5650,7 @@ class C_api3 extends CI_Controller {
         }
         else if($TypeUser=='lec'){
 
-            $array_topic = ['pu_civitas_akademika','pu_lec_emp','pu_lec'];
+            $array_topic = ['pu_civitas_akademika','pu_lec_emp','pu_lec','pu_user_'.$Username];
 
             // get jadwal di semester aktif
             $dataSch = $this->db->query('SELECT s.ID AS ScheduleID FROM db_academic.schedule s 
@@ -5660,7 +5675,9 @@ class C_api3 extends CI_Controller {
             $dataMhs = $this->db->select('Year, ProdiID')
                 ->get_where('db_academic.auth_students',array('NPM' => $Username))->result_array()[0];
 
-            $array_topic = ['pu_civitas_akademika','pu_mhs','pu_mhs_'.$dataMhs['Year'],'pu_mhs_'.$dataMhs['Year'].'_'.$dataMhs['ProdiID']];
+            $array_topic = ['pu_civitas_akademika','pu_mhs',
+                'pu_mhs_'.$dataMhs['Year'],
+                'pu_mhs_'.$dataMhs['Year'].'_'.$dataMhs['ProdiID'],'pu_user_'.$Username];
 
             $dbstd = 'ta_'.$dataMhs['Year'];
             // get jadwal aktif
