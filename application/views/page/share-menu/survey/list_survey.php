@@ -145,9 +145,10 @@
                 '<a href="'+base_url_js+'save2pdf/share-survey/'+tokenLink+'" target="_blank" class="btn btn-primary">Download QR Code PDF</a> ' +
                 '<a href="data:image/png;base64,'+jsonResult.Encode+'" download="QR-Code-'+jsonResult.Key+'.png" class="btn btn-primary">Download QR Code Image</a>' +
                 '</div>' +
-                '</div>';
+                '</div>'+
+                '<input type="checkbox" id="myCheck" onclick="myFunction('+ID+')"> Share to public';
 
-            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#GlobalModal .modal-footer').html('<button type="button" id="test" class="btn btn-default" data-dismiss="modal">Close</button>');
 
             $('#GlobalModal .modal-body').html(htmlss);
 
@@ -161,6 +162,42 @@
         });
 
     });
+
+async function myFunction($id) {
+  var i = document.getElementById("myCheck").checked;
+var ID = $id;
+     var boolValidation = true;
+  if(i===true){
+    var shareAtPublic = 1;
+  }else{
+    var shareAtPublic = 0;
+   
+  }
+    
+     var cekData = {
+         ID : ID,
+       shareAtPublic : shareAtPublic,
+     };
+
+
+     var token = jwt_encode(cekData,'UAP)(*');
+     var url = "<?php echo base_url('survey/share-public'); ?>";
+     try{
+       var ajax = await AjaxSubmitFormPromises(url,token);
+     
+       if(ajax['status'] == 1){
+         toastr.success('Share to public success','Success');
+       }
+      else
+       {
+         alert(ajax['msg']);
+       }
+     }
+     catch(err){
+      toastr.info('Something error');
+     }
+    
+}
 
     $(document).on('click','.showQuestionList',function () {
 
