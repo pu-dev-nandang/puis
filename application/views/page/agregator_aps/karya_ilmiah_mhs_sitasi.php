@@ -94,14 +94,17 @@ var App_karya_ilmiah_mhs_sitasi = {
             }  
          });
 
-         recordTable.on( 'order.dt search.dt', function () {
-                                    recordTable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-                                        cell.innerHTML = i+1;
-                                    } );
-                                } ).draw();
-
          oTable = recordTable;
          oSettings = oTable.settings();
+
+         oTable.on( 'order.dt search.dt', function () {
+            recordTable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                cell.innerHTML = i+1;
+            } );
+         } ).draw();
+
+         
+         
     },
 
     loaded : function(){
@@ -109,18 +112,16 @@ var App_karya_ilmiah_mhs_sitasi = {
         var firstLoad = setInterval(function () {
             var filterProdi = $('#filterProdi').val();
             var FilterTahun = $('#FilterTahun').val();
-            // console.log(filterProdi);
-            // console.log(FilterTahun);
             if(filterProdi!='' && filterProdi!=null && FilterTahun !='' && FilterTahun!=null){
                 $('#viewProdiID').html(filterProdi);
                 $('#viewProdiName').html($('#filterProdi option:selected').text());
                 App_karya_ilmiah_mhs_sitasi.LoadAjaxTable();
                 clearInterval(firstLoad);
             }
-        },1000);
+        },500);
         setTimeout(function () {
             clearInterval(firstLoad);
-        },1000);
+        },2500);
     }
 
 };

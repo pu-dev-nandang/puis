@@ -73,57 +73,57 @@ class C_scheduler extends CI_Controller {
       $dataToken = $this->getInputToken();
       $table = $dataToken['table'];
       switch ($table) {
-        // case 's1':
-        //   $this->__s1();
-        //   break;
-        // case 's2a':
-        //   $this->__s2a();
-        //   break;
-        // case 's2b':
-        //   $this->__s2b();
-        //   break;
-        // case 's3a1':
-        //   $this->__s3a1();
-        //   break;
-        // case 's3b1':
-        //   $this->__s3b1();
-        //   break;
-        // case 's3b2':
-        //   $this->__s3b2();
-        //   break;
-        // case 's3b4':
-        //   $this->__s3b4();
-        //   break;
-        // case 's3b5':
-        //   $this->__s3b5();
-        //   break;
-        // case 's3b7':
-        //   $this->__s3b7();
-        //   break;
-        // case 's4':
-        //   $this->__s4();
-        //   break;
-        // case 's5a':
-        //   $this->__s5a();
-        //   break;
-        // case 's5b':
-        //   $this->__s5b();
-        //   break;
-        // case 's5c':
-        //   $this->__s5c();
-        //   break;
-        // case 's6a':
-        //   $this->__s6a();
-        //   break;
-        // case 's8a':
-        //   $this->__s8a();
-        //   break;
-        // case 's8b':
-        //   $this->__s8b();
-        //   break;
-        // case 's8c':
-        //   $this->__s8c();
-        //   break;
+        case 's1':
+          $this->__s1();
+          break;
+        case 's2a':
+          $this->__s2a();
+          break;
+        case 's2b':
+          $this->__s2b();
+          break;
+        case 's3a1':
+          $this->__s3a1();
+          break;
+        case 's3b1':
+          $this->__s3b1();
+          break;
+        case 's3b2':
+          $this->__s3b2();
+          break;
+        case 's3b4':
+          $this->__s3b4();
+          break;
+        case 's3b5':
+          $this->__s3b5();
+          break;
+        case 's3b7':
+          $this->__s3b7();
+          break;
+        case 's4':
+          $this->__s4();
+          break;
+        case 's5a':
+          $this->__s5a();
+          break;
+        case 's5b':
+          $this->__s5b();
+          break;
+        case 's5c':
+          $this->__s5c();
+          break;
+        case 's6a':
+          $this->__s6a();
+          break;
+        case 's8a':
+          $this->__s8a();
+          break;
+        case 's8b':
+          $this->__s8b();
+          break;
+        case 's8c':
+          $this->__s8c();
+          break;
         case 's8d':
           $this->__s8d();
           break;
@@ -132,6 +132,15 @@ class C_scheduler extends CI_Controller {
           break;
         case 's8f1':
           $this->__s8f1();
+          break;
+        case 's8f2':
+          $this->__s8f2();
+          break;
+        case 's8f3':
+          $this->__s8f3();
+          break;
+        case 's8f4':
+          $this->__s8f4();
           break;
         default:
           # code...
@@ -1930,7 +1939,6 @@ class C_scheduler extends CI_Controller {
         $this->db->update('aps_apt_rekap.log',['Status' => 1]);
       }
 
-
     }
 
 
@@ -1991,9 +1999,190 @@ class C_scheduler extends CI_Controller {
     private function __s8f2(){
       $this->db->insert('aps_apt_rekap.log',[
          'RunTime' => date('Y-m-d H:i:s'),
-         'TableName' => 's8f1'
+         'TableName' => 's8f2'
       ]);
-    }    
 
+      $ID = $this->db->insert_id();
+      $dataProdi = $this->getProdi();
+
+      $tableFill = 'aps_apt_rekap.s8f2';
+
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d'); 
+
+      $arrYear = $this->arrYearPUStart();
+
+      for ($i=0; $i < count($dataProdi); $i++) { 
+        $ProdiID = $dataProdi[$i]['ID'];
+        // remove old data first by years and month
+        $this->db->query(
+         'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'" and ProdiID = '.$ProdiID
+        );
+        for ($j=0; $j < count($arrYear) ; $j++) { 
+          $YearFilter = $arrYear[$j];
+          $param =  [
+            'ProdiID' => $ProdiID.'.'.$dataProdi[$i]['Code'],
+            'Year' => $YearFilter,
+            'auth' => 's3Cr3T-G4N',
+            'mode' => 'karya_ilmiah_mhs_sitasi'
+          ];
+
+          $token = $this->jwt->encode($param,"UAP)(*");
+          $data_post = [
+            'token' => $token,
+          ];
+
+          $urlPostCurl =  base_url().'rest3/__get_APS_CrudAgregatorTB8';
+          $postCurl = $this->m_master->postApiPHP($urlPostCurl,$data_post);
+          $result = (array) json_decode($postCurl,true)['data'];
+
+          for ($z=0; $z < count($result); $z++) { 
+              $dataSave = [
+                'ProdiID'  =>  $ProdiID,
+                'Year'  =>  $YearFilter ,
+                'NamaMahasiswa' => $result[$z][1],
+                'JudulArtikeDisitasi' => $result[$z][2],
+                'JumlahSitas1' => $result[$z][3],
+                'DateCreated'  =>   $DateCreated,
+              ];
+
+              $this->db->insert($tableFill,$dataSave);
+          }
+
+        }
+
+      }
+
+      $this->data['status'] = 1;
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+
+    }
+
+    private function __s8f3(){
+      $this->db->insert('aps_apt_rekap.log',[
+         'RunTime' => date('Y-m-d H:i:s'),
+         'TableName' => 's8f3'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $dataProdi = $this->getProdi();
+
+      $tableFill = 'aps_apt_rekap.s8f3';
+
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d'); 
+
+      $arrYear = $this->arrYearPUStart();
+
+      for ($i=0; $i < count($dataProdi); $i++) { 
+        $ProdiID = $dataProdi[$i]['ID'];
+        // remove old data first by years and month
+        $this->db->query(
+         'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'" and ProdiID = '.$ProdiID
+        );
+
+        for ($j=0; $j < count($arrYear) ; $j++) { 
+            $YearFilter = $arrYear[$j];
+
+            $param =  [
+              'ProdiID' => $ProdiID.'.'.$dataProdi[$i]['Code'],
+              'Year' => $YearFilter,
+              'auth' => 's3Cr3T-G4N',
+              'mode' => 'produk_jasa_mhs'
+            ];
+
+            $token = $this->jwt->encode($param,"UAP)(*");
+            $data_post = [
+              'token' => $token,
+            ];
+
+            $urlPostCurl =  base_url().'rest3/__get_APS_CrudAgregatorTB8';
+            $postCurl = $this->m_master->postApiPHP($urlPostCurl,$data_post);
+            $result = (array) json_decode($postCurl,true)['data'];
+
+            for ($z=0; $z < count($result); $z++) { 
+                $dataSave = [
+                  'ProdiID'  =>  $ProdiID ,
+                  'Year'  =>  $YearFilter ,
+                  'Nama' => $result[$z][1],
+                  'NamaProdukOrJasa' => $result[$z][2],
+                  'DeskripsiProdukOrJasa' => $result[$z][3],
+                  'Bukti' => $result[$z][4],
+                  'DateCreated'  =>   $DateCreated,
+                ];
+
+                $this->db->insert($tableFill,$dataSave);
+            }
+
+        }
+
+      }
+
+      $this->data['status'] = 1;
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+
+    }
+
+    private function __s8f4(){
+      $this->db->insert('aps_apt_rekap.log',[
+         'RunTime' => date('Y-m-d H:i:s'),
+         'TableName' => 's8f4'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $dataProdi = $this->getProdi();
+
+      $tableFill = 'aps_apt_rekap.s8f4';
+
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+      for ($i=0; $i < count($dataProdi); $i++) { 
+        $ProdiID = $dataProdi[$i]['ID'];
+        // remove old data first by years and month
+        $this->db->query(
+         'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'" and ProdiID = '.$ProdiID
+        );
+
+        $param =  [
+          'ProdiID' => $ProdiID.'.'.$dataProdi[$i]['Code'],
+          'auth' => 's3Cr3T-G4N',
+          'mode' => 'luaran_penelitian_pkm_mhs'
+        ];
+
+        $token = $this->jwt->encode($param,"UAP)(*");
+        $data_post = [
+          'token' => $token,
+        ];
+
+        $urlPostCurl =  base_url().'rest3/__get_APS_CrudAgregatorTB8';
+        $postCurl = $this->m_master->postApiPHP($urlPostCurl,$data_post);
+        $result = (array) json_decode($postCurl,true);
+
+        $dataSave = [
+          'ProdiID'  =>  $ProdiID ,
+          'JsonData' => json_encode($result),
+          'DateCreated'  =>   $DateCreated,
+        ];
+
+        $this->db->insert($tableFill,$dataSave);
+      }
+
+      $this->data['status'] = 1;
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+
+    }
 
 }
