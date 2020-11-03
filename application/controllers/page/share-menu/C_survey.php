@@ -83,7 +83,6 @@ class C_survey extends Globalclass {
         'isPublicSurvey' => (string)$share
         
       );
-      print_r($updates);
     
      $this->db->where('ID', $id);
       $this->db->update('db_it.surv_survey', $updates);

@@ -136,7 +136,9 @@
                 shareLink : shareLink
             },'UAP)(*');
 
-            var htmlss = '<div style="text-align: center;">' +
+            
+                if (jsonResult.isPublicSurvey==0||jsonResult.isPublicSurvey==null){
+                    var htmlss = '<div style="text-align: center;">' +
                 '<img src="'+jsonResult.QRCode+'" />' +
                 '<div class="form-group">' +
                 '<div class="panel-link">'+shareLink+'</div>'+
@@ -146,7 +148,22 @@
                 '<a href="data:image/png;base64,'+jsonResult.Encode+'" download="QR-Code-'+jsonResult.Key+'.png" class="btn btn-primary">Download QR Code Image</a>' +
                 '</div>' +
                 '</div>'+
-                '<input type="checkbox" id="myCheck" onclick="myFunction('+ID+')"> Share to public';
+                    '<input type="checkbox" id="myCheck" onclick="myFunction('+ID+')" value="'+jsonResult.isPublicSurvey+'"> Share to public';
+                }else{
+                    var htmlss = '<div style="text-align: center;">' +
+                '<img src="'+jsonResult.QRCode+'" />' +
+                '<div class="form-group">' +
+                '<div class="panel-link">'+shareLink+'</div>'+
+                '</div>' +
+                '<div class="form-group">' +
+                '<a href="'+base_url_js+'save2pdf/share-survey/'+tokenLink+'" target="_blank" class="btn btn-primary">Download QR Code PDF</a> ' +
+                '<a href="data:image/png;base64,'+jsonResult.Encode+'" download="QR-Code-'+jsonResult.Key+'.png" class="btn btn-primary">Download QR Code Image</a>' +
+                '</div>' +
+                '</div>'+
+                    '<input type="checkbox" id="myCheck" onclick="myFunction('+ID+')" value="'+jsonResult.isPublicSurvey+'" checked="checked"> Share to public';
+                }
+                
+                
 
             $('#GlobalModal .modal-footer').html('<button type="button" id="test" class="btn btn-default" data-dismiss="modal">Close</button>');
 
