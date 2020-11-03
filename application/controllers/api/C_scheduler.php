@@ -150,6 +150,318 @@ class C_scheduler extends CI_Controller {
       echo json_encode($this->data);
     }
 
+    public function APT(){
+      $this->data=['status' => 0,'msg' => '','callback' => []];
+      $dataToken = $this->getInputToken();
+      $table = $dataToken['table'];
+
+      switch ($table) {
+        case 't1a1':
+          $this->__t1a1();
+          break;
+        case 't1a2':
+          $this->__t1a2();
+          break;
+        case 't1a3':
+          $this->__t1a3();
+          break;
+        case 't1b':
+          $this->__t1b();
+        case 't1c':
+          $this->__t1c();
+          break;
+        default:
+          # code...
+          break;
+      }
+
+      echo json_encode($this->data);
+    }
+
+    private function __t1a1(){
+      // save to log
+      $this->db->insert('aps_apt_rekap.log',[
+        'RunTime' => date('Y-m-d H:i:s'),
+        'TableName' => 't1a1'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $tableFill = 'aps_apt_rekap.t1a1';
+
+      $urlPost = base_url().'api3/__crudExternalAccreditation';
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+      $param = [
+        'action' => 'viewListAE',
+        'Previlege' => '1'
+      ];
+
+      $token = $this->jwt->encode($param,"UAP)(*");
+
+      $data_post = [
+        'token' => $token,
+        'start' => 0,
+        'length' => 10000,
+        'search[value]' => '',
+        'search[regex]' => false,
+        'draw' => 1,
+      ];
+
+      try {
+        // remove old data first by years and month
+        $this->db->query(
+         'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'"'
+        );
+
+        $postTicket = $this->m_master->postApiPHP($urlPost,$data_post);
+        $result = (array) json_decode($postTicket,true);
+        $getData =  $result['data'];
+        $dataSave = [
+          'JsonData' => json_encode($getData),
+          'DateCreated'  =>   $DateCreated,
+        ];
+
+        $this->db->insert($tableFill,$dataSave);
+        $this->data['status'] = 1;
+      } catch (Exception $e) {
+         print_r($e);
+      }
+
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+
+    }
+
+    private function __t1a2(){
+      // save to log
+      $this->db->insert('aps_apt_rekap.log',[
+        'RunTime' => date('Y-m-d H:i:s'),
+        'TableName' => 't1a2'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $tableFill = 'aps_apt_rekap.t1a2';
+
+      $urlPost = base_url().'api3/__crudInternationalAccreditation';
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+      $param = [
+        'action' => 'viewListIA',
+        'Previlege' => '1'
+      ];
+
+      $token = $this->jwt->encode($param,"UAP)(*");
+
+      $data_post = [
+        'token' => $token,
+        'start' => 0,
+        'length' => 10000,
+        'search[value]' => '',
+        'search[regex]' => false,
+        'draw' => 1,
+      ];
+
+      try {
+        // remove old data first by years and month
+        $this->db->query(
+         'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'"'
+        );
+
+        $postTicket = $this->m_master->postApiPHP($urlPost,$data_post);
+        $result = (array) json_decode($postTicket,true);
+        $getData =  $result['data'];
+        $dataSave = [
+          'JsonData' => json_encode($getData),
+          'DateCreated'  =>   $DateCreated,
+        ];
+
+        $this->db->insert($tableFill,$dataSave);
+        $this->data['status'] = 1;
+      } catch (Exception $e) {
+         print_r($e);
+      }
+
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+    }
+
+    private function __t1a3(){
+      // save to log
+      $this->db->insert('aps_apt_rekap.log',[
+        'RunTime' => date('Y-m-d H:i:s'),
+        'TableName' => 't1a3'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $tableFill = 'aps_apt_rekap.t1a3';
+
+      $urlPost = base_url().'api3/__crudLembagaSurview';
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+      $param = [
+        'action' => 'readLembagaAudit',
+      ];
+
+      $token = $this->jwt->encode($param,"UAP)(*");
+
+      $data_post = [
+        'token' => $token,
+      ];
+
+      try {
+        // remove old data first by years and month
+        $this->db->query(
+         'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'"'
+        );
+
+        $postTicket = $this->m_master->postApiPHP($urlPost,$data_post);
+        $result = (array) json_decode($postTicket,true);
+        $getData =  $result;
+        $dataSave = [
+          'JsonData' => json_encode($getData),
+          'DateCreated'  =>   $DateCreated,
+        ];
+
+        $this->db->insert($tableFill,$dataSave);
+        $this->data['status'] = 1;
+      } catch (Exception $e) {
+         print_r($e);
+      }
+
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+    }
+
+    private function __t1b(){
+      // save to log
+      $this->db->insert('aps_apt_rekap.log',[
+        'RunTime' => date('Y-m-d H:i:s'),
+        'TableName' => 't1b'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $tableFill = 'aps_apt_rekap.t1b';
+
+      $urlPost = base_url().'api3/__getAkreditasiProdi';
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+      $data_post = ['token' => NULL];
+
+      try {
+        // remove old data first by years and month
+        $this->db->query(
+         'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'"'
+        );
+
+        $postTicket = $this->m_master->postApiPHP($urlPost,$data_post);
+        $result = (array) json_decode($postTicket,true);
+        $getData =  $result;
+        $dataSave = [
+          'JsonData' => json_encode($getData),
+          'DateCreated'  =>   $DateCreated,
+        ];
+
+        $this->db->insert($tableFill,$dataSave);
+        $this->data['status'] = 1;
+      } catch (Exception $e) {
+         print_r($e);
+      }
+
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+    }
+
+    private function __t1c(){
+      // save to log
+      $this->db->insert('aps_apt_rekap.log',[
+        'RunTime' => date('Y-m-d H:i:s'),
+        'TableName' => 't1c'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $tableFill = 'aps_apt_rekap.t1c';
+
+      $urlPost = base_url().'rest2/__get_data_kerja_sama_perguruan_tinggi';
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+      $param = [
+        'auth' => 's3Cr3T-G4N',
+        'mode' => 'DataKerjaSamaAggregator'
+      ];
+
+      $token = $this->jwt->encode($param,"UAP)(*");
+
+      $data_post = [
+        'token' => $token,
+        'start' => 0,
+        'length' => 10000,
+        'search[value]' => '',
+        'search[regex]' => false,
+        'draw' => 1,
+      ];
+
+      try {
+        // remove old data first by years and month
+        $this->db->query(
+         'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'"'
+        );
+
+        $postTicket = $this->m_master->postApiPHP($urlPost,$data_post);
+        $result = (array) json_decode($postTicket,true);
+        
+        $DataTableJson = json_encode($result['data']);
+
+        $queryPass = $this->jwt->decode($result['queryPass'],"UAP)(*");
+        $query =  $this->db->query($queryPass)->result_array();
+
+        for ($i=0; $i < count($query); $i++) { 
+            $dataSave = [
+              'DataTableJson' => $DataTableJson,
+              'LembagaMitraKerjaSama' => $query[$i]['Lembaga'] ,
+              'Kategori' => $query[$i]['Kategori'] ,
+              'T_internasional' =>  $query[$i]['Internasional'],
+              'T_nasional' => $query[$i]['Nasional'] ,
+              'T_wilayah' => $query[$i]['Lokal'] ,
+              'BentukKegiatan' => $query[$i]['BentukKegiatan'] ,
+              'BuktiKerjaSama' => $query[$i]['BuktiName'] ,
+              'MasaBerlaku' => $query[$i]['EndDate'],
+              'SemesterName' => $query[$i]['SemesterName'] ,
+              'DateCreated' => $DateCreated,
+            ];
+
+             $this->db->insert($tableFill,$dataSave);
+        }
+       
+        $this->data['status'] = 1;
+      } catch (Exception $e) {
+         print_r($e);
+      }
+
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+
+    }
+    
 
     private function getProdi(){
       return $this->m_api->__getBaseProdiSelectOption();
