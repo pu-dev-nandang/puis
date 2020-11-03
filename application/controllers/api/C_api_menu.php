@@ -514,7 +514,18 @@ class C_api_menu extends CI_Controller {
                 $Range = date('d M Y',strtotime($row['StartDate'])).' - '.
                     date('d M Y',strtotime($row['EndDate']));
 
+                $dateNow = date("Y-m-d");
+                $dateExpired = $row['EndDate'];
 
+                if ($dateNow>=$dateExpired) {
+                    $updates = array(
+                        'isPublicSurvey' => '0',
+        
+                    );
+                    //for ($i=0; $i <count($dataClose) ; $i++) { 
+                        $this->db->where('ID', $row['ID']);
+                        $this->db->update('db_it.surv_survey', $updates);
+                }
                 $Status = '<span class="label label-warning">Unpublish</span>';
                 $btnClose = 'hide';
                 $btnPublish = '';
@@ -627,6 +638,7 @@ class C_api_menu extends CI_Controller {
                 $no++;
 
             }
+
 
             $json_data = array(
                 "draw"            => intval( $requestData['draw'] ),
@@ -773,7 +785,7 @@ class C_api_menu extends CI_Controller {
 
 
             // Cek apakah sudah mempunyai key atau blm
-            $dataCk = $this->db->select('Key,isPublicSurvey')->get_where('db_it.surv_survey',array(
+            $dataCk = $this->db->select('Key,isPublicSurvey,Status')->get_where('db_it.surv_survey',array(
                 'ID' => $ID
             ))->result_array();
 
@@ -800,7 +812,8 @@ class C_api_menu extends CI_Controller {
                 'Key' => $KeyPublic,
                 'Encode' => $t,
                 'QRCode' => $pic,
-                'isPublicSurvey' => $dataCk[0]['isPublicSurvey']
+                'isPublicSurvey' => $dataCk[0]['isPublicSurvey'],
+                'Sts'=> $dataCk[0]['Status']
             );
 
 
