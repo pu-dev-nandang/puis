@@ -773,7 +773,7 @@ class C_api_menu extends CI_Controller {
 
 
             // Cek apakah sudah mempunyai key atau blm
-            $dataCk = $this->db->select('Key')->get_where('db_it.surv_survey',array(
+            $dataCk = $this->db->select('Key,isPublicSurvey')->get_where('db_it.surv_survey',array(
                 'ID' => $ID
             ))->result_array();
 
@@ -799,7 +799,9 @@ class C_api_menu extends CI_Controller {
                 'Status' => 1,
                 'Key' => $KeyPublic,
                 'Encode' => $t,
-                'QRCode' => $pic);
+                'QRCode' => $pic,
+                'isPublicSurvey' => $dataCk[0]['isPublicSurvey']
+            );
 
 
             return print_r(json_encode($result));
