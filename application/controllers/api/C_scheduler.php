@@ -170,6 +170,15 @@ class C_scheduler extends CI_Controller {
         case 't1c':
           $this->__t1c();
           break;
+        case 't2a':
+          $this->__t2a();
+          break;
+        case 't2b':
+          $this->__t2b();
+          break;
+        case 't2c':
+          $this->__t2c();
+          break;
         default:
           # code...
           break;
@@ -453,6 +462,202 @@ class C_scheduler extends CI_Controller {
         $this->data['status'] = 1;
       } catch (Exception $e) {
          print_r($e);
+      }
+
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+
+    }
+
+    private function __t2a(){
+      // save to log
+      $this->db->insert('aps_apt_rekap.log',[
+        'RunTime' => date('Y-m-d H:i:s'),
+        'TableName' => 't2a'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $tableFill = 'aps_apt_rekap.t2a';
+
+      $urlPost = base_url().'api3/__crudAgregatorTB2';
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+       // remove old data first by years and month
+       $this->db->query(
+        'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'"'
+       );
+
+      $arrYear = $this->arrYearPUStart();
+
+      for ($i=0; $i < count($arrYear); $i++) { 
+        $FilterYear = $arrYear[$i];
+        $param = [
+          'action' => 'readDataMHSBaru',
+          'Year' => $FilterYear
+        ];
+
+        $token = $this->jwt->encode($param,"UAP)(*");
+        $data_post = [
+          'token' => $token,
+        ];
+
+        try {
+           $postTicket = $this->m_master->postApiPHP($urlPost,$data_post);
+           $result = (array) json_decode($postTicket,true);   
+
+           for ($j=0; $j < count($result); $j++) { 
+             $dataSave = [
+              'ProdiID' =>  $result[$j]['ProdiID'] ,
+              'ProdiName' =>  $result[$j]['ProdiName'] ,
+              'Year' =>  $result[$j]['Year'] ,
+              'Capacity' =>  $result[$j]['Capacity'] ,
+              'Registrant' =>  $result[$j]['Registrant'] ,
+              'PassSelection' =>  $result[$j]['PassSelection'] ,
+              'Regular' =>  $result[$j]['Regular'] ,
+              'Transfer' =>  $result[$j]['Transfer'] ,
+              'Regular2' =>  $result[$j]['Regular2'] ,
+              'Transfer2' =>  $result[$j]['Transfer2'] ,
+              'd_Registrant' =>  $result[$j]['d_Registrant'] ,
+              'd_PassSelection' =>  $result[$j]['d_PassSelection'] ,
+              'd_Regular' =>  $result[$j]['d_Regular'] ,
+              'd_Regular2' =>  $result[$j]['d_Regular2'] ,
+              'd_Transfer' =>  $result[$j]['d_Transfer'] ,
+              'd_Transfer2' =>  $result[$j]['d_Transfer2'] ,
+              'DateCreated' => $DateCreated,
+             ];
+
+             $this->db->insert($tableFill,$dataSave);
+
+           }
+
+        } catch (Exception $e) {
+           print_r($e);
+        }
+
+      }
+
+      $this->data['status'] = 1;
+
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+
+    }
+
+    private function __t2b(){
+      // save to log
+      $this->db->insert('aps_apt_rekap.log',[
+        'RunTime' => date('Y-m-d H:i:s'),
+        'TableName' => 't2b'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $tableFill = 'aps_apt_rekap.t2b';
+
+      $urlPost = base_url().'api3/__crudAgregatorTB2';
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+      // remove old data first by years and month
+      $this->db->query(
+       'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'"'
+      );
+
+      $param = [
+        'action' => 'readDataMHSBaruAsing',
+      ];
+
+      $token = $this->jwt->encode($param,"UAP)(*");
+      $data_post = [
+        'token' => $token,
+      ];
+
+      try {
+        $postTicket = $this->m_master->postApiPHP($urlPost,$data_post);
+        $result = (array) json_decode($postTicket,true);
+
+        $dataSave = [
+          'JsonData' => json_encode($result),
+          'DateCreated' => $DateCreated,
+        ];
+
+        $this->db->insert($tableFill,$dataSave);
+
+        $this->data['status'] = 1;
+
+      } catch (Exception $e) {
+        print_r($e);
+      }
+
+      if ($this->data['status'] == 1) {
+        $this->db->where('ID',$ID);
+        $this->db->update('aps_apt_rekap.log',['Status' => 1]);
+      }
+    }
+
+    private function __t2c(){
+      // save to log
+      $this->db->insert('aps_apt_rekap.log',[
+        'RunTime' => date('Y-m-d H:i:s'),
+        'TableName' => 't2c'
+      ]);
+
+      $ID = $this->db->insert_id();
+      $tableFill = 'aps_apt_rekap.t2c';
+
+      $urlPost = base_url().'api3/__crudAgregatorTB2';
+      $Year = date('Y');
+      $Month = date('m');
+      $DateCreated = $Year.'-'.$Month.'-'.date('d');
+
+      // remove old data first by years and month
+      $this->db->query(
+       'delete from '.$tableFill.' where Year(DateCreated) = "'.$Year.'" and Month(DateCreated) = "'.$Month.'"'
+      );
+
+      try {
+
+        // get API Curiculum
+        $dataPostCurl = ['token' => NULL];
+        $postCuriculumAPI= $this->m_master->postApiPHP(base_url().'api/__getKurikulumSelectOption',$dataPostCurl);
+        $resultCuriculumAPI = (array) json_decode($postCuriculumAPI,true);
+
+        for ($i=0; $i < count($resultCuriculumAPI); $i++) { 
+          $CurriculumID = $resultCuriculumAPI[$i]['ID'];
+
+          $param = [
+            'action' => 'getAllCourse',
+            'CurriculumID' => $CurriculumID
+          ];
+
+          $token = $this->jwt->encode($param,"UAP)(*");
+          $data_post = [
+            'token' => $token,
+          ];
+
+          $postTicket = $this->m_master->postApiPHP($urlPost,$data_post);
+          $result = (array) json_decode($postTicket,true);
+
+          $dataSave = [
+            'CurriculumID' => $CurriculumID,
+            'JsonData' => json_encode($result),
+            'DateCreated' => $DateCreated,
+          ];
+
+          $this->db->insert($tableFill,$dataSave);
+
+          $this->data['status'] = 1;
+
+        }
+        
+      } catch (Exception $e) {
+        print_r($e);
       }
 
       if ($this->data['status'] == 1) {
