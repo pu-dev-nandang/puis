@@ -148,6 +148,7 @@
                 '<a href="data:image/png;base64,'+jsonResult.Encode+'" download="QR-Code-'+jsonResult.Key+'.png" class="btn btn-primary">Download QR Code Image</a>' +
                 '</div>' +
                 '</div>'+
+                '<input type="hidden" id="status" value="'+jsonResult.Sts+'" />'+
                     '<input type="checkbox" id="myCheck" onclick="myFunction('+ID+')" value="'+jsonResult.isPublicSurvey+'"> Share to public';
                 }else{
                     var htmlss = '<div style="text-align: center;">' +
@@ -160,6 +161,7 @@
                 '<a href="data:image/png;base64,'+jsonResult.Encode+'" download="QR-Code-'+jsonResult.Key+'.png" class="btn btn-primary">Download QR Code Image</a>' +
                 '</div>' +
                 '</div>'+
+                '<input type="hidden" id="status" value="'+jsonResult.Sts+'" />'+
                     '<input type="checkbox" id="myCheck" onclick="myFunction('+ID+')" value="'+jsonResult.isPublicSurvey+'" checked="checked"> Share to public';
                 }
                 
@@ -181,15 +183,38 @@
     });
 
 async function myFunction($id) {
-  var i = document.getElementById("myCheck").checked;
-var ID = $id;
-     var boolValidation = true;
-  if(i===true){
-    var shareAtPublic = 1;
-  }else{
-    var shareAtPublic = 0;
-   
-  }
+    var sts = $("#status").val();
+    console.log(sts);
+    if(sts!=1){
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Share to public</h4>');
+             var htmlss = '<div style="text-align: center;">Unpublish survey status. Please change status to publish before sharing!' +
+                
+                '</div>';
+                
+                
+                
+                
+
+            $('#GlobalModal .modal-footer').html('<button type="button" id="test" class="btn btn-primary" data-dismiss="modal">OK</button>');
+
+            $('#GlobalModal .modal-body').html(htmlss);
+
+
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+        
+    }else{
+        var i = document.getElementById("myCheck").checked;
+        var ID = $id;
+        var boolValidation = true;
+        if(i===true){
+            var shareAtPublic = 1;
+        }else{
+            var shareAtPublic = 0;
+        }
     
      var cekData = {
          ID : ID,
@@ -204,6 +229,7 @@ var ID = $id;
      
        if(ajax['status'] == 1){
          toastr.success('Share to public success','Success');
+         window.location="";
        }
       else
        {
@@ -213,7 +239,7 @@ var ID = $id;
      catch(err){
       toastr.info('Something error');
      }
-    
+    }
 }
 
     $(document).on('click','.showQuestionList',function () {
