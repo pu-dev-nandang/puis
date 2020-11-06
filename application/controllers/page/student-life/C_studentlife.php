@@ -10,6 +10,8 @@ class C_studentlife extends Student_Life {
         parent::__construct();
         $this->load->model('student-life/m_studentlife','stdlife');
         $this->load->model('student-life/m_alumni');
+        // $this->load->library(array('JWT','pagination'));   
+        // $this->load->helper('General_helper');     
     }
 
     private function __setting_rest_alumni(){
@@ -115,6 +117,7 @@ class C_studentlife extends Student_Life {
     public function student_achievement()
     {
         $data['department'] = parent::__getDepartement();
+        $data['categories'] = $this->db->get_where('db_studentlife.categories_achievement',array('isActive'=>1))->result();
         $page = $this->load->view('page/'.$data['department'].'/student-achievement/student_achievement',$data,true);
         $this->menu_student_achievementc($page);
     }
@@ -368,5 +371,148 @@ class C_studentlife extends Student_Life {
     }
 
 
+    public function fetchData()
+    {
+      $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
+      $datatoken =  $this->getInputToken();
+      $datatoken = json_decode(json_encode($datatoken),true);
+
+        if($datatoken['action']=='viewData'){  
+            $requestData = $_REQUEST;
+         
+            $param =  array();
+  
+
+        /*FILTER*/
+        if(!empty($datatoken['EventName'])){
+            $param[] = array("field"=>"a.Event","data"=>" like '%".$datatoken['EventName']."%' ","filter"=>"AND",);
+        }       
+        if(!empty($datatoken['lvl'])){
+            $param[] = array("field"=>"a.Level","data"=>" ='".$datatoken['lvl']."'","filter"=>"AND",);
+        }
+        if(!empty($datatoken['type'])){
+            $param[] = array("field"=>"a.Type","data"=>" ='".$datatoken['type']."'","filter"=>"AND",);
+        }
+        if(!empty($datatoken['categ'])){
+            $param[] = array("field"=>"a.CategID","data"=>" ='".$datatoken['categ']."'","filter"=>"AND",);
+        }
+        if(!empty($datatoken['sDate'])){
+            $param[] = array("field"=>"a.StartDate","data"=>"  >= '".$datatoken['sDate']."'","filter"=>"AND",);
+        }
+        if(!empty($datatoken['eDate'])){
+            $param[] = array("field"=>"a.EndDate","data"=>"  <= '".$datatoken['eDate']."'","filter"=>"AND",);
+        }
+        if(!empty($datatoken['std'])){
+            $param[] = array("field"=>"(e.NPM","data"=>" like '%".$datatoken['std']."%' ","filter"=>"AND",);
+            $param[] = array("field"=>"e.Name","data"=>" like '%".$datatoken['std']."%') ","filter"=>"OR",);
+        }
+        if(!empty($datatoken['isAppr'])){
+            $param[] = array("field"=>"a.isApproved","data"=>"  = '".$datatoken['isAppr']."'","filter"=>"AND",);
+        }   
+        if( !empty($requestData['search']['value']) ) {            
+            $param[] = array("field"=>"a.Event","data"=>" like '%".$requestData['search']['value']."%' ","filter"=>"AND",);
+        }
+
+         $where='';
+        if(!empty($param)){
+            $where = 'WHERE ';
+            $counter = 0;
+            foreach ($param as $key => $value) {
+                if($counter==0){
+                    $where = $where.$value['field']." ".$value['data'];
+                }
+                else{
+                    $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                }
+                $counter++;
+            }
+
+        }
+
+            $queryDefault = 'SELECT a.*,b.Name as categName , e.NPM as NPM,e.Name as studentName, (select approvedBy from db_studentlife.student_achievement c where c.approvedBy like "'.$this->session->userdata('NIP').'%" and c.ID = a.ID) as isAbble
+                                      FROM db_studentlife.student_achievement  a
+                                      left join db_studentlife.student_achievement_student d on d.SAID = a.ID 
+                                      left join db_academic.auth_students e on e.NPM = d.NPM 
+                                      left join db_studentlife.categories_achievement b on b.ID = a.CategID
+                                      '.$where.'
+                                      ORDER BY Year, StartDate ASC';
+                                    
+          
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+                    
+                $nestedData = array();
+                $row = $query[$i];
+                $tokenID = $this->jwt->encode(array('ID'=>$row['ID']),'UAP)(*');
+                                         
+                    $ID = $row['ID'];
+
+                    $disabled = (!$row['isAbble']) ? 'disabled':'';
+                    $btnAct = '<div class="btn-group">
+                          <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-edit"></i> <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li><a href="'.base_url('student-life/student-achievement/update-data-achievement?id='.$ID).'" >Edit</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="'.$disabled.'"><a href="javascript:void(0);" class="actRemove" data-id="'.$ID.'">Remove</a></li>
+                          </ul>
+                        </div>';
+
+                    $lbl = ($row['Type']=='1' || $row['Type']==1)
+                        ? '<span class="label label-success">Academic</span>'
+                        : '<span class="label label-default">Non Academic</span>';
+
+                    $viewEvent = '<a><b>'.$row['Event'].'</b></a>';
+                    $labelStatusApv = "";
+                    if($row['isApproved'] == 1) {$labelStatusApv="<span class='label label-info'>Wait approval</span>";}
+                    else if($row['isApproved'] == 2) {$labelStatusApv="<span class='label label-primary'>Approved</span>";}
+                    else if($row['isApproved'] == 3) {$labelStatusApv="<span class='label label-danger'>Rejected</span>";}
+                    else{$labelStatusApv="UNKNOW";}
+                    $labelApvBy = "";
+                    if($row['isApproved'] == 2 &&($row['approvedBy'] != "" || $row['approvedBy'])){$labelApvBy = "<br><small>Approved by ".$row['approvedBy']."</small>";}
+            
+   
+                $startdate = date('D, d M Y',strtotime($row['StartDate']));
+                $enddate = date('D, d M Y',strtotime($row['EndDate']));
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$viewEvent."<br>".(($row['isSKPI'] == 1) ? '<span class="label label-warning">SKPI</span>':'').'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$startdate.'<br/>'.$enddate.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['categName'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Level'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$lbl.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Achievement'].'</div>';
+                $nestedData[] = '<div style="text-align: left;"><a class="btn btn-xs btn-primary" target="_blank" href="'.base_url('uploads/certificate/'.$row['Certificate']).'">View PDF</a></div>';
+                $nestedData[] = '<div style="text-align: center;">'.$labelStatusApv.$labelApvBy.'</div>';
+                $nestedData[] = $btnAct;
+                $nestedData[] = '<div style="text-align: left;">'.ucwords($row['studentName']).' ('.$row['NPM'].')</div>';
+                
+                
+         
+
+                $data[] = $nestedData;
+                $no++;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval( $queryDefaultRow),
+                "data"            => $data,
+                "dataQuery"            => $query
+            );
+            echo json_encode($json_data);
+        
+        } 
+    }
 
 }
