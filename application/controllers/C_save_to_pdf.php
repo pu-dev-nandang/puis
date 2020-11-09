@@ -6357,15 +6357,35 @@ Phone: (021) 29200456';
             $pdf->SetFont('Arial','',9);
 
             $no=1;
+            $isPageOne = true;
+//            print_r($dataMK[0]);
+//            exit();
+//            foreach ($dataMK AS $item){
+//                array_push($dataMK,$item);
+//            }
             foreach ($dataMK AS $item){
 
                 $Credit = ($item['CreditResult']!='' && $item['CreditResult']!=null) ? $item['CreditResult'] : '-' ;
+
+                $y = $pdf->GetY();
 
                 $pdf->Cell(10,$h,$no,1,0,'C');
                 $pdf->Cell(125,$h,$item['NameEng'],1,0,'L');
                 $pdf->Cell(20,$h,$item['Credit'],1,0,'C');
                 $pdf->Cell(20,$h,$Credit,1,0,'C');
                 $pdf->Cell(15,$h,'14',1,1,'C');
+
+//                if($no<=8){
+//
+//                }
+
+                if($y>=172){
+                    $pdf->AddPage();
+
+                    $pdf->SetAutoPageBreak(true, 0);
+                    $pdf->Image('./images/FA_letterhead_a4_r2.jpg',0,0,210);
+                    $pdf->Ln(25);
+                }
 
                 $no++;
             }
