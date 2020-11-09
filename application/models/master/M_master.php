@@ -4491,5 +4491,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $rs;
     }
 
+    public function TwoArraysObjectJoin($arr1,$arr2){
+        for ($i=0; $i < count($arr2); $i++) { 
+            $arr1[] = $arr2[$i];
+        }
+
+        return $arr1;
+    }
+
 
 }

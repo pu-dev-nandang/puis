@@ -512,6 +512,14 @@
             '</div>');
     }
 
+    function loading_page2(selector) {
+        selector.html('<div class="row">' +
+            '<div class="col-md-12" style="text-align: center;">' +
+            '<h3 class="animated flipInX"><i class="fa fa-circle-o-notch fa-spin fa-fw"></i> <span>Loading page . . .</span></h3>' +
+            '</div>' +
+            '</div>');
+    }
+
     function loading_anytext(element,text) {
         $(element).html('<div class="row">' +
             '<div class="col-md-12" style="text-align: center;">' +
@@ -1053,6 +1061,40 @@
 
             }
         });
+
+    }
+
+    const checkboxListStatuStudent = async (selector) => {
+        var url = base_url_js+'api/__crudStatusStudents';
+        var data = {
+            action : 'read'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        loading_page2(selector);
+        try{
+            const fetch = await AjaxSubmitFormPromises(url,token);
+            let html  = '<div class = "row">';
+
+                for (var i = 0; i < fetch.length; i++) {
+                    html += '<div class = "col-sm-6">'+
+                                '<div class="checkbox">'+
+                                    '<label>'+
+                                        '<input type="checkbox" class="checkboxStatus"  value="'+fetch[i].ID+'">'+fetch[i].Description+
+                                    '</label>'+
+                                '</div>'+
+                            '</div>';
+                }
+
+                html+= '</div>';
+
+            selector.html(html);   
+
+        }
+        catch(err){
+            toastr.info('something wrong, please contact IT');
+        }
+        
 
     }
 

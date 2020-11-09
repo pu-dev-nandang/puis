@@ -5120,5 +5120,92 @@ class M_finance extends CI_Model {
       
    }
 
+   public function rekap_std_by_status($StatusStudentID){
+      $rs = [];
+      $this->load->model('m_master');
+      // distinct month
+      $dataMonthly = $this->db->select('YEAR(EffectiveDateStatus) as Yearly, MONTH(EffectiveDateStatus) as Monthly')
+                                 ->where('StatusStudentID',$StatusStudentID)
+                                 ->group_by('YEAR(EffectiveDateStatus), MONTH(EffectiveDateStatus)')
+                                 ->order_by('EffectiveDateStatus','desc')
+                                 ->get('db_academic.auth_students a')->result_array();
+      
+      // add NULL EffectiveDateStatus
+      $dataMonthly2 = $this->db->select(' "NULL" as Yearly, "NULL" as Monthly')
+                                 ->where('StatusStudentID',$StatusStudentID)
+                                 ->where('EffectiveDateStatus is NULL')
+                                 ->group_by('YEAR(EffectiveDateStatus), MONTH(EffectiveDateStatus)')
+                                 ->get('db_academic.auth_students a')->result_array();
+
+      $dataMonthly = $this->m_master->TwoArraysObjectJoin($dataMonthly,$dataMonthly2); // join
+
+      for ($i=0; $i < count($dataMonthly); $i++) { 
+        $Yearly = $dataMonthly[$i]['Yearly'];
+        $Monthly = $dataMonthly[$i]['Monthly'];
+
+        if ($Yearly != NULL && !empty($Yearly)) {
+          $NameSemester = $Yearly.'/'.($Yearly+1);
+          // get semester name by year
+          $dataMHS =  $this->db->select('a.NPM,a.Name,c.Name as ProdiName,a.Year')
+                                     ->join('db_academic.program_study c','a.ProdiID = c.ID','join')
+                                     ->where('a.StatusStudentID',$StatusStudentID)
+                                     ->where('YEAR(EffectiveDateStatus) = '.$Yearly)
+                                     ->where('MONTH(EffectiveDateStatus) = '.$Monthly)
+                                     ->get('db_academic.auth_students a')->result_array();
+        }
+        else
+        {
+          $NameSemester = 'EffectiveDateStatus belum diisi';
+          // get semester name by year
+          $dataMHS =  $this->db->select('a.NPM,a.Name,c.Name as ProdiName,a.Year')
+                                     ->join('db_academic.program_study c','a.ProdiID = c.ID','join')
+                                     ->where('a.StatusStudentID',$StatusStudentID)
+                                     ->where('a.EffectiveDateStatus is NULL')
+                                     ->get('db_academic.auth_students a')->result_array();
+
+        }
+
+         $arr = [
+            'endNameSemester' => $NameSemester,
+            'statusName' => $this->db->select('Description')
+                                     ->where('ID',$StatusStudentID),
+                                     ->get('db_academic.status_student')->row()->Description,
+            'data' => []
+          ];
+
+        // get All payment dari semester 1
+        for ($j=0; $j < count($dataMHS); $j++) { 
+          $getTA = $dataMHS[$j]['Year'];
+
+
+        }  
+        
+
+      }
+
+   }
+
+   public function Payment_SemesterStart_to_End($NPM,$TA=''){
+      $rs = [];
+      if ($TA == '') {
+        $TA =  $this->db->select('Year')
+                                   ->where('NPM',$NPM)
+                                   ->get('db_academic.auth_students')->row()->Year;
+      }
+
+      
+
+   }
+
+   public function report_rekap_std($StatusStudentArr){
+      $rs = [];
+
+      for ($i=0; $i < count($StatusStudentArr); $i++) { 
+        $data = $this->rekap_std_by_status($StatusStudentArr[$i]);
+      }
+
+
+   }
+
 
 }

@@ -1132,4 +1132,10 @@ class C_save_to_excel2 extends CI_Controller
         $objWriter->save('php://output');
     }
 
+    public function reportFin_rekap(){
+        $this->load->model('finance/m_finance');
+        $input =  $this->getInputToken2();
+        $data = $this->m_finance->report_rekap_std($input['StatusStudentArr']);
+    }
+
 }
