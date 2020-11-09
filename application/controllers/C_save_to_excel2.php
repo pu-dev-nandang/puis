@@ -3,6 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class C_save_to_excel2 extends CI_Controller
 {
+    public $data = [];    
 
     function __construct()
     {
@@ -13,6 +14,13 @@ class C_save_to_excel2 extends CI_Controller
         $this->load->model('report/m_save_to_excel');
         $this->load->model('master/m_master');
 
+        $this->init_variable();
+
+    }
+
+
+    private function init_variable(){
+        $this->data['keyM'] = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
     }
 
     private function getInputToken($token)
@@ -1025,6 +1033,103 @@ class C_save_to_excel2 extends CI_Controller
         $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
         $write->save('php://output');
 
+    }
+
+    private function standard_style(){
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        return ['style_row' => $style_row,'style_col' => $style_col];
+    }
+
+
+    public function reportFin_deposit(){
+        $this->load->model('finance/m_finance');
+        $input =  $this->getInputToken2();
+        $TA = $input['TA'];
+        $GetDateNow = date('Y-m-d');
+        $data = $this->m_finance->get_deposit_saldo_uang_tititpan($TA);
+
+        
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/finance/Template_uang_titipan.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+
+        $subject_A2 = 'REKAP UANG TITIPAN TA '.$TA.'/'.($TA+1);
+        $DatePrint = date('d M Y', strtotime($GetDateNow));
+        $excel3->setCellValue('A2', $subject_A2);
+        $excel3->setCellValue('B3', 'sd '.$DatePrint);
+
+        $style = $this->standard_style();
+        $style_row = $style['style_row'];
+        $style_col = $style['style_col'];
+
+
+        $Filename = 'UangTititpanMHS_TA_'.$TA.'.xlsx';
+        $a = 7;
+        $Total = 0;
+        $no = 0;
+
+        for ($i=0; $i < count($data); $i++) { 
+           $no++;
+           $excel3->setCellValue('A'.$a, $no);
+           $excel3->setCellValue('B'.$a, $data[$i]['Name']);
+           $excel3->setCellValue('C'.$a, $data[$i]['NPM']);
+           $excel3->setCellValue('D'.$a, $data[$i]['CodeProdi']);
+           $excel3->setCellValue('E'.$a, $data[$i]['Saldo']);
+
+           $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('B'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('C'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('D'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('E'.$a)->applyFromArray($style_row);
+
+           $Total = $Total + $data[$i]['Saldo'];
+           $a++;     
+        }
+
+        $excel3->setCellValue('A'.$a, 'Total ');
+        $excel3->setCellValue('E'.$a, $Total);
+        $excel3->mergeCells('A'.$a.':D'.$a);
+        $excel3->getStyle('A'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('B'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('C'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('D'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('E'.$a)->applyFromArray($style_col);
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        header('Content-Disposition: attachment; filename="'.$Filename.'"'); // jalan ketika tidak menggunakan ajax
+        $objWriter->save('php://output');
     }
 
 }

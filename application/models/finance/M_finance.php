@@ -5084,5 +5084,41 @@ class M_finance extends CI_Model {
     return $query;
    }
 
+   public function deposit_saldo_uang_tititpan_mhs($NPM){
+    $this->load->model('m_master');
+    $get = $this->db->query(
+            '
+              select ( sum(Credit) - sum(Debit) ) as left_saldo, sum(Credit) as CreditTotal,sum(Debit) as DebitTotal
+              from db_finance.trans_deposit 
+              where NPM = "'.$NPM.'"
+            '
+          )->row()->left_saldo;
+
+    return $get; 
+   }
+
+   public function get_deposit_saldo_uang_tititpan($TA){
+      $rs = [];
+      $listMHSDeposit = $this->db->select('b.NPM,b.Name,c.Code as CodeProdi')
+                                 ->join('db_academic.auth_students  b','a.NPM = b.NPM','join')
+                                 ->join('db_academic.program_study c','b.ProdiID = c.ID','join')
+                                 ->where('b.Year',$TA)
+                                 ->group_by('a.NPM')
+                                 ->get('db_finance.trans_deposit a')->result_array();
+
+      for ($i=0; $i < count($listMHSDeposit); $i++) { 
+        $NPM = $listMHSDeposit[$i]['NPM'];
+        $left_saldo = $this->deposit_saldo_uang_tititpan_mhs($NPM);
+
+        if ( (!empty($left_saldo)) && $left_saldo > 0  ) {
+          $listMHSDeposit[$i]['Saldo'] = $left_saldo;
+          $rs[] = $listMHSDeposit[$i];
+        }
+      }
+
+      return $rs;
+      
+   }
+
 
 }

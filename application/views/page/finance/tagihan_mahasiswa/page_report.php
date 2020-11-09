@@ -27,6 +27,9 @@
                         <li class="">
                             <a href="javascript:void(0)" class="PageNav" page = "RDaily">Penerimaan</a>
                         </li>
+                        <li class="">
+                            <a href="javascript:void(0)" class="PageNav" page = "RTitipan">Deposit / Titipan</a>
+                        </li>
                         <!-- <li class="">
                             <a href="javascript:void(0)" class="PageNav" page = "RSummary">Summary</a>
                         </li> -->
@@ -110,5 +113,6 @@ function loadSelectOptionStatusStudent_ID(element,selected,load = "loadData") {
 
     });
 }
+
 
 </script>
