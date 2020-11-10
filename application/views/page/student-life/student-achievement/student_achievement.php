@@ -146,7 +146,7 @@
 
 
     function fetchData() {
-        $('#loadTable').html('<table id="tableData" class="table table-bordered table-striped table-centre">' +
+        $('#loadTable').html('<table id="tableDataSA" class="table table-bordered table-striped table-centre" style="width:100%;">' +
             '               <thead>' +
             '                <tr style="background: #337ab7; color:#fff;">' +
             '                   <th style="width: 1%;">No</th>'+
@@ -180,7 +180,7 @@
         var token = jwt_encode(data,'UAP)(*');
         var url = "<?php echo base_url('student-life/student-achievement/fetchData'); ?>";
 
-        var dataTable = $('#tableData').DataTable( {
+        var dataTable = $('#tableDataSA').DataTable( {
             "processing": true,
             "serverSide": true,
             "iDisplayLength" : 10,
@@ -231,7 +231,7 @@
     });
 
     function loadDataRequest() {
-        $('#loadTable').html('<table id="tableData" class="table table-bordered table-striped table-centre">' +
+        $('#loadTable').html('<table id="tableDataSA" class="table table-bordered table-striped table-centre" style="width:100%";>' +
             '               <thead>' +
             '                <tr style="background: #337ab7; color:#fff;">' +
             '                   <th style="width: 1%;">No</th>'+
@@ -276,7 +276,7 @@
         };
         var token = jwt_encode(data,'UAP)(*');
         var url = "<?php echo base_url('student-life/student-achievement/fetchData'); ?>";
-        var dataTable = $('#tableData').DataTable( {
+        var dataTable = $('#tableDataSA').DataTable( {
             "processing": true,
             "serverSide": true,
             "iDisplayLength" : 10,
