@@ -5094,7 +5094,7 @@ class M_finance extends CI_Model {
             '
           )->row()->left_saldo;
 
-    return $get; 
+    return (!empty($get) && $get > 0) ? $get : 0; 
    }
 
    public function get_deposit_saldo_uang_tititpan($TA){
@@ -5131,13 +5131,22 @@ class M_finance extends CI_Model {
                                  ->get('db_academic.auth_students a')->result_array();
       
       // add NULL EffectiveDateStatus
-      $dataMonthly2 = $this->db->select(' "NULL" as Yearly, "NULL" as Monthly')
+      $dataMonthly2 = $this->db->select(' EffectiveDateStatus as Yearly, EffectiveDateStatus as Monthly')
                                  ->where('StatusStudentID',$StatusStudentID)
                                  ->where('EffectiveDateStatus is NULL')
                                  ->group_by('YEAR(EffectiveDateStatus), MONTH(EffectiveDateStatus)')
                                  ->get('db_academic.auth_students a')->result_array();
 
       $dataMonthly = $this->m_master->TwoArraysObjectJoin($dataMonthly,$dataMonthly2); // join
+
+      $rs = [
+          'StatusStudentID' => $StatusStudentID,
+          'StatusStudentName' => $this->db->select('Description')
+                                     ->where('ID',$StatusStudentID)
+                                     ->get('db_academic.status_student')->row()->Description,
+          'dataPerMonth' => [],
+
+      ];
 
       for ($i=0; $i < count($dataMonthly); $i++) { 
         $Yearly = $dataMonthly[$i]['Yearly'];
@@ -5146,7 +5155,7 @@ class M_finance extends CI_Model {
         if ($Yearly != NULL && !empty($Yearly)) {
           $NameSemester = $Yearly.'/'.($Yearly+1);
           // get semester name by year
-          $dataMHS =  $this->db->select('a.NPM,a.Name,c.Name as ProdiName,a.Year')
+          $dataMHS =  $this->db->select('a.NPM,a.Name,c.Name as ProdiName,a.Year,a.EffectiveDateStatus')
                                      ->join('db_academic.program_study c','a.ProdiID = c.ID','join')
                                      ->where('a.StatusStudentID',$StatusStudentID)
                                      ->where('YEAR(EffectiveDateStatus) = '.$Yearly)
@@ -5155,9 +5164,10 @@ class M_finance extends CI_Model {
         }
         else
         {
-          $NameSemester = 'EffectiveDateStatus belum diisi';
+          // $NameSemester = 'EffectiveDateStatus belum diisi';
+          $NameSemester = '-';
           // get semester name by year
-          $dataMHS =  $this->db->select('a.NPM,a.Name,c.Name as ProdiName,a.Year')
+          $dataMHS =  $this->db->select('a.NPM,a.Name,c.Name as ProdiName,a.Year,a.EffectiveDateStatus')
                                      ->join('db_academic.program_study c','a.ProdiID = c.ID','join')
                                      ->where('a.StatusStudentID',$StatusStudentID)
                                      ->where('a.EffectiveDateStatus is NULL')
@@ -5167,21 +5177,20 @@ class M_finance extends CI_Model {
 
          $arr = [
             'endNameSemester' => $NameSemester,
-            'statusName' => $this->db->select('Description')
-                                     ->where('ID',$StatusStudentID),
-                                     ->get('db_academic.status_student')->row()->Description,
             'data' => []
           ];
 
         // get All payment dari semester 1
         for ($j=0; $j < count($dataMHS); $j++) { 
           $getTA = $dataMHS[$j]['Year'];
+          $dataMHS[$j]['ALLPayment'] = $this->Payment_SemesterStart_to_End($dataMHS[$j]['NPM'],$getTA);
+        }
 
-
-        }  
-        
-
+        $arr['data'] = $dataMHS;
+        $rs['dataPerMonth'][] = $arr;
       }
+
+      return $rs;
 
    }
 
@@ -5189,11 +5198,89 @@ class M_finance extends CI_Model {
       $rs = [];
       if ($TA == '') {
         $TA =  $this->db->select('Year')
-                                   ->where('NPM',$NPM)
-                                   ->get('db_academic.auth_students')->row()->Year;
+                       ->where('NPM',$NPM)
+                       ->get('db_academic.auth_students')->row()->Year;
       }
 
-      
+
+      $YearSemesterEnd = $this->db->select('EffectiveDateStatus')
+                                  ->where('NPM',$NPM)
+                                  ->get('db_academic.auth_students')->row()->EffectiveDateStatus;
+
+      $t = (!empty($YearSemesterEnd) && $YearSemesterEnd != NULL) ? true : false;
+      $YearSemesterEnd = (!empty($YearSemesterEnd) && $YearSemesterEnd != NULL) ? date('Y', strtotime($YearSemesterEnd)) : 14;
+     
+
+      $Semester = 1;
+      $get_Semester =  $this->db->select('*')
+                                   ->where('Year >= '.$TA)
+                                   ->order_by('Year','asc')
+                                   ->order_by('Code','asc')
+                                   ->get('db_academic.semester')->result_array();
+      // TITIPAN
+      $TITIPAN = $this->deposit_saldo_uang_tititpan_mhs($NPM);
+      $temp = [
+        'NPM' => $NPM,
+        'TITIPAN' => $TITIPAN,
+        'Payment' => []
+      ];
+
+      for ($i=0; $i < count($get_Semester); $i++) { 
+        $SemesterID = $get_Semester[$i]['ID'];
+         $JUMLAH_TAGIHAN = 0;
+         $JUMLAH_PENERIMAAN = 0;
+
+         $data_Payment =  $this->db->select('*')
+                                   ->where('SemesterID',$SemesterID)
+                                   ->where('NPM',$NPM)
+                                   ->get('db_finance.payment')->result_array();
+
+          for ($j=0; $j < count($data_Payment); $j++) { 
+            $JUMLAH_TAGIHAN = $JUMLAH_TAGIHAN + $data_Payment[$j]['Invoice'];
+            $ID_payment = $data_Payment[$j]['ID'];
+            $get_payment_student = $this->findDatapayment_studentsBaseID_payment($ID_payment,1);
+
+            for ($k=0; $k < count($get_payment_student); $k++) { 
+              $JUMLAH_PENERIMAAN = $JUMLAH_PENERIMAAN + $get_payment_student[$k]['Invoice'];
+            }
+          }
+
+          $temp['Payment'][] = [
+              'SemesterID' => $SemesterID,
+              'Semester' => $Semester,
+              'JUMLAH_TAGIHAN' => $JUMLAH_TAGIHAN,
+              'JUMLAH_PENERIMAAN' => $JUMLAH_PENERIMAAN,
+          ];
+
+          if ($t) {
+             // get last semester
+             $LastSemester = $this->db->select('*')
+                                    ->where('Year',$YearSemesterEnd)
+                                    ->where('Code',2)
+                                    ->get('db_academic.semester')->result_array();
+
+             if (count($LastSemester) == 0) {
+                break;
+              }
+              else{
+                $LastSemester = $LastSemester[0]['ID'];
+                if ($SemesterID >= $LastSemester) {
+                  break;
+                }
+              }                       
+             
+          }
+          else
+          {
+            if ($Semester >= $YearSemesterEnd) {
+              break;
+            }
+          }
+          $Semester++;                         
+      }
+     
+      $rs = $temp;
+      return $rs;
 
    }
 
@@ -5202,9 +5289,10 @@ class M_finance extends CI_Model {
 
       for ($i=0; $i < count($StatusStudentArr); $i++) { 
         $data = $this->rekap_std_by_status($StatusStudentArr[$i]);
+        $rs[] = $data;
       }
 
-
+      return $rs;
    }
 
 
