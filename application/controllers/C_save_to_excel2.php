@@ -3,6 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class C_save_to_excel2 extends CI_Controller
 {
+    public $data = [];    
 
     function __construct()
     {
@@ -13,6 +14,13 @@ class C_save_to_excel2 extends CI_Controller
         $this->load->model('report/m_save_to_excel');
         $this->load->model('master/m_master');
 
+        $this->init_variable();
+
+    }
+
+
+    private function init_variable(){
+        $this->data['keyM'] = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
     }
 
     private function getInputToken($token)
@@ -1024,6 +1032,268 @@ class C_save_to_excel2 extends CI_Controller
 
         $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
         $write->save('php://output');
+
+    }
+
+    private function standard_style(){
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        return ['style_row' => $style_row,'style_col' => $style_col];
+    }
+
+
+    public function reportFin_deposit(){
+        $this->load->model('finance/m_finance');
+        $input =  $this->getInputToken2();
+        $TA = $input['TA'];
+        $GetDateNow = date('Y-m-d');
+        $data = $this->m_finance->get_deposit_saldo_uang_tititpan($TA);
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/finance/Template_uang_titipan.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+
+        $subject_A2 = 'REKAP UANG TITIPAN TA '.$TA.'/'.($TA+1);
+        $DatePrint = date('d M Y', strtotime($GetDateNow));
+        $excel3->setCellValue('A2', $subject_A2);
+        $excel3->setCellValue('B3', 'sd '.$DatePrint);
+
+        $style = $this->standard_style();
+        $style_row = $style['style_row'];
+        $style_col = $style['style_col'];
+
+
+        $Filename = 'UangTititpanMHS_TA_'.$TA.'.xlsx';
+        $a = 7;
+        $Total = 0;
+        $no = 0;
+
+        for ($i=0; $i < count($data); $i++) { 
+           $no++;
+           $excel3->setCellValue('A'.$a, $no);
+           $excel3->setCellValue('B'.$a, $data[$i]['Name']);
+           $excel3->setCellValue('C'.$a, $data[$i]['NPM']);
+           $excel3->setCellValue('D'.$a, $data[$i]['CodeProdi']);
+           $excel3->setCellValue('E'.$a, $data[$i]['Saldo']);
+
+           $excel3->getStyle('A'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('B'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('C'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('D'.$a)->applyFromArray($style_row);
+           $excel3->getStyle('E'.$a)->applyFromArray($style_row);
+
+           $Total = $Total + $data[$i]['Saldo'];
+           $a++;     
+        }
+
+        $excel3->setCellValue('A'.$a, 'Total ');
+        $excel3->setCellValue('E'.$a, $Total);
+        $excel3->mergeCells('A'.$a.':D'.$a);
+        $excel3->getStyle('A'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('B'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('C'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('D'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('E'.$a)->applyFromArray($style_col);
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        header('Content-Disposition: attachment; filename="'.$Filename.'"'); // jalan ketika tidak menggunakan ajax
+        $objWriter->save('php://output');
+    }
+
+    private function reportFin_rekap_subject_A2($StatusStudentArr){
+        $text = 'REKAP MAHASISWA ';
+        $Name = $this->db->select('Description')
+                 ->where('ID',$StatusStudentArr[0])
+                 ->get('db_academic.status_student')->row()->Description;
+        $text .= $Name;         
+        for ($i=1; $i < count($StatusStudentArr); $i++) { 
+           $Name = $this->db->select('Description')
+                    ->where('ID',$StatusStudentArr[$i])
+                    ->get('db_academic.status_student')->row()->Description;
+            $text = $text.', '.$Name;
+        }
+
+        return $text;
+    }
+
+    private function reportFin_rekap_makeHeaderTable($a,$subjectTable,$excel3){
+        $style = $this->standard_style();
+        $style_row = $style['style_row'];
+        $style_col = $style['style_col'];
+
+        $excel3->setCellValue('A'.$a, $subjectTable);
+        $excel3->mergeCells('A'.$a.':'.'I'.$a);
+        $a++;
+        $excel3->setCellValue('A'.$a, 'NO');
+        $excel3->setCellValue('B'.$a, 'Nama');
+        $excel3->setCellValue('C'.$a, 'NPM');
+        $excel3->setCellValue('D'.$a, 'PROGRAM STUDI');
+        $excel3->setCellValue('E'.$a, 'BULAN');
+        $excel3->setCellValue('F'.$a, 'SEMESTER');
+        $excel3->setCellValue('G'.$a, 'JUMLAH TAGIHAN');
+        $excel3->setCellValue('H'.$a, 'JUMLAH PENERIMAAN');
+        $excel3->setCellValue('I'.$a, 'TITIPAN');
+
+        $excel3->getStyle('A'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('B'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('C'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('D'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('E'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('F'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('G'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('H'.$a)->applyFromArray($style_col);
+        $excel3->getStyle('I'.$a)->applyFromArray($style_col);
+
+        foreach(range('G','H') as $columnID) {
+            $excel3->getColumnDimension($columnID)
+                // ->setAutoSize(true);
+                ->setWidth(25);
+        }
+    }
+
+    public function reportFin_rekap(){
+        $this->load->model('finance/m_finance');
+        $input =  $this->getInputToken2();
+        $data = $this->m_finance->report_rekap_std($input['StatusStudentArr']);
+        $GetDateNow = date('Y-m-d');
+        $DatePrint = date('d M Y', strtotime($GetDateNow));
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/finance/TemplateRekapByStatusSTD.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+
+        $subject_A2 = $this->reportFin_rekap_subject_A2($input['StatusStudentArr']);
+        $excel3->setCellValue('A2', $subject_A2);
+        $excel3->setCellValue('A3', 'sd '.$DatePrint);
+
+        $style = $this->standard_style();
+        $style_row = $style['style_row'];
+        $style_col = $style['style_col'];
+
+        $Filename = $subject_A2.'.xlsx';
+        $a = 6;
+
+        for ($i=0; $i < count($data); $i++) {
+            $HeadsubjectTable = 'REKAP MAHASISWA  '.$data[$i]['StatusStudentName'];
+            $dataPerMonth = $data[$i]['dataPerMonth'];
+            for ($j=0; $j < count($dataPerMonth); $j++) { 
+                $subjectTable = $HeadsubjectTable.' '.$dataPerMonth[$j]['endNameSemester'];
+                $this->reportFin_rekap_makeHeaderTable($a,$subjectTable,$excel3); // make header table
+                $a = $a + 2;
+                $get_data =  $dataPerMonth[$j]['data'];
+                $No = 0;
+                $totalTagihan = 0;
+                $totalPenerimaan = 0;
+                $totalTitipan = 0;
+                for ($k=0; $k < count($get_data); $k++) { // isi data
+                    $No++;
+                    $excel3->setCellValue('A'.$a, $No);
+                    $excel3->setCellValue('B'.$a, $get_data[$k]['Name']);
+                    $excel3->setCellValue('C'.$a, $get_data[$k]['NPM']);
+                    $excel3->setCellValue('D'.$a, $get_data[$k]['ProdiName']);
+                    $EffectiveDateStatus = '';
+                    if (!empty($get_data[$k]['EffectiveDateStatus'])) {
+                        $EffectiveDateStatus = date('M-y', strtotime($get_data[$k]['EffectiveDateStatus']));
+                    }
+                    $excel3->setCellValue('E'.$a, $EffectiveDateStatus);
+                    
+                    $Payment = $get_data[$k]['ALLPayment']['Payment'];
+                    $TotalRowpayment = count($Payment);
+                    // TITIPAN
+                    $excel3->setCellValue('I'.$a, $get_data[$k]['ALLPayment']['TITIPAN']);
+
+                    $rUntil = $a + ($TotalRowpayment - 1);
+
+                    $excel3->mergeCells('A'.$a.':'.'A'.$rUntil);
+                    $excel3->mergeCells('B'.$a.':'.'B'.$rUntil);
+                    $excel3->mergeCells('C'.$a.':'.'C'.$rUntil);
+                    $excel3->mergeCells('D'.$a.':'.'D'.$rUntil);
+                    $excel3->mergeCells('E'.$a.':'.'E'.$rUntil);
+                    $excel3->mergeCells('I'.$a.':'.'I'.$rUntil);
+              
+                    $excel3->getStyle('A'.$a.':'.'A'.$rUntil)->applyFromArray($style_row);
+                    $excel3->getStyle('B'.$a.':'.'B'.$rUntil)->applyFromArray($style_row);
+                    $excel3->getStyle('C'.$a.':'.'C'.$rUntil)->applyFromArray($style_row);
+                    $excel3->getStyle('D'.$a.':'.'D'.$rUntil)->applyFromArray($style_row);
+                    $excel3->getStyle('E'.$a.':'.'E'.$rUntil)->applyFromArray($style_row);
+                    $excel3->getStyle('I'.$a.':'.'I'.$rUntil)->applyFromArray($style_row);
+
+                    $totalTitipan = $get_data[$k]['ALLPayment']['TITIPAN'];
+
+                    for ($l=0; $l < count($Payment); $l++) { 
+                        $excel3->setCellValue('F'.$a, $Payment[$l]['Semester']);
+                        $excel3->setCellValue('G'.$a, $Payment[$l]['JUMLAH_TAGIHAN']);
+                        $excel3->setCellValue('H'.$a, $Payment[$l]['JUMLAH_PENERIMAAN']);
+
+                        $excel3->getStyle('F'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('G'.$a)->applyFromArray($style_row);
+                        $excel3->getStyle('H'.$a)->applyFromArray($style_row);
+
+                        $totalTagihan =  $totalTagihan + $Payment[$l]['JUMLAH_TAGIHAN'];
+                        $totalPenerimaan =  $totalPenerimaan + $Payment[$l]['JUMLAH_PENERIMAAN'];
+                        $a++;
+                    }
+
+                }
+
+                $excel3->setCellValue('A'.$a, 'Total ');
+                $excel3->setCellValue('G'.$a, $totalTagihan);
+                $excel3->setCellValue('H'.$a, $totalPenerimaan);
+                $excel3->setCellValue('I'.$a, $totalTitipan);
+                $excel3->mergeCells('A'.$a.':F'.$a);
+                $excel3->getStyle('A'.$a)->applyFromArray($style_col);
+                $excel3->getStyle('B'.$a)->applyFromArray($style_col);
+                $excel3->getStyle('C'.$a)->applyFromArray($style_col);
+                $excel3->getStyle('D'.$a)->applyFromArray($style_col);
+                $excel3->getStyle('E'.$a)->applyFromArray($style_col);
+                $excel3->getStyle('F'.$a)->applyFromArray($style_col);
+                $excel3->getStyle('G'.$a)->applyFromArray($style_col);
+                $excel3->getStyle('H'.$a)->applyFromArray($style_col);
+                $excel3->getStyle('I'.$a)->applyFromArray($style_col);
+
+                $a = $a + 2;
+            } 
+            
+        }
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        header('Content-Disposition: attachment; filename="'.$Filename.'"'); // jalan ketika tidak menggunakan ajax
+        $objWriter->save('php://output');
+
 
     }
 

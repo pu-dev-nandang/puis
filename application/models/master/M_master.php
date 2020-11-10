@@ -4420,7 +4420,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     }
 
-       public function UpdatePwdAD($data_arr)
+    public function UpdatePwdAD($data_arr)
     {
         $TypeUser = $data_arr['User'];
         switch ($TypeUser) {
@@ -4459,7 +4459,63 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             default:
                 # code...
                 break;
-        }}
+        }
+    }
+
+    public function date_range_get_list($startDate,$endDate){
+        $rs = ['status' => true,'data' => [] ];
+        $query = $this->db->query(
+            '
+                select * from 
+                (select adddate("1970-01-01",t4.i*10000 + t3.i*1000 + t2.i*100 + t1.i*10 + t0.i) selected_date from
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t0,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t1,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v
+                where selected_date between "'.$startDate.'" and "'.$endDate.'"
+            '
+        )->result_array();
+
+        if (count($query) > 0) {
+            for ($i=0; $i < count($query); $i++) { 
+                $rs['data'][] = $query[$i]['selected_date'];
+            }
+           
+        }
+        else
+        {
+            $rs['status'] = false;
+        }
+
+        return $rs;
+    }
+
+    public function TwoArraysObjectJoin($arr1,$arr2){
+        $rs = [];
+        for ($i=0; $i < count($arr2); $i++) { 
+            $arr1[] = $arr2[$i];
+        }
+
+        for ($i=0; $i < count($arr1); $i++) { 
+           $c = json_encode($arr1[$i]);
+           $bool = true;
+           for ($j=$i+1; $j < count($arr1); $j++) { 
+               $d = json_encode($arr1[$j]);
+               if($c===$d){
+                 $bool = false;
+                 break;
+               }     
+           }
+
+            if ($bool) {
+                $rs[] = $arr1[$i];
+            }
+
+        }
+
+        return $rs;
+    }
 
 
 }

@@ -1640,6 +1640,9 @@ class C_api extends CI_Controller {
                 $this->db->where('NPM', $data_arr['NPM']);
                 $this->db->update($da_.'.students', $arrUpdateStd);
 
+                // adding by adhi 20201109 : add EffectiveDateStatus
+                $arrUpdateStd['EffectiveDateStatus'] = $data_arr['EffectiveDateStatus'];
+
                 $this->db->where('NPM', $data_arr['NPM']);
                 $this->db->update('db_academic.auth_students', $arrUpdateStd);
 
