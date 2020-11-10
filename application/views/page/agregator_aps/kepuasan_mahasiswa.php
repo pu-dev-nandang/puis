@@ -175,7 +175,8 @@ var App_kepuasan_mhs = {
              },
              dom: 'l<"toolbar">frtip',
              initComplete: function(){
-               
+               let SemesterID = (($('#FilterSemester option:selected').val()).split('.'))[0];
+               newDescritionInput.getDescription(null,SemesterID);
             }  
          });
 
@@ -377,6 +378,12 @@ $(document).off('keyup', '.nominal').on('keyup', '.nominal',function(e) {
     if (v > 100) {
         $(this).val(100)
     }
+})
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    let SemesterID = (($('#FilterSemester option:selected').val()).split('.'))[0];
+    newDescritionInput.saveDescription(itsme,null,SemesterID);
 })
 
 </script>       

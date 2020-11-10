@@ -128,7 +128,7 @@ var App_alumni_mahasiswa = {
         }).fail(function() {
             toastr.error("Connection Error, Please try again", 'Error!!');
         }).always(function() {
-
+          newDescritionInput.getDescription();
         });
 
     },
@@ -198,5 +198,10 @@ $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
             'backdrop' : 'static'
         });
     }
+})
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    newDescritionInput.saveDescription(itsme);
 })   
 </script>

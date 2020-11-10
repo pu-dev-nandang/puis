@@ -71,6 +71,7 @@ var AppJQ = {
                 },
     loaded : function(ProdiID,ProdiName){
                 AppJQ.LoadAjaxForTable(ProdiID,ProdiName);
+                newDescritionInput.getDescription();
             },
 };
 
@@ -102,4 +103,9 @@ function loadPage() {
         AppJQ.loaded(filterProdi,filterProdiName);
     }
 }
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    newDescritionInput.saveDescription(itsme);
+})
 </script>

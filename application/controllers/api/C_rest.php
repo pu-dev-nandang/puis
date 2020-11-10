@@ -830,6 +830,46 @@ class C_rest extends CI_Controller {
                 }
 
 
+
+                // push notifikasi hanya untuk invote group kelas
+                if($dataTopic['InviteTo']==2 || $dataTopic['InviteTo']=='2') {
+
+                    // get employee name
+                    $dataEmp = $this->db->select('Name,TitleAhead,TitleBehind')
+                        ->get_where('db_employees.employees',
+                            array('NIP' => $dataTopic['CreateBy']))->result_array()[0];
+
+                    $TitleAhead = ($dataEmp['TitleAhead']!='' && $dataEmp['TitleAhead']!=null)
+                        ? $dataEmp['TitleAhead'].' ' : '';
+
+                    $TitleBehind = ($dataEmp['TitleBehind']!='' && $dataEmp['TitleBehind']!=null)
+                        ? ' '.$dataEmp['TitleBehind'] : '';
+
+                    $LecName = $TitleAhead.$dataEmp['Name'].$TitleBehind;
+
+                    // get mk name
+                    $dataMK = $this->db->query('SELECT s.ClassGroup, mk.NameEng FROM db_academic.schedule s 
+                                                            LEFT JOIN db_academic.schedule_details_course sdc 
+                                                            ON (s.ID = sdc.ScheduleID)
+                                                            LEFT JOIN db_academic.mata_kuliah mk 
+                                                            ON (mk.ID = sdc.MKID)
+                                                            WHERE s.ID = "'.$dataTopic['ScheduleID'].'"
+                                                             GROUP BY s.ID ')->result_array()[0];
+
+                    // push notification
+                    $url = 'https://firebase.podomorouniversity.ac.id/pushnotification.php';
+                    $dataPush = array(
+                        'type' => 'topic', // topic / token
+                        'topic' => 'pu_course_'.$dataTopic['ScheduleID'],
+//                        'topic' => 'pu_emp_12',
+                        'title' => 'New Discussion - '.$LecName,
+                        'body' => $dataMK['ClassGroup'].' '.$dataMK['NameEng']
+                            .' | '.$dataTopic['Topic']);
+                    $this->m_master->http_request_post_data($url,$dataPush);
+
+                }
+
+
                 return print_r(1);
             }
 
@@ -1043,8 +1083,47 @@ class C_rest extends CI_Controller {
 
                 }
 
+                // push notification
 
+                // cek apakah user mhs atau bukan
+                $dataMhs = $this->db->select('Name')->get_where('db_academic.auth_students',array('NPM' => $UserID))
+                    ->result_array();
 
+                if(count($dataMhs)>0){
+                    $Sender = $dataMhs[0]['Name'];
+                } else {
+                    $dataEmp = $this->db->select('Name,TitleAhead,TitleBehind')
+                        ->get_where('db_employees.employees',
+                            array('NIP' => $UserID))->result_array()[0];
+
+                    $TitleAhead = ($dataEmp['TitleAhead']!='' && $dataEmp['TitleAhead']!=null)
+                        ? $dataEmp['TitleAhead'].' ' : '';
+
+                    $TitleBehind = ($dataEmp['TitleBehind']!='' && $dataEmp['TitleBehind']!=null)
+                        ? ' '.$dataEmp['TitleBehind'] : '';
+
+                    $Sender = $TitleAhead.$dataEmp['Name'].$TitleBehind;
+                }
+
+                // get mk name
+                $dataMK = $this->db->query('SELECT s.ClassGroup, mk.NameEng FROM db_academic.schedule s 
+                                                            LEFT JOIN db_academic.schedule_details_course sdc 
+                                                            ON (s.ID = sdc.ScheduleID)
+                                                            LEFT JOIN db_academic.mata_kuliah mk 
+                                                            ON (mk.ID = sdc.MKID)
+                                                            WHERE s.ID = "'.$ScheduleID.'"
+                                                             GROUP BY s.ID ')->result_array()[0];
+
+                $url = 'https://firebase.podomorouniversity.ac.id/pushnotification.php';
+                $dataPush = array(
+                    'type' => 'topic', // topic / token
+                    'topic' => 'pu_course_'.$ScheduleID,
+//                    'topic' => 'pu_emp_12',
+                    'title' => 'Discussion - '.$Sender,
+                    'body' => $dataMK['ClassGroup'].' '.$dataMK['NameEng']
+                        .' | '.$dataForm['Comment']);
+
+                $this->m_master->http_request_post_data($url,$dataPush);
 
                 return print_r(1);
             }

@@ -6269,14 +6269,14 @@ Phone: (021) 29200456';
             $thn = ($dateGen!='') ? explode('-',$dateGen)[0] : '';
 
             // Get Mata kuliah
-            $dataMK = $this->db->query('SELECT mk.NameEng, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule s
+            $dataMK = $this->db->query('SELECT mk.Name, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule s
                                                   LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                   LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                   LEFT JOIN db_academic.schedule_share_credit ssc ON (ssc.ScheduleID = s.ID AND ssc.NIP = s.Coordinator)
                                                   WHERE s.SemesterID = "'.$SemesterID.'" AND s.Coordinator = "'.$NIP.'" GROUP BY s.ID
                                                   UNION ALL
-                                                  SELECT mk2.NameEng, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule_details_course sdc2
+                                                  SELECT mk2.Name, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule_details_course sdc2
                                                   LEFT JOIN db_academic.schedule s2 ON (s2.ID = sdc2.ScheduleID)
                                                   LEFT JOIN db_academic.mata_kuliah mk2 ON (mk2.ID = sdc2.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc2.CDID)
@@ -6357,15 +6357,35 @@ Phone: (021) 29200456';
             $pdf->SetFont('Arial','',9);
 
             $no=1;
+            $isPageOne = true;
+//            print_r($dataMK[0]);
+//            exit();
+//            foreach ($dataMK AS $item){
+//                array_push($dataMK,$item);
+//            }
             foreach ($dataMK AS $item){
 
                 $Credit = ($item['CreditResult']!='' && $item['CreditResult']!=null) ? $item['CreditResult'] : '-' ;
 
+                $y = $pdf->GetY();
+
                 $pdf->Cell(10,$h,$no,1,0,'C');
-                $pdf->Cell(125,$h,$item['NameEng'],1,0,'L');
+                $pdf->Cell(125,$h,$item['Name'],1,0,'L');
                 $pdf->Cell(20,$h,$item['Credit'],1,0,'C');
                 $pdf->Cell(20,$h,$Credit,1,0,'C');
                 $pdf->Cell(15,$h,'14',1,1,'C');
+
+//                if($no<=8){
+//
+//                }
+
+                if($y>=172){
+                    $pdf->AddPage();
+
+                    $pdf->SetAutoPageBreak(true, 0);
+                    $pdf->Image('./images/FA_letterhead_a4_r2.jpg',0,0,210);
+                    $pdf->Ln(25);
+                }
 
                 $no++;
             }

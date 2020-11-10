@@ -3003,3 +3003,74 @@
 
 </script>
 
+
+<!-- ====== FIREBASE SETTING ====== -->
+
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-messaging.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.13.0/firebase-database.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-analytics.js"></script>
+
+
+<script>
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+        apiKey: "AIzaSyDNEjQGVH_D0gdXJ17IB_AUs1Z2uCdzWJs",
+        authDomain: "pals-194015.firebaseapp.com",
+        databaseURL: "https://pals-194015.firebaseio.com",
+        projectId: "pals-194015",
+        storageBucket: "pals-194015.appspot.com",
+        messagingSenderId: "652219708720",
+        appId: "1:652219708720:web:cea24855ef4135ce9584f5",
+        measurementId: "G-WKXRKEJ5XD"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    const messaging = firebase.messaging();
+    // messaging.usePublicVapidKey("BELr-_XwFphNa8xc_VVgWqEBVHlDPFuZOGcvg_rF7PFIx3P0oriPnFCqMasfkh5TDSfjZmypdCht9iIDtMsy714");
+
+    //
+    // messaging.getToken().then((currentToken) => {
+    //     // console.log(currentToken);
+    //     updateFCMToken(currentToken);
+    // }).catch((err) => {
+    //     console.log('An error occurred while retrieving token. ', err);
+    //     // showToken('Error retrieving Instance ID token. ', err);
+    //     // setTokenSentToServer(false);
+    // });
+
+    messaging.requestPermission().then(function () {
+        console.log('Have permission');
+        return messaging.getToken();
+    })
+        .then(function (token) {
+            updateFCMToken(token);
+        })
+        .catch(function (err) {
+            console.log(err);
+            console.log('Not have permission');
+        });
+
+    messaging.onMessage(function (payload) {
+        const title = payload.notification.title;
+        const icon = (typeof payload.notification.icon !== "undefined" && payload.notification.icon !='')
+            ? payload.notification.icon : './images/icon/favicon.png';
+        const options = {
+            body : payload.notification.body,
+            icon : icon
+        };
+        // toastr.info(payload.notification.body,title);
+
+        var notification = new Notification(title,options);
+    });
+
+</script>
+

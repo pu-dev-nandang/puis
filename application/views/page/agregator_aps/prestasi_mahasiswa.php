@@ -94,41 +94,43 @@ function loadPage() {
     var token = jwt_encode(data,'UAP)(*');
     var url = base_url_js+'api3/__crudAgregatorTB5';
     
-    $.post(url,{token:token},function (jsonResult) {
+        $.post(url,{token:token},function (jsonResult) {
 
-        if(jsonResult.length>0){
-            $.each(jsonResult,function (i,v) {
-                var DataStudent = v.DataStudent;
-                var DataStudentToken =  jwt_encode(DataStudent,'UAP)(*');
-                var EventWr = '<a href = "javascript:void(0);" class = "datadetail" data = "'+DataStudentToken+'">'+v.Event+'</a>'
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+                    var DataStudent = v.DataStudent;
+                    var DataStudentToken =  jwt_encode(DataStudent,'UAP)(*');
+                    var EventWr = '<a href = "javascript:void(0);" class = "datadetail" data = "'+DataStudentToken+'">'+v.Event+'</a>'
 
-                var Provinsi = (v.Level=='Provinsi') ? 'v' : '';
-                var Nasional = (v.Level=='Nasional') ? 'v' : '';
-                var Internasional = (v.Level=='Internasional') ? 'v' : '';
-                var lbl = (v.Type=='1' || v.Type==1)
-                    ? '<span class="label label-success">Academic</span>'
-                    : '<span class="label label-default">Non Academic</span>';
+                    var Provinsi = (v.Level=='Provinsi') ? 'v' : '';
+                    var Nasional = (v.Level=='Nasional') ? 'v' : '';
+                    var Internasional = (v.Level=='Internasional') ? 'v' : '';
+                    var lbl = (v.Type=='1' || v.Type==1)
+                        ? '<span class="label label-success">Academic</span>'
+                        : '<span class="label label-default">Non Academic</span>';
 
-                $('#listData').append('<tr>' +
-                    '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
-                    '<td style="text-align: left;">'+EventWr+'</td>' +
-                    '<td style="text-align: center;">'+lbl+'</td>' +
-                    '<td>'+moment(v.StartDate).format('DD-MM-YYYY')+'</td>' +
-                    '<td>'+Provinsi+'</td>' +
-                    '<td>'+Nasional+'</td>' +
-                    '<td>'+Internasional+'</td>' +
-                    '<td>'+v.Achievement+'</td>' +
-                    '</tr>');
+                    $('#listData').append('<tr>' +
+                        '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
+                        '<td style="text-align: left;">'+EventWr+'</td>' +
+                        '<td style="text-align: center;">'+lbl+'</td>' +
+                        '<td>'+moment(v.StartDate).format('DD-MM-YYYY')+'</td>' +
+                        '<td>'+Provinsi+'</td>' +
+                        '<td>'+Nasional+'</td>' +
+                        '<td>'+Internasional+'</td>' +
+                        '<td>'+v.Achievement+'</td>' +
+                        '</tr>');
 
-            });
-        }
-
-
-        oTable = $('#dataTablesPAM').DataTable();
-        oSettings = oTable.settings();
+                });
+            }
 
 
-    });
+            oTable = $('#dataTablesPAM').DataTable();
+            oSettings = oTable.settings();
+
+
+        });
+
+        newDescritionInput.getDescription();
     }
 }
 
@@ -174,5 +176,10 @@ $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
         'show' : true,
         'backdrop' : 'static'
     });
+})
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    newDescritionInput.saveDescription(itsme);
 })
 </script>

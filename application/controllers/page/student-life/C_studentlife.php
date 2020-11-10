@@ -10,8 +10,8 @@ class C_studentlife extends Student_Life {
         parent::__construct();
         $this->load->model('student-life/m_studentlife','stdlife');
         $this->load->model('student-life/m_alumni');
-        // $this->load->library(array('JWT','pagination'));   
-        // $this->load->helper('General_helper');     
+        $this->load->model('student-life/m_podivers');
+
     }
 
     private function __setting_rest_alumni(){
@@ -514,5 +514,167 @@ class C_studentlife extends Student_Life {
         
         } 
     }
+
+    // Podivers
+    // 10/14/2020
+    // Yamin
+    private function menu_podivers($page){
+        $data['page'] = $page;
+        $data['department'] = parent::__getDepartement();
+        // $data['setgroup'] = $this->m_podivers->getSetGroup();
+        $content = $this->load->view('page/'.$data['department'].'/podivers/menu_podivers',$data,true);
+        $this->temp($content);
+    }
+
+    public function list_podivers(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/podivers/list_podivers',$data,true);
+        $this->menu_podivers($page);
+    }
+
+    public function set_group(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/podivers/set_group',$data,true);
+        $this->menu_podivers($page);
+    }
+
+    public function user_access(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/podivers/user_access',$data,true);
+        $this->menu_podivers($page);
+    }
+
+    // get set set_group
+    public function ajax_listPodivers()
+    {
+        $type=$this->uri->segment(2);
+        $list = $this->m_podivers->get_datatables($type);
+
+        $data = array();        
+        $no = $_POST['start'];
+       
+        foreach ($list as $m) {
+            $no++;
+            $row = array();
+            $row[] = $m->NPM;
+            $row[] = $m->Name;
+            $row[] = $m->GroupName;
+            $row[] = $m->UpdateAt; 
+            //add html for action
+            $row[] = '
+                    <a class="btn btn-sm btn-primary hide" href="javascript:void(0)" title="Edit" onclick="edit_podivers('."'".$m->ID_Podivers."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                    <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_podivers('."'".$m->ID_Podivers."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+ 
+            $data[] = $row;
+        }
+       
+        $output = array(
+                "draw" => $_POST['draw'],
+                "recordsTotal" => $this->m_podivers->count_all(),
+                "recordsFiltered" => $this->m_podivers->count_filtered(),
+                "data" => $data,
+                );
+        //output to json format
+        echo json_encode($output);
+    }
+
+    public function crudSetGroup(){
+        // $id = $this->input->post('id',TRUE);
+        $data = $this->m_podivers->getSetGroup();
+        echo json_encode($data);
+    }
+
+    public function ajax_editpodivers($id)
+    {
+        $data = $this->m_podivers->get_by_id($id);
+        // print_r($data);die();
+        echo json_encode($data);
+    }
+ 
+    public function ajax_addpodivers()
+    {
+        // $this->_validate();
+        $data = array(
+                // 'IDType' => $this->input->post('type'),
+                'ID_set_group' => $this->input->post('ID_set_group'),
+                'NPM' => $this->input->post('npm'),                
+                'UpdateAt' => date('Y-m-d H:i:s'),
+                'UpdateBy' => $this->session->userdata('NIP'),
+            );
+        $insert = $this->m_podivers->save($data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    // Content 
+    public function ajax_updatepodivers()
+    {
+        $data = array(
+                'ID_Podivers' => $this->input->post('idpodivers'),
+                'ID_set_group' => $this->input->post('ID_set_group'),
+                'NPM' => $this->input->post('npm'),                
+                'UpdateAt' => date('Y-m-d H:i:s'),
+                'UpdateBy' => $this->session->userdata('NIP'),
+            );
+
+        
+
+        $this->m_podivers->update(array('ID_Podivers' => $this->input->post('idpodivers')), $data);
+        echo json_encode(array("status" => TRUE));
+    }
+    
+    public function ajax_deletepodivers($id)
+    {
+        //delete file
+        // $alumni = $this->m_podivers->get_by_id($id);
+        $this->m_podivers->delete_by_id($id);
+        echo json_encode(array("status" => TRUE));
+    }
+
+
+    // set group
+    // public  function list_setgroup(){
+    //     $data=$this->m_podivers->get_setgroup();
+    //     echo json_encode($data);
+    // }
+
+    public function ajax_addSet()
+    {
+        // $this->_validate();
+        $data = array(                
+                'GroupName' => $this->input->post('groupname'),
+                'Active' => 1,
+            );
+        
+        // print_r($data);die();
+        $insert = $this->m_podivers->saveSet($data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    public function ajax_editSet($id)
+    {
+        $data = $this->m_podivers->get_by_idSet($id);
+        echo json_encode($data);
+    }
+
+    public function ajax_updateSet()
+    {
+        // $this->_validate();
+        $data = array(                
+                'GroupName' => $this->input->post('groupname'), 
+                'Active' => 1,               
+            );
+        
+        $update = $this->m_podivers->updateSet($this->input->post('idSetGroup'),$data);       
+        echo json_encode(array("status" => TRUE));
+    }
+
+    public function ajax_deleteset($id)
+    {
+        $this->m_podivers->delete_by_idSet($id);
+        echo json_encode(array("status" => TRUE));
+    }
+
+
+
 
 }

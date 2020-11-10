@@ -76,7 +76,8 @@ var App_integrasi_penelitian_pkm = {
         }).fail(function() {
             toastr.error("Connection Error, Please try again", 'Error!!');
         }).always(function() {
-
+            var SemesterID = (($('#FilterSemester option:selected').val()).split('.'))[0];
+            newDescritionInput.getDescription(null,SemesterID);
         });
 
     },
@@ -115,5 +116,11 @@ $('#filterProdi').change(function () {
 
 $(document).off('change', '#FilterSemester').on('change', '#FilterSemester',function(e) {
     App_integrasi_penelitian_pkm.LoadAjaxTable();
+})
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    var SemesterID = (($('#FilterSemester option:selected').val()).split('.'))[0];
+    newDescritionInput.saveDescription(itsme,null,SemesterID);
 })
 </script>
