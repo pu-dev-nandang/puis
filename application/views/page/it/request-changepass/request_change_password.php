@@ -115,7 +115,7 @@ function loadSelectOptionRequest(element,selected) {
 
  function loadDataRequest() {
 
-        $('#loadTable').html('<table id="tableData" class="table table-bordered table-striped table-centre">' +
+        $('#loadTable').html('<table id="tableDataRequest" class="table table-bordered table-striped table-centre" style="width:100%">' +
             '               <thead>' +
             '                <tr style="background: #eceff1;">' +
             '                    <th style="width: 1%;text-align: center;">No</th>'+
@@ -141,7 +141,7 @@ function loadSelectOptionRequest(element,selected) {
         var token = jwt_encode(data,'UAP)(*');
         var url = "<?php echo base_url('it/finish-changepass'); ?>";
 
-        var dataTable = $('#tableData').DataTable( {
+        var dataTable = $('#tableDataRequest').DataTable( {
             "processing": true,
             "serverSide": true,
             "iDisplayLength" : 10,
