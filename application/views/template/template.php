@@ -520,7 +520,7 @@
     if($showNotif){ ?>
     <style>
         .box-notif.ntf-1{background: #f3e8af85;}
-        .box-notif{cursor: pointer;border-bottom:1px solid #f9f9f9;display: inline-flex;width: 100%;margin-bottom: 10px;padding: 10px}
+        .box-notif{cursor: pointer;border-bottom:1px solid #eaeaea;display: inline-flex;width: 100%;margin-bottom: 10px;padding: 10px;}
         .box-notif > .picture{width:50px;max-height:50px;margin-right: 10px}
         .box-notif > .info > .created{font-weight: bold;}
         .box-notif > .info{width: 100%}
@@ -545,7 +545,7 @@
 						appendList += '<div class="box-notif NotificationLinkRead " id_logging_user = "'+v.ID_logging_user+'" onClick="location.href=\''+base_url_js+v.URLDirect+'\'"><img src="'+v.Icon+'" class="picture img-rounded pull-left"><div class="info"><span class="date pull-right"><i class="fa fa-clock-o"></i> '+moment(v.CreatedAt).format('dddd, DD MMM YYYY HH:mm:ss')+'</span><p class="created">'+v.CreatedName+'</p><p class="title">'+v.Title+'</p></div></div>';
 					});
 					$("#GlobalModal .modal-header").html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> <h4 class="modal-title" id="exampleModalLabel">Notifications</h4>');
-					$("#GlobalModal .modal-body").css({"overflow":"auto","max-height":"200px"}).html(appendList);
+					$("#GlobalModal .modal-body").html('<div style="overflow:auto;max-height:400px;">'+appendList+'</div>');
 					$("#GlobalModal .modal-footer").html('<a href="'+base_url_js+'ShowLoggingNotification">View all notifications</a>');
 					$("#GlobalModal").modal("show");
 				}
