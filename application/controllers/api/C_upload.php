@@ -226,6 +226,7 @@ class C_upload extends CI_Controller {
         if($f==1 || $f=='1'){
 
             $formNameFileOld = $this->input->post('formNameFileOld');
+            $unix_name = $this->input->post('formNameFile');
 
             if($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id'){
                 $headerOrigin = serverRoot;
@@ -233,7 +234,7 @@ class C_upload extends CI_Controller {
                     $path_delete = "pcam/task-exam/".$formNameFileOld;
                     $this->m_master->DeleteFileToNas($headerOrigin,$path_delete);
                     $path = 'task-exam';
-                    $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$formNameFileOld,'userfile',$path,'string');
+                    $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$unix_name,'userfile',$path,'string');
                     $file_name = $uploadNas;
                 } else {
                     $error = array('error' =>'File not selected');
@@ -249,7 +250,7 @@ class C_upload extends CI_Controller {
                     unlink($Path);
                 }
 
-                $unix_name = $this->input->post('formNameFile');
+
                 $config['upload_path']          = './uploads/task-exam/';
                 $config['allowed_types']        = 'pdf';
                 $config['max_size']             = 8000;
