@@ -742,7 +742,8 @@
                 var file = (jsonResult[0].File!='' && jsonResult[0].File!=null) ? jsonResult[0].File : '';
                 if(file!=''){
                     showFile = (jsonResult.length>0)
-                        ? '<iframe src="'+base_url_js+'/uploads/task-exam/'+file+'"></iframe>' : '';
+                        ? '<a href="'+base_url_js+'uploads/task-exam/'+file+'" target="_blank" class="btn btn-sm btn-default">Open in New Tab</a>' +
+                        '<iframe style="width: 100%;height: 250px;" src="'+base_url_js+'uploads/task-exam/'+file+'"></iframe>' : '';
                     formNameFileOld = file;
                 }
                 IDExamTask = jsonResult[0].ID;
