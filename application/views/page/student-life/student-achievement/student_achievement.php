@@ -18,7 +18,7 @@
                 <div class="panel panel-info">
                     <div class="panel-heading"><h5 style="margin:0px"><i class="fa fa-filter"></i> Form Filter</h5></div>
                     <div class="panel-body">
-                        <!-- <form class="form-filter" action="<?=site_url('student-life/student-achievement/filterdata')?>" method="post" autocomplete="off"> -->
+                        <form class="form-filter"> 
                             <div class="row">
                                 <div class="col-sm-2">
                                     <div class="form-group">
@@ -113,12 +113,12 @@
                             <div class="row">
                                 <div class="col-sm-12 text-center">
                                     <div class="btn-group">
-                                        <a class="btn btn-sm btn-default" onclick="fetchData()">Clear</a>
+                                        <a class="btn btn-sm btn-default" id="clearBtn">Clear</a>
                                         <button class="btn btn-sm btn-info btn-search" type="button" onclick="loadDataRequest()">Search</button>
                                     </div>
                                 </div>
                             </div>
-                        <!-- </form> -->
+                        </form>
                     </div>
                 </div>
             </div>
@@ -143,65 +143,11 @@
 </div>
 
 <script>
+    $('#clearBtn').click(function () {
+        $('.form-filter')[0].reset();
 
-
-    function fetchData() {
-        $('#loadTable').html('<table id="tableDataSA" class="table table-bordered table-striped table-centre" style="width:100%;">' +
-            '               <thead>' +
-            '                <tr style="background: #337ab7; color:#fff;">' +
-            '                   <th style="width: 1%;">No</th>'+
-            '                    <th style="width: 25%;">Event Name</th>'+
-            '                    <th style="width: 10%;">Event Date</th>'+
-            '                    <th style="width: 5%;">Category</th>'+
-            '                    <th style="width: 5%;">Level</th>'+
-            '                    <th style="width: 5%;">Type</th>'+
-            '                    <th style="width: 10%;">Achievement</th>'+
-            '                    <th style="width: 5%;">Certificate</th>'+
-            '                    <th style="width: 10%;">Status Approval</th>'+
-            '                    <th style="width: 5%;"><i class="fa fa-cog"></i></th>'+
-            '                    <th style="width: 15%;">Member</th>'+
-            '                </tr>' +
-            '                </thead>' +
-            '           </table>');
-                $("#FEvent").val('');
-                $("#FNPM").val('');
-                $("#FCategID").val('');
-                $("#FLevel").val('');
-                $("#FType").val('');
-                $('#StartDate').val('');
-                $('#EndDate').val('');
-                $("#FTIsApproved").val('');
-           
-        var data = {
-            action : 'viewData',
-        };
-
-
-        var token = jwt_encode(data,'UAP)(*');
-        var url = "<?php echo base_url('student-life/student-achievement/fetchData'); ?>";
-
-        var dataTable = $('#tableDataSA').DataTable( {
-            "processing": true,
-            "serverSide": true,
-            "iDisplayLength" : 10,
-            "ordering" : false,
-            "language": {
-                "searchPlaceholder": "Search..."
-            },
-            "ajax":{
-                url :url, // json datasource
-                data : {token:token},
-                ordering : false,
-                type: "post",  // method  , by default get
-                error: function(){  // error handling
-                    loading_modal_hide();
-                    $(".employee-grid-error").html("");
-                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-                    $("#employee-grid_processing").css("display","none");
-                }
-            }
-        } );
-    }
+        loadDataRequest();
+    });
 
     $(document).ready(function(){
        loadDataRequest();
@@ -231,6 +177,14 @@
     });
 
     function loadDataRequest() {
+         var EventName = $("#FEvent").val();
+            var std = $("#FNPM").val();
+            var categ = $("#FCategID").val();
+            var lvl = $("#FLevel").val();
+            var type = $("#FType").val();
+            var sDate = $('#StartDate').val();
+            var eDate = $('#EndDate').val();
+            var isAppr = $("#FTIsApproved").val();
         $('#loadTable').html('<table id="tableDataSA" class="table table-bordered table-striped table-centre" style="width:100%";>' +
             '               <thead>' +
             '                <tr style="background: #337ab7; color:#fff;">' +
@@ -249,18 +203,8 @@
             '                </thead>' +
             '           </table>');
 
-                var EventName = $("#FEvent").val();
-                var std = $("#FNPM").val();
-                var categ = $("#FCategID").val();
-                var lvl = $("#FLevel").val();
-                var type = $("#FType").val();
-                var sDate = $('#StartDate').val();
-                var eDate = $('#EndDate').val();
-                var isAppr = $("#FTIsApproved").val();
-   
-        if (EventName == null || std == null || categ == null || lvl == null || type == null || sDate == null || eDate == null || isAppr == null) {
-            fetchData();
-        }else{
+           
+          
         var data = {
             action : 'viewData',
             EventName : EventName,
@@ -271,18 +215,17 @@
             sDate : sDate,
             eDate : eDate,
             isAppr : isAppr,
-           
-
         };
+           
         var token = jwt_encode(data,'UAP)(*');
-        var url = "<?php echo base_url('student-life/student-achievement/fetchData'); ?>";
+        var url = base_url_js+"student-life/student-achievement/fetchData";
         var dataTable = $('#tableDataSA').DataTable( {
             "processing": true,
             "serverSide": true,
             "iDisplayLength" : 10,
             "ordering" : false,
             "language": {
-                "searchPlaceholder": "Search..."
+                "searchPlaceholder": "Event, Member"
             },
             "ajax":{
                 url :url, // json datasource
@@ -290,7 +233,7 @@
                 ordering : false,
                 type: "post",  // method  , by default get
                 error: function(){  // error handling
-                    loading_modal_hide();
+                    // loading_modal_hide();
                     $(".employee-grid-error").html("");
                     $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
                     $("#employee-grid_processing").css("display","none");
@@ -302,6 +245,6 @@
         
 
         
-    }
+    
 
 </script>
