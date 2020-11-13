@@ -1609,7 +1609,7 @@ class M_rest extends CI_Model {
                                     'Course' => $d['Name'],
                                     'CourseEng' => $d['NameEng'],
                                     'Credit' => $d['Credit'],
-                                    'TypeSchedule' => $d['TypeSchedule'],
+                                    'TypeSchedule' => $dataScore[0]['TypeSchedule'],
                                     'TransferCourse' => $d['TransferCourse'],
                                     'TransferCourseDetails' => $dataTRXc,
                                     'Score' => $Score,

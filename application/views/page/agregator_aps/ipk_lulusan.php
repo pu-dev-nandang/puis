@@ -109,6 +109,8 @@ function LoadTableData(filterProdi)
 
 
     });
+
+    newDescritionInput.getDescription();
 }
 
 $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
@@ -153,4 +155,9 @@ $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
         });
     }
 }) 
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    newDescritionInput.saveDescription(itsme);
+})
 </script>

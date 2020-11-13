@@ -508,9 +508,9 @@ function loadPenggunaanDana(filterProdi) {
             }
 
         });
+
+        newDescritionInput.getDescription(filterYear);
     }
-
-
 
 }
 $(document).on('click','.editNominal',function () {
@@ -565,6 +565,13 @@ function loadJenisDana() {
         $('#formJP_ID').val(ID);
         $('#formJP_Jenis').val(j);
     })
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        var filterYear = $('#filterYear').val();
+        newDescritionInput.saveDescription(itsme,filterYear);
+    })
+    
 
 
 </script>

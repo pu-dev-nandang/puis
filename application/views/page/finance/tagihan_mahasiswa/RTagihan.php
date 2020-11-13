@@ -38,7 +38,7 @@
        <div class="col-md-3">
            <div class="thumbnail" style="min-height: 30px;padding: 10px;">
                 <select class="form-control filter-db-std" id="filterStatus">
-                    <option value="">-- All Status Mahasiswa--</option>
+                    <option value="">-- Aktif,cuti dan cuti akademik--</option>
                     <option disabled>------------------------</option>
                 </select>
            </div>
@@ -85,7 +85,7 @@
         loadSelectOptionBaseProdi('#selectProdi','');
         loadSelectOptionPaymentTypeAll('#selectPTID','');
         loadSelectOptionSemesterByload('#selectSemester',1);
-        getReloadTableSocket();
+        //getReloadTableSocket();
     });
 
 

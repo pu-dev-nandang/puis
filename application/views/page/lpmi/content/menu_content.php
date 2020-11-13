@@ -800,8 +800,7 @@
 	        {
 	            alert('Error adding / update data');
 	            $('#btnSubcategory').text('Save'); //change button text
-	            $('#btnSubcategory').attr('disabled',false); //set button enable 
-	 
+	            $('#btnSubcategory').attr('disabled',false); //set button enable 	 
 	        }
 	    });
 	    return false;

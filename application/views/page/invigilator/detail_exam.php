@@ -3,9 +3,9 @@
 <?php if($viewPageExam==1 || $viewPageExam=='1'){ ?>
 
     <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/7.13.0/firebase-app.js"></script>
+<!--    <script src="https://www.gstatic.com/firebasejs/7.13.0/firebase-app.js"></script>-->
 
-    <script src="https://www.gstatic.com/firebasejs/7.13.0/firebase-database.js"></script>
+
 
 <style>
     #examHelp {
@@ -169,17 +169,17 @@
     });
 
     // fire base
-    var firebaseConfig = {
-        apiKey: "AIzaSyCj6Wf2ARn_N3Nqsa1YGY5HcRHKoCFQaNA",
-        authDomain: "my-test-6976a.firebaseapp.com",
-        databaseURL: "https://my-test-6976a.firebaseio.com",
-        projectId: "my-test-6976a",
-        storageBucket: "my-test-6976a.appspot.com",
-        messagingSenderId: "964038080180",
-        appId: "1:964038080180:web:ca3fd88deb491a8c7d09e1"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    // var firebaseConfig = {
+    //     apiKey: "AIzaSyCj6Wf2ARn_N3Nqsa1YGY5HcRHKoCFQaNA",
+    //     authDomain: "my-test-6976a.firebaseapp.com",
+    //     databaseURL: "https://my-test-6976a.firebaseio.com",
+    //     projectId: "my-test-6976a",
+    //     storageBucket: "my-test-6976a.appspot.com",
+    //     messagingSenderId: "964038080180",
+    //     appId: "1:964038080180:web:ca3fd88deb491a8c7d09e1"
+    // };
+    // // Initialize Firebase
+    // firebase.initializeApp(firebaseConfig);
 
 
     function loadTableExam(){

@@ -1640,6 +1640,9 @@ class C_api extends CI_Controller {
                 $this->db->where('NPM', $data_arr['NPM']);
                 $this->db->update($da_.'.students', $arrUpdateStd);
 
+                // adding by adhi 20201109 : add EffectiveDateStatus
+                $arrUpdateStd['EffectiveDateStatus'] = $data_arr['EffectiveDateStatus'];
+
                 $this->db->where('NPM', $data_arr['NPM']);
                 $this->db->update('db_academic.auth_students', $arrUpdateStd);
 
@@ -3444,7 +3447,7 @@ class C_api extends CI_Controller {
                     <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu">
-                    <li class="'.$re.'"><a href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Edit</a></li>
+                    <li class="'.$re.'"><a target="_blank" href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Edit</a></li>
                     <li><a href="javascript:void(0);" class="uploadSoal" data-id="'.$row['ID'].'" data-act="'.$actUploadTask.'">Upload Exam Task</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a target="_blank" href="'.base_url('save2pdf/exam-layout/'.$row['ID']).'">Layout</a></li>
