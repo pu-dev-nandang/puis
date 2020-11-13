@@ -10,8 +10,7 @@ class C_studentlife extends Student_Life {
         parent::__construct();
         $this->load->model('student-life/m_studentlife','stdlife');
         $this->load->model('student-life/m_alumni');
-        // $this->load->library(array('JWT','pagination'));   
-        // $this->load->helper('General_helper');     
+          
     }
 
     private function __setting_rest_alumni(){
@@ -373,13 +372,13 @@ class C_studentlife extends Student_Life {
 
     public function fetchData()
     {
-      $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
+      // $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
       $datatoken =  $this->getInputToken();
-      $datatoken = json_decode(json_encode($datatoken),true);
+      // $datatoken = json_decode(json_encode($datatoken),true);
 
         if($datatoken['action']=='viewData'){  
             $requestData = $_REQUEST;
-         
+            $approvedBy = $this->session->userdata('NIP');
             $param =  array();
   
 
@@ -410,7 +409,9 @@ class C_studentlife extends Student_Life {
             $param[] = array("field"=>"a.isApproved","data"=>"  = '".$datatoken['isAppr']."'","filter"=>"AND",);
         }   
         if( !empty($requestData['search']['value']) ) {            
-            $param[] = array("field"=>"a.Event","data"=>" like '%".$requestData['search']['value']."%' ","filter"=>"AND",);
+            $param[] = array("field"=>"(a.Event","data"=>" like '%".$requestData['search']['value']."%' ","filter"=>"AND",);
+            $param[] = array("field"=>"e.NPM","data"=>" like '%".$requestData['search']['value']."%' ","filter"=>"OR",);
+            $param[] = array("field"=>"e.Name","data"=>" like '%".$requestData['search']['value']."%') ","filter"=>"OR",);
         }
 
          $where='';
@@ -429,14 +430,17 @@ class C_studentlife extends Student_Life {
 
         }
 
-            $queryDefault = 'SELECT a.*,b.Name as categName , e.NPM as NPM,e.Name as studentName, (select approvedBy from db_studentlife.student_achievement c where c.approvedBy like "'.$this->session->userdata('NIP').'%" and c.ID = a.ID) as isAbble
+
+            $queryDefault = 'SELECT a.*,b.Name as categName , e.NPM as NPM,e.Name as Name, (select approvedBy from db_studentlife.student_achievement c where c.approvedBy like "'.$approvedBy.'%" and c.ID = a.ID) as isAbble
                                       FROM db_studentlife.student_achievement  a
                                       left join db_studentlife.student_achievement_student d on d.SAID = a.ID 
                                       left join db_academic.auth_students e on e.NPM = d.NPM 
                                       left join db_studentlife.categories_achievement b on b.ID = a.CategID
                                       '.$where.'
+                                      group by a.ID
                                       ORDER BY Year, StartDate ASC';
-                                    
+                    
+
           
             $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
 
@@ -462,7 +466,7 @@ class C_studentlife extends Student_Life {
                             <i class="fa fa-edit"></i> <span class="caret"></span>
                           </button>
                           <ul class="dropdown-menu">
-                            <li><a href="'.base_url('student-life/student-achievement/update-data-achievement?id='.$ID).'" >Edit</a></li>
+                            <li><a href="'.base_url('student-life/student-achievement/update-data-achievement?id='.$ID).'">Edit</a></li>
                             <li role="separator" class="divider"></li>
                             <li class="'.$disabled.'"><a href="javascript:void(0);" class="actRemove" data-id="'.$ID.'">Remove</a></li>
                           </ul>
@@ -482,11 +486,10 @@ class C_studentlife extends Student_Life {
                     if($row['isApproved'] == 2 &&($row['approvedBy'] != "" || $row['approvedBy'])){$labelApvBy = "<br><small>Approved by ".$row['approvedBy']."</small>";}
             
    
-                $startdate = date('D, d M Y',strtotime($row['StartDate']));
-                $enddate = date('D, d M Y',strtotime($row['EndDate']));
+            
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$viewEvent."<br>".(($row['isSKPI'] == 1) ? '<span class="label label-warning">SKPI</span>':'').'</div>';
-                $nestedData[] = '<div style="text-align: left;">'.$startdate.'<br/>'.$enddate.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.date('D, d M Y',strtotime($row['StartDate'])).'<br/>'.date('D, d M Y',strtotime($row['EndDate'])).'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$row['categName'].'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$row['Level'].'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$lbl.'</div>';
@@ -494,9 +497,7 @@ class C_studentlife extends Student_Life {
                 $nestedData[] = '<div style="text-align: left;"><a class="btn btn-xs btn-primary" target="_blank" href="'.base_url('uploads/certificate/'.$row['Certificate']).'">View PDF</a></div>';
                 $nestedData[] = '<div style="text-align: center;">'.$labelStatusApv.$labelApvBy.'</div>';
                 $nestedData[] = $btnAct;
-                $nestedData[] = '<div style="text-align: left;">'.ucwords($row['studentName']).' ('.$row['NPM'].')</div>';
-                
-                
+                $nestedData[] = '<div style="text-align: left;">'.ucwords($row['Name']).' ('.$row['NPM'].')</div>'; 
          
 
                 $data[] = $nestedData;
@@ -504,11 +505,11 @@ class C_studentlife extends Student_Life {
             }
 
             $json_data = array(
-                "draw"            => intval( $requestData['draw'] ),
+                "draw"            => intval($requestData['draw']),
                 "recordsTotal"    => intval($queryDefaultRow),
-                "recordsFiltered" => intval( $queryDefaultRow),
+                "recordsFiltered" => intval($queryDefaultRow),
                 "data"            => $data,
-                "dataQuery"            => $query
+                // "dataQuery"       => $query
             );
             echo json_encode($json_data);
         
