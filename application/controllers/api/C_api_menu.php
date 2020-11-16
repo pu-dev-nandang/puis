@@ -522,9 +522,18 @@ class C_api_menu extends CI_Controller {
                         'isPublicSurvey' => '0',
         
                     );
-                    //for ($i=0; $i <count($dataClose) ; $i++) { 
+                   
                         $this->db->where('ID', $row['ID']);
                         $this->db->update('db_it.surv_survey', $updates);
+
+                                      $updates = array(
+                                'SharePublicStat' => '0'
+                            );
+    
+                            $this->db->where('SurveyID', $row['ID']);
+                            $this->db->update('db_it.surv_survey_detail', $updates);   
+
+
                 }
                 $Status = '<span class="label label-warning">Unpublish</span>';
                 $btnClose = 'hide';

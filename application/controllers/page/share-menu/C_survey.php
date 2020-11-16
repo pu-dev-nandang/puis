@@ -71,24 +71,111 @@ class C_survey extends Globalclass {
         $this->menu_survey($page);
     }
 
-    public function share_public(){
-        $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
-        $datatoken =  $this->getInputToken();
-        $formData = json_decode(json_encode($datatoken),true);
+    // public function share_public(){
+    //     $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
+    //     $datatoken =  $this->getInputToken();
+    //     $formData = json_decode(json_encode($datatoken),true);
       
-      $id = $formData['ID'];
-      $share = $formData['shareAtPublic'];
+    //   $id = $formData['ID'];
+    //   $share = $formData['shareAtPublic'];
   
-      $updates = array(
-        'isPublicSurvey' => (string)$share
+    //   $updates = array(
+    //     'isPublicSurvey' => (string)$share
         
-      );
+    //   );
     
-     $this->db->where('ID', $id);
-      $this->db->update('db_it.surv_survey', $updates);
+    //  $this->db->where('ID', $id);
+    //   $this->db->update('db_it.surv_survey', $updates);
         
-      $rs['status'] = 1;  
-      echo json_encode($rs);
+    //   $rs['status'] = 1;  
+    //   echo json_encode($rs);
+    // }
+
+    public function share_public(){
+        $reqdata = $this->input->post();
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+
+
+                if($data_arr['action']=='shareToPublic'){
+                    
+                            $id = $data_arr['ID'];  
+                            $share = $data_arr['shareAtPublic']; 
+                            $updates = array(
+                                'isPublicSurvey' => (string)$share
+                            );
+    
+                            $this->db->where('ID', $id);
+                            $this->db->update('db_it.surv_survey', $updates);  
+
+                            $updates = array(
+                                'SharePublicStat' => '0'
+                            );
+    
+                            $this->db->where('SurveyID', $id);
+                            $this->db->update('db_it.surv_survey_detail', $updates);                                
+                            return print_r(json_encode(1));  
+                }
+                
+                else if($data_arr['action']=='selectQuestion'){
+                            $QuestionID = $data_arr['QuestionID'];
+                            $ID = explode(",", $QuestionID);
+                            $SurveyID = $data_arr['ID'];
+                     
+
+                                $updates = array(
+                                    'SharePublicStat' => '1'
+                                );
+    
+                            $this->db->where_in('QuestionID', $ID);
+                            $this->db->where('SurveyID', $SurveyID);
+                            $this->db->update('db_it.surv_survey_detail', $updates);  
+                             
+                             $updates = array(
+                                    'SharePublicStat' => '0'
+                                );
+    
+                            $this->db->where_not_in('QuestionID', $ID);
+                            $this->db->where('SurveyID', $SurveyID);
+                            $this->db->update('db_it.surv_survey_detail', $updates);  
+
+                    
+                            $updates = array(
+                                'isPublicSurvey' => '1'
+                            );
+    
+                            $this->db->where('ID', $SurveyID);
+                            $this->db->update('db_it.surv_survey', $updates);  
+                            return print_r(json_encode(1));  
+                }
+
+                else if($data_arr['action']=='showQuestionInSurveyShare'){
+
+                    $SurveyID = $data_arr['SurveyID'];
+
+                    $data = $this->db->query('SELECT ssd.QuestionID, ssd.SharePublicStat AS stat, sq.Question, sq.QTID, sqc.Description AS Category, 
+                                                 sqt.Description AS Type
+                                                FROM db_it.surv_survey_detail ssd
+                                                LEFT JOIN db_it.surv_question sq ON (sq.ID = ssd.QuestionID)
+                                                LEFT JOIN db_it.surv_question_category sqc ON (sqc.ID = sq.QCID)
+                                                LEFT JOIN db_it.surv_question_type sqt ON (sqt.ID = sq.QTID)
+                                                WHERE ssd.SurveyId = "'.$SurveyID.'" ORDER BY ssd.Queue ASC ')
+                                    ->result_array();
+
+                    if(count($data)>0){
+                        for($i=0;$i<count($data);$i++){
+                            if ($data[$i]['stat']==0||$data[$i]['stat']==null) {
+                                $AverageRate = '<input type="checkbox" class="selectQuestion" name="selectQuestion[]" value="'.$data[$i]['QuestionID'].'"></input>';
+                            }else{
+                                $AverageRate = '<input type="checkbox" class="selectQuestion" name="selectQuestion[]" value="'.$data[$i]['QuestionID'].'" checked="checked"></input>';
+                            }
+
+                            $data[$i]['AverageRate'] = '<div style="text-align: center;">'.$AverageRate.'</div>';
+                        }
+                    }
+                    return print_r(json_encode($data));
+                }
+
     }
 
 }
