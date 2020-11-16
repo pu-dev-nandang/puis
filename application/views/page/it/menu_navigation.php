@@ -288,6 +288,12 @@
                     Request Change Password
                 </a>
             </li>
+            <li class="<?php if($this->uri->segment(2)=='summary_knowledgebase'){echo"current";}?>">
+                <a href="<?php echo base_url('it/summary_knowledgebase');?>">
+                   <i class="fa fa-area-chart"><span class="badge" style="background-color: red;"></span></i>
+                    Summary Knowledgebase
+                </a>
+            </li>
         </ul>
 
 
