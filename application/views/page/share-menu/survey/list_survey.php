@@ -332,6 +332,7 @@ $(document).ready(function() {
             });
             selectCheck = selectCheck.toString();
    
+   
             if (selectCheck==''||selectCheck==null) {
                  toastr.error('Please select question!','Error');
             

@@ -162,6 +162,7 @@ class C_survey extends Globalclass {
                                                 WHERE ssd.SurveyId = "'.$SurveyID.'" ORDER BY ssd.Queue ASC ')
                                     ->result_array();
 
+
                     if(count($data)>0){
                         for($i=0;$i<count($data);$i++){
                             if ($data[$i]['stat']==0||$data[$i]['stat']==null) {

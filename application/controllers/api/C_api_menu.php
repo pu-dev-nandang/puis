@@ -592,6 +592,7 @@ class C_api_menu extends CI_Controller {
                 $TotalYgUdahIsiSurvey = $this->db->query('SELECT COUNT(*) AS Total FROM db_it.surv_answer 
                                                                     WHERE SurveyID= "'.$row['ID'].'" AND 
                                                                       FormType = "internal" '.$whereAnswerSurvey)->result_array()[0]['Total'];
+                
 //                $TotalYgUdahIsiSurvey = $this->db->from('db_it.surv_answer')
 //                    ->where(array('SurveyID' => $row['ID'],
 //                        'FormType' => 'internal',
