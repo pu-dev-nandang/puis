@@ -4517,5 +4517,49 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $rs;
     }
 
+    public function getAllDepartementPU()
+    {
+        $arr_result = array();
+        $NA = $this->caribasedprimary('db_employees.division','StatusDiv',1);
+        if (isset($_POST)) {
+            if (array_key_exists('Show', $_POST)) {
+                if ($_POST['Show'] == 'all') {
+                    $NA = $this->showData_array('db_employees.division');
+                }
+            }
+
+        }
+        $AC = $this->caribasedprimary('db_academic.program_study','Status',1);
+        $FT = $this->caribasedprimary('db_academic.faculty','StBudgeting',1);
+        for ($i=0; $i < count($NA); $i++) {
+            $arr_result[] = array(
+                'Code'  => 'NA.'.$NA[$i]['ID'],
+                'Name1' => $NA[$i]['Description'],
+                'Name2' => $NA[$i]['Division'],
+                'Abbr' => $NA[$i]['Abbreviation'],
+            );
+        }
+
+        for ($i=0; $i < count($AC); $i++) {
+            $arr_result[] = array(
+                'Code'  => 'AC.'.$AC[$i]['ID'],
+                'Name1' => 'Prodi '.$AC[$i]['Name'],
+                'Name2' => 'Study '.$AC[$i]['NameEng'],
+                'Abbr' => $AC[$i]['Code'],
+            );
+        }
+
+        for ($i=0; $i < count($FT); $i++) {
+            $arr_result[] = array(
+                'Code'  => 'FT.'.$FT[$i]['ID'],
+                'Name1' => 'Facultas '.$FT[$i]['Name'],
+                'Name2' => 'Faculty '.$FT[$i]['NameEng'],
+                'Abbr' => $FT[$i]['Abbr'],
+            );
+        }
+
+        return $arr_result;
+    }
+
 
 }

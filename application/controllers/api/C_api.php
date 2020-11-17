@@ -9903,45 +9903,7 @@ class C_api extends CI_Controller {
 
     public function getAllDepartementPU()
     {
-        $arr_result = array();
-        $NA = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
-        if (isset($_POST)) {
-            if (array_key_exists('Show', $_POST)) {
-                if ($_POST['Show'] == 'all') {
-                    $NA = $this->m_master->showData_array('db_employees.division');
-                }
-            }
-
-        }
-        $AC = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
-        $FT = $this->m_master->caribasedprimary('db_academic.faculty','StBudgeting',1);
-        for ($i=0; $i < count($NA); $i++) {
-            $arr_result[] = array(
-                'Code'  => 'NA.'.$NA[$i]['ID'],
-                'Name1' => $NA[$i]['Description'],
-                'Name2' => $NA[$i]['Division'],
-                'Abbr' => $NA[$i]['Abbreviation'],
-            );
-        }
-
-        for ($i=0; $i < count($AC); $i++) {
-            $arr_result[] = array(
-                'Code'  => 'AC.'.$AC[$i]['ID'],
-                'Name1' => 'Prodi '.$AC[$i]['Name'],
-                'Name2' => 'Study '.$AC[$i]['NameEng'],
-                'Abbr' => $AC[$i]['Code'],
-            );
-        }
-
-        for ($i=0; $i < count($FT); $i++) {
-            $arr_result[] = array(
-                'Code'  => 'FT.'.$FT[$i]['ID'],
-                'Name1' => 'Facultas '.$FT[$i]['Name'],
-                'Name2' => 'Faculty '.$FT[$i]['NameEng'],
-                'Abbr' => $FT[$i]['Abbr'],
-            );
-        }
-
+        $arr_result = $this->m_master->getAllDepartementPU();
         echo json_encode($arr_result);
     }
 
