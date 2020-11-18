@@ -25,13 +25,25 @@ class C_summary_knowledgebase extends It_Controler {
                 '2' => ['name' => 'Countable', 'title' => 'Total', 'class' => 'default-sort', 'sort' => 'desc',],
             ],
         ];
+
+        $this->subdata['tbl_total_top5_content'] = [
+            'columns' => [
+                '0' => ['name' => 'No', 'title' => "No", 'class' => 'no-sort image', 'filter' => false],
+                '1' => ['name' => '`Desc`', 'title' => 'Content', 'filter' => ['type' => 'text'] ],
+                '2' => ['name' => 'NameDepartment', 'title' => 'Division', 'filter' => ['type' => 'text'] ],
+                '3' => ['name' => 'EnteredByName', 'title' => 'CreatedBy', 'filter' => ['type' => 'text'] ],
+                '4' => ['name' => 'Countable', 'title' => 'Total', 'class' => 'default-sort', 'sort' => 'desc', 'filter' => false ],
+            ],
+        ];
     }
 
     public function index(){
     	$this->data['page_total_kb_per_divisi'] = $this->load->view('page/it/summary_knowledgebase/total_kb_per_divisi',$this->subdata,true);
     	$this->data['page_total_max_view_log_employees'] = $this->load->view('page/it/summary_knowledgebase/page_total_max_view_log_employees',$this->subdata,true);
     	$this->data['page_total_top10By_EMP'] = $this->load->view('page/it/summary_knowledgebase/page_total_top10By_EMP','',true);
-    	$this->data['page_max_view_content_per_divisi'] = $this->load->view('page/it/summary_knowledgebase/page_max_view_content_per_divisi','',true);
+    	
+        $this->data['page_top_5_content'] = $this->load->view('page/it/summary_knowledgebase/page_top_5_content',$this->subdata,true);
+
     	$this->data['page_search_filter_by_employees'] = $this->load->view('page/it/summary_knowledgebase/page_search_filter_by_employees','',true);
     	$this->data['page_search_filter_by_content'] = $this->load->view('page/it/summary_knowledgebase/page_search_filter_by_content','',true);
     	
@@ -134,6 +146,62 @@ class C_summary_knowledgebase extends It_Controler {
 
           echo json_encode($rs);
           
+    }
+
+    public function get_top5_Content(){
+        $this->input->is_ajax_request() or exit('No direct post submit allowed!');
+        $start = $this->input->post('start');
+        $length = $this->input->post('length');
+        $order = $this->input->post('order')[0];
+        $draw = intval($this->input->post('draw'));
+        $filter = $this->input->post('filter');
+        $this->session->set_userdata('tbl_total_top5_Content', $filter);
+
+        $this->load->model('it/summary_knowledgebase/m_top5_content_model');
+
+        $datas= $this->m_top5_content_model->get_all($start, $length, $filter, $order);
+        $data_total =  $this->m_top5_content_model->get_total();
+        $data_total_filtered =  $this->m_top5_content_model->get_total($filter);
+        $output['data'] = array();
+
+        if ($datas) {
+            $no = $start + 1;
+            foreach ($datas->result() as $data) {
+                $output['data'][] = array(
+                    $no,
+                     (strlen($data->Desc) > 31) ? substr($data->Desc, 0,31).' ...' : $data->Desc,
+                    $data->NameDepartment,
+                    $data->EnteredByName,
+                    $data->Countable,
+                );
+
+                $no++;
+            }
+        }
+
+        $output['draw'] = $draw++;
+        $output['recordsTotal'] = $data_total;
+        $output['recordsFiltered'] = $data_total_filtered;
+        echo json_encode($output);
+    }
+
+    public function pie_chart_top5_Content(){
+          $this->input->is_ajax_request() or exit('No direct post submit allowed!');
+          $this->load->model('it/summary_knowledgebase/m_top5_content_model');
+          $rs = [];
+          $order = array ( 'column' => 4, 'dir' => 'desc' );
+          $datas= $this->m_top5_content_model->get_all(0, 5, '', $order);
+          if ($datas) {
+              foreach ($datas->result() as $data) {
+                $label = $data->Abbr.' - '.$data->Desc;
+                $rs[] = [
+                    'label' => (strlen($label) > 25) ? substr($label, 0,25).'...' : $label,
+                    'data' => $data->Countable,
+                ];
+              }
+          }
+
+          echo json_encode($rs);
           
     }
 
