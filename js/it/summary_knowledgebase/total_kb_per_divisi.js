@@ -140,9 +140,6 @@ class Class_total_kb_per_divisi
 		 const response = await AjaxSubmitFormPromises(url,'');
 		 return response;
 	}
-
-
-
 }
 
 const total_kb_per_divisi = new Class_total_kb_per_divisi();
