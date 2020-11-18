@@ -6365,6 +6365,7 @@ class C_api extends CI_Controller {
                     $Division = $PositionMain[0];
                     // for AD
                     $Password = $formInsert['Password_Old'];
+                    $Password_md5 = md5($formInsert['Password_Old']);
                     $Name = $formInsert['Name'];
                     $G_div = $this->m_master->caribasedprimary('db_employees.division','ID',$Division);
                     $description = $G_div[0]['Description'];
@@ -6452,7 +6453,7 @@ class C_api extends CI_Controller {
                     }
                     // end AD
                     $rs['arr_callback'] = $arr_callback; // for callback
-                    $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
+                    $formInsert['Password_Old'] = $Password_md5;
 
                     /*ADDED BY FEBRI @ FEB 2020*/
                     $myNIP = $this->session->userdata('NIP');
