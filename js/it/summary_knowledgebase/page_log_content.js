@@ -87,8 +87,8 @@ class Class_log_content
 			$('#filter_emp_datetimepicker1').removeClass('hide');
 			$('#filter_emp_datetimepicker2').removeClass('hide');
 
-			$('#datetimepicker1_by_employee').val(dateNowLogContent);
-			$('#datetimepicker2_by_employee').val(dateNowLogContent);
+			// $('#datetimepicker1_by_employee').val(dateNowLogContent);
+			// $('#datetimepicker2_by_employee').val(dateNowLogContent);
 
 			$('#filter_emp_datetimepicker1').datetimepicker({
 			  format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
