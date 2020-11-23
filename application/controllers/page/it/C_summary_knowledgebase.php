@@ -249,7 +249,7 @@ class C_summary_knowledgebase extends It_Controler {
                     $data->DepartmentCode,
                      // (strlen($data->KB_desc) > 31) ? substr($data->KB_desc, 0,31).' ...' : $data->KB_desc,
                      $data->KB_desc,
-                    '<a href = "'.base_url().'fileGetAny/'.$data->KB_file.'" target="_blank" >File</a>' ,
+                    '<a href = "'.base_url().'fileGetAny/kb-'.$data->KB_file.'" target="_blank" >File</a>' ,
                     $data->Entred_NIP.' - '.$data->Entred_Name,
                 );
             }
