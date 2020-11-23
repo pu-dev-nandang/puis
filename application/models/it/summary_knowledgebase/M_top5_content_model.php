@@ -9,7 +9,11 @@ class M_top5_content_model extends CI_Model {
        $this->columns = isset($this->subdata['tbl_total_top5_content']) ? $this->subdata['tbl_total_top5_content']['columns'] : [];
        $this->sqlFrom = '
                         select "auto" as No, kb.ID,kb.Desc,kbt.Type,kb.EntredBy,emp.Name as EnteredByName,kbt.IDDivision,qdj.NameDepartment,qdj.Abbr,
-                        (select count(*) as total from db_employees.log_countable_content where ContentID = kb.ID and TypeContent = "knowledge_base" limit 1 ) AS Countable
+                        (select count(*) as total from db_employees.log_countable_content as lcc
+                         join db_employees.employees as emp on emp.NIP = lcc.NIP
+                         join db_employees.knowledge_base as sub_kb on sub_kb.ID = lcc.ContentID
+                         join db_employees.kb_type as kt on kt.ID = sub_kb.IDType
+                         where ContentID = kb.ID and TypeContent = "knowledge_base" limit 1 ) AS Countable
                         from db_employees.knowledge_base as kb join db_employees.kb_type as kbt on kb.IDType = kbt.ID
                         join db_employees.employees as emp on  kb.EntredBy =  emp.NIP
                         '.$this->m_master->QueryDepartmentJoin('kbt.IDDivision').'
@@ -29,6 +33,7 @@ class M_top5_content_model extends CI_Model {
     }
 
     private function filtered($filter = array()){
+        // print_r($filter);die();
         if ($filter) {
             $this->db->group_start();
             foreach ($filter as $column => $value) {

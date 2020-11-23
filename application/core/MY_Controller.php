@@ -889,9 +889,14 @@ abstract class It_Controler extends Globalclass{
         $this->m_menu2->set_model('it_sess','auth_it_sess','menu_it_sess','menu_it_grouping','db_it');
     }
 
-    public function temp($content)
+    // public function temp($content)
+    // {
+    //     $this->template($content);
+    // }
+
+    public function temp($content,$ClassContainer = '')
     {
-        $this->template($content);
+        $this->template($content,$ClassContainer);
     }
 
     public function auth_ajax()

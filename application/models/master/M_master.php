@@ -4561,5 +4561,23 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $arr_result;
     }
 
+    public function dropdownEMP($condition = array()){
+        $options = ['%' => 'All Employee'];
+        $data = $this->db->get('db_employees.employees')->result();
+        foreach ($data as $key ) {
+            $options[$key->NIP] = $key->Name;
+        }
+        return $options;
+    }
+
+    public function dropdownDiv($condition = array()){
+        $options = ['%' => 'All Division'];
+        $data = $this->getAllDepartementPU();
+        for ($i=0; $i < count($data); $i++) { 
+            $options[$data[$i]['Code']] = $data[$i]['Abbr'];
+        }
+        return $options;
+    }
+
 
 }

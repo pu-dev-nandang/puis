@@ -11,6 +11,9 @@ class M_total_top100_view_log_employees_model extends CI_Model {
                                     emp.Name,
                                     count(lcc.NIP) as Countable from db_employees.log_countable_content as lcc
                                     join db_employees.employees as emp on emp.NIP = lcc.NIP
+                                    join db_employees.knowledge_base as kb on kb.ID = lcc.ContentID
+                                    join db_employees.kb_type as kt on kt.ID = kb.IDType
+                                    where lcc.TypeContent = "knowledge_base"
                                     group by lcc.NIP
 
                                     ) as summary

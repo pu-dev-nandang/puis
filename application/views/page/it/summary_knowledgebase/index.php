@@ -98,23 +98,13 @@
 				<h4 style="color: blue;">Search</h4>
 			</div>
 			<div class="row" style="padding:10px;">
-			    <div class="col-md-6">
+			    <div class="col-md-12">
 			        <div class="panel panel-primary">
 			            <div class="panel-heading clearfix">
-			                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Filter by Employees</h4>
+			                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Log Content</h4>
 			            </div>
 			            <div class="panel-body">
-		            		<?php echo  $page_search_filter_by_employees ?>
-			            </div>
-			        </div>
-			    </div>
-			    <div class="col-md-6">
-			        <div class="panel panel-primary">
-			            <div class="panel-heading clearfix">
-			                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Filter by content</h4>
-			            </div>
-			            <div class="panel-body">
-		            		<?php echo  $page_search_filter_by_content ?>
+		            		<?php echo  $page_log_content ?>
 			            </div>
 			        </div>
 			    </div>

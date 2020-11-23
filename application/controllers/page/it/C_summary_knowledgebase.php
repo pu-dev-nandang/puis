@@ -35,20 +35,37 @@ class C_summary_knowledgebase extends It_Controler {
                 '4' => ['name' => 'Countable', 'title' => 'Total', 'class' => 'default-sort', 'sort' => 'desc', 'filter' => false ],
             ],
         ];
+
+        $this->subdata['tbl_kb_log_content'] = [
+            'columns' => [
+                '0' => ['name' => 'NIP_readBy', 'width' => '200px', 'title' => "Read By", 'filter' => ['type' => 'dropdown', 'options' => $this->m_master->dropdownEMP() ]   ],
+                '1' => ['name' => 'ViewedAt', 'title' => 'View At', 'class' => 'default-sort', 'sort' => 'desc', 'filter' => false ],
+                '2' => ['name' => 'Type', 'title' => 'Type', 'filter' => ['type' => 'text'] ],
+                '3' => ['name' => 'IDDepartment','width' => '150px', 'title' => 'Division', 'filter' => ['type' => 'dropdown', 'options' => $this->m_master->dropdownDiv() ] ],
+                '4' => ['name' => 'KB_desc', 'title' => 'Desc', 'filter' => ['type' => 'text'] ],
+                '5' => ['name' => 'KB_file', 'title' => 'File', 'filter' => false ],
+                '6' => ['name' => 'Entred_NIP', 'width' => '200px', 'title' => 'Entry By', 'filter' => ['type' => 'dropdown', 'options' => $this->m_master->dropdownEMP() ] ],
+            ],
+        ];
     }
 
+
+
     public function index(){
+        $this->load->helper('form');
     	$this->data['page_total_kb_per_divisi'] = $this->load->view('page/it/summary_knowledgebase/total_kb_per_divisi',$this->subdata,true);
     	$this->data['page_total_max_view_log_employees'] = $this->load->view('page/it/summary_knowledgebase/page_total_max_view_log_employees',$this->subdata,true);
     	$this->data['page_total_top10By_EMP'] = $this->load->view('page/it/summary_knowledgebase/page_total_top10By_EMP','',true);
     	
         $this->data['page_top_5_content'] = $this->load->view('page/it/summary_knowledgebase/page_top_5_content',$this->subdata,true);
 
-    	$this->data['page_search_filter_by_employees'] = $this->load->view('page/it/summary_knowledgebase/page_search_filter_by_employees','',true);
-    	$this->data['page_search_filter_by_content'] = $this->load->view('page/it/summary_knowledgebase/page_search_filter_by_content','',true);
+    	$this->data['page_log_content'] = $this->load->view('page/it/summary_knowledgebase/page_log_content',$this->subdata,true);
     	
     	$content = $this->load->view('page/it/summary_knowledgebase/index',$this->data,true);
-    	$this->temp($content);
+
+        $ClassContainerTemplate = 'sidebar-closed';
+        $this->temp($content,$ClassContainerTemplate);
+    	// $this->temp($content);
     }
 
     public function get_total_kb_per_divisi(){
@@ -138,7 +155,8 @@ class C_summary_knowledgebase extends It_Controler {
           if ($datas) {
               foreach ($datas->result() as $data) {
                 $rs[] = [
-                    'label' => (strlen($data->Name) > 22) ? substr($data->Name, 0,22).'...' : $data->Name,
+                    // 'label' => (strlen($data->Name) > 22) ? substr($data->Name, 0,22).'...' : $data->Name,
+                    'label' => $data->Name,
                     'data' => $data->Countable,
                 ];
               }
@@ -169,7 +187,8 @@ class C_summary_knowledgebase extends It_Controler {
             foreach ($datas->result() as $data) {
                 $output['data'][] = array(
                     $no,
-                     (strlen($data->Desc) > 31) ? substr($data->Desc, 0,31).' ...' : $data->Desc,
+                     // (strlen($data->Desc) > 31) ? substr($data->Desc, 0,31).' ...' : $data->Desc,
+                     $data->Desc,
                     $data->NameDepartment,
                     $data->EnteredByName,
                     $data->Countable,
@@ -196,6 +215,7 @@ class C_summary_knowledgebase extends It_Controler {
                 $label = $data->Abbr.' - '.$data->Desc;
                 $rs[] = [
                     'label' => (strlen($label) > 25) ? substr($label, 0,25).'...' : $label,
+                    // 'label' => $label,
                     'data' => $data->Countable,
                 ];
               }
@@ -203,6 +223,43 @@ class C_summary_knowledgebase extends It_Controler {
 
           echo json_encode($rs);
           
+    }
+
+    public function get_log_content(){
+        $this->input->is_ajax_request() or exit('No direct post submit allowed!');
+        $start = $this->input->post('start');
+        $length = $this->input->post('length');
+        $order = $this->input->post('order')[0];
+        $draw = intval($this->input->post('draw'));
+        $filter = $this->input->post('filter');
+        $this->session->set_userdata('tbl_kb_log_content', $filter);
+        $this->load->model('it/summary_knowledgebase/m_log_content_model');
+
+        $datas= $this->m_log_content_model->get_all($start, $length, $filter, $order);
+        $data_total =  $this->m_log_content_model->get_total();
+        $data_total_filtered =  $this->m_log_content_model->get_total($filter);
+        $output['data'] = array();
+
+        if ($datas) {
+            foreach ($datas->result() as $data) {
+                $output['data'][] = array(
+                    $data->NIP_readBy.' - '.$data->Name_readBy,
+                    $data->ViewedAt,
+                    $data->Type,
+                    $data->DepartmentCode,
+                     // (strlen($data->KB_desc) > 31) ? substr($data->KB_desc, 0,31).' ...' : $data->KB_desc,
+                     $data->KB_desc,
+                    '<a href = "'.base_url().'fileGetAny/'.$data->KB_file.'" target="_blank" >File</a>' ,
+                    $data->Entred_NIP.' - '.$data->Entred_Name,
+                );
+            }
+        }
+
+        $output['draw'] = $draw++;
+        $output['recordsTotal'] = $data_total;
+        $output['recordsFiltered'] = $data_total_filtered;
+        echo json_encode($output);
+
     }
 
 }
