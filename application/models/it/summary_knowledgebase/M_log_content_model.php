@@ -33,7 +33,7 @@ class M_log_content_model extends CI_Model {
 
 	private function filtered($filter = array()){
 	    if (!empty($filter['start_date'])  &&  !empty($filter['end_date'] ) ) {
-	    	$this->db->where(' ViewedAt >= "'.$filter['start_date'].'" and  ViewedAt <= "'.$filter['end_date'].'" ');
+	    	$this->db->where(' ViewedAt >= "'.$filter['start_date'].'" and  ViewedAt <= "'.$filter['end_date'].' 23:59:59" ');
 	    }
 	    if ($filter) {
 	        $this->db->group_start();
