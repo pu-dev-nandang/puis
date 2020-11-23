@@ -195,7 +195,7 @@ function questionlist(id)
         };
         var token = jwt_encode(data,'UAP)(*');
         var url = "<?php echo base_url('survey/share-public'); ?>";
-
+         $('#GlobalModal').modal('hide');
         $('#GlobalModalXtraLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Show Question</h4>'+'<input type="hidden" id="idsurv" name="ID" value='+ID+' />');
 
