@@ -1,7 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class C_summary_knowledgebase extends It_Controler {
+// class C_summary_knowledgebase extends It_Controler {
+class C_summary_knowledgebase extends Globalclass {
     public $data = array();
     public $subdata = array();
 
@@ -49,7 +50,10 @@ class C_summary_knowledgebase extends It_Controler {
         ];
     }
 
-
+    public function temp($content,$ClassContainer = '')
+    {
+        $this->template($content,$ClassContainer);
+    }
 
     public function index(){
         $this->load->helper('form');
