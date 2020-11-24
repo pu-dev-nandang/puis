@@ -267,6 +267,9 @@
                              </li>
                          <?php } ?>
                         <!-- End Added by Febri -->
+                        <li class="<?php echo ($this->uri->segment(1) == 'it' &&  $this->uri->segment(2) == 'summary_knowledgebase') ? 'active' : ''  ?>">
+                            <a href="<?php echo base_url().'it/summary_knowledgebase' ?>"><i class="fa fa-book" aria-hidden="true"></i> Summary Knowledgebase</a>
+                        </li>`  
                         
 
                     </ul>
