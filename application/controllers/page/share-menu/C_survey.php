@@ -97,7 +97,7 @@ class C_survey extends Globalclass {
         $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
 
 
-                if($data_arr['action']=='shareToPublic'){
+                if($data_arr['action']=='sharetoPublic'){
                     
                             $id = $data_arr['ID'];  
                             $share = $data_arr['shareAtPublic']; 
@@ -117,7 +117,7 @@ class C_survey extends Globalclass {
                             return print_r(json_encode(1));  
                 }
                 
-                else if($data_arr['action']=='selectQuestion'){
+                else if($data_arr['action']=='selectQuestionSurvey'){
                             $QuestionID = $data_arr['QuestionID'];
                             $ID = explode(",", $QuestionID);
                             $SurveyID = $data_arr['ID'];
@@ -149,7 +149,7 @@ class C_survey extends Globalclass {
                             return print_r(json_encode(1));  
                 }
 
-                else if($data_arr['action']=='showQuestionInSurveyShare'){
+                else if($data_arr['action']=='showQuestioninSurveyShare'){
 
                     $SurveyID = $data_arr['SurveyID'];
 
