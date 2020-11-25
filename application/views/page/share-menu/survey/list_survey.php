@@ -190,7 +190,7 @@ function questionlist(id)
     {
         var ID = id;
         var data = {
-            action : 'showQuestionInSurveyShare',
+            action : 'showQuestioninSurveyShare',
             SurveyID : ID,
         };
         var token = jwt_encode(data,'UAP)(*');
@@ -263,7 +263,7 @@ async function myFunction($id) {
         var shareAtPublic = 0;
     
         var cekData = {
-            action : 'shareToPublic',
+            action : 'sharetoPublic',
             ID : ID,
             shareAtPublic : shareAtPublic,
          };
@@ -339,7 +339,7 @@ $(document).ready(function() {
         }
         else {
            var data = {
-                action : 'selectQuestion',
+                action : 'selectQuestionSurvey',
                 ID : ID,
                 QuestionID : selectCheck,
             };
