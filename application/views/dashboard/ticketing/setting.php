@@ -85,6 +85,44 @@
 <script type="text/javascript">
     var oTable;
     var oTable2;
+
+    var btnPasteHere = function (context) {
+        var ui = $.summernote.ui;
+
+        // create button
+        var button = ui.button({
+            contents: '<i class="fa fa-clipboard"/> Paste text',
+            tooltip: 'Paste text',
+            click: function () {
+                // invoke insertText method with 'hello' on editor module.
+
+                $('#GlobalModalLarge .pastePanelModal').html(
+                          '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                              '<div class = "well">'+
+                                '<label>Paste here</label>'+
+                                '<textarea id="fillModalPaste" class="form-control" rows="10" placeholder="Paste here..."></textarea>' +
+                                '<hr/>' +
+                                '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> ' +
+                                ' | <button type="button" class="btn btn-success" id="btnSaveModalPaste">Save</button> ' +
+                              '</div>'+
+                            '</div>'+
+                          '</div>'  
+                  );
+
+                $('#fillModalPaste').focus()
+
+                $('#btnSaveModalPaste').click(function () {
+                    var fillModalPaste = $('#fillModalPaste').val();
+                    context.invoke('editor.insertText', fillModalPaste);
+                    $('#GlobalModalLarge .pastePanelModal').html('');
+                });
+            }
+        });
+
+        return button.render();   // return button as jquery object
+    };
+
     var App_ticketing_setting_category = {
         LoadTable : function(){
              var recordTable = $('#Tblticket_setting_category').DataTable({
@@ -176,9 +214,13 @@
                                     '<label class="control-label">Template Message</label>'+
                                 '</div>'+
                                 '<div class="col-sm-6">'+
-                                     '<textarea class="form-control input" name="TemplateMessage" rows ="6"></textarea>'+
+                                     //'<textarea class="form-control input" name="TemplateMessage" rows ="6"></textarea>'+
+                                     '<textarea name="TemplateMessage" class="form-control input area-summernote" id="formTemplateMessage"></textarea>'+
                                 '</div>'+
                             '</div>'+
+                        '</div>'+
+                        '<div class = "col-md-12 pastePanelModal">'+
+
                         '</div>'+
                     '</div>';                    
 
@@ -196,6 +238,40 @@
                     $('.input[name="'+key+'"]').val(data[key]);
                 }
             }
+
+            App_ticketing_setting_category.loadSummerNoteJS();
+
+        },
+
+        loadSummerNoteJS : () => {
+          $('#formTemplateMessage').summernote({
+              placeholder: 'Text your question...',
+              height: 250,
+              disableDragAndDrop : true,
+              toolbar: [
+                  ['style', ['style']],
+                  ['font', ['bold', 'underline', 'clear']],
+                  ['fontname', ['fontname']],
+                  ['color', ['color']],
+                  ['para', ['ul', 'ol', 'paragraph']],
+                  ['table', ['table']],
+                  // ['insert', ['link', 'picture','video']],
+                  ['view', ['fullscreen','codeview', 'help']],
+                  ['mybutton', ['PasteHere']]
+              ],
+              buttons: {
+                  PasteHere: btnPasteHere
+              },
+              callbacks: {
+                  onImageUpload: function(image) {
+                      // var formSummernoteID = $('#formSummernoteID').val();
+                      // summernote_UploadImage('#formQuestion',image[0],formSummernoteID);
+                  },
+                  onMediaDelete : function(target) {
+                      // summernote_DeleteImage(target[0].src);
+                  }
+              }
+          });
         },
 
         ActionData : function(selector,action="add",ID=""){
@@ -558,6 +634,25 @@
         var data = jwt_decode(Token);
         App_ticketing_setting_admin.ModalForm('Form Admin','edit',ID,data);
     })
+
+    $('#GlobalModalLarge').bind('cut copy paste', function (e) {
+        const itsme  = $(this);
+        if (itsme.find('.pastePanelModal')) {
+          alert('Disabled cut copy and paste');
+          e.preventDefault();
+        }
+        
+    });
+
+    //Disable mouse right click
+    $("#GlobalModalLarge").on("contextmenu",function(e){
+        const itsme  = $(this);
+        if (itsme.find('.pastePanelModal')) {
+          alert('Disabled right click');
+          return false;
+        }
+        
+    });
 
 </script>
 
