@@ -1102,5 +1102,24 @@ $(document).off('click', '.btnSaveRating').on('click', '.btnSaveRating',function
 })
 
 
+$('#GlobalModal').bind('cut copy paste', function (e) {
+    const itsme  = $(this);
+    if (itsme.find('.pastePanelModal')) {
+      alert('Disabled cut copy and paste');
+      e.preventDefault();
+    }
+    
+});
+
+//Disable mouse right click
+$("#GlobalModal").on("contextmenu",function(e){
+    const itsme  = $(this);
+    if (itsme.find('.pastePanelModal')) {
+      alert('Disabled right click');
+      return false;
+    }
+    
+});
+
 </script>
 
