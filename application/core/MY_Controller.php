@@ -226,6 +226,42 @@ abstract class Lpmi_Controler extends Globalclass{
     }
 }
 
+abstract class Lppm_Controler extends Globalclass{
+    public function __construct()
+    {
+        parent::__construct();
+        // $this->load->model('lpmi/m_lpmi');
+        $this->m_menu3lpmi->set_model('lpmi_sess','auth_lpmi_sess','menu_lpmi_sess','menu_lpmi_grouping','db_lpmi');
+    }
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+
+    // overide function
+    public function template($content)
+    {
+
+        $data['include'] = $this->load->view('template/include','',true);
+
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+
+    }
+
+    // overide function
+    public function  menu_navigation(){
+        $data['departement'] = $this->__getDepartement();
+        $page = $this->load->view('page/lppm/menu_navigation','',true);
+        return $page;
+    }
+}
+
 abstract class Library extends Globalclass{
     public function __construct()
     {

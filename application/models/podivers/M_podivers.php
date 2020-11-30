@@ -11,7 +11,7 @@ class M_podivers extends CI_Model {
     }
 
     public function registration($action,$data){
-        $tbl = 'db_podivers.registration';
+        $tbl = 'db_podivers.set_list_member';
         switch ($action) {
             case 'delete':
                 $this->db->db_debug=false;
@@ -56,7 +56,7 @@ class M_podivers extends CI_Model {
         $NPM = $data['NPM'];
         $Password = $data['Password'];
         $dataMHS = $this->db->query('select ID,NPM,Year from db_academic.auth_students where NPM = "'.$NPM.'" and Password = "'.$Password.'" ')->result_array();        
-        $dataPodivers = $this->db->query('select count(*) as total from db_podivers.registration where NPM = "'.$NPM.'"  ')->result_array();
+        $dataPodivers = $this->db->query('select count(*) as total from db_podivers.set_list_member where NIPNPM = "'.$NPM.'"  ')->result_array();
         if (count($dataMHS) > 0 && $dataPodivers[0]['total'] > 0 ) {
              $this->callback = $this->setUserSession($dataMHS[0]);
         }

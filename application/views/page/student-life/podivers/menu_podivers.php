@@ -4,7 +4,7 @@
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
         <li class="btn-primary <?php if($this->uri->segment(3)=='') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('student-life/list-podivers'); ?>">List Podivers</a>
+            <a href="<?php echo base_url('student-life/list-podivers'); ?>">Setting Member Podivers</a>
         </li>
         <!-- <li class="<?php if($this->uri->segment(3)=='set-group') { echo 'active'; } ?>">
             <a href="<?php echo base_url('student-life/list-podivers/set-group'); ?>">Set Group Access</a>

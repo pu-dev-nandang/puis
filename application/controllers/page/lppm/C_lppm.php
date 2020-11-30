@@ -1,13 +1,13 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class C_lpmi extends Lpmi_Controler {
+class C_lppm extends Lppm_Controler {
 
     function __construct()
     {
         parent::__construct();
         $this->load->model('General_model');
-        $this->load->model('lpmi/m_lpmi');
+        $this->load->model('lppm/m_lppm');
     }
 
 
@@ -16,106 +16,11 @@ class C_lpmi extends Lpmi_Controler {
         parent::template($content);
     }
 
-    public function menu_edom($page){
-        $data['page'] = $page;
-        $data['department'] = parent::__getDepartement();
-        $content = $this->load->view('page/'.$data['department'].'/edom/menu_edom',$data,true);
-        $this->temp($content);
-    }
-    
-    public function edom_list_lecturer()
-    {
-        $data['department'] = parent::__getDepartement();
-        $page = $this->load->view('page/'.$data['department'].'/edom/list_lecturer',$data,true);
-        $this->menu_edom($page);
-    }
-
-    public function edom_list_question()
-    {
-        $data['department'] = parent::__getDepartement();
-        $page = $this->load->view('page/'.$data['department'].'/edom/question',$data,true);
-        $this->menu_edom($page);
-    }
-
-    public function crudQuestion($action,$ID)
-    {
-        $data['department'] = parent::__getDepartement();
-        $page = $this->load->view('page/'.$data['department'].'/edom/crudQuestion',$data,true);
-        $this->menu_edom($page);
-    }
-
-
-    public function edom_list_result(){
-        $data['department'] = parent::__getDepartement();
-        $data['semester'] = $this->General_model->fetchData("db_academic.semester",array(),"ID","ASC")->result();
-        $page = $this->load->view('page/'.$data['department'].'/edom/list_result',$data,true);
-        $this->menu_edom($page);
-    }
-
-
-    public function request_edom(){
-        $data = $this->input->post();
-        if($data){
-            $explodeSemester = explode(".", $data['semester']);
-            $semeseterID = (!empty($explodeSemester[0]) ? $explodeSemester[0] : 0);
-            $semeseterYear = (!empty($explodeSemester[1]) ? $explodeSemester[1] : 0);
-            $semeseterOddEvent = (!empty($explodeSemester[2]) ? $explodeSemester[2] : 0);
-            $semesterType = ($semeseterOddEvent==2)? "genap":"ganjil";
-            
-            $explodeProdi = explode(".", $data['prodi']);
-            $prodiID = (!empty($explodeProdi[0]) ? $explodeProdi[0] : 0);
-            $prodiCode = (!empty($explodeProdi[1]) ? strtolower($explodeProdi[1]) : null);
-
-            $message = "";
-            if((!empty($semeseterID) && !empty($data['intake'])) && (!empty($prodiID)) ){
-                $tablename = "edomRecap_".$prodiCode."_".$semeseterYear."_".$semesterType."_".$data['intake'];
-                //chek existing table
-                $isExistTable = $this->General_model->callStoredProcedure("select * from information_schema.`TABLES` where table_schema = 'db_statistik' and table_name = '".$tablename."'")->row();
-                if(!empty($isExistTable)){
-                    $conditions = array("Prodi_id"=>$prodiID,"Semester_id"=>$semeseterID);
-                    $results = $this->General_model->fetchData("db_statistik.".$tablename,$conditions)->result();
-                    
-                    if(!empty($results)){
-                        header("Content-type: application/vnd-ms-excel");
-                        header("Content-Disposition: attachment; filename=edom-recap-".$prodiCode."-".$semeseterYear."-".$semesterType.".xls");
-                        echo '<table border="1"><thead><tr><th>No</th><th>Intake</th><th>Code</th><th>Course</th><th>Group</th><th>Program Study</th><th>Lecturer</th><th>NIP</th><th>Question</th><th>Total Student</th><th>Rate</th></tr></thead><tbody>';
-                        $no = 1;
-                        foreach ($results as $v) {
-                            echo '<tr height="50px"><td>'.$no.'</td>'.
-                                 '<td>'.$v->Intake.'</td>'.
-                                 '<td>'.$v->CourseCode.'</td>'.
-                                 '<td>'.$v->CourseNameEng.'</td>'.
-                                 '<td>'.$v->ClassGroup.'</td>'.
-                                 '<td>'.$v->ProdiNameEng.'</td>'.
-                                 '<td>'.$v->Lecturer.'</td>'.
-                                 '<td>'.$v->LecturerNIP.'</td>'.
-                                 '<td width="60%">'.$v->Question.'</td>'.
-                                 '<td>'.$v->TotalStudent.'</td>'.
-                                 '<td>'.round($v->Rate,2).'</td></tr>';
-                            $no++;
-                        }
-                        echo '</tbody></table>';
-                        
-                    }else{
-                        $message = "Your request data is unavailable.";
-                        $this->session->set_flashdata("message",$message);
-                        redirect(site_url('lpmi/lecturer-evaluation/download-result'));
-                    }
-                }else{
-                    $message = "Your request data is unavailable. Database '".$tablename."' is unavailable.";
-                    $this->session->set_flashdata("message",$message);
-                    redirect(site_url('lpmi/lecturer-evaluation/download-result'));
-                }
-            }
-            
-        }
-    }
-
     public function menu_content(){
         // $data['pages'] = $pages;
         $data['department'] = parent::__getDepartement();
-        $data['category'] = $this->m_lpmi->get_category();
-        $content = $this->load->view('page/'.$data['department'].'/content/menu_content',$data,true);
+        $data['category'] = $this->m_lppm->get_category();
+        $content = $this->load->view('page/lppm/content/menu_content',$data,true);
         $this->temp($content);
     }
 
@@ -124,7 +29,7 @@ class C_lpmi extends Lpmi_Controler {
     public function ajax_list()
     {
         $type=$this->uri->segment(2);
-        $list = $this->m_lpmi->get_datatables($type);
+        $list = $this->m_lppm->get_datatables($type);
         
         $data = array();        
         $no = $_POST['start'];
@@ -140,16 +45,16 @@ class C_lpmi extends Lpmi_Controler {
             
  
             //add html for action
-            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_lpmi('."'".$m->ID."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
-                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_lpmi('."'".$m->ID."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Edit" onclick="edit_lppm('."'".$m->ID."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                  <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_lppm('."'".$m->ID."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
  
             $data[] = $row;
         }
  
         $output = array(
                         "draw" => $_POST['draw'],
-                        "recordsTotal" => $this->m_lpmi->count_all(),
-                        "recordsFiltered" => $this->m_lpmi->count_filtered(),
+                        "recordsTotal" => $this->m_lppm->count_all(),
+                        "recordsFiltered" => $this->m_lppm->count_filtered(),
                         "data" => $data,
                 );
         //output to json format
@@ -158,7 +63,7 @@ class C_lpmi extends Lpmi_Controler {
 
     public function ajax_edit($id)
     {
-        $data = $this->m_lpmi->get_by_id($id);
+        $data = $this->m_lppm->get_by_id($id);
         // print_r($data);die();
         echo json_encode($data);
     }
@@ -186,7 +91,7 @@ class C_lpmi extends Lpmi_Controler {
             $data['File'] = $upload;
         }
         $type = $this->input->post('type');
-        $insert = $this->m_lpmi->save($data,$type);
+        $insert = $this->m_lppm->save($data,$type);
         echo json_encode(array("status" => TRUE));
     }
 
@@ -194,7 +99,7 @@ class C_lpmi extends Lpmi_Controler {
     // Category
 
     public  function list_category(){
-        $data=$this->m_lpmi->get_category();
+        $data=$this->m_lppm->get_category();
         echo json_encode($data);
     }
 
@@ -209,13 +114,13 @@ class C_lpmi extends Lpmi_Controler {
             );
         
         // print_r($data);die();
-        $insert = $this->m_lpmi->saveCat($data);
+        $insert = $this->m_lppm->saveCat($data);
         echo json_encode(array("status" => TRUE));
     }
 
     public function ajax_editCat($id)
     {
-        $data = $this->m_lpmi->get_by_idCat($id);
+        $data = $this->m_lppm->get_by_idCat($id);
         echo json_encode($data);
     }
 
@@ -230,13 +135,13 @@ class C_lpmi extends Lpmi_Controler {
             );
         
         // print_r($data);die();
-        $insert = $this->m_lpmi->updateCat(array('ID' => $this->input->post('idcat')),$data);
+        $insert = $this->m_lppm->updateCat(array('ID' => $this->input->post('idcat')),$data);
         echo json_encode(array("status" => TRUE));
     }
 
     public function ajax_deleteCat($id)
     {
-        $this->m_lpmi->delete_by_idCat($id);
+        $this->m_lppm->delete_by_idCat($id);
         echo json_encode(array("status" => TRUE));
     }
 
@@ -246,7 +151,7 @@ class C_lpmi extends Lpmi_Controler {
 
         $getidlang =  $this->input->post('idlang');
         // print_r($getidlang);
-        $q = $this->m_lpmi->getCategory($getidlang);        
+        $q = $this->m_lppm->getCategory($getidlang);        
         echo json_encode($q);  
     }
 
@@ -256,13 +161,13 @@ class C_lpmi extends Lpmi_Controler {
         $getidcat =  $this->input->post('idcat');
         $getidsubcat =  $this->input->post('idsubcat');
         // print_r($getidcat);
-        $q = $this->m_lpmi->getSubCategory($getidcat,$getidsubcat);        
+        $q = $this->m_lppm->getSubCategory($getidcat,$getidsubcat);        
         echo json_encode($q);  
     }
 
 
     public  function list_Subcategory(){
-        $data=$this->m_lpmi->get_Subcategory();
+        $data=$this->m_lppm->get_Subcategory();
         echo json_encode($data);
     }
 
@@ -277,13 +182,13 @@ class C_lpmi extends Lpmi_Controler {
             );
         
         // print_r($data);die();
-        $insert = $this->m_lpmi->saveSubCat($data);
+        $insert = $this->m_lppm->saveSubCat($data);
         echo json_encode(array("status" => TRUE));
     }
 
     public function ajax_editSubCat($id)
     {
-        $data = $this->m_lpmi->get_by_idSubCat($id);
+        $data = $this->m_lppm->get_by_idSubCat($id);
         echo json_encode($data);
     }
 
@@ -298,14 +203,14 @@ class C_lpmi extends Lpmi_Controler {
             );
         
         // print_r($data);die();
-        $insert = $this->m_lpmi->updateSubCat(array('IDSub' => $this->input->post('idSubcat')),$data);
+        $insert = $this->m_lppm->updateSubCat(array('IDSub' => $this->input->post('idSubcat')),$data);
         // print_r($insert);die();
         echo json_encode(array("status" => TRUE));
     }
 
     public function ajax_deleteSubCat($id)
     {
-        $this->m_lpmi->delete_by_idSubCat($id);
+        $this->m_lppm->delete_by_idSubCat($id);
         echo json_encode(array("status" => TRUE));
     }
 
@@ -331,31 +236,31 @@ class C_lpmi extends Lpmi_Controler {
             $upload = $this->_do_upload();
              
             //delete file
-            $lpmi = $this->m_lpmi->get_by_id($this->input->post('id'));
-            if(file_exists('./uploads/lpmi/'.$lpmi->File) && $lpmi->File)
-                unlink('./uploads/lpmi/'.$lpmi->File);
+            $lppm = $this->m_lppm->get_by_id($this->input->post('id'));
+            if(file_exists('./uploads/lppm/'.$lppm->File) && $lppm->File)
+                unlink('./uploads/lppm/'.$lppm->File);
  
             $data['File'] = $upload;
         }
 
-        $this->m_lpmi->update(array('ID' => $this->input->post('id')), $data);
+        $this->m_lppm->update(array('ID' => $this->input->post('id')), $data);
         echo json_encode(array("status" => TRUE));
     }
     
     public function ajax_delete($id)
     {
         //delete file
-        $lpmi = $this->m_lpmi->get_by_id($id);
-        if(file_exists('./uploads/lpmi/'.$lpmi->File) && $lpmi->File)
-            unlink('./uploads/lpmi/'.$lpmi->File);
+        $lppm = $this->m_lppm->get_by_id($id);
+        if(file_exists('./uploads/lppm/'.$lppm->File) && $lppm->File)
+            unlink('./uploads/lppm/'.$lppm->File);
 
-        $this->m_lpmi->delete_by_id($id);
+        $this->m_lppm->delete_by_id($id);
         echo json_encode(array("status" => TRUE));
     }
 
     private function _do_upload()
     {
-        $config['upload_path']          = './uploads/lpmi';
+        $config['upload_path']          = './uploads/lppm';
         $config['allowed_types']        = 'gif|jpg|png|jpeg|pdf';
         $config['max_size']             = 2048000; //set max size allowed in Kilobyte 2mb
         // $config['max_width']            = 1000; // set max width image allowed

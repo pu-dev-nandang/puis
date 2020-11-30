@@ -26,6 +26,7 @@
                       <!-- <th>#</th> -->
                       <th>NIP</th>
                       <th>Name</th>
+                      <th>Set Master Group</th>
                       <th>Set Group</th>
                       <th>Date Update</th>
                       <!-- <th>Lang</th> -->
@@ -126,8 +127,36 @@
             </div>
             <div class="form-group" style="margin-bottom: 0px">                
                 <div class="form-group" style="margin-bottom: 0px">
+                    <label>Select Master Group</label>
+                    <select  name="ID_master_group" class="form-control getSetcontent" id="showSetMasterGroup">
+                      <option value="">--Select--</option>
+                        <!-- <?php foreach($setgroup as $row):?>
+                        <option value="<?php echo $row->ID_set_group;?>" ><?php echo $row->GraoupName;?></option>
+                        <?php endforeach;?>      -->                  
+                    </select>
+                    <span class="help-block"></span>
+                </div> 
+                <span class="help-block"></span>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0px">                
+                <div class="form-group" style="margin-bottom: 0px">
                     <label>Select Group</label>
                     <select  name="ID_set_group" class="form-control getSetcontent" id="showSetGroup">
+                      <option value="">--Select--</option>
+                        <!-- <?php foreach($setgroup as $row):?>
+                        <option value="<?php echo $row->ID_set_group;?>" ><?php echo $row->GraoupName;?></option>
+                        <?php endforeach;?>      -->                  
+                    </select>
+                    <span class="help-block"></span>
+                </div> 
+                <span class="help-block"></span>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0px">                
+                <div class="form-group" style="margin-bottom: 0px">
+                    <label>Set Member</label>
+                    <select  name="ID_set_member" class="form-control getSetcontent" id="showSetMember">
                       <option value="">--Select--</option>
                         <!-- <?php foreach($setgroup as $row):?>
                         <option value="<?php echo $row->ID_set_group;?>" ><?php echo $row->GraoupName;?></option>
@@ -255,6 +284,26 @@
     $(document).ready(function(){        
             var id=$(this).val();
             $.ajax({
+                url : base_url_js+'_crudSetMasterGroup',
+                method : "POST",
+                data : {id: id},
+                async : true,
+                dataType : 'json',
+                success: function(data){                     
+                    var html = '';
+                    var i;
+                    for(i=0; i<data.length; i++){
+                        html += '<option value='+data[i].ID_master_group+'>'+data[i].MasterGroupName+'</option>';
+                    }
+                    $('#showSetMasterGroup').html(html);
+                }
+            });
+            return false;
+    });
+
+    $(document).ready(function(){        
+            var id=$(this).val();
+            $.ajax({
                 url : base_url_js+'_crudSetGroup',
                 method : "POST",
                 data : {id: id},
@@ -265,6 +314,26 @@
                     var i;
                     for(i=0; i<data.length; i++){
                         html += '<option value='+data[i].ID_set_group+'>'+data[i].GroupName+'</option>';
+                    }
+                    $('#showSetGroup').html(html);
+                }
+            });
+            return false;
+    });
+
+    $(document).ready(function(){        
+            var id=$(this).val();
+            $.ajax({
+                url : base_url_js+'_crudSetMember',
+                method : "POST",
+                data : {id: id},
+                async : true,
+                dataType : 'json',
+                success: function(data){                     
+                    var html = '';
+                    var i;
+                    for(i=0; i<data.length; i++){
+                        html += '<option value='+data[i].ID_set_member+'>'+data[i].MemberName+'</option>';
                     }
                     $('#showSetGroup').html(html);
                 }
@@ -296,8 +365,8 @@
             {
                 $('[name="ID_set_group"]').val(data.ID_set_group);
                 $('[name="idset"]').val(data.ID_set_group);
-                $('[name="idpodivers"]').val(data.ID_Podivers).trigger('change');
-                $('[name="npm"]').val(data.NPM);
+                $('[name="idpodivers"]').val(data.ID_set_list_member).trigger('change');
+                $('[name="npm"]').val(data.NIPNPM);
                 $('[name="name"]').val(data.Name);
                 $('[name="setgroup"]').val(data.ID_set_group).trigger('change');
             },
@@ -327,6 +396,7 @@
         var NPM = $(this).attr('data-npm');
         // ajax adding data to database
         var formData = new FormData($('#form')[0]);
+
         $.ajax({
             url : url,
             type: "POST",
