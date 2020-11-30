@@ -269,6 +269,11 @@
                   },
                   onMediaDelete : function(target) {
                       // summernote_DeleteImage(target[0].src);
+                  },
+
+                  onPaste: function(e) {
+                          alert('Disabled cut copy and paste');
+                          e.preventDefault();
                   }
               }
           });
@@ -635,24 +640,24 @@
         App_ticketing_setting_admin.ModalForm('Form Admin','edit',ID,data);
     })
 
-    $('#GlobalModalLarge').bind('cut copy paste', function (e) {
-        const itsme  = $(this);
-        if (itsme.find('.pastePanelModal')) {
-          alert('Disabled cut copy and paste');
-          e.preventDefault();
-        }
+    // $('#GlobalModalLarge').bind('cut copy paste', function (e) {
+    //     const itsme  = $(this);
+    //     if (itsme.find('.pastePanelModal')) {
+    //       alert('Disabled cut copy and paste');
+    //       e.preventDefault();
+    //     }
         
-    });
+    // });
 
-    //Disable mouse right click
-    $("#GlobalModalLarge").on("contextmenu",function(e){
-        const itsme  = $(this);
-        if (itsme.find('.pastePanelModal')) {
-          alert('Disabled right click');
-          return false;
-        }
+    // //Disable mouse right click
+    // $("#GlobalModalLarge").on("contextmenu",function(e){
+    //     const itsme  = $(this);
+    //     if (itsme.find('.pastePanelModal')) {
+    //       alert('Disabled right click');
+    //       return false;
+    //     }
         
-    });
+    // });
 
 </script>
 
