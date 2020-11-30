@@ -1,9 +1,9 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
  
-class M_lpmi extends CI_Model {
+class M_lppm extends CI_Model {
  
-    var $table = 'db_lpmi.content';
+    var $table = 'db_lppm.content';
     var $column_order = array('Title','Description','Status',null); //set column field database for datatable orderable
     var $column_search = array('Title','Description','Status'); //set column field database for datatable searchable just firstname , lastname , address are searchable
     var $order = array('ID' => 'desc'); // default order 
@@ -17,19 +17,19 @@ class M_lpmi extends CI_Model {
     private function _get_datatables_query()
     {
         if($this->input->post('type')){
-            $sql = 'select ci.* from db_lpmi.content_index AS ci
+            $sql = 'select ci.* from db_lppm.content_index AS ci
                             WHERE ci.SegmentMenu="'.$this->input->post('type').'" ';
             $query=$this->db->query($sql, array())->result_array();
             $getvaID= $query[0]['ID'];  
             $this->db->where('IDindex', $getvaID);
         }
         
-        $this->db->from('db_lpmi.content'); 
+        $this->db->from('db_lppm.content'); 
         $i = 0;
         
         // if(!isset($_POST['category']))
         // {
-        //     $this->db->join('db_lpmi.category', 'db_lpmi.content.IDCat = db_lpmi.category.ID');
+        //     $this->db->join('db_lppm.category', 'db_lppm.content.IDCat = db_lppm.category.ID');
 
         // }
 
@@ -94,9 +94,9 @@ class M_lpmi extends CI_Model {
         $this->db->select('co.ID,co.IDindex,co.IDSubCat,co.Title,co.Meta_description,co.Meta_keywords,co.Description,co.File,co.Lang,co.AddDate,co.Status,co.CreateAt,co.CreateBy,co.UpdatedAt,co.UpdatedBy');
         $this->db->select('sb.IDSub,sb.IDCat,sb.SubName');
         $this->db->select('cat.ID as ID1,cat.Name,cat.Lang as Lang1');
-        $this->db->from('db_lpmi.content as co');
-        $this->db->join('db_lpmi.sub_category as sb','sb.IDSub=co.IDSubCat','left');          
-        $this->db->join('db_lpmi.category as cat','sb.IDCat=cat.ID','left');
+        $this->db->from('db_lppm.content as co');
+        $this->db->join('db_lppm.sub_category as sb','sb.IDSub=co.IDSubCat','left');          
+        $this->db->join('db_lppm.category as cat','sb.IDCat=cat.ID','left');
         $this->db->where('co.ID',$id);       
         $query = $this->db->get(); 
         return $query->row();
@@ -105,7 +105,7 @@ class M_lpmi extends CI_Model {
     
     public function get_by_idCat($id)
     {
-        $this->db->from('db_lpmi.category');
+        $this->db->from('db_lppm.category');
         $this->db->where('ID',$id);
         $query = $this->db->get(); 
         return $query->row();
@@ -113,7 +113,7 @@ class M_lpmi extends CI_Model {
 
     public function save($data,$type)
     {   
-        $sql = 'select ci.* from db_lpmi.content_index AS ci
+        $sql = 'select ci.* from db_lppm.content_index AS ci
                             WHERE ci.SegmentMenu="'.$type.'" ';
         $query=$this->db->query($sql, array())->result_array();
         $data['IDindex'] = $query[0]['ID'];
@@ -143,7 +143,7 @@ class M_lpmi extends CI_Model {
     // category
 
     public function get_category(){
-        $this->db->from("db_lpmi.category");
+        $this->db->from("db_lppm.category");
         $this->db->order_by('ID','desc');
         $q = $this->db->get();
         return $q->result();  
@@ -151,13 +151,13 @@ class M_lpmi extends CI_Model {
 
     public function saveCat($data)
     {           
-        $this->db->insert('db_lpmi.category', $data);
+        $this->db->insert('db_lppm.category', $data);
         return $this->db->insert_id();
     }
 
     public function updateCat($where, $data)
     {
-        $this->db->update('db_lpmi.category', $data, $where);
+        $this->db->update('db_lppm.category', $data, $where);
         return $this->db->affected_rows();
     }
  
@@ -165,7 +165,7 @@ class M_lpmi extends CI_Model {
     public function delete_by_idCat($id)
     {
         $this->db->where('ID', $id);
-        $this->db->delete('db_lpmi.category');
+        $this->db->delete('db_lppm.category');
     }
 
 
@@ -175,14 +175,14 @@ class M_lpmi extends CI_Model {
 
     public function getCategory($getidlang)
     {
-        $hasil=$this->db->query("SELECT * FROM db_lpmi.category where Lang = '".$getidlang."' ")->result_array();
+        $hasil=$this->db->query("SELECT * FROM db_lppm.category where Lang = '".$getidlang."' ")->result_array();
         return $hasil;
     }
 
     public function getSubCategory($getidcat,$getidsubcat)
     {
-        $hasil=$this->db->query("SELECT * FROM db_lpmi.category as ck 
-                                 left join db_lpmi.sub_category as sc on sc.IDCat=ck.ID 
+        $hasil=$this->db->query("SELECT * FROM db_lppm.category as ck 
+                                 left join db_lppm.sub_category as sc on sc.IDCat=ck.ID 
                                  where sc.IDCat = '".$getidcat."' or IDSub='".$getidsubcat."' ")
         ->result_array();
         return $hasil;
@@ -190,16 +190,16 @@ class M_lpmi extends CI_Model {
 
     public function get_by_idSubCat($id)
     {
-        $this->db->from('db_lpmi.sub_category as sc');
-        $this->db->join('db_lpmi.category as ck','sc.IDCat=ck.ID');
+        $this->db->from('db_lppm.sub_category as sc');
+        $this->db->join('db_lppm.category as ck','sc.IDCat=ck.ID');
         $this->db->where('sc.IDSub',$id);
         $query = $this->db->get(); 
         return $query->row();
     }
 
     public function get_Subcategory(){
-        $this->db->from("db_lpmi.sub_category as sc");
-        $this->db->join("db_lpmi.category as ck", "ck.ID = sc.IDCat");
+        $this->db->from("db_lppm.sub_category as sc");
+        $this->db->join("db_lppm.category as ck", "ck.ID = sc.IDCat");
         $this->db->order_by('sc.IDSub','desc');
         $q = $this->db->get();
         return $q->result();  
@@ -207,13 +207,13 @@ class M_lpmi extends CI_Model {
 
     public function saveSubCat($data)
     {           
-        $this->db->insert('db_lpmi.sub_category', $data);
+        $this->db->insert('db_lppm.sub_category', $data);
         return $this->db->insert_id();
     }
 
     public function updateSubCat($where, $data)
     {
-        $this->db->update('db_lpmi.sub_category', $data, $where);
+        $this->db->update('db_lppm.sub_category', $data, $where);
         return $this->db->affected_rows();
     }
  
@@ -221,7 +221,7 @@ class M_lpmi extends CI_Model {
     public function delete_by_idSubCat($id)
     {
         $this->db->where('IDSub', $id);
-        $this->db->delete('db_lpmi.sub_category');
+        $this->db->delete('db_lppm.sub_category');
     }
  
  

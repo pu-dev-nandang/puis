@@ -14,9 +14,9 @@
             <p id="idDisplay"></p>
         </div>
         <div class="panel-body" id="tabs">
-        	<button class="btn btn-success" onclick="add_lpmi()"><i class="glyphicon glyphicon-plus"></i> Create</button>
-        	<?php if($Segment1=='knowledge'){echo '<button class="btn btn-success" onclick="Catlpmi()"><i class="glyphicon glyphicon-plus"></i> Add Category</button>';} ?>
-        	<?php if($Segment1=='knowledge'){echo '<button class="btn btn-success" onclick="SubCatlpmi()"><i class="glyphicon glyphicon-plus"></i> Add Sub Category</button>';} ?>
+        	<button class="btn btn-success" onclick="add_lppm()"><i class="glyphicon glyphicon-plus"></i> Create</button>
+        	<?php if($Segment1=='knowledge'){echo '<button class="btn btn-success" onclick="Catlppm()"><i class="glyphicon glyphicon-plus"></i> Add Category</button>';} ?>
+        	<?php if($Segment1=='knowledge'){echo '<button class="btn btn-success" onclick="SubCatlppm()"><i class="glyphicon glyphicon-plus"></i> Add Sub Category</button>';} ?>
         	<button class="btn btn-default" onclick="reload_table()"><i class="glyphicon glyphicon-refresh"></i> Reload</button>
         	<hr>        	
 						
@@ -445,7 +445,7 @@
 	 
 	        // Load data for the table's content from an Ajax source
 	        "ajax": {	        	
-	            "url": base_url_js+'__ajaxlist_lpmi',
+	            "url": base_url_js+'__ajaxlist_lppm',
 	            "type": "POST",
 	            "data": function ( data ) {
 		                data.type = '<?= $Segment1 ?>';		                
@@ -491,7 +491,7 @@
     var idlang =  $(this).val();
     // alert(idlang); 
     $.ajax({
-        url: base_url_js+'__getCatByLang_lpmi',
+        url: base_url_js+'__getCatByLang_lppm',
         method : "POST",
         data : {idlang: idlang},
         async : true,
@@ -520,7 +520,7 @@
     var idcat =  $(this).val();
     // alert(idlang); 
     $.ajax({
-        url: base_url_js+'__getSubCat_lpmi',
+        url: base_url_js+'__getSubCat_lppm',
         method : "POST",
         data : {idcat: idcat},
         async : true,
@@ -573,9 +573,9 @@
 	    var url;
 	 
 	    if(save_method == 'add') {
-	        url = base_url_js+'__ajaxaddCat_lpmi';
+	        url = base_url_js+'__ajaxaddCat_lppm';
 	    } else {
-	        url = base_url_js+'__ajaxupdateCat_lpmi';
+	        url = base_url_js+'__ajaxupdateCat_lppm';
 	    }
 	 
 	    // ajax adding data to database
@@ -622,7 +622,7 @@
         
         $.ajax({
               type  : 'GET',
-              url   : base_url_js+'__ajaxCat_lpmi',
+              url   : base_url_js+'__ajaxCat_lppm',
               async : false,
               dataType : 'json',
               success : function(data){
@@ -637,8 +637,8 @@
 		                        '<td>'+data[i].CreateAt+'</td>'+
 		                        '<td>'+data[i].CreateBy+'</td>'+
 		                        '<td>'+
-		                          '<a id="tab1-20933" class="btn btn-success" onclick="editCat_lpmi('+data[i].ID+')" href="javascript:;" data="'+data[i].ID+'"> Edit</a>'+
-		                          '<a id="tab1-20933" class="btn btn-danger" onclick="deleteCat_lpmi('+data[i].ID+')" href="javascript:;" data="'+data[i].ID+'"> Delete</a>'+
+		                          '<a id="tab1-20933" class="btn btn-success" onclick="editCat_lppm('+data[i].ID+')" href="javascript:;" data="'+data[i].ID+'"> Edit</a>'+
+		                          '<a id="tab1-20933" class="btn btn-danger" onclick="deleteCat_lppm('+data[i].ID+')" href="javascript:;" data="'+data[i].ID+'"> Delete</a>'+
 		                        '</td>'+
 		                      '</tr>';
 		                      // console.log(data[i].Name);
@@ -649,7 +649,7 @@
           })
     }
 
-	function Catlpmi()
+	function Catlppm()
 	{
 		loadDatacate();	
 	    save_method = 'add';
@@ -661,11 +661,11 @@
 	}
 	
 
-	function editCat_lpmi(id)
+	function editCat_lppm(id)
 	{
 	    save_method = 'update';
 	    $.ajax({
-	        url : base_url_js+'__ajaxeditCat_lpmi/'+id,
+	        url : base_url_js+'__ajaxeditCat_lppm/'+id,
 	        type: "GET",
 	        dataType: "JSON",
 	        success: function(data)
@@ -684,13 +684,13 @@
 	    });
 	}
 
-	function deleteCat_lpmi(id)
+	function deleteCat_lppm(id)
 	{
 	    if(confirm('Are you sure delete this data?'))
 	    {
 	        // ajax delete data to database
 	        $.ajax({
-	            url : base_url_js+'__ajaxdeleteCat_lpmi/'+id,
+	            url : base_url_js+'__ajaxdeleteCat_lppm/'+id,
 	            type: "POST",
 	            dataType: "JSON",
 	            success: function(data)
@@ -718,7 +718,7 @@
         
         $.ajax({
               type  : 'GET',
-              url   : base_url_js+'__ajaxSubCat_lpmi',
+              url   : base_url_js+'__ajaxSubCat_lppm',
               async : false,
               dataType : 'json',
               success : function(data){
@@ -734,8 +734,8 @@
 		                        '<td>'+data[i].CreateAt+'</td>'+
 		                        '<td>'+data[i].CreateBy+'</td>'+
 		                        '<td>'+
-		                          '<a id="tab1-20933" class="btn btn-success" onclick="editSubCat_lpmi('+data[i].IDSub+')" href="javascript:;" data="'+data[i].IDSub+'"> Edit</a>'+
-		                          '<a id="tab1-20933" class="btn btn-danger" onclick="deleteSubCat_lpmi('+data[i].IDSub+')" href="javascript:;" data="'+data[i].IDSub+'"> Delete</a>'+
+		                          '<a id="tab1-20933" class="btn btn-success" onclick="editSubCat_lppm('+data[i].IDSub+')" href="javascript:;" data="'+data[i].IDSub+'"> Edit</a>'+
+		                          '<a id="tab1-20933" class="btn btn-danger" onclick="deleteSubCat_lppm('+data[i].IDSub+')" href="javascript:;" data="'+data[i].IDSub+'"> Delete</a>'+
 		                        '</td>'+
 		                      '</tr>';
 		                      // console.log(data[i].Name);
@@ -746,7 +746,7 @@
           })
     }
 
-	function SubCatlpmi()
+	function SubCatlppm()
 	{
 		loadDataSubcate();	
 	    save_method = 'add';
@@ -765,9 +765,9 @@
 	    var url;
 	 
 	    if(save_method == 'add') {
-	        url = base_url_js+'__ajaxaddSubCat_lpmi';
+	        url = base_url_js+'__ajaxaddSubCat_lppm';
 	    } else {
-	        url = base_url_js+'__ajaxupdateSubCat_lpmi';
+	        url = base_url_js+'__ajaxupdateSubCat_lppm';
 	    }
 	 
 	    // ajax adding data to database
@@ -809,11 +809,11 @@
 	}
 
 
-	function editSubCat_lpmi(id)
+	function editSubCat_lppm(id)
 	{
 	    save_method = 'update';
 	    $.ajax({
-	        url : base_url_js+'__ajaxeditSubCat_lpmi/'+id,
+	        url : base_url_js+'__ajaxeditSubCat_lppm/'+id,
 	        type: "GET",
 	        dataType: "JSON",
 	        success: function(data)
@@ -833,13 +833,13 @@
 	    });
 	}
 
-	function deleteSubCat_lpmi(id)
+	function deleteSubCat_lppm(id)
 	{
 	    if(confirm('Are you sure delete this data?'))
 	    {
 	        // ajax delete data to database
 	        $.ajax({
-	            url : base_url_js+'__ajaxdeleteSubCat_lpmi/'+id,
+	            url : base_url_js+'__ajaxdeleteSubCat_lppm/'+id,
 	            type: "POST",
 	            dataType: "JSON",
 	            success: function(data)
@@ -861,7 +861,7 @@
 
 // Craete content
 
-	function add_lpmi()
+	function add_lppm()
 	{
 	    save_method = 'add';
 	    $('#form')[0].reset(); // reset form on modals
@@ -897,7 +897,7 @@
 	}
 
 	const LoadAjaxByID = async(id) => {
-		const url = base_url_js+'__ajaxedit_lpmi/'+id;
+		const url = base_url_js+'__ajaxedit_lppm/'+id;
 		const data = {}
 		const token = jwt_encode(data,'UAP)(*');
 		const response = await AjaxSubmitFormPromises(url,token);
@@ -922,7 +922,7 @@
 	}
 
 	const AjaxshowCategoryBylang = async(idlang) => {
-		const url = base_url_js+'__getCatByLang_lpmi';
+		const url = base_url_js+'__getCatByLang_lppm';
 		const data = {idlang:idlang}
 		const response = await AjaxSubmitFormPromisesNoToken(url,data);
 		return response;
@@ -939,7 +939,7 @@
 
 	const AjaxshowSubCategoryByCategory = async(idcat,idsubcat1) => {
 		// console.log(idcat);
-		const url = base_url_js+'__getSubCat_lpmi';
+		const url = base_url_js+'__getSubCat_lppm';
 		const data = {idcat:idcat,idsubcat:idsubcat1}
 		// console.log(data);
 		const response = await AjaxSubmitFormPromisesNoToken(url,data);
@@ -956,10 +956,10 @@
 		$('#showSubcategorycontent').html(html);
 	}
 
-	const edit_lpmi =async(id) => {
+	const edit_lppm =async(id) => {
 		/*
 			1. isi data default
-			2. Load Ajax __ajaxedit_lpmi
+			2. Load Ajax __ajaxedit_lppm
 			3. result point 2 ajax ke  plus event change (getidlang)
 			4. result point 3 ajax isi category
 			5. result category auto ke suc categegory plus event change (getsubCat)
@@ -969,25 +969,25 @@
 		// 1
 		loadDefaultEdit(); 
 		// 2 
-		const dataLPMI = await LoadAjaxByID(id);
-			fillDataModal(dataLPMI);
+		const dataLPpm = await LoadAjaxByID(id);
+			fillDataModal(dataLPpm);
 
 		// 3
-		const lang = dataLPMI.Lang;
+		const lang = dataLPpm.Lang;
 		$('[name="lang"]').val(lang);
 		const DataCategory = await AjaxshowCategoryBylang(lang);
 			HtmlDataCategory(DataCategory);
-		const idcat = dataLPMI.IDCat;
+		const idcat = dataLPpm.IDCat;
 		$('[name="category"]').val(idcat);
 		// 4 dan 5
 		const getCategory = $('.getsubCatcontent').find('option:selected').val();
-		const getidSub = dataLPMI.IDSub;
+		const getidSub = dataLPpm.IDSub;
 		$('[name="idsubcategory"]').val(getidSub);
 		console.log(idcat);
 		const DataSubCategory = await AjaxshowSubCategoryByCategory(getCategory,getidSub);
 			HtmlDataSubCategory(DataSubCategory);
 
-			const data = dataLPMI;
+			const data = dataLPpm;
             if (data.Status=="Yes") {
             	document.getElementById("st1").checked = true;
             } else {
@@ -1037,10 +1037,10 @@
 		        // console.log(fileNameExt);
             	if(!fileNameExt=='pdf'){
 	                $('#label-photo').text('Change file'); // label photo upload
-	                $('#photo-preview div').html('<img src="'+base_url_js+'uploads/lpmi/'+data.File+'" class="img-responsive">'); // show photo
+	                $('#photo-preview div').html('<img src="'+base_url_js+'uploads/lppm/'+data.File+'" class="img-responsive">'); // show photo
 	                // $('#photo-preview div').append('<input type="checkbox" name="remove_photo" value="'+data.file+'"/> Remove photo when saving'); // remove photo
                 }else{
-                	$('#photo-preview div').html('<iframe src="'+base_url_js+'uploads/lpmi/'+data.File+'" height="100%" width="100%" scrolling="auto"></iframe>');
+                	$('#photo-preview div').html('<iframe src="'+base_url_js+'uploads/lppm/'+data.File+'" height="100%" width="100%" scrolling="auto"></iframe>');
                 }
 
             }
@@ -1069,9 +1069,9 @@
 	    var url;
 	 
 	    if(save_method == 'add') {
-	        url = base_url_js+'__ajaxadd_lpmi';
+	        url = base_url_js+'__ajaxadd_lppm';
 	    } else {
-	        url = base_url_js+'__ajaxupdate_lpmi';
+	        url = base_url_js+'__ajaxupdate_lppm';
 	    }
 	 
 	    // ajax adding data to database
@@ -1116,13 +1116,13 @@
 	    });
 	}
 	 
-	function delete_lpmi(id)
+	function delete_lppm(id)
 	{
 	    if(confirm('Are you sure delete this data?'))
 	    {
 	        // ajax delete data to database
 	        $.ajax({
-	            url : base_url_js+'__ajaxdelete_lpmi/'+id,
+	            url : base_url_js+'__ajaxdelete_lppm/'+id,
 	            type: "POST",
 	            dataType: "JSON",
 	            success: function(data)
