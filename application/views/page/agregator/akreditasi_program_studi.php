@@ -31,6 +31,7 @@
     var passToExcel = [];
     $(document).ready(function () {
         loadAkreditasiProdi();
+        newDescritionInput.getDescription();
     });
 
     function __MakeHtmlTable(header)
@@ -184,6 +185,11 @@
                 'backdrop' : 'static'
             });
         }
+    })
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
     })
 
 </script>

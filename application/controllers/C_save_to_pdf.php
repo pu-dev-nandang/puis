@@ -874,7 +874,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Times','',7);
         $pdf->Cell($w_ttd,$h,'Staff SAS',1,0,'C');
         $pdf->Cell($w_ttd,$h,'Kabag. Administrasi Perkuliahan',1,0,'C');
-        $pdf->Cell($w_ttd,$h,'Wakil Rektor I',1,1,'C');
+        $pdf->Cell($w_ttd,$h,'Wakil Rektor I Bidang Akademik',1,1,'C');
 
 
         $pdf->Ln(5);
@@ -3318,7 +3318,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell((3*$w_f)+$w_fv,$h,ucwords(strtolower($dataTempTr['Place'])).', '.$dateT,$border,1,'L');
 
 
-        $ttdb = ($lang=='ind')? 'Pjs. Wakil Rektor I' : 'Acting Vice Rector I';
+        $ttdb = ($lang=='ind')? 'Wakil Rektor I Bidang Akademik' : 'Vice Rector of Academic Affairs';
         $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk,$h,'',$border,0,'R');
         $pdf->Cell((3*$w_f)+$w_fv,$h,$ttdb,$border,1,'L');
 
@@ -3662,11 +3662,11 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Ln(5);
 
             $pdf->SetFont('dinpromedium','',$font_medium);
-            $pdf->Cell($w_Div+$min,$h,'Wakil Rektor I',$borderttd,0,'L');
+            $pdf->Cell($w_Div+$min,$h,'Wakil Rektor I Bidang Akademik',$borderttd,0,'L');
             $pdf->Cell($w_Div-$min,$h,'Dekan',$borderttd,1,'L');
 
             $pdf->SetFont('dinlightitalic','',$font_medium_i);
-            $pdf->Cell($w_Div+$min,$h,'Vice Rector I',$borderttd,0,'L');
+            $pdf->Cell($w_Div+$min,$h,'Vice Rector of Academic Affairs',$borderttd,0,'L');
             $pdf->Cell($w_Div-$min,$h,'Dean',$borderttd,1,'L');
 
             $pdf->Ln(17);
@@ -3719,11 +3719,11 @@ class C_save_to_pdf extends CI_Controller {
 
             $pdf->SetFont('dinpromedium','',$font_medium);
             $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-            $pdf->Cell($w_Div-$min,$h,'Wakil Rektor I',$borderttd,1,'L');
+            $pdf->Cell($w_Div-$min,$h,'Wakil Rektor I Bidang Akademik',$borderttd,1,'L');
 
             $pdf->SetFont('dinlightitalic','',$font_medium_i);
             $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-            $pdf->Cell($w_Div-$min,$h,'Vice Rector I',$borderttd,1,'L');
+            $pdf->Cell($w_Div-$min,$h,'Vice Rector of Academic Affairs',$borderttd,1,'L');
 
             $pdf->Ln(17);
 
@@ -4485,10 +4485,10 @@ class C_save_to_pdf extends CI_Controller {
         //================ Tanda tangan =======================
         $pdf->SetX($x);
         $pdf->SetFont('Arial','',$fn_b);
-        $pdf->Cell($fillFull,$h,'Wakil Rektor I',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'Wakil Rektor I Bidang Akademik',$border,1,'L');
         $pdf->SetX($x);
         $pdf->SetFont('Arial','I',$fn_i);
-        $pdf->Cell($fillFull,$h,'Vice Rector I',$border,1,'L');
+        $pdf->Cell($fillFull,$h,'Vice Rector of Academic Affairs',$border,1,'L');
         $y = $pdf->GetY()+7;
         $pdf->Ln(15);
         //================ hormat kami ========================
@@ -6002,7 +6002,7 @@ Phone: (021) 29200456';
              $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
              $pdf->AddPage();
              $pdf->SetAutoPageBreak(true, 0);
-           
+
              // $ConverToPath = function($PathURL)
              // {
              //    $rs = '';
@@ -6269,17 +6269,19 @@ Phone: (021) 29200456';
             $thn = ($dateGen!='') ? explode('-',$dateGen)[0] : '';
 
             // Get Mata kuliah
-            $dataMK = $this->db->query('SELECT mk.NameEng, cd.TotalSKS AS Credit FROM db_academic.schedule s
+            $dataMK = $this->db->query('SELECT mk.Name, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule s
                                                   LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                   LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                  LEFT JOIN db_academic.schedule_share_credit ssc ON (ssc.ScheduleID = s.ID AND ssc.NIP = s.Coordinator)
                                                   WHERE s.SemesterID = "'.$SemesterID.'" AND s.Coordinator = "'.$NIP.'" GROUP BY s.ID
                                                   UNION ALL
-                                                  SELECT mk2.NameEng, cd.TotalSKS AS Credit FROM db_academic.schedule_details_course sdc2
+                                                  SELECT mk2.Name, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule_details_course sdc2
                                                   LEFT JOIN db_academic.schedule s2 ON (s2.ID = sdc2.ScheduleID)
                                                   LEFT JOIN db_academic.mata_kuliah mk2 ON (mk2.ID = sdc2.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc2.CDID)
                                                   LEFT JOIN db_academic.schedule_team_teaching stt ON (sdc2.ScheduleID = stt.ScheduleID)
+                                                  LEFT JOIN db_academic.schedule_share_credit ssc ON (ssc.ScheduleID = s2.ID AND ssc.NIP = stt.NIP)
                                                   WHERE s2.SemesterID = "'.$SemesterID.'" AND stt.NIP = "'.$NIP.'" GROUP BY s2.ID ')->result_array();
 
 
@@ -6344,8 +6346,9 @@ Phone: (021) 29200456';
             $pdf->SetFillColor(38, 75, 135);
             $pdf->SetTextColor(255, 255, 255);
             $pdf->Cell(10,$h,'No',1,0,'C',true);
-            $pdf->Cell(150,$h,'Nama Mata Kuliah',1,0,'C',true);
-            $pdf->Cell(15,$h,'SKS',1,0,'C',true);
+            $pdf->Cell(125,$h,'Nama Mata Kuliah',1,0,'C',true);
+            $pdf->Cell(20,$h,'SKS MK',1,0,'C',true);
+            $pdf->Cell(20,$h,'SKS BKD',1,0,'C',true);
             $pdf->Cell(15,$h,'Sesi',1,1,'C',true);
 
             //Living the Family Business/Social Entrepreneurship Experience
@@ -6354,11 +6357,35 @@ Phone: (021) 29200456';
             $pdf->SetFont('Arial','',9);
 
             $no=1;
+            $isPageOne = true;
+//            print_r($dataMK[0]);
+//            exit();
+//            foreach ($dataMK AS $item){
+//                array_push($dataMK,$item);
+//            }
             foreach ($dataMK AS $item){
+
+                $Credit = ($item['CreditResult']!='' && $item['CreditResult']!=null) ? $item['CreditResult'] : '-' ;
+
+                $y = $pdf->GetY();
+
                 $pdf->Cell(10,$h,$no,1,0,'C');
-                $pdf->Cell(150,$h,$item['NameEng'],1,0,'L');
-                $pdf->Cell(15,$h,$item['Credit'],1,0,'C');
+                $pdf->Cell(125,$h,$item['Name'],1,0,'L');
+                $pdf->Cell(20,$h,$item['Credit'],1,0,'C');
+                $pdf->Cell(20,$h,$Credit,1,0,'C');
                 $pdf->Cell(15,$h,'14',1,1,'C');
+
+//                if($no<=8){
+//
+//                }
+
+                if($y>=172){
+                    $pdf->AddPage();
+
+                    $pdf->SetAutoPageBreak(true, 0);
+                    $pdf->Image('./images/FA_letterhead_a4_r2.jpg',0,0,210);
+                    $pdf->Ln(25);
+                }
 
                 $no++;
             }
@@ -7264,7 +7291,7 @@ Phone: (021) 29200456';
                 if ( empty($d2['Photo']) || $d2['Photo'] == '' || !$this->m_master->is_url_exist($path)   ) {
                     $path = './images/icon/userfalse.png';
                 }
-                
+
                 $pdf->Image($path,10,$pdf->GetY(),25);
 
                 $pdf->SetFont('dinprolight','',$fontBody);
@@ -7477,12 +7504,12 @@ Phone: (021) 29200456';
                 } else {
                     $dataWarek =  $this->db->query(
                         'select * from db_employees.employees
-                         where StatusEmployeeID = 1 
-                         and 
+                         where StatusEmployeeID = 1
+                         and
                          (
                             PositionMain = "2.2" or
                             PositionOther1 = "2.2" or
-                            PositionOther2 = "2.2" or 
+                            PositionOther2 = "2.2" or
                             PositionOther3 = "2.2"
                          )
 
@@ -7540,6 +7567,73 @@ Phone: (021) 29200456';
 
 
         }
+
+    }
+
+    public function shareSurvey($token){
+        $this->load->library('Qrcode/qrlib');
+        $data_arr = $this->getInputToken($token);
+
+        $pdf = new FPDF('P','mm','A4');
+        $pdf->AddFont('dinpromedium','','dinpromedium.php');
+        $pdf->AddFont('dinpromediumitalic','','dinpromediumitalic.php');
+        $pdf->AddFont('dinprolight','','dinprolight.php');
+        $pdf->AddFont('dinlightitalic','','dinlightitalic.php');
+        $pdf->SetMargins(10,10,10);
+        $pdf->AddPage();
+
+
+//        $pdf->Cell(183,5,'Information Identifying Diploma Supplement Holder',1,1,'L');
+//
+//        $pdf->Cell(91.5,5,'Information Identifying Diploma Supplement Holder',1,1,'L');
+//        $pdf->Cell(58.5,5,'Information ',1,1,'L');
+
+        $pdf->Image('./images/FA_letterhead_a4_r2.jpg',0,0,210);
+
+
+        $URLQrCode = $data_arr['shareLink'];
+
+        $t = QRcode::png($URLQrCode,false,'L', 10, 4);
+        $pic = 'data://text/plain;base64,' . $t;
+        $pdf->Image($pic,68.5,41,66,NULL,'png');
+        $pdf->Image('./images/SKPI/frame-qrcode.png',68.5,41,66);
+
+        $pdf->setFillColor(230, 236, 255);
+        $pdf->SetFont('dinprolight','',15);
+        $pdf->SetXY(10,130.5);
+        $pdf->Cell(0,15,$URLQrCode,0,1,'C',true);
+//
+        $pdf->SetTextColor(255,0,0);
+        $pdf->SetFont('dinpromedium','',9);
+        $pdf->SetXY(10,145.5);
+        $pdf->Cell(0,5,'*) Tidak ada angka 0 (nol) di dalam URL',0,1,'C',true);
+//
+//
+        $pdf->Ln(13);
+
+        $dataSurv = $this->db->get_where('db_it.surv_survey',array('ID'=>$data_arr['ID']))
+            ->result_array();
+
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('dinpromedium','',13);
+        $pdf->Cell(40,5,'Judul',0,0,'L');
+        $pdf->Cell(10,5,':',0,0,'C');
+        $pdf->SetXY(60,$pdf->GetY());
+        $pdf->MultiCell(140,5,$dataSurv[0]['Title'],0);
+
+        $pdf->Ln(5);
+
+        $pdf->Cell(40,5,'Tanggal Publikasi',0,0,'L');
+        $pdf->Cell(10,5,':',0,0,'C');
+        $pdf->SetXY(60,$pdf->GetY());
+        $pdf->MultiCell(140,5,date('d F yy', strtotime($dataSurv[0]['StartDate'])).' - '.
+            date('d F yy', strtotime($dataSurv[0]['EndDate'])),0);
+
+
+        $StudentName = '123123';
+        $nameF = str_replace(' ','_',$StudentName);
+
+        $pdf->Output('SKPI__'.$nameF.'.pdf','I');
 
     }
 

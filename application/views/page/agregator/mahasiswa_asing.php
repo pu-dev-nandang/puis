@@ -24,6 +24,7 @@
         var firstLoad = setInterval(function () {
 
             loadDataTable();
+            newDescritionInput.getDescription();
             clearInterval(firstLoad);
 
         },1000);
@@ -139,4 +140,9 @@
         });
 
     }
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
+    })
 </script>

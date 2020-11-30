@@ -29,6 +29,7 @@
 
     $(document).ready(function () {
         loadDataPAM();
+        newDescritionInput.getDescription();
     });
 
     function loadDataPAM() {
@@ -102,4 +103,9 @@
             saveTable2Excel('dataTable2Excel');
         },1000);
     });
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
+    })
 </script>

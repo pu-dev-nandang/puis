@@ -128,7 +128,8 @@
 		$.post(url,function (resultJson) {
 			var response = jQuery.parseJSON(resultJson);
 			$(".valueFormulir").html(formatRupiah(response['Formulir']))
-			$(".valueTuitionFee").html(formatRupiah(response['tuition_fee']))
+			const rs = parseInt(response['tuition_fee']) - parseInt(response['refunds'])
+			$(".valueTuitionFee").html(formatRupiah(rs));
 		}); // exit spost
 
 	}

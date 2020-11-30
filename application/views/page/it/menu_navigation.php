@@ -174,11 +174,18 @@
                 }    
 
              ?>
-        </ul>
-        <div class="sidebar-title">
-            <span>Manual Menu</span>
-        </div>
-        <ul id="nav">
+
+
+            <div class="sidebar-title">
+                <span>Manual Menu</span>
+            </div>
+
+<!--            <li class="--><?php //if($this->uri->segment(2)=='version'){echo"current";}?><!--">-->
+<!--                <a href="--><?php //echo base_url('survey/list-survey');?><!--">-->
+<!--                    <i class="fa fa-copyright"></i>-->
+<!--                    Survey-->
+<!--                </a>-->
+<!--            </li>-->
 
             <li class="<?php if($this->uri->segment(2)=='version'){echo"current";}?>">
                 <a href="<?php echo base_url('it/version');?>">
@@ -257,7 +264,7 @@
             </li>
             <li class="<?php if($this->uri->segment(2)=='console-developer'){echo"current";}?>">
                 <a href="<?php echo base_url('it/console-developer');?>">
-                    <i class="fa fa-angellist"></i>
+                    <i class="fa fa-codiepie"></i>
                     Console Developer
                 </a>
             </li>
@@ -275,8 +282,21 @@
                 </a>
             </li>
             <!-- END ADDED BY FEBRI @ JAN 2020 -->
-
+            <li class="<?php if($this->uri->segment(2)=='request-change-password'){echo"current";}?>">
+                <a href="<?php echo base_url('it/request-change-password');?>">
+                   <i class="fa fa-envelope"><span class="badge" style="background-color: red;"><?php echo $resetpassmenu; ?></span></i>
+                    Request Change Password
+                </a>
+            </li>
+            <li class="<?php if($this->uri->segment(2)=='summary_knowledgebase'){echo"current";}?>">
+                <a href="<?php echo base_url('it/summary_knowledgebase');?>">
+                   <i class="fa fa-area-chart"><span class="badge" style="background-color: red;"></span></i>
+                    Summary Knowledgebase
+                </a>
+            </li>
         </ul>
+
+
 
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">

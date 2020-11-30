@@ -714,6 +714,18 @@ class C_finance extends Finnance_Controler {
         $this->temp($content);
     }
 
+    public function page_set_potongan_lain(){
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_set_potongan_lain',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function ajax_set_potongan_lain(){
+        $rs = ['status' => 0,'msg' => ''];
+        $dataToken = json_decode(json_encode($this->getInputToken()),true) ;
+        $rs = $this->m_finance->save_potongan($dataToken);
+        echo json_encode($rs);
+    }
+
     public function get_tagihan_mhs()
     {
         $input = $this->getInputToken();
@@ -1622,10 +1634,39 @@ class C_finance extends Finnance_Controler {
 
     public function mahasiswa()
     {
-        $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
-        $data['getSemester'] = $getSemester;
-        $content = $this->load->view('page/'.$this->data['department'].'/master/page_master_mahasiswa',$this->data,true);
-        $this->temp($content);
+        if ($this->input->is_ajax_request()) {
+            $dataToken = $this->getInputToken();
+            $action = $dataToken['action'];
+            switch ($action) {
+                case 'SaveMenuPayment':
+                    $rs = ['status' => 0,'msg' => ''];
+                    $NPM = $dataToken['NPM'];
+                    $data = $dataToken['data'];
+                    $this->db->where('NPM',$NPM);
+                    $this->db->update('db_academic.auth_students',$data);
+                    if ($this->db->affected_rows() > 0 ){
+                        $rs['status'] = 1;
+                    }
+                    else
+                    {
+                        $rs['msg'] = 'Data cannot be save, please contact IT';
+                    }
+                    echo json_encode($rs);
+                    break;
+                
+                default:
+                    # code...
+                    break;
+            }
+        }
+        else
+        {
+            $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+            $data['getSemester'] = $getSemester;
+            $content = $this->load->view('page/'.$this->data['department'].'/master/page_master_mahasiswa',$this->data,true);
+            $this->temp($content);
+        }
+        
     }
 
     public function mahasiswa_list($page = null)
@@ -1937,7 +1978,10 @@ class C_finance extends Finnance_Controler {
                 if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
                 as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
                 if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
-                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref
+                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref,
+                if(
+                  (select count(*) as total from db_finance.register_refund where ID_register_formulir = a.ID ) > 0,"Refund",""
+                ) as CekRefund
                 from db_admission.register_formulir as a
                 left JOIN db_admission.register_verified as b 
                 ON a.ID_register_verified = b.ID
@@ -1979,9 +2023,12 @@ class C_finance extends Finnance_Controler {
                 f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
                 n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
                 if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-                as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
+                as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Pay_Cond,
                 if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
-                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref
+                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref,
+                if(
+                  (select count(*) as total from db_finance.register_refund where ID_register_formulir = a.ID ) > 0,"Refund",""
+                ) as CekRefund
                 from db_admission.register_formulir as a
                 left JOIN db_admission.register_verified as b 
                 ON a.ID_register_verified = b.ID
@@ -2028,7 +2075,7 @@ class C_finance extends Finnance_Controler {
             // $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
             $nestedData[] = $No;
             $nestedData[] = $row['NamePrody'];
-            $nestedData[] = $row['Name'].'<br>'.$row['Email'];
+            $nestedData[] = $this->m_master->setBintang_HTML($row['Pay_Cond']).'<br/>'.$row['Name'].'<br>'.$row['Email'];
             $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
             $nestedData[] = $FormulirCode;
 
@@ -2042,8 +2089,14 @@ class C_finance extends Finnance_Controler {
             $nestedData[] = $tagihan;
             $nestedData[] = $row['cicilan'];
             $nestedData[] = '<button class="btn btn-inverse btn-notification btn-show" id-register-formulir = "'.$row['ID_register_formulir'].'" email = "'.$row['Email'].'" Nama = "'.$row['Name'].'">Show</button>';
-            $nestedData[] = $row['StatusPayment'];
-            $nestedData[] = '<button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
+            // refund or not
+            $refundShow = '';
+            if (!empty($row['CekRefund'])) {
+                $refundShow = '<br/><label style = "color:red;">Refund</label>';
+            }
+
+            $nestedData[] = $row['StatusPayment'].$refundShow;
+            $nestedData[] = '<button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Action</button>';
            
             $data[] = $nestedData;
             $No++;
@@ -2069,9 +2122,12 @@ class C_finance extends Finnance_Controler {
                 f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
                 n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
                 if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
-                as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
+                as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Pay_Cond,
                 if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
-                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref,p.RevID
+                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref,p.RevID,
+                if(
+                  (select count(*) as total from db_finance.register_refund where ID_register_formulir = a.ID ) > 0,"Refund",""
+                ) as CekRefund
                 from db_admission.register_formulir as a
                 left JOIN db_admission.register_verified as b 
                 ON a.ID_register_verified = b.ID
@@ -2105,7 +2161,7 @@ class C_finance extends Finnance_Controler {
                 or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%"
                 or No_Ref LIKE "'.$requestData['search']['value'].'%"
                 )
-                and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
+                and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs) and CekRefund = ""
                 ';
         $sql.= ' ORDER BY StatusPayment ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
@@ -2118,7 +2174,7 @@ class C_finance extends Finnance_Controler {
 
             $nestedData[] = '<input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">';
             $nestedData[] = $row['NamePrody'];
-            $nestedData[] = $row['Name'].'<br>'.$row['Email'];
+            $nestedData[] = $this->m_master->setBintang_HTML($row['Pay_Cond']).'<br/>'.$row['Name'].'<br>'.$row['Email'];
             $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
             $nestedData[] = $FormulirCode;
             // get tagihan
@@ -2213,31 +2269,17 @@ class C_finance extends Finnance_Controler {
         echo json_encode($msg);
     }
 
-    // public function report()
-    // {
-    //     $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/report',$this->data,true);
-    //     $this->temp($content);
-    // }
-
-    // public function get_reporting($page = null)
-    // {
-    //     $input = $this->getInputToken();
-    //     $this->load->library('pagination');
-    //     // per page 2 database
-    //     $sqlCount = 'show databases like "%ta_2%"';
-    //     $queryCount=$this->db->query($sqlCount, array())->result_array();
-
-    //     $config = $this->config_pagination_default_ajax(count($queryCount),1,3);
-    //     $this->pagination->initialize($config);
-    //     $page = $this->uri->segment(3);
-    //     $start = ($page - 1) * $config["per_page"];
-    //     $data = $this->m_finance->get_report_pembayaran_mhs($input['ta'],$input['prodi'],$input['NIM'],$input['Semester'],$input['Status'],$config["per_page"], $start);
-    //     $output = array(
-    //     'pagination_link'  => $this->pagination->create_links(),
-    //     'loadtable'   => $data,
-    //     );
-    //     echo json_encode($output);
-    // }
+    public function pageRegistrationList(){
+        if ($this->input->is_ajax_request()) {
+            $this->registrationListData();
+        }
+        else
+        {
+            $content = $this->load->view('page/'.$this->data['department'].'/report_admission/pageRegistrationList',$this->data,true);
+            $this->temp($content);
+        }
+        
+    }
 
     public function formulir_registration_offline_serverSide()
     {

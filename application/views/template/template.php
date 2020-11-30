@@ -520,7 +520,7 @@
     if($showNotif){ ?>
     <style>
         .box-notif.ntf-1{background: #f3e8af85;}
-        .box-notif{cursor: pointer;border-bottom:1px solid #f9f9f9;display: inline-flex;width: 100%;margin-bottom: 10px;padding: 10px}
+        .box-notif{cursor: pointer;border-bottom:1px solid #eaeaea;display: inline-flex;width: 100%;margin-bottom: 10px;padding: 10px;}
         .box-notif > .picture{width:50px;max-height:50px;margin-right: 10px}
         .box-notif > .info > .created{font-weight: bold;}
         .box-notif > .info{width: 100%}
@@ -545,7 +545,7 @@
 						appendList += '<div class="box-notif NotificationLinkRead " id_logging_user = "'+v.ID_logging_user+'" onClick="location.href=\''+base_url_js+v.URLDirect+'\'"><img src="'+v.Icon+'" class="picture img-rounded pull-left"><div class="info"><span class="date pull-right"><i class="fa fa-clock-o"></i> '+moment(v.CreatedAt).format('dddd, DD MMM YYYY HH:mm:ss')+'</span><p class="created">'+v.CreatedName+'</p><p class="title">'+v.Title+'</p></div></div>';
 					});
 					$("#GlobalModal .modal-header").html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> <h4 class="modal-title" id="exampleModalLabel">Notifications</h4>');
-					$("#GlobalModal .modal-body").css({"padding":"0px","overflow":"auto","max-height":"200px"}).html(appendList);
+					$("#GlobalModal .modal-body").html('<div style="overflow:auto;max-height:400px;">'+appendList+'</div>');
 					$("#GlobalModal .modal-footer").html('<a href="'+base_url_js+'ShowLoggingNotification">View all notifications</a>');
 					$("#GlobalModal").modal("show");
 				}
@@ -557,6 +557,46 @@
     
     <!-- END ADDED BY FEBRI @ MARCH 2020 -->
 
+<script>
+    
+        var data = '<?php if(count($dataMenuShare)>0) { ?>'+
+        '<div class="sidebar-title">'+
+                      '<span>Shared Menu</span>'+
+                    '</div>'+
+                    '<ul id="nav">'+
+                    '<?php foreach ($dataMenuShare AS $item){ ?>'+
+                    '<li class="<?php if($this->uri->segment(2)== strtolower(str_replace(" ", "-",$item['Name']))){echo"current";}?>">'+
+                       ' <?php if(count($item['DataLevel_1'])>0){ ?>'+
+                            '<a href="javascript:void(0);">'+
+                            '    <i class="<?= $item['Icon']; ?>"></i>'+
+                            '    <?= $item['Name']; ?>'+
+                            '    <i class="arrow <?= ($this->uri->segment(2)==strtolower(str_replace(" ", "-",$item['Name']))) ? 'icon-angle-down' : 'icon-angle-left'?>"></i>'+
+                            '</a>'+
+                            '<ul class="sub-menu">'+
+                            '    <?php foreach ($item['DataLevel_1'] AS $item1) { ?>'+
+                            '        <li class="<?= ($this->uri->segment(3)==strtolower(str_replace(" ", "-",$item1['Name']))) ? "current open" : ""?>">'+
+                            '            <a href="<?= base_url( $item1['Route']) ?>">'+
+                            '                <i class="icon-angle-right"></i>'+
+                            '                <?= $item1['Name']; ?>'+
+                            '            </a>'+
+                            '        </li>'+
+                            '    <?php } ?>'+
+                            '</ul>'+
+                        '<?php } else { ?>'+
+                            '<a href="<?php echo base_url($item['Route']);?>">'+
+                               ' <i class="<?= $item['Icon']; ?>"></i>'+
+                                '<?= $item['Name']; ?>'+
+                           ' </a>'+
+                       '<?php  } ?>'+
+                    '</li>'+
+                '<?php } ?>'+
+            '</ul>'+
+             '<?php } ?>';
+             $('#nav').after('<div>'+data+'</div>');
+            // document.getElementById("shareMenu").innerHTML=data;
+
+    
+</script>
 
 </body>
 </html>

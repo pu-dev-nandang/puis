@@ -23,7 +23,7 @@
 	        			<div class="panel-heading">
 	        				<div class="pull-right">
                                 <div class="btn-group">
-                                    <button class="btn btn-default btn-xs btn-add" type="button">
+                                    <button class="btn btn-default btn-xs btn-add2" type="button">
                                         <i class="fa fa-plus"></i>
                                     </button>
                                     <button class="btn btn-default btn-xs btn-remove" type="button">

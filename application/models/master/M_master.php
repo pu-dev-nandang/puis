@@ -2724,6 +2724,21 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $rs;
     }
 
+    public function http_request_post_data($url,$data){
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($ch);
+        curl_close($ch);
+
+        return $output;
+    }
+
     public function apiservertoserver_NotWaitResponse($url,$token = '')
     {
         $Input = $token;
@@ -2735,7 +2750,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     "token=".$Input);
         curl_setopt($ch, CURLOPT_TIMEOUT, 1);
         curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
         curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 10);
@@ -2917,11 +2932,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
 
 
-    public function insert_m_tuition_fee($NPM,$PTID_Q,$ProdiID,$YearAuth,$Invoice_Q,$Discount_Q)
+    public function insert_m_tuition_fee($NPM,$PTID_Q,$ProdiID,$YearAuth,$Invoice_Q,$Discount_Q,$Pay_Cond = '1')
     {
         // untuk semester data diambil dari set tagihan awal, semester lainnya akan baca payment per prodi dan discount sama dengan = 0
-        $sql1 = 'select * from db_finance.tuition_fee where PTID = ? and ProdiID = ? and ClassOf = ?';
-        $query1=$this->db->query($sql1, array($PTID_Q,$ProdiID,$YearAuth))->result_array();
+        $sql1 = 'select * from db_finance.tuition_fee where PTID = ? and ProdiID = ? and ClassOf = ? and Pay_Cond = ? ';
+        $query1=$this->db->query($sql1, array($PTID_Q,$ProdiID,$YearAuth,$Pay_Cond))->result_array();
         $PTID = $query1[0]['PTID'];
         for ($k=1; $k <= 14; $k++) {
                 $st = $k;
@@ -2941,10 +2956,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         if ($k == 1) {
                            $Invoice = $Invoice_Q;
                            $Discount = $Discount_Q;
-                           // if ($PTID == 3) { // karena hitung satu sks
-                           //     $Invoice = $query1[0]['Cost'];
-                           //     $Discount = $Discount_Q;
-                           // }
+                           if ($PTID == 3) { // karena hitung satu sks
+                               $Invoice = $query1[0]['Cost'];
+                               $Discount = $Discount_Q;
+                           }
                         }
                         break;
                     default:
@@ -4389,6 +4404,179 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $rs = (array) json_decode($pr,true);
         curl_close ($ch);
         return $rs;
+    }
+
+    public function setBintang_HTML($JmlBintang){
+        $html = '';
+        $str = '';
+        if (!empty($JmlBintang)) {
+           for ($i=1; $i <= $JmlBintang; $i++) { 
+               $str .= '*';
+           }
+        }
+
+        $html = '<span style = "color:red;">'.$str.'</span>';
+        return $html;
+
+    }
+
+    public function UpdatePwdAD($data_arr)
+    {
+        $TypeUser = $data_arr['User'];
+        switch ($TypeUser) {
+            case 'Students':
+                $data = array(
+                    'auth' => 's3Cr3T-G4N',
+                    'Type' => 'Student',
+                    'UserID' => $data_arr['Username'],
+                    'Password' => $data_arr['NewPassword'],
+                );
+
+                $url = URLAD.'__api/ChangePWD';
+                $token = $this->jwt->encode($data,"UAP)(*");
+                $this->apiservertoserver($url,$token);
+                break;
+            case 'Employees':
+                // find email karena email = user ad
+                $sql = 'select * from db_employees.employees where NIP = ?';
+                $query=$this->db->query($sql, array($data_arr['Username']))->result_array();
+                $EmailPU = $query[0]['EmailPU'];
+                // get 
+                    $ex = explode('@', $EmailPU);
+                    $UserID = $ex[0];
+                // end
+                $data = array(
+                    'auth' => 's3Cr3T-G4N',
+                    'Type' => 'Employee',
+                    'UserID' => $UserID,
+                    'Password' => $data_arr['NewPassword'],
+                );
+
+                $url = URLAD.'__api/ChangePWD';
+                $token = $this->jwt->encode($data,"UAP)(*");
+                $this->apiservertoserver($url,$token);
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    public function date_range_get_list($startDate,$endDate){
+        $rs = ['status' => true,'data' => [] ];
+        $query = $this->db->query(
+            '
+                select * from 
+                (select adddate("1970-01-01",t4.i*10000 + t3.i*1000 + t2.i*100 + t1.i*10 + t0.i) selected_date from
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t0,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t1,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v
+                where selected_date between "'.$startDate.'" and "'.$endDate.'"
+            '
+        )->result_array();
+
+        if (count($query) > 0) {
+            for ($i=0; $i < count($query); $i++) { 
+                $rs['data'][] = $query[$i]['selected_date'];
+            }
+           
+        }
+        else
+        {
+            $rs['status'] = false;
+        }
+
+        return $rs;
+    }
+
+    public function TwoArraysObjectJoin($arr1,$arr2){
+        $rs = [];
+        for ($i=0; $i < count($arr2); $i++) { 
+            $arr1[] = $arr2[$i];
+        }
+
+        for ($i=0; $i < count($arr1); $i++) { 
+           $c = json_encode($arr1[$i]);
+           $bool = true;
+           for ($j=$i+1; $j < count($arr1); $j++) { 
+               $d = json_encode($arr1[$j]);
+               if($c===$d){
+                 $bool = false;
+                 break;
+               }     
+           }
+
+            if ($bool) {
+                $rs[] = $arr1[$i];
+            }
+
+        }
+
+        return $rs;
+    }
+
+    public function getAllDepartementPU()
+    {
+        $arr_result = array();
+        $NA = $this->caribasedprimary('db_employees.division','StatusDiv',1);
+        if (isset($_POST)) {
+            if (array_key_exists('Show', $_POST)) {
+                if ($_POST['Show'] == 'all') {
+                    $NA = $this->showData_array('db_employees.division');
+                }
+            }
+
+        }
+        $AC = $this->caribasedprimary('db_academic.program_study','Status',1);
+        $FT = $this->caribasedprimary('db_academic.faculty','StBudgeting',1);
+        for ($i=0; $i < count($NA); $i++) {
+            $arr_result[] = array(
+                'Code'  => 'NA.'.$NA[$i]['ID'],
+                'Name1' => $NA[$i]['Description'],
+                'Name2' => $NA[$i]['Division'],
+                'Abbr' => $NA[$i]['Abbreviation'],
+            );
+        }
+
+        for ($i=0; $i < count($AC); $i++) {
+            $arr_result[] = array(
+                'Code'  => 'AC.'.$AC[$i]['ID'],
+                'Name1' => 'Prodi '.$AC[$i]['Name'],
+                'Name2' => 'Study '.$AC[$i]['NameEng'],
+                'Abbr' => $AC[$i]['Code'],
+            );
+        }
+
+        for ($i=0; $i < count($FT); $i++) {
+            $arr_result[] = array(
+                'Code'  => 'FT.'.$FT[$i]['ID'],
+                'Name1' => 'Facultas '.$FT[$i]['Name'],
+                'Name2' => 'Faculty '.$FT[$i]['NameEng'],
+                'Abbr' => $FT[$i]['Abbr'],
+            );
+        }
+
+        return $arr_result;
+    }
+
+    public function dropdownEMP($condition = array()){
+        $options = ['%' => 'All Employee'];
+        $data = $this->db->get('db_employees.employees')->result();
+        foreach ($data as $key ) {
+            $options[$key->NIP] = $key->Name;
+        }
+        return $options;
+    }
+
+    public function dropdownDiv($condition = array()){
+        $options = ['%' => 'All Division'];
+        $data = $this->getAllDepartementPU();
+        for ($i=0; $i < count($data); $i++) { 
+            $options[$data[$i]['Code']] = $data[$i]['Abbr'];
+        }
+        return $options;
     }
 
 

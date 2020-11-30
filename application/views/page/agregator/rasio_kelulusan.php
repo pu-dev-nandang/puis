@@ -44,6 +44,10 @@
 		$.post(url,{token:token},function (jsonResult) {
 			MakeContentData(jsonResult);
 			// MakeContentData2(jsonResult);
+
+			// Description
+			newDescritionInput.getDescription(SelectTA);
+
 		});
 
 	}
@@ -264,5 +268,11 @@
 	            'backdrop' : 'static'
 	        });
 	    }
+	})
+
+	$(document).on('click','.btnSaveDescription',function(e){
+	    const itsme =  $(this);
+	    var SelectTA = $('#SelectTA option:selected').val();
+	    newDescritionInput.saveDescription(itsme,SelectTA);
 	})
 </script>

@@ -125,7 +125,7 @@
             var token = jwt_encode({action : 'viewYudisiumList',SemesterID:SemesterID,ProdiID : ProdiID, StatusTA : StatusTA},'UAP)(*');
             var url = base_url_js+'api3/__crudYudisium';
 
-            var dataTable = $('#tableData').DataTable( {
+            window.dataTable = $('#tableData').DataTable( {
                 "processing": true,
                 "serverSide": true,
                 "iDisplayLength" : 10,
@@ -159,7 +159,8 @@
 
             $.post(url,{token:token},function (result) {
 
-                loadData();
+                // loadData();
+                window.dataTable.ajax.reload(null, false);
                 toastr.success('Data saved','Success');
 
             });

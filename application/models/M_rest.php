@@ -1589,6 +1589,17 @@ class M_rest extends CI_Model {
                                 $Grade = (isset($dataScore[0]['Grade']) && $dataScore[0]['Grade']!='' && $dataScore[0]['Grade']!=null && $dataScore[0]['Grade']!='-') ? $dataScore[0]['Grade'] : 'E';
                                 $GradeValue = (isset($dataScore[0]['GradeValue']) && $dataScore[0]['GradeValue']!='' && $dataScore[0]['GradeValue']!=null && $dataScore[0]['GradeValue']!='-') ? $dataScore[0]['GradeValue'] : 0;
 
+                                $dataTRXc = [];
+                                if($d['TransferCourse']=='1'){
+                                    // get matakuliah asal
+                                    $dataTRXc = $this->db->query('SELECT cd.TotalSKS, mk.Name AS MKName, mk.NameEng AS MKNameEng, mk.MKCode  
+                                                                    FROM db_academic.transfer_history_conversion thc
+                                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = thc.CDID_Before)
+                                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
+                                                                    WHERE thc.NPM_After = "'.$NPM.'" 
+                                                                    AND thc.CDID_After = "'.$d['CDID'].'" ')->result_array();
+                                }
+
                                 $arrTr = array(
                                     'SemesterID' => $data[$i]['ID'],
                                     'CDID' => $d['CDID'],
@@ -1598,6 +1609,9 @@ class M_rest extends CI_Model {
                                     'Course' => $d['Name'],
                                     'CourseEng' => $d['NameEng'],
                                     'Credit' => $d['Credit'],
+                                    'TypeSchedule' => $dataScore[0]['TypeSchedule'],
+                                    'TransferCourse' => $d['TransferCourse'],
+                                    'TransferCourseDetails' => $dataTRXc,
                                     'Score' => $Score,
                                     'Grade' => $Grade,
                                     'GradeValue' => $GradeValue,
@@ -1655,6 +1669,8 @@ class M_rest extends CI_Model {
                                     'Course' => $d_sa['Name'],
                                     'CourseEng' => $d_sa['NameEng'],
                                     'Credit' => $d_sa['Credit'],
+                                    'TypeSchedule' => $d_sa['Type'],
+                                    'TransferCourse' => '0',
                                     'Score' => $Score,
                                     'Grade' => $Grade,
                                     'GradeValue' => $GradeValue,
@@ -1732,6 +1748,8 @@ class M_rest extends CI_Model {
         $data_MK_Wajib = [];
         $data_MK_Wajib_SKS = 0;
 
+        $LastSemesterID = 0;
+
         if(count($dataTranscript)>0){
 
             foreach ($dataTranscript AS $item){
@@ -1747,12 +1765,34 @@ class M_rest extends CI_Model {
                     $data_MK_Wajib_SKS = $data_MK_Wajib_SKS + (integer) $item['Credit'];
                 }
 
+                if($LastSemesterID < $item['SemesterID']){
+                    $LastSemesterID = $item['SemesterID'];
+                }
+
             }
 
         }
 
         $IPK_Ori = (count($dataTranscript)>0) ? $data_TotalPoint/$data_TotalSKS : 0 ;
         $data_ipk = round($IPK_Ori,2);
+
+        // Menghitung IPS trakhir
+        $last_IPS_TotalSKS = 0;
+        $last_IPS__TotalPoint = 0;
+
+        if($LastSemesterID > 0){
+            foreach ($dataTranscript AS $item){
+
+                if($LastSemesterID == $item['SemesterID']){
+                    $last_IPS_TotalSKS = $last_IPS_TotalSKS + (float) $item['Credit'];
+                    $last_IPS__TotalPoint = $last_IPS__TotalPoint + $item['Point'];
+                }
+            }
+        }
+
+        $last_IPS_Ori = ($LastSemesterID > 0) ? $last_IPS__TotalPoint / $last_IPS_TotalSKS : 0;
+        $last_IPS = round($last_IPS_Ori,2);
+
 
         $result = array(
             'IPK_Ori' => $IPK_Ori,
@@ -1761,7 +1801,10 @@ class M_rest extends CI_Model {
             'TotalPoint' => number_format($data_TotalPoint,2,'.',''),
             'MK_D' => $dataMK_D,
             'MK_Wajib' => $data_MK_Wajib,
-            'MK_Wajib_SKS' => $data_MK_Wajib_SKS
+            'MK_Wajib_SKS' => $data_MK_Wajib_SKS,
+            'Last_SemesterID' => $LastSemesterID,
+            'Last_IPS_Ori' => $last_IPS_Ori,
+            'Last_IPS' => $last_IPS
         );
 
         return $result;

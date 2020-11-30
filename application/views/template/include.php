@@ -354,6 +354,7 @@
     window.base_url_img_student = "<?php echo base_url('uploads/students/'); ?>";
     window.sessionNIP = "<?php echo $this->session->userdata('NIP'); ?>";
     window.sessionName = "<?php echo $this->session->userdata('Name'); ?>";
+    window.sessionIDdepartementNavigation = "<?php echo $this->session->userdata('IDdepartementNavigation'); ?>";
     window.timePerCredits = "<?php echo $this->session->userdata('timePerCredits'); ?>";
 
     window.sessionUrlPhoto = "<?php echo $imgProfile = (file_exists('./uploads/employees/'.$this->session->userdata('Photo')))
@@ -505,6 +506,14 @@
 
     function loading_page(element) {
         $(element).html('<div class="row">' +
+            '<div class="col-md-12" style="text-align: center;">' +
+            '<h3 class="animated flipInX"><i class="fa fa-circle-o-notch fa-spin fa-fw"></i> <span>Loading page . . .</span></h3>' +
+            '</div>' +
+            '</div>');
+    }
+
+    function loading_page2(selector) {
+        selector.html('<div class="row">' +
             '<div class="col-md-12" style="text-align: center;">' +
             '<h3 class="animated flipInX"><i class="fa fa-circle-o-notch fa-spin fa-fw"></i> <span>Loading page . . .</span></h3>' +
             '</div>' +
@@ -979,13 +988,19 @@
         });
     }
 
-    function loadSelectOptionClassOf_DESC(element,selected) {
+    function loadSelectOptionClassOf_DESC(element,selected,label='') {
         var url = base_url_js+"api/__getKurikulumSelectOptionDSC";
+
+        var viewLabel = 'Class of - ';
+        if(label=='HideLabel'){
+            viewLabel = '';
+        }
+
         $.get(url,function (data_json) {
             // console.log(data_json);
             for(var i=0;i<data_json.length;i++){
                 var sc = (data_json[i].Year==selected) ? 'selected' : '';
-                $(element).append('<option value="'+data_json[i].Year+'" '+sc+'>Class of - '+data_json[i].Year+'</option>');
+                $(element).append('<option value="'+data_json[i].Year+'" '+sc+'>'+viewLabel+data_json[i].Year+'</option>');
             }
         });
     }
@@ -1046,6 +1061,40 @@
 
             }
         });
+
+    }
+
+    const checkboxListStatuStudent = async (selector) => {
+        var url = base_url_js+'api/__crudStatusStudents';
+        var data = {
+            action : 'read'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        loading_page2(selector);
+        try{
+            const fetch = await AjaxSubmitFormPromises(url,token);
+            let html  = '<div class = "row">';
+
+                for (var i = 0; i < fetch.length; i++) {
+                    html += '<div class = "col-sm-6">'+
+                                '<div class="checkbox">'+
+                                    '<label>'+
+                                        '<input type="checkbox" class="checkboxStatus"  value="'+fetch[i].ID+'">'+fetch[i].Description+
+                                    '</label>'+
+                                '</div>'+
+                            '</div>';
+                }
+
+                html+= '</div>';
+
+            selector.html(html);   
+
+        }
+        catch(err){
+            toastr.info('something wrong, please contact IT');
+        }
+        
 
     }
 
@@ -1190,6 +1239,39 @@
                     .val(selected).trigger('change');
             }
         });
+    }
+
+    function loadSelectOptionSurvQuestionType(element,selected) {
+
+        var data = {action : 'getSurvQuestionType'};
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+
+        $.post(url,{token:token},function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+                var sc = (selected==v.ID) ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+            });
+        });
+
+    }
+
+    function loadSelectOptionSurvQuestionCategory(element,selected) {
+
+        var data = { action : 'getQuestionCategory', DepartmentID : sessionIDdepartementNavigation };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'apimenu/__crudSurvey';
+        $.post(url,{token:token},function (jsonResult) {
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+                    var sc = (selected==v.ID) ? 'selected' : '';
+                    $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+                })
+            }
+        });
+
     }
 
     function loadSelectOptionConf(element,jenis,selected) {
@@ -2798,6 +2880,96 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    const setBintangFinance = (JmlBintang) => {
+        let html = '';
+        let str = '';
+        for (var i = 1; i <= JmlBintang; i++) {
+           str += '*';
+        }
+
+        html = '<span style = "color:red;">'+str+'</span>';
+        return html;
+    };
+
+
+    const IntakePaymentDetailDiscount = {
+        htmlWr : (dataTuitionFee) => {
+            const PaymentTypeData = IntakePaymentDetailDiscount.getPaymentTypeData(dataTuitionFee);
+            let html = '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                                '<table class ="table table-striped table-bordered table-hover table-checkable tableData">'+
+                                    '<thead>'+
+                                        '<tr>';
+                                            html += '<th>@</th>'
+                                            for (var i = 0; i < PaymentTypeData.length; i++) {
+                                                html += '<th>'+PaymentTypeData[i]+'</th>';
+                                            }
+
+                                html+=  '</tr>'+
+                                    '</thead>'+
+                                    '<tbody>'+
+                                        '<tr>'+
+                                            '<td>Harga</td>';
+                                            for (var i = 0; i < PaymentTypeData.length; i++) {
+                                                for(key in dataTuitionFee){
+                                                    if (key == PaymentTypeData[i]) {
+                                                        html += '<td style = "color:green;">Rp. '+dataTuitionFee[key]+'</td>';
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                html += '</tr>';
+                                html += '<tr>'+
+                                            '<td>Discount</td>';
+                                            for (var i = 0; i < PaymentTypeData.length; i++) {
+                                                for(key in dataTuitionFee){
+                                                    const s = key.split('-');
+
+                                                    if (s[0] == 'Discount' && s[1] == PaymentTypeData[i]) {
+                                                        html += '<td style = "font-weight:bold;">'+dataTuitionFee[key]+'%</td>';
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                html += '</tr>';
+
+                                html += '<tr>'+
+                                            '<td>PotonganLain</td>';
+                                            for (var i = 0; i < PaymentTypeData.length; i++) {
+                                                for(key in dataTuitionFee){
+                                                    const s = key.split('-');
+
+                                                    if (s[0] == 'PotonganLain' && s[1] == PaymentTypeData[i]) {
+                                                        const dataPotongan = dataTuitionFee[key];
+                                                        let liPot = '';
+                                                        for (var z = 0; z < dataPotongan.length; z++) {
+                                                            liPot += '<li style = "color:blue;">'+dataPotongan[z].DiscountName+ ' : '+formatRupiah(dataPotongan[z].DiscountValue)+'</li>';
+                                                        }
+                                                        html += '<td>'+liPot+'</td>';
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                html += '</tr>';
+                            html += '</tbody>'+
+                                    '</table>'+
+                                '</div>'+
+                            '</div>';
+                return html;            
+        },
+
+        getPaymentTypeData : (dataTuitionFee) => {
+            let PaymentTypeData = [];
+            for(key in dataTuitionFee){
+                const s =  key.split('-');
+                if (s[0] == 'Discount') {
+                    PaymentTypeData.push(s[1]);
+                }
+            }
+            return PaymentTypeData;
+        },
+    };
+
 
     /*ADDED BY FEBRI @ FEB 2020*/
     function loadSelectOptionCountry(element,selected) {
@@ -2813,4 +2985,134 @@
     }
     /*END ADDED BY FEBRI @ FEB 2020*/
 
+    /*ADDED BY Adhi @ Sep 2020*/
+    const ValidationGenerate = {
+        required : (val,theName) => {
+          const chk = Validation_required(val,theName);
+          if (chk.status == 0) {
+            toastr.info(chk.messages);
+            return false;
+          }
+          return true
+        },
+
+        moreZero : (val,theName) => {
+          try{
+            if (parseInt(val) <= 0) {
+              toastr.info(theName + ' have to more than zero');
+              return false;
+            }
+
+          }
+          catch(err){
+            return false;
+          }
+
+          return true;
+        },
+
+        initializeProcess : (selector) => {
+            let BoolProcess = true;
+            selector.each(function(e){
+              const rule =  ($(this).attr('rule')).split(',');
+              const valueData = $(this).val();
+              const theName = $(this).attr('name');
+              for (var i = 0; i < rule.length; i++) {
+                const nameRule = rule[i];
+                if (nameRule != '' && nameRule !== undefined) {
+                  try{
+                    const pr = ValidationGenerate[nameRule](valueData,theName);
+                    if (!pr) {
+                      BoolProcess = false;
+                      return;
+                    }
+                  }
+                  catch(err){
+                    BoolProcess = false;
+                    return;
+                  }
+                }
+              }
+            })
+
+            if (!BoolProcess) {
+              return false;
+            }
+            return true;
+        }
+    }
+    /*END ADDED BY Adhi @ Sep 2020*/
+
 </script>
+
+
+<!-- ====== FIREBASE SETTING ====== -->
+
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-messaging.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.13.0/firebase-database.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-analytics.js"></script>
+
+
+<script>
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+        apiKey: "AIzaSyDNEjQGVH_D0gdXJ17IB_AUs1Z2uCdzWJs",
+        authDomain: "pals-194015.firebaseapp.com",
+        databaseURL: "https://pals-194015.firebaseio.com",
+        projectId: "pals-194015",
+        storageBucket: "pals-194015.appspot.com",
+        messagingSenderId: "652219708720",
+        appId: "1:652219708720:web:cea24855ef4135ce9584f5",
+        measurementId: "G-WKXRKEJ5XD"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    const messaging = firebase.messaging();
+    // messaging.usePublicVapidKey("BELr-_XwFphNa8xc_VVgWqEBVHlDPFuZOGcvg_rF7PFIx3P0oriPnFCqMasfkh5TDSfjZmypdCht9iIDtMsy714");
+
+    //
+    // messaging.getToken().then((currentToken) => {
+    //     // console.log(currentToken);
+    //     updateFCMToken(currentToken);
+    // }).catch((err) => {
+    //     console.log('An error occurred while retrieving token. ', err);
+    //     // showToken('Error retrieving Instance ID token. ', err);
+    //     // setTokenSentToServer(false);
+    // });
+
+    messaging.requestPermission().then(function () {
+        console.log('Have permission');
+        return messaging.getToken();
+    })
+        .then(function (token) {
+            updateFCMToken(token);
+        })
+        .catch(function (err) {
+            console.log(err);
+            console.log('Not have permission');
+        });
+
+    messaging.onMessage(function (payload) {
+        const title = payload.notification.title;
+        const icon = (typeof payload.notification.icon !== "undefined" && payload.notification.icon !='')
+            ? payload.notification.icon : './images/icon/favicon.png';
+        const options = {
+            body : payload.notification.body,
+            icon : icon
+        };
+        // toastr.info(payload.notification.body,title);
+
+        var notification = new Notification(title,options);
+    });
+
+</script>
+

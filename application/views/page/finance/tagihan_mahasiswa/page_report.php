@@ -25,7 +25,13 @@
                             <a href="javascript:void(0)" class="PageNav" page = "RTagihan">Tagihan</a>
                         </li>
                         <li class="">
-                            <a href="javascript:void(0)" class="PageNav" page = "RDaily">Daily</a>
+                            <a href="javascript:void(0)" class="PageNav" page = "RDaily">Penerimaan</a>
+                        </li>
+                        <li class="">
+                            <a href="javascript:void(0)" class="PageNav" page = "RTitipan">Deposit / Titipan</a>
+                        </li>
+                        <li class="">
+                            <a href="javascript:void(0)" class="PageNav" page = "RRekap">Rekap</a>
                         </li>
                         <!-- <li class="">
                             <a href="javascript:void(0)" class="PageNav" page = "RSummary">Summary</a>
@@ -110,5 +116,8 @@ function loadSelectOptionStatusStudent_ID(element,selected,load = "loadData") {
 
     });
 }
+
+
+
 
 </script>

@@ -90,18 +90,22 @@ var App_karya_ilmiah_mhs_sitasi = {
              },
              dom: 'l<"toolbar">frtip',
              initComplete: function(){
-               
+               var Year = $('#FilterTahun option:selected').val();
+               newDescritionInput.getDescription(Year);
             }  
          });
 
-         recordTable.on( 'order.dt search.dt', function () {
-                                    recordTable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-                                        cell.innerHTML = i+1;
-                                    } );
-                                } ).draw();
-
          oTable = recordTable;
          oSettings = oTable.settings();
+
+         oTable.on( 'order.dt search.dt', function () {
+            recordTable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                cell.innerHTML = i+1;
+            } );
+         } ).draw();
+
+         
+         
     },
 
     loaded : function(){
@@ -109,18 +113,16 @@ var App_karya_ilmiah_mhs_sitasi = {
         var firstLoad = setInterval(function () {
             var filterProdi = $('#filterProdi').val();
             var FilterTahun = $('#FilterTahun').val();
-            // console.log(filterProdi);
-            // console.log(FilterTahun);
             if(filterProdi!='' && filterProdi!=null && FilterTahun !='' && FilterTahun!=null){
                 $('#viewProdiID').html(filterProdi);
                 $('#viewProdiName').html($('#filterProdi option:selected').text());
                 App_karya_ilmiah_mhs_sitasi.LoadAjaxTable();
                 clearInterval(firstLoad);
             }
-        },1000);
+        },500);
         setTimeout(function () {
             clearInterval(firstLoad);
-        },1000);
+        },2500);
     }
 
 };
@@ -150,4 +152,11 @@ $('#saveToExcel').click(function () {
            saveTable2Excel('dataTable2Excel');
        },1000);
 });
+
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    var Year = $('#FilterTahun option:selected').val();
+    newDescritionInput.saveDescription(itsme,Year);
+})
 </script>

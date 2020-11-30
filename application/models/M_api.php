@@ -4085,7 +4085,7 @@ class M_api extends CI_Model {
     public function getDataAuthStudent($NPM){
 
         $data = $this->db->query('SELECT auts.NPM,auts.Name,auts.ProgramID,auts.ProdiID,auts.Year, ps.NameEng,
-                                              em.Name AS MentorName, em.NIP AS MentorNIP
+                                              em.Name AS MentorName, em.NIP AS MentorNIP, auts.ProdiGroupID
                                               FROM db_academic.auth_students auts
                                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
                                               LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
@@ -4186,6 +4186,13 @@ class M_api extends CI_Model {
 
     private function getDetailScheduleByCDID($SemesterID,$NPM,$student_DB,$CDID){
 
+        // Cek group student
+        $dataGroupID =
+            $this->db->select('ProdiGroupID')
+                ->get_where('db_academic.auth_students',array('NPM'=>$NPM))->result_array()[0]['ProdiGroupID'];
+
+        $whereProdiGroup = ($dataGroupID!='' && $dataGroupID!=null) ? ' AND sdc.ProdiGroupID = "'.$dataGroupID.'" ' : '';
+
         $data = $this->db->query('SELECT s.ID, s.SemesterID, s.TeamTeaching, s.ClassGroup,
                                             cd.ID AS CDID, cd.MKType, cd.Semester ,cd.TotalSKS AS Credit, cd.StatusPrecondition, cd.DataPrecondition,
                                             mk.ID AS MKID, mk.MKCode, mk.Name AS MKName, mk.NameEng AS MKNameEng,
@@ -4196,7 +4203,7 @@ class M_api extends CI_Model {
                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
                                             WHERE sdc.CDID = "'.$CDID.'"
-                                            AND s.SemesterID = "'.$SemesterID.'"')->result_array();
+                                            AND s.SemesterID = "'.$SemesterID.'" '.$whereProdiGroup)->result_array();
 
         $result = [];
         if(count($data)>0){
@@ -4407,7 +4414,7 @@ class M_api extends CI_Model {
 
     public function chekCodeReport(){
 
-        $rand = $this->genrateCode();
+        $rand = $this->genrateCode(false,9);
 
         $d = $this->db->get_where('db_ticketing.ss_report',array('ReportNumber' => $rand))->result_array();
         if(count($d)>0){
@@ -4419,7 +4426,7 @@ class M_api extends CI_Model {
     }
 
     public function checkCodeIjazah(){
-        $rand = $this->genrateCode();
+        $rand = $this->genrateCode(false,9);
 
         $d = $this->db->get_where('db_academic.ijazah',array('Code' => $rand))->result_array();
         if(count($d)>0){
@@ -4429,14 +4436,25 @@ class M_api extends CI_Model {
         }
     }
 
-    private function genrateCode(){
+    public function checkCodeSurvey(){
+        $rand = $this->genrateCode(true,15);
 
-        $k = 'abcdefghijklmnopqrstuvwxyz';
-        $seed = str_split('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'); // and any other characters
+        $d = $this->db->get_where('db_it.surv_survey',array('Key' => $rand))->result_array();
+        if(count($d)>0){
+            $this->checkCodeSurvey();
+        } else {
+            return $rand;
+        }
+    }
+
+    private function genrateCode($casesensitive,$length){
+
+        $k = ($casesensitive) ? 'abcdefghijklmnopqrstuvwxyz' : '';
+        $seed = str_split('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'.$k); // and any other characters
 
         shuffle($seed); // probably optional since array_is randomized; this may be redundant
         $rand = '';
-        foreach (array_rand($seed, 9) as $k) $rand .= $seed[$k];
+        foreach (array_rand($seed, $length) as $key) $rand .= $seed[$key];
 
         return $rand;
     }

@@ -402,6 +402,9 @@ class C_database extends Globalclass {
         $data['Arr_nationality'] = json_encode($this->m_master->caribasedprimary('db_admission.country','ctr_active',1));
         $data['Religion'] = $this->General_model->fetchData("`db_admission`.`agama`",array())->result();
         $data['companyInsurance'] = $this->General_model->fetchData("db_employees.master_company",array("IndustryID"=>33,"IsActive"=>1),"Name","ASC")->result();
+        $data['Arr_edu'] =  $this->m_master->showData_array('db_admission.education');
+        $data['Arr_ocu'] =  $this->m_master->showData_array('db_admission.occupation');
+        $data['Arr_jacketSize'] =  $this->m_master->showData_array('db_admission.register_jacket_size_m');
         $content = $this->load->view('page/database/students/editStudent',$data,true);
         $this->temp($content);
     }
@@ -506,7 +509,10 @@ class C_database extends Globalclass {
                         }
                         else
                         {
-                           rename("./uploads/students/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo, "./uploads/students/ta_".$data_arr['TA']."/".$NewName); 
+                            if (file_exists("./uploads/students/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo)) {
+                               rename("./uploads/students/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo, "./uploads/students/ta_".$data_arr['TA']."/".$NewName); 
+                            }
+                          
                         }
 
                         // update to ta
@@ -790,7 +796,11 @@ class C_database extends Globalclass {
 
         $data_arr = $this->getInputToken();
         $token = $this->input->post('token');
-
+        $DecodeToken = $this->jwt->decode($token,'UAP)(*');
+        $timeINT = strtotime($DecodeToken->DueDate) ;
+        $maxURL = 300; // 5 minutes
+        $timeINT += $maxURL;
+        $DateTimeEndURL = date("Y-m-d H:i:s", $timeINT);
         $to = $data_arr['Email'];
 //        $to = 'nndg.ace3@gmail.com';
 
@@ -808,6 +818,7 @@ class C_database extends Globalclass {
                     </tr>
                     </tbody>
                 </table>
+                <p style="color: red;">This link will expired at <strong>'.$DateTimeEndURL.'</strong></p>
                 <br/>';
 
         $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,'Reset Password');

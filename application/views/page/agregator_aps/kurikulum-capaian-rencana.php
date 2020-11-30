@@ -51,7 +51,7 @@
                                         '                   <th>Seminar</th>' +
                                         '                   <th>Pratikum/ Praktik/ Praktik Lapangan</th>' +
                                         '                   <th>Sikap</th>' +
-                                        '                   <th>Penegetahuan</th>' +
+                                        '                   <th>Pengetahuan</th>' +
                                         '                   <th>Keterampilan Umum</th>' +
                                         '                   <th>Keterampilan Khusus</th>' +
                                         '               </tr>' +

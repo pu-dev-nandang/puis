@@ -192,13 +192,14 @@
                         if(Data_mhs[i]['StatusPayment'] == 0) // menandakan belum approve
                          {
                            // show bintang
-                           var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
+                           // var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
+                           var bintang = setBintangFinance(Data_mhs[i]['Pay_Cond']);
                            if (Data_mhs[i]['DetailPayment'].length == 1) { // menandakan untuk setting cicilan maka harus memiliki satu detail payment
                                $('#dataRow').append(tr +
                                                       '<td>'+inputCHK+'</td>' +
                                                       '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
                                                       // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                                                      '<td>'+bintang+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
+                                                      '<td>'+bintang+'<br/>'+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
                                                       // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                                                       // '<td>'+Data_mhs[i]['Year']+'</td>' +
                                                       '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
@@ -250,7 +251,13 @@
                         
                     }
                 } else {
-                  toastr.error('Error', 'Failed!!');
+                  if (Data_mhs.length == 0) {
+                    toastr.info('No result data');
+                  }
+                  else
+                  {
+                    toastr.error('Error', 'Failed!!');
+                  }
                 }
             }).fail(function() {
               
@@ -584,6 +591,7 @@
           if(dataaModal[i]['NPM'] == NPM)
           {
             CancelPayment = dataaModal[i]['cancelPay'];
+            dataPotonganLain = dataaModal[i]['potonganLain'];
             var totCancelPayment = CancelPayment.length;
             var DetailPaymentArr = dataaModal[i]['DetailPayment'];
             var Nama = dataaModal[i]['Nama'];
@@ -633,6 +641,36 @@
         if (CancelPayment.length > 0) {
           html += htmlReason;
         }
+
+        // potongan lain
+        var htmlPotonganLain = '<div class = "row"><div class= col-md-12><h5>List Potongan Lain</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">No</th>'+
+                              '<th style="width: 55px;">Nama Potongan</th>'+
+                              '<th style="width: 55px;">Nominal</th>'+
+                              '<th style="width: 55px;">Desc</th>'+
+                              '<th style="width: 55px;">By & At</th>';
+        htmlPotonganLain += '</tr>' ;  
+        htmlPotonganLain += '</thead>' ; 
+        htmlPotonganLain += '<tbody>' ;
+        for (var i = 0; i < dataPotonganLain.length; i++) {
+          var No = parseInt(i) + 1;
+          htmlPotonganLain += '<tr>'+
+                '<td>'+ (i+1) + '</td>'+
+                '<td>'+ dataPotonganLain[i]['DiscountName'] + '</td>'+
+                '<td>'+ '<span style = "color:blue">'+formatRupiah(dataPotonganLain[i]['DiscountValue'])+'</span>' + '</td>'+
+                '<td>'+ dataPotonganLain[i]['Description'] + '</td>'+
+                '<td>'+ '<span style = "color:green">'+dataPotonganLain[i]['Name']+ '<br/>' + dataPotonganLain[i]['UpdateAt']+'</span>' + '</td>'+
+              '<tr>'; 
+        }
+
+        htmlPotonganLain += '</tbody>' ; 
+        htmlPotonganLain += '</table></div></div>' ;
+        if (dataPotonganLain.length > 0) {
+          html += htmlPotonganLain;
+        }
+
 
         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
             '';

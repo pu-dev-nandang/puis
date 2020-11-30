@@ -143,12 +143,16 @@ class C_admission extends Admission_Controler {
        $status = $input['selectStatus'];
 
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->totalDataFormulir_online(),15,5);
+       $config = $this->config_pagination_default_ajax($this->m_admission->totalDataFormulir_online($tahun,$NomorFormulir,$status),15,5);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(5);
        $start = ($page - 1) * $config["per_page"];
        $this->data['datadb'] = $this->m_admission->selectDataDitribusiFormulirOnline($config["per_page"], $start,$tahun,$NomorFormulir,$status);
-      // $content = $this->load->view('page/'.$this->data['department'].'/distribusi_formulir/tabel_formulir_online',$this->data,true);
+      // print_r($this->session->userdata('IDdepartementNavigation'));die(); 
+      if ($this->session->userdata('IDdepartementNavigation') == 12) {
+         $this->data['action'] ='actionColoumn';
+      } 
+      
       $content = $this->load->view('page/'.'admission'.'/distribusi_formulir/tabel_formulir_online',$this->data,true);
 
        $output = array(
@@ -784,9 +788,38 @@ class C_admission extends Admission_Controler {
 
     public function page_data_calon_mahasiswa()
     {
-      // $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_data_calon_mahasiswa',$this->data,true);
-      $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_data_calon_mahasiswa_server_side',$this->data,true);
-      $this->temp($content);
+      if ($this->input->is_ajax_request()) {
+          $dataToken = $this->getInputToken();
+          $action = $dataToken['action'];
+          switch ($action) {
+              case 'SaveMenuPayment':
+                  $rs = ['status' => 0,'msg' => ''];
+                  $ID_register_formulir = $dataToken['ID_register_formulir'];
+                  $data = $dataToken['data'];
+                  $this->db->where('ID_register_formulir',$ID_register_formulir);
+                  $this->db->update('db_finance.register_admisi',$data);
+                  if ($this->db->affected_rows() > 0 ){
+                      $rs['status'] = 1;
+                  }
+                  else
+                  {
+                      $rs['msg'] = 'Data cannot be save, please contact IT';
+                  }
+                  echo json_encode($rs);
+                  break;
+              
+              default:
+                  # code...
+                  break;
+          }
+      }
+      else
+      {
+        $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_data_calon_mahasiswa_server_side',$this->data,true);
+        $ClassContainerTemplate = 'sidebar-closed';
+        $this->temp($content,$ClassContainerTemplate);
+      }
+      
     }
 
     public function data_calon_mahasiswa($page = null)
@@ -1067,171 +1100,7 @@ class C_admission extends Admission_Controler {
 
     public function getDataPersonal_Candidate()
     {
-        $requestData= $_REQUEST;
-        $reqTahun = $this->input->post('tahun');
-        $FormulirType = $this->input->post('FormulirType');
-        $StatusPayment = $this->input->post('StatusPayment');
-        // print_r($requestData);
-        // die();
-        $No = $requestData['start'] + 1;
-        $totalData = $this->m_admission->getCountAllDataPersonal_Candidate($requestData,$reqTahun,$FormulirType,$StatusPayment);
-        $AddWhere = '';
-        $AddWhere2 = '';
-        if ($FormulirType != '%') {
-           $AddWhere .= ' and a.StatusReg = '.$FormulirType.' ';
-        }
-        $sql = 'select ccc.* from (
-                select a.ID as RegisterID,a.Name,a.SchoolID,a.Phone,b.SchoolName,a.Email,a.RegisterAT,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
-                xq.DiscountType,
-                if(f.Rangking > 0 ,f.Rangking,"-") as Rangking,
-                if(
-                    (select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = e.ID limit 1) = 0 ,
-                        if((select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID limit 1)
-                             > 0 ,"Lunas","-"
-                          )
-                        ,
-                        "Belum Lunas"
-                  ) as chklunas,
-                (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
-                ,xx.Name as NameSales,
-                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,a.StatusReg
-                from db_admission.register as a
-                LEFT join db_admission.school as b
-                on a.SchoolID = b.ID
-                LEFT JOIN db_admission.register_verification as z
-                on a.ID = z.RegisterID
-                LEFT JOIN db_admission.register_verified as c
-                on z.ID = c.RegVerificationID
-                LEFT JOIN db_admission.register_formulir as e
-                on c.ID = e.ID_register_verified
-                LEFT join db_academic.program_study as d
-                on e.ID_program_study = d.ID
-                LEFT join db_admission.register_rangking as f
-                on e.ID = f.ID_register_formulir
-                left join db_admission.sale_formulir_offline as xz
-                  on c.FormulirCode = xz.FormulirCodeOffline
-                LEFT JOIN db_employees.employees as xx
-                on xz.PIC = xx.NIP
-                LEFT JOIN db_finance.register_admisi as xy
-                on e.ID = xy.ID_register_formulir
-                LEFT JOIN db_admission.register_dsn_type_m as xq
-                on xq.ID = xy.TypeBeasiswa
-                where a.SetTa = "'.$reqTahun.'" '.$AddWhere.'
-              ) ccc
-            ';
-        if ($StatusPayment != '%') {
-           // $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
-          if ($StatusPayment == '-100') {
-            
-            $AddWhere2 .= ' and (FormulirCode = "" or FormulirCode is NULL ) ';
-          }
-          elseif ($StatusPayment == '100') {
-             $AddWhere2 .= ' and FormulirCode != "" and FormulirCode is not NULL  ';
-          }
-          else{
-            $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
-          }
-        }    
-        $sql.= ' where ( Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
-                or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
-                #or chklunas LIKE "'.$requestData['search']['value'].'%" 
-                or DiscountType LIKE "'.$requestData['search']['value'].'%"
-                or NameSales LIKE "'.$requestData['search']['value'].'%"
-                or No_Ref LIKE "'.$requestData['search']['value'].'%" )
-                '.$AddWhere2.'
-                ';
-        $sql.= ' ORDER BY chklunas ASC, RegisterID DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-
-        $query = $this->db->query($sql)->result_array();
-
-        $data = array();
-        for($i=0;$i<count($query);$i++){
-            $nestedData=array();
-            $row = $query[$i];
-
-            // online or offline
-            $stFormulirAct = '<i class="fa fa-circle" style="color:#bdc80e;"></i>'; // online
-            if ($row['StatusReg'] == 1) {
-              $stFormulirAct = '<i class="fa fa-circle" style="color:#db4273;"></i>'; // offline
-            }
-            
-            $Code = ($row['No_Ref'] != "") ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
-            $nestedData[] = $No;
-
-            $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['Phone'].'<br>'.$row['SchoolName'].'<br/>'.$stFormulirAct;
-            $nestedData[] = $row['NamePrody'].'<br>'.$Code.'<br>'.$row['VA_number'];
-            $nestedData[] = $row['NameSales'];
-            $nestedData[] = $row['Rangking'];
-            $nestedData[] = $row['DiscountType'];
-            $nestedData[] = '<button class="btn btn-inverse btn-notification btn-show" id-register-formulir = "'.$row['ID_register_formulir'].'" email = "'.$row['Email'].'" Nama = "'.$row['Name'].'">Show</button>';
-            // get tagihan
-            $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
-            $tagihan = '';
-            for ($j=0; $j < count($getTagihan); $j++) {
-                $tagihan .= $getTagihan[$j]['Abbreviation'].' : '.'Rp '.number_format($getTagihan[$j]['Pay_tuition_fee'],2,',','.').'<br>';
-            }
-
-            $nestedData[] = $tagihan;
-            $cicilan = '';
-            if ($row['Cicilan'] == 0) {
-              $cicilan = '-';
-            }
-            elseif ($row['Cicilan'] == 1) {
-               $cicilan = '1x Pembayaran'.'<br><button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
-             }
-             elseif ($row['Cicilan'] > 1) {
-               $cicilan = $row['Cicilan'].'x Pembayaran'.'<br><button class = "btn btn-primary btn-payment" id-register-formulir = "'.$row['ID_register_formulir'].'" Nama = "'.$row['Name'].'">Detail</button>';
-             }
-            $nestedData[] = $cicilan;
-            $nestedData[] = $row['chklunas'];
-            $nestedData[] = $row['RegisterAT'];
-
-            $actLogin = '<a href="javascript:void(0)" class ="btnLoginPortalRegister" data-xx="'.$row['Email'].'" data-xx2="'.$row['FormulirCode'].'">Login portal</a>';
-            $actDetailResendEmail = '<a href="javascript:void(0)" class = "btnDetaiLResendEmail" RegisterID = "'.$row['RegisterID'].'"> Detail Resend Email</a>';
-            $actResendEmail = '';
-            $actSetTahun = '';
-            if ( ($row['FormulirCode'] == '' || $row['FormulirCode'] == null || empty($row['FormulirCode'])) && $row['StatusReg'] == 0 ) {
-              // show email to resend in html
-              $DataEmailSend = $this->m_admission->DataEmailSend($row['RegisterID']);
-              $actResendEmail = '<a href="javascript:void(0)" class = "btnResendEmail" RegisterID = "'.$row['RegisterID'].'" DataEmailSend = "'.$DataEmailSend.'">Resend Email</a>';
-              $actSetTahun = '<a href="javascript:void(0)" class = "btnSetTahun" RegisterID = "'.$row['RegisterID'].'" data = "'.$row['Name'].' || '.$row['Email'].'" >Set Tahun</a>';
-
-            }
-
-            $actionCol = '<div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-edit"></i> <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                              <li>'.$actLogin.'</li>
-                              <li role="separator" class="divider"></li>
-                              <li>'.$actDetailResendEmail.'</li>
-                              <li role="separator" class="divider"></li>
-                              <li>'.$actResendEmail.'</li>
-                              <li role="separator" class="divider"></li>
-                              <li>'.$actSetTahun.'</li>
-                            </ul>
-                          </div>
-
-
-            '; 
-
-             $nestedData[] = $actionCol;
-
-
-            $data[] = $nestedData;
-            $No++;
-        }
-
-        // print_r($data);
-
-        $json_data = array(
-            "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval($totalData),
-            "recordsFiltered" => intval($totalData ),
-            "data"            => $data
-        );
-        echo json_encode($json_data);
+        $this->registrationListData();
     }
 
     public function getDataPersonal_Candidate_to_be_mhs()
@@ -1245,7 +1114,12 @@ class C_admission extends Admission_Controler {
       $No = $requestData['start'] + 1;
       $totalData = $this->m_admission->getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun,$FormulirType,$StatusPayment);
       $AddWhere = '';
-      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") and CekIntake = "Intake" ';
+      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") and CekIntake = "Intake" and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund as rr 
+              join db_admission.register_formulir as rf on rf.ID = rr.ID_register_formulir
+              join db_admission.register_verified as rv on rv.ID = rf.ID_register_verified
+              join db_admission.register_verification as rve on rve.ID = rv.RegVerificationID
+              join db_admission.register as reg on reg.ID = rve.RegisterID
+              where reg.SetTa = "'.$reqTahun.'" ) ';
       if ($FormulirType != '%') {
          $AddWhere .= ' and a.StatusReg = '.$FormulirType.' ';
       }
@@ -1267,7 +1141,8 @@ class C_admission extends Admission_Controler {
               if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,a.StatusReg,
               if(
                 (select count(*) as total from db_finance.payment_pre where `Status` = 1 and ID_register_formulir = e.ID ) > 0,"Intake","Not Intake"
-              ) as CekIntake
+              ) as CekIntake,
+              xy.Pay_Cond
               from db_admission.register as a
               join db_admission.school as b
               on a.SchoolID = b.ID
@@ -1321,7 +1196,7 @@ class C_admission extends Admission_Controler {
           }
 
           $nestedData[] = $No.' &nbsp <input type="checkbox" name="id[]" value="'.$row['ID_register_formulir'].'">';
-          $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'].'<br/>'.$stFormulirAct;
+          $nestedData[] = $this->m_master->setBintang_HTML($row['Pay_Cond']).'<br/>'.$row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'].'<br/>'.$stFormulirAct;
           $FormulirCode = ($row['No_Ref'] != "" || $row['No_Ref'] != null ) ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
           $nestedData[] = $row['NamePrody'].'<br>'.$FormulirCode.'<br>'.$row['VA_number'];
           $nestedData[] = $row['NameSales'];
@@ -1348,6 +1223,7 @@ class C_admission extends Admission_Controler {
           }
           $nestedData[] = $cicilan;
           $nestedData[] = $row['chklunas'];
+          $nestedData[] = $this->jwt->encode($row,"UAP)(*");
           $data[] = $nestedData;
           $No++;
       }
@@ -1405,6 +1281,8 @@ class C_admission extends Admission_Controler {
 
 
             $data2 = $this->m_admission->getDataPersonal($arrInputID[$i]);
+
+            $getRegisterAdmisi = $this->m_master->caribasedprimary('db_finance.register_admisi','ID_register_formulir',$arrInputID[$i]);
 
             // Update Intake CRM
              if (count($data2) > 0) {
@@ -1721,6 +1599,7 @@ class C_admission extends Admission_Controler {
                 'ProdiID' => $ProdiID,
                 'ProgramID' => 1,
                 'KTPNumber' => $KTPNumber,
+                'Pay_Cond' => $getRegisterAdmisi[0]['Pay_Cond'],
             );
 
             $arr_insert_auth[] = $temp2;
@@ -1769,6 +1648,7 @@ class C_admission extends Admission_Controler {
 
               // get payment
                  $getPaymentAdmisi = $this->m_master->caribasedprimary('db_finance.payment_admisi','ID_register_formulir',$arrInputID[$i]);
+                 
                  $PayFee = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$arrInputID[$i]);
                  $hitung = 0;
                  for ($x=0; $x < count($PayFee); $x++) {
@@ -1793,7 +1673,7 @@ class C_admission extends Admission_Controler {
                      $insert_id = $this->db->insert_id();
 
                      // insert to m_tuition_fee
-                     $this->m_master->insert_m_tuition_fee($NPM,$getPaymentAdmisi[$z]['PTID'],$ProdiID,$YearAuth,$Invoice,$getPaymentAdmisi[$z]['Discount']);
+                     $this->m_master->insert_m_tuition_fee($NPM,$getPaymentAdmisi[$z]['PTID'],$ProdiID,$YearAuth,$Invoice,$getPaymentAdmisi[$z]['Discount'],$getRegisterAdmisi[0]['Pay_Cond']);
 
 
                      // cek lunas atau tidak
@@ -1850,11 +1730,16 @@ class C_admission extends Admission_Controler {
                               Username : '.$NPM.'<br>
                               Password : '.$pasword_old.'<br><br>
                           ';
-                  $to = $Email;
-                  $subject = "Podomoro University Registration";
                   $ServerName = $_SERVER['SERVER_NAME'];
+                  $to = ($ServerName == 'pcam.podomorouniversity.ac.id') ? $Email : 'alhadi.rahman@podomorouniversity.ac.id';
+                  $subject = "Podomoro University Registration";
+            
                   if ($ServerName == 'pcam.podomorouniversity.ac.id') {
-                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,null,'admission@podomorouniversity.ac.id');
+                  }
+                  else
+                  {
+                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,null,null,'alhadi.rahman@podomorouniversity.ac.id');
                   }
 
             $aa++;
@@ -2982,6 +2867,80 @@ class C_admission extends Admission_Controler {
       ]);
       echo json_encode(1);
 
+    }
+
+    public function pageRefundData(){
+      if ($this->input->is_ajax_request()) {
+        $dataToken =  $this->getInputToken();
+        $action = $dataToken['action'];
+        switch ($action) {
+          case 'read':
+            $requestData = $_REQUEST;
+            $classOf = $dataToken['data']->classOf;
+            $process = $this->m_admission->loadRefundData($classOf,$requestData);
+            echo json_encode($process);
+            break;
+          case 'delete':
+            // setTA
+            $ID_register_formulir =  $dataToken['ID_register_formulir'];
+            $dataGet = $this->m_admission->getDataPersonal($ID_register_formulir);
+            if ($this->data['academic_year_admission'] == $dataGet[0]['SetTa']) {
+              
+              $this->db->where('ID_register_formulir',$ID_register_formulir);
+              $this->db->delete('db_finance.register_refund');  
+              echo json_encode( ['status' => 1,'msg' => 'success'] );
+            }
+            else
+            {
+              echo json_encode(['status' => 0,'msg' => 'Periode academic yg berjalan sekarang adalah  '.$this->data['academic_year_admission'].' , data tidak bisa dihapus']);
+            }
+            break;
+          default:
+            # code...
+            break;
+        }
+      }
+      else
+      {
+        $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/refundData',$this->data,true);
+        $this->temp($content);
+      }
+    
+    }
+
+    public function pageSetRefund(){
+      if ($this->input->is_ajax_request()) {
+        $dataToken =  $this->getInputToken();
+        $action = $dataToken['action'];
+        switch ($action) {
+          case 'setRefund':
+            $dataSave = $dataToken['data'];
+            $ID_register_formulir = $dataSave->ID_register_formulir;
+            $dataGet = $this->m_admission->getDataPersonal($ID_register_formulir);
+            if ($this->data['academic_year_admission'] == $dataGet[0]['SetTa']) {
+             $dataSave->UpdateBy = $this->session->userdata('NIP');
+             $dataSave->UpdateAt = date('Y-m-d H:i:s');
+             $this->db->insert('db_finance.register_refund',$dataSave);
+             echo json_encode(['status' => 1,'msg'=>'']);
+            }
+            else
+            {
+              echo json_encode(['status' => 0,'msg' => 'Periode academic yg berjalan sekarang adalah  '.$this->data['academic_year_admission'].' , data tidak bisa create']);
+            }
+
+            break;
+          
+          default:
+            # code...
+            break;
+        }
+      }
+      else
+      {
+        $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/setRefund',$this->data,true);
+        $this->temp($content);
+      }
+      
     }
 
 }

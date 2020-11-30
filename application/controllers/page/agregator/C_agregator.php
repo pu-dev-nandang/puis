@@ -430,6 +430,73 @@ class C_agregator extends Globalclass {
         $this->menu_agregator($page);
     }
 
+    public function APT_getDescription(){
+        if ($this->input->is_ajax_request()) {
+            $Input = $this->getInputToken();
+            $rs = ['data' => ''];
+            $addWhere = '';
+            if (array_key_exists('Year', $Input)) {
+                $whereOrAnd = ($addWhere == '') ? ' where ' : ' and ';    
+                $addWhere .= $whereOrAnd.' a.Year ='.$Input['Year'];
+            }
+
+            if (array_key_exists('SemesterID', $Input)) {
+                $whereOrAnd = ($addWhere == '') ? ' where ' : ' and ';    
+                $addWhere .= $whereOrAnd.' a.SemesterID ='.$Input['SemesterID'];
+            }
+
+            $whereOrAnd = ($addWhere == '') ? ' where ' : ' and ';    
+            $addWhere .= $whereOrAnd.' a.ID_agregator_menu ='.$Input['ID_agregator_menu'];
+
+            $query = $this->db->query(
+                'select a.*,b.Name as NameEMP from db_agregator.agregator_menu_description as a 
+                 join db_employees.employees as b on a.UpdatedBy = b.NIP
+                '.$addWhere
+            )->result_array();
+
+            if (count($query) > 0) {
+                $rs['data'] = $query[0]['Description'];
+                $rs['UpdatedBy'] = $query[0]['NameEMP'];
+                $rs['UpdatedAt'] = $query[0]['UpdatedAt'];
+            }
+
+            echo json_encode($rs);
+        }
+    }
+
+    public function APT_saveDescription(){
+        if ($this->input->is_ajax_request()) {
+            $rs = ['status' => 0,'msg' => 'error in script'];
+            $arrFilter = $this->getInputToken();
+            $Description = $arrFilter['Description'];
+            unset($arrFilter['Description']);
+
+            // check db for insert or update
+            $addWhere = '';
+            foreach ($arrFilter as $key => $value) {
+                $whereOrAnd = ($addWhere == '') ? ' Where ' : ' And ';
+                $addWhere .= $whereOrAnd.' '.$key.' = '.$value;
+            }
+
+            $query = $this->db->query('select * from db_agregator.agregator_menu_description '.$addWhere)->result_array();
+            if (count($query) > 0) {
+                // update
+                $this->db->query('update db_agregator.agregator_menu_description set Description = "'.$Description.'" ,UpdatedBy = "'.$this->session->userdata('NIP').'" , UpdatedAt = "'.date('Y-m-d H:i:s').'"  '.$addWhere);
+
+            }
+            else
+            {
+                $arrFilter['Description'] = $Description;
+                $arrFilter['UpdatedBy'] = $this->session->userdata('NIP');
+                $arrFilter['UpdatedAt'] = date('Y-m-d H:i:s');
+                $this->db->insert('db_agregator.agregator_menu_description',$arrFilter);
+            }
+
+            $rs['status'] = 1;
+            echo json_encode($rs);
+        }
+    }
+
 
     
 

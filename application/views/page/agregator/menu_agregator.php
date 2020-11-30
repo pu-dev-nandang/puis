@@ -37,6 +37,13 @@
     .alert-note-agregator {
         border-color: #5db2c3 !important;
     }
+
+    h3.header-blue {
+        margin-top: 0px;
+        border-left: 7px solid #2196F3;
+        padding-left: 10px;
+        font-weight: bold;
+    }
 </style>
 
 
@@ -75,6 +82,10 @@
     <div class="col-md-10" id = "pageContent">
         <?= $page; ?>
 
+        <div id = "pageInputDescription" style="margin-top: 5px;margin-bottom: 15px;">
+            
+        </div>
+
         <?php if(count($Description)>0){
 
             if($Description[0]['Description']!='' && $Description[0]['Description']!=null){ ?>
@@ -91,6 +102,109 @@
 
 
 <script>
+    const ID_agregator_menu = <?php echo $Description[0]['ID'] ?>;
+
+    class Class_DescriptionInput {
+        
+        constructor(){
+            
+        }
+
+        domInput = (response) => {
+            let valuedata = '';
+            let UpdatedAt = '-';
+            let UpdatedBy = '-';
+            if (typeof response['data'] != "undefined" && response['data'] != "" && response['data'] != null) {
+               valuedata = response['data'];
+               UpdatedAt = moment(response['UpdatedAt']).format('dddd, DD MMM YYYY HH:mm');
+               UpdatedBy = response['UpdatedBy'];
+            }
+            let html = '<div class = "well"><div style="padding-left:15px;padding-right:15px;"><h3 class="header-blue">Input Description</h2></div>'+
+                            '<div class = "row" style = "margin-left:15px;margin-right:15px;>'+
+                                '<div class = "col-md-12">'+
+                                    '<textarea class = "inputDescription form-control" placeholder = "Input Description" rows = "4"></textarea>'+
+                                    '<br/>'+
+                                    'Updated : <span style = "color:green;">  '+UpdatedBy+ '</span> at <span style = "color : blue;">'+UpdatedAt+'</span>'+
+                                '</div>'+
+                                '<div class = "col-md-12" style = "margin-top:10px;">'+
+                                    '<div style = "text-align:right;">'+
+                                        '<button class = "btn btn-success btnSaveDescription" style = "width:100%;">Save</button>'
+                                    '</div>'+
+                                '</div>'+
+                        '</div></div>';
+            $('#pageInputDescription').html(html);
+            $('.inputDescription').html(valuedata);
+        }
+
+        getDescription = async(Years = null,SemesterID = null) => {
+            const url = base_url_js + 'agregator/APT_getDescription';
+            const data = {
+                ID_agregator_menu : ID_agregator_menu,
+            }
+
+            if (Years != null && Years !== undefined) {
+                data['Year'] = Years;
+            }
+
+            if (SemesterID != null && SemesterID !== undefined) {
+                data['SemesterID'] = SemesterID;
+            }
+
+            var token = jwt_encode(data,"UAP)(*");
+
+           try{
+               const response = await AjaxSubmitFormPromises(url,token);
+               this.domInput(response);
+           }
+           catch(err){
+                toastr.info('something wrong get description');
+           }
+        }
+
+        saveDescription = async(selector,Years = null,SemesterID = null) => {
+            const htmlBtn = selector.html();
+            const url = base_url_js + 'agregator/APT_saveDescription';
+            const data = {
+                ID_agregator_menu : ID_agregator_menu,
+                Description : $('.inputDescription').val(),
+            }
+
+            if (Years != null && Years !== undefined) {
+                data['Year'] = Years;
+            }
+
+            if (SemesterID != null && SemesterID !== undefined) {
+                data['SemesterID'] = SemesterID;
+            }
+
+            var token = jwt_encode(data,"UAP)(*");
+
+            if ($('.inputDescription').val() != '' && $('.inputDescription').val() !== undefined && confirm('Are you sure ?') ) {
+                loading_button2(selector);
+                try{
+                     const response = await AjaxSubmitFormPromises(url,token);
+                     if (response.status == 1) {
+                        toastr.success('Saved');
+                     }
+                     else
+                     {
+                        toastr.info(response.msg);
+                     }
+                }
+                catch(err){
+                    toastr.error('something wrong');
+                }
+
+                end_loading_button2(selector);
+            }
+
+        }
+
+
+    }
+
+    var newDescritionInput =  new Class_DescriptionInput();
+
     var WaitForLoading = 0;
     var MyVarEbomb;
     var waitForEl_AGG = function(selector, callback) {
@@ -174,10 +288,10 @@
             // console.log(RuleAccess);
             WaitForLoading = 1;
         },
-        loaded : function(){
+        loaded : async function(){
             loadingStart();
             App_menu_aggregator.Loadauth();
-            loadingEnd(1500)
+            loadingEnd(1500);
         }
 
     };

@@ -313,6 +313,17 @@ class M_finance extends CI_Model {
    {
     $sql = 'select * from db_finance.payment_pre where ID_register_formulir = ? order by ID asc';
     $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
+    // for ($i=0; $i < count($query); $i++) { 
+    //   $query[$i]['Refund'] = $this->m_master->caribasedprimary('db_finance.register_refund','ID_register_formulir',$query[$i]['ID_register_formulir']);
+    // }
+    if (count($query) > 0) {
+      $query[0]['Refund'] = $this->db->query(
+          'select rr.*,emp.Name as NameEMP from  db_finance.register_refund as rr join db_employees.employees as emp on emp.NIP = rr.UpdateBy
+          where ID_register_formulir = '.$query[0]['ID_register_formulir'].'
+           '
+      )->result_array();
+    }
+    
     return $query;
    }
 
@@ -322,18 +333,33 @@ class M_finance extends CI_Model {
     $sql = 'select * from db_finance.payment_pre where ID_register_formulir = ? order by ID asc';
     $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
     $this->load->model('admission/m_admission');
+    $dataTuitionFee =  $this->m_admission->tuitionFeeIntake_ALL($ID_register_formulir);
     $getFormulirCode = $this->m_admission->getDataPersonal($ID_register_formulir);
     $FormulirCode = $getFormulirCode[0]['FormulirCode'];
     // find formulir code pada db_admission.to_be_mhs
     $this->load->model('master/m_master');
     $get = $this->m_master->caribasedprimary('db_admission.to_be_mhs','FormulirCode',$FormulirCode);
+    $RefundChk = $this->db->query(
+          'select rr.*,emp.Name as NameEMP from  db_finance.register_refund as rr join db_employees.employees as emp on emp.NIP = rr.UpdateBy
+          where ID_register_formulir = '.$ID_register_formulir.'
+           '
+      )->result_array();
     if (count($get) > 0) {
-      $arr_result = array('data' => $query,'action' => 0);
+      $arr_result = array('data' => $query,'action' => 0,'dataRefund' => $RefundChk); // already generate
     }
     else
     {
-      $arr_result = array('data' => $query,'action' => 1);
+      if (count($RefundChk) > 0) {
+        $arr_result = array('data' => $query,'action' => 2,'dataRefund' => $RefundChk); // refund
+      }
+      else
+      {
+        $arr_result = array('data' => $query,'action' => 1,'dataRefund' => $RefundChk); 
+      }
+
     }
+
+    $arr_result['dataTuitionFee'] = $dataTuitionFee;
 
     return $arr_result;
    }
@@ -1009,7 +1035,7 @@ class M_finance extends CI_Model {
             if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
             as status1,p.CreateAT,p.CreateBY,d.VA_number,b.FormulirCode,
             a.Address,a.ID_province as IDPRovAddress,a.ID_region as IDRegionAddress,
-            a.PhoneNumber,d.SetTa,px.No_Ref
+            a.PhoneNumber,d.SetTa,px.No_Ref,p.Pay_Cond
             from db_admission.register_formulir as a
             left JOIN db_admission.register_verified as b
             ON a.ID_register_verified = b.ID
@@ -1037,17 +1063,24 @@ class M_finance extends CI_Model {
        $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
        // print_r($query);die();
        $this->load->model('master/m_master');
+       $this->load->model('admission/m_admission');
        for ($i=0; $i < count($query); $i++) {
          $DiskonSPP = 0;
          // get Price
+
+              // $arr_temp2 = $this->m_admission->tuitionFeeIntake_ALL($query[$i]['ID_register_formulir']);
+         
              $getPaymentType_Cost = $this->getPaymentType_Cost_created_calon_mhs($query[$i]['ID_register_formulir']);
              $arr_temp2 = array();
              for ($k=0; $k < count($getPaymentType_Cost); $k++) {
-               // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
+               
+               // check meiliki potongan lain atau tidak
+              $getPotonganLain =  $this->m_master->caribasedprimary('db_finance.payment_admisi_potongan_lain','ID_payment_admisi',$getPaymentType_Cost[$k]['ID']);
+
                $arr_temp2 = $arr_temp2 + array(
-                 // $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
                  $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
                  'Discount-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Discount'],
+                 'PotonganLain-'.$getPaymentType_Cost[$k]['Abbreviation'] => $getPotonganLain,
                );
              }
 
@@ -1072,7 +1105,7 @@ class M_finance extends CI_Model {
                  }
 
               // cicilan
-              $Cicilan = $this->checkPayment_admisi($query[$i]['ID_register_formulir']);
+              // $Cicilan = $this->checkPayment_admisi($query[$i]['ID_register_formulir']); // nggk ke pake disini
 
 
          if ($query[$i]['status1'] == 'Rapor') {
@@ -1098,6 +1131,7 @@ class M_finance extends CI_Model {
                'NamaTahunAkademik' => $NamaTahunAkademik,
                'ID_program_study' => $query[$i]['ID_program_study'],
                'SetTa' => $query[$i]['SetTa'],
+               'Pay_Cond' => $query[$i]['Pay_Cond']
 
              );
          }
@@ -1121,6 +1155,7 @@ class M_finance extends CI_Model {
                'NamaTahunAkademik' => $NamaTahunAkademik,
                'ID_program_study' => $query[$i]['ID_program_study'],
                'SetTa' => $query[$i]['SetTa'],
+               'Pay_Cond' => $query[$i]['Pay_Cond']
 
              );
          }
@@ -1335,7 +1370,7 @@ class M_finance extends CI_Model {
       $queryAdd = ' and a.NPM in (select NPM from db_finance.payment where PTID = 2 and SemesterID = '.$Semester.' and Status = "1")';
     }
     if ($prodi == '') {
-     $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
+     $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount,b.Pay_Cond from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
              on a.NPM = c.NPM
              where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
                order by a.NPM asc
@@ -1344,7 +1379,7 @@ class M_finance extends CI_Model {
     }
     else
     {
-      $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
+      $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount,b.Pay_Cond from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM left join db_finance.m_tuition_fee as c
               on a.NPM = c.NPM
               where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
                 order by a.NPM asc
@@ -1364,7 +1399,7 @@ class M_finance extends CI_Model {
       }
 
       if ($prodi == '') {
-       $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a
+       $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount,b.Pay_Cond from '.$db.' as a
                 join db_academic.auth_students as b on a.NPM = b.NPM
                 join db_academic.sa_student as sast on sast.NPM = b.NPM
                 join db_finance.m_tuition_fee as c
@@ -1377,7 +1412,7 @@ class M_finance extends CI_Model {
       }
       else
       {
-        $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a
+        $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount,b.Pay_Cond from '.$db.' as a
                 join db_academic.auth_students as b on a.NPM = b.NPM
                 join db_academic.sa_student as sast on sast.NPM = b.NPM
                 join db_finance.m_tuition_fee as c
@@ -1872,6 +1907,7 @@ class M_finance extends CI_Model {
       // Detail Payment & cek cancel
          $DetailPayment = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']);
          $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
+         $potonganLain = $this->getPotonganLain($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
 
       if($prodi == '' || $prodi == Null){
         $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
@@ -1898,6 +1934,7 @@ class M_finance extends CI_Model {
             'Credit' => $Credit,
             'Pay_Cond' => $query[$i]['Pay_Cond'],
             'cancelPay' => $cancelPay,
+            'potonganLain' => $potonganLain,
         );
       }
       else
@@ -1928,6 +1965,7 @@ class M_finance extends CI_Model {
               'Credit' => $Credit,
               'Pay_Cond' => $query[$i]['Pay_Cond'],
               'cancelPay' => $cancelPay,
+              'potonganLain' => $potonganLain,
           );
         }
       }
@@ -2176,6 +2214,7 @@ class M_finance extends CI_Model {
 
       // cek cancel
          $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
+         $potonganLain = $this->getPotonganLain($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
 
       // cek Payment Proof
               $payment_proof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$query[$i]['ID']);
@@ -2211,6 +2250,7 @@ class M_finance extends CI_Model {
             'Pay_Cond' => $query[$i]['Pay_Cond'],
             'cancelPay' => $cancelPay,
             'payment_proof' => $payment_proof,
+            'potonganLain' => $potonganLain,
         );
       }
       else
@@ -2242,6 +2282,7 @@ class M_finance extends CI_Model {
               'Pay_Cond' => $query[$i]['Pay_Cond'],
               'cancelPay' => $cancelPay,
               'payment_proof' => $payment_proof,
+              'potonganLain' => $potonganLain,
           );
         }
       }
@@ -2549,6 +2590,13 @@ class M_finance extends CI_Model {
       $PTID = $input[$i]->PTID;
       $SemesterID = $input[$i]->semester;
       $NPM = $input[$i]->NPM;
+
+      // clear potongan dahulu
+      $this->db->where('NPM',$NPM);
+      $this->db->where('PTID',$PTID);
+      $this->db->where('SemesterID',$SemesterID);
+      $this->db->delete('db_finance.payment_student_potongan');
+
       // Closed VA dahulu
           // check Status VA
               // cari Biling ID
@@ -3546,7 +3594,7 @@ class M_finance extends CI_Model {
 
     $queryAdd = '';
     if ($prodi == '') {
-     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
+     $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,b.PaymentShow,b.PaymentShowTextMSG from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
              where a.StatusStudentID like "%%"   '.$NPM.$queryAdd.'
              order by a.NPM asc
              LIMIT '.$start. ', '.$limit;
@@ -3555,7 +3603,7 @@ class M_finance extends CI_Model {
     }
     else
     {
-      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
+      $sql = 'select a.*,b.EmailPU,b.Pay_Cond,b.Bea_BPP,b.Bea_Credit,b.PaymentShow,b.PaymentShowTextMSG from '.$db.' as a left join db_academic.auth_students as b on a.NPM = b.NPM
               where a.StatusStudentID like "%%"  and a.ProdiID = ? '.$NPM.$queryAdd.'
               order by a.NPM asc
               LIMIT '.$start. ', '.$limit;
@@ -3605,7 +3653,7 @@ class M_finance extends CI_Model {
 
    public function getCountAllPayment_admission()
    {
-    $sql = 'select count(*) as total from db_finance.register_admisi where Status = "Approved" ';
+    $sql = 'select count(*) as total from db_finance.register_admisi where Status = "Approved" and ID_register_formulir not in (select ID_register_formulir from db_finance.register_refund) ';
     $query=$this->db->query($sql, array())->result_array();
     return $query[0]['total'];
    }
@@ -4713,6 +4761,16 @@ class M_finance extends CI_Model {
             select a.ID,a.ID_ProgramStudy,o.Name as NamePrody,a.FullName,0,"","",a.Price_Form,"",1,"",a.DateFin,""
             from db_admission.sale_formulir_offline as a join db_academic.program_study  as o on
             a.ID_ProgramStudy = o.ID where a.DateFin like "'.$DailyTgl.'%" and SUBSTRING(a.FormulirCodeOffline, 1, 2) = "'.substr($Year, 2,4).'"
+            UNION
+              select a.ID as ID_register_formulir2,a.ID_program_study,o.Name as NamePrody,d.Name,1 as StatusTbl,"","", (0 - rr.Price),"",1,"",rr.UpdateAt,rr.UpdateAt
+              from db_admission.register_formulir as a 
+              JOIN db_admission.register_verified as b ON a.ID_register_verified = b.ID 
+              JOIN db_admission.register_verification as c ON b.RegVerificationID = c.ID 
+              JOIN db_admission.register as d ON c.RegisterID = d.ID 
+              join db_academic.program_study as o on o.ID = a.ID_program_study
+              join db_finance.register_refund as rr on rr.ID_register_formulir = a.ID 
+              where d.SetTa = "'.$Year.'" and rr.UpdateAt like "'.$DailyTgl.'%"
+              group by a.ID 
             ) bb ORDER BY ID_program_study asc ,ID_register_formulir asc,ID asc
         ';
         // print_r($sql);die();
@@ -4948,5 +5006,294 @@ class M_finance extends CI_Model {
       $query=$this->db->query($sql, array())->result_array();
       return $query;
    }
+
+   public function save_potongan($dataForm){
+    $rs = ['status' => 0,'msg' => ''];
+
+    $tbl_payment = $this->db->query(
+       'select * from db_finance.payment
+        where NPM = "'.$dataForm['NPM'].'" and PTID = '.$dataForm['PTID'].' and SemesterID = '.$dataForm['SemesterID'].'
+       '
+    )->result_array()[0];
+
+    $tbl_payment_std = $this->findDatapayment_studentsBaseID_payment($tbl_payment['ID'],1);
+    if (count($tbl_payment_std) == 0) {
+
+      // check data telah melakukan potongan
+      $checkPotongan = $this->db->query(
+        'select * from db_finance.payment_student_potongan
+        where NPM = "'.$dataForm['NPM'].'" and PTID = '.$dataForm['PTID'].' and SemesterID = '.$dataForm['SemesterID'].'
+        '
+      )->result_array();
+
+      if (count($checkPotongan) > 0) {
+        $rs['msg'] = 'Student already got another discount payment, please cancel payment first';
+        return $rs;
+      }
+
+      $data = $dataForm['data'];
+      $total = 0;
+      for ($i=0; $i < count($data); $i++) { 
+        $dataSave = $data[$i];
+        $dataSave = $dataSave + [
+          'NPM' => $dataForm['NPM'] ,
+          'PTID' => $dataForm['PTID'] ,
+          'SemesterID' => $dataForm['SemesterID'] ,
+          'UpdatedBy' => $this->session->userdata('NIP'),
+          'UpdateAt' => date('Y-m-d H:i:s'),
+        ];
+
+        $this->db->insert('db_finance.payment_student_potongan',$dataSave);
+        $total += $data[$i]['DiscountValue'];
+
+      }
+
+      $InvoiceUpdated = $tbl_payment['Invoice'] - $total;
+      $this->db->where('ID',$tbl_payment['ID']);
+      $this->db->update('db_finance.payment',['Invoice' => $InvoiceUpdated,'UpdateAt' => date('Y-m-d H:i:s'),'UpdatedBy' => $this->session->userdata('NIP') ]);
+
+      $dataPaymentStd = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$tbl_payment['ID']);
+      // delete table payment student
+      $this->db->where('ID_payment',$tbl_payment['ID']);
+      $this->db->delete('db_finance.payment_students');
+
+       $this->db->insert('db_finance.payment_students',[
+        'ID_payment' => $tbl_payment['ID'],
+        'Invoice' => $InvoiceUpdated,
+        'BilingID' => 0,
+        'Deadline' => $dataPaymentStd[0]['Deadline']
+      ]);
+
+      $rs['status'] = 1;
+    }
+    else
+    {
+      $rs['msg'] = 'Student have been paid the payment';
+    }
+
+    return $rs;
+
+    
+   }
+
+   public function getPotonganLain($PTID,$SemesterID,$NPM){
+    $sql = 'select a.*,b.Name from db_finance.payment_student_potongan as a
+            join db_employees.employees as b on a.UpdatedBy = b.NIP
+     where NPM = "'.$NPM.'" and SemesterID = '.$SemesterID.' and PTID = '.$PTID.' ';
+    $query=$this->db->query($sql, array($PTID,$SemesterID,$NPM))->result_array();
+    return $query;
+   }
+
+   public function deposit_saldo_uang_tititpan_mhs($NPM){
+    $this->load->model('m_master');
+    $get = $this->db->query(
+            '
+              select ( sum(Credit) - sum(Debit) ) as left_saldo, sum(Credit) as CreditTotal,sum(Debit) as DebitTotal
+              from db_finance.trans_deposit 
+              where NPM = "'.$NPM.'"
+            '
+          )->row()->left_saldo;
+
+    return (!empty($get) && $get > 0) ? $get : 0; 
+   }
+
+   public function get_deposit_saldo_uang_tititpan($TA){
+      $rs = [];
+      $listMHSDeposit = $this->db->select('b.NPM,b.Name,c.Code as CodeProdi')
+                                 ->join('db_academic.auth_students  b','a.NPM = b.NPM','join')
+                                 ->join('db_academic.program_study c','b.ProdiID = c.ID','join')
+                                 ->where('b.Year',$TA)
+                                 ->group_by('a.NPM')
+                                 ->get('db_finance.trans_deposit a')->result_array();
+
+      for ($i=0; $i < count($listMHSDeposit); $i++) { 
+        $NPM = $listMHSDeposit[$i]['NPM'];
+        $left_saldo = $this->deposit_saldo_uang_tititpan_mhs($NPM);
+
+        if ( (!empty($left_saldo)) && $left_saldo > 0  ) {
+          $listMHSDeposit[$i]['Saldo'] = $left_saldo;
+          $rs[] = $listMHSDeposit[$i];
+        }
+      }
+
+      return $rs;
+      
+   }
+
+   public function rekap_std_by_status($StatusStudentID){
+      $rs = [];
+      $this->load->model('m_master');
+      // distinct month
+      $dataMonthly = $this->db->select('YEAR(EffectiveDateStatus) as Yearly, MONTH(EffectiveDateStatus) as Monthly')
+                                 ->where('StatusStudentID',$StatusStudentID)
+                                 ->group_by('YEAR(EffectiveDateStatus), MONTH(EffectiveDateStatus)')
+                                 ->order_by('EffectiveDateStatus','desc')
+                                 ->get('db_academic.auth_students a')->result_array();
+      
+      // add NULL EffectiveDateStatus
+      $dataMonthly2 = $this->db->select(' EffectiveDateStatus as Yearly, EffectiveDateStatus as Monthly')
+                                 ->where('StatusStudentID',$StatusStudentID)
+                                 ->where('EffectiveDateStatus is NULL')
+                                 ->group_by('YEAR(EffectiveDateStatus), MONTH(EffectiveDateStatus)')
+                                 ->get('db_academic.auth_students a')->result_array();
+
+      $dataMonthly = $this->m_master->TwoArraysObjectJoin($dataMonthly,$dataMonthly2); // join
+
+      $rs = [
+          'StatusStudentID' => $StatusStudentID,
+          'StatusStudentName' => $this->db->select('Description')
+                                     ->where('ID',$StatusStudentID)
+                                     ->get('db_academic.status_student')->row()->Description,
+          'dataPerMonth' => [],
+
+      ];
+
+      for ($i=0; $i < count($dataMonthly); $i++) { 
+        $Yearly = $dataMonthly[$i]['Yearly'];
+        $Monthly = $dataMonthly[$i]['Monthly'];
+
+        if ($Yearly != NULL && !empty($Yearly)) {
+          $NameSemester = $Yearly.'/'.($Yearly+1);
+          // get semester name by year
+          $dataMHS =  $this->db->select('a.NPM,a.Name,c.Name as ProdiName,a.Year,a.EffectiveDateStatus')
+                                     ->join('db_academic.program_study c','a.ProdiID = c.ID','join')
+                                     ->where('a.StatusStudentID',$StatusStudentID)
+                                     ->where('YEAR(EffectiveDateStatus) = '.$Yearly)
+                                     ->where('MONTH(EffectiveDateStatus) = '.$Monthly)
+                                     ->get('db_academic.auth_students a')->result_array();
+        }
+        else
+        {
+          // $NameSemester = 'EffectiveDateStatus belum diisi';
+          $NameSemester = '-';
+          // get semester name by year
+          $dataMHS =  $this->db->select('a.NPM,a.Name,c.Name as ProdiName,a.Year,a.EffectiveDateStatus')
+                                     ->join('db_academic.program_study c','a.ProdiID = c.ID','join')
+                                     ->where('a.StatusStudentID',$StatusStudentID)
+                                     ->where('a.EffectiveDateStatus is NULL')
+                                     ->get('db_academic.auth_students a')->result_array();
+
+        }
+
+         $arr = [
+            'endNameSemester' => $NameSemester,
+            'data' => []
+          ];
+
+        // get All payment dari semester 1
+        for ($j=0; $j < count($dataMHS); $j++) { 
+          $getTA = $dataMHS[$j]['Year'];
+          $dataMHS[$j]['ALLPayment'] = $this->Payment_SemesterStart_to_End($dataMHS[$j]['NPM'],$getTA);
+        }
+
+        $arr['data'] = $dataMHS;
+        $rs['dataPerMonth'][] = $arr;
+      }
+
+      return $rs;
+
+   }
+
+   public function Payment_SemesterStart_to_End($NPM,$TA=''){
+      $rs = [];
+      if ($TA == '') {
+        $TA =  $this->db->select('Year')
+                       ->where('NPM',$NPM)
+                       ->get('db_academic.auth_students')->row()->Year;
+      }
+
+
+      $YearSemesterEnd = $this->db->select('EffectiveDateStatus')
+                                  ->where('NPM',$NPM)
+                                  ->get('db_academic.auth_students')->row()->EffectiveDateStatus;
+
+      $t = (!empty($YearSemesterEnd) && $YearSemesterEnd != NULL) ? true : false;
+      $YearSemesterEnd = (!empty($YearSemesterEnd) && $YearSemesterEnd != NULL) ? date('Y', strtotime($YearSemesterEnd)) : 14;
+     
+
+      $Semester = 1;
+      $get_Semester =  $this->db->select('*')
+                                   ->where('Year >= '.$TA)
+                                   ->order_by('Year','asc')
+                                   ->order_by('Code','asc')
+                                   ->get('db_academic.semester')->result_array();
+      // TITIPAN
+      $TITIPAN = $this->deposit_saldo_uang_tititpan_mhs($NPM);
+      $temp = [
+        'NPM' => $NPM,
+        'TITIPAN' => $TITIPAN,
+        'Payment' => []
+      ];
+
+      for ($i=0; $i < count($get_Semester); $i++) { 
+        $SemesterID = $get_Semester[$i]['ID'];
+         $JUMLAH_TAGIHAN = 0;
+         $JUMLAH_PENERIMAAN = 0;
+
+         $data_Payment =  $this->db->select('*')
+                                   ->where('SemesterID',$SemesterID)
+                                   ->where('NPM',$NPM)
+                                   ->get('db_finance.payment')->result_array();
+
+          for ($j=0; $j < count($data_Payment); $j++) { 
+            $JUMLAH_TAGIHAN = $JUMLAH_TAGIHAN + $data_Payment[$j]['Invoice'];
+            $ID_payment = $data_Payment[$j]['ID'];
+            $get_payment_student = $this->findDatapayment_studentsBaseID_payment($ID_payment,1);
+
+            for ($k=0; $k < count($get_payment_student); $k++) { 
+              $JUMLAH_PENERIMAAN = $JUMLAH_PENERIMAAN + $get_payment_student[$k]['Invoice'];
+            }
+          }
+
+          $temp['Payment'][] = [
+              'SemesterID' => $SemesterID,
+              'Semester' => $Semester,
+              'JUMLAH_TAGIHAN' => $JUMLAH_TAGIHAN,
+              'JUMLAH_PENERIMAAN' => $JUMLAH_PENERIMAAN,
+          ];
+
+          if ($t) {
+             // get last semester
+             $LastSemester = $this->db->select('*')
+                                    ->where('Year',$YearSemesterEnd)
+                                    ->where('Code',2)
+                                    ->get('db_academic.semester')->result_array();
+
+             if (count($LastSemester) == 0) {
+                break;
+              }
+              else{
+                $LastSemester = $LastSemester[0]['ID'];
+                if ($SemesterID >= $LastSemester) {
+                  break;
+                }
+              }                       
+             
+          }
+          else
+          {
+            if ($Semester >= $YearSemesterEnd) {
+              break;
+            }
+          }
+          $Semester++;                         
+      }
+     
+      $rs = $temp;
+      return $rs;
+
+   }
+
+   public function report_rekap_std($StatusStudentArr){
+      $rs = [];
+
+      for ($i=0; $i < count($StatusStudentArr); $i++) { 
+        $data = $this->rekap_std_by_status($StatusStudentArr[$i]);
+        $rs[] = $data;
+      }
+
+      return $rs;
+   }
+
 
 }

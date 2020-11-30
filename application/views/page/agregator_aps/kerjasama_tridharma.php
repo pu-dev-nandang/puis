@@ -171,6 +171,9 @@
         });
 
         oTable = table;
+
+        // description
+         newDescritionInput.getDescription();
     }
 
     $(document).off('click', '#btndownloaadExcel').on('click', '#btndownloaadExcel',function(e) {
@@ -185,6 +188,11 @@
               { name: 'token', value: token },
           ]);  
         }
+    })
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
     })
 
 </script>

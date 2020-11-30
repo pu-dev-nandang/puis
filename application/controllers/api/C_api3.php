@@ -3182,7 +3182,7 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='readKesesuaianBidangKerjaLulusan'){
             $Year = $data_arr['Year'];
             $dataEd = $this->db->query('SELECT el.ID, el.Name, el.Description FROM db_academic.education_level el')->result_array();
-
+    
             if(count($dataEd)>0) {
                 for ($j = 0; $j < count($dataEd); $j++) {
 
@@ -3245,6 +3245,7 @@ class C_api3 extends CI_Controller {
 
                 }
             }
+
             return print_r(json_encode($dataEd));
         }
 
@@ -3446,6 +3447,7 @@ class C_api3 extends CI_Controller {
         ))->result_array();
 
         if(count($data)>0){
+            $arrCertificateType = ['Profesional','Profesi','Industri','Kompetensi'];
             for($i=0;$i<count($data);$i++){
 
                 // Total Employees
@@ -3459,8 +3461,35 @@ class C_api3 extends CI_Controller {
                                           WHERE em.ProdiID = "'.$data[$i]['ID'].'" AND em.Serdos="1"
                                           AND (em.StatusForlap = "1" || em.StatusForlap = "2")  ')->result_array();
 
+                // untuk certified tanpa serdos
+                $dataEmpCerti2 = $dataEmp;
 
                 $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti;
+
+                for ($y=0; $y < count($arrCertificateType) ; $y++) { 
+                   $data[$i]['Certificate_'.$arrCertificateType[$y]] = [];
+                }
+                
+                for ($x=0; $x < count($dataEmpCerti2); $x++) { 
+                   for ($z=0; $z < count($arrCertificateType); $z++) { 
+                        $sql = 'select a.*,"'.$dataEmpCerti2[$x]['Name'].'" as NameDosen, "'.$dataEmpCerti2[$x]['NIDN'].'" as NIDN from db_employees.employees_certificate as a where a.NIP = "'.$dataEmpCerti2[$x]['NIP'].'" 
+                            and a.StatusEdit = 1 and a.Certificate = "'.$arrCertificateType[$z].'"
+
+                           ';
+                       $dt = $this->db->query(
+                           $sql
+                       )->result_array();
+
+
+                       if (count($dt) > 0) {
+
+                           // $data[$i]['Certificate_'.$arrCertificateType[$z]] = $data[$i]['Certificate_'.$arrCertificateType[$z]] + $dt;
+                            $data[$i]['Certificate_'.$arrCertificateType[$z]] = array_merge($data[$i]['Certificate_'.$arrCertificateType[$z]],$dt);
+                       }
+
+                       
+                   }
+                }
 
             }
         }
@@ -3511,15 +3540,45 @@ class C_api3 extends CI_Controller {
                 //
                 if($SemesterID>=13){
 
-                    $StatusFolap = '';
-                    if($Status=='1' || $Status==1){
+                    $StatusFolap = ''; // value status all(0) 
+                    if($Status=='1' || $Status==1 || $Status=='99' || $Status==99){
                         $StatusFolap = ' AND (em.StatusForlap = "1" OR em.StatusForlap = "2")';
                     }
                     else if($Status=='2' || $Status==2){
                         $StatusFolap = ' AND em.StatusForlap = "0"';
                     }
 
-                    $dataSchedule = $this->db->query('SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap FROM db_academic.schedule_details_course sdc
+                    // condition dosen tetap tidak mengajar
+                    if ($Status=='99' || $Status == 99 )  {
+                         $dataSchedule = $this->db->query(' select * from (
+                                                        SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap FROM db_academic.schedule_details_course sdc
+                                                              LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
+                                                              LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
+                                                               WHERE sc.SemesterID = "'.$SemesterID.'"
+                                                               AND sdc.ProdiID = "'.$data[$i]['ID'].'"
+                                                               AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                               '.$StatusFolap.'
+                                                        UNION
+                                                            Select em.NIP,em.NUP, em.NIDN, em.NIDK, em.Name,em.StatusForlap from
+                                                            db_employees.employees as em 
+                                                                where em.NIP not in (
+                                                                    select sc.Coordinator from db_academic.schedule_details_course as sdc
+                                                                    join db_academic.schedule as sc ON (sc.ID = sdc.ScheduleID)
+                                                                    join db_employees.employees as em on sc.Coordinator = em.NIP
+                                                                    where 
+                                                                    sc.SemesterID = "'.$SemesterID.'" AND
+                                                                    em.ProdiID = "'.$data[$i]['ID'].'"
+                                                                    '.$StatusFolap.'
+                                                                )
+                                                                AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                                   '.$StatusFolap.'
+                                                                
+                                                        )xx
+                                                                GROUP BY NIP ')->result_array();
+                    }
+                    else
+                    { // Tidak All
+                        $dataSchedule = $this->db->query('SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap FROM db_academic.schedule_details_course sdc
                                                               LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
                                                               LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
                                                                WHERE sc.SemesterID = "'.$SemesterID.'"
@@ -3527,6 +3586,9 @@ class C_api3 extends CI_Controller {
                                                                AND em.ProdiID = "'.$data[$i]['ID'].'"
                                                                '.$StatusFolap.'
                                                                 GROUP BY sc.Coordinator ')->result_array();
+                    }
+
+                    
 
                     $data[$i]['Lecturer_Sch_Co'] = $dataSchedule;
 
@@ -5478,6 +5540,189 @@ class C_api3 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='removeLogging'){
+
+            $table = $data_arr['table'];
+
+            $this->db->query('DELETE FROM '.$table.' WHERE AccessedOn 
+            BETWEEN "'.$data_arr['Start'].' 00:00:00" AND "'.$data_arr['End'].' 23:59:00"');
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='updateFCMToken'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $Username = $dataForm['Username'];
+            $TypeUser = $dataForm['TypeUser'];
+            $FCMToken = $dataForm['FCMToken'];
+
+            $arrWhere = array('Username'=>$Username, 'TypeUser' => $TypeUser);
+            // cek apakah username sudah ada atau blm
+            $cekUser = $this->db->from('db_it.fcm_token')->where($arrWhere)->count_all_results();
+
+            if($cekUser>0){
+                unset($dataForm['Username']);
+                unset($dataForm['TypeUser']);
+                $this->db->where($arrWhere);
+                $this->db->update('db_it.fcm_token',$dataForm);
+            } else {
+                $this->db->insert('db_it.fcm_token',$dataForm);
+            }
+
+            // hanya untuk live
+            if($_SERVER['SERVER_NAME']!='localhost'){
+                $this->subscribeTopic($Username,$TypeUser,$FCMToken);
+            }
+
+
+            return print_r(1);
+
+        }
+    }
+
+    function testNotif(){
+        $url = 'https://firebase.podomorouniversity.ac.id/pushnotification.php';
+        $dataPush = array(
+            'type' => 'topic', // topic / token
+//                    'topic' => 'pu_course_'.$dataTopic['ScheduleID'],
+            'topic' => 'pu_emp_12',
+            'title' => 'nandang',
+            'body' => 'ClassGroup NameEng'
+                .' - Create new discussion : Topic'
+                .' - For details, please login to the portal'
+        );
+        $this->m_master->http_request_post_data($url,$dataPush);
+    }
+
+    private function subscribeTopic($Username,$TypeUser,$FCMToken){
+
+        // SUBSCRIBE TOPIK
+        /*
+        ========================================
+        untuk semua mhs - dosen - staff >>> pu_civitas_akademika
+        untuk semua mhs - dosen >>> pu_std_lec
+        untuk semua dosen - staff >>> pu_lec_emp
+        untuk semua dosen >>> pu_lec
+        untuk semua staff (exclude dosen) >>> pu_emp
+        untuk semua staff per divisi (exclude dosen) >>> pu_emp_divisiid
+        untuk semua mhs >>> pu_mhs
+        untuk semua mhs (angkatan n) >>> pu_mhs_n (n adalah tahun masuk)
+        untuk semua mhs (angkatan n) & prodi x >>> pu_mhs_n_x (n adalah tahun masuk , x adalah prodi id)
+        ========================================
+        Topik mata kuliah >>> pu_course_ScheduleID (di subscribe dosen dan mahasiswa)
+        ========================================
+        subscribe_username sendiri (NIP / NPM)
+        */
+
+        $array_topic = [];
+
+        if($TypeUser=='emp'){
+
+            $array_topic = ['pu_civitas_akademika','pu_lec_emp','pu_emp','pu_user_'.$Username];
+
+            // get id divisi
+            $dataEmp = $this->db->select('PositionMain,PositionOther1,PositionOther2,PositionOther3')
+                ->get_where('db_employees.employees',array('NIP' => $Username))->result_array()[0];
+
+            if($dataEmp['PositionMain']!=null && $dataEmp['PositionMain']!='') {
+                $DivisiID = explode('.',$dataEmp['PositionMain'])[0];
+                array_push($array_topic,'pu_emp_'.$DivisiID);
+            }
+
+            if($dataEmp['PositionOther1']!=null && $dataEmp['PositionOther1']!='') {
+                $DivisiID = explode('.',$dataEmp['PositionOther1'])[0];
+                array_push($array_topic,'pu_emp_'.$DivisiID);
+            }
+
+            if($dataEmp['PositionOther2']!=null && $dataEmp['PositionOther2']!='') {
+                $DivisiID = explode('.',$dataEmp['PositionOther2'])[0];
+                array_push($array_topic,'pu_emp_'.$DivisiID);
+            }
+
+            if($dataEmp['PositionOther3']!=null && $dataEmp['PositionOther3']!='') {
+                $DivisiID = explode('.',$dataEmp['PositionOther3'])[0];
+                array_push($array_topic,'pu_emp_'.$DivisiID);
+            }
+
+
+
+        }
+        else if($TypeUser=='lec'){
+
+            $array_topic = ['pu_civitas_akademika','pu_lec_emp','pu_lec','pu_user_'.$Username];
+
+            // get jadwal di semester aktif
+            $dataSch = $this->db->query('SELECT s.ID AS ScheduleID FROM db_academic.schedule s 
+                                                LEFT JOIN db_academic.semester smt ON (smt.ID = s.SemesterID)
+                                                WHERE smt.Status = 1 AND s.Coordinator = "'.$Username.'" 
+                                                UNION ALL
+                                                SELECT sst.ScheduleID FROM db_academic.schedule_team_teaching sst 
+                                                LEFT JOIN db_academic.schedule s2 ON (s2.ID = sst.ScheduleID)
+                                                LEFT JOIN db_academic.semester smt2 ON (smt2.ID = s2.SemesterID)
+                                                WHERE smt2.Status = 1 AND sst.NIP = "'.$Username.'" ')->result_array();
+
+            if(count($dataSch)>0){
+                foreach ($dataSch AS $item){
+                    array_push($array_topic,'pu_course_'.$item['ScheduleID']);
+                }
+            }
+
+        }
+        else if($TypeUser=='std') {
+            // mahasiswa
+            // get data mhs
+            $dataMhs = $this->db->select('Year, ProdiID')
+                ->get_where('db_academic.auth_students',array('NPM' => $Username))->result_array()[0];
+
+            $array_topic = ['pu_civitas_akademika','pu_mhs',
+                'pu_mhs_'.$dataMhs['Year'],
+                'pu_mhs_'.$dataMhs['Year'].'_'.$dataMhs['ProdiID'],'pu_user_'.$Username];
+
+            $dbstd = 'ta_'.$dataMhs['Year'];
+            // get jadwal aktif
+            $dataSch = $this->db->query('SELECT sp.ScheduleID  FROM '.$dbstd.'.study_planning sp 
+                                                    LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
+                                                     WHERE s.Status = 1
+                                                     AND sp.NPM = "'.$Username.'" ')->result_array();
+
+            if(count($dataSch)>0){
+                foreach ($dataSch AS $item){
+                    array_push($array_topic,'pu_course_'.$item['ScheduleID']);
+                }
+            }
+
+
+        }
+
+
+        if(count($array_topic)>0){
+            // push to subscribe
+            for($i=0;$i<count($array_topic);$i++){
+
+                $array_check = array(
+                    'Topic' => $array_topic[$i],
+                    'Username' => $Username,
+                    'TypeUser' => $TypeUser,
+                    'FCMToken' => $FCMToken
+                );
+
+                $dataCkSubs = $this->db->from('db_it.fcm_subscribe_topic')
+                    ->where($array_check)->count_all_results();
+
+                if($dataCkSubs<=0){
+                    // insert dan subscribe
+                    $this->db->insert('db_it.fcm_subscribe_topic',$array_check);
+                    $dataPostFCM = array('topic' => $array_topic[$i],'token' => $FCMToken);
+                    $url = 'https://firebase.podomorouniversity.ac.id/subscribe.php';
+                    $this->m_master->http_request_post_data($url,$dataPostFCM);
+                }
+
+            }
+        }
+
+
+
     }
 
     public function crudFileFinalProject(){

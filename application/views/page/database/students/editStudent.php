@@ -157,7 +157,12 @@ $(document).ready(function(){
                                 <th>Jacket</th>
                                 <th>:</th>
                                 <td>
-                                    <input class="form-control formBiodata" id="formJacket">
+                                    <!-- <input class="form-control formBiodata" id="formJacket"> -->
+                                    <select class="form-control" id = "formJacket">
+                                        <?php for ($i=0;$i<count($Arr_jacketSize);$i++): ?>
+                                            <option value="<?php echo $Arr_jacketSize[$i]['JacketSize'] ?>" ><?php echo $Arr_jacketSize[$i]['JacketSize'] ?></option>
+                                        <?php endfor ?>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
@@ -307,14 +312,24 @@ $(document).ready(function(){
                                 <th>Education</th>
                                 <th>:</th>
                                 <td>
-                                    <input class="form-control" id="formEducationFather">
+                                    <!-- <input class="form-control" id="formEducationFather"> -->
+                                    <select class="form-control" id = "formEducationFather">
+                                        <?php for ($i=0;$i<count($Arr_edu);$i++): ?>
+                                            <option value="<?php echo $Arr_edu[$i]['edu_name'] ?>" ><?php echo $Arr_edu[$i]['edu_name'] ?></option>
+                                        <?php endfor ?>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Occupation</th>
                                 <th>:</th>
                                 <td>
-                                    <input class="form-control" id="formOccuFather">
+                                    <!-- <input class="form-control" id="formOccuFather"> -->
+                                    <select class="form-control" id = "formOccuFather">
+                                        <?php for ($i=0;$i<count($Arr_ocu);$i++): ?>
+                                            <option value="<?php echo $Arr_ocu[$i]['ocu_name'] ?>" ><?php echo $Arr_ocu[$i]['ocu_name'] ?></option>
+                                        <?php endfor ?>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
@@ -322,13 +337,6 @@ $(document).ready(function(){
                                 <th>:</th>
                                 <td>
                                     <input class="form-control" id="formPhoneFather">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>HP</th>
-                                <th>:</th>
-                                <td>
-                                    <input class="form-control" id="formHpFather">
                                 </td>
                             </tr>
                             <tr>
@@ -368,14 +376,24 @@ $(document).ready(function(){
                                 <th>Education</th>
                                 <th>:</th>
                                 <td>
-                                    <input class="form-control" id="formEducationMother">
+                                    <!-- <input class="form-control" id="formEducationMother"> -->
+                                    <select class="form-control" id = "formEducationMother">
+                                        <?php for ($i=0;$i<count($Arr_edu);$i++): ?>
+                                            <option value="<?php echo $Arr_edu[$i]['edu_name'] ?>" ><?php echo $Arr_edu[$i]['edu_name'] ?></option>
+                                        <?php endfor ?>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Occupation</th>
                                 <th>:</th>
                                 <td>
-                                    <input class="form-control" id="formOccupationMother">
+                                    <!-- <input class="form-control" id="formOccupationMother"> -->
+                                    <select class="form-control" id = "formOccupationMother">
+                                        <?php for ($i=0;$i<count($Arr_ocu);$i++): ?>
+                                            <option value="<?php echo $Arr_ocu[$i]['ocu_name'] ?>" ><?php echo $Arr_ocu[$i]['ocu_name'] ?></option>
+                                        <?php endfor ?>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
@@ -383,13 +401,6 @@ $(document).ready(function(){
                                 <th>:</th>
                                 <td>
                                     <input class="form-control" id="formPhoneMother">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>HP</th>
-                                <th>:</th>
-                                <td>
-                                    <input class="form-control" id="formHpMother">
                                 </td>
                             </tr>
                             <tr>
@@ -654,8 +665,22 @@ $(document).ready(function(){
                     Phone : formPhone,
                     HP : formHP,
                     Email : formEmail,
-                    Address : formAddress,
-                    Jacket : formJacket,
+                    Address : $('#formAddress').val(),
+                    Jacket : $('#formJacket').val(),
+                    Father : $('#formNameFather').val() ,
+                    StatusFather : $('#formStatusFather').val() ,
+                    PhoneFather : $('#formPhoneFather').val() ,
+                    OccupationFather : $('#formOccuFather').val() ,
+                    EducationFather : $('#formEducationFather').val() ,
+                    AddressFather : $('#formAddressFather').val() ,
+                    EmailFather : $('#formEmailFather').val() ,
+                    Mother : $('#formNameMother').val() ,
+                    StatusMother : $('#formStatusMother').val() ,
+                    PhoneMother : $('#formPhoneMother').val() ,
+                    OccupationMother : $('#formOccupationMother').val() ,
+                    EducationMother : $('#formEducationMother').val() ,
+                    AddressMother : $('#formAddressMother').val() ,
+                    EmailMother : $('#formEmailMother').val() ,
 
                 },
                 dataAuth : {

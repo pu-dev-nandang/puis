@@ -112,6 +112,8 @@
             var filterYear = $('#filterYear').val();
             if(filterYear!='' && filterYear!=null){
                 loadPenggunaanDana();
+                const Year = $('#filterYear option:selected').val();
+                newDescritionInput.getDescription(Year);
                 clearInterval(firstLoad);
             }
         },1000);
@@ -171,6 +173,8 @@
        var filterYear = $('#filterYear').val();
        if(filterYear!='' && filterYear!=null){
            loadPenggunaanDana();
+           const Year = $('#filterYear option:selected').val();
+           newDescritionInput.getDescription(Year);
        }
     });
 
@@ -482,6 +486,11 @@
         $('#formJP_ID').val(ID);
         $('#formJP_Jenis').val(j);
     })
-
+   
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        const Year = $('#filterYear option:selected').val();
+        newDescritionInput.saveDescription(itsme,Year);
+    })
 
 </script>

@@ -8,9 +8,10 @@ class C_it extends It_Controler {
     {
         parent::__construct();
         $this->load->model('m_sendemail');
+        $this->load->model('m_sm_menu');
         $this->data['department'] = parent::__getDepartement(); 
         $this->load->model('m_api');
-        // $this->load->model('master/m_master');
+        $this->load->model('admission/m_admission');
     }
 
     
@@ -158,7 +159,7 @@ class C_it extends It_Controler {
     {
       $Input = $this->getInputToken();
       $action = $Input['action'];
-      $rs = ['msg' => '','Status' => 0];
+      $rs = ['msg' => '','Status' => 0,'callback' => []];
       switch ($action) {
         case 'EditNumberFormulir':
         $FormulirCodeOnline = $Input['FormulirCodeOnline'];
@@ -224,6 +225,141 @@ class C_it extends It_Controler {
 
           echo json_encode($rs);
           break;
+        case 'Unsell' : 
+            $data = $Input['data'];
+            // print_r($data);die();
+            $FormulirCode =  $data->FormulirCode;
+            $No_Ref =  $data->No_Ref;
+            $get_register_verified = $this->m_master->caribasedprimary('db_admission.register_verified','FormulirCode',$FormulirCode);
+            /* 
+              1.remove document if existing file dan db
+              2.remove nilai
+              3.remove biodata in register_formulir,register_verified,register_verification
+              -formulir_number_online_m ( fields : status, no kwitansi, no_ref)
+              -formulir_number_global
+            */
+            if (count($get_register_verified) > 0) {
+                $ID_register_verified = $get_register_verified[0]['ID'];
+                $RegVerificationID = $get_register_verified[0]['RegVerificationID'];
+                $getRegisterID = $this->m_master->caribasedprimary('db_admission.register_verification','ID',$RegVerificationID);
+                $RegisterID = $getRegisterID[0]['RegisterID'];
+                $checkStep = $this->m_admission->checkStepAfterFormulir($ID_register_verified,$FormulirCode);
+                
+                $boolCheck = true;
+                for ($i=0; $i < count($checkStep); $i++) { 
+                  $r = $checkStep[$i];
+                  if ($r['tbl'] == 'db_finance.register_admisi' && $r['status']['status'] == 1) 
+                  {
+                    $boolCheck = false;
+                    $rs['msg'] = $r['status']['msg'].' , cannot be unsell';
+                    break;
+                  }
+                }
+
+                if ($boolCheck) {
+                    for ($i=0; $i < count($checkStep); $i++) { 
+                      $r = $checkStep[$i];
+                      $tbl = $r['tbl'];
+                      $primary = $r['primary'];
+                      $relationTbl =  $r['relationTbl'];
+                      $param = $r['param'];
+
+                      if (count($relationTbl) > 0) {
+                        for ($z=0; $z < count($relationTbl); $z++) { 
+                          $this->db->where($primary,$param[$primary]);
+                          $this->db->delete($relationTbl[$z]);
+                        }
+                      }
+
+                      $this->db->where($primary,$param[$primary]);
+                      $this->db->delete($tbl);
+                      if ($this->db->affected_rows() > 0) {
+                        $checkStep[$i]['action'] = 'Proses deleted has been finished';
+                      }
+                      
+                    }
+
+                    // update formuli global dengan status = 0 unused
+                      $this->db->where('FormulirCodeGlobal',$No_Ref);
+                      $this->db->update('db_admission.formulir_number_global',['Status' => 0]);
+                      $checkStep[] = [
+                        'tbl' => 'db_admission.formulir_number_global',
+                        'primary' => 'FormulirCodeGlobal',
+                        'desc' => 'Process Data Formulir',
+                        'required' => 1,
+                        'relationTbl' => [],
+                        'return' => 'No_Ref',
+                        'status' => ['status' => 1,'msg' => 'Process Data finish'],
+                        'action' => ($this->db->affected_rows() > 0) ? 'Update Status = 0 (In) finish ' : 'No Action',
+                      ];
+                    // update formulir_number_online_m (Status = 0 / in,NoKwitansi = NULL,No_Ref = '')
+                        $this->db->where('No_Ref',$No_Ref);
+                        $this->db->update('db_admission.formulir_number_online_m',[
+                          'Status' => 0,
+                          'NoKwitansi' => NULL,
+                          'No_Ref' => ''
+                        ]);
+
+                        $checkStep[] = [
+                          'tbl' => 'db_admission.formulir_number_online_m',
+                          'primary' => 'No_Ref',
+                          'desc' => 'Process Data Formulir',
+                          'required' => 1,
+                          'relationTbl' => [],
+                          'return' => 'No_Ref',
+                          'status' => ['status' => 1,'msg' => 'Process Data finish'],
+                          'action' => ($this->db->affected_rows() > 0) ? 'Update Status = 0 (in),NoKwitansi = NULL,No_Ref = "" finish ' : 'No Action',
+                        ];
+
+                    // delete data register_verified dan register_verification
+                        $this->db->where('FormulirCode',$FormulirCode);
+                        $this->db->delete('db_admission.register_verified');
+                        $checkStep[] = [
+                          'tbl' => 'db_admission.register_verified',
+                          'primary' => 'FormulirCode',
+                          'desc' => 'Process Data Formulir',
+                          'required' => 1,
+                          'relationTbl' => [],
+                          'return' => 'RegVerificationID',
+                          'status' => ['status' => 1,'msg' => 'Process Data finish'],
+                          'action' => ($this->db->affected_rows() > 0) ? 'Proses deleted has been finished' : 'No Action',
+                        ];
+
+                        $this->db->where('ID',$RegVerificationID);
+                        $this->db->delete('db_admission.register_verification');
+                        $checkStep[] = [
+                          'tbl' => 'db_admission.register_verification',
+                          'primary' => 'FormulirCode',
+                          'desc' => 'Process Data Formulir',
+                          'required' => 1,
+                          'relationTbl' => [],
+                          'return' => 'RegisterID',
+                          'status' => ['status' => 1,'msg' => 'Process Data finish'],
+                          'action' => ($this->db->affected_rows() > 0) ? 'Proses deleted has been finished' : 'No Action',
+                        ];
+
+                        // insert register_unsell_formulir
+                        $this->db->insert('db_admission.register_unsell_formulir',[
+                          'RegisterID' => $RegisterID,
+                          'TodoAction' => json_encode($checkStep),
+                          'UpdatedBy' => $this->session->userdata('NIP'),
+                          'UpdatedAt' => date('Y-m-d H:i:s'),
+                        ]);
+
+
+                    $rs['Status'] = 1;
+                    $rs['msg'] = 'Unsell Success';
+                }
+
+                $rs['callback'] = $checkStep;
+               
+            }
+            else{
+              $rs['msg'] = 'Data cannot be unsell, formulir does not exist';
+            }  
+        
+            echo json_encode($rs);
+          break;
         default:
           # code...
           break;
@@ -251,12 +387,296 @@ class C_it extends It_Controler {
 
     public function routes()
     {
-      $this->data['input_routes'] = $this->load->view('page/'.$this->data['department'].'/console-developer/input_routes',$this->data,true);
-      $this->data['table_routes_local'] = $this->load->view('page/'.$this->data['department'].'/console-developer/table_routes_local',$this->data,true);
-      $this->data['table_routes_live'] = $this->load->view('page/'.$this->data['department'].'/console-developer/table_routes_live',$this->data,true);
-      $content = $this->load->view('page/'.$this->data['department'].'/console-developer/routes',$this->data,true);
-      $this->menu_developer($content);
+        $this->data['input_routes'] = $this->load->view('page/'.$this->data['department'].'/console-developer/input_routes',$this->data,true);
+        $this->data['table_routes_local'] = $this->load->view('page/'.$this->data['department'].'/console-developer/table_routes_local',$this->data,true);
+        $this->data['table_routes_live'] = $this->load->view('page/'.$this->data['department'].'/console-developer/table_routes_live',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/console-developer/routes',$this->data,true);
+        $this->menu_developer($content);
     }
+
+    public function request_changepass()
+    {
+      $department = parent::__getDepartement();
+      $data['resetpass'] = $this->db->order_by('Status', 'ASC')->get('db_it.reset_password');
+      $content = $this->load->view('page/'.$department.'/request-changepass/request_change_password',$data,true);
+      $this->temp($content);  
+    }
+
+    public function finish_changepass()
+    {
+      $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
+      $datatoken =  $this->getInputToken();
+      $datatoken = json_decode(json_encode($datatoken),true);
+
+   
+    if($datatoken['action']=='finish'){
+      $formData = $datatoken['datarequest'];
+
+
+
+      $requestid = $formData['ID'];
+      $ActionBy = $this->session->userdata('Name');
+      
+      $updates = array(
+        'Status' => '1',
+        'ActionAt' => date('Y-m-d H:i:s'),
+        'ActionBy' => $ActionBy,
+      );
+    
+      $this->db->where('ID', $requestid);
+      $this->db->update('db_it.reset_password', $updates);
+        $rs['status'] = 1;
+      return print_r(json_encode($rs));
+     }
+      else if($datatoken['action']=='getStatus'){  
+        $data = $this->db->query('SELECT DISTINCT(Status) AS sts FROM db_it.reset_password')->result_array();      
+  
+      return print_r(json_encode($data));  
+    }
+    else if($datatoken['action']=='viewData'){  
+        $requestData = $_REQUEST;
+
+            $filterType = $datatoken['filterType'];
+        
+
+            $dataWhere = '';
+            if($filterType!=''){
+                $w_Type = ($filterType!='')
+                    ? ' AND Status = "'.$filterType.'" ' : '';
+                
+
+                $dataWhere = $w_Type;
+            }
+     
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataScr = 'Username LIKE "%'.$search.'%" OR Name LIKE "%'.$search.'%" OR Email LIKE "%'.$search.'%"';
+
+                $dataSearch = ' AND ('.$dataScr.')';
+            }
+
+            $queryDefault = 'SELECT * FROM db_it.reset_password WHERE ID IS NOT NULL
+                                            '.$dataSearch.$dataWhere;
+
+                                            
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                $tokenID = $this->jwt->encode(array('ID'=>$row['ID']),'UAP)(*');
+                if ($row['Status']==0) {
+                  $btnAct = ' <div class="btn-group">
+                   <button class="btn btn-info btn-sm" onclick="finishbtn('.$row['ID'].');" title="Finish">Finish</button>
+                   </div>';
+                } else {
+                  $btnAct = ' <div class="btn-group">
+                   <button class="btn btn-info btn-sm" disabled>Finish</button>
+                   </div>';
+                }
+                
+          
+
+               
+
+               
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Username'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Name'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Email'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['NewPassword'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['EnteredAt'].'</div>';
+                if ($row['Status']==0) {
+                  $nestedData[] = '<div style="text-align: left;">Pending</div>';
+                } else {
+                  $nestedData[] = '<div style="text-align: left;">Finish</div>';;
+                }
+                
+
+                $nestedData[] = $btnAct;
+         
+
+                $data[] = $nestedData;
+                $no++;
+                }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval( $queryDefaultRow),
+                "data"            => $data,
+                "dataQuery"            => $query
+            );
+            echo json_encode($json_data);
+      }
+    
+    }
+
+    public function share_menu()
+    {
+        $data[''] = '';
+        $data['sm'] = $this->m_sm_menu->getAllSm_menu();
+        $content = $this->load->view('page/'.$this->data['department'].'/console-developer/share_menu',$data,true);
+        $this->menu_developer($content);
+    }
+
+     public function edit_share_menu($id)
+    {
+        $condition = array('ID' => $id);
+        $data['sm_menu'] = $this->m_sm_menu->getSm_menu($condition);
+        $data['sm_child'] = $this->m_sm_menu->getIDSM_child($data['sm_menu']['ID']);
+        $content = $this->load->view('page/'.$this->data['department'].'/console-developer/edit_share_menu',$data,true);
+        $this->menu_developer($content);
+    }
+
+    public function ShareMenuCRUD()
+    {
+      $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
+      $datatoken =  $this->getInputToken();
+      $datatoken = json_decode(json_encode($datatoken),true);
+      $action = $datatoken['action'];
+   
+    switch ($action) {
+      case 'createShareMenu':
+      
+        $createBy = $this->session->userdata('Name');
+        $formData = $datatoken['dataShareMenu'];
+
+        $formData =  $formData + [
+            'CreatedAt' => date('Y-m-d H:i:s'),
+            'CreatedBy' => $createBy,
+        ];
+        $this->m_sm_menu->insertSm_menu($formData);
+        $rs['status'] = 1;    
+        break;
+
+      case 'createAllData':
+
+        $createBy = $this->session->userdata('Name');
+        $formData = $datatoken['dataShareMenu'];
+
+        $formData =  $formData + [
+            'CreatedAt' => date('Y-m-d H:i:s'),
+            'CreatedBy' => $createBy,
+        ];
+
+        $saveSM = $this->m_sm_menu->insertSm_menu($formData);
+        $idsm = $saveSM;
+        $dataChild = $datatoken['dataChild'];
+          for ( $i=0 ; $i < count($dataChild) ; $i++ ) 
+          {
+            $insert = array(
+              'Name' => $dataChild[$i]['Name'],
+              'Route' => $dataChild[$i]['Route'],
+              'IDSM' => $idsm,
+            );
+            $this->m_sm_menu->insertSm_child($insert);
+          }
+
+        $rs['status'] = 1;    
+        break;
+
+        case 'updateShareMenu':
+
+        $UpdatedBy = $this->session->userdata('Name');
+        $formData = $datatoken['dataShareMenu'];
+        $id = $formData['ID'];
+
+        $formData =  $formData + [
+            'UpdatedAt' => date('Y-m-d H:i:s'),
+            'UpdatedBy' => $UpdatedBy,
+        ];
+
+        $this->m_sm_menu->updateSm_menu($id, $formData);
+        
+        $rs['status'] = 1;    
+        break;
+
+        case 'updateAllData':
+
+        $UpdatedBy = $this->session->userdata('Name');
+        $formData = $datatoken['dataShareMenu'];
+        $id = $formData['ID'];
+
+        $this->m_sm_menu->deleteChild_byIDSM($id);
+
+        $formData =  $formData + [
+            'UpdatedAt' => date('Y-m-d H:i:s'),
+            'UpdatedBy' => $UpdatedBy,
+        ];
+
+        $this->m_sm_menu->updateSm_menu($id, $formData);
+      
+        $dataChild = $datatoken['dataChild'];
+          for ( $i=0 ; $i < count($dataChild) ; $i++ ) 
+          {
+            $insert = array(
+              'Name' => $dataChild[$i]['Name'],
+              'Route' => $dataChild[$i]['Route'],
+              'IDSM' => $id,
+            );
+            $this->m_sm_menu->insertSm_child($insert);
+          }
+        
+        $rs['status'] = 1;    
+        break;
+      
+        case 'deleteChild':
+
+        $formData = $datatoken['dataShareMenu'];
+        $id = $formData['ID'];
+        $this->m_sm_menu->deleteSm_child($id);
+        $rs['status'] = 1;    
+        break;
+
+        case 'deleteShareMenu':
+        
+        $formData = $datatoken['dataShareMenu'];
+        $id = $formData['ID'];
+        $this->m_sm_menu->deleteChild_byIDSM($id);
+        $this->m_sm_menu->deleteSm_menu($id);
+        $rs['status'] = 1;    
+        break;
+    }
+
+      echo json_encode($rs);
+    }
+
+    public function selectDivision()
+    {
+
+      $EntredBy = $this->session->userdata('Name');
+      $insert = array(
+        'IDSM' => $_POST["idsm"],
+        'IDDivision' => $_POST["id"],
+        'EntredAt' => date('Y-m-d H:i:s'),
+        'EntredBy' => $EntredBy,
+      );
+      $this->m_sm_menu->insertSm_user($insert);
+
+    }
+    
+    public function cancelDivision()
+    {
+        $iddiv = $_POST["id"];
+        $idsm = $_POST["idsm"];
+        $this->m_sm_menu->deletesm_user($iddiv,$idsm);
+    }
+
+
 
     public function submit_routes()
     {

@@ -201,6 +201,7 @@
         }
 
         loadRekognisiDosen();
+        newDescritionInput.getDescription();
     });
 
     function loadRekognisiDosen() {
@@ -319,6 +320,11 @@
 
        }
     });
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
+    })
 
 
 </script>

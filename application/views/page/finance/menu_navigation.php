@@ -136,6 +136,12 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "registration-list"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/admission/registration-list'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Registration List
+                        </a>
+                    </li>
                     <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "report"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/admission/report'); ?>">
                         <i class="icon-angle-right"></i>
@@ -177,6 +183,12 @@
                         <a href="<?php echo base_url('finance/tagihan-mhs/set-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
                         Set Tagihan
+                        </a>
+                    </li>
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-potongan-lain"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/set-potongan-lain'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Set Potongan Lain
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-cicilan-tagihan-mhs"){echo "current";} ?>">

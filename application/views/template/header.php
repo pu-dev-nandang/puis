@@ -272,6 +272,9 @@
                              </li>
                          <?php } ?>
                         <!-- End Added by Febri -->
+                        <li class="<?php echo ($this->uri->segment(1) == 'it' &&  $this->uri->segment(2) == 'summary_knowledgebase') ? 'active' : ''  ?>">
+                            <a href="<?php echo base_url().'it/summary_knowledgebase' ?>"><i class="fa fa-book" aria-hidden="true"></i> Summary Knowledgebase</a>
+                        </li>`  
                         
 
                     </ul>
@@ -561,21 +564,36 @@
 
         var token = $(this).attr('data-token');
         var title = $(this).attr('data-title');
-        var dataToken = jwt_decode(token,'UAP)(*');
 
+        var dataToken = jwt_decode(token,'UAP)(*');
         var tr = '';
         if(dataToken.length>0){
+            console.log(dataToken);
             $.each(dataToken,function (i,v) {
 
                 var mkt = (v.MKType=='1') ? '<br/><span class="label label-primary">Required</span>' : '';
+
+                var isTransfer = (parseInt(v.TransferCourse)==1) ? '<div>Transfer</div><i class="fa fa-level-down fa-2x"></i>' : '';
+
+                var trConverted = '';
+                if(parseInt(v.TransferCourse)==1) {
+                    var dataCoversion = v.TransferCourseDetails[0];
+                    trConverted = '<tr style="background: #eaeaea;">' +
+                        '<td colspan="2" style="border-top: none;color: #ff493b;font-weight: bold;">Converted from : </td>' +
+                        '<td colspan="2" style="text-align:left;border-top: none;"><b>'+dataCoversion.MKNameEng+'</b><br/><i>'+dataCoversion.MKName+'</i></td>' +
+                        '<td style="border-top: none;">MKCode<br/>'+dataCoversion.MKCode+'</td>' +
+                        '<td style="border-top: none;">SKS<br/>'+dataCoversion.TotalSKS+'</td>' +
+                        '</tr>';
+                }
 
                 tr = tr + '<tr>' +
                     '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
                     '<td>'+v.MKCode+''+mkt+'</td>' +
                     '<td style="text-align: left;"><b>'+v.Course+'</b><br/><i>'+v.CourseEng+'</i></td>' +
+                    '<td>'+v.TypeSchedule+isTransfer+'</td>' +
                     '<td>'+v.Credit+'</td>' +
                     '<td>'+v.Grade+'</td>' +
-                    '</tr>'
+                    '</tr>'+trConverted;
             });
         }
 
@@ -584,12 +602,13 @@
 
         var htmlss = '<div class="row">' +
             '    <div class="col-md-12">' +
-            '        <table class="table table-centre table-striped">' +
+            '        <table class="table table-centre table-bordered table-hover">' +
             '            <thead>' +
-            '            <tr>' +
+            '            <tr style="background: #dcdcdc;">' +
             '                <th style="width: 1%;">No</th>' +
             '                <th style="width: 17%;">MKCode</th>' +
             '                <th>Course</th>' +
+            '                <th style="width: 7%;">Type</th>' +
             '                <th style="width: 7%;">Credit</th>' +
             '                <th style="width: 7%;">Grade</th>' +
             '            </tr>' +
@@ -1089,6 +1108,7 @@
          });
      }
 
+
      function AjaxSubmit(url='',token='',ArrUploadFilesSelector=[]){
          var def = jQuery.Deferred();
          var form_data = new FormData();
@@ -1134,4 +1154,28 @@
         selector.prop('disabled',false).html(html);
     }
 
+    function updateFCMToken(FCMToken) {
+        var url = base_url_js+'api3/__crudLogging';
+
+        var data = {
+            action : 'updateFCMToken',
+            dataForm : {
+                Username : sessionNIP,
+                TypeUser : 'emp',
+                FCMToken : FCMToken,
+                UpdatedAt : dateTimeNow()
+            }
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+
+        $.post(url,{token:token},function (result) {
+
+        });
+    }
+
+
+
 </script>
+
+

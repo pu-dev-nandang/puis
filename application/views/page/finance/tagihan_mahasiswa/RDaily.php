@@ -4,8 +4,19 @@
      <h5>Search</h5>
      <div class="row">
        <div class="col-md-3">
-           <label>Daily Penerimaan Bank</label>
-           	<div id="datetimepicker" class="input-group input-append date datetimepicker"><input data-format="yyyy-MM-dd" class="form-control" id="DailyTgl" type=" text" readonly="" value="<?php echo date('Y-m-d') ?>"><span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span></div>
+           <label>Date Range</label>
+           	<div id="datetimepicker" class="input-group input-append date datetimepicker">
+           		<input data-format="yyyy-MM-dd" class="form-control" id="DailyTgl" type=" text" readonly="" value="<?php echo date('Y-m-d') ?>">
+           		<span class="input-group-addon add-on">
+           			<i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i>
+           		</span>
+           	</div>
+           	<div id="datetimepicker2" class="input-group input-append date datetimepicker" style="margin-top: 10px;">
+           		<input data-format="yyyy-MM-dd" class="form-control" id="DailyTgl2" type=" text" readonly="" value="<?php echo date('Y-m-d') ?>">
+           		<span class="input-group-addon add-on">
+           			<i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i>
+           		</span>
+           	</div>
        </div>
        <div class="col-md-3">
        	<label>Semester</label>
@@ -29,6 +40,11 @@
 		$('#datetimepicker').datetimepicker({
 		  format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 		});
+
+		$('#datetimepicker2').datetimepicker({
+		  format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		});
+
 		loadSelectOptionSemesterByload('#selectSemester',1,'');
 
 		$('#export_excel_daily').click(function(){
@@ -36,6 +52,7 @@
 			var url = base_url_js+'finance/export_excel_report_daily';
 			data = {
 			  DailyTgl : $("#DailyTgl").val(),
+			  DailyTgl2 : $("#DailyTgl2").val(),
 			  selectSemester : $("#selectSemester").val(),
 			}
 			var token = jwt_encode(data,"UAP)(*");

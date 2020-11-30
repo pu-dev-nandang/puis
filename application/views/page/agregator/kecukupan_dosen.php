@@ -48,6 +48,7 @@
 
     $(document).ready(function () {
         loadKecukupanDosen();
+        newDescritionInput.getDescription();
     });
 
     $("#btndownloaadExcel").click(function(){
@@ -168,6 +169,9 @@
 
     });
 
-
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
+    })
 
 </script>

@@ -192,6 +192,8 @@ function LoadTableData(filterProdi)
         
     });
 
+    newDescritionInput.getDescription(filterTahun);
+
 }
 /*
 function __BodyGrouping(arr){
@@ -316,4 +318,10 @@ function __BodyGrouping(arr){
   // console.log(rs);
   return rs;
 }*/
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    let Year = $('#filterTahun option:selected').val();
+    newDescritionInput.saveDescription(itsme,Year);
+})
 </script>

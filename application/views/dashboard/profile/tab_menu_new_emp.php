@@ -363,7 +363,7 @@ $(document).ready(function(){
         $("#ProfilePicture,#imgThumbnail").attr("src",window.sessionUrlPhoto);
 
 
-        $("#form-employee").on("click","#multiple-field .btn-add",function(){
+        $("#form-employee").on("click","#multiple-field .btn-add,#multiple-field .btn-add2",function(){
             var itsme = $(this);
             var parent = itsme.parent().parent().parent().parent();
             var fieldName = parent.data("source");
@@ -595,6 +595,7 @@ $(document).ready(function(){
                         <li class="nv-experience" ><a href="<?=site_url('profile/work-experience/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-briefcase"></i> Work Experience</a></li>
                         <li class="nv-department" ><a href="<?=site_url('profile/department/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-building"></i> Department Member</a></li>
                         <li class="nv-signature" ><a href="<?=site_url('profile/signature/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-pencil-square-o"></i> Signature</a></li>
+                        <li class="nv-services" ><a href="<?=site_url('profile/self-services/'.$NIP.(!empty($param) ? $param:''))?>"><i class="fa fa-cog"></i> Self Services</a></li>
                       </ul>
                     </div>
                 </div>

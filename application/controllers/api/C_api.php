@@ -758,25 +758,20 @@ class C_api extends CI_Controller {
 
         $db_ = 'ta_'.$dataYear;
 
-        $dataWhere = ($dataProdiID != '' && $dataProdiID != null && !empty($dataProdiID)) ? 'WHERE s.ProdiID = "'.$dataProdiID.'"' : '';
+        $dataWhere = '';
         $arryWhere = array('ProdiID' => $dataProdiID);
-        if($dataStatus!='' && $dataStatus!=null){
-            if ($dataProdiID != '' && $dataProdiID != null && !empty($dataProdiID) ) {
-                $arryWhere = array(
-                    'ProdiID' => $dataProdiID,
-                    'StatusStudentID' => $dataStatus
-                );
-                $dataWhere = 'WHERE s.ProdiID = "'.$dataProdiID.'" AND s.StatusStudentID = "'.$dataStatus.'" ';
-            }
-            else
-            {
-                $arryWhere = array(
-                    'StatusStudentID' => $dataStatus
-                );
-                $dataWhere = 'WHERE  s.StatusStudentID = "'.$dataStatus.'" ';
-            }
 
+        if($dataStatus!='' && $dataStatus!=null){
+            $WhereOrAnd = (empty($dataWhere)) ? ' where ' : ' and ';
+            $dataWhere = $WhereOrAnd.' s.StatusStudentID = "'.$dataStatus.'" ';
         }
+
+        if ($dataProdiID != '' && $dataProdiID != null && !empty($dataProdiID) ) {
+            $WhereOrAnd = (empty($dataWhere)) ? ' where ' : ' and ';
+            $dataWhere = $WhereOrAnd.' s.ProdiID = "'.$dataProdiID.'" ';
+        }
+
+        // print_r($dataWhere);die();
 
         // -------------total data---------- //
         $sqlSelectData  = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, ps.Name AS ProdiNameInd,s.StatusStudentID,
@@ -800,8 +795,8 @@ class C_api extends CI_Controller {
                           LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
                           ';
         if( !empty($requestData['search']['value']) ) {
-            $dataWhere = (empty($dataWhere)) ? ' where ' : ' and ';
-            $sql.= '  '.$dataWhere.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
+            $WhereOrAnd = (empty($dataWhere)) ? ' where ' : ' and ';
+            $sql.= '  '.$dataWhere.' '.$WhereOrAnd.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
             $sql.= ' OR asx.FormulirCode LIKE "'.$requestData['search']['value'].'%" ';
@@ -1645,6 +1640,9 @@ class C_api extends CI_Controller {
                 $this->db->where('NPM', $data_arr['NPM']);
                 $this->db->update($da_.'.students', $arrUpdateStd);
 
+                // adding by adhi 20201109 : add EffectiveDateStatus
+                $arrUpdateStd['EffectiveDateStatus'] = $data_arr['EffectiveDateStatus'];
+
                 $this->db->where('NPM', $data_arr['NPM']);
                 $this->db->update('db_academic.auth_students', $arrUpdateStd);
 
@@ -1900,10 +1898,12 @@ class C_api extends CI_Controller {
                 $insert_id = $this->db->insert_id();
 
                 // schedule_details
+                $CreditDefaultMK = 0;
                 $dataScheduleDetails = (array) $formData['schedule_details'];
                 for($s=0;$s<count($dataScheduleDetails);$s++){
                     $arr = (array) $dataScheduleDetails[$s];
                     $arr['ScheduleID'] = $insert_id;
+                    $CreditDefaultMK = $arr['Credit'];
                     $this->db->insert('db_academic.schedule_details',$arr);
                     $insert_id_SD = $this->db->insert_id();
 
@@ -1928,15 +1928,46 @@ class C_api extends CI_Controller {
 
 
                 //schedule_team_teaching
+                $dataTemaTeaching = (array) $formData['schedule_team_teaching'];
+
+                // ==== Insert to pembagian BKD ====
+                $TotalDosen = 1 + count($dataTemaTeaching);
+                $ShareCredit = 100 / $TotalDosen;
+                $CreditOri = $CreditDefaultMK / $TotalDosen;
+                $CreditResult = round($CreditOri,2);
+
+                $insertShareCoord = array(
+                    'ScheduleID' => $insert_id,
+                    'NIP' => $insertSchedule['Coordinator'],
+                    'ShareCredit' => $ShareCredit,
+                    'CreditOri' => $CreditOri,
+                    'Credit' => $CreditResult
+                );
+                $this->db->insert('db_academic.schedule_share_credit',$insertShareCoord);
+
+
                 if($insertSchedule['TeamTeaching']==1){
-                    $dataTemaTeaching = (array) $formData['schedule_team_teaching'];
                     for($t=0;$t<count($dataTemaTeaching);$t++){
                         $arr = (array) $dataTemaTeaching[$t];
                         $arr['ScheduleID'] = $insert_id;
-
                         $this->db->insert('db_academic.schedule_team_teaching',$arr);
+
+                        // ==== Insert to pembagian BKD ====
+                        $insertShareCoord = array(
+                            'ScheduleID' => $insert_id,
+                            'NIP' => $arr['NIP'],
+                            'ShareCredit' => $ShareCredit,
+                            'CreditOri' => $CreditOri,
+                            'Credit' => $CreditResult
+                        );
+                        $this->db->insert('db_academic.schedule_share_credit',$insertShareCoord);
+
                     }
                 }
+
+
+
+
 
 
 
@@ -2319,13 +2350,16 @@ class C_api extends CI_Controller {
                 $ScheduleID = $data_arr['ScheduleID'];
 
                 $dataProgram = $this->db->query('SELECT s.ID AS ScheduleID, s.ProgramsCampusID, sem.Name AS SemesterName,
-                                                              s.ClassGroup, s.Coordinator, s.TeamTeaching,
+                                                              s.ClassGroup, s.Coordinator, em.Name AS CoordinatorName, 
+                                                              ssc.ShareCredit AS CoordinatorCreditPoint, s.TeamTeaching,
                                                              s.SemesterID, s.Attendance, s.OnlineLearning, mk.NameEng AS CourseEng, cd.TotalSKS AS TotalCredit
                                                             FROM db_academic.schedule s
                                                             LEFT JOIN db_academic.semester sem ON (sem.ID = s.SemesterID)
                                                             LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                            LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                            LEFT JOIN db_academic.schedule_share_credit ssc ON (ssc.ScheduleID = sdc.ScheduleID AND ssc.NIP = s.Coordinator)
                                                             WHERE s.ID = "'.$ScheduleID.'" AND SemesterID = "'.$SemesterID.'"
                                                              GROUP BY s.ID ')
                     ->result_array();
@@ -2333,14 +2367,19 @@ class C_api extends CI_Controller {
 
                 if(count($dataProgram)>0){
                     $detailTeamTeaching = [];
-                    $dataTTC = $this->db->select('NIP')->get_where('db_academic.schedule_team_teaching',array('ScheduleID'=>$dataProgram[0]['ScheduleID']))
+                    $dataTTC = $this->db->query('SELECT em.NIP, em.Name, ssc.ShareCredit FROM db_academic.schedule_team_teaching stt  
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                    LEFT JOIN db_academic.schedule_share_credit ssc ON (stt.ScheduleID = ssc.ScheduleID AND ssc.NIP = stt.NIP)
+                                                    WHERE stt.ScheduleID = "'.$dataProgram[0]['ScheduleID'].'" ')
                         ->result_array();
                     if(count($dataTTC)>0){
                         foreach ($dataTTC as $item){
                             array_push($detailTeamTeaching,$item['NIP']);
                         }
                     }
-                    $dataProgram[0]['detailTeamTeaching'] = $detailTeamTeaching;
+                    $dataProgram[0]['TeamTeachingNIP'] = $detailTeamTeaching;
+
+                    $dataProgram[0]['TeamTeachingDetail'] = $dataTTC;
 
                 }
 
@@ -2465,6 +2504,24 @@ class C_api extends CI_Controller {
                     $UpdateLog = (array) $data_arr['UpdateLog'];
                     $this->db->where('ID', $data_arr['ScheduleID']);
                     $this->db->update('db_academic.schedule',$UpdateLog);
+                    $this->db->reset_query();
+
+
+                    $dataCreditSahre = $data_arr['dataCreditSahre'];
+                    if(count($dataCreditSahre)>0){
+                        // Update Credit Share
+                        $this->db->where('ScheduleID',$data_arr['ScheduleID']);
+                        $this->db->delete('db_academic.schedule_share_credit');
+                        $this->db->reset_query();
+
+                        for($i=0;$i<count($dataCreditSahre);$i++){
+                            $dataInsertCreditShare = (array) $dataCreditSahre[$i];
+                            $this->db->insert('db_academic.schedule_share_credit',$dataInsertCreditShare);
+                        }
+
+                    }
+
+
 
                     $result = array(
                         'Status' => 1
@@ -3390,7 +3447,7 @@ class C_api extends CI_Controller {
                     <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu">
-                    <li class="'.$re.'"><a href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Edit</a></li>
+                    <li class="'.$re.'"><a target="_blank" href="'.base_url('academic/exam-schedule/edit-exam-schedule/'.$row['ID']).'">Edit</a></li>
                     <li><a href="javascript:void(0);" class="uploadSoal" data-id="'.$row['ID'].'" data-act="'.$actUploadTask.'">Upload Exam Task</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a target="_blank" href="'.base_url('save2pdf/exam-layout/'.$row['ID']).'">Layout</a></li>
@@ -5705,7 +5762,7 @@ class C_api extends CI_Controller {
                                                     LEFT JOIN db_finance.payment_type pt ON (tf.PTID = pt.ID)
                                                     LEFT JOIN db_academic.program_study ps ON (tf.ProdiID = ps.ID)
                                                     WHERE tf.ClassOf = "'.$ClassOf.'" AND tf.ProdiID = "'.$prodi[$i]['ID'].'" and tf.Pay_Cond = 1
-                                                    ORDER BY tf.ProdiID, tf.PTID ASC ')->result_array();
+                                                    ORDER BY tf.ProdiID, tf.PTID ASC, tf.Pay_Cond ASC ')->result_array();
                     if(count($data)>0){
                         $data_p = array(
                             'ProdiID' => $prodi[$i]['ID'],
@@ -5722,7 +5779,7 @@ class C_api extends CI_Controller {
                                                     LEFT JOIN db_finance.payment_type pt ON (tf.PTID = pt.ID)
                                                     LEFT JOIN db_academic.program_study ps ON (tf.ProdiID = ps.ID)
                                                     WHERE tf.ClassOf = "'.$ClassOf.'" AND tf.ProdiID = "'.$prodi[$i]['ID'].'" and tf.Pay_Cond = 2
-                                                    ORDER BY tf.ProdiID, tf.PTID ASC ')->result_array();
+                                                    ORDER BY tf.ProdiID, tf.PTID ASC, tf.Pay_Cond ASC ')->result_array();
                     if(count($data)>0){
                         $data_p = array(
                             'ProdiID' => $prodi[$i]['ID'],
@@ -6267,7 +6324,25 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='readCertificateLec_request'){
+                $rs = ['dataApprove' => [],'dataRequest' => [] ];
+                $data = $this->db->get_where('db_employees.employees_certificate',array(
+                    'NIP' => $data_arr['NIP']
+                ))->result_array();
+                $rs['dataApprove'] = $data;
+                // get certificate request di log field and adding
+                    $dataEMP = $this->db->get_where('db_employees.employees',array(
+                        'NIP' => $data_arr['NIP']
+                    ))->result_array()[0];
 
+
+                    if (!empty($dataEMP['Logs'])) {
+                        $jsonExtract = json_decode($dataEMP['Logs'],true);
+                        $rs['dataRequest']= $jsonExtract['certificate_request'];
+                    }
+
+                return print_r(json_encode($rs));
+            }
             else if($data_arr['action']=='addEmployees'){
                 $rs = array('msg' => '','status' => 1);
                 $formInsert = (array) $data_arr['formInsert'];
@@ -6290,6 +6365,7 @@ class C_api extends CI_Controller {
                     $Division = $PositionMain[0];
                     // for AD
                     $Password = $formInsert['Password_Old'];
+                    $Password_md5 = md5($formInsert['Password_Old']);
                     $Name = $formInsert['Name'];
                     $G_div = $this->m_master->caribasedprimary('db_employees.division','ID',$Division);
                     $description = $G_div[0]['Description'];
@@ -6377,7 +6453,7 @@ class C_api extends CI_Controller {
                     }
                     // end AD
                     $rs['arr_callback'] = $arr_callback; // for callback
-                    $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
+                    $formInsert['Password_Old'] = $Password_md5;
 
                     /*ADDED BY FEBRI @ FEB 2020*/
                     $myNIP = $this->session->userdata('NIP');
@@ -6528,6 +6604,28 @@ class C_api extends CI_Controller {
                     }
                 }
 
+                    // disabled enabled AD
+                if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
+                // if(true) {
+                    $urlAD = URLAD.'__api/DisableEnable';
+                    $is_url_exist = $this->m_master->is_url_exist($urlAD);
+
+                    if (array_key_exists('StatusEmployeeID', $formUpdate) && $is_url_exist) {
+                        $UserID = explode('@', $formUpdate['EmailPU']);
+                        $UserID = $UserID[0];
+                        $statusGet = ($formUpdate['StatusEmployeeID'] == -1 ||$formUpdate['StatusEmployeeID'] == '-1') ? 'yes' : 'no';
+                        $data = array(
+                            'auth' => 's3Cr3T-G4N',
+                            'UserID' => $UserID,
+                            'statusGet' => $statusGet,
+                        );
+
+                        $urlAD = URLAD.'__api/DisableEnable';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        $this->m_master->apiservertoserver($urlAD,$token);
+                    }
+                }
+                
                 // Cek apakah delete photo atau tidak
                 if($data_arr['DeletePhoto']==1 || $data_arr['DeletePhoto']=='1'){
                     $pathPhoto = './uploads/employees/'.$data_arr['LastPhoto'];
@@ -9806,45 +9904,7 @@ class C_api extends CI_Controller {
 
     public function getAllDepartementPU()
     {
-        $arr_result = array();
-        $NA = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
-        if (isset($_POST)) {
-            if (array_key_exists('Show', $_POST)) {
-                if ($_POST['Show'] == 'all') {
-                    $NA = $this->m_master->showData_array('db_employees.division');
-                }
-            }
-
-        }
-        $AC = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
-        $FT = $this->m_master->caribasedprimary('db_academic.faculty','StBudgeting',1);
-        for ($i=0; $i < count($NA); $i++) {
-            $arr_result[] = array(
-                'Code'  => 'NA.'.$NA[$i]['ID'],
-                'Name1' => $NA[$i]['Description'],
-                'Name2' => $NA[$i]['Division'],
-                'Abbr' => $NA[$i]['Abbreviation'],
-            );
-        }
-
-        for ($i=0; $i < count($AC); $i++) {
-            $arr_result[] = array(
-                'Code'  => 'AC.'.$AC[$i]['ID'],
-                'Name1' => 'Prodi '.$AC[$i]['Name'],
-                'Name2' => 'Study '.$AC[$i]['NameEng'],
-                'Abbr' => $AC[$i]['Code'],
-            );
-        }
-
-        for ($i=0; $i < count($FT); $i++) {
-            $arr_result[] = array(
-                'Code'  => 'FT.'.$FT[$i]['ID'],
-                'Name1' => 'Facultas '.$FT[$i]['Name'],
-                'Name2' => 'Faculty '.$FT[$i]['NameEng'],
-                'Abbr' => $FT[$i]['Abbr'],
-            );
-        }
-
+        $arr_result = $this->m_master->getAllDepartementPU();
         echo json_encode($arr_result);
     }
 
@@ -10872,7 +10932,7 @@ class C_api extends CI_Controller {
                           </button>
                           <ul class="dropdown-menu">
                             <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' id="btnResetPass'.$row['NIP'].'" class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password (Send Email)</a></li>
-                            <li class="'.$disDateOfBirth.'"><a href="javascript:void(0);" '.$disDateOfBirth.' class="resetpassBirthDay '.$disDateOfBirth.'" data-nip="'.$row['NIP'].'" data-day="'.$DateOfBirth.'">Reset Password (DDMMYY)</a></li>
+                            <!--<li class="'.$disDateOfBirth.'"><a href="javascript:void(0);" '.$disDateOfBirth.' class="resetpassBirthDay '.$disDateOfBirth.'" data-nip="'.$row['NIP'].'" data-day="'.$DateOfBirth.'">Reset Password (DDMMYY)</a></li>-->
                             <li><a href="javascript:void(0);" class="btn-update-email" id="btnUpdateEmail'.$row['NIP'].'" data-name="'.$row['Name'].'" data-nip="'.$row['NIP'].'" data-empid="'.$row['StatusEmployeeID'].'" data-email="'.$Email.'">Update Email</a></li>
                             <li><a class = "PrintIDCard" href="javascript:void(0);" type = "employees" data-npm="'.$row['NIP'].'" data-name="'.ucwords(strtolower($row['Name'])).'" path = '.$srcImg.' email = "'.$row['EmailPU'].'">Print ID Card</a></li>
                           </ul>
@@ -11400,8 +11460,8 @@ class C_api extends CI_Controller {
                         <i class="fa fa-edit"></i> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a href="'.base_url('academic/timetables/list/edit/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Course</a></li>
-                        <li><a href="'.base_url('academic/timetables/list/edit-schedule/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Schedule</a></li>
+                        <li><a target="_blank" href="'.base_url('academic/timetables/list/edit/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Course</a></li>
+                        <li><a target="_blank" href="'.base_url('academic/timetables/list/edit-schedule/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Schedule</a></li>
 
                         <li role="separator" class="divider"></li>
                         <li><a href="javascript:void(0);" class="btnTimetablesEditDelete" data-group="'.$row['ClassGroup'].'" data-id="'.$row['ID'].'">Delete</a></li>

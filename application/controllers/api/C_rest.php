@@ -270,7 +270,7 @@ class C_rest extends CI_Controller {
 
             $data = $this->m_rest->getTranscript($dataToken['ClassOf'],$dataToken['NPM'],'ASC');
 
-            if($dataToken['Source']=='Portal'){
+            if(isset($dataToken['Source']) && $dataToken['Source']=='Portal'){
                 unset($data['dataIPK']);
                 $dataCourse = $data['dataCourse'];
                 for($i=0;$i<count($dataCourse);$i++){
@@ -830,6 +830,46 @@ class C_rest extends CI_Controller {
                 }
 
 
+
+                // push notifikasi hanya untuk invote group kelas
+                if($dataTopic['InviteTo']==2 || $dataTopic['InviteTo']=='2') {
+
+                    // get employee name
+                    $dataEmp = $this->db->select('Name,TitleAhead,TitleBehind')
+                        ->get_where('db_employees.employees',
+                            array('NIP' => $dataTopic['CreateBy']))->result_array()[0];
+
+                    $TitleAhead = ($dataEmp['TitleAhead']!='' && $dataEmp['TitleAhead']!=null)
+                        ? $dataEmp['TitleAhead'].' ' : '';
+
+                    $TitleBehind = ($dataEmp['TitleBehind']!='' && $dataEmp['TitleBehind']!=null)
+                        ? ' '.$dataEmp['TitleBehind'] : '';
+
+                    $LecName = $TitleAhead.$dataEmp['Name'].$TitleBehind;
+
+                    // get mk name
+                    $dataMK = $this->db->query('SELECT s.ClassGroup, mk.NameEng FROM db_academic.schedule s 
+                                                            LEFT JOIN db_academic.schedule_details_course sdc 
+                                                            ON (s.ID = sdc.ScheduleID)
+                                                            LEFT JOIN db_academic.mata_kuliah mk 
+                                                            ON (mk.ID = sdc.MKID)
+                                                            WHERE s.ID = "'.$dataTopic['ScheduleID'].'"
+                                                             GROUP BY s.ID ')->result_array()[0];
+
+                    // push notification
+                    $url = 'https://firebase.podomorouniversity.ac.id/pushnotification.php';
+                    $dataPush = array(
+                        'type' => 'topic', // topic / token
+                        'topic' => 'pu_course_'.$dataTopic['ScheduleID'],
+//                        'topic' => 'pu_emp_12',
+                        'title' => 'New Discussion - '.$LecName,
+                        'body' => $dataMK['ClassGroup'].' '.$dataMK['NameEng']
+                            .' | '.$dataTopic['Topic']);
+                    $this->m_master->http_request_post_data($url,$dataPush);
+
+                }
+
+
                 return print_r(1);
             }
 
@@ -1041,33 +1081,49 @@ class C_rest extends CI_Controller {
                     // Cek attendace online
                     $this->m_onlineclass->checkOnlineAttendance($UserID,$ScheduleID,$Sessions);
 
-                    // Cek apakah sudah membuat tugas
-//                    $sc_t = $this->db->query('SELECT COUNT(*) AS Total
-//                                        FROM (SELECT stt.ID FROM db_academic.schedule_task_student stt
-//                                        LEFT JOIN db_academic.schedule_task st ON (st.ID = stt.IDST)
-//                                        WHERE st.ScheduleID = "'.$ScheduleID.'"
-//                                        AND st.Session = "'.$Sessions.'"
-//                                        AND stt.NPM = "'.$UserID.'" ) xx ')->result_array();
-//
-//                    if($sc_t[0]['Total']>0){
-//
-//                        $dataArrAttd = $this->m_onlineclass->getArrIDAttd($ScheduleID);
-//
-//                        $data_arr_attd = array(
-//                            'ArrIDAttd' => $dataArrAttd,
-//                            'Meet' => $Sessions,
-//                            'Attendance' => '1',
-//                            'NPM' => $UserID
-//                        );
-//
-//                        $this->m_onlineclass->setAttendanceStudent($data_arr_attd);
-//                    }
-
-
                 }
 
+                // push notification
 
+                // cek apakah user mhs atau bukan
+                $dataMhs = $this->db->select('Name')->get_where('db_academic.auth_students',array('NPM' => $UserID))
+                    ->result_array();
 
+                if(count($dataMhs)>0){
+                    $Sender = $dataMhs[0]['Name'];
+                } else {
+                    $dataEmp = $this->db->select('Name,TitleAhead,TitleBehind')
+                        ->get_where('db_employees.employees',
+                            array('NIP' => $UserID))->result_array()[0];
+
+                    $TitleAhead = ($dataEmp['TitleAhead']!='' && $dataEmp['TitleAhead']!=null)
+                        ? $dataEmp['TitleAhead'].' ' : '';
+
+                    $TitleBehind = ($dataEmp['TitleBehind']!='' && $dataEmp['TitleBehind']!=null)
+                        ? ' '.$dataEmp['TitleBehind'] : '';
+
+                    $Sender = $TitleAhead.$dataEmp['Name'].$TitleBehind;
+                }
+
+                // get mk name
+                $dataMK = $this->db->query('SELECT s.ClassGroup, mk.NameEng FROM db_academic.schedule s 
+                                                            LEFT JOIN db_academic.schedule_details_course sdc 
+                                                            ON (s.ID = sdc.ScheduleID)
+                                                            LEFT JOIN db_academic.mata_kuliah mk 
+                                                            ON (mk.ID = sdc.MKID)
+                                                            WHERE s.ID = "'.$ScheduleID.'"
+                                                             GROUP BY s.ID ')->result_array()[0];
+
+                $url = 'https://firebase.podomorouniversity.ac.id/pushnotification.php';
+                $dataPush = array(
+                    'type' => 'topic', // topic / token
+                    'topic' => 'pu_course_'.$ScheduleID,
+//                    'topic' => 'pu_emp_12',
+                    'title' => 'Discussion - '.$Sender,
+                    'body' => $dataMK['ClassGroup'].' '.$dataMK['NameEng']
+                        .' | '.$dataForm['Comment']);
+
+                $this->m_master->http_request_post_data($url,$dataPush);
 
                 return print_r(1);
             }
@@ -1432,6 +1488,12 @@ class C_rest extends CI_Controller {
                          }
                      }
                     $dataCkSession[0]['Details'] = $Details;
+
+                     // Cek totak soal
+                    $dataCkSession[0]['TotalQuestion'] = $this->db->query('SELECT COUNT(*) AS Total 
+                                                                    FROM db_academic.q_quiz_details
+                                                                    WHERE QuizID = "'.$dataCkSession[0]['ID'].'" ')
+                                                                    ->result_array()[0]['Total'];
                 }
 
                 $result = array(
@@ -1450,7 +1512,7 @@ class C_rest extends CI_Controller {
 
                 $data = $this->db->query('SELECT q.ID, q.Duration , qs.ID AS QuizStudentID,   
                                                     qs.StartSession, qs.EndSession,
-                                                    qs.WorkDuration
+                                                    qs.WorkDuration, q.NotesForStudents
                                                     FROM db_academic.q_quiz q
                                                     LEFT JOIN db_academic.q_quiz_students qs 
                                                     ON (qs.QuizID = q.ID AND qs.NPM = "'.$NPM.'")
@@ -1642,13 +1704,17 @@ class C_rest extends CI_Controller {
                     $this->db->reset_query();
                 }
 
-                // return quiz
-                $dataReturn = $this->db->query('SELECT q.ScheduleID, q.Session,qs.NPM FROM db_academic.q_quiz q 
-                                                        LEFT JOIN db_academic.q_quiz_students qs 
-                                                        ON (qs.QuizID = q.ID )
-                                                        WHERE qs.ID = "'.$dataToken['QuizStudentID'].'" ')
-                    ->result_array()[0];
 
+
+                // return quiz
+                $dataReturn = $this->db->query('SELECT s.SemesterID, q.ScheduleID, q.Session,qs.NPM  
+                                                FROM db_academic.q_quiz q
+                                                LEFT JOIN db_academic.q_quiz_students qs 
+                                                    ON (qs.QuizID = q.ID )
+                                                LEFT JOIN db_academic.schedule s 
+                                                    ON (s.ID = q.ScheduleID)
+                                                WHERE qs.ID = "'.$dataToken['QuizStudentID'].'" ')
+                    ->result_array()[0];
 
                 // Cek attendace online
                 $this->m_onlineclass->checkOnlineAttendance($dataReturn['NPM'],
@@ -1676,6 +1742,7 @@ class C_rest extends CI_Controller {
     }
 
     public function getPaymentStudent(){
+        $this->load->model('finance/m_finance');
         $dataToken = $this->getInputToken();
         $cekUser = $this->cekAuthAPI($dataToken['auth']);
 
@@ -1713,6 +1780,9 @@ class C_rest extends CI_Controller {
                     //Cek Bukti Upload
                         $payment_proof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$data[$i]['ID']);
                         $data[$i]['payment_proof'] = $payment_proof;
+
+                    // potongan lain
+                        $data[$i]['potonganLain'] = $this->m_finance->getPotonganLain($data[$i]['PTID'],$data[$i]['SemesterID'],$data[$i]['NPM']);
 
                     if(count($dataSmt)>0){
                         $data[$i]['Semester'] = count($dataSmt);

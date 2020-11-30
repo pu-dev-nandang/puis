@@ -6,7 +6,7 @@
 	window.getDataCalonMhs = <?php echo $getDataCalonMhs ?>;
 	$(document).ready(function () {
 		// console.log(payment_type);
-		// console.log(getDataCalonMhs);
+		console.log(getDataCalonMhs);
 		loadtable_header(loadDataTable);
 		funcBtnPrint();
 	});
@@ -74,14 +74,22 @@
 			var isi_payment = '';
 			for (var j = 0; j < payment_type.length; j++) {
 				var value_cost = 0;
+				var potonganLain = '';
 					for(var key in getDataCalonMhs[i]) {
 						// var keyDiscount = 
 						if (key == payment_type[j]['Abbreviation']) {
 							value_cost = getDataCalonMhs[i][key];
 							DiskonSPP = getDataCalonMhs[i]['Discount-'+key];
+							const dataPotongan = getDataCalonMhs[i]['PotonganLain-'+key];
+							if (dataPotongan.length > 0) {
+								potonganLain = '<br/><br/><label>Potongan Lain</label>';
+								for (var zz = 0; zz < dataPotongan.length; zz++) {
+									potonganLain += '<li style = "color:blue;">'+dataPotongan[zz]['DiscountName']+' : '+formatRupiah(dataPotongan[zz]['DiscountValue'])+'</li>'
+								}
+							}
 						}
 					}
-				isi_payment += '<td>Invoice : '+value_cost+'<br> Discount : '+DiskonSPP+'%</td>';
+				isi_payment += '<td style = "color:green;">Invoice : '+value_cost+'<br> Discount : '+DiskonSPP+'%'+potonganLain+'</td>';
 				//isi_payment += '<td>'+DiskonSPP+'%</td>';
 			}
 
@@ -101,7 +109,7 @@
 			$(".tableData tbody").append(
 					'<tr>'+
 						'<td align= "center">'+no+'&nbsp<input type="checkbox" class="uniform" nama ="'+getDataCalonMhs[i]['Name']+'" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'" </td>'+
-						'<td>'+'<span style="color: #c77905;">'+getDataCalonMhs[i]['Name']+'</span>'+'<br>'+'<span style="color: #c77905;">'+getDataCalonMhs[i]['NamePrody']+'</span>'+'<br>'+getDataCalonMhs[i]['SchoolName']+'<br>'+'<span style="color: #20525a;">'+getDataCalonMhs[i]['CreateAT']+'</span>'+'</td>'+
+						'<td>'+setBintangFinance(getDataCalonMhs[i]['Pay_Cond'])+'<br/>'+'<span style="color: #c77905;">'+getDataCalonMhs[i]['Name']+'</span>'+'<br>'+'<span style="color: #c77905;">'+getDataCalonMhs[i]['NamePrody']+'</span>'+'<br>'+getDataCalonMhs[i]['SchoolName']+'<br>'+'<span style="color: #20525a;">'+getDataCalonMhs[i]['CreateAT']+'</span>'+'</td>'+
 						'<td>'+Code+'</td>'+
 						'<td>'+getDataCalonMhs[i]['getBeasiswa']+'<br><br>'+Rangking+'<br><br>'+showFile+'</td>'+
 						isi_payment+

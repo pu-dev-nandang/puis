@@ -54,6 +54,7 @@
     var oTable;
     $(document).ready(function () {
         LoadFirst();
+        newDescritionInput.getDescription();
     });
 
     function LoadFirst()
@@ -154,5 +155,10 @@
 
     $(document).off('change', '.Kategori_kegiatan').on('change', '.Kategori_kegiatan',function(e) {
         oTable.ajax.reload( null, false );
+    })
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
     })
 </script>

@@ -2299,7 +2299,7 @@ class C_api2 extends CI_Controller {
             $w_semester = ($Semester!='' && $Semester!=0)
                 ? ' AND cd.Semester = "'.$Semester.'" ' : ' ' ;
 
-            $dataCID = $this->db->query('SELECT cd.Semester, mk.MKCode, mk.Name AS Coure, mk.NameEng AS CoureEng, cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit  
+            $dataCID = $this->db->query('SELECT cd.Semester, mk.MKCode, mk.Name AS Coure, mk.NameEng AS CoureEng, cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit
                                               FROM db_academic.curriculum_details cd
                                               LEFT JOIN db_academic.curriculum cur ON (cur.ID = cd.CurriculumID)
                                               LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
@@ -2308,14 +2308,37 @@ class C_api2 extends CI_Controller {
                                               ORDER BY cd.Semester ASC, mk.MKCode ASC
                                               ')->result_array();
 
+
             if(count($dataCID)>0){
+
+              // mencari semester id Aktif
+              $dateNow = $this->m_rest->getDateNow();
+
+
+
                 for($i=0;$i<count($dataCID);$i++){
                     $d = $dataCID[$i];
 
-                    $dataC = $this->db->query('SELECT ID AS SPID, Score, Grade, GradeValue, Credit FROM '.$db_.'.study_planning sp
+                    $dataC = $this->db->query('SELECT ID AS SPID, SemesterID, Score, Grade, GradeValue, Credit FROM '.$db_.'.study_planning sp
                                                             WHERE sp.NPM = "'.$NPM.'"
                                                             AND sp.CDID = "'.$d['CDID'].'"
                                                             ORDER BY sp.Score DESC LIMIT 1 ')->result_array();
+
+                    if(count($dataC)>0){
+                      for($s=0;$s<count($dataC);$s++){
+
+                        // show nilai di kurikulum ketika show nilai uas
+                        $dataAY_UAS = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.academic_years ay
+                                        WHERE ay.SemesterID = "'.$dataC[$s]['SemesterID'].'"
+                                         AND ay.showNilaiUas <= "'.$dateNow.'" ')->result_array();
+
+                        $ShowScoreUAS = ($dataAY_UAS[0]['Total']>0) ? true : false;
+
+                          $dataC[$s]['Score'] = ($ShowScoreUAS) ? $dataC[$s]['Score'] : '-';
+                          $dataC[$s]['Grade'] = ($ShowScoreUAS) ? $dataC[$s]['Grade'] : '-';
+                          $dataC[$s]['GradeValue'] = ($ShowScoreUAS) ? $dataC[$s]['GradeValue'] : '-';
+                        }
+                    }
 
                     // Cek apakah sudah di ambil atau belum
                     $dataAmbil = $this->db->limit(1)->get_where('db_academic.sa_student_details',array(
@@ -2450,6 +2473,7 @@ class C_api2 extends CI_Controller {
 
 
 
+
             if(count($dataStd)>0){
                 $IDSAStudent = $dataStd[0]['ID'];
 
@@ -2468,6 +2492,7 @@ class C_api2 extends CI_Controller {
                                                             WHERE sp.NPM = "'.$NPM.'"
                                                             AND sp.CDID = "'.$d['CDID'].'"
                                                             ORDER BY sp.Score DESC LIMIT 1 ')->result_array();
+
 
                         $dataCID[$i]['SP'] = $dataC;
 
@@ -4326,7 +4351,7 @@ class C_api2 extends CI_Controller {
                                         LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
                                         LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
                                         WHERE f.NIP = "'.$NIP.'" AND f.Active = 1 AND LinkFiles IS NOT NULL ORDER BY mf.ID ASC')->result_array();
-           
+
             return print_r(json_encode($dataF));
         }
         else if($data_arr['action']=='removeDoc'){
@@ -4345,7 +4370,7 @@ class C_api2 extends CI_Controller {
                                         LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
                                         LEFT JOIN db_employees.master_other_files AS p ON (f.ID_OtherFiles = p.ID)
                                         LEFT JOIN db_research.university AS z ON (f.NameUniversity = z.ID)
-                                        LEFT JOIN db_employees.major_programstudy_employees AS j ON (f.Major = j.ID)  
+                                        LEFT JOIN db_employees.major_programstudy_employees AS j ON (f.Major = j.ID)
                                         LEFT JOIN db_employees.major_programstudy_employees AS k ON (f.ProgramStudy = k.ID)
                                         WHERE f.ID = "'.$ID.'" ')->result_array();
 
@@ -4470,12 +4495,12 @@ class C_api2 extends CI_Controller {
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
-            $dataSearch = ' AND ( em.NIP LIKE "%'.$search.'%" 
-                                    OR em.Name LIKE "%'.$search.'%" 
-                                    OR c.Name LIKE "%'.$search.'%" 
-                                    OR c.Email LIKE "%'.$search.'%" 
-                                    OR c.Phone LIKE "%'.$search.'%" 
-                                    OR c.Mobile LIKE "%'.$search.'%" 
+            $dataSearch = ' AND ( em.NIP LIKE "%'.$search.'%"
+                                    OR em.Name LIKE "%'.$search.'%"
+                                    OR c.Name LIKE "%'.$search.'%"
+                                    OR c.Email LIKE "%'.$search.'%"
+                                    OR c.Phone LIKE "%'.$search.'%"
+                                    OR c.Mobile LIKE "%'.$search.'%"
                                     )';
         }
 

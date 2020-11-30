@@ -82,6 +82,9 @@
 
         oTableGet = dataTable;
         oSettingsGet = oTableGet.settings();
+
+        var Year = status;
+        newDescritionInput.getDescription(Year);
     }
 
     $('#saveToExcel').click(function () {
@@ -105,5 +108,11 @@
             }
         });
     }
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        const Year = $('#filterTahun option:selected').attr('id');
+        newDescritionInput.saveDescription(itsme,Year);
+    })
 
 </script>

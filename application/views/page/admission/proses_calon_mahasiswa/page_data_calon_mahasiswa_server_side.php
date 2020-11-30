@@ -51,6 +51,8 @@
                                   <option value="Lunas" >Lunas</option>
                                   <option value="-100" >Belum Bayar Formulir</option>
                                   <option value="100" >Sudah Bayar Formulir</option>
+                                  <option value="Intake" >Intake</option>
+                                  <option value="Refund" >Refund</option>
                               </select>
                             </div>
                           </div>
@@ -86,6 +88,57 @@
     window.temp = '';
     var oTable1;
     var oTable2;
+
+    // hide show menu payment
+    const getUrl = window.location.href;
+    const __MenuPayment = (ID_register_formulir,PaymentShow = '1',PaymentShowTextMSG = null) => {
+      let html  = '<div class = "MenuPaymentShow" style = "pading:3px;margin-top:7px;">'+
+                    '<label style="font-size:10px;color:red;margin-bottom:6px;">Hide Show Menu Payment</label>';
+      let arrShow = [
+        {
+          value : '0',
+          text : 'Hide'
+        },
+        {
+          value : '1',
+          text : 'Show'
+        },
+      ];
+
+      let showText = (PaymentShowTextMSG == null || PaymentShowTextMSG == '') ? '' : PaymentShowTextMSG;
+      let htmlSelectOP = '<select class = "form-control PaymentShow" ID_register_formulir = "'+ID_register_formulir+'">';
+          for (var i = 0; i < arrShow.length; i++) {
+            let selected = (arrShow[i].value == PaymentShow) ? 'selected' : '';
+            htmlSelectOP += '<option value = "'+arrShow[i].value+'" '+selected+'>'+arrShow[i].text+'</option>';
+          }
+
+          htmlSelectOP += '</select>';
+      let InputMSG = '<div class = "form-group" style = "width:100%;">'+ 
+                          '<label>Messages</label>'+
+                          '<input type = "text" class = "form-control PaymentShowTextMSG" value = "'+showText+'" placeholder = "input pesan untuk student" />'+
+                     '</div>';
+
+
+      let btnSaveMenuPayment = '<div style = "margin-top:5px;">'+
+                                  '<button class = "btn btn-success btnSaveMenuPayment" ID_register_formulir = "'+ID_register_formulir+'">Save</button>'+
+                                '</div>';
+      if (PaymentShow == '1') {
+        InputMSG = '';
+      }                           
+
+      let divInput = '<div>'+
+                      '<div class = "form-group" style = "width:100%;">'+
+                          '<label>Choose</label>'+
+                          htmlSelectOP + 
+                      '</div>'+      
+                      InputMSG+
+                     '</div>';
+      html += divInput + btnSaveMenuPayment;                
+      html += '</div>'; 
+
+      return html;
+    }
+
     function loadTahun()
     {
         var academic_year_admission = "<?php echo $academic_year_admission ?>";
@@ -151,20 +204,22 @@
               selector.find('option[value="-"]').attr('disabled',false);
               selector.find('option[value="-100"]').attr('disabled',false);
               selector.find('option[value="100"]').attr('disabled',false);
+              selector.find('option[value="Intake"]').attr('disabled',false);
+              selector.find('option[value="Refund"]').attr('disabled',false);
                $("#dataPageLoad").empty();
                var table = '<table class="table table-bordered datatable2" id = "datatable2">'+
                            '<thead>'+
                            '<tr style="background: #333;color: #fff;">'+
                                // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
                                '<th>No</th>'+
-                               '<th>Nama,Email,Phone & Sekolah</th>'+
-                               '<th>Prody,Formulir & VA</th>'+
+                               '<th width = "10%">Nama,Email,Phone & Sekolah</th>'+
+                               '<th width = "4%">Prody,Formulir & VA</th>'+
                                '<th>Sales</th>'+
                                '<th>Rangking</th>'+
                                '<th>Beasiswa</th>'+
                                '<th>Document & Exam</th>'+
                                '<th width = "13%">Tagihan</th>'+
-                               '<th>Detail Payment</th>'+
+                               '<th width = "35%">Detail Payment</th>'+
                                '<th>Status</th>'+
                                '<th>RegisterAt</th>'+
                                '<th width = "17%"><i class="fa fa-cog"></i></th>'+
@@ -219,6 +274,30 @@
                            $("#employee-grid_processing").css("display","none");
                        }
                    },
+                   'columnDefs': [
+                       {
+                         'targets': 0,
+                         'searchable': false,
+                         'orderable': false,
+                         'className': 'dt-body-center',
+                       },
+                       {
+                         'targets': 8,
+                         'render': function (data, type, full, meta){
+                           let html = full[8];
+                           if (full[8] != '-') {
+                            let dataTokenDecode = jwt_decode(full['dataToken']);
+                            // console.log(dataTokenDecode)
+                            const ID_register_formulir = dataTokenDecode['ID_register_formulir'];
+                            const PaymentShow = dataTokenDecode['PaymentShow'];
+                            const PaymentShowTextMSG = dataTokenDecode['PaymentShowTextMSG'];
+                            const htmlMenuPayment = __MenuPayment(ID_register_formulir,PaymentShow,PaymentShowTextMSG);
+                            html += '<div class = "tdMenuPayment">'+htmlMenuPayment+'</div>';
+                           }
+                           return html;
+                         }
+                       },
+                   ],
                    'createdRow': function( row, data, dataIndex ) {
                          if(data[9] == 'Lunas')
                          {
@@ -235,9 +314,11 @@
                 selector.find('option[value="-"]').attr('disabled',true);
                 selector.find('option[value="-100"]').attr('disabled',true);
                 selector.find('option[value="100"]').attr('disabled',true);
+                selector.find('option[value="Intake"]').attr('disabled',true);
+                selector.find('option[value="Refund"]').attr('disabled',true);
                 var S_StatusPayment = selector.find('option:selected').val();
                 // console.log(S_StatusPayment);
-                if (S_StatusPayment == '-' || S_StatusPayment == '-100' || S_StatusPayment == '100' ) {
+                if (S_StatusPayment == '-' || S_StatusPayment == '-100' || S_StatusPayment == '100' || S_StatusPayment == 'Intake' || S_StatusPayment == 'Refund'  ) {
                   // selector.find('option[value="%"]').attr('selected',true);
                   $("#selectStatusPayment option").filter(function() {
                      //may want to use $.trim in here
@@ -427,38 +508,100 @@
                               '<th style="width: 55px;">BilingID</th>'+
                               '<th style="width: 55px;">Status</th>'+
                               '<th style="width: 55px;">Deadline</th>'+
+                              '<th style="width: 55px;">Payment Date</th>'+
                               '<th style="width: 55px;">UpdateAt</th>';
-        table += '</tr>' ;
-        table += '</thead>' ;
+        table += '</tr>' ;  
+        table += '</thead>' ; 
         table += '<tbody>' ;
 
-        var url = base_url_js+'finance/getPayment_detail_admission';
+        var url = base_url_js+'finance/getPayment_detail_admission2';
         var data = {
             ID_register_formulir : ID_register_formulir,
         };
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token},function (resultJson) {
-           var DetailPaymentArr = jQuery.parseJSON(resultJson);
-
+           var resultJson = jQuery.parseJSON(resultJson);
+           var DetailPaymentArr = resultJson['data'];
+           var action = resultJson['action'];
+           dataRefund =  resultJson['dataRefund'];
+           const dataTuitionFee =  resultJson['dataTuitionFee'];
            var isi = '';
            for (var j = 0; j < DetailPaymentArr.length; j++) {
              var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
              var status = (DetailPaymentArr[j]['Status'] == 0) ? 'Belum Bayar' : 'Sudah Bayar';
+             var btn_bayar = 'Already Generated';
+             if(action == 1)
+             {
+              btn_bayar = (DetailPaymentArr[j]['Status'] == 0) ? '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "1">Bayar</button>' : '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "0">Tidak Bayar</button>';
+             }
+             if(action == 2)
+             {
+              btn_bayar = 'Already Refund';
+             }
+
+             var PaymentDate = (DetailPaymentArr[j]['DatePayment'] == '' || DetailPaymentArr[j]['DatePayment'] == null || DetailPaymentArr[j]['DatePayment'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['DatePayment'];
+             var Deadline = (DetailPaymentArr[j]['Deadline'] == '' || DetailPaymentArr[j]['Deadline'] == null || DetailPaymentArr[j]['Deadline'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['Deadline'];
+             var UpdateAt = (DetailPaymentArr[j]['UpdateAt'] == '' || DetailPaymentArr[j]['UpdateAt'] == null || DetailPaymentArr[j]['UpdateAt'] == '0000-00-00 00:00:00') ? '' : DetailPaymentArr[j]['UpdateAt']
+             
              isi += '<tr>'+
                    '<td>'+ (j+1) + '</td>'+
                    // '<td>'+ Nama + '</td>'+
                    '<td>'+ yy + '</td>'+
                    '<td>'+ DetailPaymentArr[j]['BilingID'] + '</td>'+
                    '<td>'+ status + '</td>'+
-                   '<td>'+ DetailPaymentArr[j]['Deadline'] + '</td>'+
-                   '<td>'+ DetailPaymentArr[j]['UpdateAt'] + '</td>'+
-                 '<tr>';
+                   '<td>'+ Deadline + '</td>'+
+                   '<td>'+ PaymentDate + '</td>'+
+                   '<td>'+ UpdateAt + '</td>'+
+                 '<tr>'; 
            }
 
-           table += isi+'</tbody>' ;
+           table += isi+'</tbody>' ; 
            table += '</table>' ;
 
            html += table;
+
+           html += '<hr/>';
+
+           html += IntakePaymentDetailDiscount.htmlWr(dataTuitionFee);
+
+           if (dataRefund.length > 0) {
+                html  += '<br/>';
+                html += '<div class = "row">'+
+                     '<div class = "col-md-12">'+
+                       '<div class = "well" style = "padding:10px;">'+
+                           '<div class = "row">'+
+                             '<div class = "col-md-12">'+
+                               '<h4 style = "color:red;">Refund</h4>'+
+                             '</div>'+
+                             '<div class = "col-md-12">'+
+                               '<table class = "table">'+
+                                 '<tr>'+
+                                   '<td style = "font-weight:bold;">Price</td>'+
+                                   '<td>:</td>'+
+                                   '<td style = "color:blue;">'+formatRupiah(dataRefund[0].Price)+'</td>'+
+                                 '</tr>'+
+                                 '<tr>'+
+                                   '<td style = "font-weight:bold;">Desc</td>'+
+                                   '<td>:</td>'+
+                                   '<td style = "color:blue;">'+dataRefund[0].Desc+'</td>'+
+                                 '</tr>'+
+                                 '<tr>'+
+                                   '<td style = "font-weight:bold;">By</td>'+
+                                   '<td>:</td>'+
+                                   '<td style = "color:blue;">'+dataRefund[0].NameEMP+'</td>'+
+                                 '</tr>'+
+                                 '<tr>'+
+                                   '<td style = "font-weight:bold;">At</td>'+
+                                   '<td>:</td>'+
+                                   '<td style = "color:blue;">'+dataRefund[0].UpdateAt+'</td>'+
+                                 '</tr>'+
+                               '</table>'+
+                             '</div>'+
+                           '</div>'+
+                       '</div>'+
+                     '</div>'+
+                   '</div>';
+           }
 
            var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                '';
@@ -469,10 +612,10 @@
            $('#GlobalModalLarge').modal({
                'show' : true,
                'backdrop' : 'static'
-           });
+           });   
 
         }).fail(function() {
-          toastr.info('No Action...');
+          toastr.info('No Action...'); 
           // toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {
 
@@ -913,5 +1056,52 @@
       end_loading_button2(itsme,'Save');
 
     })
+
+    // hide & show menu payment
+    $(document).on('change','.PaymentShow',function(e){
+      const itsme = $(this);
+      const valData = itsme.find('option:selected').val();
+      const id_register_formulir = itsme.attr('id_register_formulir');
+      itsme.closest('.tdMenuPayment').html(__MenuPayment(id_register_formulir,valData,''));
+    })
+
+    $(document).on('click','.btnSaveMenuPayment',async function(e){
+      const itsme = $(this);
+      const id_register_formulir = $(this).attr('id_register_formulir');
+      const PaymentShow = itsme.closest('.MenuPaymentShow').find('.PaymentShow option:selected').val();
+      const PaymentShowTextMSG = itsme.closest('.MenuPaymentShow').find('.PaymentShowTextMSG').val();
+      const dataForm = {
+        action : 'SaveMenuPayment',
+        ID_register_formulir : id_register_formulir,
+        data :{
+          PaymentShow : PaymentShow,
+          PaymentShowTextMSG : PaymentShowTextMSG
+        }
+        
+      };
+      var token = jwt_encode(dataForm,'UAP)(*');
+      if (confirm('Are you sure ?')) {
+         loading_button2(itsme);
+         try{
+          const response = await AjaxSubmitFormPromises(getUrl,token);
+          if (response.status == 1) {
+            itsme.closest('.tdMenuPayment').html(__MenuPayment(id_register_formulir,PaymentShow,PaymentShowTextMSG));
+            toastr.success('Saved');
+          }
+          else
+          {
+            toastr.info(response.msg);
+          }
+         }
+         catch(err){
+          toastr.info('something wrong');
+         }
+
+         end_loading_button2(itsme,'Save');
+      }
+     
+
+    })
+    // hide & show menu payment
 
 </script>

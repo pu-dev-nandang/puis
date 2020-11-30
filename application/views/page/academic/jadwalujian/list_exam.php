@@ -547,7 +547,7 @@
 
                 var token = jwt_encode(data,'UAP)(*');
 
-                var dataTable = $('#tableShowExam').DataTable( {
+                window.dataTable = $('#tableShowExam').DataTable( {
                     "processing": true,
                     "serverSide": true,
                     "iDisplayLength" : 10,
@@ -742,7 +742,8 @@
                 var file = (jsonResult[0].File!='' && jsonResult[0].File!=null) ? jsonResult[0].File : '';
                 if(file!=''){
                     showFile = (jsonResult.length>0)
-                        ? '<iframe src="'+base_url_js+'/uploads/task-exam/'+file+'"></iframe>' : '';
+                        ? '<a href="'+base_url_js+'uploads/task-exam/'+file+'" target="_blank" class="btn btn-sm btn-default">Open in New Tab</a>' +
+                        '<iframe style="width: 100%;height: 250px;" src="'+base_url_js+'uploads/task-exam/'+file+'"></iframe>' : '';
                     formNameFileOld = file;
                 }
                 IDExamTask = jsonResult[0].ID;
@@ -843,8 +844,8 @@
 
             $.post(url,function (result) {
 
-                load__DateExam();
-
+                // load__DateExam();
+                window.dataTable.ajax.reload(null, false);
                 toastr.success('Data removed','Success');
                 $('#GlobalModal').modal('hide');
 
@@ -881,7 +882,8 @@
                         if(typeof jsonData.success=='undefined'){
                             alert(jsonData.error);
                         } else {
-                            load__DateExam();
+                            // load__DateExam();
+                            window.dataTable.ajax.reload(null, false);
                             toastr.success('Data saved','Success');
                             $('#GlobalModal').modal('hide');
                         }
