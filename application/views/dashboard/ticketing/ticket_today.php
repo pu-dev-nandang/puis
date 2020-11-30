@@ -126,6 +126,10 @@ var App_ticket_ticket_today = {
               },
               onMediaDelete : function(target) {
                   // summernote_DeleteImage(target[0].src);
+              },
+              onPaste: function(e) {
+                      alert('Disabled cut copy and paste');
+                      e.preventDefault();
               }
           }
       });
@@ -369,7 +373,7 @@ var App_ticket_ticket_today = {
                                         '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
                                         '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                         '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
-                                        '<p>'+nl2br(row.Message)+'</p>'+
+                                        // '<p>'+nl2br(row.Message)+'</p>'+
                                         pfiles+
                                         '<div style="text-align: center;margin-top: 10px;">'+
                                             '<a href="javascript:void(0);" class="ModalReadMore" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
@@ -436,7 +440,7 @@ var App_ticket_ticket_today = {
                                        '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
                                        '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
-                                       '<p>'+nl2br(row.Message)+'</p>'+
+                                       // '<p>'+nl2br(row.Message)+'</p>'+
                                        pfiles+
                                        '<div style="text-align: center;margin-top: 10px;">'+
                                            '<a href="javascript:void(0);" class="ModalReadMore" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
@@ -538,7 +542,7 @@ var App_ticket_ticket_today = {
                                        
                                        '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
-                                       '<p>'+nl2br(row.Message)+'</p>'+
+                                       // '<p>'+nl2br(row.Message)+'</p>'+
                                        pfiles+
                                        '<div class="ticket-accepted">'+
                                         '<div class="separator"><b>Received</b></div>'+
@@ -654,7 +658,7 @@ var App_ticket_ticket_today = {
                                        '<div class="ticket-division">'+department_handle+'</div>'+
                                        '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
-                                       '<p>'+nl2br(row.Message)+'</p>'+
+                                       // '<p>'+nl2br(row.Message)+'</p>'+
                                        pfiles+
                                        '<div class="ticket-accepted">'+
                                         '<div class="separator"><b>Received</b></div>'+
@@ -1102,24 +1106,24 @@ $(document).off('click', '.btnSaveRating').on('click', '.btnSaveRating',function
 })
 
 
-$('#GlobalModal').bind('cut copy paste', function (e) {
-    const itsme  = $(this);
-    if (itsme.find('.pastePanelModal')) {
-      alert('Disabled cut copy and paste');
-      e.preventDefault();
-    }
+// $('#GlobalModal').bind('cut copy paste', function (e) {
+//     const itsme  = $(this);
+//     if (itsme.find('.pastePanelModal')) {
+//       alert('Disabled cut copy and paste');
+//       e.preventDefault();
+//     }
     
-});
+// });
 
-//Disable mouse right click
-$("#GlobalModal").on("contextmenu",function(e){
-    const itsme  = $(this);
-    if (itsme.find('.pastePanelModal')) {
-      alert('Disabled right click');
-      return false;
-    }
+// //Disable mouse right click
+// $("#GlobalModal").on("contextmenu",function(e){
+//     const itsme  = $(this);
+//     if (itsme.find('.pastePanelModal')) {
+//       alert('Disabled right click');
+//       return false;
+//     }
     
-});
+// });
 
 </script>
 
