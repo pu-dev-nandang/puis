@@ -206,16 +206,14 @@ class C_react_mobile extends CI_Controller {
              default:
                if ($AsIT) {
                   $DeptDiv = $this->db->query(
-                     'select * from db_employees.division'
+                     'select * from db_employees.division where ID = '.$RuleUser[$i]['IDDivision'].'  '
                   )->result_array();
-                  for ($z=0; $z < count($DeptDiv); $z++) { 
-                    $DepartmenID = 'NA.'.$DeptDiv[$z]['ID'];
-                    $DeptList[] = [
-                     'DepartmenID' => $DepartmenID,
-                     'DepartmentName' => $DeptDiv[$z]['Division'],
-                     'As' => 'Admin'
-                    ];
-                  }
+                  $DepartmenID = 'NA.'.$DeptDiv[0]['ID'];
+                  $DeptList[] = [
+                   'DepartmenID' => $DepartmenID,
+                   'DepartmentName' => $DeptDiv[0]['Division'],
+                   'As' => 'Admin'
+                  ];
                   
                }
                else
