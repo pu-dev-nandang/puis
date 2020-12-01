@@ -2,6 +2,12 @@
 .nav-tabs > li > a {
     background-color: #ececec;
 }
+.select2-container {
+    padding-top: 0px;
+}
+iframe >img{
+	width: 100%;
+}
 </style>
 <?php $Segment1 = $this->uri->segment(2); ?>
 <?php $Segment2 = $this->uri->segment(3); ?>
@@ -25,7 +31,7 @@
 			      <thead>
 			        <tr>
 			          <!-- <th>#</th> -->
-			          <th><?php if ($Segment1 =="testimonials"){echo "Name";}else{echo "Title";}?></th>
+			          <th><?php if ($Segment1 =="testimonials" || $Segment1 =="committee"){echo "Name";}else{echo "Title";}?></th>
 			          <!-- <th>Category</th> -->
 			          <th>Published</th>
 			          <th>Date Update</th>
@@ -208,9 +214,18 @@
 					<div class="col-md-8" >
 	                <div class="thumbnail" style="padding: 15px"> 
 						<div class="form-group">
-	                        <label><?php if ($Segment1 =="testimonials"){echo "Name";}else{echo "Title";}?></label>                        
+	                        <label><?php if ($Segment1 =="testimonials" || $Segment1 =="committee"){echo "Name";}else{echo "Title";}?></label>
+
+                        <?php if ($Segment1 =="committee"){?>
+
+                        	<select name="title" class="form-control" style="width: 100%;padding: 0px;" id="NIP" ></select>
+
+                    	<?php }else{ ?>
+
 	                        <input name="title" placeholder="<?php if ($Segment1 =="testimonials"){echo "Name";}else{echo "Title";}?>" class="form-control" type="text">
 	                        <span class="help-block"></span>
+
+                    	<?php } ?>
 	                	</div>
 	                	 <div class="container" id="show_a1" hidden="true">
 						  <div class="row">
@@ -284,12 +299,27 @@
 							<span class="help-block"></span>
 	                    </div>
 	            	</div>
-	            	<div id="show_a5" class="thumbnail" style="padding: 15px ;margin-bottom:15px" > 
-	            		<div class="form-group" style="margin-bottom: 0px">
-	                        <h3>Select Category</h3>
-	                        <div class="form-group" style="margin-bottom: 0px">
-			                    <label>Select Category</label>
-			                    <select  name="category" class="form-control getsubCatcontent" id="showcategorycontent">
+	            	<?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="event" || $Segment1 =="testimonials" || $Segment1 =="partner" || $Segment1 =="committee"){?>
+
+	            	<?php }else{?>
+	            		<div id="show_a5" class="thumbnail" style="padding: 15px ;margin-bottom:15px" > 
+		            		<div class="form-group" style="margin-bottom: 0px">
+		                        <h3>Select Category</h3>
+		                        <div class="form-group" style="margin-bottom: 0px">
+				                    <label>Select Category</label>
+				                    <select  name="category" class="form-control getsubCatcontent" id="showcategorycontent">
+				                      <option value="">--Select--</option>
+				                        <!-- <?php foreach($category as $row):?>
+				                        <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
+				                        <?php endforeach;?>  -->                          
+				                    </select>
+				                    <span class="help-block"></span>
+				                </div> 
+								<span class="help-block"></span>
+		                    </div>
+		                    <div class="form-group" style="margin-bottom: 0px">
+			                    <label>Select Sub Category</label>
+			                    <select  name="idsubcategory" class="form-control shotes" id="showSubcategorycontent">
 			                      <option value="">--Select--</option>
 			                        <!-- <?php foreach($category as $row):?>
 			                        <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
@@ -297,26 +327,16 @@
 			                    </select>
 			                    <span class="help-block"></span>
 			                </div> 
-							<span class="help-block"></span>
-	                    </div>
-	                    <div class="form-group" style="margin-bottom: 0px">
-		                    <label>Select Sub Category</label>
-		                    <select  name="idsubcategory" class="form-control shotes" id="showSubcategorycontent">
-		                      <option value="">--Select--</option>
-		                        <!-- <?php foreach($category as $row):?>
-		                        <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
-		                        <?php endforeach;?>  -->                          
-		                    </select>
-		                    <span class="help-block"></span>
-		                </div> 
-	                </div>
+		                </div>
+	            	<?php }?>
+
 	            	<div class="thumbnail" style="padding: 15px"> 	            		
 	            		
 	                    <div class="form-group" style="margin-bottom: 15px">
 	                        <h3>Setting Build</h3>	                                             
 							<hr>
 
-								<div><input type="checkbox" id="ad1" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="knowledge" || $Segment1 =="testimonials" || $Segment1 =="partner"){echo "disabled";}?> onchange="valueChanged1()"> <label id="setingedit0">Add</label> Date
+								<div><input type="checkbox" id="ad1" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="knowledge" || $Segment1 =="testimonials" || $Segment1 =="partner" || $Segment1 =="committee"){echo "disabled";}?> onchange="valueChanged1()"> <label id="setingedit0">Add</label> Date
 								</div>
 								<div><input type="checkbox" id="ad2" onchange="valueChanged2()"> <label id="setingedit">Add</label> Meta Descripton
 								</div>
@@ -324,7 +344,7 @@
 								</div>
 								<div><input type="checkbox" id="ad4" <?php if ($Segment1 =="vision" || $Segment1 =="mission" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="event" ){echo "disabled";}?> onchange="valueChanged4()"> <label id="setingedit2">Add</label> Upload
 								</div>
-								<div><input type="checkbox" id="ad5" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="event" || $Segment1 =="testimonials" || $Segment1 =="partner"){echo "disabled";}?> onchange="valueChanged5()"> <label id="setingedit3">Add</label> Category
+								<div><input type="checkbox" id="ad5" <?php if ($Segment1 =="vision" || $Segment1 =="mission" || $Segment1 =="slider" ||$Segment1 =="target" || $Segment1 =="program" || $Segment1 =="news" || $Segment1 =="event" || $Segment1 =="testimonials" || $Segment1 =="partner" || $Segment1 =="committee"){echo "disabled";}?> onchange="valueChanged5()"> <label id="setingedit3">Add</label> Category
 								</div>										
 							<span class="help-block"></span>
 	                    </div>
@@ -356,7 +376,44 @@
 </script>
 
 <script>
-	
+	$(document).ready(function () {
+	    LoadNama();
+	});
+    function LoadNama() { // load data student
+
+	$('#modal_form').removeAttr('tabindex');
+        var selector =$('#NIP');
+        var url = base_url_js+'api/__getDosenSelectOption';
+        var data = {
+            auth : 's3Cr3T-G4N',
+            mode : 'showDataDosen'
+        };
+        var token = jwt_encode(data,"UAP)(*");
+        $.post(url,{ token:token },function (resultJson) {
+            
+        }).done(function(resultJson) {
+            //var response = jQuery.parseJSON(resultJson);
+            selector.empty()
+            for (var i = 0; i < resultJson.length; i++) {
+                var NIP = resultJson[i].NIP
+                var Name = resultJson[i].Name
+                selector.append(
+                    ' <option value="'+NIP+'">'+NIP+'|'+Name+'</option>'
+                    )
+
+            }
+            selector.select2({
+                //allowClear: true
+
+            });
+        }).fail(function() {
+          toastr.info('No Result Data');
+        }).always(function() {
+                        
+        }); 
+
+    }
+
     $(document).ready(function () {    	
         $('#Description').summernote({
             placeholder: 'Text your announcement',
@@ -386,6 +443,9 @@
         });
 
     }); 
+
+
+    
 
      // show setting build
     $("#show_a1").hide();
@@ -671,7 +731,7 @@
 	        success: function(data)
 	        {
 	 			$('[name="idcat"]').val(data.ID);
-	            $('[name="category"]').append(data.Name);
+	            $('[name="category"]').val(data.Name);
 	            $('[name="lang"]').val(data.Lang);	
 				$('[name="category"]').focus();	  
 				$('#cng').text('Edit')          			
@@ -918,6 +978,7 @@
 		$('[name="meta_des"]').val(data.Meta_des);
 		$('[name="meta_key"]').val(data.Meta_key);
 		$('[name="date"]').val(data.AddDate);
+		$('select[name="title"]').val(data.Title).trigger('change');
 		// console.log(data.ID);
 	}
 
@@ -969,25 +1030,25 @@
 		// 1
 		loadDefaultEdit(); 
 		// 2 
-		const dataLPpm = await LoadAjaxByID(id);
-			fillDataModal(dataLPpm);
+		const dataLppm = await LoadAjaxByID(id);
+			fillDataModal(dataLppm);
 
 		// 3
-		const lang = dataLPpm.Lang;
+		const lang = dataLppm.Lang;
 		$('[name="lang"]').val(lang);
 		const DataCategory = await AjaxshowCategoryBylang(lang);
 			HtmlDataCategory(DataCategory);
-		const idcat = dataLPpm.IDCat;
+		const idcat = dataLppm.IDCat;
 		$('[name="category"]').val(idcat);
 		// 4 dan 5
 		const getCategory = $('.getsubCatcontent').find('option:selected').val();
-		const getidSub = dataLPpm.IDSub;
+		const getidSub = dataLppm.IDSub;
 		$('[name="idsubcategory"]').val(getidSub);
-		console.log(idcat);
+		// console.log(idcat);
 		const DataSubCategory = await AjaxshowSubCategoryByCategory(getCategory,getidSub);
 			HtmlDataSubCategory(DataSubCategory);
 
-			const data = dataLPpm;
+			const data = dataLppm;
             if (data.Status=="Yes") {
             	document.getElementById("st1").checked = true;
             } else {
@@ -1002,16 +1063,16 @@
             	$("#show_a1").show()
             }
             // console.log(data.IDCat);
-            if (data.IDSubCat ){
-            	document.getElementById("ad5").checked = true;
-            	$('#show_a5').show();
+            if (data.IDSubCat=='' || data.IDSubCat=='null'){            	
+            	document.getElementById("ad5").checked = false;
+            	$('#show_a5').hide();
             	// $("#show_a1").prop("show", this.checked);
             	// console.log('no');
             }else{
-            	document.getElementById("ad5").checked = false;
-            	// document.getElementById("show_a5").hidden = false;
-            	$('#show_a5').hide();
             	// console.log('ok');
+            	document.getElementById("ad5").checked = true;
+            	// document.getElementById("show_a5").hidden = false;
+            	$('#show_a5').show();
             }
             // if (data.File!=="" ) {
          //    	// document.getElementById("ad4").checked = true;                	

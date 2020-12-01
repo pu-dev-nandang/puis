@@ -84,7 +84,7 @@ class C_lppm extends Lppm_Controler {
                 'CreateAt' => date('Y-m-d H:i:s'),
                 'CreateBy' => $this->session->userdata('NIP'),
             );
-
+        // print_r($data);
         if(!empty($_FILES['photo']['name']))
         {
             $upload = $this->_do_upload();

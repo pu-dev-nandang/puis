@@ -186,15 +186,21 @@ class C_apilppm extends CI_Controller {
 
     public function GetDataCommittee(){
         $data_arr = $this->getInputToken2(); 
-
-        $sql = 'select * from db_employees.position ';
+        $lang = $data_arr['LangCode'];
+        $IDType = $data_arr['IDType'];
+        $sql = 'select ci.* from db_lppm.content_index AS ci
+                WHERE ci.SegmentMenu="'.$IDType.'" ';
         $query=$this->db->query($sql, array())->result_array();
         $idindex = $query[0]['ID'];
-        // print_r($IDType).die();
-        $data = $this->db->query('SELECT * FROM  db_employees.employees AS e
-                LEFT JOIN db_employees.position p on SUBSTRING_INDEX(SUBSTRING_INDEX(e.PositionMain, ".", 2), ".", -1) = p.ID
-                WHERE e.PositionMain LIKE "%3.%" AND e.PositionMain NOT LIKE "%13.%" AND e.PositionMain NOT LIKE "%33.%" AND e.StatusEmployeeID in (1,2) OR e.PositionOther1 like "%3.%" AND e.PositionOther1 NOT LIKE "%13.%" AND e.PositionOther1 NOT LIKE "%33.%" AND e.StatusEmployeeID in (1,2) OR e.PositionOther2 like "%3.%" AND e.PositionOther2 NOT LIKE "%13.%" AND e.PositionOther2 NOT LIKE "%33.%" AND e.StatusEmployeeID in (1,2) OR e.PositionOther3 like "%3.%" AND e.PositionOther3 NOT LIKE "%13.%" AND e.PositionOther3 NOT LIKE "%33.%" AND e.StatusEmployeeID in (1,2)
-                ORDER BY p.ID ASC')->result_array();
+
+        $data = $this->db->query('SELECT c.*, l.language, ct.Label , ci.SegmentMenu , e.Name, p.Position
+            FROM db_lppm.content c 
+            LEFT JOIN db_lppm.content_type ct ON (ct.ID = c.IDindex)
+            LEFT JOIN db_lppm.content_index ci ON (ci.ID = c.IDindex)
+            LEFT JOIN db_lppm.language l ON (l.ID = ct.LangID)
+            LEFT JOIN db_employees.employees e ON (e.NIP=c.Title)
+            LEFT JOIN db_employees.position p on SUBSTRING_INDEX(SUBSTRING_INDEX(e.PositionMain, ".", 2), ".", -1) = p.ID
+            WHERE c.IDindex ='.$idindex.' and c.Lang="'.$lang.'" and c.Status="Yes" ORDER BY c.AddDate ASC')->result_array();
         return print_r(json_encode($data));
     }
 

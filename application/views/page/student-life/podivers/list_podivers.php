@@ -324,7 +324,7 @@
     $(document).ready(function(){        
             var id=$(this).val();
             $.ajax({
-                url : base_url_js+'_crudSetMember',
+                url : base_url_js+'page/student-life/c_studentlife/crudSetMember',
                 method : "POST",
                 data : {id: id},
                 async : true,
@@ -335,7 +335,7 @@
                     for(i=0; i<data.length; i++){
                         html += '<option value='+data[i].ID_set_member+'>'+data[i].MemberName+'</option>';
                     }
-                    $('#showSetGroup').html(html);
+                    $('#showSetMember').html(html);
                 }
             });
             return false;
