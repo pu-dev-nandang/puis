@@ -67,22 +67,56 @@ class C_react_mobile extends CI_Controller {
         return $data_arr;
     }
 
+    private function AsIT($dataEMP){
+      $IT_DivisionID = 12;
+      $bool = false;
+      $arr_key = ['DivisionID','DivisionID_other1','DivisionID_other2','DivisionID_other3'];
+      if (count($dataEMP) > 0 ) {
+        for ($i=0; $i < count($dataEMP); $i++) { 
+          $s = $dataEMP[$i];
+          foreach ($s as $key => $value) {
+            if (in_array($key, $arr_key) && $value == $IT_DivisionID ) {
+              $bool = true;
+              break;
+            }
+          }
+
+          if ($bool) {
+            break;
+          }
+        }
+      }
+
+      return $bool;
+    }
+
     public function LoginMobile(){
       $rs = ['status' => -1,'msg' => '','callback' => []];
       $dataToken = $this->getInputToken();
       $data = $dataToken['data'];
       $NIP = $data['NIP'];
       $Password = $this->m_master->genratePassword($NIP, $data['Password']);
-      $dataEMP = $this->db->query(
-        'select * from db_employees.employees where NIP = "'.$NIP.'" and Password = "'.$Password.'" 
+      // $dataEMP = $this->db->query(
+      //   'select * from db_employees.employees where NIP = "'.$NIP.'" and Password = "'.$Password.'" 
+      //   and Status = "1"
+      //    '
+      // )->result_array();
+
+      $checkEMP =  $this->db->query('
+          select count(*) as total from 
+          db_employees.employees where NIP = "'.$NIP.'" and Password = "'.$Password.'" 
         and Status = "1"
-         '
-      )->result_array();
+        ')->row()->total;
+
+      $dataEMP = $this->m_master->SearchEmployeesByNIP($NIP);
+
       $RuleUser = $this->db->query('SELECT * FROM db_employees.rule_users WHERE NIP LIKE "'.$NIP.'"')->result_array();
-      if (count($dataEMP) > 0 && count($RuleUser) > 0 ) {
+      if ($checkEMP > 0 && count($RuleUser) > 0 ) {
          $this->load->model('ticketing/m_general');
         // read rule user
          $DeptList = [];
+
+         $AsIT = $this->AsIT($dataEMP);
 
          $As = function($NIP,$DepartmenID) {
           $Total = $this->db->query(
@@ -99,57 +133,104 @@ class C_react_mobile extends CI_Controller {
            switch ($RuleUser[$i]['IDDivision']) {
              case '15': // Prodi
              case 15:
-               $Auth_prodi = $this->m_master->caribasedprimary('db_prodi.auth_prodi','NIP',$NIP);
-               if (count($Auth_prodi) > 0) {
-                 $Auth_prodi =   $ProdiAuth[0]['ProdiAuth'];
-                 $Auth_prodi =   json_decode($Auth_prodi,true);
-                 for ($j=0; $j < count($Auth_prodi); $j++) { 
-                   $ProdiID =  $Auth_prodi[$i];
-                   $d = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
-                   $DepartmenID = 'AC.'.$ProdiID;
+               if ($AsIT) {
+                 $getPrody = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+                 for ($z=0; $z < count($getPrody); $z++) { 
+                   $DepartmenID = 'AC.'.$getPrody[$z]['ID'];
                    $DeptList[] = [
                     'DepartmenID' => $DepartmenID,
-                    'DepartmentName' => 'Prodi '.$d[0]['Name'],
-                    'As' => $As($NIP,$DepartmenID)
+                    'DepartmentName' => 'Prodi '.$getPrody[$z]['Name'],
+                    'As' => 'Admin'
                    ];
                  }
+                 
+               }
+               else
+               {
+                  $Auth_prodi = $this->m_master->caribasedprimary('db_prodi.auth_prodi','NIP',$NIP);
+                  if (count($Auth_prodi) > 0) {
+                    $Auth_prodi =   $ProdiAuth[0]['ProdiAuth'];
+                    $Auth_prodi =   json_decode($Auth_prodi,true);
+                    for ($j=0; $j < count($Auth_prodi); $j++) { 
+                      $ProdiID =  $Auth_prodi[$i];
+                      $d = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                      $DepartmenID = 'AC.'.$ProdiID;
+                      $DeptList[] = [
+                       'DepartmenID' => $DepartmenID,
+                       'DepartmentName' => 'Prodi '.$d[0]['Name'],
+                       'As' =>   $As($NIP,$DepartmenID)
+                      ];
+                    }
+                  }
                }
                
                break;
              
              case '34':
              case 34:
-              $a_ID = $this->m_master->caribasedprimary('db_academic.faculty','AdminID',$NIP);
-              $k_ID = $this->m_master->caribasedprimary('db_academic.faculty','NIP',$NIP);
-              if (count($a_ID) > 0) {
-                $DepartmenID = 'FT.'.$a_ID[0]['ID'];
-                  $DeptList[] = [
-                   'DepartmenID' => $DepartmenID,
-                   'DepartmentName' => 'Fakultas '.$a_ID[0]['Name'],
-                   'As' => $As($NIP,$DepartmenID)
-                  ];
+              if ($AsIT) {
+                $getFaculty = $this->m_master->showData_array('db_academic.faculty');
+                for ($z=0; $z < count($getFaculty); $z++) { 
+                    $DepartmenID = 'FT.'.$getFaculty[$z]['ID'];
+                    $DeptList[] = [
+                     'DepartmenID' => $DepartmenID,
+                     'DepartmentName' => 'Fakultas '.$getFaculty[$z]['Name'],
+                     'As' => 'Admin'
+                    ];
+                }
               }
-              elseif (count($k_ID) > 0) {
-                $DepartmenID = 'FT.'.$k_ID[0]['ID'];
-                  $DeptList[] = [
-                   'DepartmenID' => $DepartmenID,
-                   'DepartmentName' => 'Fakultas '.$k_ID[0]['Name'],
-                   'As' => $As($NIP,$DepartmenID)
-                  ];
+              else
+              {
+                  $a_ID = $this->m_master->caribasedprimary('db_academic.faculty','AdminID',$NIP);
+                  $k_ID = $this->m_master->caribasedprimary('db_academic.faculty','NIP',$NIP);
+                  if (count($a_ID) > 0) {
+                      $DepartmenID = 'FT.'.$a_ID[0]['ID'];
+                      $DeptList[] = [
+                       'DepartmenID' => $DepartmenID,
+                       'DepartmentName' => 'Fakultas '.$a_ID[0]['Name'],
+                       'As' => $As($NIP,$DepartmenID)
+                      ];
+                  }
+                  elseif (count($k_ID) > 0) {
+                      $DepartmenID = 'FT.'.$k_ID[0]['ID'];
+                      $DeptList[] = [
+                       'DepartmenID' => $DepartmenID,
+                       'DepartmentName' => 'Fakultas '.$k_ID[0]['Name'],
+                       'As' => $As($NIP,$DepartmenID)
+                      ];
+                  }
               }
               
               break;  
 
              default:
-               $DeptDiv = $this->db->query(
-                  'select * from db_employees.division where ID = '.$RuleUser[$i]['IDDivision'].'  '
-               )->result_array();
-               $DepartmenID = 'NA.'.$DeptDiv[0]['ID'];
-               $DeptList[] = [
-                'DepartmenID' => $DepartmenID,
-                'DepartmentName' => $DeptDiv[0]['Division'],
-                'As' => $As($NIP,$DepartmenID)
-               ];
+               if ($AsIT) {
+                  $DeptDiv = $this->db->query(
+                     'select * from db_employees.division'
+                  )->result_array();
+                  for ($z=0; $z < count($DeptDiv); $z++) { 
+                    $DepartmenID = 'NA.'.$DeptDiv[$z]['ID'];
+                    $DeptList[] = [
+                     'DepartmenID' => $DepartmenID,
+                     'DepartmentName' => $DeptDiv[$z]['Division'],
+                     'As' => 'Admin'
+                    ];
+                  }
+                  
+               }
+               else
+               {
+                $DeptDiv = $this->db->query(
+                   'select * from db_employees.division where ID = '.$RuleUser[$i]['IDDivision'].'  '
+                )->result_array();
+                $DepartmenID = 'NA.'.$DeptDiv[0]['ID'];
+                $DeptList[] = [
+                 'DepartmenID' => $DepartmenID,
+                 'DepartmentName' => $DeptDiv[0]['Division'],
+                 'As' => $As($NIP,$DepartmenID)
+                ];
+               }
+              
                break;
            }
          }
