@@ -5,10 +5,10 @@ class M_podivers extends CI_Model {
 
     var $table = 'db_podivers.set_list_member';
     var $tableset = 'db_podivers.set_group';
-    var $column_order = array('ID_set_list_member','Name',null); //set column field database for datatable orderable
+    var $column_order = array('po.ID_set_list_member','Name',null); //set column field database for datatable orderable
     var $column_search = array('NIPNPM'); //set column field database for datatable searchable just firstname , lastname , address are searchable
 
-    var $order = array('ID_set_list_member' => 'desc'); // default order 
+    var $order = array('po.ID_set_list_member' => 'desc'); // default order 
 
     private function _get_datatables_query()
     {
@@ -20,10 +20,11 @@ class M_podivers extends CI_Model {
         //     $this->db->where('IDindex', $getvaID);
         // }
         
-        $this->db->from('db_podivers.set_list_member'); 
-        $this->db->join('db_academic.auth_students', 'auth_students.NPM = set_list_member.NIPNPM', 'left');
-        $this->db->join('db_blogs.set_master_group', 'set_list_member.ID_master_group = set_list_member.ID_master_group', 'left');
-         $this->db->join('db_blogs.set_group', 'set_list_member.ID_set_group = set_group.ID_set_group', 'left');
+        $this->db->from('db_podivers.set_list_member as po'); 
+        $this->db->join('db_blogs.set_list_member as bl', 'po.NIPNPM = bl.NIPNPM');
+        $this->db->join('db_academic.auth_students', 'auth_students.NPM = po.NIPNPM', 'left');
+        $this->db->join('db_blogs.set_master_group', 'set_master_group.ID_master_group = po.ID_master_group', 'left');
+         $this->db->join('db_blogs.set_group', 'po.ID_set_group = set_group.ID_set_group', 'left');
         $i = 0;
         
         // if(!isset($_POST['category']))
@@ -123,9 +124,11 @@ class M_podivers extends CI_Model {
 
     public function delete_by_id($id)
     {
-        $this->db->where('ID_set_list_member', $id);
-        $this->db->delete($this->table);
-        $this->db->delete('db_blogs.set_list_member');
+        $this->db->where('NIPNPM', $id);
+        if($this->db->delete($this->table)){
+            $this->db->where('NIPNPM', $id);
+            $this->db->delete('db_blogs.set_list_member');
+        }
     }
 
     public function getSetMasterGroup(){
