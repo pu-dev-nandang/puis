@@ -125,6 +125,7 @@ class M_podivers extends CI_Model {
     {
         $this->db->where('ID_set_list_member', $id);
         $this->db->delete($this->table);
+        $this->db->delete('db_blogs.set_list_member');
     }
 
     public function getSetMasterGroup(){
@@ -158,7 +159,7 @@ class M_podivers extends CI_Model {
     {   
        
          // print_r($data);die();
-        $this->db->insert($this->tableset, $data);
+        $this->db->insert('db_blogs.set_group', $data);
         return $this->db->insert_id();
     }
 
@@ -166,7 +167,7 @@ class M_podivers extends CI_Model {
     public function updateSet($where, $data)
     {	
     	$this->db->where('ID_set_group', $where);
-		$this->db->update('db_podivers.set_group', $data);
+		$this->db->update('db_blogs.set_group', $data);
         return $this->db->affected_rows();
     }    
     
@@ -174,6 +175,6 @@ class M_podivers extends CI_Model {
     public function delete_by_idSet($id)
     {
         $this->db->where('ID_set_group', $id);
-        $this->db->delete($this->tableset);
+        $this->db->delete('db_blogs.set_group');
     }
 }

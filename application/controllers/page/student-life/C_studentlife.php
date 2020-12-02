@@ -612,16 +612,18 @@ class C_studentlife extends Student_Life {
         // $this->_validate();
         $data = array(
                 // 'IDType' => $this->input->post('type'),
-                'ID_set_list_master' => $this->input->post('ID_master_group'),
+                'ID_master_group' => $this->input->post('ID_master_group'),
                 'ID_set_group' => $this->input->post('ID_set_group'),
+                'ID_set_member' => $this->input->post('ID_set_member'),
                 'NIPNPM' => $this->input->post('npm'),                
                 'UpdateAT' => date('Y-m-d H:i:s'),
                 'UpdateBY' => $this->session->userdata('NIP'),
             );
         $datablog = array(
                 // 'IDType' => $this->input->post('type'),
-                'ID_set_list_master' => $this->input->post('ID_master_group'),
+                'ID_master_group' => $this->input->post('ID_master_group'),
                 'ID_set_group' => $this->input->post('ID_set_group'),
+                'ID_set_member' => $this->input->post('ID_set_member'),
                 'NIPNPM' => $this->input->post('npm'),                
                 'UpdateAT' => date('Y-m-d H:i:s'),
                 'UpdateBY' => $this->session->userdata('NIP'),
@@ -634,22 +636,24 @@ class C_studentlife extends Student_Life {
     public function ajax_updatepodivers()
     {
         $data = array(
-                'ID_set_list_member' => $this->input->post('idpodivers'),
+                'ID_master_group' => $this->input->post('ID_master_group'),
                 'ID_set_group' => $this->input->post('ID_set_group'),
+                'ID_set_member' => $this->input->post('ID_set_member'),
                 'NIPNPM' => $this->input->post('npm'),                
                 'UpdateAT' => date('Y-m-d H:i:s'),
                 'UpdateBY' => $this->session->userdata('NIP'),
             );
         $datablog = array(
-                'ID_set_list_member' => $this->input->post('idpodivers'),
+                'ID_master_group' => $this->input->post('ID_master_group'),
                 'ID_set_group' => $this->input->post('ID_set_group'),
+                'ID_set_member' => $this->input->post('ID_set_member'),
                 'NIPNPM' => $this->input->post('npm'),                
                 'UpdateAT' => date('Y-m-d H:i:s'),
                 'UpdateBY' => $this->session->userdata('NIP'),
             );
         
 
-        $this->m_podivers->update(array('ID_set_list_member' => $this->input->post('idpodivers')), $data);
+        $this->m_podivers->update(array('ID_master_group' => $this->input->post('ID_master_group')), $data);
         echo json_encode(array("status" => TRUE));
     }
     
