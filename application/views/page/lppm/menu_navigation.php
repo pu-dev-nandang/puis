@@ -210,7 +210,7 @@
                     <li class="<?php if($this->uri->segment(2)=='target'){echo"current";}?>">
                         <a href="<?php echo base_url('lppm/target');?>">
                             <i class="fa fa-bolt"></i>
-                            Traget
+                            Target
                         </a>
                     </li>
                     <li class="<?php if($this->uri->segment(2)=='program'){echo"current";}?>">

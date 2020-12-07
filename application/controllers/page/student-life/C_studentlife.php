@@ -567,7 +567,7 @@ class C_studentlife extends Student_Life {
             //add html for action
             $row[] = '
                     <a class="btn btn-sm btn-primary hide" href="javascript:void(0)" title="Edit" onclick="edit_podivers('."'".$m->ID_set_list_member."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
-                    <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_podivers('."'".$m->ID_set_list_member."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+                    <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_podivers('."'".$m->NIPNPM."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
  
             $data[] = $row;
         }

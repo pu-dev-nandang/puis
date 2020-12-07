@@ -66,7 +66,7 @@ class C_rest_podivers extends CI_Controller {
       switch ($action) {
         case 'registration':
           $data = $input['data'];
-          $DtRegistrationByNPM = $this->m_master->caribasedprimary('db_podivers.registration','NPM',$data['NPM']);
+          $DtRegistrationByNPM = $this->m_master->caribasedprimary('db_podivers.set_list_member','NPM',$data['NPM']);
           if (count($DtRegistrationByNPM) > 0 ) {
              if ($data['Choosepodivers'] == 0) {
                // delete data di registration
