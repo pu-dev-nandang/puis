@@ -3043,6 +3043,22 @@
     }
     /*END ADDED BY Adhi @ Sep 2020*/
 
+    function loadSelectOptionEmployees_kelompok_profesi(selector,selected = ''){
+        var url = base_url_js+'api/__getemployees_kelompok_profesi';
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.ID_kelompok_profesi) ? 'selected' : '';
+                selector.append('<option value="'+v.ID_kelompok_profesi+'" '+sc+'>'+v.Name+'</option>');
+
+            })
+        });
+    }
+
+    function loadSelectOptionStatus_NITK(selector,selected = ''){
+        loadSelectOptionEmployees_kelompok_profesi(selector,selected)
+    }
+
 </script>
 
 

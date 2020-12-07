@@ -628,7 +628,71 @@ class C_aphris extends HR_Controler {
         }else{show_404();}
     }
 
+    public function master_kelompok_profesi(){
+        // index data
+        $url = base_url(uri_string());
+        $this->subdata['table_default'] = [
+            'columns' => [
+                '0' => ['name' => 'No', 'title' => "No", 'class' => 'no-sort image', 'filter' => false,'width' => '30px'],
+                '1' => ['name' => 'Name', 'title' => 'Name', 'class' => 'default-sort', 'sort' => 'desc', 'filter' => ['type' => 'text'] ],
+            ],
+            'url' => $url,
+        ];
 
+        $this->subdata['table_default']['columns']['2'] = ['name' => 'ID_kelompok_profesi', 'title' => 'Action', 'class' => 'no-sort text-center', 'width' => '100px', 'filter' => ['type' => 'action']];
+
+        $this->subdata['filter_name'] = 'table_filter_hr_master_kelompok_profesi';
+        $this->subdata['tabledb'] = 'db_employees.employees_kelompok_profesi';
+        
+        if ($this->input->is_ajax_request()) {
+            // server side datatable
+            $start = $this->input->post('start');
+            $length = $this->input->post('length');
+            $order = $this->input->post('order')[0];
+            $draw = intval($this->input->post('draw'));
+            $filter = $this->input->post('filter');
+            $this->session->set_userdata($this->subdata['filter_name'], $filter);
+
+            $this->load->model('hr/master/m_master_kelompok_profesi_model');
+
+            $datas= $this->m_master_kelompok_profesi_model->get_all($start, $length, $filter, $order);
+            $data_total =  $this->m_master_kelompok_profesi_model->get_total();
+            $data_total_filtered =  $this->m_master_kelompok_profesi_model->get_total($filter);
+            $output['data'] = array();
+
+            if ($datas) {
+                $no = $start + 1;
+                foreach ($datas->result() as $data) {
+                    $output['data'][] = array(
+                        $no,
+                        $data->Name,
+                        ' <a class = "btn btn-sm btn-primary" href="'.$url.'/form/'.$data->ID_kelompok_profesi.'"><i class="fa fa fa-edit"></i>
+                         </a> &nbsp
+                         <a href="javascript:void(0);" class="btn btn-sm btn-danger" data-id="'.$data->ID_kelompok_profesi.'"><i class="fa fa fa-trash"></i>
+                         </a>
+                        '
+                    );
+
+                    $no++;
+                }
+            }
+
+            $output['draw'] = $draw++;
+            $output['recordsTotal'] = $data_total;
+            $output['recordsFiltered'] = $data_total_filtered;
+            echo json_encode($output);
+
+        }
+        else
+        {
+            // page
+            $this->load->helper('form');
+            $this->subdata['heading'] = 'Master Kelompok Profesi';
+            $this->subdata['add'] = $url.'/form';
+            $page = $this->load->view('template/CRUD/index',$this->subdata,true);;
+            $this->temp($page);
+        }
+    }
 
 
 
