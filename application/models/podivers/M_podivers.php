@@ -15,7 +15,7 @@ class M_podivers extends CI_Model {
         switch ($action) {
             case 'delete':
                 $this->db->db_debug=false;
-                $this->db->where('NPM',$data['NPM']);
+                $this->db->where('NIPNPM',$data['NIPNPM']);
                 $query = $this->db->delete($tbl);
                 if( !$query )
                 {
@@ -29,7 +29,7 @@ class M_podivers extends CI_Model {
             case 'create':
                 $this->db->db_debug=false;
                 $dataSave = [
-                    'NPM' => $data['NPM'],
+                    'NIPNPM' => $data['NIPNPM'],
                     'UpdateAt' => date('Y-m-d H:i:s'),
                     'UpdateBy' => $data['UpdateBy'],
                 ];
