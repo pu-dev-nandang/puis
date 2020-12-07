@@ -969,7 +969,7 @@ iframe >img{
 		$('[name="id"]').val(data.ID);	
 		$('[name="idcat1"]').val(data.IDCat);	
 		$('[name="idsubcat1"]').val(data.IDSubCat);	
-		$('[name="category"]').val(data.ID);
+		$('select[name="category"]').val(data.ID).trigger('change');
 		$('select[name="idsubcategory"]').val(data.IDSubCat).trigger('change');
 		// $('[name="lang"]').val(data.Lang).trigger('change');
 		$('[name="title"]').val(data.Title);
@@ -1011,8 +1011,11 @@ iframe >img{
 	const HtmlDataSubCategory = (data) => {
 		var html = '';
 		var i;
+		var idsubcat1=$('[name="idsubcat1"]').val();
+		// console.log(idsubcat1);
 		for(i=0; i<data.length; i++){
-		    html += '<option value='+data[i].IDSub+'>'+data[i].SubName+'</option>';
+			var isSelected = ( idsubcat1== data[i].IDSub ) ? "selected" : "";
+	    	html += '<option value='+data[i].IDSub+' '+isSelected+'>'+data[i].SubName+'</option>';
 		}
 		$('#showSubcategorycontent').html(html);
 	}

@@ -301,7 +301,7 @@
 	                    </div>
 	                    <div class="form-group" style="margin-bottom: 0px">
 		                    <label>Select Sub Category</label>
-		                    <select  name="idsubcategory" class="form-control shotes" id="showSubcategorycontent">
+		                    <select  name="idsubcategory" class="form-control shotes selectSubCatcontent" id="showSubcategorycontent">
 		                      <option value="">--Select--</option>
 		                        <!-- <?php foreach($category as $row):?>
 		                        <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
@@ -909,7 +909,7 @@
 		$('[name="id"]').val(data.ID);	
 		$('[name="idcat1"]').val(data.IDCat);	
 		$('[name="idsubcat1"]').val(data.IDSubCat);	
-		$('[name="category"]').val(data.ID);
+		$('select[name="category"]').val(data.ID).trigger('change');
 		$('select[name="idsubcategory"]').val(data.IDSubCat).trigger('change');
 		// $('[name="lang"]').val(data.Lang).trigger('change');
 		$('[name="title"]').val(data.Title);
@@ -938,11 +938,12 @@
 	}
 
 	const AjaxshowSubCategoryByCategory = async(idcat,idsubcat1) => {
-		// console.log(idcat);
+		// console.log(idsubcat1);
 		const url = base_url_js+'__getSubCat_lpmi';
 		const data = {idcat:idcat,idsubcat:idsubcat1}
 		// console.log(data);
 		const response = await AjaxSubmitFormPromisesNoToken(url,data);
+		// console.log(response);
 		return response;
 	}
 
@@ -950,8 +951,11 @@
 	const HtmlDataSubCategory = (data) => {
 		var html = '';
 		var i;
+		var idsubcat1=$('[name="idsubcat1"]').val();
+		// console.log(idsubcat1);
 		for(i=0; i<data.length; i++){
-		    html += '<option value='+data[i].IDSub+'>'+data[i].SubName+'</option>';
+			var isSelected = ( idsubcat1== data[i].IDSub ) ? "selected" : "";
+	    	html += '<option value='+data[i].IDSub+' '+isSelected+'>'+data[i].SubName+'</option>';
 		}
 		$('#showSubcategorycontent').html(html);
 	}
@@ -983,7 +987,8 @@
 		const getCategory = $('.getsubCatcontent').find('option:selected').val();
 		const getidSub = dataLPMI.IDSub;
 		$('[name="idsubcategory"]').val(getidSub);
-		console.log(idcat);
+		// const getidSubCategory = $('.selectSubCatcontent').find('option:selected').val();
+		// console.log(getidSub);
 		const DataSubCategory = await AjaxshowSubCategoryByCategory(getCategory,getidSub);
 			HtmlDataSubCategory(DataSubCategory);
 
@@ -1002,16 +1007,16 @@
             	$("#show_a1").show()
             }
             // console.log(data.IDCat);
-            if (data.IDSubCat ){
-            	document.getElementById("ad5").checked = true;
-            	$('#show_a5').show();
+            if (data.IDSubCat=='' || data.IDSubCat=='null'){            	
+            	document.getElementById("ad5").checked = false;
+            	$('#show_a5').hide();
             	// $("#show_a1").prop("show", this.checked);
             	// console.log('no');
             }else{
-            	document.getElementById("ad5").checked = false;
-            	// document.getElementById("show_a5").hidden = false;
-            	$('#show_a5').hide();
             	// console.log('ok');
+            	document.getElementById("ad5").checked = true;
+            	// document.getElementById("show_a5").hidden = false;
+            	$('#show_a5').show();
             }
             // if (data.File!=="" ) {
          //    	// document.getElementById("ad4").checked = true;                	
