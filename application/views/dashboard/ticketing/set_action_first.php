@@ -63,9 +63,9 @@
 			    <h4 class="panel-title">Assign To</h4>
 			</div>
 			<div class="panel-body" style="min-height: 100px;" id = "PageAssignTo">
-				<span data-smt="" class="btn btn btn-add-assign_to">
+				<!-- <span data-smt="" class="btn btn btn-add-assign_to">
                     <i class="icon-plus"></i> Add
-                </span>
+                </span> -->
                 <div id="FormAssignTo" style="margin-top: 10px;"></div>
 			</div>
 		</div>
@@ -98,6 +98,53 @@
 	var DataCategory = <?php echo json_encode($DataCategory) ?>;
 	var DataEmployees = <?php echo json_encode($DataEmployees) ?>;
 	var DataReceived = <?php echo json_encode($DataReceived) ?>;
+
+	var btnPasteHere = function (context) {
+	    var ui = $.summernote.ui;
+
+	    // create button
+	    var button = ui.button({
+	        contents: '<i class="fa fa-clipboard"/> Paste text',
+	        tooltip: 'Paste text',
+	        click: function () {
+	            // invoke insertText method with 'hello' on editor module.
+
+	            let html = 
+	                      '<div class = "row">'+
+	                        '<div class = "col-md-12">'+
+	                          '<div class = "well">'+
+	                            '<label>Paste here</label>'+
+	                            '<textarea id="fillModalPaste" class="form-control" rows="10" placeholder="Paste here..."></textarea>' +
+	                            '<hr/>' +
+	                            '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> ' +
+	                            ' | <button type="button" class="btn btn-success" id="btnSaveModalPaste">Save</button> ' +
+	                          '</div>'+
+	                        '</div>'+
+	                      '</div>'  
+	              ;
+
+	            $('#GlobalModal .modal-header').html('<h4 class="modal-title">Paste Here</h4>');
+	            $('#GlobalModal .modal-body').html(html);
+	            $('#GlobalModal .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
+	                '<button type="button" id="btnSaveModalPaste" class="btn btn-success">Save</button>');
+	            $('#GlobalModal').modal({
+	                'show' : true,
+	                'backdrop' : 'static'
+	            });
+
+	            $('#fillModalPaste').focus()
+
+	            $('#btnSaveModalPaste').click(function () {
+	                var fillModalPaste = $('#fillModalPaste').val();
+	                context.invoke('editor.insertText', fillModalPaste);
+	               $('#GlobalModal').modal('hide');
+	            });
+	        }
+	    });
+
+	    return button.render();   // return button as jquery object
+	};	
+
 	var App_AssignTo = {
 		DomContentForm : function(selector){
 			var html = '';
@@ -122,8 +169,8 @@
 										//'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
-										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
-										 // '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
+										 // '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 '<textarea name="MessageReceived" class="form-control input_assign_to area-summernote formTemplateMessage">'+valTextArea+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -166,7 +213,34 @@
 			$('.form-assign-to:last').find('.datetimepicker').datetimepicker({
 				useCurrent: false,
 				format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
-			});				 			
+			});	
+
+
+			$('.form-assign-to').find('.formTemplateMessage').summernote({
+			    placeholder: 'Text your question...',
+			    height: 250,
+			    disableDragAndDrop : true,
+			    toolbar: [
+			        ['style', ['style']],
+			        ['font', ['bold', 'underline', 'clear']],
+			        ['fontname', ['fontname']],
+			        ['color', ['color']],
+			        ['para', ['ul', 'ol', 'paragraph']],
+			        ['table', ['table']],
+			        ['view', ['fullscreen', 'help']],
+			        ['mybutton', ['PasteHere']]
+			    ],
+			    buttons: {
+			        PasteHere: btnPasteHere
+			    },
+			    callbacks: {
+			        onPaste: function(e) {
+			                alert('Disabled cut copy and paste');
+			                e.preventDefault();
+			        }
+			    }
+			});
+
 		},
 
 		DomContentRemove : function(selector){
@@ -198,8 +272,8 @@
 										//'<p style = "color:red;">(not show in user)</p>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
-										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
-										 // '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+''+'</textarea>'+
+										 // '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 	'<textarea name="MessageReceived" class="form-control input_transfer_to area-summernote formTemplateMessage">'+valTextArea+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -213,6 +287,31 @@
 
 			var selectorCategory = $('.form-transfer-to:last').find('.input_transfer_to[name="CategoryReceivedID"]');
 			App_set_ticket.LoadSelectOptionCategory(selectorCategory,'transfer_to');
+
+			$('.form-transfer-to:last').find('.formTemplateMessage').summernote({
+			    placeholder: 'Text your question...',
+			    height: 250,
+			    disableDragAndDrop : true,
+			    toolbar: [
+			        ['style', ['style']],
+			        ['font', ['bold', 'underline', 'clear']],
+			        ['fontname', ['fontname']],
+			        ['color', ['color']],
+			        ['para', ['ul', 'ol', 'paragraph']],
+			        ['table', ['table']],
+			        ['view', ['fullscreen', 'help']],
+			        ['mybutton', ['PasteHere']]
+			    ],
+			    buttons: {
+			        PasteHere: btnPasteHere
+			    },
+			    callbacks: {
+			        onPaste: function(e) {
+			                alert('Disabled cut copy and paste');
+			                e.preventDefault();
+			        }
+			    }
+			});
 		},
 
 		DomContentRemove : function(selector){
