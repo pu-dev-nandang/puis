@@ -210,11 +210,11 @@
                             </li>
                         <?php } ?>
 
-                        <?php if(in_array(6,$rule_service)){ ?>
+                        <!-- <?php if(in_array(6,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(1)=='budgeting'){echo 'active';} ?>" id = "PageServiceBudgeting">
                                 <a href="<?php echo base_url('budgeting'); ?>"><i class="fa fa-money" aria-hidden="true"></i> Budgeting</a>
                             </li>
-                        <?php } ?>
+                        <?php } ?> -->
 
                         <?php if(in_array(9,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(1)=='agregator'){echo 'active';} ?>">
