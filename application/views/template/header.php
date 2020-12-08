@@ -254,10 +254,10 @@
                              </li>
                         <!-- End Adding for Testing -->
                         <!-- Adding for Testing -->
-                        <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
+                        <!-- <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
                              <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='lppm'){echo 'active';} ?>">
                                  <a href="<?php echo base_url('lppm'); ?>"><i class="fa fa-hourglass-half" aria-hidden="true"></i> LPPM</a>
-                             </li>
+                             </li> -->
                         <!-- End Adding for Testing -->
                         <!-- Added by Febri @ Jun 2020 -->
                         <?php 
