@@ -1,7 +1,7 @@
 <script type="text/javascript" src="<?php echo base_url('js/research/portal-eksternal/Clas_global_portal_eksternal.js'); ?>"></script>
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
-        <li class="<?php if($this->uri->segment(2)=='portal-eksternal') { echo 'active'; } ?>">
+        <li class="<?php if($this->uri->segment(1)=='research' || $this->uri->segment(2)=='portal-eksternal') { echo 'active'; } ?>">
             <a href="<?php echo base_url('research/portal-eksternal'); ?>">Portal Eksternal</a>
         </li>
     </ul>
