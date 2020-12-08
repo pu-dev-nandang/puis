@@ -9,8 +9,8 @@ class C_research extends Research_Controler {
     }
 
    public function portal_eksternal(){
-   	$page['department'] = parent::__getDepartement();
-   	$content = $this->load->view('page/research/portal_eksternal/index',$page,true);
+   	// $page['department'] = parent::__getDepartement();
+   	$content = $this->load->view('page/research/portal_eksternal/index',true);
    	$this->menu_portal_eksternal($content);
    }
 
