@@ -3132,3 +3132,40 @@ https://firebase.google.com/docs/web/setup#available-libraries -->
 
 </script>
 
+
+<!--Added by Adhi 2020-12-08 -->
+<script>
+
+const success_message_response = (message) => {
+    toastr.success(message);
+}
+const error_message_response = (message) => {
+    toastr.info(message);
+}
+
+$(document).ready(function(e){
+    <?php
+    if ($this->session->flashdata('form_response_status')) {
+        echo $this->session->flashdata('form_response_status') . '_message_response("' . $this->session->flashdata('form_response_message') . '");';
+    }
+    ?>
+})
+
+const response_form = (response) => {
+    // response = JSON.parse(response);
+    if (response.redirect) {
+        window.location = response.redirect;
+    } else {
+        if (response.message) {
+            if (response.status == 'success') {
+                success_message_response(response.message);
+            } else if (response.status == 'error') {
+                error_message_response(response.message);
+            }
+        }
+    }
+
+}
+
+</script>
+<!--Added by Adhi 2020-12-08 -->

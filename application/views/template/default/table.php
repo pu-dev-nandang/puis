@@ -6,7 +6,7 @@
 					<tr class="column">
 					    <?php
 					    foreach ($table_default['columns'] as $key => $column) {
-					        echo '<th style="' . (isset($column['width']) ? 'width:' . $column['width'] : '') . ' ;text-align: center;background: #20485A;color: #FFFFFF;'.'" ' . (isset($column['id']) ? 'id="' . $column['id'] . '"' : '') . ' class="' . (isset($column['class']) ? $column['class'] : '') . '" data-data="' . $key . '" data-sort="' . (isset($column['sort']) ? $column['sort'] : '') . '">' . $column['title'] . '</th>';
+					        echo '<th style="' . (isset($column['width']) ? 'width:' . $column['width'] : '') . ' ;text-align:center;'.'" ' . (isset($column['id']) ? 'id="' . $column['id'] . '"' : '') . ' class="' . (isset($column['class']) ? $column['class'] : '') . '" data-data="' . $key . '" data-sort="' . (isset($column['sort']) ? $column['sort'] : '') . '">' . $column['title'] . '</th>';
 					    }
 					    ?>
 					</tr>

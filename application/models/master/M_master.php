@@ -4589,5 +4589,20 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $options;
     }
 
+    public function re_format_POST_serializeArray_to_Validation_CI($data){
+        $rs = [];
+        for ($i=0; $i < count($data); $i++) { 
+            if (!array_key_exists('name', $data[$i])) {
+                die('Format not match, ex : Array ( [0] => Array ( [name] => ID_kelompok_profesi [value] => ) [1] => Array ( [name] => Name [value] => fgdgfdg ) )');
+            }
+            else
+            {
+                $rs[$data[$i]['name']] = $data[$i]['value'];
+            }
+        }
+
+        return $rs;
+    }
+
 
 }

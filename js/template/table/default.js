@@ -111,4 +111,32 @@ $(document).ready(function(e){
 	        
 	    });
 	});
+
+	$('body').on('click', '.delete_row_default', function (e) {
+	    var get_url = $(this).attr('href');
+	    e.preventDefault();
+	    if (confirm('Are you sure want to delete ?')) {
+	    	delete_row_default(get_url,tbl)
+	    }
+	});
 })
+
+const delete_row_default = async(get_url,tbl) => {
+	try {
+	  var response =  await AjaxSubmitFormPromises(get_url,'');
+	  if (response.status == 'success') {
+	  	tbl.ajax.reload((e) => {
+	  	    
+	  	});
+	  	success_message_response(response.message);
+	  }
+	  else
+	  {
+	  	error_message_response(response.message);
+	  }
+	    
+	}
+	catch(err) {
+	  toastr.error('something wrong, please contact IT','!Error');
+	}
+}

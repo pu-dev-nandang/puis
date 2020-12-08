@@ -35,6 +35,7 @@ class M_master_kelompok_profesi_model extends CI_Model {
 
     private function filtered($filter = array()){
         // print_r($filter);die();
+        $this->db->where('DeletedBy is NULL');
         if ($filter) {
             $this->db->group_start();
             foreach ($filter as $column => $value) {

@@ -668,7 +668,7 @@ class C_aphris extends HR_Controler {
                         $data->Name,
                         ' <a class = "btn btn-sm btn-primary" href="'.$url.'/form/'.$data->ID_kelompok_profesi.'"><i class="fa fa fa-edit"></i>
                          </a> &nbsp
-                         <a href="javascript:void(0);" class="btn btn-sm btn-danger" data-id="'.$data->ID_kelompok_profesi.'"><i class="fa fa fa-trash"></i>
+                         <a href="'.$url.'/delete/'.$data->ID_kelompok_profesi.'" class="btn btn-sm btn-danger delete_row_default"><i class="fa fa fa-trash"></i>
                          </a>
                         '
                     );
@@ -685,16 +685,134 @@ class C_aphris extends HR_Controler {
         }
         else
         {
-            // page
             $this->load->helper('form');
             $this->subdata['heading'] = 'Master Kelompok Profesi';
             $this->subdata['add'] = $url.'/form';
-            $page = $this->load->view('template/CRUD/index',$this->subdata,true);;
+            $page = $this->load->view('template/default/index',$this->subdata,true);;
             $this->temp($page);
         }
     }
 
+    public function master_kelompok_profesi_form($id = ''){
+        $this->load->helper('form');
+        $tabledb = 'db_employees.employees_kelompok_profesi';
+        $this->subdata['heading'] = 'Form Master Kelompok Profesi';
+        $this->subdata['base_module_url'] = base_url().'human-resources/master-aphris/master_kelompok_profesi';
 
 
+        $data = [];
+        if ($id) {
+            $data =  $this->db->where('ID_kelompok_profesi',$id)->get($tabledb)->row();
+            if (!$data) {
+                show_404();
+                exit();
+            }
+        }
+
+
+        $form = [
+            [
+                'id' => 'ID_kelompok_profesi',
+                'type' => 'hidden',
+                'value' => ($data) ? $data->ID_kelompok_profesi : '',
+            ],
+            [
+                'id' => 'Name',
+                'value' => ($data) ? $data->Name  : '',
+                'label' => 'Name',
+                'required' => 'true',
+                'form_control_class' => 'col-md-5',
+                'required' => 'true',
+            ],
+            // [
+            //     'id' => 'Name',
+            //     'value' => ($data) ? $data->Name  : '',
+            //     'label' => 'Name',
+            //     'required' => 'true',
+            //     'form_control_class' => 'col-md-5',
+            //     'type' => 'file',
+            // ],
+        ];
+
+        $this->load->library('form_builder');
+        $this->subdata['data'] = $data;
+        $this->subdata['form'] = [
+            'action' => $this->subdata['base_module_url'].'/'. 'save',
+            'build' => $this->form_builder->build_form_horizontal($form),
+            'class' => 'ajax-token',
+        ];
+
+        $page = $this->load->view('template/default/form',$this->subdata,true);;
+        $this->temp($page);
+
+    }
+
+    public function master_kelompok_profesi_save(){
+        $this->input->is_ajax_request() or exit('No direct post submit allowed!');
+        $this->load->library('form_validation');
+        $dataDecode = json_decode(json_encode($this->getInputToken()),true);
+        $dataFormater = $this->m_master->re_format_POST_serializeArray_to_Validation_CI($dataDecode);
+        
+        $this->form_validation->set_data($dataFormater);
+        $this->form_validation->set_rules('Name', 'Name', 'trim|required');
+
+        $tabledb = 'db_employees.employees_kelompok_profesi';
+        $this->subdata['base_module_url'] = base_url().'human-resources/master-aphris/master_kelompok_profesi';
+
+        if ($this->form_validation->run() === true) {
+            $data = $dataFormater;
+            do {
+                if (!$data['ID_kelompok_profesi']) {
+                    $data['CreatedBy'] = $this->session->userdata('NIP');
+                    $data['CreatedAt'] = date('Y-m-d H:i:s');
+                    $this->db->insert($tabledb,$data);
+                }
+                else
+                {
+                    $data['UpdatedBy'] = $this->session->userdata('NIP');
+                    $data['UpdatedAt'] = date('Y-m-d H:i:s');
+                    $this->db->where('ID_kelompok_profesi',$data['ID_kelompok_profesi']);
+                    $this->db->update($tabledb,$data);
+                }
+
+                $return = array('message' => 'Saved data '.$data['Name'], 'status' => 'success', 'redirect' => $this->subdata['base_module_url']);
+            } while (0);
+
+        }
+        else
+        {
+             $return = array('message' => validation_errors(), 'status' => 'error');
+        }
+
+        if (isset($return['redirect'])) {
+            $this->session->set_flashdata('form_response_status', $return['status']);
+            $this->session->set_flashdata('form_response_message', $return['message']);
+        }
+        echo json_encode($return);
+
+    }
+
+    public function master_kelompok_profesi_delete($id){
+        $this->input->is_ajax_request() or exit('No direct post submit allowed!');
+        $tabledb = 'db_employees.employees_kelompok_profesi';
+        $dataSave = [];
+        $dataSave['DeletedBy'] = $this->session->userdata('NIP');
+        $dataSave['DeletedAt'] = date('Y-m-d H:i:s');
+
+        $get_data = $this->db->where('ID_kelompok_profesi',$id)->get($tabledb);
+        if ($get_data) {
+            $this->db->where('ID_kelompok_profesi',$id);
+            $this->db->update($tabledb,$dataSave);
+
+            $Name = $get_data->row()->Name;
+            $return = array('message' => 'Delete data '.$Name, 'status' => 'success');
+        }
+        else
+        {
+             $return = array('message' => 'No data '.$Name.' in database', 'status' => 'error');
+        }
+
+        echo json_encode($return);
+    }
 
 }
