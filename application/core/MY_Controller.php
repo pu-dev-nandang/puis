@@ -1137,7 +1137,7 @@ abstract class Research_Controler extends Globalclass{
         $data['page'] = $page;
         $data['department'] = parent::__getDepartement();
         $data['rest_setting_global'] = $this->rest_setting_global;
-        $content = $this->load->view('page/'.$data['department'].'/portal_eksternal/menu_portal_eksternal',$data,true);
+        $content = $this->load->view('page/research/portal_eksternal/menu_portal_eksternal',$data,true);
         $this->temp($content);
     }
 }
