@@ -4288,6 +4288,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 
                 $output[] = $filenameNew;
               }
+              else
+              {
+                $error = array('error' => $this->upload->display_errors());
+                return print_r(json_encode($error));
+              }
             }
         }
 

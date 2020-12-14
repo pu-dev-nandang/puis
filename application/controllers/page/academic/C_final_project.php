@@ -83,15 +83,12 @@ class C_final_project extends Academic_Controler {
             unlink($pathStudent.'/'.$old);
         }
 
-
-        $this->load->library('upload', $config);
-        if ( ! $this->upload->do_upload('userfile')){
-            // Error
-            $error = array('error' => $this->upload->display_errors());
-            return print_r(json_encode($error));
-        }
-        else {
-            // Sukses
+        if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+            // upload to nas
+            $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+            $path = 'document/'.$NPM;
+            $TheFile = 'userfile';
+            $uploadNas = $this->m_master->UploadOneFilesToNas($headerOrigin,$fileName,$TheFile,$path,'string');
 
             // Cek apakah sudah ada atau blm
             $arrWhere = array(
@@ -119,9 +116,49 @@ class C_final_project extends Academic_Controler {
                 $this->db->insert('db_admission.doc_mhs',$dataInsrt);
             }
 
-
             return print_r(1);
         }
+        else
+        {
+            $this->load->library('upload', $config);
+            if ( ! $this->upload->do_upload('userfile')){
+                // Error
+                $error = array('error' => $this->upload->display_errors());
+                return print_r(json_encode($error));
+            }
+            else {
+                // Sukses
+
+                // Cek apakah sudah ada atau blm
+                $arrWhere = array(
+                    'NPM' => $NPM,
+                    'ID_reg_doc_checklist' => 3
+                );
+                $dataCK = $this->db->get_where('db_admission.doc_mhs',$arrWhere)->result_array();
+                $dataInsrt = array(
+                    'NPM' => $NPM,
+                    'ID_reg_doc_checklist' => 3,
+                    'Status' => 'Done',
+                    'Description' => 'Ijazah / SKHUN SMA from Academic',
+                    'VerificationBy' => $this->session->userdata('NIP'),
+                    'VerificationAT' => $this->m_rest->getDateTimeNow(),
+                    'Attachment' => $fileName
+                );
+
+                print_r($dataInsrt);
+                print_r($dataCK);
+
+                if(count($dataCK)>0){
+                    $this->db->where('ID' , $dataCK[0]['ID']);
+                    $this->db->update('db_admission.doc_mhs',$dataInsrt);
+                } else {
+                    $this->db->insert('db_admission.doc_mhs',$dataInsrt);
+                }
+
+                return print_r(1);
+            }
+        }
+       
     }
 
     public function scheduling_final_project(){

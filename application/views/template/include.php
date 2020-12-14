@@ -3039,7 +3039,48 @@
               return false;
             }
             return true;
-        }
+        },
+
+        file_validation : (ev,TheName='',max_upload_per_file = 4,allow_extension = ['pdf,jpeg,jpg,png'],max_size = 5000000) => {
+            var files = ev[0].files;
+            var error = '';
+            var msgStr = '';
+            if (files.length > 0) {
+              if (files.length > max_upload_per_file) {
+                msgStr += 'Upload File '+TheName + ' 1 Document should not be more than '+max_upload_per_file+' Files<br>';
+
+              }
+              else
+              {
+                for(var count = 0; count<files.length; count++)
+                {
+                 var no = parseInt(count) + 1;
+                 var name = files[count].name;
+                 var extension = name.split('.').pop().toLowerCase();
+                 if(jQuery.inArray(extension, ['pdf']) == -1)
+                 {
+                  msgStr += 'Upload File '+TheName + ' Invalid Type File<br>';
+                 }
+
+                 var oFReader = new FileReader();
+                 oFReader.readAsDataURL(files[count]);
+                 var f = files[count];
+                 var fsize = f.size||f.fileSize;
+
+                 if(fsize > max_size) 
+                 {
+                  msgStr += 'Upload File '+TheName +  ' Image File Size is very big<br>';
+                 }
+                 
+                }
+              }
+            }
+            else
+            {
+              msgStr += 'Upload File '+TheName + ' Required';
+            }
+            return msgStr;
+        },
     }
     /*END ADDED BY Adhi @ Sep 2020*/
 
