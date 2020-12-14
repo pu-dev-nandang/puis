@@ -230,13 +230,10 @@ class C_mobile extends CI_Controller {
             $dataSp = $this->m_rest->getTranscript($d['Year'],$NPM,'ASC');
             $TotalCredit = 0;
             $TotalPoint = 0;
-            if(count($dataSp)>0){
-                foreach ($dataSp AS $itemSP){
-
+            if(count($dataSp['dataCourse'])>0){
+                foreach ($dataSp['dataCourse'] AS $itemSP){
                     $TotalCredit = $TotalCredit + $itemSP['Credit'];
                     $TotalPoint = $TotalPoint + $itemSP['Point'];
-
-
                 }
             }
 

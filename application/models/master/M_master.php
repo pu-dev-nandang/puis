@@ -3307,9 +3307,19 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     }
 
     public function SearchEmployeesByNIP($NIP){
-        $sql = 'select emp.*,divi.ID as DivisionID,divi.Division as DivisionName,divi.Description as DivisionNameDesc,divi.Abbreviation as DivAbbr,pos.Position as PositionName,pos.Description as PositionDescription,pos.ID as PositionID from db_employees.employees as emp
-            join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
-            join db_employees.position as pos on SPLIT_STR(emp.PositionMain, ".", 2) = pos.ID
+        $sql = 'select emp.*,divi.ID as DivisionID,divi.Division as DivisionName,divi.Description as DivisionNameDesc,divi.Abbreviation as DivAbbr,pos.Position as PositionName,pos.Description as PositionDescription,pos.ID as PositionID,
+            divi_other1.ID as DivisionID_other1,divi_other1.Division as DivisionName_other1,divi_other1.Description as DivisionNameDesc_other1,divi_other1.Abbreviation as DivAbbr_other1,pos_other1.Position as PositionName_other1,pos_other1.Description as PositionDescription_other1,pos_other1.ID as PositionID_other1,
+            divi_other2.ID as DivisionID_other2,divi_other2.Division as DivisionName_other2,divi_other2.Description as DivisionNameDesc_other2,divi_other2.Abbreviation as DivAbbr_other2,pos_other2.Position as PositionName_other2,pos_other2.Description as PositionDescription_other2,pos_other2.ID as PositionID_other2,
+            divi_other3.ID as DivisionID_other3,divi_other3.Division as DivisionName_other3,divi_other3.Description as DivisionNameDesc_other3,divi_other3.Abbreviation as DivAbbr_other3,pos_other3.Position as PositionName_other3,pos_other3.Description as PositionDescription_other3,pos_other3.ID as PositionID_other3
+            from db_employees.employees as emp
+            left join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+            left join db_employees.position as pos on SPLIT_STR(emp.PositionMain, ".", 2) = pos.ID
+            left join db_employees.division as divi_other1 on SPLIT_STR(emp.PositionOther1, ".", 1) = divi_other1.ID
+            left join db_employees.position as pos_other1 on SPLIT_STR(emp.PositionOther1, ".", 2) = pos_other1.ID
+            left join db_employees.division as divi_other2 on SPLIT_STR(emp.PositionOther1, ".", 1) = divi_other2.ID
+            left join db_employees.position as pos_other2 on SPLIT_STR(emp.PositionOther1, ".", 2) = pos_other2.ID
+            left join db_employees.division as divi_other3 on SPLIT_STR(emp.PositionOther1, ".", 1) = divi_other3.ID
+            left join db_employees.position as pos_other3 on SPLIT_STR(emp.PositionOther1, ".", 2) = pos_other3.ID
             where emp.NIP = "'.$NIP.'"
                 ';
         $query=$this->db->query($sql, array())->result_array();
@@ -4577,6 +4587,21 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $options[$data[$i]['Code']] = $data[$i]['Abbr'];
         }
         return $options;
+    }
+
+    public function re_format_POST_serializeArray_to_Validation_CI($data){
+        $rs = [];
+        for ($i=0; $i < count($data); $i++) { 
+            if (!array_key_exists('name', $data[$i])) {
+                die('Format not match, ex : Array ( [0] => Array ( [name] => ID_kelompok_profesi [value] => ) [1] => Array ( [name] => Name [value] => fgdgfdg ) )');
+            }
+            else
+            {
+                $rs[$data[$i]['name']] = $data[$i]['value'];
+            }
+        }
+
+        return $rs;
     }
 
 

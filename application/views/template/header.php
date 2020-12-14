@@ -210,11 +210,11 @@
                             </li>
                         <?php } ?>
 
-                        <?php if(in_array(6,$rule_service)){ ?>
+                        <!-- <?php if(in_array(6,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(1)=='budgeting'){echo 'active';} ?>" id = "PageServiceBudgeting">
                                 <a href="<?php echo base_url('budgeting'); ?>"><i class="fa fa-money" aria-hidden="true"></i> Budgeting</a>
                             </li>
-                        <?php } ?>
+                        <?php } ?> -->
 
                         <?php if(in_array(9,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(1)=='agregator'){echo 'active';} ?>">
@@ -241,10 +241,10 @@
                         
 
                         <!-- Adding for Testing -->
-                        <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
+                       <!--  <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
                              <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='request-document-generator'){echo 'active';} ?>">
                                  <a href="<?php echo base_url('request-document-generator'); ?>"><i class="glyphicon glyphicon-transfer" aria-hidden="true"></i> Request Document Generator</a>
-                             </li>
+                             </li> -->
                         <!-- End Adding for Testing -->
 
                         <!-- Adding for Testing -->
@@ -272,9 +272,9 @@
                              </li>
                          <?php } ?>
                         <!-- End Added by Febri -->
-                        <li class="<?php echo ($this->uri->segment(1) == 'it' &&  $this->uri->segment(2) == 'summary_knowledgebase') ? 'active' : ''  ?>">
+                        <!-- <li class="<?php echo ($this->uri->segment(1) == 'it' &&  $this->uri->segment(2) == 'summary_knowledgebase') ? 'active' : ''  ?>">
                             <a href="<?php echo base_url().'it/summary_knowledgebase' ?>"><i class="fa fa-book" aria-hidden="true"></i> Summary Knowledgebase</a>
-                        </li>  
+                        </li> -->  
                         
 
                     </ul>
