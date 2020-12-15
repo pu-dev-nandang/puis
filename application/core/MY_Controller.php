@@ -1105,3 +1105,28 @@ abstract class Research_Controler extends Globalclass{
         $this->temp($content);
     }
 }
+
+abstract class Abdimas_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    // overide function
+    public function template($content)
+    {
+        $data['include'] = $this->load->view('template/include','',true);
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+        $data['ClassContainer'] = 'sidebar-closed';
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+    }
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+}
