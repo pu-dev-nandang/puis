@@ -68,6 +68,8 @@
 
 <script>
 
+    let noteAction;
+
     $(document).ready(function () {
         loSelectOptionSemester('#filterSemester','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
@@ -168,12 +170,26 @@
 
     });
 
+    const noteFileShow = (NPM,thefile,selector) => {
+        let html = '<label class="btn btn-sm btn-default note-btn-upload">'+
+                        'Upload file'+
+                        '<input type="file" name="userfile" class="note-uploadFile" accept="application/pdf" style="display: none;">'+
+                    '</label>';
+        if (selector && thefile) {
+            html = '<a href = "'+base_url_js+'uploads/document/'+NPM+'/'+thefile+'" class = "btn btn-primary" target="_blank">File</a> &nbsp <button class = "btn btn-danger NotedeleteFile" npm = "'+NPM+'" >Delete File</button>';
+        }
+
+        selector.html(html);
+    }
+
 
     // === Adding Note Button ===
     $(document).on('click','.btnNote',function () {
-
+        noteAction = $(this);
         var dept = $(this).attr('data-dept');
         var NPM = $(this).attr('data-npm');
+
+        const thefile =  $(this).attr('thefile');
 
         var v = $('#'+dept+'_viewValueNote_'+NPM).val();
         var valNote = (typeof v !== "undefined") ? v : '';
@@ -188,6 +204,7 @@
             '             <textarea class="form-control" id="formNote_Note" rows="5" maxlength="255" placeholder="Please enter notes here...">'+valNote+'</textarea>' +
             '               <p class="help-block">Maximum 255 character</p>' +
             '        </div>' +
+            '<div class = "col-md-4 dom_file"></div>'+
             '    </div>';
 
         $('#GlobalModal .modal-body').html(htmlss);
@@ -203,44 +220,120 @@
             'backdrop' : 'static'
         });
 
+        // set show hide upload file
+        const selectorDOM = $('#GlobalModal').find('.dom_file');
+        noteFileShow(NPM,thefile,selectorDOM);
+
     });
 
-    $(document).on('click','#submitNoteForm',function () {
+    $(document).on('click','.NotedeleteFile',function(e){
+        const itsme = $(this);
+        const NPM = itsme.attr('npm');
+        if (confirm('are you sure ?')) {
+            deleteFileNoteForm(NPM,itsme);
+        }
+        
+    })
 
+    const deleteFileNoteForm = async(npm,selector) => {
+        var token = jwt_encode({
+            action : 'delete_fileNotetoClearent',
+            NPM : npm,
+        },'UAP)(*');
+        var url = base_url_js+'api3/__crudYudisium';
+        loading_button2(selector)
+        try{
+            var response =  await AjaxSubmitFormPromises(url,token);
+            if (response.status == 1) {
+                 const selectorDOM = $('#GlobalModal').find('.dom_file');
+                 noteFileShow(npm,'',selectorDOM);
+
+                 noteAction.attr('thefile','');
+            }
+            else
+            {
+                 toastr.info(response.msg)
+                 end_loading_button2(selector,'Delete File')
+            }
+        }
+        catch(err){
+            toastr.info('something wrong, please contact IT'); // failed
+            end_loading_button2(selector,'Delete File')
+        }
+
+    }
+
+    const submitNoteForm = async(itsme) => {
         var NPM = $('#formNote_NPM').val();
         var Dept = $('#formNote_Dept').val();
         var Note = $('#formNote_Note').val();
 
         if(Note!='') {
+            // updated
+                var ArrUploadFilesSelector = [];
+                var UploadFile = $('.note-uploadFile');
+                var valUploadFile = UploadFile.val();
+                if (valUploadFile) {
+                    var NameField = UploadFile.attr('name');
+                    var temp = {
+                        NameField : NameField,
+                        Selector : UploadFile,
+                    };
+                    ArrUploadFilesSelector.push(temp);
+                }
 
-            loading_buttonSm('#submitNoteForm');
+                // validation ekstension file
+                var FilesValidation = ValidationGenerate.file_validation(ArrUploadFilesSelector[0].Selector,'Note',1,['pdf'],8000000);
+                if (FilesValidation) {
+                    toastr.error(FilesValidation, 'Failed!!'); // failed
+                }
+                else
+                {
+                    var token = jwt_encode({
+                        action : 'updateNotetoClearent',
+                        NPM : NPM,
+                        Dept : Dept,
+                        Note : Note,
+                        User : sessionNIP,
+                        DateTime : getDateTimeNow()
+                    },'UAP)(*');
+                    var url = base_url_js+'api3/__crudYudisium';
 
-            var token = jwt_encode({
-                action : 'updateNotetoClearent',
-                NPM : NPM,
-                Dept : Dept,
-                Note : Note,
-                User : sessionNIP,
-                DateTime : getDateTimeNow()
-            },'UAP)(*');
-            var url = base_url_js+'api3/__crudYudisium';
+                    loading_button2(itsme)
+                    try{
+                       var response =  await AjaxSubmitFormPromises(url,token,ArrUploadFilesSelector);
+                       if (response.status == 1) {
+                            $('#'+Dept+'_viewNote_'+NPM).html('<textarea class="form-control" style="color: #333;" id="'+Dept+'_viewValueNote_'+NPM+'" readonly>'+Note+'</textarea><hr style="margin-bottom: 5px;margin-top: 5px;"/>');
+                            
+                            noteAction.attr('thefile',response.callback.filename );
 
-            $.post(url,{token:token},function (result) {
+                            toastr.success('Data saved','Success');
 
-                $('#'+Dept+'_viewNote_'+NPM).html('<textarea class="form-control" style="color: #333;" id="'+Dept+'_viewValueNote_'+NPM+'" readonly>'+Note+'</textarea><hr style="margin-bottom: 5px;margin-top: 5px;"/>');
-
-                toastr.success('Data saved','Success');
-
-                setTimeout(function () {
-                    $('#GlobalModal').modal('hide');
-                },500);
-
-            });
+                            setTimeout(function () {
+                                $('#GlobalModal').modal('hide');
+                            },500);
+                       }
+                       else
+                       {
+                            toastr.info(response.msg)
+                            end_loading_button2(itsme,'Submit')
+                       }
+                       
+                    }
+                    catch(err) {
+                        toastr.info('something wrong, please contact IT'); // failed
+                        end_loading_button2(itsme,'Submit')
+                    }
+                }   
+            // updated
         } else {
             toastr.warning('Form note required','Warning');
         }
+    }
 
-
+    $(document).on('click','#submitNoteForm',function () {
+        const itsme = $(this);
+        submitNoteForm(itsme);
 
     });
 
