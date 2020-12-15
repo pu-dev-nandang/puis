@@ -3617,7 +3617,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $yA = $pdf->GetY();
 
-        $pdf->Cell($w_R_label,$h,'Judul Skripsi / Tugas Akhir',0,0,'L');
+        $pdf->Cell($w_R_label,$h,'Judul Skripsi / ',0,0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
         $pdf->MultiCell($w_R_fill+$w_Div-2,$h,$SkripsiInd,0);
 
@@ -4084,7 +4084,7 @@ class C_save_to_pdf extends CI_Controller {
 
 
             //foto
-            $pdf->Rect($x+45, $y, 40, 58);
+            $pdf->Rect($x+42, $y, 38, 55); //Update Irfan
 
         }
 
