@@ -1,0 +1,5 @@
+#!/bin/bash
+sudo docker kill $(docker ps --filter name=taskforce_api -aq)
+sudo docker rm $(docker ps --filter name=taskforce_api -aq)
+
+echo "Destroyed. It's safe to ignore any errors this script may have produced."

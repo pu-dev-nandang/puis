@@ -1,0 +1,6 @@
+HTTP_PORT=80
+PATH_CODE= "C:/xampp/htdocs/puis"
+DB_PASSWORD= ""
+DB_NAME= "db_academic"
+DB_USER= "root"
+DB_HOST= "localhost"
