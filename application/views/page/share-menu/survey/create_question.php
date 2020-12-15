@@ -42,9 +42,9 @@
                             <div id="showRate" class="" style="margin-top: 30px;">
                                 <ul style="list-style-type:none;color: #ffa622;">
                                     <li><i class="fa fa-star" aria-hidden="true"></i> Kurang</li>
-                                    <li><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> Sedang</li>
-                                    <li><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> Cukup</li>
-                                    <li><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> Baik</li>
+                                    <li><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> Cukup</li>
+                                    <li><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> Puas</li>
+                                    <li><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> Sangat Puas</li>
                                 </ul>
                             </div>
 
