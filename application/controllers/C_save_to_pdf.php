@@ -4084,7 +4084,7 @@ class C_save_to_pdf extends CI_Controller {
 
 
             //foto
-            $pdf->Rect($x+42, $y, 38, 55); //Update Irfan
+            $pdf->Rect($x+47, $y, 38, 55); //Update Irfan
 
         }
 
