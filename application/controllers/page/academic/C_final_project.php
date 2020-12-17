@@ -16,6 +16,125 @@ class C_final_project extends Academic_Controler {
         parent::template($content);
     }
 
+     public function monitoring_final_project(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/finalproject/monitoring_final_project',$data,true);
+        $this->menu_transcript($page);
+    }
+
+    public function loadFinalProject()
+    {
+        $datatoken =  $this->getInputToken();
+        $datatoken = json_decode(json_encode($datatoken),true);
+
+        if($datatoken['action']=='viewList'){
+
+            $requestData= $_REQUEST;
+
+            
+            
+            $dataWhere = ($datatoken['ProdiID']!='' && $datatoken['ProdiID']!=null)
+                ? '( aut_s.StatusStudentID = "3" OR aut_s.StatusStudentID = "1" ) AND aut_s.ProdiID = "'.$datatoken['ProdiID'].'" '
+                : '( aut_s.StatusStudentID = "3" OR aut_s.StatusStudentID = "1" ) ' ;
+
+            $dataSemester = '';
+            if( !empty($datatoken['SemesterID'])) {
+                $SemesterID = $datatoken['SemesterID'];
+                $dataSemester = 'AND ( s.ID = '.$SemesterID.')';
+            }
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%"
+                               OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" OR fp.TitleInd LIKE "%'.$search.'%" OR fp.TitleEng LIKE "%'.$search.'%" )';
+            }
+
+            $queryDefault = 'SELECT fp.*, aut_s.Name, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng FROM db_academic.final_project fp 
+                                      LEFT JOIN db_academic.auth_students aut_s ON (fp.NPM = aut_s.NPM)
+                                      LEFT JOIN db_academic.semester s ON (aut_s.Year=s.Year)
+                                      LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
+                                      WHERE ( '.$dataWhere.' ) '.$dataSearch.' '.$dataSemester.' ORDER BY aut_s.NPM ASC ';
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+                $tokenID = $this->jwt->encode(array('ID'=>$row['ID']),'UAP)(*');
+
+
+                  $btnAct = ' <div class="btn-group">
+                   <button class="btn btn-warning btn-sm" data-id="'.$row['ID'].'" data-tittleindo="'.$row['TitleInd'].'" data-tittleing="'.$row['TitleEng'].'" data-toggle="modal" data-target="#editdata" title="Edit"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                   </div>';
+                
+                
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div  style="text-align:left;">
+                                    <b><i class="fa fa-user margin-right"></i> '.ucwords(strtolower($row['Name'])).'</b><br/>
+                                        '.$row['NPM'].' | '.$row['ProdiNameEng'].'<br/>
+                                        </div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['TitleInd'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['TitleEng'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['UpdatedBy'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['UpdatedAt'].'</div>';
+                
+
+                $nestedData[] = $btnAct;
+                
+
+                $data[] = $nestedData;
+                $no++;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval($queryDefaultRow),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
+        }
+
+        else if($datatoken['action']=='editTittle'){
+            $formData = $datatoken['datarequest'];
+
+            $requestid = $formData['ID'];
+            $requestInd = $formData['tittleIndo'];
+            $requestIng = $formData['tittleIng'];
+            $ActionBy = $this->session->userdata('Name');
+            
+            $updates = array(
+              'TitleInd' => $requestInd,
+              'TitleEng' => $requestIng,
+              'UpdatedAt' => date('Y-m-d H:i:s'),
+              'UpdatedBy' => $ActionBy,
+            );
+
+            
+            $this->db->where('ID', $requestid);
+            $this->db->update('db_academic.final_project', $updates);
+
+            $rs['status'] = 1;
+            return print_r(json_encode($rs));
+
+        }
+
+            
+    }
+
     public function menu_transcript($page){
         $data['department'] = parent::__getDepartement();
         $data['page'] = $page;
