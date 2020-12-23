@@ -531,6 +531,7 @@ class C_studentlife extends Student_Life {
     public function list_podivers(){
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/podivers/list_podivers',$data,true);
+        // $page = $this->load->view('page/'.$data['department'].'/podivers/v_setting',$data,true);
         $this->menu_podivers($page);
     }
 
@@ -558,14 +559,15 @@ class C_studentlife extends Student_Life {
         foreach ($list as $m) {
             $no++;
             $row = array();
-            $row[] = $m->NPM;
+            $row[] = $m->NIPNPM;
             $row[] = $m->Name;
+            $row[] = $m->MasterGroupName;
             $row[] = $m->GroupName;
-            $row[] = $m->UpdateAt; 
+            $row[] = $m->UpdateAT; 
             //add html for action
             $row[] = '
-                    <a class="btn btn-sm btn-primary hide" href="javascript:void(0)" title="Edit" onclick="edit_podivers('."'".$m->ID_Podivers."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
-                    <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_podivers('."'".$m->ID_Podivers."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
+                    <a class="btn btn-sm btn-primary hide" href="javascript:void(0)" title="Edit" onclick="edit_podivers('."'".$m->ID_set_list_member."'".')"><i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                    <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Hapus" onclick="delete_podivers('."'".$m->NIPNPM."'".')"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
  
             $data[] = $row;
         }
@@ -580,9 +582,21 @@ class C_studentlife extends Student_Life {
         echo json_encode($output);
     }
 
+    public function crudSetMasterGroup(){
+        // $id = $this->input->post('id',TRUE);
+        $data = $this->m_podivers->getSetMasterGroup();
+        echo json_encode($data);
+    }
+
     public function crudSetGroup(){
         // $id = $this->input->post('id',TRUE);
         $data = $this->m_podivers->getSetGroup();
+        echo json_encode($data);
+    }
+
+    public function crudSetMember(){
+        // $id = $this->input->post('id',TRUE);
+        $data = $this->m_podivers->getSetMember();
         echo json_encode($data);
     }
 
@@ -598,12 +612,23 @@ class C_studentlife extends Student_Life {
         // $this->_validate();
         $data = array(
                 // 'IDType' => $this->input->post('type'),
+                'ID_master_group' => $this->input->post('ID_master_group'),
                 'ID_set_group' => $this->input->post('ID_set_group'),
-                'NPM' => $this->input->post('npm'),                
-                'UpdateAt' => date('Y-m-d H:i:s'),
-                'UpdateBy' => $this->session->userdata('NIP'),
+                'ID_set_member' => $this->input->post('ID_set_member'),
+                'NIPNPM' => $this->input->post('npm'),                
+                'UpdateAT' => date('Y-m-d H:i:s'),
+                'UpdateBY' => $this->session->userdata('NIP'),
             );
-        $insert = $this->m_podivers->save($data);
+        $datablog = array(
+                // 'IDType' => $this->input->post('type'),
+                'ID_master_group' => $this->input->post('ID_master_group'),
+                'ID_set_group' => $this->input->post('ID_set_group'),
+                'ID_set_member' => $this->input->post('ID_set_member'),
+                'NIPNPM' => $this->input->post('npm'),                
+                'UpdateAT' => date('Y-m-d H:i:s'),
+                'UpdateBY' => $this->session->userdata('NIP'),
+            );
+        $insert = $this->m_podivers->save($data,$datablog);
         echo json_encode(array("status" => TRUE));
     }
 
@@ -611,16 +636,24 @@ class C_studentlife extends Student_Life {
     public function ajax_updatepodivers()
     {
         $data = array(
-                'ID_Podivers' => $this->input->post('idpodivers'),
+                'ID_master_group' => $this->input->post('ID_master_group'),
                 'ID_set_group' => $this->input->post('ID_set_group'),
-                'NPM' => $this->input->post('npm'),                
-                'UpdateAt' => date('Y-m-d H:i:s'),
-                'UpdateBy' => $this->session->userdata('NIP'),
+                'ID_set_member' => $this->input->post('ID_set_member'),
+                'NIPNPM' => $this->input->post('npm'),                
+                'UpdateAT' => date('Y-m-d H:i:s'),
+                'UpdateBY' => $this->session->userdata('NIP'),
             );
-
+        $datablog = array(
+                'ID_master_group' => $this->input->post('ID_master_group'),
+                'ID_set_group' => $this->input->post('ID_set_group'),
+                'ID_set_member' => $this->input->post('ID_set_member'),
+                'NIPNPM' => $this->input->post('npm'),                
+                'UpdateAT' => date('Y-m-d H:i:s'),
+                'UpdateBY' => $this->session->userdata('NIP'),
+            );
         
 
-        $this->m_podivers->update(array('ID_Podivers' => $this->input->post('idpodivers')), $data);
+        $this->m_podivers->update(array('ID_master_group' => $this->input->post('ID_master_group')), $data);
         echo json_encode(array("status" => TRUE));
     }
     

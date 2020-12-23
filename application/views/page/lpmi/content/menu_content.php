@@ -201,6 +201,8 @@
 	    <div class="modal-body form">
 	    	<form action="#" id="form" class="form-horizontal">
 	            			<input type="hidden" value="" name="id"/>
+	            			<input type="hidden" value="" name="idsubcat1"/>
+	            			<input type="hidden" value="" name="idcat1"/>
 	            			<input type="hidden" value="<?= $Segment1 ?>" name="type"/>
 	        <div class="row">
 					<div class="col-md-8" >
@@ -299,7 +301,7 @@
 	                    </div>
 	                    <div class="form-group" style="margin-bottom: 0px">
 		                    <label>Select Sub Category</label>
-		                    <select  name="idsubcategory" class="form-control shotes" id="showSubcategorycontent">
+		                    <select  name="idsubcategory" class="form-control shotes selectSubCatcontent" id="showSubcategorycontent">
 		                      <option value="">--Select--</option>
 		                        <!-- <?php foreach($category as $row):?>
 		                        <option value="<?php echo $row->ID;?>" ><?php echo $row->Name;?></option>
@@ -899,17 +901,24 @@
 		const data = {}
 		const token = jwt_encode(data,'UAP)(*');
 		const response = await AjaxSubmitFormPromises(url,token);
+		// console.log(response);		
 		return response;
 	}
 
 	const fillDataModal = (data) => {
-		$('[name="id"]').val(data.ID);
+		$('[name="id"]').val(data.ID);	
+		$('[name="idcat1"]').val(data.IDCat);	
+		$('[name="idsubcat1"]').val(data.IDSubCat);	
+		$('select[name="category"]').val(data.ID).trigger('change');
+		$('select[name="idsubcategory"]').val(data.IDSubCat).trigger('change');
+		// $('[name="lang"]').val(data.Lang).trigger('change');
 		$('[name="title"]').val(data.Title);
 		// $('[name="description"]').val(data.Description);
 		$('#Description').summernote('code', data.Description);
 		$('[name="meta_des"]').val(data.Meta_des);
 		$('[name="meta_key"]').val(data.Meta_key);
 		$('[name="date"]').val(data.AddDate);
+		// console.log(data.ID);
 	}
 
 	const AjaxshowCategoryBylang = async(idlang) => {
@@ -928,10 +937,13 @@
 		$('#showcategorycontent').html(html);
 	}
 
-	const AjaxshowSubCategoryByCategory = async(idcat) => {
+	const AjaxshowSubCategoryByCategory = async(idcat,idsubcat1) => {
+		// console.log(idsubcat1);
 		const url = base_url_js+'__getSubCat_lpmi';
-		const data = {idcat:idcat}
+		const data = {idcat:idcat,idsubcat:idsubcat1}
+		// console.log(data);
 		const response = await AjaxSubmitFormPromisesNoToken(url,data);
+		// console.log(response);
 		return response;
 	}
 
@@ -939,8 +951,11 @@
 	const HtmlDataSubCategory = (data) => {
 		var html = '';
 		var i;
+		var idsubcat1=$('[name="idsubcat1"]').val();
+		// console.log(idsubcat1);
 		for(i=0; i<data.length; i++){
-		    html += '<option value='+data[i].IDSub+'>'+data[i].SubName+'</option>';
+			var isSelected = ( idsubcat1== data[i].IDSub ) ? "selected" : "";
+	    	html += '<option value='+data[i].IDSub+' '+isSelected+'>'+data[i].SubName+'</option>';
 		}
 		$('#showSubcategorycontent').html(html);
 	}
@@ -966,10 +981,15 @@
 		$('[name="lang"]').val(lang);
 		const DataCategory = await AjaxshowCategoryBylang(lang);
 			HtmlDataCategory(DataCategory);
+		const idcat = dataLPMI.IDCat;
+		$('[name="category"]').val(idcat);
 		// 4 dan 5
 		const getCategory = $('.getsubCatcontent').find('option:selected').val();
-
-		const DataSubCategory = await AjaxshowSubCategoryByCategory(getCategory);
+		const getidSub = dataLPMI.IDSub;
+		$('[name="idsubcategory"]').val(getidSub);
+		// const getidSubCategory = $('.selectSubCatcontent').find('option:selected').val();
+		// console.log(getidSub);
+		const DataSubCategory = await AjaxshowSubCategoryByCategory(getCategory,getidSub);
 			HtmlDataSubCategory(DataSubCategory);
 
 			const data = dataLPMI;
@@ -978,7 +998,6 @@
             } else {
                 document.getElementById("st2").checked = true;
             }
-            console.log(data.AddDate);
             if (data.AddDate=='' || data.AddDate=='0000-00-00 00:00:00'){
             	document.getElementById("ad1").checked = false;
             	$("#show_a1").hide();
@@ -988,16 +1007,16 @@
             	$("#show_a1").show()
             }
             // console.log(data.IDCat);
-            if (data.IDSubCat ){
-            	document.getElementById("ad5").checked = true;
-            	$('#show_a5').show();
+            if (data.IDSubCat=='' || data.IDSubCat=='null'){            	
+            	document.getElementById("ad5").checked = false;
+            	$('#show_a5').hide();
             	// $("#show_a1").prop("show", this.checked);
             	// console.log('no');
             }else{
-            	document.getElementById("ad5").checked = false;
-            	// document.getElementById("show_a5").hidden = false;
-            	$('#show_a5').hide();
             	// console.log('ok');
+            	document.getElementById("ad5").checked = true;
+            	// document.getElementById("show_a5").hidden = false;
+            	$('#show_a5').show();
             }
             // if (data.File!=="" ) {
          //    	// document.getElementById("ad4").checked = true;                	
@@ -1042,114 +1061,7 @@
 
 	}
 	 
-	// function edit_lpmi(id)
-	// {
-	//     save_method = 'update';
-	//     $('#form')[0].reset(); // reset form on modals
-	//     $('.form-group').removeClass('has-error'); // clear error class
-	//     $('.help-block').empty(); // clear error string
-	//     $('#setingedit0').text('Edit');  //change name checkbox
-	//  	$('#setingedit').text('Edit');  //change name checkbox
-	//  	$('#setingedit1').text('Edit');  //change name checkbox
-	//  	$('#setingedit2').text('Edit');  //change name checkbox
-	//  	$('#setingedit3').text('Edit');  //change name checkbox
-	//     //Ajax Load data from ajax
-	//     $.ajax({
-	//         url : base_url_js+'__ajaxedit_lpmi/'+id,
-	//         type: "GET",
-	//         dataType: "JSON",
-	//         success: function(data)
-	//         {
-	//  			// console.log(data.IDSubCat);
-	//  			// console.log(data.SubName);
-	//             $('[name="id"]').val(data.ID);
-	//             $('[name="title"]').val(data.Title);
-	//             // $('[name="description"]').val(data.Description);
-	//             $('#Description').summernote('code', data.Description);
-	//             $('[name="meta_des"]').val(data.Meta_des);
-	//             $('[name="meta_key"]').val(data.Meta_key);
-	//             $('[name="date"]').val(data.AddDate);
-	//             // $('[name="category"]').val(data.IDCat);
-	//             // Language
-	//             $('[name="lang"]').val(data.Lang).trigger('change');
-	//             $('[name="category"]').val(data.IDCat).trigger('change');
-	//             $('[name="idsubcategory"]').val(data.IDSub).trigger('change');
-
-	//             // $('.getsubCatcontent').trigger('change');
-
-
-	//             if (data.Status=="Yes") {
- //                	document.getElementById("st1").checked = true;
-	//             } else {
-	//                 document.getElementById("st2").checked = true;
-	//             }
-	//             console.log(data.AddDate);
-	//             if (data.AddDate=='' || data.AddDate=='0000-00-00 00:00:00'){
-	//             	document.getElementById("ad1").checked = false;
-	//             	$("#show_a1").hide();
-	//             	// $("#show_a1").prop("show", this.checked);
-	//             }else{
-	//             	document.getElementById("ad1").checked = true;
-	//             	$("#show_a1").show()
-	//             }
-	//             // console.log(data.IDCat);
-	//             if (data.IDSubCat ){
-	//             	document.getElementById("ad5").checked = true;
-	//             	$('#show_a5').show();
-	//             	// $("#show_a1").prop("show", this.checked);
-	//             	// console.log('no');
-	//             }else{
-	//             	document.getElementById("ad5").checked = false;
-	//             	// document.getElementById("show_a5").hidden = false;
-	//             	$('#show_a5').hide();
-	//             	// console.log('ok');
-	//             }
-	//             // if (data.File!=="" ) {
- //             //    	// document.getElementById("ad4").checked = true;                	
-					
-	//             // } else {
-	//             //     $('#photo-preview').hide();
-
-	//             // }
-	//             // $('[name="status"]').val(data.Status);
-	//             // $('[name="lang"]').val(data.Lang);
-	//             $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
-	//             $('.modal-title').text('Update Content'); // Set title to Bootstrap modal title
-	 				
-	//  			// $('#photo-preview').show(); // show photo preview modal
-	//  			// console.log(data.File);
-	 			
-
-	//  			if(data.File)
-	//             {
-	            	
-	// 		        var fileName = data.File;
-	// 		        var fileNameExt = fileName.substr(fileName.lastIndexOf('.') + 1);
-	// 		        // console.log(fileNameExt);
-	//             	if(!fileNameExt=='pdf'){
-	// 	                $('#label-photo').text('Change file'); // label photo upload
-	// 	                $('#photo-preview div').html('<img src="'+base_url_js+'uploads/lpmi/'+data.File+'" class="img-responsive">'); // show photo
-	// 	                // $('#photo-preview div').append('<input type="checkbox" name="remove_photo" value="'+data.file+'"/> Remove photo when saving'); // remove photo
-	//                 }else{
-	//                 	$('#photo-preview div').html('<iframe src="'+base_url_js+'uploads/lpmi/'+data.File+'" height="100%" width="100%" scrolling="auto"></iframe>');
-	//                 }
 	
-	//             }
-	//             else
-	//             {
-	//                 // $('#label-photo').text('Upload Photo1'); // label photo upload
-	//                 // $('#photo-preview div').text('(No photo)');
-	//                 $('#photo-preview').hide();
-	//                 // document.getElementById("photo-preview").hidden = false;
-	//             }
-	//         },
-	//         error: function (jqXHR, textStatus, errorThrown)
-	//         {
-	//             alert('Error get data from ajax');
-	//         }
-	//     });
-	// }
-	 
 	function reload_table()
 	{
 	    table.ajax.reload(null,false); //reload datatable ajax 

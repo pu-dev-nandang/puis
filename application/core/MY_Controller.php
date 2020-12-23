@@ -1,4 +1,4 @@
-<?php
+<?php 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MY_Controller extends CI_Controller {
@@ -52,8 +52,6 @@ class MY_Controller extends CI_Controller {
         $decode = $this->jwt->decode($token,$key);
         return $decode;
     }
-
-
 }
 
 // deklarasi nama function yang akan diimplementasikan ke sub class dibawah nya
@@ -72,10 +70,6 @@ abstract class Globalclass extends MyAbstract{
     public function __construct()
     {
         parent::__construct();
-
-//        $this->checkMaintenanceMode();
-
-
     }
 
     public function template($content,$ClassContainerTemplate = '')
@@ -97,7 +91,6 @@ abstract class Globalclass extends MyAbstract{
             $this->load->view('template/userfalse',$data);
         }
 
-
     }
 
     public function page404(){
@@ -112,7 +105,6 @@ abstract class Globalclass extends MyAbstract{
 
         $this->load->view('template/blank',$data);
     }
-
 
     protected function menu_header(){
 
@@ -452,6 +444,43 @@ abstract class Lpmi_Controler extends Globalclass{
     }
 }
 
+abstract class Lppm_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+        // $this->load->model('lpmi/m_lpmi');
+        $this->m_menu3lpmi->set_model('lpmi_sess','auth_lpmi_sess','menu_lpmi_sess','menu_lpmi_grouping','db_lpmi');
+    }
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+    // overide function
+    public function template($content,$ClassContainerTemplate = '')
+    {
+
+        $data['include'] = $this->load->view('template/include','',true);
+
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+
+    }
+
+    // overide function
+    public function  menu_navigation(){
+        $data['departement'] = $this->__getDepartement();
+        $page = $this->load->view('page/lppm/menu_navigation','',true);
+        return $page;
+    } 
+} 
+
 abstract class Library extends Globalclass{
     public function __construct()
     {
@@ -578,7 +607,7 @@ abstract class Vreservation_Controler extends Globalclass{
 
 
     // overide function
-    public function template($content)
+    public function template($content,$ClassContainerTemplate = '')
     {
 
         $data['include'] = $this->load->view('template/include','',true);
@@ -723,7 +752,7 @@ abstract class Budgeting_Controler extends Globalclass{
 
 
     // overide function
-    public function template($content)
+    public function template($content,$ClassContainerTemplate = '')
     {
 
         $data['include'] = $this->load->view('template/include','',true);
@@ -1002,7 +1031,7 @@ abstract class Ticket_Controler extends Globalclass{
     }
 
     // overide function
-    public function template($content)
+    public function template($content,$ClassContainer = '')
     {
 
         $data['include'] = $this->load->view('template/include','',true);
@@ -1053,7 +1082,7 @@ abstract class ServiceDocumentGenerator_Controler extends Globalclass{ // for se
     }
 
     // overide function
-    public function template($content)
+    public function template($content,$ClassContainer = '')
     {
         $data['include'] = $this->load->view('template/include','',true);
         $data['header'] = $this->menu_header();
@@ -1081,7 +1110,7 @@ abstract class Research_Controler extends Globalclass{
     }
 
     // overide function
-    public function template($content)
+    public function template($content,$ClassContainer = '')
     {
         $data['include'] = $this->load->view('template/include','',true);
         $data['header'] = $this->menu_header();
@@ -1101,7 +1130,7 @@ abstract class Research_Controler extends Globalclass{
         $data['page'] = $page;
         $data['department'] = parent::__getDepartement();
         $data['rest_setting_global'] = $this->rest_setting_global;
-        $content = $this->load->view('page/'.$data['department'].'/portal_eksternal/menu_portal_eksternal',$data,true);
+        $content = $this->load->view('page/research/portal_eksternal/menu_portal_eksternal',$data,true);
         $this->temp($content);
     }
 }

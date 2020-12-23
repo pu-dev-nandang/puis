@@ -4602,7 +4602,7 @@ class C_api3 extends CI_Controller {
                                         fpc.Cl_Academic, fpc.Cl_Academic_By, fpc.Cl_Academic_At, em6.Name AS Cl_Academic_Name,
                                         ats.MentorFP1, em4.Name AS MentorFP1Name, ats.MentorFP2, em5.Name AS MentorFP2Name,
                                         ats.ID AS AUTHID, dm.Attachment AS IjazahSMA,
-                                        fpn.finance AS Note_Finance
+                                        fpn.finance AS Note_Finance,fpn.UploadFile as NoteUploadFile
                                         FROM db_academic.std_study_planning ssp
                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
                                         LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
@@ -4740,9 +4740,11 @@ class C_api3 extends CI_Controller {
 
                     $v_note_finance = ($row['Note_Finance']!='' && $row['Note_Finance']!=null) ? '<textarea class="form-control" style="color: #333;" id="finance_viewValueNote_'.$row['NPM'].'" readonly>'.$row['Note_Finance'].'</textarea><hr style="margin-bottom: 5px;margin-top: 5px;"/>' : '';
 
+                $NoteUploadFile =  (!empty($row['NoteUploadFile'])) ? $row['NoteUploadFile'] : ''; // for field UploadFile in final_project_note
+
                     $c_Finance = ($row['Cl_Finance']!=null && $row['Cl_Finance']!='' && $row['Cl_Finance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Finance_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Finance">Clearance</button><hr style="margin-top: 10px;margin-bottom: 7px;" /><div style="text-align: left;" id="finance_viewNote_'.$row['NPM'].'">'.$v_note_finance.'</div><a href="javascript:void(0);" class="btnNote" data-dept="finance" data-npm="'.$row['NPM'].'"><i class="fa fa-edit"></i> Note</a>';
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Finance">Clearance</button><hr style="margin-top: 10px;margin-bottom: 7px;" /><div style="text-align: left;" id="finance_viewNote_'.$row['NPM'].'">'.$v_note_finance.'</div><a href="javascript:void(0);" class="btnNote" data-dept="finance" data-npm="'.$row['NPM'].'" thefile = "'.$NoteUploadFile.'"><i class="fa fa-edit"></i> Note</a>';
                 } else {
                     $c_Finance = ($row['Cl_Finance']!=null && $row['Cl_Finance']!='' && $row['Cl_Finance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Finance_Name'].''.$dateTm
@@ -5147,6 +5149,28 @@ class C_api3 extends CI_Controller {
         }
 
         else if($data_arr['action']=='updateNotetoClearent'){
+            $rs = ['status' => 1,'msg' => '','callback' => []];
+            $dataForm = [];
+            if (array_key_exists('userfile', $_FILES)) {
+                $selectorFile = $_FILES['userfile']['name'][0];
+                $ext = pathinfo($selectorFile, PATHINFO_EXTENSION);
+                $filename = $data_arr['Dept'].'_viewnote'.$data_arr['NPM'].'.'.$ext;
+                if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                    $headerOrigin = ($_SERVER['SERVER_NAME'] == 'localhost') ? "http://localhost" : serverRoot;
+                    
+                    $path = 'document/'.$data_arr['NPM'];
+                    $TheFile = 'userfile';
+                    $upload = $this->m_master->UploadManyFilesToNas($headerOrigin,$filename,$TheFile,$path,'array');
+                    $dataForm['UploadFile'] = $upload[0];
+                }
+                else
+                {
+                   $upload = $this->m_master->uploadDokumenSetFileName($filename,'userfile','./uploads/document/'.$data_arr['NPM']);
+                   $dataForm['UploadFile'] = $upload[0];
+                }
+
+                $rs['callback']['filename'] =  $dataForm['UploadFile'];
+            }
 
             // Cek apakah sudah ada atau blm
             $Dept = $data_arr['Dept'];
@@ -5155,7 +5179,7 @@ class C_api3 extends CI_Controller {
                 'NPM' => $NPM
             ))->result_array();
 
-            $dataForm = array(
+            $dataForm = $dataForm +  array(
                 'NPM' => $NPM,
                 $Dept => $data_arr['Note'],
                 $Dept.'At' => $data_arr['DateTime'],
@@ -5171,8 +5195,46 @@ class C_api3 extends CI_Controller {
                 $this->db->insert('db_academic.final_project_note',$dataForm);
             }
 
-            return print_r(1);
+            return print_r(json_encode($rs));
 
+        }
+
+        elseif ($data_arr['action'] == 'delete_fileNotetoClearent') {
+            $rs = ['status' => 1,'msg' => '','callback' => []];
+            $NPM = $data_arr['NPM'];
+            $data = $this->db->where('NPM',$NPM)->get('db_academic.final_project_note');
+            if ($data) {
+                $datas = $data->row();
+                if (!empty($datas->UploadFile)) {
+                    if ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
+                        $headerOrigin = serverRoot;
+                        $p = $this->m_master->DeleteFileToNas($headerOrigin,'pcam/document/'.$NPM.'/'.$datas->UploadFile);
+                        if ( array_key_exists('Status', $p) && $p['Status'] != '1') {
+                            $rs['status'] = 0;
+                            $rs['msg'] = 'delete failed';
+                        }
+                        else
+                        {
+                            $this->db->update('db_academic.final_project_note',['UploadFile' => NULL]);
+                        }
+                    }
+                    else
+                    {
+                        if (file_exists('./uploads/document/'.$NPM.'/'.$datas->UploadFile)) {
+                           unlink('./uploads/document/'.$NPM.'/'.$datas->UploadFile);
+                        }
+                        $this->db->update('db_academic.final_project_note',['UploadFile' => NULL]);
+                    }
+
+
+                }
+                else
+                {
+                    $rs['status'] = 0;
+                    $rs['msg'] = 'No file found';
+                }
+            }
+            return print_r(json_encode($rs));
         }
 
         else if($data_arr['action']=='loadJudiciumsData'){
