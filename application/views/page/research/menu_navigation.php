@@ -10,7 +10,15 @@
                         Portal Eksternal
                     </a>
                 </li>
-            <?php //endif ?> -->
+
+                <li class="<?php if($this->uri->segment(2)=='monitoring-research'){echo"current";}?>">
+                    <a href="<?php echo base_url('research/monitoring-research');?>">
+                        <i class="fa fa-archive"></i>
+                        Monitoring Research
+                    </a>
+                </li>
+            <?php //endif ?>
+
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">

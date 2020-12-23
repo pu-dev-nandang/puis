@@ -3691,7 +3691,8 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_Div+$min,$h,'NIP : '.$Rektorat['NIP'],$borderttd,0,'L');
             $pdf->Cell($w_Div-$min,$h,'NIP : '.$Student['NIP'],$borderttd,1,'L');
 
-            $pdf->Rect(85, $y+5, 40, 58);
+            // $pdf->Rect(85, $y+5, 40, 58);
+            $pdf->Rect(85, $y+16, 40, 48);
 
         } else {
 
@@ -3742,7 +3743,8 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
             $pdf->Cell($w_Div-$min,$h,'NIP : '.$Rektorat['NIP'],$borderttd,1,'L');
 
-            $pdf->Rect(61, $y+5, 40, 58);
+            // $pdf->Rect(61, $y+5, 40, 58);
+            $pdf->Rect(61, $y+16, 40, 48);
 
         }
 
