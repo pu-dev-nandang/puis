@@ -86,13 +86,28 @@
         var url = base_url_js+"api/__getKurikulumSelectOptionDSC";
         $.get(url,function (data_json) {
             //console.log(data_json);
-            for(var i=0;i<(data_json.length)-4;i++){
-            	tahun = (data_json[i].Year)-4;
-            	tahunID = (data_json[i].ID)-4;
-            	console.log(tahun);
-                var sc = (tahunID==selected) ? 'selected' : '';
-                $(element).append('<option value="'+tahunID+'.'+tahun+'" '+sc+'>Class of - '+tahun+'</option>');
-            }
+            for(var i=0;i<data_json.length;i++){
+                    var selc = '';
+                    var tahun = new Date().getFullYear();
+            		var tahunsekarang=tahun-4;
+                    if(selected=='selectedNow') {
+                        selc = (data_json[i].Year==tahunsekarang) ? 'selected' : '';
+
+                    } else {
+                        if(selected!='' && selected!=null && typeof selected !== undefined){
+                            selc = (selected==data_json[i].ID) ? 'selected' : '';
+                        } else {
+                            selc = (data_json[i].Year==tahunsekarang) ? 'selected' : '';
+                        }
+
+                    }
+
+
+
+                    $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selc+'>Class of - '+data_json[i].Year+'</option>');
+
+                }
+            
         });
     }
 
