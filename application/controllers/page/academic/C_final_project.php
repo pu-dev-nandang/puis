@@ -22,6 +22,7 @@ class C_final_project extends Academic_Controler {
         $this->menu_transcript($page);
     }
 
+
     public function loadFinalProject()
     {
         $datatoken =  $this->getInputToken();
@@ -38,9 +39,9 @@ class C_final_project extends Academic_Controler {
                 : '( aut_s.StatusStudentID = "3" OR aut_s.StatusStudentID = "1" ) ' ;
 
             $dataSemester = '';
-            if( !empty($datatoken['SemesterID'])) {
-                $SemesterID = $datatoken['SemesterID'];
-                $dataSemester = 'AND ( s.ID = '.$SemesterID.')';
+            if( !empty($datatoken['Year'])) {
+                $classofyear = $datatoken['Year'];
+                $datatahun = 'AND ( aut_s.Year = '.$classofyear.')';
             }
 
             $dataSearch = '';
@@ -52,9 +53,8 @@ class C_final_project extends Academic_Controler {
 
             $queryDefault = 'SELECT fp.*, aut_s.Name, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng FROM db_academic.final_project fp 
                                       LEFT JOIN db_academic.auth_students aut_s ON (fp.NPM = aut_s.NPM)
-                                      LEFT JOIN db_academic.semester s ON (aut_s.Year=s.Year)
                                       LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
-                                      WHERE ( '.$dataWhere.' ) '.$dataSearch.' '.$dataSemester.' ORDER BY aut_s.NPM ASC ';
+                                      WHERE ( '.$dataWhere.' ) '.$dataSearch.' '.$datatahun.' ORDER BY aut_s.NPM ASC ';
 
             $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
 
