@@ -22,7 +22,7 @@
         <div class="well">
             <div class="row">
                 <div class="col-md-6">
-                    <select class="form-control" id="filterSemester"></select>
+                    <select class="form-control filter-transcript" id="filterClassOf"></select>
                 </div>
                 <div class="col-md-6">
                     <select class="form-control" id="filterBaseProdi">
@@ -82,13 +82,27 @@
 
 <script>
 
+	function loadSelectOptionClassOf_FinalProject(element,selected) {
+        var url = base_url_js+"api/__getKurikulumSelectOptionDSC";
+        $.get(url,function (data_json) {
+            //console.log(data_json);
+            for(var i=0;i<(data_json.length)-4;i++){
+            	tahun = (data_json[i].Year)-4;
+            	tahunID = (data_json[i].ID)-4;
+            	console.log(tahun);
+                var sc = (tahunID==selected) ? 'selected' : '';
+                $(element).append('<option value="'+tahunID+'.'+tahun+'" '+sc+'>Class of - '+tahun+'</option>');
+            }
+        });
+    }
+
     $(document).ready(function () {
-        loSelectOptionSemester('#filterSemester','');
+        loadSelectOptionClassOf_FinalProject('#filterClassOf','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
 
         var firstLoad = setInterval(function () {
-            var filterSemester = $('#filterSemester').val();
-            if(filterSemester!='' && filterSemester!=null){
+            var filterClassOf = $('#filterClassOf').val();
+            if(filterClassOf!='' && filterClassOf!=null){
                 loadData();
                 clearInterval(firstLoad);
             }
@@ -107,24 +121,22 @@
         })
     });
 
-    $('#filterSemester,#filterBaseProdi').change(function () {
-        var filterSemester = $('#filterSemester').val();
-        if(filterSemester!='' && filterSemester!=null){
+    $('#filterClassOf,#filterBaseProdi').change(function () {
+        var filterClassOf = $('#filterClassOf').val();
+        if(filterClassOf!='' && filterClassOf!=null){
             loadData();
         }
     });
 
     function loadData() {
-        var filterSemester = $('#filterSemester').val();
+        var filterClassOf = $('#filterClassOf').val();
         var filterBaseProdi = $('#filterBaseProdi').val();
 
 
-        if(filterSemester!='' && filterSemester!=null){
+        if(filterClassOf!='' && filterClassOf!=null){
 
             var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null)
                 ? filterBaseProdi.split('.')[0] : '';
-
-            var SemesterID = filterSemester.split('.')[0];
 
             $('#viewData').html('<table class="table table-striped table-bordered" id="tableData" style="width: 100%;">' +
                 '            <thead>' +
@@ -141,7 +153,7 @@
                 '        </table>');
 
 
-            var token = jwt_encode({action : 'viewList',SemesterID:SemesterID,ProdiID : ProdiID},'UAP)(*');
+            var token = jwt_encode({action : 'viewList',Year:filterClassOf.split('.')[1],ProdiID : ProdiID},'UAP)(*');
             var url = base_url_js+'academic/loadFinalProject';
 
             // window.dataTable.ajax.reload(null, false);
