@@ -77,7 +77,9 @@ class C_final_project extends Academic_Controler {
                   $btnAct = ' <div class="btn-group">
                    <button class="btn btn-warning btn-sm" data-id="'.$row['ID'].'" data-tittleindo="'.$row['TitleInd'].'" data-tittleing="'.$row['TitleEng'].'" data-toggle="modal" data-target="#editdata" title="Edit"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                    </div>';
-                
+
+            
+                    $getName = $this->db->query('SELECT Name FROM db_employees.employees WHERE NIP = '.$row['UpdatedBy'])->row_array();
                 
 
                 $nestedData[] = '<div>'.$no.'</div>';
@@ -87,7 +89,7 @@ class C_final_project extends Academic_Controler {
                                         </div>';
                 $nestedData[] = '<div style="text-align: left;">'.$row['TitleInd'].'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$row['TitleEng'].'</div>';
-                $nestedData[] = '<div style="text-align: left;">'.$row['UpdatedBy'].'</div>';
+                $nestedData[] = '<div style="text-align: left;"><b>'.ucwords(strtolower($getName['Name'])).'</b> <br>'.$row['UpdatedBy'].'</div>';
                 $nestedData[] = '<div style="text-align: left;">'.$row['UpdatedAt'].'</div>';
                 
 
@@ -114,8 +116,8 @@ class C_final_project extends Academic_Controler {
             $requestid = $formData['ID'];
             $requestInd = $formData['tittleIndo'];
             $requestIng = $formData['tittleIng'];
-            $ActionBy = $this->session->userdata('Name');
-            
+            $ActionBy = $this->session->userdata('NIP');
+      
             $updates = array(
               'TitleInd' => $requestInd,
               'TitleEng' => $requestIng,
