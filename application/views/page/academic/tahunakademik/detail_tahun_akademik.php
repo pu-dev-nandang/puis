@@ -64,7 +64,7 @@
             <input type="text" id="krs_end" name="regular" class="form-control form-tahun-akademik form-next">
         </td>
         <td>
-            <a href="javascript:void(0);" id="idBtnSPKRS" data-head="KRS" data-load="prodi" class="btn btn-sm btn-warning btn-block hide">Special Case</a>
+            <a href="javascript:void(0);" id="idBtnSPKRS" data-head="KRS" data-load="prodi" class="btn btn-sm btn-warning btn-block">Special Case</a>
         </td>
     </tr>
     <tr>
