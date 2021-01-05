@@ -3,7 +3,7 @@
         <!--=== Navigation ===-->
         <ul id="nav">
             <!-- list menu -->
-            <!-- <?php //if ($_SERVER['SERVER_NAME'] == 'localhost'): ?>
+            <?php //if ($_SERVER['SERVER_NAME'] == 'localhost'): ?>
                 <li class="<?php if($this->uri->segment(2)=='portal-eksternal'){echo"current";}?>">
                     <a href="<?php echo base_url('research/portal-eksternal');?>">
                         <i class="fa fa-user-circle"></i>
@@ -33,4 +33,4 @@
     </div>
     <div id="divider" class="resizeable"></div>
 </div>
-<!-- /Sidebar -->
+<!-- /Sidebar
