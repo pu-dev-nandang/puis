@@ -4,13 +4,7 @@
         <ul id="nav">
             <!-- list menu -->
             <?php //if ($_SERVER['SERVER_NAME'] == 'localhost'): ?>
-                <li class="<?php if($this->uri->segment(2)=='portal-eksternal'){echo"current";}?>">
-                    <a href="<?php echo base_url('research/portal-eksternal');?>">
-                        <i class="fa fa-user-circle"></i>
-                        Portal Eksternal
-                    </a>
-                </li>
-
+                
                 <li class="<?php if($this->uri->segment(2)=='monitoring-research'){echo"current";}?>">
                     <a href="<?php echo base_url('research/monitoring-research');?>">
                         <i class="fa fa-archive"></i>
