@@ -3439,7 +3439,7 @@ class C_api extends CI_Controller {
 
             $actUploadTask = ($row['ExamDate']>$dateNow) ? '1' : '0';
 
-            $act = '<div  style="text-align:center;"><div class="btn-group">
+            $act = (!isset($data_arr['ForQuiz'])) ? '<div  style="text-align:center;"><div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                   </button>
@@ -3452,7 +3452,7 @@ class C_api extends CI_Controller {
                   '.$actDelete.'  
                   </ul>
                 </div>
-                </div>';
+                </div>' : '<button class="btn btn-sm btn-success btnActAddToQuiz" data-id="'.$row['ID'].'"><i class="fa fa-arrow-right"></i></button>';
 
             $dateInsert = ($row['InsertAt']!='' && $row['InsertAt']!=null) ? date('l, d M Y h:i',strtotime($row['InsertAt'])) : '-' ;
 
@@ -3472,7 +3472,11 @@ class C_api extends CI_Controller {
             $nestedData[] = $act;
             $nestedData[] = '<div>'.$exam_date.'<br/>'.$exam_time.'</div>';
             $nestedData[] = '<div>'.$exam_room.$isOnline.'</div>';
-            $nestedData[] = $isOnlineExam;
+
+            if(!isset($data_arr['ForQuiz'])){
+                $nestedData[] = $isOnlineExam;
+            }
+
 
             $data[] = $nestedData;
         }

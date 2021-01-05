@@ -3989,6 +3989,8 @@ class M_api extends CI_Model {
                     $data[$i]['ButtonAttendance'] = '0';
                 }
 
+                $data[$i]['dateTimeNow'] = $dateTimeNow;
+
             }
         }
 
@@ -4042,10 +4044,14 @@ class M_api extends CI_Model {
                                                       LEFT JOIN db_academic.exam ex ON (ex.ID = exd.ExamID)
                                                       LEFT JOIN db_academic.auth_students aut ON (aut.NPM = exd.NPM)
                                                       WHERE exd.ExamID = "'.$ExamID.'" ORDER BY aut.NPM ASC')->result_array();
+
+
+        // Cek apakah exam menggunakan quiz
+        $checkQuiz = $this->db->get_where('db_academic.q_exam',array('ExamID' => $ExamID))->result_array();
+
+
         if(count($dataExamDetail)>0){
             for($i=0;$i<count($dataExamDetail);$i++){
-
-
 
                 // Cek Semester
                 $dataSemester = $this->m_rest->checkSemesterByClassOf($dataExamDetail[$i]['Year'],$dataExamDetail[$i]['SemesterID']);
@@ -4071,11 +4077,27 @@ class M_api extends CI_Model {
                 $dataExamDetail[$i]['DetailAttendance'] = $dataAttendance;
 
 
-                // Detail Exam Online
-                $dataExamDetail[$i]['DetailExam'] = $this->db->get_where('db_academic.exam_student_online',array(
-                    'ExamID' => $ExamID,
-                    'NPM' => $dataExamDetail[$i]['NPM']
-                ))->result_array();
+                if(count($checkQuiz)<=0){
+                    
+
+                    // Detail Exam Online
+                    $dataExamDetail[$i]['DetailExam'] = $this->db->get_where('db_academic.exam_student_online',array(
+                        'ExamID' => $ExamID,
+                        'NPM' => $dataExamDetail[$i]['NPM']
+                    ))->result_array();
+
+                } else {
+
+                    $dataExamDetail[$i]['DetailExam'] = $this->db->get_where('db_academic.q_quiz_students',array(
+                        'QuizID' => $checkQuiz[0]['QuizID'],
+                        'NPM' => $dataExamDetail[$i]['NPM']
+                    ))->result_array();
+
+                }
+
+                $dataExamDetail[$i]['ExamWhitQuiz'] = (count($checkQuiz)<=0) ? 0 : 1;
+
+                
             }
         }
 

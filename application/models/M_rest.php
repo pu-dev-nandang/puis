@@ -1445,8 +1445,9 @@ class M_rest extends CI_Model {
                 if(count($dataCourse)>0){
                     $i=0;
                     foreach ($dataCourse as $item){
-                        $dataExam = $this->db->query('SELECT ex.*, cl.Room, em1.Name AS Inv1, em2.Name AS Inv2  
+                        $dataExam = $this->db->query('SELECT ex.*, cl.Room, em1.Name AS Inv1, em2.Name AS Inv2, qe.QuizID  
                                                                     FROM db_academic.exam ex
+                                                                    LEFT JOIN db_academic.q_exam qe ON (qe.ExamID = ex.ID)
                                                                     LEFT JOIN db_academic.exam_group eg ON (eg.ExamID = ex.ID)
                                                                     LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                                                     LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)

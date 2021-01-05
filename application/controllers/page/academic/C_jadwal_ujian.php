@@ -60,6 +60,30 @@ class C_jadwal_ujian extends Academic_Controler {
         $this->menu_jadwalUjian($page);
     }
 
+    public function exam_quiz(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/jadwalujian/exam_quiz',$data,true);
+        $this->menu_jadwalUjian($page);
+    }
+
+    public function exam_quiz_create(){
+        $data['department'] = parent::__getDepartement();
+
+        $dataQuiz = [];
+
+        if(isset($_GET['id'])){
+            $id = $_GET['id'];
+            $dataQuiz = $this->db->query('SELECT * FROM db_academic.q_quiz q WHERE q.ID = "'.$id.'"')
+                ->result_array();
+        }
+
+        $data['dataQuiz'] = $dataQuiz;
+
+        $page = $this->load->view('page/'.$data['department'].'/jadwalujian/exam_quiz_create',$data,true);
+        $this->menu_jadwalUjian($page);
+
+    }
+
     public function list_waiting_approve(){
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/jadwalujian/list_waiting_approve',$data,true);

@@ -4740,9 +4740,11 @@ class C_api3 extends CI_Controller {
 
                     $v_note_finance = ($row['Note_Finance']!='' && $row['Note_Finance']!=null) ? '<textarea class="form-control" style="color: #333;" id="finance_viewValueNote_'.$row['NPM'].'" readonly>'.$row['Note_Finance'].'</textarea><hr style="margin-bottom: 5px;margin-top: 5px;"/>' : '';
 
-                    $c_Finance = ($row['Cl_Finance']!=null && $row['Cl_Finance']!='' && $row['Cl_Finance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                    $c_Finance = ($row['Cl_Finance']!=null && $row['Cl_Finance']!='' && $row['Cl_Finance']!='0')
+                        ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Finance_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Finance">Clearance</button><hr style="margin-top: 10px;margin-bottom: 7px;" /><div style="text-align: left;" id="finance_viewNote_'.$row['NPM'].'">'.$v_note_finance.'</div><a href="javascript:void(0);" class="btnNote" data-dept="finance" data-npm="'.$row['NPM'].'"><i class="fa fa-edit"></i> Note</a>';
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Finance">Clearance</button><hr style="margin-top: 10px;margin-bottom: 7px;" /><div style="text-align: left;" id="finance_viewNote_'.$row['NPM'].'">'.$v_note_finance.'</div>
+                            <a href="javascript:void(0);" class="btnNote" data-dept="finance" data-npm="'.$row['NPM'].'"><i class="fa fa-edit"></i> Note</a>';
                 } else {
                     $c_Finance = ($row['Cl_Finance']!=null && $row['Cl_Finance']!='' && $row['Cl_Finance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Finance_Name'].''.$dateTm
