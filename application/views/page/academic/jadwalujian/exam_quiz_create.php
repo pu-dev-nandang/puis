@@ -92,7 +92,7 @@
     }
 </style>
 
-<pre>
+
     <?php
 
     $ID = (count($dataQuiz)>0) ? $dataQuiz[0]['ID'] : '';
@@ -102,7 +102,7 @@
 //    print_r($dataQuiz);
 
     ?>
-</pre>
+
 
 <div class="row">
     <div class="col-md-10 col-md-offset-1">

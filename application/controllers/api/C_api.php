@@ -3463,6 +3463,9 @@ class C_api extends CI_Controller {
                 ? '<div><i style="color: green;" class="fa fa-check-square"></i> Exam file uploaded</div>' : '';
 
 
+            
+
+
 
             $nestedData[] = '<div>'.($no++).'</div>';
             $nestedData[] = $course;
@@ -3474,7 +3477,13 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div>'.$exam_room.$isOnline.'</div>';
 
             if(!isset($data_arr['ForQuiz'])){
-                $nestedData[] = $isOnlineExam;
+                // Cek apakah exam menggunakan quiz atau tidak
+                $dataCkQuiz = $this->db->get_where('db_academic.q_exam',array('ExamID' => $row['ID']))->result_array();
+                $isUseQuiz = (count($dataCkQuiz)>0) 
+                ? '<div><i style="color: green;" class="fa fa-check-square"></i> Use quiz <a href="'.base_url('academic/exam-schedule/exam-quiz-create?id='.$dataCkQuiz[0]['QuizID']).'" target="_blank">Show quiz</a></div>' 
+                : '';
+
+                $nestedData[] = $isOnlineExam.$isUseQuiz;
             }
 
 
