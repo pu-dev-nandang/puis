@@ -3,7 +3,7 @@
         <!--=== Navigation ===-->
         <ul id="nav">
             <!-- list menu -->
-            <!-- <?php //if ($_SERVER['SERVER_NAME'] == 'localhost'): ?> -->
+            <?php //if ($_SERVER['SERVER_NAME'] == 'localhost'): ?>
                 
                 <li class="<?php if($this->uri->segment(2)=='monitoring-research'){echo"current";}?>">
                     <a href="<?php echo base_url('research/monitoring-research');?>">
@@ -11,7 +11,7 @@
                         Monitoring Research
                     </a>
                 </li>
-            <!-- <?php //endif ?> -->
+            <?php //endif ?>
 
         </ul>
         <div class="sidebar-widget align-center">
