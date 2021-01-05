@@ -3,14 +3,14 @@
         <!--=== Navigation ===-->
         <ul id="nav">
             <!-- list menu -->
-            <!-- <?php //if ($_SERVER['SERVER_NAME'] == 'localhost'): ?> -->
+            <?php //if ($_SERVER['SERVER_NAME'] == 'localhost'): ?>
                 <li class="<?php if($this->uri->segment(2)=='monitoring-abdimas'){echo"current";}?>">
                     <a href="<?php echo base_url('abdimas/monitoring-abdimas');?>">
                         <i class="fa fa-archive"></i>
                         Monitoring Community Services
                     </a>
                 </li>
-            <!-- <?php //endif ?> -->
+            <?php //endif ?>
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
