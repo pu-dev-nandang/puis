@@ -90,6 +90,8 @@
                                             <th>Ticket</th>
                                             <th style="width: 5%;"><i class="fa fa-cog"></i></th>
                                             <th style="width: 10%;">Created Date</th>
+                                            <th style="width: 10%;">Closed Date</th>
+                                            <th style="width: 10%;">Duration</th>
                                             <th style="width: 5%;">Status</th>
                                         </tr>
                                     </thead>
@@ -355,7 +357,9 @@
                     if (data[7] == 'Close' || data[7] == 'Has Given Rate') {
                         styleSt = 'style = "color:green;"';
                     }
-                    $(row).find('td:eq(6)').html('<span ' + styleSt + '>' + data[7] + '</span>');
+                    $(row).find('td:eq(6)').html('<label class="text-primary">' + data[13] + '</label>');
+                    $(row).find('td:eq(7)').html('<label class="text-success">' + data[14] + '</label>');
+                    $(row).find('td:eq(8)').html('<span ' + styleSt + '>' + data[7] + '</span>');
                 },
                 dom: 'l<"toolbar">frtip',
                 "initComplete": function(settings, json) {
