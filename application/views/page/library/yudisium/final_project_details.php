@@ -122,6 +122,11 @@
                     </tr>
                     <tr>
                         <td>16</td>
+                        <td>BAB VI</td>
+                        <td id="BAB6">-</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
                         <td>Daftar Pustaka</td>
                         <td id="DaftarPustaka">-</td>
                     </tr>
