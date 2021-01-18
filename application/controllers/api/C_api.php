@@ -3442,7 +3442,7 @@ class C_api extends CI_Controller {
 
             $actUploadTask = ($row['ExamDate']>$dateNow) ? '1' : '0';
 
-            $act = '<div  style="text-align:center;"><div class="btn-group">
+            $act = (!isset($data_arr['ForQuiz'])) ? '<div  style="text-align:center;"><div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                   </button>
@@ -3455,7 +3455,7 @@ class C_api extends CI_Controller {
                   '.$actDelete.'  
                   </ul>
                 </div>
-                </div>';
+                </div>' : '<button class="btn btn-sm btn-success btnActAddToQuiz" data-id="'.$row['ID'].'"><i class="fa fa-arrow-right"></i></button>';
 
             $dateInsert = ($row['InsertAt']!='' && $row['InsertAt']!=null) ? date('l, d M Y h:i',strtotime($row['InsertAt'])) : '-' ;
 
@@ -3464,6 +3464,9 @@ class C_api extends CI_Controller {
                 ? '<div><span class="label label-success">Online</span></div>' : '';
             $isOnlineExam = ($row['ExamTaskID']!='' && $row['ExamTaskID']!=null)
                 ? '<div><i style="color: green;" class="fa fa-check-square"></i> Exam file uploaded</div>' : '';
+
+
+            
 
 
 
@@ -3475,7 +3478,17 @@ class C_api extends CI_Controller {
             $nestedData[] = $act;
             $nestedData[] = '<div>'.$exam_date.'<br/>'.$exam_time.'</div>';
             $nestedData[] = '<div>'.$exam_room.$isOnline.'</div>';
-            $nestedData[] = $isOnlineExam;
+
+            if(!isset($data_arr['ForQuiz'])){
+                // Cek apakah exam menggunakan quiz atau tidak
+                $dataCkQuiz = $this->db->get_where('db_academic.q_exam',array('ExamID' => $row['ID']))->result_array();
+                $isUseQuiz = (count($dataCkQuiz)>0) 
+                ? '<div><i style="color: green;" class="fa fa-check-square"></i> Use quiz <a href="'.base_url('academic/exam-schedule/exam-quiz-create?id='.$dataCkQuiz[0]['QuizID']).'" target="_blank">Show quiz</a></div>' 
+                : '';
+
+                $nestedData[] = $isOnlineExam.$isUseQuiz;
+            }
+
 
             $data[] = $nestedData;
         }

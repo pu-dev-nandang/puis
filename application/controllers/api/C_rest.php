@@ -1510,9 +1510,9 @@ class C_rest extends CI_Controller {
                 $QuizID = $dataToken['QuizID'];
                 $NPM = $dataToken['NPM'];
 
-                $data = $this->db->query('SELECT q.ID, q.Duration , qs.ID AS QuizStudentID,   
+                $data = $this->db->query('SELECT q.ID, q.Duration, q.ForExam , qs.ID AS QuizStudentID,   
                                                     qs.StartSession, qs.EndSession,
-                                                    qs.WorkDuration, q.NotesForStudents
+                                                    qs.WorkDuration, qs.SubmittedAt, q.NotesForStudents
                                                     FROM db_academic.q_quiz q
                                                     LEFT JOIN db_academic.q_quiz_students qs 
                                                     ON (qs.QuizID = q.ID AND qs.NPM = "'.$NPM.'")
