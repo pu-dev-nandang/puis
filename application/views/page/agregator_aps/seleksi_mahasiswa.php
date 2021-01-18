@@ -130,6 +130,8 @@
            			'</tfoot>'		
            		)
 
+            newDescritionInput.getDescription();
+
            })
 
         }
@@ -253,5 +255,10 @@
                 'backdrop' : 'static'
             });
         }
+    })
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        newDescritionInput.saveDescription(itsme);
     })
 </script>

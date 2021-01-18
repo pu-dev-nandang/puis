@@ -39,6 +39,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         }
         return "";
     }
+    
 </script>
 
 </html>

@@ -10,147 +10,241 @@
     }
 </style>
 
-<div class="row">
 
-    <div class="col-md-12">
-        <div class="" style="min-height: 300px;">
-            <table class="table table-striped" id="dataTableAc">
-                <thead>
-                <tr>
-                    <th style="width: 1%;">No</th>
-                    <th>Event Name</th>
-                    <th style="width: 15%;">Event Date</th>
-                    <th style="width: 5%;">Category</th>
-                    <th style="width: 5%;">Level</th>
-                    <th style="width: 5%;">Type</th>
-                    <th style="width: 10%;">Achievement</th>
-                    <th style="width: 5%;">Certificate</th>
-                    <th style="width: 10%;">Status Approval</th>
-                    <th style="width: 5%;"><i class="fa fa-cog"></i></th>
-                    <th style="width: 25%;">Member</th>
-                </tr>
-                </thead>
-                <tbody id="dataStdList"></tbody>
-            </table>
+<div id="generate-edom">
+     <div class="row">
+        <div class="col-md-12">
+            <div id="filter-panel" class="collapse">
+                <div class="panel panel-info">
+                    <div class="panel-heading"><h5 style="margin:0px"><i class="fa fa-filter"></i> Form Filter</h5></div>
+                    <div class="panel-body">
+                        <form class="form-filter"> 
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Student</label>
+                                        <input type="text" id="FNPM" name="FNPM" class="form-control" placeholder="NPM or Name" >
+                                    </div>
+                                </div>
+                            
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Event Name</label>
+                                        <input type="text" id="FEvent" name="FEvent" class="form-control" >
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <label>Category</label>
+                                    <select class="form-control" name="FCategID" id="FCategID">
+                                        <option value="">-Choose One-</option>
+                                        <?php if(!empty($categories)){ 
+                                        foreach ($categories as $c) { ?>
+                                        <option value="<?=$c->ID?>"><?=$c->Name?></option>
+                                        <?php } } ?>
+                                    </select>
+                                </div>
+                                                
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Level</label>
+                                        <select class="form-control required Level" id="FLevel" required name="FLevel" >
+                                            <option value="">Choose one</option>
+                                            <option value="Provinsi">Provinsi/Wilayah</option>
+                                            <option value="Nasional">Nasional</option>
+                                            <option value="Internasional">Internasional</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Type</label>
+                                        <select class="form-control required Level" id="FType" required name="FType" >
+                                            <option value="">Choose one</option>
+                                            <option value="1">Academic</option>
+                                            <option value="0">Non Academic</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                                
+                                <div class="col-sm-4">
+                                    <div class="row">
+                                        <div class="col-sm-6">                                          
+                                            <div class="form-group">
+                                                <label>Start Date</label>
+                                                 <input class="form-control form-update-data" id="StartDate"  style="color: #333333;background: #ffffff;" readonly />
+
+                                            </div>                                          
+                                        </div>
+                                        <div class="col-sm-6">                                          
+                                            <div class="form-group">
+                                               <label>End Date</label>
+                                                <input class="form-control form-update-data" id="EndDate"  style="color: #333333;background: #ffffff;" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Status Approval</label>
+                                        <select class="form-control required FTIsApproved" id="FTIsApproved" required name="FTIsApproved" >
+                                            <option value="">Choose one</option>
+                                            <option value="1">Need Approval</option>
+                                            <option value="2">Approved</option>
+                                            <option value="3">Rejected</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                                
+                                <!-- <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>SKPI</label>
+                                        <select class="form-control required FTIsSKPI" id="FTIsSKPI" required name="FTIsSKPI" >
+                                            <option value="">Choose one</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                    </div>
+                                </div> -->
+
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 text-center">
+                                    <div class="btn-group">
+                                        <a class="btn btn-sm btn-default" id="clearBtn">Clear</a>
+                                        <button class="btn btn-sm btn-info btn-search" type="button" onclick="loadDataRequest()">Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel panel-default">                                
+                <div class="panel-body">
+                    <div class="row" style="margin-bottom:10px">
+                        <div class="col-sm-12">
+                            <button id="filterbtn" class="btn btn-sm btn-info btn-open-filter" type="button" data-toggle="collapse" data-target="#filter-panel" aria-expanded="false" aria-controls="filter-panel">
+                                <i class="fa fa-filter"> <span>Filter</span></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">                                        
+                        <div id="loadTable"></div>
+                    </div>
+                </div>
+            </div>
+                      
         </div>
-    </div>
-
+    </div> 
 </div>
 
 <script>
+    $('#clearBtn').click(function () {
+        $('.form-filter')[0].reset();
 
-    $(document).ready(function () {
-        loadDataachievement();
-
+        loadDataRequest();
     });
 
+    $(document).ready(function(){
+       loadDataRequest();
 
-
-    function loadDataachievement() {
-        var data = {
-            action : 'viewDataPAM'
-        };
-
-        var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'api3/__crudAgregatorTB5';
-
-        $.post(url,{token:token},function (jsonResult) {
-
-            $('#dataStdList').empty();
-
-            if(jsonResult.length>0){
-
-                $.each(jsonResult,function (i,v) {
-
-                    var StartDate = (v.StartDate!='' && v.StartDate!=null) ? moment(v.StartDate).format('ddd, DD MMM YYYY') : '';
-                    var EndDate = (v.EndDate!='' && v.EndDate!=null) ? moment(v.EndDate).format('ddd, DD MMM YYYY') : '';
-
-                    var member = '';
-                    if(v.DataStudent.length>0){
-                        $.each(v.DataStudent,function (i2,v2) {
-                            member = member+'<div> - '+ucwords(v2.Name)+' ('+v2.NPM+')</div>';
-                        });
-                    }
-
-                    var disabled = (!v.isAbble) ? 'disabled':'';
-                    var link = (v.isAbble) ? base_url_js+'student-life/student-achievement/update-data-achievement?id='+v.ID:'#';
-
-                    var btnAct = '<div class="btn-group">' +
-                        '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                        '    <i class="fa fa-edit"></i> <span class="caret"></span>' +
-                        '  </button>' +
-                        '  <ul class="dropdown-menu">' +
-                        '    <li><a href="'+base_url_js+'student-life/student-achievement/update-data-achievement?id='+v.ID+'" >Edit</a></li>' +
-                        '    <li role="separator" class="divider"></li>' +
-                        '    <li class="'+disabled+'"><a href="javascript:void(0);" class="actRemove" data-id="'+v.ID+'">Remove</a></li>' +
-                        '  </ul>' +
-                        '</div>';
-
-                    var lbl = (v.Type=='1' || v.Type==1)
-                        ? '<span class="label label-success">Academic</span>'
-                        : '<span class="label label-default">Non Academic</span>';
-
-                    var viewEvent = '<a><b>'+v.Event+'</b></a>';
-                    var labelStatusApv = "";
-                    if(v.isApproved == 1) {labelStatusApv="<span class='label label-info'>Wait approval</span>";}
-                    else if(v.isApproved == 2) {labelStatusApv="<span class='label label-primary'>Approved</span>";}
-                    else if(v.isApproved == 3) {labelStatusApv="<span class='label label-danger'>Rejected</span>";}
-                    else{labelStatusApv="UNKNOW";}
-                    var labelApvBy = "";
-                    if(v.isApproved == 2 &&(v.approvedBy != "" || v.approvedBy)){labelApvBy = "<br><small>Approved by "+v.approvedBy+"</small>";}
-                    
-                    $('#dataStdList').append('<tr>' +
-                        '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
-                        '<td style="text-align: left;">'+viewEvent+"<br>"+((v.isSKPI == 1) ? '<span class="label label-warning">SKPI</span>':'')+'</td>' +
-                        '<td>'+StartDate+'<br/>'+EndDate+'</td>' +
-                        '<td>'+v.categName+'</td>' +
-                        '<td>'+v.Level+'</td>' +
-                        '<td>'+lbl+'</td>' +
-                        '<td>'+v.Achievement+'</td>' +
-                        '<td><a class="btn btn-xs btn-primary" target="_blank" href="'+base_url_js+'uploads/certificate/'+v.Certificate+'">View PDF</a></td>' +
-                        '<td style="border-right: 1px solid #ccc;">'+labelStatusApv+labelApvBy+'</td>' +
-                        '<td>'+btnAct+'</td>' +
-                        '<td style="text-align: left;">'+member+'</td>' +
-                        '</tr>');
-
-                });
-
-            } else {
-                var tds = $('#dataTableAc').children('thead').children('tr').children('th').length;
-                $('#dataStdList').html('<tr><td colspan="'+tds+'">Data Not Yet</td></tr>');
+        $(".btn-open-filter").click(function(){
+            var isOpen = $(this).attr("aria-expanded");
+            if(isOpen == "false"){
+                $("button").attr("aria-expanded","true");
+                document.getElementById("filterbtn").style.backgroundColor = "#bd362f"; 
+                $(this).find("i.fa").toggleClass("fa-filter fa-times");
+                $(this).find("span").text("Close Filter");
+            }else{
+                $("button").attr("aria-expanded","false");
+                document.getElementById("filterbtn").style.backgroundColor = "#34a7c8"; 
+                $(this).find("i.fa").toggleClass("fa-times fa-filter");
+                $(this).find("span").text("Filter");                
             }
-
         });
+        
 
-    }
-
-    $(document).on('click','.actRemove',function () {
-        if( !$(this).parent().hasClass('disabled') ){
-            if(confirm('Are you sure?')){
-                loading_modal_show();
-
-                var ID = $(this).attr('data-id');
-
-                var data = {
-                    action : 'removePAM',
-                    ID : ID
-                };
-
-                var token = jwt_encode(data,'UAP)(*');
-                var url = base_url_js+'api3/__crudAgregatorTB5';
-
-                $.post(url,{token:token},function (result) {
-                    toastr.success('Data removed','Success');
-                    setTimeout(function () {
-                        loadDataachievement();
-                        loading_modal_hide();
-                    },500);
-                });
-            }
-        }
-
-
-
+        $( "#StartDate,#EndDate" )
+            .datepicker({
+                dateFormat: 'yy-mm-dd',
+                changeYear: true,
+                changeMonth: true
+            });
     });
+
+    function loadDataRequest() {
+         var EventName = $("#FEvent").val();
+            var std = $("#FNPM").val();
+            var categ = $("#FCategID").val();
+            var lvl = $("#FLevel").val();
+            var type = $("#FType").val();
+            var sDate = $('#StartDate').val();
+            var eDate = $('#EndDate').val();
+            var isAppr = $("#FTIsApproved").val();
+        $('#loadTable').html('<table id="tableDataSA" class="table table-bordered table-striped table-centre" style="width:100%";>' +
+            '               <thead>' +
+            '                <tr style="background: #337ab7; color:#fff;">' +
+            '                   <th style="width: 1%;">No</th>'+
+            '                    <th style="width: 25%;">Event Name</th>'+
+            '                    <th style="width: 10%;">Event Date</th>'+
+            '                    <th style="width: 5%;">Category</th>'+
+            '                    <th style="width: 5%;">Level</th>'+
+            '                    <th style="width: 5%;">Type</th>'+
+            '                    <th style="width: 10%;">Achievement</th>'+
+            '                    <th style="width: 5%;">Certificate</th>'+
+            '                    <th style="width: 10%;">Status Approval</th>'+
+            '                    <th style="width: 5%;"><i class="fa fa-cog"></i></th>'+
+            '                    <th style="width: 15%;">Member</th>'+
+            '                </tr>' +
+            '                </thead>' +
+            '           </table>');
+
+           
+          
+        var data = {
+            action : 'viewData',
+            EventName : EventName,
+            std : std,
+            categ : categ,
+            lvl : lvl,
+            type : type,
+            sDate : sDate,
+            eDate : eDate,
+            isAppr : isAppr,
+        };
+           
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+"student-life/student-achievement/fetchData";
+        var dataTable = $('#tableDataSA').DataTable( {
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "language": {
+                "searchPlaceholder": "Event, Member"
+            },
+            "ajax":{
+                url :url, // json datasource
+                data : {token:token},
+                ordering : false,
+                type: "post",  // method  , by default get
+                error: function(){  // error handling
+                    // loading_modal_hide();
+                    $(".employee-grid-error").html("");
+                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#employee-grid_processing").css("display","none");
+                }
+            }
+        } );
+    }
+    
+        
+
+        
+    
 
 </script>
