@@ -210,11 +210,11 @@
                             </li>
                         <?php } ?>
 
-                        <?php if(in_array(6,$rule_service)){ ?>
+                        <!-- <?php if(in_array(6,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(1)=='budgeting'){echo 'active';} ?>" id = "PageServiceBudgeting">
                                 <a href="<?php echo base_url('budgeting'); ?>"><i class="fa fa-money" aria-hidden="true"></i> Budgeting</a>
                             </li>
-                        <?php } ?>
+                        <?php } ?> -->
 
                         <?php if(in_array(9,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(1)=='agregator'){echo 'active';} ?>">
@@ -241,10 +241,10 @@
                         
 
                         <!-- Adding for Testing -->
-                        <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
+                       <!--  <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
                              <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='request-document-generator'){echo 'active';} ?>">
                                  <a href="<?php echo base_url('request-document-generator'); ?>"><i class="glyphicon glyphicon-transfer" aria-hidden="true"></i> Request Document Generator</a>
-                             </li>
+                             </li> -->
                         <!-- End Adding for Testing -->
 
                         <!-- Adding for Testing -->
@@ -253,7 +253,12 @@
                                  <a href="javascript:void(0)"><i class="fa fa-rss" aria-hidden="true"></i> Blog Admin</a>
                              </li>
                         <!-- End Adding for Testing -->
-
+                        <!-- Adding for Testing -->
+                        <!-- <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : ''; ?>
+                             <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='lppm'){echo 'active';} ?>">
+                                 <a href="<?php echo base_url('lppm'); ?>"><i class="fa fa-hourglass-half" aria-hidden="true"></i> LPPM</a>
+                             </li> -->
+                        <!-- End Adding for Testing -->
                         <!-- Added by Febri @ Jun 2020 -->
                         <?php 
                         $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; 
@@ -267,6 +272,9 @@
                              </li>
                          <?php } ?>
                         <!-- End Added by Febri -->
+                        <!-- <li class="<?php echo ($this->uri->segment(1) == 'it' &&  $this->uri->segment(2) == 'summary_knowledgebase') ? 'active' : ''  ?>">
+                            <a href="<?php echo base_url().'it/summary_knowledgebase' ?>"><i class="fa fa-book" aria-hidden="true"></i> Summary Knowledgebase</a>
+                        </li> -->  
                         
 
                     </ul>
@@ -1100,6 +1108,52 @@
          });
      }
 
+
+     function AjaxSubmit(url='',token='',ArrUploadFilesSelector=[]){
+         var def = jQuery.Deferred();
+         var form_data = new FormData();
+         form_data.append('token',token);
+         if (ArrUploadFilesSelector.length>0) {
+            for (var i = 0; i < ArrUploadFilesSelector.length; i++) {
+                var NameField = ArrUploadFilesSelector[i].NameField+'[]';
+                var Selector = ArrUploadFilesSelector[i].Selector;
+                var UploadFile = Selector[0].files;
+                for(var count = 0; count<UploadFile.length; count++)
+                {
+                 form_data.append(NameField, UploadFile[count]);
+                }
+            }
+         }
+
+         $.ajax({
+           type:"POST",
+           url:url,
+           data: form_data,
+           contentType: false,       // The content type used when sending data to the server.
+           cache: false,             // To unable request pages to be cached
+           processData:false,
+           dataType: "json",
+           success:function(data)
+           {
+            def.resolve(data);
+           },  
+           error: function (data) {
+             // toastr.info('No Result Data'); 
+             def.reject();
+           }
+         })
+         return def.promise();
+    }
+
+    function loading_button2(selector) {
+        selector.html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');
+        selector.prop('disabled',true);
+    }
+
+    function end_loading_button2(selector,html='Save'){
+        selector.prop('disabled',false).html(html);
+    }
+
     function updateFCMToken(FCMToken) {
         var url = base_url_js+'api3/__crudLogging';
 
@@ -1119,6 +1173,7 @@
 
         });
     }
+
 
 
 </script>

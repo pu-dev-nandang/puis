@@ -136,7 +136,9 @@
                 shareLink : shareLink
             },'UAP)(*');
 
-            var htmlss = '<div style="text-align: center;">' +
+            
+                if (jsonResult.isPublicSurvey==0||jsonResult.isPublicSurvey==null){
+                    var htmlss = '<div style="text-align: center;">' +
                 '<img src="'+jsonResult.QRCode+'" />' +
                 '<div class="form-group">' +
                 '<div class="panel-link">'+shareLink+'</div>'+
@@ -145,9 +147,31 @@
                 '<a href="'+base_url_js+'save2pdf/share-survey/'+tokenLink+'" target="_blank" class="btn btn-primary">Download QR Code PDF</a> ' +
                 '<a href="data:image/png;base64,'+jsonResult.Encode+'" download="QR-Code-'+jsonResult.Key+'.png" class="btn btn-primary">Download QR Code Image</a>' +
                 '</div>' +
-                '</div>';
+                '</div>'+
+                '<input type="hidden" id="status" value="'+jsonResult.Sts+'" />'+
+                    '<input type="checkbox" id="myCheck" onclick="myFunction('+ID+')" value="'+jsonResult.isPublicSurvey+'"> Share to public'+
+                    '<a href="javascript:void(0)" id="btnSelectQuestion" style="display: none;" onclick="questionlist('+ID+');"> Select Question</a> ';
+                
+                }else{
+                    var htmlss = '<div style="text-align: center;">' +
+                '<img src="'+jsonResult.QRCode+'" />' +
+                '<div class="form-group">' +
+                '<div class="panel-link">'+shareLink+'</div>'+
+                '</div>' +
+                '<div class="form-group">' +
+                '<a href="'+base_url_js+'save2pdf/share-survey/'+tokenLink+'" target="_blank" class="btn btn-primary">Download QR Code PDF</a> ' +
+                '<a href="data:image/png;base64,'+jsonResult.Encode+'" download="QR-Code-'+jsonResult.Key+'.png" class="btn btn-primary">Download QR Code Image</a>' +
+                '</div>' +
+                '</div>'+
+                '<input type="hidden" id="status" value="'+jsonResult.Sts+'" />'+
+                
+                    '<input type="checkbox" id="myCheck" onclick="myFunction('+ID+')" value="'+jsonResult.isPublicSurvey+'" checked="checked"> Share to public'+
+                    '<a href="javascript:void(0)" id="btnSelectQuestion" style="display: block;" onclick="questionlist('+ID+');">Select Question</a> ';
+                }
+                
+                
 
-            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#GlobalModal .modal-footer').html('<button type="button" id="test" class="btn btn-default" data-dismiss="modal">Close</button>');
 
             $('#GlobalModal .modal-body').html(htmlss);
 
@@ -161,6 +185,181 @@
         });
 
     });
+
+function questionlist(id)
+    {
+        var ID = id;
+        var data = {
+            action : 'showQuestioninSurveyShare',
+            SurveyID : ID,
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = "<?php echo base_url('survey/share-public'); ?>";
+         $('#GlobalModal').modal('hide');
+        $('#GlobalModalXtraLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Show Question</h4>'+'<input type="hidden" id="idsurv" name="ID" value='+ID+' />');
+
+        var htmlss = '<div id="panelShowQuestion"></div>';
+
+        $('#GlobalModalXtraLarge .modal-footer').html('<button type="button" id="btnSelect" class="btn btn-primary">Share</button> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+        $('#GlobalModalXtraLarge .modal-body').html(htmlss);
+
+        loading_page('#panelShowQuestion');
+
+        $('#GlobalModalXtraLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        $.post(url,{token:token},function (jsonResult) {
+                $('#GlobalModal').modal('hide');
+            if(jsonResult.length>0){
+
+                var tr = '';
+                $.each(JSON.parse(jsonResult),function (i,v) {
+
+                    tr = tr+'<tr>' +
+                        '<td>'+(i + 1)+'</td>' +
+                        '<td style="text-align: left;"><span class="label label-primary">'+v.Category+'</span>' +
+                        ' <span class="label label-success">'+v.Type+'</span>' +
+                        '       <div class="q-scroll">'+v.Question+'</div></td>' +
+                        '<td>'+v.AverageRate+'</td>' +
+                        '</tr>';
+                })
+
+            }
+
+            var dataListQuestion = '<div class="table-responsive">' +
+                '    <table class="table table-bordered table-centre">' +
+                '        <thead>' +
+                '        <tr style="background: #eceff1;">' +
+                '            <th style="width: 3%">No</th>' +
+                '            <th>Question</th>' +
+                '            <th style="width: 5%"><input type="checkbox" id="selectAllQuestion" name="selectQuestion"></input> </th>' +
+                '        </tr>' +
+                '        </thead>' +
+                '        <tbody>'+tr+'</tbody>' +
+                '    </table>' +
+                '</div>';
+
+            setTimeout(function () {
+                $('#panelShowQuestion').html(dataListQuestion);
+            },500);
+
+        });
+    }
+
+async function myFunction($id) {
+    var i = document.getElementById("myCheck").checked;
+    var x = document.getElementById("btnSelectQuestion");
+ 
+    var ID = $id;
+    if (i==true) {
+        x.style.display="block";
+        
+    }else{
+        x.style.display="none";
+        var shareAtPublic = 0;
+    
+        var cekData = {
+            action : 'sharetoPublic',
+            ID : ID,
+            shareAtPublic : shareAtPublic,
+         };
+    
+    
+        var token = jwt_encode(cekData,'UAP)(*');
+        var url = "<?php echo base_url('survey/share-public'); ?>";
+    
+        $.post(url,{token:token},function (jsonResult) {
+          toastr.success('Data saved','Success'); 
+        });
+    }
+}
+    
+
+$(document).ready(function() {
+
+    $(document).on('click','#selectAllQuestion',function () {
+        if (this.checked) {
+            $('.selectQuestion').each(function() {
+                this.checked=true;
+            });
+        }else{
+            $('.selectQuestion').each(function() {
+                this.checked=false;
+            });
+        }
+    });
+    $(document).on('click','.selectQuestion',function () {
+        if ($('.selectQuestion:checked').length == $('.selectQuestion').length) {
+            $('#selectAllQuestion').prop('checked', true);
+        }else{
+             $('#selectAllQuestion').prop('checked', false);
+        }
+    });
+
+    $(document).on('click','#btnSelect',function () {
+        var ID =  $("#idsurv").val();
+        var sts = $("#status").val();
+
+        if(sts!=1){
+            $('#GlobalModalXtraLarge').modal('hide');
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Notification</h4>');
+             var htmlss = '<div style="text-align: center;">Unpublish survey status. <br> Please change status to publish before sharing!' +
+                
+                '</div>';
+                
+            $('#GlobalModal .modal-footer').html('<button type="button" id="test" class="btn btn-primary" data-dismiss="modal">OK</button>');
+
+            $('#GlobalModal .modal-body').html(htmlss);
+
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+        
+        }else{
+            
+            var selectCheck = [];
+            $('.selectQuestion').each(function () {
+                if ($(this).is(":checked")) {
+                    selectCheck.push($(this).val());
+                }
+
+            });
+            selectCheck = selectCheck.toString();
+   
+   
+            if (selectCheck==''||selectCheck==null) {
+                 toastr.error('Please select question!','Error');
+            
+        }
+        else {
+           var data = {
+                action : 'selectQuestionSurvey',
+                ID : ID,
+                QuestionID : selectCheck,
+            };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = "<?php echo base_url('survey/share-public'); ?>";
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            toastr.success('Data saved','Success');
+                 setTimeout(function () {
+                  window.location = "";
+              },500);
+        });
+        }
+    }
+ 
+    });
+})
+
+    
 
     $(document).on('click','.showQuestionList',function () {
 

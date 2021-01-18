@@ -233,6 +233,23 @@
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label>NITK</label>
+                                            <input type="text" class="form-control" id="formNITK" value="">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label>Status of NITK</label>
+                                            <select class="form-control" id="formStatus_NITK">
+                                                <option value="">Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>Email Other</label>
@@ -240,7 +257,6 @@
                                             <small class="text-danger text-message"></small>
                                         </div>
                                     </div>  
-
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>Phone</label>
@@ -561,6 +577,9 @@
         FuncEvform_MainDivision();
 
         loadSelectOptionLevelEducation('#formLevelEducationID','');
+
+        loadSelectOptionStatus_NITK($('#formStatus_NITK'));
+
         loadSelectOptionLecturerAcademicPosition('#formLecturerAcademicPositionID','');
 
 
@@ -948,6 +967,9 @@
 
             var formProfession = $('#formProfession').val();
 
+            var formNITK = $('#formNITK').val();
+            var formStatus_NITK = $('#formStatus_NITK').val();
+
             var data = {
                 arr_Prodi : arr_Prodi,
                 action : 'addEmployees',
@@ -997,7 +1019,9 @@
                     DistrictID  : DistrictID,
                     Extension   : formExtension,
                     PassTelp    : formPassTelp,
-                    isApproved : 0
+                    isApproved : 0,
+                    NITK : formNITK,
+                    Status_NITK : formStatus_NITK,
                 }
             };
 

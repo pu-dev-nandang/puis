@@ -91,12 +91,16 @@ class M_lpmi extends CI_Model {
     
     public function get_by_id($id)
     {
+        $this->db->select('co.ID,co.IDindex,co.IDSubCat,co.Title,co.Meta_description,co.Meta_keywords,co.Description,co.File,co.Lang,co.AddDate,co.Status,co.CreateAt,co.CreateBy,co.UpdatedAt,co.UpdatedBy');
+        $this->db->select('sb.IDSub,sb.IDCat,sb.SubName');
+        $this->db->select('cat.ID as ID1,cat.Name,cat.Lang as Lang1');
         $this->db->from('db_lpmi.content as co');
-        $this->db->join('db_lpmi.sub_category as sb','sb.IDSub=co.IDSubCat');          
-        $this->db->join('db_lpmi.category as cat','sb.IDSub=cat.ID');       
-        $query = $this->db->get();
- 
+        $this->db->join('db_lpmi.sub_category as sb','sb.IDSub=co.IDSubCat','left');          
+        $this->db->join('db_lpmi.category as cat','sb.IDCat=cat.ID','left');
+        $this->db->where('co.ID',$id);       
+        $query = $this->db->get(); 
         return $query->row();
+
     }
     
     public function get_by_idCat($id)
@@ -175,11 +179,11 @@ class M_lpmi extends CI_Model {
         return $hasil;
     }
 
-    public function getSubCategory($getidcat)
+    public function getSubCategory($getidcat,$getidsubcat)
     {
         $hasil=$this->db->query("SELECT * FROM db_lpmi.category as ck 
-                                 join db_lpmi.sub_category as sc on sc.IDCat=ck.ID 
-                                 where sc.IDCat = '".$getidcat."' ")
+                                 left join db_lpmi.sub_category as sc on sc.IDCat=ck.ID 
+                                 where sc.IDCat = '".$getidcat."' or IDSub='".$getidsubcat."' ")
         ->result_array();
         return $hasil;
     }

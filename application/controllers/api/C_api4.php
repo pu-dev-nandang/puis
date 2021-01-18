@@ -2299,6 +2299,11 @@ class C_api4 extends CI_Controller {
         }
     }
 
+    public function getkelompok_profesi(){
+        $data = $this->db->where('DeletedBy is NULL')->order_by('ID_kelompok_profesi','ASC')->get('db_employees.employees_kelompok_profesi')->result_array();
+        return print_r(json_encode($data));
+    }
+
 
 
 }

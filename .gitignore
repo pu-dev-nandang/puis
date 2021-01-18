@@ -1,12 +1,21 @@
 /.idea
-
-
+/.env
+/application/cache/*
 /index.php
 #index.php
 #index.php
 
 /application/logs
 /application/config/database.php
+/uploads/agregator/*
+/uploads/announcement/*
+/uploads/budgeting/*
+/uploads/ijazah/*
+/uploads/lpmi/*
+/uploads/prodi/*
+/uploads/profile/*
+/uploads/lppm/*
+/uploads/employees/*.JPG
 /uploads/employees/*.jpeg
 /uploads/employees/*.jpg
 /uploads/employees/*.png

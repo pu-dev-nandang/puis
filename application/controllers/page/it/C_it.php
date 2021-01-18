@@ -397,7 +397,7 @@ class C_it extends It_Controler {
     public function request_changepass()
     {
       $department = parent::__getDepartement();
-      $data['resetpass'] = $this->db->where('Status', '0')->get('db_it.reset_password');
+      $data['resetpass'] = $this->db->order_by('Status', 'ASC')->get('db_it.reset_password');
       $content = $this->load->view('page/'.$department.'/request-changepass/request_change_password',$data,true);
       $this->temp($content);  
     }
@@ -407,7 +407,13 @@ class C_it extends It_Controler {
       $rs = ['status' => 0,'msg' => '','callback' => [] ]; 
       $datatoken =  $this->getInputToken();
       $datatoken = json_decode(json_encode($datatoken),true);
+
+   
+    if($datatoken['action']=='finish'){
       $formData = $datatoken['datarequest'];
+
+
+
       $requestid = $formData['ID'];
       $ActionBy = $this->session->userdata('Name');
       
@@ -419,9 +425,104 @@ class C_it extends It_Controler {
     
       $this->db->where('ID', $requestid);
       $this->db->update('db_it.reset_password', $updates);
+        $rs['status'] = 1;
+      return print_r(json_encode($rs));
+     }
+      else if($datatoken['action']=='getStatus'){  
+        $data = $this->db->query('SELECT DISTINCT(Status) AS sts FROM db_it.reset_password')->result_array();      
+  
+      return print_r(json_encode($data));  
+    }
+    else if($datatoken['action']=='viewData'){  
+        $requestData = $_REQUEST;
+
+            $filterType = $datatoken['filterType'];
         
-      $rs['status'] = 1;  
-      echo json_encode($rs);
+
+            $dataWhere = '';
+            if($filterType!=''){
+                $w_Type = ($filterType!='')
+                    ? ' AND Status = "'.$filterType.'" ' : '';
+                
+
+                $dataWhere = $w_Type;
+            }
+     
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataScr = 'Username LIKE "%'.$search.'%" OR Name LIKE "%'.$search.'%" OR Email LIKE "%'.$search.'%"';
+
+                $dataSearch = ' AND ('.$dataScr.')';
+            }
+
+            $queryDefault = 'SELECT * FROM db_it.reset_password WHERE ID IS NOT NULL
+                                            '.$dataSearch.$dataWhere;
+
+                                            
+
+            $queryDefaultTotal = 'SELECT COUNT(*) AS Total FROM ('.$queryDefault.') xx';
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefaultTotal)->result_array()[0]['Total'];
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                $tokenID = $this->jwt->encode(array('ID'=>$row['ID']),'UAP)(*');
+                if ($row['Status']==0) {
+                  $btnAct = ' <div class="btn-group">
+                   <button class="btn btn-info btn-sm" onclick="finishbtn('.$row['ID'].');" title="Finish">Finish</button>
+                   </div>';
+                } else {
+                  $btnAct = ' <div class="btn-group">
+                   <button class="btn btn-info btn-sm" disabled>Finish</button>
+                   </div>';
+                }
+                
+          
+
+               
+
+               
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Username'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Name'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['Email'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['NewPassword'].'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$row['EnteredAt'].'</div>';
+                if ($row['Status']==0) {
+                  $nestedData[] = '<div style="text-align: left;">Pending</div>';
+                } else {
+                  $nestedData[] = '<div style="text-align: left;">Finish</div>';;
+                }
+                
+
+                $nestedData[] = $btnAct;
+         
+
+                $data[] = $nestedData;
+                $no++;
+                }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval($queryDefaultRow),
+                "recordsFiltered" => intval( $queryDefaultRow),
+                "data"            => $data,
+                "dataQuery"            => $query
+            );
+            echo json_encode($json_data);
+      }
+    
     }
 
     public function share_menu()

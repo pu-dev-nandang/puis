@@ -65,7 +65,7 @@ var App_penelitian_melibatkan_mhs = {
              },
              dom: 'l<"toolbar">frtip',
              initComplete: function(){
-               
+               newDescritionInput.getDescription();
             }  
          });
 
@@ -117,4 +117,9 @@ $('#saveToExcel').click(function () {
            saveTable2Excel('dataTable2Excel');
        },1000);
 });
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    newDescritionInput.saveDescription(itsme);
+})
 </script>

@@ -9,6 +9,9 @@
             <a href="<?php echo base_url('academic/final-project'); ?>">List Student</a>
         </li>
 
+        <li class="<?php if($this->uri->segment(3)=='monitoring-final-project') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/final-project/monitoring-final-project'); ?>">Monitoring Final Project</a>
+        </li>
 
         <li class="<?php if($this->uri->segment(3)=='mentor-final-project') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/final-project/mentor-final-project'); ?>">Mentor Final Project</a>

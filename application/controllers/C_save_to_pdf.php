@@ -3617,7 +3617,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $yA = $pdf->GetY();
 
-        $pdf->Cell($w_R_label,$h,'Judul Skripsi / Tugas Akhir',0,0,'L');
+        $pdf->Cell($w_R_label,$h,'Judul Skripsi / ',0,0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
         $pdf->MultiCell($w_R_fill+$w_Div-2,$h,$SkripsiInd,0);
 
@@ -3691,7 +3691,8 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_Div+$min,$h,'NIP : '.$Rektorat['NIP'],$borderttd,0,'L');
             $pdf->Cell($w_Div-$min,$h,'NIP : '.$Student['NIP'],$borderttd,1,'L');
 
-            $pdf->Rect(85, $y+5, 40, 58);
+            // $pdf->Rect(85, $y+5, 40, 58);
+            $pdf->Rect(85, $y+16, 40, 48);
 
         } else {
 
@@ -3742,7 +3743,8 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
             $pdf->Cell($w_Div-$min,$h,'NIP : '.$Rektorat['NIP'],$borderttd,1,'L');
 
-            $pdf->Rect(61, $y+5, 40, 58);
+            // $pdf->Rect(61, $y+5, 40, 58);
+            $pdf->Rect(61, $y+16, 40, 48);
 
         }
 
@@ -4084,7 +4086,7 @@ class C_save_to_pdf extends CI_Controller {
 
 
             //foto
-            $pdf->Rect($x+45, $y, 40, 58);
+            $pdf->Rect($x+47, $y, 38, 55); //Update Irfan
 
         }
 
@@ -6269,14 +6271,14 @@ Phone: (021) 29200456';
             $thn = ($dateGen!='') ? explode('-',$dateGen)[0] : '';
 
             // Get Mata kuliah
-            $dataMK = $this->db->query('SELECT mk.NameEng, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule s
+            $dataMK = $this->db->query('SELECT mk.Name, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule s
                                                   LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                   LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                   LEFT JOIN db_academic.schedule_share_credit ssc ON (ssc.ScheduleID = s.ID AND ssc.NIP = s.Coordinator)
                                                   WHERE s.SemesterID = "'.$SemesterID.'" AND s.Coordinator = "'.$NIP.'" GROUP BY s.ID
                                                   UNION ALL
-                                                  SELECT mk2.NameEng, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule_details_course sdc2
+                                                  SELECT mk2.Name, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule_details_course sdc2
                                                   LEFT JOIN db_academic.schedule s2 ON (s2.ID = sdc2.ScheduleID)
                                                   LEFT JOIN db_academic.mata_kuliah mk2 ON (mk2.ID = sdc2.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc2.CDID)
@@ -6370,7 +6372,7 @@ Phone: (021) 29200456';
                 $y = $pdf->GetY();
 
                 $pdf->Cell(10,$h,$no,1,0,'C');
-                $pdf->Cell(125,$h,$item['NameEng'],1,0,'L');
+                $pdf->Cell(125,$h,$item['Name'],1,0,'L');
                 $pdf->Cell(20,$h,$item['Credit'],1,0,'C');
                 $pdf->Cell(20,$h,$Credit,1,0,'C');
                 $pdf->Cell(15,$h,'14',1,1,'C');
