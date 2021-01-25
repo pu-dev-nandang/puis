@@ -19,5 +19,5 @@ services:
       - ${PATH_CODE}/.docker/nginx/ssl:/etc/nginx/ssl
       - ${PATH_CODE}/.docker/nginx/log/access.log:/var/log/nginx/access.log 
       - ${PATH_CODE}/.docker/nginx/log/error.log:/var/log/nginx/error.log
-      #- ${PATH_CODE}/.docker/nginx/php:/usr/local/etc/php
+      - ${PATH_CODE}/.docker/nginx/php:/usr/local/etc/php
 
