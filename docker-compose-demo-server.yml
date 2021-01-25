@@ -1,7 +1,7 @@
 version: '2'
 services:
    web_pcam:
-    hostname: web_pcam
+    hostname: web_demo_pcam
     image: richarvey/nginx-php-fpm:1.6.4
     environment:
       _DB_PASSWORD: ${DB_PASSWORD}
