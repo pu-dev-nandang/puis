@@ -122,11 +122,16 @@
                         </tr>
                         <tr>
                             <td>16</td>
+                            <td>BAB VI</td>
+                            <td id="BAB6">-</td>
+                        </tr>
+                        <tr>
+                            <td>17</td>
                             <td>Daftar Pustaka</td>
                             <td id="DaftarPustaka">-</td>
                         </tr>
                         <tr>
-                            <td>17</td>
+                            <td>18</td>
                             <td>Lampiran</td>
                             <td id="Lampiran">-</td>
                         </tr>
@@ -328,4 +333,3 @@
     });
 
 </script>
-
