@@ -1,5 +1,6 @@
 /.idea
 /.env
+/.env.demo-server
 /application/cache/*
 /index.php
 #index.php
@@ -79,3 +80,13 @@ document/*
 **/uploads/task-exam/
 **/uploads/kb/
 **/uploads/help/
+
+
+#docker
+.docker/nginx/log/*
+***/.docker/nginx/log/
+application/logs/*
+.docker/nginx/ssl/*
+***/.docker/nginx/ssl/
+.docker/nginx/php/*
+***/.docker/nginx/php/

@@ -1,0 +1,1 @@
+docker-compose -f docker-compose-demo-server.yml --env-file ./.env.demo-server up --build
