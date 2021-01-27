@@ -209,6 +209,12 @@
                         Batal Tagihan
                         </a>
                     </li>
+                    <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-bayar"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/set-bayar'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Set Bayar
+                        </a>
+                    </li>
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cek-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/cek-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>

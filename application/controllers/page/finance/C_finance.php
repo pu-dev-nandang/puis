@@ -2607,4 +2607,9 @@ class C_finance extends Finnance_Controler {
         echo json_encode($rs);
     }
 
+    public function page_set_bayar(){
+        $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_set_bayar',$this->data,true);
+        $this->temp($content);
+    }
+
 }
