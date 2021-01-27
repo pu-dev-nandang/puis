@@ -190,12 +190,12 @@ setlocale(LC_ALL, "en_US.UTF-8");
 	Alhadi Rahman 2021 - 01 - 25
 */
 
-	define(_DB_HOST, isset($_SERVER['_DB_HOST']) ? $_SERVER['_DB_HOST'] : '10.1.30.59');
-	define(_DB_USER, isset($_SERVER['_DB_USER']) ? $_SERVER['_DB_USER'] : 'db_itpu');
-	define(_DB_PASSWORD, isset($_SERVER['_DB_PASSWORD']) ? $_SERVER['_DB_PASSWORD'] : 'Uap)(*&^%');
-	define(_DB_NAME, isset($_SERVER['_DB_NAME']) ? $_SERVER['_DB_NAME'] : 'db_academic');
-	define(_DB_PORT, isset($_SERVER['_DB_PORT']) ? $_SERVER['_DB_PORT'] : '3306');
-	define(_HOST_ID, isset($_SERVER['_HOST_ID']) ? $_SERVER['_HOST_ID'] : 'DEMO');
+	define('_DB_HOST', isset($_SERVER['_DB_HOST']) ? $_SERVER['_DB_HOST'] : '10.1.30.59');
+	define('_DB_USER', isset($_SERVER['_DB_USER']) ? $_SERVER['_DB_USER'] : 'db_itpu');
+	define('_DB_PASSWORD', isset($_SERVER['_DB_PASSWORD']) ? $_SERVER['_DB_PASSWORD'] : 'Uap)(*&^%');
+	define('_DB_NAME', isset($_SERVER['_DB_NAME']) ? $_SERVER['_DB_NAME'] : 'db_academic');
+	define('_DB_PORT', isset($_SERVER['_DB_PORT']) ? $_SERVER['_DB_PORT'] : '3306');
+	define('_HOST_ID', isset($_SERVER['_HOST_ID']) ? $_SERVER['_HOST_ID'] : 'DEMO');
 
 
 /*
