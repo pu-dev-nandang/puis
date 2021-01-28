@@ -1905,9 +1905,11 @@ class M_finance extends CI_Model {
             }
 
       // Detail Payment & cek cancel
-         $DetailPayment = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']);
+         $DetailPayment = $this->detail_payment_std($query[$i]['ID']);
          $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
          $potonganLain = $this->getPotonganLain($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
+
+
 
       if($prodi == '' || $prodi == Null){
         $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
@@ -5293,6 +5295,17 @@ class M_finance extends CI_Model {
       }
 
       return $rs;
+   }
+
+   public function detail_payment_std($ID_payment) {
+    $DetailPayment = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+    for ($i=0; $i < count($DetailPayment); $i++) { 
+      $payment_student_details = $this->m_master->caribasedprimary('db_finance.payment_student_details','ID_payment_students',$DetailPayment[$i]['ID']);
+      $DetailPayment[$i]['payment_student_details'] = $payment_student_details;
+    }
+
+    return $DetailPayment;
+
    }
 
 

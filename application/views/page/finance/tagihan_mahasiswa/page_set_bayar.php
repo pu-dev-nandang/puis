@@ -13,6 +13,11 @@
                        </div>
                    </div>
                </div>
+               <div class="row">
+                 <div class="col-md-12" align="right">
+                   <button type="button" class="btn btn-default" id = 'idbtn-cari'><span class="glyphicon glyphicon-search"></span> Cari</button>
+                 </div>
+               </div>
             </div>
         </div>
     </div>
