@@ -67,6 +67,7 @@ const create_html_choose_payment = (data_db) => {
 	}
 
 	$('#dataRow').empty();
+	$('.panel-body').find('.payment_content').remove();
 
 	if (data_db.length > 0) {
 		data_get = data_db.slice(0);
@@ -180,14 +181,81 @@ const create_html_pay = (PaymentID) => {
 	let data_choose = data_get.find(x => x.PaymentID === PaymentID);
 	count_left_paymet(data_choose);
 
-	let arr = {
-		total_invoice : total_invoice,
-		left_payment : left_payment,
-		data_get : data_get,
-		have_pay : have_pay,
-	};
+	if (!$('.panel-body').find('.payment_content').length) {
+		$('.panel-body').append(
+				'<div class = "payment_content"></div>'
+			);
+	}
 
-	console.log(arr);
+	console.log(data_choose);
+
+	const sel = $('.panel-body').find('.payment_content');
+
+	let DetailPayment = data_choose.DetailPayment;
+
+	let html_detail_payment = '';
+
+	for (var i = 0; i < DetailPayment.length; i++) {
+		let html_lunas_chk = (DetailPayment[i].Status == 1 || DetailPayment[i].Status == '1' ) ? '<i class="fa fa-check-circle" style="color: green;"></i>' : '<i class="fa fa-minus-circle" style="color: red;"></i>';
+
+		let html_pay = '<span>Invoice : '+formatRupiah(DetailPayment[i].Invoice)+'</span> &nbsp'+html_lunas_chk;
+
+		let detail_new_pay = '';
+		let payment_student_details = DetailPayment[i].payment_student_details;
+		if (payment_student_details.length > 0) {
+			 detail_new_pay += '<ol>';
+			 for (var j = 0; j < payment_student_details.length; j++) {
+			 	detail_new_pay += '<li>'+formatRupiah(payment_student_details[j].Pay)+ ' : <span style = "color :green;">'+payment_student_details[j].Pay_Date+'</span></li>';
+			 }
+
+			 html_pay = '<a data-toggle="collapse" href="#detail-payment-list_'+i+'" aria-expanded="false">'+
+							html_pay+
+							'</a>'+
+							'<div id = "detail-payment-list_'+i+'" class="panel-collapse collapse">'+
+								detail_new_pay+
+							'</div>';
+		}
+		else
+		{
+			if (DetailPayment[i].DatePayment != null) {
+				html_pay += ' | <span style = "color :green;">Tgl Bayar : '+DetailPayment[i].DatePayment+'</span>';
+			}
+			
+		}
+
+		html_detail_payment += '<li style = "font-weight: bold;">'+html_pay+'</li>';
+	}
+
+	let html_invoice = '<div class = "row">'+
+							'<div class = "col-md-12">'+
+								'<ol><label>Cicilan : </label>'+
+										html_detail_payment+
+								'</ol>'+									
+							'</div>'+
+					   '</div>'
+
+	sel.html(
+			'<div class = "row">'+
+				'<div class = "col-md-6">'+
+					'<div class="panel panel-default">'+
+						'<div class="panel-heading" role="tab" id="content-invoice">'+
+							'<h5 class="panel-title">'+
+							'<a data-toggle="collapse" href="#content-invoice-data" aria-expanded="false" aria-controls="answerOne">'+
+							'<span style = "color:blue;">Total Bayar : '+formatRupiah(have_pay)+' | '+'Invoice : '+formatRupiah(data_choose.InvoicePayment)+' | Sisa : '+formatRupiah(left_payment)+' </span>'+
+							'</a>'+
+							'</h5>'+
+						'</div>'+
+						'<div id="content-invoice-data" class="panel-collapse collapse" role="tabpanel" >'+
+							'<div class="panel-body">'+
+							html_invoice+
+							'</div>'+
+						'</div>'+
+					'</div>'+
+				'</div>'+
+			'</div>'
+		)
+
+
 }
 
 
