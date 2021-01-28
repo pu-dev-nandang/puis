@@ -6356,6 +6356,7 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='addEmployees'){
                 $rs = array('msg' => '','status' => 1);
                 $formInsert = (array) $data_arr['formInsert'];
+                $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
 
                 // Cek apakah NIP sudah digunakan atau belum
                 $NIP = $formInsert['NIP'];
