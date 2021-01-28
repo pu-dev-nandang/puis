@@ -16,12 +16,13 @@ const load_default = () => {
 }
 
 const key_press_nim = async(NIM) => {
-	const url = base_url_js+'finance/get_created_tagihan_mhs_not_approved/1';
+	const url = base_url_js+'finance/get_created_tagihan_mhs/1';
 	const data_post = {
             ta : '',
             prodi : '',
             PTID  : '',
             NIM : NIM,
+            StatusPayment : '0',
         };
     var token = jwt_encode(data_post,'UAP)(*');
     loadingStart();
