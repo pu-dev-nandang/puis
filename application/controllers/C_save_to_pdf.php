@@ -7533,8 +7533,12 @@ Phone: (021) 29200456';
                 $ttd_name = $t_a.$t_name.$t_b;
 
 
-                $pdf->Image('./images/cap.png',$spasiTdd+20,$pdf->GetY()-2,40);
-                $pdf->Image('./uploads/signature/'.$ttd_Signatures,$spasiTdd + 10,$pdf->GetY(),40);
+                $pathSignature = './uploads/signature/'.$ttd_Signatures;
+                if(file_exists($pathSignature)){
+                    $pdf->Image('./images/cap.png',$spasiTdd+20,$pdf->GetY()-2,40);
+                    $pdf->Image($pathSignature,$spasiTdd + 10,$pdf->GetY(),40);
+                }
+
 
                 $pdf->SetFont('dinpromedium','',$fontBody);
                 $pdf->Cell($spasiTdd,$h_1,'',$border,0,'L');
