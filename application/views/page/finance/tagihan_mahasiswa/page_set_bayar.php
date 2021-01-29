@@ -9,8 +9,16 @@
                <div class="row" style="margin-top: 30px;">
                    <div class="col-md-3">
                        <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                           <label>Input NPM</label>
                            <input type="text" name="" class="form-control" placeholder="Input NPM Mahasiswa" id = "NIM">
                        </div>
+                   </div>
+                   <div class="col-md-3">
+                     <div class="thumbnail" style="min-height: 30px;padding: 10px;">
+                         <label>Pilih Semester</label>
+                         <select class="form-control" id="selectSemester">
+                         </select>
+                     </div>
                    </div>
                </div>
                <div class="row">

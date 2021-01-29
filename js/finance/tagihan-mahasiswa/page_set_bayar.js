@@ -3,6 +3,24 @@ let left_payment = -1;
 let data_get = [];
 let have_pay = -1;
 
+function loadSelectOptionSemesterByload(element,selected) {
+
+    var token = jwt_encode({action:'read'},'UAP)(*');
+    var url = base_url_js+'api/__crudTahunAkademik';
+    $.post(url,{token:token},function (jsonResult) {
+
+       if(jsonResult.length>0){
+           for(var i=0;i<jsonResult.length;i++){
+               var dt = jsonResult[i];
+               var sc = (selected==dt.Status) ? 'selected' : '';
+               // var v = (option=="Name") ? dt.Name : dt.ID;
+               $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
+           }
+       }
+    });
+
+}
+
 const default_var = () => {
 	total_invoice = -1;
 	left_payment = -1;
@@ -16,13 +34,17 @@ const load_default = () => {
 }
 
 const key_press_nim = async(NIM) => {
+	var Semester = $('#selectSemester').val();
+	Semester = Semester.split('.');
+	Semester = Semester[0];
 	const url = base_url_js+'finance/get_created_tagihan_mhs/1';
 	const data_post = {
             ta : '',
             prodi : '',
             PTID  : '',
             NIM : NIM,
-            StatusPayment : '0',
+            StatusPayment : '',
+            Semester : Semester,
         };
     var token = jwt_encode(data_post,'UAP)(*');
     loadingStart();
@@ -117,10 +139,11 @@ const create_html_choose_payment = (data_db) => {
 			else
 			{
 			 tr = '<tr style="background-color: #8ED6EA; color: black;" NPM = "'+data_get[i]['NPM']+'">';
-			 inputCHK = ''; 
+			 // inputCHK = ''; 
+			 inputCHK = '<input type="checkbox" class="uniform" value ="'+data_get[i]['NPM']+'" Prodi = "'+data_get[i]['ProdiEng']+'" Nama ="'+data_get[i]['Nama']+'" semester = "'+data_get[i]['SemesterID']+'" ta = "'+data_get[i]['Year']+'" invoice = "'+data_get[i]['InvoicePayment']+'" discount = "'+data_get[i]['Discount']+'" PTID = "'+data_get[i]['PTID']+'" PTName = "'+data_get[i]['PTIDDesc']+'" PaymentID = "'+data_get[i]['PaymentID']+'" Status = "'+ccc+'">'; 
 			} 
 
-			if(data_get[i]['StatusPayment'] == 0){
+			// if(data_get[i]['StatusPayment'] == 0){
 				var bintang = setBintangFinance(data_get[i]['Pay_Cond']);
 				$('#dataRow').append(tr +
 				                       '<td>'+inputCHK+'</td>' +
@@ -134,7 +157,7 @@ const create_html_choose_payment = (data_db) => {
 				                       '<td>'+yy+'</td>' +
 				                       '<td>'+status+'</td>' +
 				                       '</tr>');
-			}
+			// }
 		}
 	}
 	else{
@@ -232,7 +255,30 @@ const create_html_pay = (PaymentID) => {
 										html_detail_payment+
 								'</ol>'+									
 							'</div>'+
-					   '</div>'
+					   '</div>';
+
+	let html_set_pay = '<div class = "form-group">'+
+							'<label class="col-xs-2 control-label">Nominal</label><div class="col-xs-6"><input type="text" id = "cost-payment" value = "" class = "form-control costInput"><br>Tanggal Bayar<div id="datetimepicker-payment" class="input-group input-append date datetimepicker">'+
+							            '<input data-format="yyyy-MM-dd hh:mm:ss" class="form-control" id="datetime_deadline-payment" type="text"></input>'+
+							            '<span class="input-group-addon add-on">'+
+							              '<i data-time-icon="icon-time" data-date-icon="icon-calendar">'+
+							              '</i>'+
+							            '</span>'+
+							        '</div></div>'+
+					   '</div>';
+
+	let htmlBtn = '<div class = "row">'+
+				'<div class = "col-md-12">'+
+					'<div style = "padding:10px;">'+
+						'<button class="btn btn-block btn-success" id="btnSubmitBayar">Submit</button>'+
+					'</div>'+
+				'</div>'+
+			'</div>';
+
+	if (parseInt(left_payment) <= 0) {
+		html_set_pay = '<h2 style = "text-align:center;color:red;">Data telah lunas</h2>';
+		htmlBtn = '';
+	}
 
 	sel.html(
 			'<div class = "row">'+
@@ -252,12 +298,42 @@ const create_html_pay = (PaymentID) => {
 						'</div>'+
 					'</div>'+
 				'</div>'+
-			'</div>'
+				'<div class = "col-md-6">'+
+					'<div class="panel panel-default">'+
+						'<div class="panel-heading">'+
+							'<h5 class="panel-title">'+
+							'Set Input Bayar'+
+							'</h5>'+
+						'</div>'+
+						'<div class="panel-body">'+
+						html_set_pay+
+						'</div>'+
+					'</div>'+
+				'</div>'+
+			'</div>'+htmlBtn
 		)
 
+	$('.costInput').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+	$('.costInput').maskMoney('mask', '9894');
 
+	$('#datetimepicker-payment').datetimepicker({
+	 // startDate: today,
+	 // startDate: '+2d',
+	 //startDate: date.addDays(i),
+	 format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+	});
+
+	$('#datetime_deadline-payment').prop('readonly',true);
 }
 
+$(document).ready(function(e){
+	loadSelectOptionSemesterByload('#selectSemester',1);
+})
+
+$(document).on('change','#selectSemester',function(e){
+	const vv = $('#NIM').val();
+	key_press_nim(vv);
+})
 
 $(document).on('keypress','#NIM', function (event)
 {
