@@ -291,7 +291,7 @@ const create_html_pay = (PaymentID) => {
 	    var htmlPaymentProof = '<div class = "row" style = "margin-bottom : 10px;">'+
 	                              '<div class = "col-md-12">'+
 	                              	  '<div class = "well" style = "padding:25px;">'+
-		                                  '<h5>List Proof of Payment</h5>'+
+		                                  '<h5>List Bukti Bayar</h5>'+
 		                                    '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
 		                                      '<thead>'+
 		                                        '<tr>'+
@@ -417,41 +417,43 @@ const reload_Data = async() => {
 }
 
 const sbmt_payment = async(selector) => {
-	const paymentid = $('#dataRow').find('.uniform:checked').attr('paymentid');
-	var Pay = findAndReplace($('#cost-payment').val(), ".",""); 
-	const Pay_Date = $('#datetime_deadline-payment').val();
 
-	loading_button2(selector);
-	const url = base_url_js + 'page/finance/c_finance/bayar_kuliah';
-	const data = {
-		paymentid : paymentid,
-		Pay : Pay,
-		Pay_Date  : Pay_Date,
-	};
+	if (confirm('are you sure ?')) {
+		const paymentid = $('#dataRow').find('.uniform:checked').attr('paymentid');
+		var Pay = findAndReplace($('#cost-payment').val(), ".",""); 
+		const Pay_Date = $('#datetime_deadline-payment').val();
 
-	var token = jwt_encode(data,'UAP)(*');
-	try{
-		const response = await AjaxSubmitFormPromises(url,token);
-		
-		if (response['status'] == 1) {
-			toastr.success('Saved');
+		loading_button2(selector);
+		const url = base_url_js + 'page/finance/c_finance/bayar_kuliah';
+		const data = {
+			paymentid : paymentid,
+			Pay : Pay,
+			Pay_Date  : Pay_Date,
+		};
+
+		var token = jwt_encode(data,'UAP)(*');
+		try{
+			const response = await AjaxSubmitFormPromises(url,token);
+			
+			if (response['status'] == 1) {
+				toastr.success('Saved');
+			}
+			else
+			{
+				toastr.info(response.msg);
+			}
+			
+			if (response['reload'] == 1) {
+				reload_Data();
+			}
+		}	
+		catch(err){	
+			console.log(err);
+			toastr.error('something wrong, please contact it');
 		}
-		else
-		{
-			toastr.info(response.msg);
-		}
-		
-		if (response['reload'] == 1) {
-			reload_Data();
-		}
-	}	
-	catch(err){	
-		console.log(err);
-		toastr.error('something wrong, please contact it');
+
+		end_loading_button2(selector,'Submit');
 	}
-
-	end_loading_button2(selector,'Submit');
-	
 
 }
 
