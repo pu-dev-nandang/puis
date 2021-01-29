@@ -273,6 +273,10 @@
                 var ArrUploadFilesSelector = [];
                 var UploadFile = $('.note-uploadFile');
                 var valUploadFile = UploadFile.val();
+
+                var next = true;
+                
+
                 if (valUploadFile) {
                     var NameField = UploadFile.attr('name');
                     var temp = {
@@ -280,15 +284,18 @@
                         Selector : UploadFile,
                     };
                     ArrUploadFilesSelector.push(temp);
+                    var FilesValidation = ValidationGenerate.file_validation(ArrUploadFilesSelector[0].Selector,'Note',1,['pdf'],8000000);
+                
+                    if (FilesValidation) {
+                        toastr.error(FilesValidation, 'Failed!!'); // failed
+                        next = false;
+                    }
                 }
 
                 // validation ekstension file
-                var FilesValidation = ValidationGenerate.file_validation(ArrUploadFilesSelector[0].Selector,'Note',1,['pdf'],8000000);
-                if (FilesValidation) {
-                    toastr.error(FilesValidation, 'Failed!!'); // failed
-                }
-                else
-                {
+
+                if(next){
+
                     var token = jwt_encode({
                         action : 'updateNotetoClearent',
                         NPM : NPM,
@@ -323,8 +330,12 @@
                     catch(err) {
                         toastr.info('something wrong, please contact IT'); // failed
                         end_loading_button2(itsme,'Submit')
-                    }
-                }   
+                    }  
+
+                }
+
+
+                 
             // updated
         } else {
             toastr.warning('Form note required','Warning');
