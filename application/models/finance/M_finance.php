@@ -5308,5 +5308,40 @@ class M_finance extends CI_Model {
 
    }
 
+   public function _count_left_paymet($ID_payment){
+      $left_payment = 0;
+      $total_invoice = 0;
+      $have_pay = 0;
+      $payment = $this->m_master->caribasedprimary('db_finance.payment','ID',$ID_payment);
+      if (count($payment) > 0) {
+        $Invoice = $payment[0]['Invoice'];
+
+        $payment_students = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+        for ($i=0; $i < count($payment_students) ; $i++) { 
+          if ($payment_students[$i]['Status'] == 1 || $payment_students[$i]['Status'] == '1') {
+            $have_pay += $payment_students[$i]['Invoice'];
+          }
+          else{
+            $payment_student_details = $this->m_master->caribasedprimary('db_finance.payment_student_details','ID_payment_students',$payment_students[$i]['ID']);
+
+            if (count($payment_student_details) > 0) {
+              for ($j=0; $j < count($payment_student_details); $j++) { 
+                $have_pay += $payment_student_details[$j]['Pay'];
+              }
+            }
+          }
+        }
+
+        $total_invoice = $Invoice;
+
+        $left_payment = abs($total_invoice - $have_pay);
+
+        return ['left_payment' => $left_payment,'total_invoice' => $total_invoice, 'have_pay' => $have_pay];
+      }
+
+      return false;
+      
+   }  
+
 
 }

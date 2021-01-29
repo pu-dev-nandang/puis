@@ -810,9 +810,6 @@
           });
         }
       })
-
-
-
     });
 
     $(document).on('click','.bayar', function () {

@@ -2617,4 +2617,109 @@ class C_finance extends Finnance_Controler {
         $this->temp($content);
     }
 
+    public function bayar_kuliah(){
+        $this->input->is_ajax_request() or exit('No direct post submit allowed!');
+        $rs = ['status' => 0,'msg' => '','reload' => 0 ];
+
+        $this->load->library('form_validation');
+        $data_token = $this->getInputToken();
+        
+        $this->form_validation->set_data($data_token);
+
+        $this->form_validation->set_rules('paymentid', 'Pilihan payment', 'trim|required');
+        $this->form_validation->set_rules('Pay', 'Nominal', 'trim|required|greater_than_equal_to[10000]');
+        $this->form_validation->set_rules('Pay_Date', 'Tanggal Bayar', 'trim|required');
+
+        if ($this->form_validation->run() === true) {
+            $count_left_paymet = $this->m_finance->_count_left_paymet($data_token['paymentid']);
+
+            if ($count_left_paymet) {
+                if ($data_token['Pay'] > $count_left_paymet['left_payment']) {
+                    $rs = ['status' => 0,'msg' => 'Nominal melebihi dari sisa tagihan','reload' => 0 ];
+                }
+                else
+                {
+                    $payment_students_blm_lunas = $this->db->where('ID_payment',$data_token['paymentid'])->where('Status',0)->get('db_finance.payment_students');
+                    if ($payment_students_blm_lunas) {
+                        $payment_students_blm_lunas = $payment_students_blm_lunas->result_array();
+                        
+                        $pay_loop = $data_token['Pay'];
+                        for ($i=0; $i < count($payment_students_blm_lunas); $i++) { 
+                            $ID_payment_students = $payment_students_blm_lunas[$i]['ID'];
+                            $Invoice_cicilan = $payment_students_blm_lunas[$i]['Invoice'];
+
+                            // check left
+                            $have_pay_details = $this->db->select(' sum(Pay) as total ')
+                                                         ->where('ID_payment_students',$ID_payment_students)
+                                                         ->get('db_finance.payment_student_details')
+                                                         ->row()->total;
+                            $have_pay_details =  (int)$have_pay_details;
+
+                            $left_pay_details = $Invoice_cicilan - $have_pay_details;
+
+                            if ($left_pay_details > $pay_loop) {
+                                $dataSave = [
+                                    'ID_payment_students' => $ID_payment_students,
+                                    'Pay' => $pay_loop,
+                                    'Pay_Date' =>  $data_token['Pay_Date'],
+                                    'Created_By' => $this->session->userdata('NIP'),
+                                    'Created_At' => date('Y-m-d H:i:s'),
+                                ];
+
+                                $this->db->insert('db_finance.payment_student_details',$dataSave);
+                                break;
+                            }
+                            else
+                            {
+                                $dataSave = [
+                                    'ID_payment_students' => $ID_payment_students,
+                                    'Pay' => $left_pay_details,
+                                    'Pay_Date' =>  $data_token['Pay_Date'],
+                                    'Created_By' => $this->session->userdata('NIP'),
+                                    'Created_At' => date('Y-m-d H:i:s'),
+                                ];
+
+                                $this->db->insert('db_finance.payment_student_details',$dataSave);
+
+                                $this->db->where('ID',$ID_payment_students);
+                                $this->db->update('db_finance.payment_students',['Status' => 1]);
+
+                                $pay_loop = $pay_loop - $left_pay_details;
+                            }   
+                            
+                        }
+
+                        $payment_students_blm_lunas_after = $this->db->where('ID_payment',$data_token['paymentid'])->where('Status',0)->get('db_finance.payment_students');
+
+                        if (!$payment_students_blm_lunas_after) {
+                            $payment =  $this->db->where('ID',$data_token['paymentid'])->get('db_finance.payment')->row();
+                            $dataSave = [
+                                'Status' =>"1",
+                                // 'ToChange' => 0,
+                                'ToChange' => ($payment->ToChange == 1 ) ? 2 : 0,
+                                'UpdateAt' => date('Y-m-d H:i:s'),
+                                'UpdatedBy' => $this->session->userdata('NIP'),
+                            ];
+
+                            $this->db->where('ID',$data_token['paymentid']);
+                            $this->db->update('db_finance.payment', $dataSave);
+                        }
+
+                        $rs = ['status' => 1,'msg' => '','reload' => 1  ];
+                    }
+                    else
+                    {
+                        $rs = ['status' => 0,'msg' => 'Data telah lunas','reload' => 1  ];
+                    }
+                }
+            }
+        }
+        else
+        {
+            $rs = ['status' => 0,'msg' => validation_errors(),'reload' => 0  ];
+        }
+
+        echo json_encode($rs);
+    }
+
 }

@@ -34,29 +34,36 @@ const load_default = () => {
 }
 
 const key_press_nim = async(NIM) => {
-	var Semester = $('#selectSemester').val();
-	Semester = Semester.split('.');
-	Semester = Semester[0];
-	const url = base_url_js+'finance/get_created_tagihan_mhs/1';
-	const data_post = {
-            ta : '',
-            prodi : '',
-            PTID  : '',
-            NIM : NIM,
-            StatusPayment : '',
-            Semester : Semester,
-        };
-    var token = jwt_encode(data_post,'UAP)(*');
-    loadingStart();
-    try{
-    	const response = await AjaxSubmitFormPromises(url,token);
-    	create_html_choose_payment(response.loadtable);
-    }
-    catch(err){
-    	toastr.info('No Result Data'); 
-    }
+	if (NIM != '') {
+			var Semester = $('#selectSemester').val();
+			Semester = Semester.split('.');
+			Semester = Semester[0];
+			const url = base_url_js+'finance/get_created_tagihan_mhs/1';
+			const data_post = {
+		            ta : '',
+		            prodi : '',
+		            PTID  : '',
+		            NIM : NIM,
+		            StatusPayment : '',
+		            Semester : Semester,
+		        };
+		    var token = jwt_encode(data_post,'UAP)(*');
+		    loadingStart();
+		    try{
+		    	const response = await AjaxSubmitFormPromises(url,token);
+		    	create_html_choose_payment(response.loadtable);
+		    }
+		    catch(err){
+		    	toastr.info('No Result Data'); 
+		    }
 
-    loadingEnd(1000);
+		    loadingEnd(1000);
+	}
+	else
+	{
+		toastr.info('Input NPM');
+	}
+	
 }
 
 const create_html_choose_payment = (data_db) => {
@@ -210,7 +217,7 @@ const create_html_pay = (PaymentID) => {
 			);
 	}
 
-	console.log(data_choose);
+	// console.log(data_choose);
 
 	const sel = $('.panel-body').find('.payment_content');
 
@@ -228,11 +235,11 @@ const create_html_pay = (PaymentID) => {
 		if (payment_student_details.length > 0) {
 			 detail_new_pay += '<ol>';
 			 for (var j = 0; j < payment_student_details.length; j++) {
-			 	detail_new_pay += '<li>'+formatRupiah(payment_student_details[j].Pay)+ ' : <span style = "color :green;">'+payment_student_details[j].Pay_Date+'</span></li>';
+			 	detail_new_pay += '<li>'+formatRupiah(payment_student_details[j].Pay)+ ' &nbsp | <label>Tgl Bayar</label> : <span style = "color :green;">'+payment_student_details[j].Pay_Date+'</span></li>';
 			 }
 
 			 html_pay = '<a data-toggle="collapse" href="#detail-payment-list_'+i+'" aria-expanded="false">'+
-							html_pay+
+							html_pay+ ' | detail bayar : '+ 
 							'</a>'+
 							'<div id = "detail-payment-list_'+i+'" class="panel-collapse collapse">'+
 								detail_new_pay+
@@ -280,7 +287,76 @@ const create_html_pay = (PaymentID) => {
 		htmlBtn = '';
 	}
 
+	// for Verify Bukti Bayar
+	    var htmlPaymentProof = '<div class = "row" style = "margin-bottom : 10px;">'+
+	                              '<div class = "col-md-12">'+
+	                              	  '<div class = "well" style = "padding:25px;">'+
+		                                  '<h5>List Proof of Payment</h5>'+
+		                                    '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+		                                      '<thead>'+
+		                                        '<tr>'+
+		                                           '<th style="width: 5px;">No</th>'+
+		                                           '<th style="width: 55px;">File</th>'+
+		                                           '<th style="width: 55px;">Money Paid</th>'+
+		                                           '<th style="width: 55px;">Account Name</th>'+
+		                                           '<th style="width: 55px;">Account Owner</th>'+
+		                                           '<th style="width: 55px;">Transaction Date</th>'+
+		                                           '<th style="width: 55px;">Upload Date</th>'+
+		                                           '<th style="width: 55px;">Bank</th>'+
+		                                           '<th style="width: 55px;">Status</th>'+
+		                                           '<th style="width: 55px;">Action</th>'+
+		                                        '</tr>'+
+		                                      '</thead>'+
+		                                    '<tbody>';
+	  var payment_proof = data_choose.payment_proof;
+	  if (payment_proof.length > 0) {
+	    for (var i = 0; i < payment_proof.length; i++) {
+	      var FileUpload = jQuery.parseJSON(payment_proof[i]['FileUpload']);
+	      var FileAhref = '';
+
+	      switch(payment_proof[i].VerifyFinance) {
+	        case '1':
+	          var VerifyFinance = '<span style="color: green;"><i class="fa fa-check-circle margin-right"></i> Verify</span>';
+	          break;
+	        case '2':
+	          var VerifyFinance  = '<span style="color: red;"><i class="fa fa-remove margin-right"></i>Reject</span>';
+	          break;
+	        default:
+	          var VerifyFinance  = '<span style="color: green;"><i class="fa fa-info-circle margin-right"></i>Not Yet Verify</span>';
+	      }
+
+	      for (var j = 0; j < FileUpload.length; j++) {
+	        FileAhref = '<a href ="'+base_url_js+'fileGetAny/document-'+data_choose.NPM+'-'+FileUpload[j].Filename+'" target="_blank">File '+ ((i+1)+j)+'</a>';
+	      }
+
+	      var btnVerify = (payment_proof[i]['VerifyFinance'] == 1)? '' : '<button class = "verify" idtable = "'+payment_proof[i]['ID']+'">Verify</button><div style = "margin-top : 10px"><button class = "rejectverify" idtable = "'+payment_proof[i]['ID']+'">Reject</button></div>';
+
+	      htmlPaymentProof += '<tr>'+
+	                              '<td>'+(i+1)+'</td>'+
+	                              '<td>'+FileAhref+'</td>'+
+	                              '<td>'+formatRupiah(payment_proof[i]['Money'])+'</td>'+
+	                              '<td>'+payment_proof[i]['NoRek']+'</td>'+
+	                              '<td>'+payment_proof[i]['AccountOwner']+'</td>'+
+	                              '<td>'+payment_proof[i]['Date_transaction']+'</td>'+
+	                              '<td>'+payment_proof[i]['Date_upload']+'</td>'+
+	                              '<td>'+payment_proof[i]['NmBank']+'</td>'+
+	                              '<td>'+VerifyFinance+'</td>'+
+	                              '<td>'+btnVerify+'</td>'+
+	                          '</tr>';
+	    }
+
+	    htmlPaymentProof += '</tbody></table></div></div></div>';
+
+	  }
+	  else
+	  {
+	  	htmlPaymentProof += '<tr><td colspan ="10">Data tidak ada </td></tr>';
+	  }
+
+	// end Verify Bukti Bayar
+
 	sel.html(
+			'<hr/>'+htmlPaymentProof+
 			'<div class = "row">'+
 				'<div class = "col-md-6">'+
 					'<div class="panel panel-default">'+
@@ -326,6 +402,59 @@ const create_html_pay = (PaymentID) => {
 	$('#datetime_deadline-payment').prop('readonly',true);
 }
 
+const reload_Data = async() => {
+	default_var();
+	const paymentid = $('#dataRow').find('.uniform:checked').attr('paymentid');
+	const vv = $('#NIM').val();
+	await key_press_nim(vv);
+
+	$('#dataRow').find('.uniform[paymentid="'+paymentid+'"]').prop('checked', true);
+
+	create_html_pay(paymentid);
+
+	$('a[href="#content-invoice-data"]').trigger('click');
+	//$('#content-invoice-data').find('ol li:last-child').find('a').trigger('click');
+}
+
+const sbmt_payment = async(selector) => {
+	const paymentid = $('#dataRow').find('.uniform:checked').attr('paymentid');
+	var Pay = findAndReplace($('#cost-payment').val(), ".",""); 
+	const Pay_Date = $('#datetime_deadline-payment').val();
+
+	loading_button2(selector);
+	const url = base_url_js + 'page/finance/c_finance/bayar_kuliah';
+	const data = {
+		paymentid : paymentid,
+		Pay : Pay,
+		Pay_Date  : Pay_Date,
+	};
+
+	var token = jwt_encode(data,'UAP)(*');
+	try{
+		const response = await AjaxSubmitFormPromises(url,token);
+		
+		if (response['status'] == 1) {
+			toastr.success('Saved');
+		}
+		else
+		{
+			toastr.info(response.msg);
+		}
+		
+		if (response['reload'] == 1) {
+			reload_Data();
+		}
+	}	
+	catch(err){	
+		console.log(err);
+		toastr.error('something wrong, please contact it');
+	}
+
+	end_loading_button2(selector,'Submit');
+	
+
+}
+
 $(document).ready(function(e){
 	loadSelectOptionSemesterByload('#selectSemester',1);
 })
@@ -355,4 +484,72 @@ $(document).on('click','.uniform',function(e){
 	create_html_pay(PaymentID);
 })
 
+$(document).on('click','#btnSubmitBayar',function(e){
+	const itsme = $(this);
+	sbmt_payment(itsme);
+})
+
+$(document).on('click','.verify', function () {
+  if (confirm('Are you sure')) {
+    var s = $(this);
+    var idtable = $(this).attr('idtable');
+    loading_button('.verify[idtable="'+idtable+'"]');
+    var url = base_url_js+'finance/verify_bukti_bayar';
+    var data = {
+        idtable : idtable,
+    };
+    var token = jwt_encode(data,'UAP)(*');
+    $.post(url,{token:token},function (resultJson) {
+       // var resultJson = jQuery.parseJSON(resultJson);
+       var fillitem = s.closest('tr');
+       fillitem.find('td:eq(8)').html('<span style="color: green;"><i class="fa fa-check-circle margin-right"></i> Verify</span>');
+       s.remove();
+       toastr.success('The data has been verified');
+    }).fail(function() {
+      toastr.info('No Action...');
+    }).always(function() {
+
+    });
+  }
+
+
+});
+
+$(document).on('click','.rejectverify', function () {
+  var idtable = $(this).attr('idtable');
+  var s = $(this);
+  var tditem = $(this).closest('td');
+  tditem.attr('style','width : 350px;');
+  tditem.append('<div style = "margin-top : 10px"><input type = "text" class = "form-control" placeholder = "Input Reason" id = "reason'+idtable+'" ></div>');
+  tditem.append('<div class = "row" style = "margin-top : 10px"><div class = "col-xs-12"><button class = "btn btn-success saverejectverify" idtable = "'+idtable+'">Save</button></div></div>');
+  s.remove();
+  $(".saverejectverify").click(function(){
+    if (confirm('Are you sure')) {
+      var idtable = $(this).attr('idtable');
+      var s = $(this);
+      var ReasonCancel = $("#reason"+idtable).val();
+      loading_button('.saverejectverify[idtable="'+idtable+'"]');
+      var url = base_url_js+'finance/reject_bukti_bayar';
+      var data = {
+          idtable : idtable,
+          ReasonCancel : ReasonCancel,
+      };
+      var token = jwt_encode(data,'UAP)(*');
+      $.post(url,{token:token},function (resultJson) {
+         // var resultJson = jQuery.parseJSON(resultJson);
+         var fillitem = s.closest('tr');
+         fillitem.find('td:eq(8)').html('<span style="color: red;"><i class="fa fa-remove margin-right"></i>Reject</span>');
+         toastr.success('The data has been verified');
+         s.remove();
+         $("#reason"+idtable).remove();
+         loadData(1);
+      }).fail(function() {
+        toastr.info('No Action...');
+        // toastr.error('The Database connection error, please try again', 'Failed!!');
+      }).always(function() {
+
+      });
+    }
+  })
+});
 
