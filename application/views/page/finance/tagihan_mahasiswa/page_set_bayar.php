@@ -31,4 +31,13 @@
     </div>
 </div>
 
+<script type="text/javascript">
+  const phpNPM = "<?php echo $NPM ?>";
+  if (phpNPM != '') {
+    $('#NIM').val(phpNPM);
+  }
+  const phpSemesterID = "<?php echo $SemesterID ?>";
+  const phppaymentid = "<?php echo $paymentid ?>";
+</script>
+
 <script type="text/javascript" src="<?php echo base_url('js/finance/tagihan-mahasiswa/page_set_bayar.js'); ?>"></script>

@@ -2612,7 +2612,10 @@ class C_finance extends Finnance_Controler {
         echo json_encode($rs);
     }
 
-    public function page_set_bayar(){
+    public function page_set_bayar($NPM = '',$SemesterID = '',$paymentid=''){
+        $this->data['NPM'] = $NPM;
+        $this->data['SemesterID'] = $SemesterID;
+        $this->data['paymentid'] = $paymentid;
         $content = $this->load->view('page/'.$this->data['department'].'/tagihan_mahasiswa/page_set_bayar',$this->data,true);
         $this->temp($content);
     }
@@ -2641,6 +2644,8 @@ class C_finance extends Finnance_Controler {
                 {
                     $payment_students_blm_lunas = $this->db->where('ID_payment',$data_token['paymentid'])->where('Status',0)->get('db_finance.payment_students');
                     if ($payment_students_blm_lunas) {
+                        $UniqueGroupBy = $this->m_master->generate_random_letters(6).'-'.date('YmdHis');
+
                         $payment_students_blm_lunas = $payment_students_blm_lunas->result_array();
                         
                         $pay_loop = $data_token['Pay'];
@@ -2660,6 +2665,7 @@ class C_finance extends Finnance_Controler {
                             if ($left_pay_details > $pay_loop) {
                                 $dataSave = [
                                     'ID_payment_students' => $ID_payment_students,
+                                    'UniqueGroupBy' => $UniqueGroupBy,
                                     'Pay' => $pay_loop,
                                     'Pay_Date' =>  $data_token['Pay_Date'],
                                     'Created_By' => $this->session->userdata('NIP'),
@@ -2673,6 +2679,7 @@ class C_finance extends Finnance_Controler {
                             {
                                 $dataSave = [
                                     'ID_payment_students' => $ID_payment_students,
+                                    'UniqueGroupBy' => $UniqueGroupBy,
                                     'Pay' => $left_pay_details,
                                     'Pay_Date' =>  $data_token['Pay_Date'],
                                     'Created_By' => $this->session->userdata('NIP'),
@@ -2689,9 +2696,9 @@ class C_finance extends Finnance_Controler {
                             
                         }
 
-                        $payment_students_blm_lunas_after = $this->db->where('ID_payment',$data_token['paymentid'])->where('Status',0)->get('db_finance.payment_students');
+                        $payment_students_blm_lunas_after = $this->db->where('ID_payment',$data_token['paymentid'])->where('Status',0)->get('db_finance.payment_students')->result_array();
 
-                        if (!$payment_students_blm_lunas_after) {
+                        if (count($payment_students_blm_lunas_after) == 0 ) {
                             $payment =  $this->db->where('ID',$data_token['paymentid'])->get('db_finance.payment')->row();
                             $dataSave = [
                                 'Status' =>"1",

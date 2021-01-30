@@ -12,10 +12,22 @@ function loadSelectOptionSemesterByload(element,selected) {
        if(jsonResult.length>0){
            for(var i=0;i<jsonResult.length;i++){
                var dt = jsonResult[i];
-               var sc = (selected==dt.Status) ? 'selected' : '';
+               if (phpSemesterID != '') {
+               	var sc = (dt.ID==phpSemesterID) ? 'selected' : '';
+               }
+               else
+               {
+               	var sc = (selected==dt.Status) ? 'selected' : '';
+               }
+               
                // var v = (option=="Name") ? dt.Name : dt.ID;
                $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
            }
+
+           if (phpSemesterID!= '') {
+           		key_press_nim(phpNPM);
+           }
+
        }
     });
 
@@ -55,6 +67,11 @@ const key_press_nim = async(NIM) => {
 		    }
 		    catch(err){
 		    	toastr.info('No Result Data'); 
+		    }
+
+		    if (phpSemesterID != '') {
+		    	$('#NIM').prop('disabled',true);
+		    	$('#selectSemester').prop('disabled',true);
 		    }
 
 		    loadingEnd(1000);
@@ -150,21 +167,41 @@ const create_html_choose_payment = (data_db) => {
 			 inputCHK = '<input type="checkbox" class="uniform" value ="'+data_get[i]['NPM']+'" Prodi = "'+data_get[i]['ProdiEng']+'" Nama ="'+data_get[i]['Nama']+'" semester = "'+data_get[i]['SemesterID']+'" ta = "'+data_get[i]['Year']+'" invoice = "'+data_get[i]['InvoicePayment']+'" discount = "'+data_get[i]['Discount']+'" PTID = "'+data_get[i]['PTID']+'" PTName = "'+data_get[i]['PTIDDesc']+'" PaymentID = "'+data_get[i]['PaymentID']+'" Status = "'+ccc+'">'; 
 			} 
 
-			// if(data_get[i]['StatusPayment'] == 0){
-				var bintang = setBintangFinance(data_get[i]['Pay_Cond']);
-				$('#dataRow').append(tr +
-				                       '<td>'+inputCHK+'</td>' +
-				                       '<td>'+data_get[i]['ProdiEng']+'<br>'+data_get[i]['SemesterName']+'</td>' +
-				                       '<td>'+bintang+'<br/>'+data_get[i]['Nama']+'<br>'+data_get[i]['NPM']+'<br>'+data_get[i]['VA']+'</td>' +
-				                       '<td>'+data_get[i]['PTIDDesc']+'</td>' +
-				                       '<td>'+data_get[i]['EmailPU']+'</td>' +
-				                       '<td>'+getCustomtoFixed(data_get[i]['IPS'],2)+'</td>' +
-				                       '<td>'+getCustomtoFixed(data_get[i]['IPK'],2)+'</td>' +
-				                       '<td>'+data_get[i]['Discount']+'%</td>' +
-				                       '<td>'+yy+'</td>' +
-				                       '<td>'+status+'</td>' +
-				                       '</tr>');
-			// }
+			var bintang = setBintangFinance(data_get[i]['Pay_Cond']);
+			if (phppaymentid != '') {
+					if (phppaymentid == data_get[i]['PaymentID']) {
+						$('#dataRow').append(tr +
+						                       '<td>'+inputCHK+'</td>' +
+						                       '<td>'+data_get[i]['ProdiEng']+'<br>'+data_get[i]['SemesterName']+'</td>' +
+						                       '<td>'+bintang+'<br/>'+data_get[i]['Nama']+'<br>'+data_get[i]['NPM']+'<br>'+data_get[i]['VA']+'</td>' +
+						                       '<td>'+data_get[i]['PTIDDesc']+'</td>' +
+						                       '<td>'+data_get[i]['EmailPU']+'</td>' +
+						                       '<td>'+getCustomtoFixed(data_get[i]['IPS'],2)+'</td>' +
+						                       '<td>'+getCustomtoFixed(data_get[i]['IPK'],2)+'</td>' +
+						                       '<td>'+data_get[i]['Discount']+'%</td>' +
+						                       '<td>'+yy+'</td>' +
+						                       '<td>'+status+'</td>' +
+						                       '</tr>');
+						}
+					}
+					
+					
+			else
+			{
+					$('#dataRow').append(tr +
+					                       '<td>'+inputCHK+'</td>' +
+					                       '<td>'+data_get[i]['ProdiEng']+'<br>'+data_get[i]['SemesterName']+'</td>' +
+					                       '<td>'+bintang+'<br/>'+data_get[i]['Nama']+'<br>'+data_get[i]['NPM']+'<br>'+data_get[i]['VA']+'</td>' +
+					                       '<td>'+data_get[i]['PTIDDesc']+'</td>' +
+					                       '<td>'+data_get[i]['EmailPU']+'</td>' +
+					                       '<td>'+getCustomtoFixed(data_get[i]['IPS'],2)+'</td>' +
+					                       '<td>'+getCustomtoFixed(data_get[i]['IPK'],2)+'</td>' +
+					                       '<td>'+data_get[i]['Discount']+'%</td>' +
+					                       '<td>'+yy+'</td>' +
+					                       '<td>'+status+'</td>' +
+					                       '</tr>');
+			}
+			
 		}
 	}
 	else{
@@ -175,6 +212,11 @@ const create_html_choose_payment = (data_db) => {
 		{
 		  toastr.error('Error', 'Failed!!');
 		}
+	}
+
+	if (phppaymentid != '') {
+		$('#dataRow').find('.uniform[paymentid="'+phppaymentid+'"]').prop('checked', true);
+		create_html_pay(phppaymentid);
 	}
 }
 
@@ -290,9 +332,11 @@ const create_html_pay = (PaymentID) => {
 	// for Verify Bukti Bayar
 	    var htmlPaymentProof = '<div class = "row" style = "margin-bottom : 10px;">'+
 	                              '<div class = "col-md-12">'+
-	                              	  '<div class = "well" style = "padding:25px;">'+
-		                                  '<h5>List Bukti Bayar</h5>'+
-		                                    '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+	                              	  '<div class="panel panel-default">'+
+	                              	  	'<div class="panel-heading" role="tab">'+
+		                                  '<a data-toggle="collapse" href="#tbl-list-BB" aria-expanded="false"><h5>List Bukti Bayar</h5></a>'+
+		                                '</div>'+
+		                                    '<div id = "tbl-list-BB" class="panel-collapse collapse"><div class="panel-body"><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
 		                                      '<thead>'+
 		                                        '<tr>'+
 		                                           '<th style="width: 5px;">No</th>'+
@@ -345,14 +389,15 @@ const create_html_pay = (PaymentID) => {
 	                          '</tr>';
 	    }
 
-	    htmlPaymentProof += '</tbody></table></div></div></div>';
+	    // htmlPaymentProof += '</tbody></table></div></div></div>';
 
 	  }
 	  else
 	  {
 	  	htmlPaymentProof += '<tr><td colspan ="10">Data tidak ada </td></tr>';
-	  }
 
+	  }
+	   htmlPaymentProof += '</tbody></table></div></div></div></div></div>';
 	// end Verify Bukti Bayar
 
 	sel.html(
