@@ -27,6 +27,9 @@
                  </div>
                </div>
             </div>
+            <div class="panel-footer">
+              <button href="<?php echo base_url().'finance/tagihan-mhs/cek-tagihan-mhs' ?>" class = "btn btn-default btn-back">Cancel</button>
+            </div>
         </div>
     </div>
 </div>

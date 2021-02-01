@@ -600,3 +600,7 @@ $(document).on('click','.rejectverify', function () {
   })
 });
 
+$(document).on('click','.btn-back',function(e){
+	window.history.back();
+})
+

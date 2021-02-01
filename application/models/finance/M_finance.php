@@ -1909,6 +1909,14 @@ class M_finance extends CI_Model {
          $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
          $potonganLain = $this->getPotonganLain($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
 
+      // cek Payment Proof
+              $payment_proof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$query[$i]['ID']);
+              for ($z=0; $z < count($payment_proof); $z++) {
+                  // get nama bank
+                  $G_bank = $this->m_master->caribasedprimary('db_finance.bank','ID',$payment_proof[$z]['ID_bank']);
+                  $payment_proof[$z]['NmBank'] = $G_bank[0]['Name'];
+              }
+
 
 
       if($prodi == '' || $prodi == Null){
@@ -1936,6 +1944,7 @@ class M_finance extends CI_Model {
             'Credit' => $Credit,
             'Pay_Cond' => $query[$i]['Pay_Cond'],
             'cancelPay' => $cancelPay,
+            'payment_proof' => $payment_proof,
             'potonganLain' => $potonganLain,
         );
       }
@@ -1967,6 +1976,7 @@ class M_finance extends CI_Model {
               'Credit' => $Credit,
               'Pay_Cond' => $query[$i]['Pay_Cond'],
               'cancelPay' => $cancelPay,
+              'payment_proof' => $payment_proof,
               'potonganLain' => $potonganLain,
           );
         }
@@ -2774,12 +2784,48 @@ class M_finance extends CI_Model {
         $ID = $Input[$i]->ID;
         $trx_amount = $Input[$i]->Invoice;
         $datetime_expired = $Input[$i]->Deadline;
-        $this->m_finance->UpdateCicilanbyID($ID,$BilingID,$trx_amount,$datetime_expired);
+
+        // check data pembayaran
+        $count_pembayaran = $this->db->where('ID_payment_students',$ID)->count_all_results('db_finance.payment_student_details');
+
+        $number_cicilan = $this->edit_cicilan_tagihan_mhs_submit_get_number_cicilan($ID);
+
+        if ($count_pembayaran == 0) {
+           $this->m_finance->UpdateCicilanbyID($ID,$BilingID,$trx_amount,$datetime_expired);
+        }
+        else
+        {
+          $arr['msg'] .= 'Cicilan ke  : '.$number_cicilan.' telah dilakukan pembayaran <br>';
+        }
       }
     }
 
     return $arr;
 
+   }
+
+   private function edit_cicilan_tagihan_mhs_submit_get_number_cicilan($ID_payment_students){
+    $x = -1;
+    $dt = $this->m_master->caribasedprimary('db_finance.payment_students','ID',$ID_payment_students);
+
+    $ID_payment =  $dt[0]['ID_payment'];
+
+    $get =  $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+
+    for ($i=0; $i < count($get); $i++) { 
+      if ($get[$i]['ID'] == $ID_payment_students) {
+        $x = $i+1;  
+        break;
+      }
+    }
+
+    if ($x == -1) {
+      return false;
+    }
+    else
+    {
+      return $x;
+    }
    }
 
    public function UpdateCicilanbyID($ID,$BilingID,$trx_amount,$datetime_expired)
@@ -5343,7 +5389,7 @@ class M_finance extends CI_Model {
       
    }
 
-     
+
 
 
 }
