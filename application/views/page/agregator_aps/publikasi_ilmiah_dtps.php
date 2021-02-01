@@ -109,7 +109,7 @@ var App_publikasi_ilmiah_dtps = {
     FillTS : function(){
        var arr = [];
        var YearNow = <?php echo date('Y') ?>;
-       var YearTs2 = YearNow - 2;
+       var YearTs2 = YearNow - 4;
        var selector = $('#JS_TS');
        selector.empty(); 
        for (var i = YearTs2; i <= YearNow; i++) {
