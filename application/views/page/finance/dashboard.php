@@ -11,12 +11,17 @@
 
 <!--=== Bars ===-->
 <div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: -30px">
-	<div class="col-xs-6 col-md-offset-5">
+	<div class="col-md-5">
+		<?php if ($this->session->userdata('NIP') == '2018018'): ?>
+			<button class="btn btn-info btn-sync-payment">Sync Payment</button>
+		<?php endif ?>
+	</div>
+	<div class="col-xs-6">
 		<h2>Semester <?php echo $getSemester[0]['Name'] ?></h2>
 	</div>
 </div>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12">
         <div class="panel panel-primary">
             <div class="panel-heading clearfix">
                 <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Summary Payment Students</h4>
@@ -26,7 +31,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <!-- <div class="col-md-6">
         <div class="panel panel-primary">
             <div class="panel-heading clearfix">
                 <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Outstanding Payment Students</h4>
@@ -36,7 +41,7 @@
                 	<table class="table table-bordered datatable2" id = "datatable2">
                 	    <thead>
                 	    <tr>
-                	        <!-- <th style="width: 12%;">Program Study</th> -->
+                	        <th style="width: 12%;">Program Study</th> 
                 	        <th style="width: 20%;">Nama & NPM</th>
                 	        <th style="width: 15%;">Payment Type</th>
                 	        <th style="width: 15%;">Semester</th>
@@ -48,7 +53,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </div>
 
 <div class="row">
@@ -77,7 +82,7 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		loadChartSummaryPayment();
-		loadDataOutstanding();
+		//loadDataOutstanding();
 		loadChartSummaryPaymentAdmission();
 		loadChartSummaryFormulirAdmission();
 
