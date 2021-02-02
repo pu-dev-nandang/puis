@@ -2729,4 +2729,57 @@ class C_finance extends Finnance_Controler {
         echo json_encode($rs);
     }
 
+    public function sync_payment(){
+        $this->input->is_ajax_request() or exit('No direct post submit allowed!');
+        $rs = ['status' => 0,'msg' => 'error'];
+
+        if ($this->session->userdata('NIP') == '2018018') {
+
+            $payment_students = $this->db->select('a.*,c.UpdatedBy')
+                                         ->join('db_finance.payment c', 'a.ID_payment = c.ID', 'join')
+                                         ->where('a.Status',1)
+                                         ->where('a.ID not in (select ID_payment_students from db_finance.payment_student_details)')
+                                        // ->limit(5, 0)
+                                         ->get('db_finance.payment_students a')
+                                         ->result_array();
+                               
+            $x = 0;
+
+            $xEnd = 100;
+
+            $arr_dataSave = [];
+            for ($i=0; $i < count($payment_students); $i++) { 
+
+                $UniqueGroupBy = $this->m_master->generate_random_letters(6).'-'.date('YmdHis');
+
+                $dataSave = [
+                    'ID_payment_students' => $payment_students[$i]['ID'] ,
+                    'UniqueGroupBy' => $UniqueGroupBy,
+                    'Pay' => $payment_students[$i]['Invoice'] ,
+                    'Pay_Date' =>  $payment_students[$i]['DatePayment'] ,
+                    'Created_By' => $payment_students[$i]['UpdatedBy'] ,
+                    'Created_At' =>  $payment_students[$i]['UpdateAt'] ,
+                ];
+
+                $arr_dataSave[] = $dataSave;
+
+                $x++;
+                
+                if ($x ==  $xEnd ) {
+                   $this->db->insert_batch('db_finance.payment_student_details', $arr_dataSave); 
+                   $x = 0;
+                   $arr_dataSave = [];
+                }
+            }
+
+            if (count($arr_dataSave) > 0) {
+                $this->db->insert_batch('db_finance.payment_student_details', $arr_dataSave); 
+            }
+
+            $rs = ['status' => 1,'msg' => ''];
+        }
+
+        echo json_encode($rs);
+    }
+
 }

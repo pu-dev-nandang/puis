@@ -356,4 +356,33 @@
 	        window.open(base_url_js+'finance/edit_telat_bayar/'+token,'_blank');
 
 	});
+
+	const sync_payment = async(selector) => {
+		const htmlButton = selector.html();
+		loading_button2(selector);
+
+		const url = base_url_js + 'page/finance/c_finance/sync_payment';
+
+		try{
+			const response =  await AjaxSubmitFormPromises(url);
+			if (response.status == 1) {
+				toastr.success('Sync success');
+			}
+			else
+			{
+				toastr.info(response.msg);
+			}
+		}
+		catch(err){
+			console.log(err);
+			toastr.error('something wrong');
+		}
+
+		end_loading_button2(selector,htmlButton);
+	}
+
+	$(document).on('click','.btn-sync-payment',function(e){
+		const itsme = $(this);
+		sync_payment(itsme);	
+	})
 </script>

@@ -2024,6 +2024,9 @@ class M_finance extends CI_Model {
       case '0':
         $AddWhereStatusPayment = ' and a.Invoice >= (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 0)';
         break;
+      case '-1':
+        $AddWhereStatusPayment = ' and a.ID not in (select z.ID_payment from db_finance.payment_students as z join db_finance.payment_student_details as x on z.ID = x.ID_payment_students )';
+        break;
       default:
         $AddWhereStatusPayment = '';
         break;
@@ -2127,6 +2130,9 @@ class M_finance extends CI_Model {
         break;
       case '0':
         $AddWhereStatusPayment = ' and a.Invoice >= (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 0)';
+        break;
+      case '-1':
+        $AddWhereStatusPayment = ' and a.ID not in (select z.ID_payment from db_finance.payment_students as z join db_finance.payment_student_details as x on z.ID = x.ID_payment_students )';
         break;
       default:
         $AddWhereStatusPayment = '';
@@ -2619,7 +2625,7 @@ class M_finance extends CI_Model {
                 {
                   $bstatus = 'and b.Status  = 0';
                 }
-                $sql = 'select * from db_finance.payment as a join db_finance.payment_students as b
+                $sql = 'select a.*,b.ID as ID_payment_students,b.BilingID,b.ID_payment from db_finance.payment as a join db_finance.payment_students as b
                         on a.ID = b.ID_payment where a.NPM = ? and a.SemesterID = ? and a.PTID = ? '.$bstatus.' order by b.ID asc limit 1';
                 $query=$this->db->query($sql, array($NPM,$SemesterID,$PTID))->result_array();
                 // save reason
@@ -2636,12 +2642,12 @@ class M_finance extends CI_Model {
                 );
                 $this->db->insert('db_finance.payment_s_cancel',$dataSave);
 
+                $ID_payment_s_cancel = $this->db->insert_id();
+
                 if (count($query) > 0 ) {
                   $BilingID = $query[0]['BilingID'];
                   if ($BilingID != 0) {
                     $checkVa = $this->checkBiling($BilingID);
-                    // print_r($checkVa);
-                    // die();
                     // va status  = 1 => active
                     // va status = 2 => Inactive
                     if ($checkVa['msg']['va_status'] != 2) {
@@ -2682,6 +2688,23 @@ class M_finance extends CI_Model {
                     $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
                     $queryDelete=$this->db->query($sqlDelete, array());
                     $this->delete_id_table($query[0]['ID_payment'],'payment');
+                  }
+
+                  for ($z=0; $z < count($query); $z++) { 
+                    $ID_payment_students = $query[$z]['ID_payment_students'];
+                    $dx = $this->m_master->caribasedprimary('db_finance.payment_student_details','ID_payment_students',$ID_payment_students);
+                    for ($v=0; $v < count($dx); $v++) { 
+                        $dataSaveRecycle = [
+                            'ID_payment_s_cancel' =>   $ID_payment_s_cancel,
+                            'UniqueGroupBy' =>  $dx[$v]['UniqueGroupBy']  ,
+                            'Pay' =>  $dx[$v]['Pay'] ,
+                            'Pay_Date' => $dx[$v]['Pay_Date']  ,
+                            'P_Created_By' => $dx[$v]['Created_By']  ,
+                            'P_Created_At' => $dx[$v]['Created_At']  ,
+                        ];
+
+                        $this->db->insert('db_finance.payment_student_details_cancel',$dataSaveRecycle);
+                    }
                   }
 
                 }

@@ -73,10 +73,12 @@
                               <div class="thumbnail" style="min-height: 30px;padding: 10px;">
                                   <select class="form-control" id="selectStatusPayment">
                                     <option value="">All Status Payment</option>
+                                    <option value="-1">Belum Bayar</option>
                                     <option value="0">Belum Lunas (All)</option>
                                     <option value="0;1">Belum Lunas (S)</option>
                                     <option value="0;0">Belum Lunas (NS)</option>
                                     <option value="1">Lunas</option>
+                                   
                                   </select>
                               </div>
                             </div>
