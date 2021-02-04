@@ -90,3 +90,4 @@ application/logs/*
 ***/.docker/nginx/ssl/
 .docker/nginx/php/*
 ***/.docker/nginx/php/
+/.env.live-server
