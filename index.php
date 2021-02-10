@@ -118,13 +118,20 @@ setlocale(LC_ALL, "en_US.UTF-8");
 	*/
 		define('_HOST_ID', isset($_SERVER['_HOST_ID']) ? $_SERVER['_HOST_ID'] : 'DEMO');
 
-		if (_HOST_ID == 'DEMO') {
-			define('_DB_HOST', isset($_SERVER['_DB_HOST']) ? $_SERVER['_DB_HOST'] : '10.1.30.59');
+		if (isset($_SERVER['_HOST_ID'])) {
+			if (_HOST_ID == 'DEMO') {
+				define('_DB_HOST', isset($_SERVER['_DB_HOST']) ? $_SERVER['_DB_HOST'] : '10.1.30.59');
+			}
+			else
+			{
+				define('_DB_HOST', isset($_SERVER['_DB_HOST']) ? $_SERVER['_DB_HOST'] : '10.1.30.18');
+			}
 		}
 		else
 		{
 			define('_DB_HOST', isset($_SERVER['_DB_HOST']) ? $_SERVER['_DB_HOST'] : '10.1.30.18');
 		}
+		
 
 		define('_DB_USER', isset($_SERVER['_DB_USER']) ? $_SERVER['_DB_USER'] : 'db_itpu');
 		define('_DB_PASSWORD', isset($_SERVER['_DB_PASSWORD']) ? $_SERVER['_DB_PASSWORD'] : 'Uap)(*&^%');
