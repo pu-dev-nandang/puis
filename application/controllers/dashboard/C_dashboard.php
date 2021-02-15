@@ -641,6 +641,7 @@ class C_dashboard extends Globalclass {
         $url = url_pas.'rest/__rekapmhspayment';
         $data = array(
                 'auth' => 's3Cr3T-G4N',
+              //  'action' => 'reset',
             );
         $Input = $this->jwt->encode($data,"UAP)(*");
         $ch = curl_init();
@@ -652,10 +653,15 @@ class C_dashboard extends Globalclass {
                     "token=".$Input);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $get = curl_exec($ch);
+       // print_r($get);die();
         $get =json_decode($get, True);
         $get =(array)$get;
         curl_close ($ch);
-        $arr_json = array('Paid_Off'=> json_decode($get[0]['Paid_Off']),'Unpaid_Off' => json_decode($get[0]['Unpaid_Off']),'unsetPaid' => json_decode($get[0]['unsetPaid']));
+        $arr_json = array('Paid_Off'=> json_decode($get[0]['Paid_Off']),'Unpaid_Off' => json_decode($get[0]['Unpaid_Off']),'unsetPaid' => json_decode($get[0]['unsetPaid']) , 
+            'Paid_Off_detail' => json_decode($get[0]['Paid_Off_detail']) ,  
+            'Unpaid_Off_detail' => json_decode($get[0]['Unpaid_Off_detail']) ,  
+            'Payment_Detail' => json_decode($get[0]['Payment_Detail']) ,  
+        );
         echo json_encode($arr_json);
     }
 

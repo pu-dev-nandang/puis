@@ -598,9 +598,28 @@ class M_statistik extends CI_Model {
                           `Paid_Off` longtext,
                           `Unpaid_Off` longtext,
                           `unsetPaid` longtext,
+                          `Paid_Off_detail` longtext,
+                          `Unpaid_Off_detail` longtext,
+                          `Payment_Detail` longtext,
                           PRIMARY KEY (`ID`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=latin1'
                                   );
+    }
+
+    private function get_pay_arrDataPS($Q_invStudent,$Invoice){
+        $Pay = 0;
+        $Sisa = 0;
+        for ($r=0; $r < count($Q_invStudent); $r++) { 
+            $ID_payment_students = $Q_invStudent[$r]['ID'];
+            $Q_payment_student_details =  $this->m_master->caribasedprimary('db_finance.payment_student_details','ID_payment_students',$ID_payment_students);
+            for ($x=0; $x < count($Q_payment_student_details); $x++) { 
+                 $Pay = $Pay + $Q_payment_student_details[$x]['Pay'];
+            }
+        }
+
+        $Sisa = $Invoice - $Pay;
+
+        return ['Sisa' => $Sisa ,'Pay' => $Pay];
     }
 
     private function insert_data_summary_payment_mhs()
@@ -633,12 +652,39 @@ class M_statistik extends CI_Model {
         $Paid_Off = array();
         $Unpaid_Off = array();
         $unsetPaid = array();
+        
+        $MHS_unsetPaid = [];
+        $MHS_Paid_Off = [];
+        $MHS_Unpaid_Off = [];
+
+        $TotInvoice = 0;
+        $TotPay = 0;
+        $TotSisa = 0;
+
+
+        $TotSPP = 0;
+        $TotSPPPay = 0;
+        $TotSPPSisa = 0;
+
+        $TotBPP = 0;
+        $TotBPPPay = 0;
+        $TotBPPSisa = 0;
+
+        $TotCredit = 0;
+        $TotCreditPay = 0;
+        $TotCreditSisa = 0;
+
+        $TotAnother = 0;
+        $TotCreditPay = 0;
+        $TotCreditSisa = 0;
+
         for ($i=0; $i < count($arrDB); $i++) { 
             // if ($arrDB[$i] != $Year) {
 
                 $a_Paid_Off = 0;
                 $a_Unpaid_Off = 0;
                 $a_unsetPaid = 0;
+
                     // get Data Mahasiswa
                     $sql = 'select a.NPM,a.Name,b.NameEng from '.$arrDB[$i].'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where a.StatusStudentID in (3,2,8) ';
                     $query=$this->db->query($sql, array())->result_array();
@@ -657,18 +703,29 @@ class M_statistik extends CI_Model {
                             for ($t=0; $t < count($queryBPP); $t++) { 
                               // cek payment students
                               $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryBPP[$t]['ID']);
-                              $PayBPP = 0;
-                              $SisaBPP = 0;
-                              for ($r=0; $r < count($Q_invStudent); $r++) { 
-                                if ($Q_invStudent[$r]['Status'] == 1) { // lunas
-                                  $PayBPP = $PayBPP + $Q_invStudent[$r]['Invoice'];
-                                }
-                                else
-                                {
-                                  $SisaBPP = $SisaBPP + $Q_invStudent[$r]['Invoice'];
-                                }
-                              }
-                              
+
+                              // get pay from table payment_student_details
+                              $Invoice = $queryBPP[$t]['Invoice'];
+
+                              $TotBPP = $TotBPP + $Invoice;
+
+                              // for get total Invoice
+                              $TotInvoice = $TotInvoice + $Invoice;
+
+                              $get_pay = $this->get_pay_arrDataPS($Q_invStudent,$Invoice);
+
+                              // for get total pay
+                              $TotPay = $TotPay +  $get_pay['Pay'];
+
+                              // for get total Sisa
+                              $TotSisa = $TotSisa +  $get_pay['Sisa'];
+
+                              $PayBPP = $get_pay['Pay'];
+                              $SisaBPP = $get_pay['Sisa'];
+
+                              $TotBPPPay =  $TotBPPPay + $PayBPP;
+                              $TotBPPSisa =  $TotBPPSisa + $SisaBPP;
+
                               $arrBPP = array(
                                 'BPP' => (int)$queryBPP[$t]['Invoice'],
                                 'PayBPP' => (int)$PayBPP,
@@ -692,17 +749,28 @@ class M_statistik extends CI_Model {
                             for ($t=0; $t < count($queryCr); $t++) { 
                               // cek payment students
                               $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryCr[$t]['ID']);
-                              $PayCr = 0;
-                              $SisaCr = 0;
-                              for ($r=0; $r < count($Q_invStudent); $r++) { 
-                                if ($Q_invStudent[$r]['Status'] == 1) { // lunas
-                                  $PayCr = $PayCr + $Q_invStudent[$r]['Invoice'];
-                                }
-                                else
-                                {
-                                  $SisaCr = $SisaCr + $Q_invStudent[$r]['Invoice'];
-                                }
-                              }
+                              
+                              // get pay from table payment_student_details
+                              $Invoice = $queryCr[$t]['Invoice'];
+
+                              $TotCredit = $TotCredit + $Invoice;
+
+                              // for get total Invoice
+                              $TotInvoice = $TotInvoice + $Invoice;
+
+                              $get_pay = $this->get_pay_arrDataPS($Q_invStudent,$Invoice);
+
+                              // for get total pay
+                              $TotPay = $TotPay +  $get_pay['Pay'];
+
+                              // for get total Sisa
+                              $TotSisa = $TotSisa +  $get_pay['Sisa'];
+
+                              $PayCr = $get_pay['Pay'];
+                              $SisaCr = $get_pay['Sisa'];
+
+                              $TotCreditPay += $PayCr;
+                              $TotCreditSisa += $SisaCr;
 
                               $arrCr = array(
                                 'Cr' => (int)$queryCr[$t]['Invoice'],
@@ -728,17 +796,29 @@ class M_statistik extends CI_Model {
                               for ($t=0; $t < count($querySPP); $t++) { 
                                 // cek payment students
                                 $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$querySPP[$t]['ID']);
-                                $PaySPP = 0;
-                                $SisaSPP = 0;
-                                for ($r=0; $r < count($Q_invStudent); $r++) { 
-                                  if ($Q_invStudent[$r]['Status'] == 1) { // lunas
-                                    $PaySPP = $PaySPP + $Q_invStudent[$r]['Invoice'];
-                                  }
-                                  else
-                                  {
-                                    $SisaSPP = $SisaSPP + $Q_invStudent[$r]['Invoice'];
-                                  }
-                                }
+                                
+                                // get pay from table payment_student_details
+                                $Invoice = $querySPP[$t]['Invoice'];
+
+                                // for get total SPP
+                                $TotSPP =  $TotSPP + $Invoice;
+
+                                // for get total Invoice
+                                $TotInvoice = $TotInvoice + $Invoice;
+
+                                $get_pay = $this->get_pay_arrDataPS($Q_invStudent,$Invoice);
+
+                                // for get total pay
+                                $TotPay = $TotPay +  $get_pay['Pay'];
+
+                                // for get total Sisa
+                                $TotSisa = $TotSisa +  $get_pay['Sisa'];
+
+                                $PaySPP = $get_pay['Pay'];
+                                $SisaSPP = $get_pay['Sisa'];
+
+                                $TotSPPPay = $TotSPPPay+$PaySPP;
+                                $TotSPPSisa = $TotSPPSisa+$SisaSPP;
                                 
                                 $arrSPP = array(
                                   'SPP' => (int)$querySPP[$t]['Invoice'],
@@ -763,18 +843,29 @@ class M_statistik extends CI_Model {
                                 for ($t=0; $t < count($queryAn); $t++) { 
                                   // cek payment students
                                   $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryAn[$t]['ID']);
-                                  $PayAn = 0;
-                                  $SisaAn = 0;
-                                  for ($r=0; $r < count($Q_invStudent); $r++) { 
-                                    if ($Q_invStudent[$r]['Status'] == 1) { // lunas
-                                      $PayAn = $PayAn + $Q_invStudent[$r]['Invoice'];
-                                    }
-                                    else
-                                    {
-                                      $SisaAn = $SisaAn + $Q_invStudent[$r]['Invoice'];
-                                    }
-                                  }
                                   
+                                  // get pay from table payment_student_details
+                                  $Invoice = $queryAn[$t]['Invoice'];
+
+                                  $TotAnother += $Invoice;
+
+                                  // for get total Invoice
+                                  $TotInvoice = $TotInvoice + $Invoice;
+
+                                  $get_pay = $this->get_pay_arrDataPS($Q_invStudent,$Invoice);
+
+                                  // for get total pay
+                                  $TotPay = $TotPay +  $get_pay['Pay'];
+
+                                  // for get total Sisa
+                                  $TotSisa = $TotSisa +  $get_pay['Sisa'];
+
+                                  $PayAn = $get_pay['Pay'];
+                                  $SisaAn = $get_pay['Sisa'];
+
+                                  $TotCreditPay += $PayAn;
+                                  $TotCreditSisa += $SisaAn;
+                                    
                                   $arrAn = array(
                                     'An' => (int)$queryAn[$t]['Invoice'],
                                     'PayAn' => (int)$PayAn,
@@ -785,18 +876,45 @@ class M_statistik extends CI_Model {
                                 }
                             }
 
-                        if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '') { // unset paid
+                        if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '' || count($arrBPP['DetailPaymentBPP']) == 0 || count($arrCr['DetailPaymentCr']) == 0  ) { // unset paid
                           $a_unsetPaid = $a_unsetPaid + 1;
+
+                          $DtMHSunsetPaid = [
+                            'NPM' => $query[$u]['NPM'],
+                            'TA' => $arrDB[$i],
+                            'Name' => $query[$u]['Name'],
+                            'Prodi' => $query[$u]['NameEng'],
+                          ];
+
+                          $MHS_unsetPaid[] = $DtMHSunsetPaid;
 
                         }
                         else
                         {
-                            if ($arrBPP['DetailPaymentBPP'] != '' && $arrCr['DetailPaymentCr'] != '' &&  $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0 &&  $arrSPP['SisaSPP'] == 0 && $arrAn['SisaAn'] == 0) { // lunas
+                            if ( $arrBPP['SisaBPP'] == 0 && $arrCr['SisaCr'] == 0 &&  $arrSPP['SisaSPP'] == 0 && $arrAn['SisaAn'] == 0) { // lunas
                               $a_Paid_Off = $a_Paid_Off + 1;
 
+                              $DtMHSPaidOFF = [
+                                'NPM' => $query[$u]['NPM'],
+                                'TA' => $arrDB[$i],
+                                'Name' => $query[$u]['Name'],
+                                'Prodi' => $query[$u]['NameEng'],
+                              ];
+
+                              $MHS_Paid_Off[] = $DtMHSPaidOFF;
+
                             }
-                            elseif ( $arrBPP['DetailPaymentBPP'] != '' || $arrCr['DetailPaymentCr'] != '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0 ||  $arrSPP['SisaSPP'] > 0 || $arrAn['SisaAn'] > 0) { // belum lunas
+                            elseif ( $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0 ||  $arrSPP['SisaSPP'] > 0 || $arrAn['SisaAn'] > 0) { // belum lunas
                               $a_Unpaid_Off = $a_Unpaid_Off + 1;
+
+                              $DtMHSUNPaidOFF = [
+                                'NPM' => $query[$u]['NPM'],
+                                'TA' => $arrDB[$i],
+                                'Name' => $query[$u]['Name'],
+                                'Prodi' => $query[$u]['NameEng'],
+                              ];
+
+                              $MHS_Unpaid_Off[] = $DtMHSUNPaidOFF;
 
                             }     
                             
@@ -816,7 +934,46 @@ class M_statistik extends CI_Model {
             // }
         }
 
-        $arr_json = array('Paid_Off'=> json_encode($Paid_Off),'Unpaid_Off' => json_encode($Unpaid_Off),'unsetPaid' => json_encode($unsetPaid));
+        $arr_json = array('Paid_Off'=> json_encode($Paid_Off),'Unpaid_Off' => json_encode($Unpaid_Off),'unsetPaid' => json_encode($unsetPaid),
+            'Paid_Off_detail' => json_encode([
+                'data_mhs' => $MHS_Paid_Off,
+            ]),
+            'Unpaid_Off_detail' => json_encode([
+                'data_mhs' => $MHS_Unpaid_Off,
+            ]),
+            'Unpaid_Off_detail' => json_encode([
+                'data_mhs' => $MHS_unsetPaid,
+            ]),
+            'Payment_Detail' => json_encode([
+                'TotInvoice' => $TotInvoice,
+                'TotPay' => $TotPay,
+                'TotSisa' => $TotSisa,
+                'SPP' => [
+                    'Tot' => $TotSPP,
+                    'TotPay' => $TotSPPPay,
+                    'TotSisa' => $TotSPPSisa,
+                ],
+                'BPP' => [
+                    'Tot' => $TotBPP,
+                    'TotPay' => $TotBPPPay,
+                    'TotSisa' => $TotBPPSisa,
+                ],
+                'Credit' => [
+                    'Tot' => $TotCredit,
+                    'TotPay' => $TotCreditPay,
+                    'TotSisa' => $TotCreditSisa,
+                ],
+                'Another' => [
+                    'Tot' => $TotAnother,
+                    'TotPay' => $TotCreditPay,
+                    'TotSisa' => $TotCreditSisa,
+                ],
+                
+            ]), 
+    );
+
+        // $arr_json = array('Paid_Off'=> json_encode($Paid_Off),'Unpaid_Off' => json_encode($Unpaid_Off),'unsetPaid' => json_encode($unsetPaid));
+
         $this->db_statistik->insert($Table, $arr_json);
         $this->saveLastUpdated($Table);
         
