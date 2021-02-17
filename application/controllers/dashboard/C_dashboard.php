@@ -323,7 +323,14 @@ class C_dashboard extends Globalclass {
                         }
                     }
                 break;
-
+                case 9:
+                    // get last updated
+                    $data['LastUpdated'] = $this->db->where('TableName','summary_payment_mhs')->get('db_statistik.lastupdated')->row()->LastUpdated;
+                    $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                    $data['getSemester'] = $getSemester;
+                    $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
+                    $this->temp($content);
+                break;
                 default:
                     $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
                     $data['getSemester'] = $getSemester;
@@ -641,7 +648,7 @@ class C_dashboard extends Globalclass {
         $url = url_pas.'rest/__rekapmhspayment';
         $data = array(
                 'auth' => 's3Cr3T-G4N',
-              //  'action' => 'reset',
+                //'action' => 'reset',
             );
         $Input = $this->jwt->encode($data,"UAP)(*");
         $ch = curl_init();
@@ -661,6 +668,7 @@ class C_dashboard extends Globalclass {
             'Paid_Off_detail' => json_decode($get[0]['Paid_Off_detail']) ,  
             'Unpaid_Off_detail' => json_decode($get[0]['Unpaid_Off_detail']) ,  
             'Payment_Detail' => json_decode($get[0]['Payment_Detail']) ,  
+            'Unset_Paid_detail' => json_decode($get[0]['Unset_Paid_detail']) ,  
         );
         echo json_encode($arr_json);
     }

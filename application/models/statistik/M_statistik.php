@@ -600,6 +600,7 @@ class M_statistik extends CI_Model {
                           `unsetPaid` longtext,
                           `Paid_Off_detail` longtext,
                           `Unpaid_Off_detail` longtext,
+                          `Unset_Paid_detail` longtext,
                           `Payment_Detail` longtext,
                           PRIMARY KEY (`ID`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=latin1'
@@ -941,7 +942,7 @@ class M_statistik extends CI_Model {
             'Unpaid_Off_detail' => json_encode([
                 'data_mhs' => $MHS_Unpaid_Off,
             ]),
-            'Unpaid_Off_detail' => json_encode([
+            'Unset_Paid_detail' => json_encode([
                 'data_mhs' => $MHS_unsetPaid,
             ]),
             'Payment_Detail' => json_encode([
