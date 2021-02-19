@@ -666,18 +666,58 @@ class M_statistik extends CI_Model {
         $TotSPP = 0;
         $TotSPPPay = 0;
         $TotSPPSisa = 0;
+        $dataDetailSPP = [
+            'Paid_Off' => [],
+            'Unpaid_Off' => [],
+            'unsetPaid' => [],
+        ];
+        $countSPPBarChart = [
+            'Paid_Off' => [],
+            'Unpaid_Off' => [],
+            'unsetPaid' => [],
+        ];
 
         $TotBPP = 0;
         $TotBPPPay = 0;
         $TotBPPSisa = 0;
+        $dataDetailBPP = [
+            'Paid_Off' => [],
+            'Unpaid_Off' => [],
+            'unsetPaid' => [],
+        ];
+        $countBPPBarChart = [
+            'Paid_Off' => [],
+            'Unpaid_Off' => [],
+            'unsetPaid' => [],
+        ];
 
         $TotCredit = 0;
         $TotCreditPay = 0;
         $TotCreditSisa = 0;
+        $dataDetailCredit = [
+            'Paid_Off' => [],
+            'Unpaid_Off' => [],
+            'unsetPaid' => [],
+        ];
+        $countCreditBarChart = [
+            'Paid_Off' => [],
+            'Unpaid_Off' => [],
+            'unsetPaid' => [],
+        ];
 
         $TotAnother = 0;
         $TotCreditPay = 0;
         $TotCreditSisa = 0;
+        $dataDetailAnother = [
+            'Paid_Off' => [],
+            'Unpaid_Off' => [],
+            'unsetPaid' => [],
+        ];
+        $countAnotherBarChart = [
+            'Paid_Off' => [],
+            'Unpaid_Off' => [],
+            'unsetPaid' => [],
+        ];
 
         for ($i=0; $i < count($arrDB); $i++) { 
             // if ($arrDB[$i] != $Year) {
@@ -686,10 +726,33 @@ class M_statistik extends CI_Model {
                 $a_Unpaid_Off = 0;
                 $a_unsetPaid = 0;
 
+                $SPP_Paid_Off = 0;
+                $SPP_Unpaid_Off = 0;
+                $SPP_unsetPaid = 0;
+
+                $BPP_Paid_Off = 0;
+                $BPP_Unpaid_Off = 0;
+                $BPP_unsetPaid = 0;
+
+                $Credit_Paid_Off = 0;
+                $Credit_Unpaid_Off = 0;
+                $Credit_unsetPaid = 0;
+
+                $Another_Paid_Off = 0;
+                $Another_Unpaid_Off = 0;
+                $Another_unsetPaid = 0;
+
                     // get Data Mahasiswa
                     $sql = 'select a.NPM,a.Name,b.NameEng from '.$arrDB[$i].'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where a.StatusStudentID in (3,2,8) ';
                     $query=$this->db->query($sql, array())->result_array();
                     for ($u=0; $u < count($query); $u++) { 
+
+                        $DtMHSTransaction = [
+                          'NPM' => $query[$u]['NPM'],
+                          'TA' => $arrDB[$i],
+                          'Name' => $query[$u]['Name'],
+                          'Prodi' => $query[$u]['NameEng'],
+                        ];
 
                       // cek BPP 
                       $sqlBPP = 'select * from db_finance.payment where PTID = 2 and NPM = ? '.$Semester; //  limit 1
@@ -724,6 +787,16 @@ class M_statistik extends CI_Model {
                               $PayBPP = $get_pay['Pay'];
                               $SisaBPP = $get_pay['Sisa'];
 
+                              if ($SisaBPP == 0) {
+                                  array_push($dataDetailBPP['Paid_Off'],$DtMHSTransaction);
+                                  $BPP_Paid_Off++;
+                              }
+                              else
+                              {
+                                  array_push($dataDetailBPP['Unpaid_Off'],$DtMHSTransaction);
+                                  $BPP_Unpaid_Off++;
+                              }
+
                               $TotBPPPay =  $TotBPPPay + $PayBPP;
                               $TotBPPSisa =  $TotBPPSisa + $SisaBPP;
 
@@ -735,6 +808,11 @@ class M_statistik extends CI_Model {
                               );
 
                             }
+                        }
+                        else
+                        {
+                            array_push($dataDetailBPP['unsetPaid'],$DtMHSTransaction);
+                            $BPP_unsetPaid++;
                         }
 
                       // cek Credit 
@@ -770,6 +848,16 @@ class M_statistik extends CI_Model {
                               $PayCr = $get_pay['Pay'];
                               $SisaCr = $get_pay['Sisa'];
 
+                              if ($SisaCr == 0) {
+                                  array_push($dataDetailCredit['Paid_Off'],$DtMHSTransaction);
+                                  $Credit_Paid_Off++;
+                              }
+                              else
+                              {
+                                  array_push($dataDetailCredit['Unpaid_Off'],$DtMHSTransaction);
+                                  $Credit_Unpaid_Off++;
+                              }
+
                               $TotCreditPay += $PayCr;
                               $TotCreditSisa += $SisaCr;
 
@@ -781,6 +869,11 @@ class M_statistik extends CI_Model {
                               );
 
                             }
+                        }
+                        else
+                        {
+                            array_push($dataDetailCredit['unsetPaid'],$DtMHSTransaction);
+                            $Credit_unsetPaid++;
                         }
 
 
@@ -818,6 +911,16 @@ class M_statistik extends CI_Model {
                                 $PaySPP = $get_pay['Pay'];
                                 $SisaSPP = $get_pay['Sisa'];
 
+                                if ($SisaSPP == 0) {
+                                    array_push($dataDetailSPP['Paid_Off'],$DtMHSTransaction);
+                                    $SPP_Paid_Off++;
+                                }
+                                else
+                                {
+                                    array_push($dataDetailSPP['Unpaid_Off'],$DtMHSTransaction);
+                                    $SPP_Unpaid_Off++;
+                                }
+
                                 $TotSPPPay = $TotSPPPay+$PaySPP;
                                 $TotSPPSisa = $TotSPPSisa+$SisaSPP;
                                 
@@ -829,6 +932,11 @@ class M_statistik extends CI_Model {
                                 );
 
                               }
+                          }
+                          else
+                          {
+                            array_push($dataDetailSPP['unsetPaid'],$DtMHSTransaction);
+                            $SPP_unsetPaid++;
                           }
 
                           // cek lain-lain 
@@ -864,6 +972,16 @@ class M_statistik extends CI_Model {
                                   $PayAn = $get_pay['Pay'];
                                   $SisaAn = $get_pay['Sisa'];
 
+                                  if ($SisaAn == 0) {
+                                      array_push($dataDetailAnother['Paid_Off'],$DtMHSTransaction);
+                                      $Another_Paid_Off++;
+                                  }
+                                  else
+                                  {
+                                      array_push($dataDetailAnother['Unpaid_Off'],$DtMHSTransaction);
+                                      $Another_Unpaid_Off++;
+                                  }
+
                                   $TotCreditPay += $PayAn;
                                   $TotCreditSisa += $SisaAn;
                                     
@@ -875,6 +993,11 @@ class M_statistik extends CI_Model {
                                   );
 
                                 }
+                            }
+                            else
+                            {
+                                array_push($dataDetailAnother['unsetPaid'],$DtMHSTransaction);
+                                $Another_unsetPaid++;
                             }
 
                         if ($arrBPP['DetailPaymentBPP'] == '' || $arrCr['DetailPaymentCr'] == '' || count($arrBPP['DetailPaymentBPP']) == 0 || count($arrCr['DetailPaymentCr']) == 0  ) { // unset paid
@@ -930,6 +1053,23 @@ class M_statistik extends CI_Model {
                 $Paid_Off[] = array($YearDB,$a_Paid_Off);
                 $Unpaid_Off[] = array($YearDB,$a_Unpaid_Off);
                 $unsetPaid[] = array($YearDB,$a_unsetPaid);
+
+                array_push($countSPPBarChart['Paid_Off'],array($YearDB,$SPP_Paid_Off) );
+                array_push($countSPPBarChart['Unpaid_Off'],array($YearDB,$SPP_Unpaid_Off) );
+                array_push($countSPPBarChart['unsetPaid'],array($YearDB,$SPP_unsetPaid));
+
+                array_push($countBPPBarChart['Paid_Off'], array($YearDB,$BPP_Paid_Off) );
+                array_push($countBPPBarChart['Unpaid_Off'],array($YearDB,$BPP_Unpaid_Off) );
+                array_push($countBPPBarChart['unsetPaid'],array($YearDB,$BPP_unsetPaid));
+
+                array_push($countCreditBarChart['Paid_Off'],array($YearDB,$Credit_Paid_Off) );
+                array_push($countCreditBarChart['Unpaid_Off'],array($YearDB,$Credit_Unpaid_Off) );
+                array_push($countCreditBarChart['unsetPaid'],array($YearDB,$Credit_unsetPaid) );
+
+                array_push($countAnotherBarChart['Paid_Off'],array($YearDB,$Another_Paid_Off) );
+                array_push($countAnotherBarChart['Unpaid_Off'],array($YearDB,$Another_Unpaid_Off) );
+                array_push($countAnotherBarChart['unsetPaid'],array($YearDB,$Another_unsetPaid) );
+
                 $unk++;
 
             // }
@@ -953,21 +1093,29 @@ class M_statistik extends CI_Model {
                     'Tot' => $TotSPP,
                     'TotPay' => $TotSPPPay,
                     'TotSisa' => $TotSPPSisa,
+                    'Detail' => $dataDetailSPP,
+                    'BarChart' => $countSPPBarChart,
                 ],
                 'BPP' => [
                     'Tot' => $TotBPP,
                     'TotPay' => $TotBPPPay,
                     'TotSisa' => $TotBPPSisa,
+                    'Detail' => $dataDetailBPP,
+                    'BarChart' => $countBPPBarChart,
                 ],
                 'Credit' => [
                     'Tot' => $TotCredit,
                     'TotPay' => $TotCreditPay,
                     'TotSisa' => $TotCreditSisa,
+                    'Detail' => $dataDetailCredit,
+                    'BarChart' => $countCreditBarChart,
                 ],
                 'Another' => [
                     'Tot' => $TotAnother,
                     'TotPay' => $TotCreditPay,
                     'TotSisa' => $TotCreditSisa,
+                    'Detail' => $dataDetailAnother,
+                    'BarChart' => $countAnotherBarChart,
                 ],
                 
             ]), 

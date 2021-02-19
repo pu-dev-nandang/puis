@@ -230,6 +230,23 @@
 </div>
 
 <div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+		    <div class="panel-heading clearfix">
+		        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">SPP - Summary Payment Students</h4>
+		    </div>
+		    <div class="panel-body">
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<div id="SPP_chart_bars_vertical" class="chart" style="padding: 0px;position: relative;min-height: 400px;"></div> 
+		    		</div>
+		    	</div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
     <div class="col-md-6">
         <div class="panel panel-primary">
             <div class="panel-heading clearfix">
@@ -341,6 +358,67 @@
 
 	}
 
+	const excecute_barChart = (element,response) => {
+		var ds = new Array();
+		ds.push({
+			label: "Paid Off",
+			data: response['Paid_Off'],
+			bars: {
+				show: true,
+				barWidth: 0.2,
+				order: 1
+			}
+		});
+
+		ds.push({
+			label: "Unpaid Off",
+			data: response['Unpaid_Off'],
+			bars: {
+				show: true,
+				barWidth: 0.2,
+				order: 2
+			}
+		});
+
+		ds.push({
+			label: "Unset Paid",
+			data: response['unsetPaid'],
+			bars: {
+				show: true,
+				barWidth: 0.2,
+				order: 3
+			}
+		});
+
+		// console.log(ds);
+		var xAxis = [];
+		for (var i = 0; i < response['unsetPaid'].length; i++) {
+			var cd = response['unsetPaid'];
+			var taa = 'ta_' + cd[i][0];
+			var aa = [cd[i][0], taa];
+			xAxis.push(aa);
+
+		}
+
+		// console.log(xAxis);
+		
+		// Initialize Chart
+		$.plot(element, ds, $.extend(true, {}, Plugins.getFlotDefaults()	, {	
+			series: {
+				lines: { show: false },
+				points: { show: false }
+			},
+			grid:{
+				hoverable: true
+			},
+			tooltip: true,
+			tooltipOpts: {
+				content: '%s: %y'
+			},
+			xaxis: { ticks:xAxis}
+		}));
+	}
+
 	function loadChartSummaryPayment()
 	{
 		loading_page("#chart_bars_vertical");
@@ -350,6 +428,9 @@
 		   console.log(response);
 
 		   payment_information_type(response);
+
+		   // barchart payment type
+		   excecute_barChart('#SPP_chart_bars_vertical',response['Payment_Detail']['SPP']['BarChart']);
 
 		   var ds = new Array();
 		   ds.push({

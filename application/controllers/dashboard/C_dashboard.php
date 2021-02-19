@@ -648,7 +648,7 @@ class C_dashboard extends Globalclass {
         $url = url_pas.'rest/__rekapmhspayment';
         $data = array(
                 'auth' => 's3Cr3T-G4N',
-                //'action' => 'reset',
+                // 'action' => 'reset',
             );
         $Input = $this->jwt->encode($data,"UAP)(*");
         $ch = curl_init();
@@ -660,7 +660,7 @@ class C_dashboard extends Globalclass {
                     "token=".$Input);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $get = curl_exec($ch);
-       // print_r($get);die();
+        // print_r($get);die();
         $get =json_decode($get, True);
         $get =(array)$get;
         curl_close ($ch);
