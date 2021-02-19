@@ -247,6 +247,46 @@
 </div>
 
 <div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+		    <div class="panel-heading clearfix">
+		        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">DetailSPP - Summary Payment Students</h4>
+		    </div>
+		    <div class="panel-body">
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered SPPtblPaidOff">
+		    				<caption style = "font-weight: bold;">Paid Off</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th>Invoice</th>
+		    						<th>Pembayaran</th>
+		    						<th>Sisa</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th></th>
+		    						<th></th>
+		    						<th></th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    			</table>
+		    		</div>
+		    	</div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
     <div class="col-md-6">
         <div class="panel panel-primary">
             <div class="panel-heading clearfix">

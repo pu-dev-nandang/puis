@@ -787,13 +787,19 @@ class M_statistik extends CI_Model {
                               $PayBPP = $get_pay['Pay'];
                               $SisaBPP = $get_pay['Sisa'];
 
+                              $Bpp_DtMHSTransaction = $DtMHSTransaction;
+
+                              $Bpp_DtMHSTransaction['Pay'] = $PayBPP;
+                              $Bpp_DtMHSTransaction['Sisa'] = abs($SisaBPP);
+                              $Bpp_DtMHSTransaction['Invoice'] = $Invoice;
+
                               if ($SisaBPP == 0) {
-                                  array_push($dataDetailBPP['Paid_Off'],$DtMHSTransaction);
+                                  array_push($dataDetailBPP['Paid_Off'],$Bpp_DtMHSTransaction);
                                   $BPP_Paid_Off++;
                               }
                               else
                               {
-                                  array_push($dataDetailBPP['Unpaid_Off'],$DtMHSTransaction);
+                                  array_push($dataDetailBPP['Unpaid_Off'],$Bpp_DtMHSTransaction);
                                   $BPP_Unpaid_Off++;
                               }
 
@@ -848,13 +854,19 @@ class M_statistik extends CI_Model {
                               $PayCr = $get_pay['Pay'];
                               $SisaCr = $get_pay['Sisa'];
 
+                              $Credit_DtMHSTransaction = $DtMHSTransaction;
+
+                              $Credit_DtMHSTransaction['Pay'] = $PayCr;
+                              $Credit_DtMHSTransaction['Sisa'] = abs($SisaCr);
+                              $Credit_DtMHSTransaction['Invoice'] = $Invoice;
+
                               if ($SisaCr == 0) {
-                                  array_push($dataDetailCredit['Paid_Off'],$DtMHSTransaction);
+                                  array_push($dataDetailCredit['Paid_Off'],$Credit_DtMHSTransaction);
                                   $Credit_Paid_Off++;
                               }
                               else
                               {
-                                  array_push($dataDetailCredit['Unpaid_Off'],$DtMHSTransaction);
+                                  array_push($dataDetailCredit['Unpaid_Off'],$Credit_DtMHSTransaction);
                                   $Credit_Unpaid_Off++;
                               }
 
@@ -911,13 +923,19 @@ class M_statistik extends CI_Model {
                                 $PaySPP = $get_pay['Pay'];
                                 $SisaSPP = $get_pay['Sisa'];
 
+                                $SPP_DtMHSTransaction = $DtMHSTransaction;
+
+                                $SPP_DtMHSTransaction['Pay'] = $PaySPP;
+                                $SPP_DtMHSTransaction['Sisa'] = abs($SisaSPP);
+                                $SPP_DtMHSTransaction['Invoice'] = $Invoice;
+
                                 if ($SisaSPP == 0) {
-                                    array_push($dataDetailSPP['Paid_Off'],$DtMHSTransaction);
+                                    array_push($dataDetailSPP['Paid_Off'],$SPP_DtMHSTransaction);
                                     $SPP_Paid_Off++;
                                 }
                                 else
                                 {
-                                    array_push($dataDetailSPP['Unpaid_Off'],$DtMHSTransaction);
+                                    array_push($dataDetailSPP['Unpaid_Off'],$SPP_DtMHSTransaction);
                                     $SPP_Unpaid_Off++;
                                 }
 
@@ -972,13 +990,19 @@ class M_statistik extends CI_Model {
                                   $PayAn = $get_pay['Pay'];
                                   $SisaAn = $get_pay['Sisa'];
 
+                                  $Another_DtMHSTransaction = $DtMHSTransaction;
+
+                                  $Another_DtMHSTransaction['Pay'] = $PayAn;
+                                  $Another_DtMHSTransaction['Sisa'] = abs($SisaAn);
+                                  $Another_DtMHSTransaction['Invoice'] = $Invoice;
+
                                   if ($SisaAn == 0) {
-                                      array_push($dataDetailAnother['Paid_Off'],$DtMHSTransaction);
+                                      array_push($dataDetailAnother['Paid_Off'],$Another_DtMHSTransaction);
                                       $Another_Paid_Off++;
                                   }
                                   else
                                   {
-                                      array_push($dataDetailAnother['Unpaid_Off'],$DtMHSTransaction);
+                                      array_push($dataDetailAnother['Unpaid_Off'],$Another_DtMHSTransaction);
                                       $Another_Unpaid_Off++;
                                   }
 
