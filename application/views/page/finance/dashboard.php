@@ -895,30 +895,61 @@
 		}));
 	}
 
-	function dataMhs_filterByColToCount(array, string,i) {
-	    return array.filter(o => {
-	    	if (i == 0) {
-	    		if (o['NPM'].toLowerCase().includes(string.toLowerCase()) || o['Name'].toLowerCase().includes(string.toLowerCase())) {
-	    			return true;
-	    		}
-	    		return false;
-	    	}
-	    	else if(i == 1){
-	    		if (o['Prodi'].toLowerCase().includes(string.toLowerCase()) ) {
-	    			return true;
-	    		}
-	    		return false;
-	    	}
-	    	else{
-	    		if (o['TA'].toLowerCase().includes(string.toLowerCase()) ) {
-	    			return true;
-	    		}
-	    		return false;
-	    	}	
+	function dataMhs_filterByColToCount(array, arrValue) {
+
+		let d = array.slice();
+
+		if (arrValue[0] != '') {
+			d = d.filter(o => {
+				if (o['NPM'].toLowerCase().includes(arrValue[0].toLowerCase()) || o['Name'].toLowerCase().includes(arrValue[0].toLowerCase())) {
+					return true;
+				}
+				return false;
+			});
+		}
+
+		if (arrValue[1] != '') {
+			d = d.filter(o => {
+				if (o['Prodi'].toLowerCase().includes(arrValue[1].toLowerCase()) ) {
+					return true;
+				}
+				return false;
+			});
+		}
+
+		if (arrValue[2] != '') {
+			d = d.filter(o => {
+				if (o['TA'].toLowerCase().includes(arrValue[2].toLowerCase()) ) {
+					return true;
+				}
+				return false;
+			});
+		}
+		
+
+	    // return array.filter(o => {
+	    // 	if (i == 0) {
+	    // 		if (o['NPM'].toLowerCase().includes(string.toLowerCase()) || o['Name'].toLowerCase().includes(string.toLowerCase())) {
+	    // 			return true;
+	    // 		}
+	    // 		return false;
+	    // 	}
+	    // 	else if(i == 1){
+	    // 		if (o['Prodi'].toLowerCase().includes(string.toLowerCase()) ) {
+	    // 			return true;
+	    // 		}
+	    // 		return false;
+	    // 	}
+	    // 	else{
+	    // 		if (o['TA'].toLowerCase().includes(string.toLowerCase()) ) {
+	    // 			return true;
+	    // 		}
+	    // 		return false;
+	    // 	}	
 	    	
-	    }
-	    	
-	    );
+	    // });
+
+	    return d;
 	}
 
 	const Summary_Payment_Students_Type_detail = (dataMhs,tableSelector) => {
@@ -951,7 +982,22 @@
 		      }
 		      
 		      $( 'input', this ).on( 'keyup change', function () {
+		      	const itsme = $(this);
 		          const vv = this.value;
+		          let valArr = [];
+
+		          valArr.push(
+		          		itsme.closest('.filterTblData').find('th:eq(0)').find('input').val()
+		          	)
+		          valArr.push(
+		          		itsme.closest('.filterTblData').find('th:eq(1)').find('input').val()
+		          	)
+
+		          valArr.push(
+		          		itsme.closest('.filterTblData').find('th:eq(2)').find('input').val()
+		          	)
+
+
 		          if ( table.column(i).search() !== this.value ) {
 		              table
 		                  .column(i)
@@ -962,15 +1008,15 @@
 		              case 0:
 		              case 1:
 		              case 2:
-            			    var total_invoice = (dataMhs_filterByColToCount(dataMhs,vv,i)).reduce(function(prev, cur) {
+            			    var total_invoice = (dataMhs_filterByColToCount(dataMhs,valArr)).reduce(function(prev, cur) {
             				  return parseInt(prev) + parseInt(cur.Invoice);
             				}, 0);
 
-        			        var total_pay = (dataMhs_filterByColToCount(dataMhs,vv,i)).reduce(function(prev, cur) {
+        			        var total_pay = (dataMhs_filterByColToCount(dataMhs,valArr)).reduce(function(prev, cur) {
         			    	  return parseInt(prev) + parseInt(cur.Pay);
         			    	}, 0);
 
-        			        var total_sisa = (dataMhs_filterByColToCount(dataMhs,vv,i)).reduce(function(prev, cur) {
+        			        var total_sisa = (dataMhs_filterByColToCount(dataMhs,valArr)).reduce(function(prev, cur) {
         			    	  return parseInt(prev) + parseInt(cur.Sisa);
         			    	}, 0);
 

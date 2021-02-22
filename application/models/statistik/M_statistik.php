@@ -607,7 +607,7 @@ class M_statistik extends CI_Model {
                                   );
     }
 
-    private function get_pay_arrDataPS($Q_invStudent,$Invoice){
+    public function get_pay_arrDataPS($Q_invStudent,$Invoice){
         $Pay = 0;
         $Sisa = 0;
         for ($r=0; $r < count($Q_invStudent); $r++) { 
