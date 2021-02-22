@@ -88,7 +88,7 @@ class C_rest3 extends CI_Controller {
                 $header[] = ['Name' => 'No','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
                 $header[] = ['Name' => 'Sumber Pembiayaan','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
                 $Year = Date('Y');
-                $Year3 = $Year - 2;
+                $Year3 = $Year - 4;
                 $arr_year = [];
                 for ($i=$Year3; $i<= $Year; $i++) { 
                    $arr_year[] = $i;
