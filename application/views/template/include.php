@@ -3100,6 +3100,18 @@
         loadSelectOptionEmployees_kelompok_profesi(selector,selected)
     }
 
+
+    // Sample query like in es6
+    // const arrayOfObject = [{ name: 'Paul', country: 'Canada', }, { name: 'Lea', country: 'Italy', }, { name: 'John', country: 'Italy' }];
+
+    // console.log(filterLikeByValue(arrayOfObject, 'lea')); // [{name: 'Lea', country: 'Italy'}]
+    // console.log(filterLikeByValue(arrayOfObject, 'ita')); // [{name: 'Lea', country: 'Italy'}, {name: 'John', country: 'Italy'}]
+    function filterLikeByValue(array, string) {
+        return array.filter(o =>
+            Object.keys(o).some(k => o[k].toLowerCase().includes(string.toLowerCase())));
+    }
+
+
 </script>
 
 

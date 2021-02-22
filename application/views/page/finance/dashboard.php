@@ -252,7 +252,7 @@
 		    <div class="panel-heading clearfix">
 		        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">DetailSPP - Summary Payment Students</h4>
 		    </div>
-		    <div class="panel-body">
+		    <div class="panel-body" style="max-height: 400px;overflow-y: auto;">
 		    	<div class="row">
 		    		<div class="col-md-12">
 		    			<table class="table table-bordered SPPtblPaidOff">
@@ -273,6 +273,442 @@
 		    						<th></th>
 		    						<th></th>
 		    						<th></th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    				<tfoot>
+		    					<tr>
+		    						<td colspan="3" style="font-weight: bold;text-align: center;">Total</td>
+		    						<td class = "sumInvoice" style="font-weight: bold;"></td>
+		    						<td class = "sumPay" style="font-weight: bold;"></td>
+		    						<td class = "sumSisa" style="font-weight: bold;"></td>
+		    					</tr>
+		    				</tfoot>
+		    			</table>
+		    		</div>
+		    	</div>
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered SPPtblUnpaidOff">
+		    				<caption style = "font-weight: bold;">Unpaid Off</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th>Invoice</th>
+		    						<th>Pembayaran</th>
+		    						<th>Sisa</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th></th>
+		    						<th></th>
+		    						<th></th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    				<tfoot>
+		    					<tr>
+		    						<td colspan="3" style="font-weight: bold;text-align: center;">Total</td>
+		    						<td class = "sumInvoice" style="font-weight: bold;"></td>
+		    						<td class = "sumPay" style="font-weight: bold;"></td>
+		    						<td class = "sumSisa" style="font-weight: bold;"></td>
+		    					</tr>
+		    				</tfoot>
+		    			</table>
+		    		</div>
+		    	</div>
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered SPPtblUnsetpaid">
+		    				<caption style = "font-weight: bold;">Unset Paid</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    			</table>
+		    		</div>
+		    	</div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+		    <div class="panel-heading clearfix">
+		        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">BPP - Summary Payment Students</h4>
+		    </div>
+		    <div class="panel-body">
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<div id="BPP_chart_bars_vertical" class="chart" style="padding: 0px;position: relative;min-height: 400px;"></div> 
+		    		</div>
+		    	</div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+		    <div class="panel-heading clearfix">
+		        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">DetailBPP - Summary Payment Students</h4>
+		    </div>
+		    <div class="panel-body" style="max-height: 400px;overflow-y: auto;">
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered BPPtblPaidOff">
+		    				<caption style = "font-weight: bold;">Paid Off</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th>Invoice</th>
+		    						<th>Pembayaran</th>
+		    						<th>Sisa</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th></th>
+		    						<th></th>
+		    						<th></th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    				<tfoot>
+		    					<tr>
+		    						<td colspan="3" style="font-weight: bold;text-align: center;">Total</td>
+		    						<td class = "sumInvoice" style="font-weight: bold;"></td>
+		    						<td class = "sumPay" style="font-weight: bold;"></td>
+		    						<td class = "sumSisa" style="font-weight: bold;"></td>
+		    					</tr>
+		    				</tfoot>
+		    			</table>
+		    		</div>
+		    	</div>
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered BPPtblUnpaidOff">
+		    				<caption style = "font-weight: bold;">Unpaid Off</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th>Invoice</th>
+		    						<th>Pembayaran</th>
+		    						<th>Sisa</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th></th>
+		    						<th></th>
+		    						<th></th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    				<tfoot>
+		    					<tr>
+		    						<td colspan="3" style="font-weight: bold;text-align: center;">Total</td>
+		    						<td class = "sumInvoice" style="font-weight: bold;"></td>
+		    						<td class = "sumPay" style="font-weight: bold;"></td>
+		    						<td class = "sumSisa" style="font-weight: bold;"></td>
+		    					</tr>
+		    				</tfoot>
+		    			</table>
+		    		</div>
+		    	</div>
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered BPPtblUnsetpaid">
+		    				<caption style = "font-weight: bold;">Unset Paid</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    			</table>
+		    		</div>
+		    	</div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+		    <div class="panel-heading clearfix">
+		        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Credit - Summary Payment Students</h4>
+		    </div>
+		    <div class="panel-body">
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<div id="Credit_chart_bars_vertical" class="chart" style="padding: 0px;position: relative;min-height: 400px;"></div> 
+		    		</div>
+		    	</div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+		    <div class="panel-heading clearfix">
+		        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">DetailCredit - Summary Payment Students</h4>
+		    </div>
+		    <div class="panel-body" style="max-height: 400px;overflow-y: auto;">
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered CredittblPaidOff">
+		    				<caption style = "font-weight: bold;">Paid Off</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th>Invoice</th>
+		    						<th>Pembayaran</th>
+		    						<th>Sisa</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th></th>
+		    						<th></th>
+		    						<th></th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    				<tfoot>
+		    					<tr>
+		    						<td colspan="3" style="font-weight: bold;text-align: center;">Total</td>
+		    						<td class = "sumInvoice" style="font-weight: bold;"></td>
+		    						<td class = "sumPay" style="font-weight: bold;"></td>
+		    						<td class = "sumSisa" style="font-weight: bold;"></td>
+		    					</tr>
+		    				</tfoot>
+		    			</table>
+		    		</div>
+		    	</div>
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered CredittblUnpaidOff">
+		    				<caption style = "font-weight: bold;">Unpaid Off</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th>Invoice</th>
+		    						<th>Pembayaran</th>
+		    						<th>Sisa</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th></th>
+		    						<th></th>
+		    						<th></th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    				<tfoot>
+		    					<tr>
+		    						<td colspan="3" style="font-weight: bold;text-align: center;">Total</td>
+		    						<td class = "sumInvoice" style="font-weight: bold;"></td>
+		    						<td class = "sumPay" style="font-weight: bold;"></td>
+		    						<td class = "sumSisa" style="font-weight: bold;"></td>
+		    					</tr>
+		    				</tfoot>
+		    			</table>
+		    		</div>
+		    	</div>
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered CredittblUnsetpaid">
+		    				<caption style = "font-weight: bold;">Unset Paid</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    			</table>
+		    		</div>
+		    	</div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+		    <div class="panel-heading clearfix">
+		        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Another - Summary Payment Students</h4>
+		    </div>
+		    <div class="panel-body">
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<div id="Another_chart_bars_vertical" class="chart" style="padding: 0px;position: relative;min-height: 400px;"></div> 
+		    		</div>
+		    	</div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-primary">
+		    <div class="panel-heading clearfix">
+		        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">DetailAnother - Summary Payment Students</h4>
+		    </div>
+		    <div class="panel-body" style="max-height: 400px;overflow-y: auto;">
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered AnothertblPaidOff">
+		    				<caption style = "font-weight: bold;">Paid Off</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th>Invoice</th>
+		    						<th>Pembayaran</th>
+		    						<th>Sisa</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th></th>
+		    						<th></th>
+		    						<th></th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    				<tfoot>
+		    					<tr>
+		    						<td colspan="3" style="font-weight: bold;text-align: center;">Total</td>
+		    						<td class = "sumInvoice" style="font-weight: bold;"></td>
+		    						<td class = "sumPay" style="font-weight: bold;"></td>
+		    						<td class = "sumSisa" style="font-weight: bold;"></td>
+		    					</tr>
+		    				</tfoot>
+		    			</table>
+		    		</div>
+		    	</div>
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered AnothertblUnpaidOff">
+		    				<caption style = "font-weight: bold;">Unpaid Off</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th>Invoice</th>
+		    						<th>Pembayaran</th>
+		    						<th>Sisa</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    						<th></th>
+		    						<th></th>
+		    						<th></th>
+		    					</tr>
+		    				</thead>
+		    				<tbody>
+		    					
+		    				</tbody>
+		    				<tfoot>
+		    					<tr>
+		    						<td colspan="3" style="font-weight: bold;text-align: center;">Total</td>
+		    						<td class = "sumInvoice" style="font-weight: bold;"></td>
+		    						<td class = "sumPay" style="font-weight: bold;"></td>
+		    						<td class = "sumSisa" style="font-weight: bold;"></td>
+		    					</tr>
+		    				</tfoot>
+		    			</table>
+		    		</div>
+		    	</div>
+		    	<div class="row">
+		    		<div class="col-md-12">
+		    			<table class="table table-bordered AnothertblUnsetpaid">
+		    				<caption style = "font-weight: bold;">Unset Paid</caption>
+		    				<thead>
+		    					<tr>
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
+		    					</tr>
+		    					<tr class="filterTblData">
+		    						<th>NPM - Nama</th>
+		    						<th>Prodi</th>
+		    						<th>TA</th>
 		    					</tr>
 		    				</thead>
 		    				<tbody>
@@ -459,6 +895,148 @@
 		}));
 	}
 
+	function dataMhs_filterByColToCount(array, string,i) {
+	    return array.filter(o => {
+	    	if (i == 0) {
+	    		if (o['NPM'].toLowerCase().includes(string.toLowerCase()) || o['Name'].toLowerCase().includes(string.toLowerCase())) {
+	    			return true;
+	    		}
+	    		return false;
+	    	}
+	    	else if(i == 1){
+	    		if (o['Prodi'].toLowerCase().includes(string.toLowerCase()) ) {
+	    			return true;
+	    		}
+	    		return false;
+	    	}
+	    	else{
+	    		if (o['TA'].toLowerCase().includes(string.toLowerCase()) ) {
+	    			return true;
+	    		}
+	    		return false;
+	    	}	
+	    	
+	    }
+	    	
+	    );
+	}
+
+	const Summary_Payment_Students_Type_detail = (dataMhs,tableSelector) => {
+		tableSelector.find('tbody').empty();
+		for (var i = 0; i < dataMhs.length; i++) {
+			let ta = dataMhs[i]['TA'];
+			ta = ta.split('_');
+			ta = ta[1];
+			tableSelector.find('tbody').append(
+					'<tr>'+
+						'<td>'+dataMhs[i]['NPM'] + ' - '+ dataMhs[i]['Name']+'</td>'+
+						'<td>'+dataMhs[i]['Prodi']+
+						'<td>'+ta+'</td>'+
+						'<td>'+formatRupiah(dataMhs[i]['Invoice'])+'</td>'+
+						'<td>'+formatRupiah(dataMhs[i]['Pay'])+'</td>'+
+						'<td>'+formatRupiah(dataMhs[i]['Sisa'])+'</td>'+
+					'</tr>'
+				);
+		}
+
+		   tableSelector.find('thead tr').clone(true).appendTo( '#example thead' );
+		   tableSelector.find('thead tr:eq(1) th').each( function (i) {
+		      var title = $(this).text();
+		      if (i > 2) {
+		      	$(this).html( '<label>No filter</label>' );
+		      }
+		      else
+		      {
+		      	$(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+		      }
+		      
+		      $( 'input', this ).on( 'keyup change', function () {
+		          const vv = this.value;
+		          if ( table.column(i).search() !== this.value ) {
+		              table
+		                  .column(i)
+		                  .search( this.value )
+		                  .draw();
+
+		            switch(i) {
+		              case 0:
+		              case 1:
+		              case 2:
+            			    var total_invoice = (dataMhs_filterByColToCount(dataMhs,vv,i)).reduce(function(prev, cur) {
+            				  return parseInt(prev) + parseInt(cur.Invoice);
+            				}, 0);
+
+        			        var total_pay = (dataMhs_filterByColToCount(dataMhs,vv,i)).reduce(function(prev, cur) {
+        			    	  return parseInt(prev) + parseInt(cur.Pay);
+        			    	}, 0);
+
+        			        var total_sisa = (dataMhs_filterByColToCount(dataMhs,vv,i)).reduce(function(prev, cur) {
+        			    	  return parseInt(prev) + parseInt(cur.Sisa);
+        			    	}, 0);
+
+		                break;
+		              default:
+		                    var total_invoice = dataMhs.reduce(function(prev, cur) {
+		                	  return parseInt(prev) + parseInt(cur.Invoice);
+		                	}, 0);
+
+		                    var total_pay = dataMhs.reduce(function(prev, cur) {
+		                	  return parseInt(prev) + parseInt(cur.Pay);
+		                	}, 0);
+
+		                    var total_sisa = dataMhs.reduce(function(prev, cur) {
+		                	  return parseInt(prev) + parseInt(cur.Sisa);
+		                	}, 0);
+
+		                	
+		            }
+
+		            $( table.table().footer() ).find('.sumInvoice').html(formatRupiah(total_invoice));
+		            $( table.table().footer() ).find('.sumPay').html(formatRupiah(total_pay));
+		            $( table.table().footer() ).find('.sumSisa').html(formatRupiah(total_sisa));
+
+
+		            // tableSelector.find('.sumInvoice').html(formatRupiah(total_invoice));
+		            // tableSelector.find('.sumPay').html(formatRupiah(total_pay));
+		            // tableSelector.find('.sumSisa').html(formatRupiah(total_sisa));
+
+		          }
+		      } );
+		  });
+
+
+		   	// sum payment
+		    var total_invoice = dataMhs.reduce(function(prev, cur) {
+		   	  return parseInt(prev) + parseInt(cur.Invoice);
+		   	}, 0);
+
+		       var total_pay = dataMhs.reduce(function(prev, cur) {
+		   	  return parseInt(prev) + parseInt(cur.Pay);
+		   	}, 0);
+
+		       var total_sisa = dataMhs.reduce(function(prev, cur) {
+		   	  return parseInt(prev) + parseInt(cur.Sisa);
+		   	}, 0);
+
+		    tableSelector.find('.sumInvoice').html(formatRupiah(total_invoice));
+		    tableSelector.find('.sumPay').html(formatRupiah(total_pay));
+		    tableSelector.find('.sumSisa').html(formatRupiah(total_sisa));
+		    
+
+		    // DataTable
+		    var table = tableSelector.DataTable({
+		    	//"searching": false,
+		    	"scrollY": "200px",
+		    	"scrollCollapse": true,
+		    	"paging": false,
+		    	//"ordering" : false,
+		    	orderCellsTop: true,
+		    	fixedHeader: true
+		    });
+
+
+	}
+
 	function loadChartSummaryPayment()
 	{
 		loading_page("#chart_bars_vertical");
@@ -470,7 +1048,25 @@
 		   payment_information_type(response);
 
 		   // barchart payment type
-		   excecute_barChart('#SPP_chart_bars_vertical',response['Payment_Detail']['SPP']['BarChart']);
+		   	excecute_barChart('#SPP_chart_bars_vertical',response['Payment_Detail']['SPP']['BarChart']);
+		   	Summary_Payment_Students_Type_detail(response['Payment_Detail']['SPP']['Detail']['Paid_Off'],$('.SPPtblPaidOff'));
+		   	Summary_Payment_Students_Type_detail(response['Payment_Detail']['SPP']['Detail']['Unpaid_Off'],$('.SPPtblUnpaidOff'));
+		   	Summary_Payment_Students_detail(response['Payment_Detail']['SPP']['Detail']['unsetPaid'],$('.SPPtblUnsetpaid'));
+
+		   	excecute_barChart('#BPP_chart_bars_vertical',response['Payment_Detail']['BPP']['BarChart']);
+		   	Summary_Payment_Students_Type_detail(response['Payment_Detail']['BPP']['Detail']['Paid_Off'],$('.BPPtblPaidOff'));
+		   	Summary_Payment_Students_Type_detail(response['Payment_Detail']['BPP']['Detail']['Unpaid_Off'],$('.BPPtblUnpaidOff'));
+		   	Summary_Payment_Students_detail(response['Payment_Detail']['BPP']['Detail']['unsetPaid'],$('.BPPtblUnsetpaid'));
+
+		   	excecute_barChart('#Credit_chart_bars_vertical',response['Payment_Detail']['Credit']['BarChart']);
+		   	Summary_Payment_Students_Type_detail(response['Payment_Detail']['Credit']['Detail']['Paid_Off'],$('.CredittblPaidOff'));
+		   	Summary_Payment_Students_Type_detail(response['Payment_Detail']['Credit']['Detail']['Unpaid_Off'],$('.CredittblUnpaidOff'));
+		   	Summary_Payment_Students_detail(response['Payment_Detail']['Credit']['Detail']['unsetPaid'],$('.CredittblUnsetpaid'));
+
+		   	excecute_barChart('#Another_chart_bars_vertical',response['Payment_Detail']['Another']['BarChart']);
+		   	Summary_Payment_Students_Type_detail(response['Payment_Detail']['Another']['Detail']['Paid_Off'],$('.AnothertblPaidOff'));
+		   	Summary_Payment_Students_Type_detail(response['Payment_Detail']['Another']['Detail']['Unpaid_Off'],$('.AnothertblUnpaidOff'));
+		   	Summary_Payment_Students_detail(response['Payment_Detail']['Another']['Detail']['unsetPaid'],$('.AnothertblUnsetpaid'));
 
 		   var ds = new Array();
 		   ds.push({
