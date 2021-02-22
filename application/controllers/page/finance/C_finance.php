@@ -1092,7 +1092,8 @@ class C_finance extends Finnance_Controler {
                if(count($a) != 1)
                {
                 echo json_encode('Data ini telah diset cicilan, sehingga proses dihentikan.');
-                break;
+                //break;
+                die();
                }
                else
                {
