@@ -706,8 +706,8 @@ class M_statistik extends CI_Model {
         ];
 
         $TotAnother = 0;
-        $TotCreditPay = 0;
-        $TotCreditSisa = 0;
+        $TotAnotherPay = 0;
+        $TotAnotherSisa = 0;
         $dataDetailAnother = [
             'Paid_Off' => [],
             'Unpaid_Off' => [],
@@ -1006,8 +1006,8 @@ class M_statistik extends CI_Model {
                                       $Another_Unpaid_Off++;
                                   }
 
-                                  $TotCreditPay += $PayAn;
-                                  $TotCreditSisa += $SisaAn;
+                                  $TotAnotherPay += $PayAn;
+                                  $TotAnotherSisa += $SisaAn;
                                     
                                   $arrAn = array(
                                     'An' => (int)$queryAn[$t]['Invoice'],
@@ -1136,8 +1136,8 @@ class M_statistik extends CI_Model {
                 ],
                 'Another' => [
                     'Tot' => $TotAnother,
-                    'TotPay' => $TotCreditPay,
-                    'TotSisa' => $TotCreditSisa,
+                    'TotPay' => $TotAnotherPay,
+                    'TotSisa' => $TotAnotherSisa,
                     'Detail' => $dataDetailAnother,
                     'BarChart' => $countAnotherBarChart,
                 ],
