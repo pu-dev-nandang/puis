@@ -304,7 +304,20 @@
                                 keteranganBPPEX = "BPP\n";
                                 for (var l = 0; l < DetailPaymentBPP.length; l++) {
                                   var lno = parseInt(l) + 1;
-                                  var StatusPay = (DetailPaymentBPP[l]['Status'] == 1)? 'Sudah Bayar' : 'Belum Bayar';
+                                  //var StatusPay = (DetailPaymentBPP[l]['Status'] == 1)? 'Sudah Bayar' : 'Belum Bayar';
+                                  if (DetailPaymentBPP[l]['Status'] == 1) {
+                                    var StatusPay = 'Lunas' 
+                                  }
+                                  else
+                                  {
+                                    if (parseInt(Data_mhs[i]['PayBPP']) > 0) {
+                                      var StatusPay = 'Belum Lunas'; 
+                                    }
+                                    else
+                                    {
+                                      var StatusPay = 'Belum Bayar'; 
+                                    }
+                                  }
                                   if (DetailPaymentBPP[l]['Status'] == 0) {
                                     keteranganBPP += '<li>Pembayaran : '+lno+'</li>';
                                     keteranganBPPEX += "Pembayaran : "+lno+" \n";
@@ -330,7 +343,21 @@
                                 keteranganCrEX = "Credit\n";
                                 for (var l = 0; l < DetailPaymentCr.length; l++) {
                                   var lno = parseInt(l) + 1;
-                                  var StatusPay = (DetailPaymentCr[l]['Status'] == 1)? 'Sudah Bayar' : 'Belum Bayar';
+                                  //var StatusPay = (DetailPaymentCr[l]['Status'] == 1)? 'Sudah Bayar' : 'Belum Bayar';
+                                  if (DetailPaymentCr[l]['Status'] == 1) {
+                                    var StatusPay = 'Lunas' 
+                                  }
+                                  else
+                                  {
+                                    if (parseInt(Data_mhs[i]['PayCr']) > 0) {
+                                      var StatusPay = 'Belum Lunas'; 
+                                    }
+                                    else
+                                    {
+                                      var StatusPay = 'Belum Bayar'; 
+                                    }
+                                  }
+
                                   if(DetailPaymentCr[l]['Status'] == 0)
                                   {
                                     keteranganCr += '<li>Pembayaran : '+lno+'</li>';
