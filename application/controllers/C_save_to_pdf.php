@@ -6288,13 +6288,15 @@ Phone: (021) 29200456';
 
 
             // Get PHR -> 2.2
-            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees em',
+            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind, Signature')->get_where('db_employees.employees em',
         "(em.PositionMain = '2.2' OR em.PositionOther1 = '2.2' OR em.PositionOther2 = '2.2' OR em.PositionOther3 = '2.2') AND  em.StatusEmployeeID = '1'")->result_array();
+
 
             $NamePHR_a = (count($dataPHR)>0) ? trim($dataPHR[0]['TitleAhead']).' ' : '';
             $NamePHR_b = (count($dataPHR)>0) ? ' '.trim($dataPHR[0]['TitleBehind']) : '';
             $NamePHR = (count($dataPHR)>0) ? $NamePHR_a.''.trim($dataPHR[0]['Name']).''.$NamePHR_b : '';
             $NIPPHR = (count($dataPHR)>0) ? $dataPHR[0]['NIP'] : '';
+            $Signature = (count($dataPHR)>0) ? $dataPHR[0]['Signature'] : '';
 
 
 
@@ -6401,8 +6403,12 @@ Phone: (021) 29200456';
             $pdf->SetFont('Arial','',11);
             $y = $pdf->GetY()+20;
 
+
             $pdf->Image(base_url('images/cap.png'),130,$y+6,40);
-            $pdf->Image('./uploads/signature/2617100.png',130,$y+6,40);
+            if($Signature!=''){
+              $pdf->Image('./uploads/signature/'.$Signature,130,$y+6,40);
+            }
+
 
             $pdf->SetXY(130,$y);
             $pdf->Cell(60,5,'Jakarta, '.$this->getDateIndonesian($dateGen),0,1,'L');
@@ -6632,8 +6638,18 @@ Phone: (021) 29200456';
         $pdf->SetFont('Arial','',11);
         $y = $pdf->GetY()+20;
 
+        // Get PHR -> 2.2
+        $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind, Signature')->get_where('db_employees.employees em',
+                          "(em.PositionMain = '2.2' OR em.PositionOther1 = '2.2' OR em.PositionOther2 = '2.2' OR em.PositionOther3 = '2.2') AND  em.StatusEmployeeID = '1'")->result_array();
+
+        $NamePHR_a = (count($dataPHR)>0) ? trim($dataPHR[0]['TitleAhead']).' ' : '';
+        $NamePHR_b = (count($dataPHR)>0) ? ' '.trim($dataPHR[0]['TitleBehind']) : '';
+        $NamePHR = (count($dataPHR)>0) ? $NamePHR_a.''.trim($dataPHR[0]['Name']).''.$NamePHR_b : '';
+        $NIPPHR = (count($dataPHR)>0) ? $dataPHR[0]['NIP'] : '';
+        $Signature = (count($dataPHR)>0) ? $dataPHR[0]['Signature'] : '';
+
         $pdf->Image('./images/cap.png',130,$y+1,40);
-        $pdf->Image('./uploads/signature/2617100.png',130,$y+4,40);
+        $pdf->Image('./uploads/signature/'.$Signature,130,$y+4,40);
 
 
         $pdf->Ln(11);
@@ -6651,10 +6667,10 @@ Phone: (021) 29200456';
         $pdf->Ln(17);
 
         $pdf->Cell($w,$h,'',0,0,'L');
-        $pdf->Cell($w2,$h,'Dr. rer. nat. Maria Prihandrijanti, S.T ',0,1,'L');
+        $pdf->Cell($w2,$h,$NamePHR,0,1,'L');
 
         $pdf->Cell($w,$h,'',0,0,'L');
-        $pdf->Cell($w2,$h,'NIP : 2617100 ',0,1,'L');
+        $pdf->Cell($w2,$h,'NIP : '.$NIPPHR,0,1,'L');
 
         $pdf->SetFont('Arial','',10);
         $pdf->SetXY(10,$y+45);
