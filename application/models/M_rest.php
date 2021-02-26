@@ -1506,16 +1506,50 @@ class M_rest extends CI_Model
 
         if (count($data) > 0) {
             for ($i = 0; $i < count($data); $i++) {
-                $data[$i]['Schedule'] = $this->db->query('SELECT s.ClassGroup, mk.MKCode, mk.Name, mk.NameEng FROM db_academic.schedule s 
+
+                $Schedule = $this->db->query('SELECT ex.ScheduleID, s.ClassGroup, mk.MKCode, mk.Name, mk.NameEng, s.Coordinator FROM db_academic.schedule s 
                                                             LEFT JOIN db_academic.exam_group ex ON (s.ID = ex.ScheduleID)
                                                             LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                             WHERE ex.ExamID = "' . $data[$i]['ID'] . '" GROUP BY s.ID')->result_array();
+
+                $data[$i]['Schedule'] = $Schedule;
+
+                $listLecturer = [];
+                if (count($Schedule) > 0) {
+                    for ($l = 0; $l < count($Schedule); $l++) {
+                        array_push($listLecturer, $Schedule[$l]['Coordinator']);
+                        $dataTeamTeach = $this->getLecturerTeamListSchedule($Schedule[$l]['ScheduleID'], 'NIP_Only');
+                        array_merge($listLecturer, $dataTeamTeach);
+                    }
+                }
+                $data[$i]['ListLecturer'] = $listLecturer;
             }
         }
 
 
         return $data;
+    }
+
+    private function getLecturerTeamListSchedule($ScheduleID, $resultType)
+    {
+        // coordinator
+        $data = $this->db->query('SELECT * FROM db_academic.schedule_team_teaching stt 
+                                    WHERE stt.ScheduleID = "' . $ScheduleID . '" ')->result_array();
+
+        $result = $data;
+        if ($resultType == 'NIP_Only') {
+            $ArrNIP = [];
+            if (count($data) > 0) {
+                for ($i = 0; $i < count($data); $i++) {
+                    array_push($ArrNIP, $data[$i]['NIP']);
+                }
+            }
+
+            $result = $ArrNIP;
+        }
+
+        return $result;
     }
 
     public function getDetailStudyResultByNPM($ClassOf, $NPM)

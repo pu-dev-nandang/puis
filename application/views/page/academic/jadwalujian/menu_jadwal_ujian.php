@@ -1,4 +1,3 @@
-
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
         <li>
@@ -17,15 +16,17 @@
             <a href="<?php echo base_url('academic/exam-schedule/exam-quiz'); ?>">Exam Quiz</a>
         </li>
 
-<!--        <li style="float: right;">-->
-<!--            <a href="--><?php //echo base_url('academic/exam-schedule/exam-barcode'); ?><!--">Exam Barcode</a>-->
-<!--        </li>-->
+        <!--        <li style="float: right;">-->
+        <!--            <a href="--><?php //echo base_url('academic/exam-schedule/exam-barcode'); 
+                                    ?>
+        <!--">Exam Barcode</a>-->
+        <!--        </li>-->
     </ul>
     <div style="border-top: 1px solid #cccccc">
 
         <div class="row">
             <div class="col-md-12">
-                <hr/>
+                <hr />
                 <?php echo $page; ?>
             </div>
         </div>
@@ -34,14 +35,13 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
+
+        setLoadFullPage();
 
         var menu_active = "<?php echo $this->uri->segment(3); ?>";
-        var arrMenu = ['','list-waiting-approve','set-exam-schedule','exam-setting','exam-quiz','exam-barcode'];
-        setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
+        var arrMenu = ['', 'list-waiting-approve', 'set-exam-schedule', 'exam-setting', 'exam-quiz', 'exam-barcode'];
+        setMenuSelected('.nav-tabs', 'li', 'active', arrMenu, menu_active);
 
     });
 </script>
-
-
-

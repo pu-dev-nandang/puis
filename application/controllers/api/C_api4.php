@@ -1626,6 +1626,20 @@ class C_api4 extends CI_Controller
             }
 
             return print_r(json_encode($result));
+        } else if ($data_arr['action'] == 'removeDataQuiz') {
+
+            $QuizID = $data_arr['QuizID'];
+
+            $tables = array('db_academic.q_exam', 'db_academic.q_quiz_details');
+            $this->db->where('QuizID', $QuizID);
+            $this->db->delete($tables);
+            $this->db->reset_query();
+
+            $this->db->where('ID', $QuizID);
+            $this->db->delete('db_academic.q_quiz');
+
+            $result = array('Status' => true);
+            return print_r(json_encode($result));
         } else if ($data_arr['action'] == 'saveDataQuiz') {
 
             // cek apakah ID Question exist atau tidak
@@ -1677,6 +1691,7 @@ class C_api4 extends CI_Controller
                     $dataFmQuiz['Duration'] = $data_arr['Duration'];
                 } else {
 
+                    $dataFmQuiz['TypeExam'] = $data_arr['TypeExam'];
                     $dataFmQuiz['Title'] = $data_arr['Title'];
                     $dataFmQuiz['NoteForExam'] = $data_arr['NoteForExam'];
                     $dataFmQuiz['ForExam'] = $data_arr['ForExam'];
@@ -1783,10 +1798,13 @@ class C_api4 extends CI_Controller
                                  ) ';
             }
 
-            $queryDefault = 'SELECT * FROM db_academic.q_quiz qq WHERE qq.ForExam = "1" ';
+            $queryDefault = 'SELECT qq.*, em.Name AS CreatedBy_Name, em1.Name AS UpdatedBy_Name FROM db_academic.q_quiz qq 
+                                        LEFT JOIN db_employees.employees em ON (em.NIP = qq.CreatedBy)
+                                        LEFT JOIN db_employees.employees em1 ON (em1.NIP = qq.UpdatedBy)
+                                        WHERE qq.ForExam = "1" 
+                                        ';
 
             $sql = $queryDefault . ' LIMIT ' . $requestData['start'] . ',' . $requestData['length'] . ' ';
-
 
 
             $dataTable = $this->db->query($sql)->result_array();
@@ -1821,6 +1839,10 @@ class C_api4 extends CI_Controller
                           </ul>
                         </div>';
 
+                $UserActionCreate = '<div>Created By : ' . $row['CreatedBy_Name'] . ' (' . date('d M Y H:i', strtotime($row['CreatedAt'])) . ')</div>';
+                $UserActionUpdate = ($row['UpdatedBy_Name'] != '' && $row['UpdatedBy_Name'] != null && $row['UpdatedBy_Name'] != 'null')
+                    ? '<div style="margin-top:5px;padding-top:5px;border-top:1px solid #eaeaea;">Updated By : ' . $row['UpdatedBy_Name'] . ' (' . date('d M Y H:i', strtotime($row['UpdatedAt'])) . ')</div>' : '';
+
                 $nestedData[] = '<div>' . $no . '</div>';
                 $nestedData[] = '<div style="text-align: left;">
                                     <b>' . $row['Title'] . '</b>
@@ -1828,6 +1850,7 @@ class C_api4 extends CI_Controller
                 $nestedData[] = '<div>' . $btnAct . '</div>';
                 $nestedData[] = '<div>' . $TotalQuestion . '</div>';
                 $nestedData[] = '<div>' . $TotalExam . '</div>';
+                $nestedData[] = '<div style="text-align:left;">' . $UserActionCreate . $UserActionUpdate . '</div>';
 
 
                 $data[] = $nestedData;

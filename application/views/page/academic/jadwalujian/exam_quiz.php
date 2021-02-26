@@ -34,6 +34,7 @@
             '                        </th>' +
             '                        <th style="width: 3%;">Question</th>' +
             '                        <th style="width: 3%;">Link</th>' +
+            '                        <th style="width: 15%;">User Act</th>' +
             '                    </tr>' +
             '                    </thead>' +
             '                </table>');

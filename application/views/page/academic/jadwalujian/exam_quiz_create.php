@@ -101,12 +101,19 @@
         padding-left: 4px;
         margin-bottom: 10px;
     }
+
+    .form-control[disabled],
+    .form-control[readonly],
+    fieldset[disabled] .form-control {
+        color: #333333 !important;
+    }
 </style>
 
 
 <?php
 
 $ID = (count($dataQuiz) > 0) ? $dataQuiz[0]['ID'] : '';
+$TypeExam = (count($dataQuiz) > 0) ? $dataQuiz[0]['TypeExam'] : '';
 $Title = (count($dataQuiz) > 0) ? $dataQuiz[0]['Title'] : '';
 $NoteForExam = (count($dataQuiz) > 0) ? $dataQuiz[0]['NoteForExam'] : '';
 $NotesForStudents = (count($dataQuiz) > 0) ? $dataQuiz[0]['NotesForStudents'] : '';
@@ -120,14 +127,25 @@ if (count($dataQuiz) > 0) {
 
 ?>
 
+<!-- <pre>
+    <?php print_r($dataQuiz); ?>
+</pre> -->
+
 
 <div class="row">
     <div class="col-md-10 col-md-offset-1">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h4 class="panel-title">Action : Create</h4>
+                <h4 class="panel-title">Action : <span id="viewAction">Create</span></h4>
             </div>
             <div class="panel-body">
+                <div class="form-group">
+                    <label>Exam Type</label>
+                    <select class="form-control" id="TypeExam" style="max-width: 150px;">
+                        <option value="uts" <?= ($TypeExam == 'uts') ? 'selected' : ''; ?>>UTS</option>
+                        <option value="uas" <?= ($TypeExam == 'uas') ? 'selected' : ''; ?>>UAS</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label>Title <sup style="color: orangered;">* required</sup></label>
                     <input class="hide" readonly id="ID" value="<?= $ID; ?>">
@@ -154,7 +172,7 @@ if (count($dataQuiz) > 0) {
                     <button id="btnAddSchedule" class="btn btn-default">Add Exam Schedule</button>
                     <textarea id="temporarySchedule" class="hide"><?= $listExam; ?></textarea>
                 </div>
-                <table class="table table-centre table-bordered table-striped" id="dataTableExamSchedule" style="width:100%!important;;">
+                <table class="table table-centre table-bordered table-striped" style="width:100%!important;;">
                     <thead>
                         <tr style="background-color: #eceff1;">
                             <th style="width: 1%;">No</th>
@@ -168,6 +186,7 @@ if (count($dataQuiz) > 0) {
                 </table>
             </div>
             <div class="panel-footer" style="text-align: right;">
+                <button class="btn btn-danger" style="float: left;" id="btnRemoveQuiz">Remove the Quiz</button>
                 Total Point : <span id="viewPoint" style="margin-right: 7px;">0</span>
                 <button class="btn btn-success" id="btnSaveQuiz">Save</button>
             </div>
@@ -181,6 +200,14 @@ if (count($dataQuiz) > 0) {
         if (ID != '') {
             getDataExist(ID);
             loadDataScheduleAdd();
+            $('#viewAction').html('Edit');
+
+            loading_modal_show();
+
+            setTimeout(function() {
+                loading_modal_hide();
+            }, 3000);
+
         }
     });
 
@@ -218,6 +245,7 @@ if (count($dataQuiz) > 0) {
 
     $('#btnSaveQuiz').click(function() {
 
+        var TypeExam = $('#TypeExam').val();
         var Title = $('#Title').val();
         var NoteForExam = $('#NoteForExam').val();
         var NotesForStudents = $('#NotesForStudents').val();
@@ -226,6 +254,7 @@ if (count($dataQuiz) > 0) {
         var temporarySchedule = $('#temporarySchedule').val();
 
         if (Title != '' && Title != null &&
+            TypeExam != '' && TypeExam != null &&
             NoteForExam != '' && NoteForExam != null &&
             dataTempQuiz != '' && dataTempQuiz != null &&
             temporarySchedule != '' && temporarySchedule != null) {
@@ -263,6 +292,7 @@ if (count($dataQuiz) > 0) {
                         QuizID: (ID != '') ? ID : '',
                         NIP: sessionNIP,
                         ForExam: '1',
+                        TypeExam: TypeExam,
                         Title: Title,
                         NoteForExam: NoteForExam,
                         NotesForStudents: NotesForStudents,
@@ -471,17 +501,10 @@ if (count($dataQuiz) > 0) {
 
         var body = /*html*/ `
         <div class="row">
-            <div class="col-md-8 col-lg-offset-2">
+            <div class="col-md-4 col-lg-offset-4">
                 <div class="well">
                     <div class="row">
-                        <div class="col-md-6">
-                            <label>Exam Type</label>
-                            <select id="filterExamType" class="form-control">
-                                <option value="uts">UTS</option>
-                                <option value="uas">UAS</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label>Exam Schedule</label>
                             <select class="form-control" id="filterExamDate"></select>
                         </div>
@@ -499,6 +522,7 @@ if (count($dataQuiz) > 0) {
 
 
         // getListSchedule('uas');
+
         getExamDateList();
 
         $('#GlobalModalXtraLarge').modal({
@@ -508,22 +532,97 @@ if (count($dataQuiz) > 0) {
 
     });
 
-    $(document).on('change', '#filterExamType', function() {
-        getExamDateList();
-    });
 
     $(document).on('change', '#filterExamDate', function() {
         getListSchedule();
+    });
+
+
+
+    $(document).on('click', '.addingSchedule', function() {
+
+        var token = $(this).attr('data-token');
+        var dataToken = jwt_decode(token, 'UAP)(*');
+
+        var temporarySchedule = $('#temporarySchedule').val();
+
+        var newData = [];
+        if (temporarySchedule != '') {
+            newData = JSON.parse(temporarySchedule);
+        }
+
+        newData.push(dataToken);
+        $('#temporarySchedule').val(JSON.stringify(newData));
+
+        $(this).remove();
+
+        loadDataScheduleAdd();
+
+    });
+
+    $(document).on('click', '.removingSchedule', function() {
+
+        var ExamID = $(this).attr('data-id');
+        var temporarySchedule = $('#temporarySchedule').val();
+
+        // console.log(temporarySchedule);
+
+        var newData = [];
+        if (temporarySchedule != '') {
+            temporarySchedule = JSON.parse(temporarySchedule);
+            $.each(temporarySchedule, function(i, v) {
+                if (ExamID != v.ExamID) {
+                    newData.push(v);
+                }
+            })
+        }
+
+        newData = (newData.length > 0) ? JSON.stringify(newData) : '';
+        // console.log(newData);
+        $('#temporarySchedule').val(newData);
+        loadDataScheduleAdd()
+
+    });
+
+    $(document).on('click', '#btnRemoveQuiz', function() {
+
+        if (confirm('Are you sure?')) {
+            loading_modal_show();
+            var ID = $('#ID').val();
+
+            var data = {
+                action: 'removeDataQuiz',
+                QuizID: ID,
+            };
+
+            var token = jwt_encode(data, 'UAP)(*');
+            var url = base_url_js + 'api4/__crudQuiz';
+
+            $.post(url, {
+                token: token
+            }, function(jsonResult) {
+                toastr.success('Quiz removed', 'Success');
+                setTimeout(function() {
+                    loading_modal_hide();
+                    window.location.href = base_url_js + 'academic/exam-schedule/exam-quiz';
+                }, 1000);
+            })
+
+
+
+        }
+
     });
 
     function getExamDateList() {
 
         $('#viewTableExamSchedule').html('<h3>Please, select date of exam</h3>');
 
-        var filterExamType = $('#filterExamType').val();
+        var TypeExam = $('#TypeExam').val();
+
         var data = {
             action: 'ExamDateList',
-            Type: filterExamType
+            Type: TypeExam
         };
 
         var token = jwt_encode(data, 'UAP)(*');
@@ -569,10 +668,11 @@ if (count($dataQuiz) > 0) {
     }
     async function getListSchedule() {
 
-        var filterExamType = $('#filterExamType').val();
+
+        var TypeExam = $('#TypeExam').val();
         var filterExamDate = $('#filterExamDate').val();
 
-        if (filterExamType != '' && filterExamType != null &&
+        if (TypeExam != '' && TypeExam != null &&
             filterExamDate != '' && filterExamDate != null) {
 
             var listTemporary = await getTempList();
@@ -581,7 +681,7 @@ if (count($dataQuiz) > 0) {
 
             var data = {
                 action: 'getListScheduleExamSemesterActive',
-                Type: filterExamType,
+                Type: TypeExam,
                 Date: filterExamDate,
                 OnlineLearning: '1'
             };
@@ -690,51 +790,6 @@ if (count($dataQuiz) > 0) {
 
     }
 
-    $(document).on('click', '.addingSchedule', function() {
-
-        var token = $(this).attr('data-token');
-        var dataToken = jwt_decode(token, 'UAP)(*');
-
-        var temporarySchedule = $('#temporarySchedule').val();
-
-        var newData = [];
-        if (temporarySchedule != '') {
-            newData = JSON.parse(temporarySchedule);
-        }
-
-        newData.push(dataToken);
-        $('#temporarySchedule').val(JSON.stringify(newData));
-
-        $(this).remove();
-
-        loadDataScheduleAdd();
-
-    });
-
-    $(document).on('click', '.removingSchedule', function() {
-
-        var ExamID = $(this).attr('data-id');
-        var temporarySchedule = $('#temporarySchedule').val();
-
-        // console.log(temporarySchedule);
-
-        var newData = [];
-        if (temporarySchedule != '') {
-            temporarySchedule = JSON.parse(temporarySchedule);
-            $.each(temporarySchedule, function(i, v) {
-                if (ExamID != v.ExamID) {
-                    newData.push(v);
-                }
-            })
-        }
-
-        newData = (newData.length > 0) ? JSON.stringify(newData) : '';
-        // console.log(newData);
-        $('#temporarySchedule').val(newData);
-        loadDataScheduleAdd()
-
-    });
-
     function loadDataScheduleAdd() {
 
         var temporarySchedule = $('#temporarySchedule').val();
@@ -776,8 +831,6 @@ if (count($dataQuiz) > 0) {
         }
 
     }
-
-
 
     function loadDataQuiz() {
         var dataTempQuiz = $('#dataTempQuiz').val();
@@ -885,11 +938,16 @@ if (count($dataQuiz) > 0) {
 
                                 }
                             });
+                        } else {
+                            $('.form-control,#formDuration').prop('disabled', true);
+                            $('.removingSchedule,#btnRemoveQuestion,#btnSaveQuiz,#btnRemoveQuiz').remove();
                         }
 
                         $('#showNoteQuiz,.panel-footer').removeClass('hide');
                         var disabledForm = (TotalAnswer > 0) ? true : false;
-                        $('#formNotesForStudents,#formDuration,#btnSaveQuiz').prop('disabled', disabledForm);
+                        $('.form-control,#formDuration').prop('disabled', disabledForm);
+
+
 
                         // loading_page_modal('hide');
                     }, 500);
