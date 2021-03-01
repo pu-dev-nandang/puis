@@ -929,11 +929,28 @@ class C_api4 extends CI_Controller
             return print_r(1);
         } else if ($data_arr['action'] == 'loadDataExamOnline') {
             $ExamID = $data_arr['ExamID'];
-            $data = $this->db->query('SELECT eso.*, ats.Name FROM 
+
+            // cek apakah menggunakan quiz atau tidak
+            $dataCk = $this->db->get_where('db_academic.q_exam', array('ExamID' => $ExamID))->result_array();
+
+            if (count($dataCk) > 0) {
+                $QuizID = $dataCk[0]['QuizID'];
+                $data = $this->db->query('SELECT qqs.ID AS QuizStudentID, qqs.StartSession AS StartWorking, 
+                                                qqs.EndSession, qqs.Score, qqs.ShowScore, 
+                                                qqs.WorkDuration, qqs.SubmittedAt AS SavedAt,
+                                                ats.Name, ats.NPM
+                                                FROM db_academic.q_quiz_students qqs
+                                                LEFT JOIN db_academic.auth_students ats ON (qqs.NPM = ats.NPM)
+                                                WHERE qqs.QuizID = "' . $QuizID . '" ')->result_array();
+            } else {
+                $data = $this->db->query('SELECT eso.*, ats.Name FROM 
                                                 db_academic.exam_student_online eso 
                                                 LEFT JOIN db_academic.auth_students ats ON (ats.NPM = eso.NPM)
                                                 WHERE eso.ExamID = "' . $ExamID . '"
                                                  ORDER BY eso.StartWorking ASC ')->result_array();
+            }
+
+
 
             return print_r(json_encode($data));
         }
