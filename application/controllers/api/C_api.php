@@ -6380,7 +6380,7 @@ class C_api extends CI_Controller {
                     $Division = $PositionMain[0];
                     // for AD
                     $Password = $raw_formInsert['Password_Old'];
-                    $Password_md5 = md5($formInsert['Password_Old']);
+                    $Password_md5 = $formInsert['Password_Old'];
                     $Name = $formInsert['Name'];
                     $G_div = $this->m_master->caribasedprimary('db_employees.division','ID',$Division);
                     $description = $G_div[0]['Description'];
