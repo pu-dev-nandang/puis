@@ -6359,6 +6359,7 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='addEmployees'){
                 $rs = array('msg' => '','status' => 1);
                 $formInsert = (array) $data_arr['formInsert'];
+                $raw_formInsert = (array) $data_arr['formInsert'];
                 $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
 
                 // Cek apakah NIP sudah digunakan atau belum
@@ -6378,7 +6379,7 @@ class C_api extends CI_Controller {
                     $Position = $PositionMain[1];
                     $Division = $PositionMain[0];
                     // for AD
-                    $Password = $formInsert['Password_Old'];
+                    $Password = $raw_formInsert['Password_Old'];
                     $Password_md5 = md5($formInsert['Password_Old']);
                     $Name = $formInsert['Name'];
                     $G_div = $this->m_master->caribasedprimary('db_employees.division','ID',$Division);
