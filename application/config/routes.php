@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 // print_r(md5('010101'));die();
+// print_r(test github push);die();
 require_once( BASEPATH .'database/DB.php' );
 $db =& DB();
 
