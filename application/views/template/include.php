@@ -2436,6 +2436,18 @@
         });
     }
 
+    // change curiculem to TA
+    function loadSelectOptionCurriculum3(element,selected) {
+        var url = base_url_js+"api/__getKurikulumSelectOption";
+        $.get(url,function (data_json) {
+            // console.log(data_json);
+            for(var i=0;i<data_json.length;i++){
+                var selected = (data_json[i].ID==selected) ? 'selected' : '';
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>'+(data_json[i].NameEng).replace('Curriculum','TA')+'</option>');
+            }
+        });
+    }
+
     function loadSelectOptionLembaga(element,selected) {
 
         var url = base_url_js+'api3/__crudLembagaSurview';

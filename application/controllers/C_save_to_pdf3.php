@@ -155,7 +155,6 @@ class C_save_to_pdf3 extends CI_Controller {
            'PPN',
            'Another Cost',
            'Total Amount',
-
         ));
 
 
@@ -3791,6 +3790,165 @@ class C_save_to_pdf3 extends CI_Controller {
 
 
         $fpdf->Output('_BAP_Online_'.'.pdf','I');
+    }
+
+    public function finance_report_pdf(){
+        $token = $this->input->post('token');
+        $dataToken =  $this->getInputToken($token);
+
+        $unique = date('YmdHis');
+
+        $filename = 'Report-TA-'.$dataToken['ta'].'-'.$unique.'.pdf'; 
+        $fpdf = new Pdf_mc_table('L','mm','A4');
+        $fpdf->AddFont('dinproExpBold','','dinproExpBold.php');
+
+        $fpdf->AddPage();
+        $fpdf->SetMargins(10,0,10,0);
+        $FontIsianHeader = 8;
+        $FontIsian = 7;
+
+        $fpdf->SetXY(10,10);
+        $fpdf->SetFont('dinpromedium','U',15);
+        $fpdf->Cell(0,0, 'Report TA '.$dataToken['ta'], 0, 0, 'C', false);
+
+        $fpdf->SetY(20);
+        $fpdf->SetFont('dinpromedium','',8);
+        $fpdf->Cell(20,5, 'Filter,', 0, 1, 'L', false);
+
+        $fpdf->SetX(15);
+        $fpdf->Cell(220,5, 'Semester : '.$dataToken['Semester'], 0, 0, 'L', false);
+        $fpdf->Cell(60,5, 'NPM : '.( ($dataToken['NPM'] == '') ? 'Semua Mhs TA '.$dataToken['ta'] : $dataToken['NPM'] ), 0, 1, 'L', false);
+
+        $fpdf->SetX(15);
+        $fpdf->Cell(220,5, 'Status : '.$dataToken['StatusMHS'], 0, 0, 'L', false);
+        $fpdf->Cell(60,5, 'Status Payment : '.$dataToken['Statuspay'], 0, 1, 'L', false);
+
+        $fpdf->SetX(15);
+        $fpdf->Cell(220,5, 'Prodi : '.$dataToken['prodi'], 0, 0, 'L', false);
+
+        $this->finance_report_pdf_header($fpdf);
+
+        $data =  $dataToken['data'];
+
+        $no = 1;
+        $tot_BPP = 0;
+        $tot_SPP = 0;
+        $tot_Credit = 0;
+        $tot_Another = 0;
+        $tot_tot_tagihan = 0;
+        $tot_tot_pay = 0;
+        $tot_piutang = 0;
+        for ($i=0; $i < count($data); $i++) { 
+            $r = $data[$i];
+            $total_tagihan = $r->BPP + $r->SPP + $r->Cr + $r->An;
+
+            $total_pembayaran = $r->PayBPP + $r->PayCr + $r->PaySPP + $r->PayAn;
+
+            $piutang = $total_tagihan - $total_pembayaran;
+            $fpdf->SetFont('dinlightitalic','',7);
+            $fpdf->Row(array(
+               $no,
+               $r->NPM,
+               $r->Name,
+               $r->ProdiENG,
+               'Rp '.number_format($r->BPP,0,',','.'),
+               'Rp '.number_format($r->SPP,0,',','.'),
+               'Rp '.number_format($r->Cr,0,',','.'),
+               'Rp '.number_format($r->An,0,',','.'),
+               'Rp '.number_format($total_tagihan,0,',','.'),
+               'Rp '.number_format($total_pembayaran,0,',','.'),
+               'Rp '.number_format($piutang,0,',','.'),
+            ));
+
+            //print_r($fpdf->GetY().'==');
+
+            if($fpdf->GetY()>=180){ // novie
+
+                $fpdf->SetMargins(10,0,10,0);
+                $fpdf->AddPage();
+                $this->finance_report_pdf_header($fpdf);
+            }
+
+            $tot_BPP += $r->BPP;
+            $tot_SPP += $r->SPP;
+            $tot_Credit += $r->Cr;
+            $tot_Another += $r->An;
+            $tot_tot_tagihan += $total_tagihan;
+            $tot_tot_pay += $total_pembayaran;
+            $tot_piutang += $piutang;
+
+            $no++;
+
+        }
+
+        // footer table
+        $y = $fpdf->GetY();
+        $w_no = 7;
+        $w_NPM = 20;
+        $w_NAMA = 40;
+        $w_jurusan = 40;
+        $w_BPP = 23;
+        $w_SPP = 23;
+        $w_Credit = 23;
+        $w_Another = 23;
+        $w_tot_tagihan = 23;
+        $w_tot_pay = 23;
+        $w_piutang = 23;
+
+        $x__ = $w_no + $w_NPM + $w_NAMA + $w_jurusan;
+        $x = 10;
+        $fpdf->SetXY($x,$y);
+        $fpdf->Cell($x__,5,'Total',1,0,'C',true);
+        $fpdf->Cell($w_BPP,5,'Rp '.number_format($tot_BPP,0,',','.'),1,0,'C',true);
+        $fpdf->Cell($w_SPP,5,'Rp '.number_format($tot_SPP,0,',','.'),1,0,'C',true);
+        $fpdf->Cell($w_Credit,5,'Rp '.number_format($tot_Credit,0,',','.'),1,0,'C',true);
+        $fpdf->Cell($w_Another,5,'Rp '.number_format($tot_Another,0,',','.'),1,0,'C',true);
+        $fpdf->Cell($w_tot_tagihan,5,'Rp '.number_format($tot_tot_tagihan,0,',','.'),1,0,'C',true);
+        $fpdf->Cell($w_tot_pay,5,'Rp '.number_format($tot_tot_pay,0,',','.'),1,0,'C',true);
+        $fpdf->Cell($w_piutang,5,'Rp '.number_format($tot_piutang,0,',','.'),1,0,'C',true);
+
+        $fpdf->Output($filename,'I');
+    }
+
+    private function finance_report_pdf_header($fpdf){
+        $w_no = 7;
+        $w_NPM = 20;
+        $w_NAMA = 40;
+        $w_jurusan = 40;
+        $w_BPP = 23;
+        $w_SPP = 23;
+        $w_Credit = 23;
+        $w_Another = 23;
+        $w_tot_tagihan = 23;
+        $w_tot_pay = 23;
+        $w_piutang = 23;
+
+        $y = $fpdf->GetY() + 10;
+        $fpdf->SetXY(10,$y);
+
+        $fpdf->SetFont('dinproExpBold','',8);
+
+        $fpdf->SetFillColor(255, 255, 255);
+
+        $fpdf->SetWidths(array($w_no,$w_NPM,$w_NAMA,$w_jurusan,$w_BPP,$w_SPP,$w_Credit,$w_Another,$w_tot_tagihan,$w_tot_pay,$w_piutang));
+
+        $fpdf->SetLineHeight(5);
+
+        $fpdf->SetAligns(array('C','L','L','L','C','C','C','C','C','C','C'));
+
+        $fpdf->Row(array(
+           'No',
+           'NPM',
+           'Nama',
+           'Jurusan',
+           'BPP',
+           'SPP',
+           'SKS',
+           'Lain-lain',
+           'Total Tagihan',
+           'Total Pembayaran',
+           'Piutang',
+        ));
     }
 
 }
