@@ -947,7 +947,8 @@ class M_ticketing extends CI_Model {
                 }
 
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
-                        b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,ts.Status as NameStatusTicket,qdx.NameDepartment as NameDepartmentTicket
+                        b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,ts.Status as NameStatusTicket,qdx.NameDepartment as NameDepartmentTicket,
+                        a.TicketClosedAt
                         from db_ticketing.ticket as a
                         join db_ticketing.category as ca on a.CategoryID = ca.ID
                         '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
@@ -1019,7 +1020,7 @@ class M_ticketing extends CI_Model {
 
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
-                        qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
+                        qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket,a.TicketClosedAt
                         from db_ticketing.ticket as a
                         join db_ticketing.category as ca on a.CategoryID = ca.ID
                         join db_employees.employees as b on a.RequestedBy = b.NIP
@@ -1098,7 +1099,7 @@ class M_ticketing extends CI_Model {
               
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
-                        qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
+                        qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket,a.TicketClosedAt
                         from db_ticketing.ticket as a
                         join db_ticketing.category as ca on a.CategoryID = ca.ID
                         join db_employees.employees as b on a.RequestedBy = b.NIP
@@ -1173,7 +1174,7 @@ class M_ticketing extends CI_Model {
                 
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
-                        qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
+                        qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket,a.TicketClosedAt
                         from db_ticketing.ticket as a
                         join db_ticketing.category as ca on a.CategoryID = ca.ID
                         join db_employees.employees as b on a.RequestedBy = b.NIP
@@ -1230,6 +1231,11 @@ class M_ticketing extends CI_Model {
             $nestedData[] = $row['Files'];
             $nestedData[] = $row['setTicket'];
             $nestedData[] = $row['NameDepartmentTicket'];
+            $nestedData[] = (!empty($row['TicketClosedAt'])) ? $this->__set_tgl_ticket($row['TicketClosedAt']) : ' - ';
+
+            $duration = (!empty($row['TicketClosedAt'])) ? $this->m_master->__dateDifference($row['RequestedAt'],$row['TicketClosedAt']) : ' - ';
+            $nestedData[] = $duration;
+
             $data[] = $nestedData;
             $No++;
         }

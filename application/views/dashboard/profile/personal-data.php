@@ -248,7 +248,23 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
+                                                <div class="row">
+                                                    <div class="col-xs-6">
+                                                        <div class="form-group">
+                                                            <label>NITK</label>
+                                                            <input type="text" class="form-control profile-NITK" id="formNITK" value="" disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-6">
+                                                        <div class="form-group">
+                                                            <label>Status of NITK</label>
+                                                            <select class="form-control profile-Status_NITK" id="formStatus_NITK" disabled>
+                                                                <option value="">Choose one</option>
+                                                            </select>
+                                                            <small class="text-danger text-message"></small>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                             
                                             <div class="col-sm-4">
@@ -287,9 +303,23 @@
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function(){
+
+    const dom_SelectOptionStatus_NITK = async(selector,selected = '') => {
+        const jsonResult  = await AjaxSubmitFormPromises(base_url_js+'api/__getemployees_kelompok_profesi');
+        $.each(jsonResult,function (i,v) {
+
+            var sc = (selected==v.ID_kelompok_profesi) ? 'selected' : '';
+            selector.append('<option value="'+v.ID_kelompok_profesi+'" '+sc+'>'+v.Name+'</option>');
+
+        })
+    }
+
+
+    const loadReadyFunction = async() => {
         $formParent = $("#form-personal-data");
         var myData = fetchAdditionalData("<?=$employee->NIP?>");
+        await dom_SelectOptionStatus_NITK($('#formStatus_NITK'));
+
         if(!jQuery.isEmptyObject(myData)){
             $.each(myData,function(key,value){
                 $formParent.find(".profile-"+key).val(value);
@@ -427,6 +457,10 @@
                 $formParent.find(".samedata").val("");
             }
         });
-            
+    }
+
+
+    $(document).ready(function(){
+        loadReadyFunction();
     });
 </script>

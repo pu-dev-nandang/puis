@@ -111,6 +111,32 @@ setlocale(LC_ALL, "en_US.UTF-8");
 	define("url_files","https://"."files.podomorouniversity.ac.id/", true);
 	define("url_DocxToPDf","http://10.1.10.31/apidocxtopdf/", true); // my local adhi
 	// define("url_DocxToPDf","http://10.1.30.33/docxtopdf/", true);
+
+	/*
+		Set Environtment if not exist, ref by docker instalation
+		Alhadi Rahman 2021 - 01 - 25
+	*/
+		define('_HOST_ID', isset($_SERVER['_HOST_ID']) ? $_SERVER['_HOST_ID'] : 'DEMO');
+
+		if (isset($_SERVER['_HOST_ID'])) {
+			if (_HOST_ID == 'DEMO') {
+				define('_DB_HOST', isset($_SERVER['_DB_HOST']) ? $_SERVER['_DB_HOST'] : '10.1.30.59');
+			}
+			else
+			{
+				define('_DB_HOST', isset($_SERVER['_DB_HOST']) ? $_SERVER['_DB_HOST'] : '10.1.30.18');
+			}
+		}
+		else
+		{
+			define('_DB_HOST', isset($_SERVER['_DB_HOST']) ? $_SERVER['_DB_HOST'] : '10.1.30.18');
+		}
+		
+
+		define('_DB_USER', isset($_SERVER['_DB_USER']) ? $_SERVER['_DB_USER'] : 'db_itpu');
+		define('_DB_PASSWORD', isset($_SERVER['_DB_PASSWORD']) ? $_SERVER['_DB_PASSWORD'] : 'Uap)(*&^%');
+		define('_DB_NAME', isset($_SERVER['_DB_NAME']) ? $_SERVER['_DB_NAME'] : 'db_academic');
+		define('_DB_PORT', isset($_SERVER['_DB_PORT']) ? $_SERVER['_DB_PORT'] : '3306');
 	
 	switch ($ServerName) {
 		case 'pcam.podomorouniversity.ac.id':
@@ -130,7 +156,14 @@ setlocale(LC_ALL, "en_US.UTF-8");
             define("url_library","http://library.podomorouniversity.ac.id/", true);
             define("url_blogadmin",$HostPath."adminblogs.podomorouniversity.ac.id/", true);
             
-            define("path_register_online","/var/www/html/registeronline/", true);
+            if (isset($_SERVER['_DB_HOST'])) {
+            	define("path_register_online","/home/docker1/admission/", true);
+            }
+            else
+            {
+            	define("path_register_online","/var/www/html/registeronline/", true);
+            }
+            
             define('ENVIRONMENT', 'production',true);
 			break;
 		case 'demopcam.podomorouniversity.ac.id':
@@ -150,7 +183,13 @@ setlocale(LC_ALL, "en_US.UTF-8");
             define("url_library","http://library.podomorouniversity.ac.id/", true);
             define("url_blogadmin",$HostPath."demoadminblogs.podomorouniversity.ac.id/", true);
             
-            define("path_register_online","C:/nginx/html/registeronline/", true);
+            if (isset($_SERVER['_DB_HOST'])) {
+            	define("path_register_online","/home/docker1/admission/", true);
+            }
+            else
+            {
+            	define("path_register_online","/var/www/html/registeronline/", true);
+            }
             define('ENVIRONMENT', 'development',true);
 			break;		
 		default:
@@ -178,11 +217,18 @@ setlocale(LC_ALL, "en_US.UTF-8");
 
             define("url_lecturers",url_sign_in_lecturers."home", true);
             define("url_students",url_sign_in_students."home", true);
+            if (isset($_SERVER['_DB_HOST'])) {
+            	define("path_register_online","/home/docker1/admission/", true);
+            }
+            else
+            {
+            	 define("path_register_online","c:/xampp/htdocs/registeronline/", true);
+            }
 
-            define("path_register_online","c:/xampp/htdocs/registeronline/", true);
             define('ENVIRONMENT', 'development',true);
 			break;
 	}
+
 
 
 /*

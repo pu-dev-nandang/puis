@@ -29,6 +29,8 @@ $route['profile'] = 'c_dashboard/profile';
 $route['ShowLoggingNotification'] = 'dashboard/c_dashboard/ShowLoggingNotification';
 $route['page404'] = 'dashboard/c_dashboard/page404';
 
+
+
 // FROM PORTAL
 $route['uath/__portal4SignIn'] = 'c_login/portal4SignIn';
 
@@ -63,6 +65,8 @@ $route['ticket'] = 'dashboard/c_dashboard/ticket';
 $route['profile/(:any)'] = 'dashboard/c_dashboard/profile/$1';
 $route['change-departement'] = 'dashboard/c_dashboard/change_departement';
 
+$route['profile/self-services/(:any)'] = 'dashboard/c_dashboard/self_services/$1';
+$route['change-password'] = 'dashboard/c_dashboard/change_password';
 // === Academic ===
 $route['academic/curriculum_cross/(:any)/(:any)'] = 'page/academic/c_kurikulum/curriculum_cross/$1/$2';
 

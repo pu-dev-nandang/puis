@@ -1,0 +1,6 @@
+HTTP_PORT=8081
+PATH_CODE=/root/docker/pcam
+DB_PASSWORD=
+DB_NAME= db_academic
+DB_USER= root
+DB_HOST= localhost

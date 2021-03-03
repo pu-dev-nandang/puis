@@ -13,7 +13,7 @@ Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
                             <th rowspan="2">No</th>
                             <th rowspan="2">Jenis Publikasi</th>
                             <th colspan="3" style="text-align: center;">Jumlah Judul</th>
-                            <th rowspan="2">Jumlah</th>
+                            <!-- <th rowspan="2">Jumlah</th> -->
                         </tr>
                         <tr id = "JS_TS">
                             
@@ -34,6 +34,7 @@ var App_publikasi_ilmiah_dtps = {
     LoadAjaxTable : function(){
         // fill tahun
         var arr_ts =  App_publikasi_ilmiah_dtps.FillTS();
+        console.log(arr_ts);
         var selector = $('#dataTablesPID tbody');
         var url = base_url_js+"rest3/__get_APS_CrudAgregatorTB3";
         var ProdiID = $('#filterProdi option:selected').val();
@@ -101,7 +102,7 @@ var App_publikasi_ilmiah_dtps = {
         }).fail(function() {
             toastr.error("Connection Error, Please try again", 'Error!!');
         }).always(function() {
-
+            newDescritionInput.getDescription();
         });
 
     },
@@ -109,7 +110,7 @@ var App_publikasi_ilmiah_dtps = {
     FillTS : function(){
        var arr = [];
        var YearNow = <?php echo date('Y') ?>;
-       var YearTs2 = YearNow - 2;
+       var YearTs2 = YearNow - 4;
        var selector = $('#JS_TS');
        selector.empty(); 
        for (var i = YearTs2; i <= YearNow; i++) {
@@ -118,6 +119,9 @@ var App_publikasi_ilmiah_dtps = {
             );
            arr.push(i);
        }
+       selector.append(
+                '<td>'+"Jumlah"+'</td>'
+            );
        return arr;
     },
 
@@ -211,5 +215,10 @@ $(document).off('click', '.datadetailpublikasi').on('click', '.datadetailpublika
             'backdrop' : 'static'
         });
     }
+})
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    newDescritionInput.saveDescription(itsme);
 })
 </script>
