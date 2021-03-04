@@ -120,6 +120,26 @@
 				    			</table>
 				    		</div>
 				    	</div>
+				    	<hr/>
+				    	<div class="row">
+				    		<div class="col-md-12">
+				    			<table class="table tblAllTotal">
+				    				<caption style = "font-weight: bold;">All Total</caption>
+				    				<tr>
+				    					<td>Total Invoice</td>
+				    					<td class="all_tot_invoice" style = "color:green;"></td>
+				    				</tr>
+				    				<tr>
+				    					<td>Total Pembayaran</td>
+				    					<td class="all_tot_pay" style = "color:green;"></td>
+				    				</tr>
+				    				<tr>
+				    					<td>Sisa</td>
+				    					<td class="all_tot_sisa" style = "color:green;"></td>
+				    				</tr>
+				    			</table>
+				    		</div>
+				    	</div>
 				    </div>
 				</div>
 			</div>
@@ -799,25 +819,46 @@
 	const payment_information_type = (response) => {
 		const Payment_Detail = response.Payment_Detail;
 
+		let all_tot_invoice = 0;
+		let all_tot_pay = 0;
+		let all_tot_sisa = 0;
+
+
 		const get_SPP = Payment_Detail['SPP'];
 		$('.tblSPP').find('.invoice').html(formatRupiah(parseInt(get_SPP['Tot'])));
+		all_tot_invoice += parseInt(get_SPP['Tot']);
 		$('.tblSPP').find('.pay').html(formatRupiah(parseInt(get_SPP['TotPay'])));
+		all_tot_pay += parseInt(get_SPP['TotPay']);
 		$('.tblSPP').find('.sisa').html(formatRupiah(parseInt(get_SPP['TotSisa'])));
+		all_tot_sisa += parseInt(get_SPP['TotSisa']);
 
 		const get_BPP = Payment_Detail['BPP'];
 		$('.tblBPP').find('.invoice').html(formatRupiah(parseInt(get_BPP['Tot'])));
+		all_tot_invoice += parseInt(get_BPP['Tot']);
 		$('.tblBPP').find('.pay').html(formatRupiah(parseInt(get_BPP['TotPay'])));
+		all_tot_pay += parseInt(get_BPP['TotPay']);
 		$('.tblBPP').find('.sisa').html(formatRupiah(parseInt(get_BPP['TotSisa'])));
+		all_tot_sisa += parseInt(get_BPP['TotSisa']);
 
 		const get_Another = Payment_Detail['Another'];
 		$('.tblAnother').find('.invoice').html(formatRupiah(parseInt(get_Another['Tot'])));
+		all_tot_invoice += parseInt(get_Another['Tot']);
 		$('.tblAnother').find('.pay').html(formatRupiah(parseInt(get_Another['TotPay'])));
+		all_tot_pay += parseInt(get_Another['TotPay']);
 		$('.tblAnother').find('.sisa').html(formatRupiah(parseInt(get_Another['TotSisa'])));
+		all_tot_sisa += parseInt(get_Another['TotSisa']);
 
 		const get_Credit = Payment_Detail['Credit'];
 		$('.tblCredit').find('.invoice').html(formatRupiah(parseInt(get_Credit['Tot'])));
+		all_tot_invoice += parseInt(get_Credit['Tot']);
 		$('.tblCredit').find('.pay').html(formatRupiah(parseInt(get_Credit['TotPay'])));
+		all_tot_pay += parseInt(get_Credit['TotPay']);
 		$('.tblCredit').find('.sisa').html(formatRupiah(parseInt(get_Credit['TotSisa'])));
+		all_tot_sisa += parseInt(get_Credit['TotSisa']);
+
+		$('.tblAllTotal').find('.all_tot_invoice').html(formatRupiah(parseInt(all_tot_invoice)));
+		$('.tblAllTotal').find('.all_tot_pay').html(formatRupiah(parseInt(all_tot_pay)));
+		$('.tblAllTotal').find('.all_tot_sisa').html(formatRupiah(parseInt(all_tot_sisa)));
 
 		// show detail table 
 		const tblPaidOffSelector =  $('.tblPaidOff');

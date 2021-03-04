@@ -1517,7 +1517,6 @@ class C_save_to_pdf3 extends CI_Controller {
             case 'Spb':
                 $this->PdfSpb_User($Input);
                 break;
-            default:
             case 'Bank Advance':
                 $this->PdfBA_User($Input);
                 break;
