@@ -299,7 +299,7 @@
                                                '<td>'+Data_mhs[i]['Discount']+'%</td>' +
                                                '<td>'+yy+'</td>' +
                                                '<td>'+status+'</td>' +
-                                               '<td>'+'<button class = "btn btn-default DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'"><i class="fa fa-search" aria-hidden="true"></i> View</button>'+'</td>' +
+                                               '<td>'+'<button class = "btn btn-default DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-search" aria-hidden="true"></i> View</button>'+'</td>' +
                                                '</tr>');
                       }
                       
@@ -329,107 +329,8 @@
 
     $(document).on('click','.DetailPayment', function () {
         var NPM = $(this).attr('NPM');
-        var html = '';
-        var table = '<div class = "row"><div class= col-md-12><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
-                      '<thead>'+
-                          '<tr>'+
-                              '<th style="width: 5px;">No</th>'+
-                              '<th style="width: 55px;">Nama</th>'+
-                              '<th style="width: 55px;">Invoice</th>'+
-                              '<th style="width: 55px;">BilingID</th>'+
-                              '<th style="width: 55px;">Status</th>'+
-                              '<th style="width: 55px;">Deadline</th>'+
-                              '<th style="width: 55px;">UpdateAt</th>';
-        table += '</tr>' ;  
-        table += '</thead>' ; 
-        table += '<tbody>' ;
-        var isi = '';
-        // console.log(dataaModal);
-        var CancelPayment = [];
-        for (var i = 0; i < dataaModal.length; i++) {
-          if(dataaModal[i]['NPM'] == NPM)
-          {
-            CancelPayment = dataaModal[i]['cancelPay'];
-            dataPotonganLain = dataaModal[i]['potonganLain'];
-            var totCancelPayment = CancelPayment.length;
-            var DetailPaymentArr = dataaModal[i]['DetailPayment'];
-            var Nama = dataaModal[i]['Nama'];
-            for (var j = 0; j < DetailPaymentArr.length; j++) {
-              var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
-              var status = (DetailPaymentArr[j]['Status'] == 0) ? 'Belum Bayar' : 'Sudah Bayar';
-              isi += '<tr>'+
-                    '<td>'+ (j+1) + '</td>'+
-                    '<td>'+ Nama + '</td>'+
-                    '<td>'+ yy + '</td>'+
-                    '<td>'+ DetailPaymentArr[j]['BilingID'] + '</td>'+
-                    '<td>'+ status + '</td>'+
-                    '<td>'+ DetailPaymentArr[j]['Deadline'] + '</td>'+
-                    '<td>'+ DetailPaymentArr[j]['UpdateAt'] + '</td>'+
-                  '<tr>'; 
-            }
-            break;
-          }
-        }
-
-        table += isi+'</tbody>' ; 
-        table += '</table></div></div>' ;
-        html += table;
-
-        var htmlReason = '<div class = "row"><div class= col-md-12><h5>List Cancel Payment</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
-                      '<thead>'+
-                          '<tr>'+
-                              '<th style="width: 5px;">No</th>'+
-                              '<th style="width: 55px;">Reason</th>'+
-                              '<th style="width: 55px;">CancelAt</th>'+
-                              '<th style="width: 55px;">CancelBy</th>';
-        htmlReason += '</tr>' ;  
-        htmlReason += '</thead>' ; 
-        htmlReason += '<tbody>' ;
-        for (var i = 0; i < CancelPayment.length; i++) {
-          var No = parseInt(i) + 1;
-          htmlReason += '<tr>'+
-                '<td>'+ (i+1) + '</td>'+
-                '<td>'+ CancelPayment[i]['Reason'] + '</td>'+
-                '<td>'+ CancelPayment[i]['CancelAt'] + '</td>'+
-                '<td>'+ CancelPayment[i]['Name'] + '</td>'+
-              '<tr>'; 
-        }
-
-        htmlReason += '</tbody>' ; 
-        htmlReason += '</table></div></div>' ;
-        if (CancelPayment.length > 0) {
-          html += htmlReason;
-        }
-
-        // potongan lain
-        var htmlPotonganLain = '<div class = "row"><div class= col-md-12><h5>List Potongan Lain</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
-                      '<thead>'+
-                          '<tr>'+
-                              '<th style="width: 5px;">No</th>'+
-                              '<th style="width: 55px;">Nama Potongan</th>'+
-                              '<th style="width: 55px;">Nominal</th>'+
-                              '<th style="width: 55px;">Desc</th>'+
-                              '<th style="width: 55px;">By & At</th>';
-        htmlPotonganLain += '</tr>' ;  
-        htmlPotonganLain += '</thead>' ; 
-        htmlPotonganLain += '<tbody>' ;
-        for (var i = 0; i < dataPotonganLain.length; i++) {
-          var No = parseInt(i) + 1;
-          htmlPotonganLain += '<tr>'+
-                '<td>'+ (i+1) + '</td>'+
-                '<td>'+ dataPotonganLain[i]['DiscountName'] + '</td>'+
-                '<td>'+ '<span style = "color:blue">'+formatRupiah(dataPotonganLain[i]['DiscountValue'])+'</span>' + '</td>'+
-                '<td>'+ dataPotonganLain[i]['Description'] + '</td>'+
-                '<td>'+ '<span style = "color:green">'+dataPotonganLain[i]['Name']+ '<br/>' + dataPotonganLain[i]['UpdateAt']+'</span>' + '</td>'+
-              '<tr>'; 
-        }
-
-        htmlPotonganLain += '</tbody>' ; 
-        htmlPotonganLain += '</table></div></div>' ;
-        if (dataPotonganLain.length > 0) {
-          html += htmlPotonganLain;
-        }
-
+        var PaymentID = $(this).attr('PaymentID');
+        var html = modal_detail_payment(dataaModal,NPM,PaymentID)
 
         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
             '';

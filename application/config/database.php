@@ -131,10 +131,11 @@ switch ($ServerName) {
         $db['default']['autoinit'] = TRUE;
         $db['default']['stricton'] = FALSE;
 
-        $db['statistik']['hostname'] = '10.1.30.18';
-        $db['statistik']['username'] = 'db_itpu';
-        $db['statistik']['password'] = 'Uap)(*&^%';
+        $db['statistik']['hostname'] = _DB_HOST;
+        $db['statistik']['username'] = _DB_USER;
+        $db['statistik']['password'] = _DB_PASSWORD;
         $db['statistik']['database'] = 'db_statistik';
+        $db['statistik']['port'] = _DB_PORT;
         $db['statistik']['dbdriver'] = 'mysqli';// support with MYSQl,POSTGRE SQL, ORACLE,SQL SERVER
         $db['statistik']['dbprefix'] = '';
         $db['statistik']['pconnect'] = TRUE;

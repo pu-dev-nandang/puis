@@ -6,6 +6,7 @@
 </style>
 <div class="row">
     <div class="col-md-12">
+        <button href="<?php echo base_url().'finance/tagihan-mhs/cek-tagihan-mhs' ?>" class = "btn btn-default btn-back">Cancel</button>
         <hr/>
         <table class="table table-bordered datatable2 hide" id = "datatable2">
             <thead>
@@ -313,76 +314,8 @@
 
     $(document).on('click','.DetailPayment', function () {
         var NPM = $(this).attr('NPM');
-        var html = '';
-        var table = '<div class = "row"><div class= col-md-12><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
-                      '<thead>'+
-                          '<tr>'+
-                              '<th style="width: 5px;">No</th>'+
-                              '<th style="width: 55px;">Nama</th>'+
-                              '<th style="width: 55px;">Invoice</th>'+
-                              '<th style="width: 55px;">BilingID</th>'+
-                              '<th style="width: 55px;">Status</th>'+
-                              '<th style="width: 55px;">Deadline</th>'+
-                              '<th style="width: 55px;">UpdateAt</th>';
-        table += '</tr>' ;  
-        table += '</thead>' ; 
-        table += '<tbody>' ;
-        var isi = '';
-        // console.log(dataaModal);
-        var CancelPayment = [];
-        for (var i = 0; i < dataaModal.length; i++) {
-          if(dataaModal[i]['NPM'] == NPM)
-          {
-            CancelPayment = dataaModal[i]['cancelPay'];
-            var totCancelPayment = CancelPayment.length;
-            var DetailPaymentArr = dataaModal[i]['DetailPayment'];
-            var Nama = dataaModal[i]['Nama'];
-            for (var j = 0; j < DetailPaymentArr.length; j++) {
-              var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
-              var status = (DetailPaymentArr[j]['Status'] == 0) ? 'Belum Bayar' : 'Sudah Bayar';
-              isi += '<tr>'+
-                    '<td>'+ (j+1) + '</td>'+
-                    '<td>'+ Nama + '</td>'+
-                    '<td>'+ yy + '</td>'+
-                    '<td>'+ DetailPaymentArr[j]['BilingID'] + '</td>'+
-                    '<td>'+ status + '</td>'+
-                    '<td>'+ DetailPaymentArr[j]['Deadline'] + '</td>'+
-                    '<td>'+ DetailPaymentArr[j]['UpdateAt'] + '</td>'+
-                  '<tr>'; 
-            }
-            break;
-          }
-        }
-
-        table += isi+'</tbody>' ; 
-        table += '</table></div></div>' ;
-        html += table;
-
-        var htmlReason = '<div class = "row"><div class= col-md-12><h5>List Cancel Payment</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
-                      '<thead>'+
-                          '<tr>'+
-                              '<th style="width: 5px;">No</th>'+
-                              '<th style="width: 55px;">Reason</th>'+
-                              '<th style="width: 55px;">CancelAt</th>'+
-                              '<th style="width: 55px;">CancelBy</th>';
-        htmlReason += '</tr>' ;  
-        htmlReason += '</thead>' ; 
-        htmlReason += '<tbody>' ;
-        for (var i = 0; i < CancelPayment.length; i++) {
-          var No = parseInt(i) + 1;
-          htmlReason += '<tr>'+
-                '<td>'+ (i+1) + '</td>'+
-                '<td>'+ CancelPayment[i]['Reason'] + '</td>'+
-                '<td>'+ CancelPayment[i]['CancelAt'] + '</td>'+
-                '<td>'+ CancelPayment[i]['Name'] + '</td>'+
-              '<tr>'; 
-        }
-
-        htmlReason += '</tbody>' ; 
-        htmlReason += '</table></div></div>' ;
-        if (CancelPayment.length > 0) {
-          html += htmlReason;
-        }
+        var PaymentID = $(this).attr('PaymentID');
+        var html = modal_detail_payment(dataaModal,NPM,PaymentID)
 
         var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
             '';
@@ -420,6 +353,7 @@
     {
       if (Data_mhs.length == 1) {
           for(var i=0;i<Data_mhs.length;i++){
+               var b = 0;
                var ccc = 0;
                var yy = (Data_mhs[i]['InvoicePayment'] != '') ? formatRupiah(Data_mhs[i]['InvoicePayment']) : '-';
                get_Invoice = Data_mhs[i]['InvoicePayment'];
@@ -456,7 +390,7 @@
                  status = 'Approve';
                  // check lunas atau tidak
                    // count jumlah pembayaran dengan status 1
-                   var b = 0;
+                   
                    for (var j = 0; j < Data_mhs[i]['DetailPayment'].length; j++) {
                      var a = Data_mhs[i]['DetailPayment'][j]['Status'];
                      if(a== 1)
@@ -519,7 +453,7 @@
                                             '<td>'+Data_mhs[i]['Discount']+'%</td>' +
                                             '<td>'+yy+'</td>' +
                                             '<td>'+status+'</td>' +
-                                            '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
+                                            '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">View</button>'+'</td>' +
                                             '</tr>');
                     }   
                   
@@ -614,5 +548,10 @@
         toastr.error('Error', 'Failed!!');
       } 
     }
+
+    $(document).on('click','.btn-back',function(e){
+      window.history.back();
+    })
+
 
 </script>

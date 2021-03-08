@@ -209,6 +209,12 @@
                         Batal Tagihan
                         </a>
                     </li>
+                    <!-- <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "set-bayar"){echo "current";} ?>">
+                        <a href="<?php echo base_url('finance/tagihan-mhs/set-bayar'); ?>">
+                        <i class="icon-angle-right"></i>
+                        Set Bayar
+                        </a>
+                    </li> -->
                     <li class="<?php if($this->uri->segment(2)=='tagihan-mhs' && $this->uri->segment(3) == "cek-tagihan-mhs"){echo "current";} ?>">
                         <a href="<?php echo base_url('finance/tagihan-mhs/cek-tagihan-mhs'); ?>">
                         <i class="icon-angle-right"></i>
@@ -270,5 +276,197 @@
     <div id="divider" class="resizeable"></div>
 </div>
 <!-- /Sidebar -->
+
+<script type="text/javascript">
+    const let_html_cicilan = (DetailPayment) => {
+      let html_detail_payment = '';
+
+      for (var i = 0; i < DetailPayment.length; i++) {
+        let html_lunas_chk = (DetailPayment[i].Status == 1 || DetailPayment[i].Status == '1' ) ? '<i class="fa fa-check-circle" style="color: green;"></i>' : '<i class="fa fa-minus-circle" style="color: red;"></i>';
+
+        let html_pay = '<span>Invoice : '+formatRupiah(DetailPayment[i].Invoice)+'</span> &nbsp'+html_lunas_chk;
+
+        let detail_new_pay = '';
+        let payment_student_details = DetailPayment[i].payment_student_details;
+        if (payment_student_details.length > 0) {
+           detail_new_pay += '<ol>';
+           for (var j = 0; j < payment_student_details.length; j++) {
+            detail_new_pay += '<li>'+formatRupiah(payment_student_details[j].Pay)+ ' &nbsp | <label>Tgl Bayar</label> : <span style = "color :green;">'+payment_student_details[j].Pay_Date+'</span></li>';
+           }
+
+           html_pay = '<a data-toggle="collapse" href="#detail-payment-list_'+i+'" aria-expanded="false">'+
+                  html_pay+ ' | detail bayar : '+ 
+                  '</a>'+
+                  '<div id = "detail-payment-list_'+i+'" class="panel-collapse collapse">'+
+                    detail_new_pay+
+                  '</div>';
+        }
+        else
+        {
+          if (DetailPayment[i].DatePayment != null) {
+            html_pay += ' | <span style = "color :green;">Tgl Bayar : '+DetailPayment[i].DatePayment+'</span>';
+          }
+          
+        }
+
+        html_detail_payment += '<li style = "font-weight: bold;">'+html_pay+'</li>';
+      }
+
+      let html_invoice = '<div class = "row">'+
+                  '<div class = "col-md-12">'+
+                    '<ol><label>Cicilan : </label>'+
+                        html_detail_payment+
+                    '</ol>'+                  
+                  '</div>'+
+                 '</div>';
+
+      return html_invoice;
+    }
+    
+    const modal_detail_payment = (data_payment,NPM,PaymentID) => {
+        var html = '';
+        var isi = '';
+        var CancelPayment = [];
+
+        let DetailPaymentArr = [];
+        for (var i = 0; i < data_payment.length; i++) {
+          if(data_payment[i]['PaymentID'] == PaymentID)
+          {
+            CancelPayment = data_payment[i]['cancelPay'];
+            var totCancelPayment = CancelPayment.length;
+            DetailPaymentArr = data_payment[i]['DetailPayment'];
+            break;
+          }
+        }
+
+        html += let_html_cicilan(DetailPaymentArr);
+
+        // potongan lain
+        var dataPotonganLain = data_payment[i]['potonganLain'];
+        var htmlPotonganLain = '<div class = "row"><div class= col-md-12><h5>List Potongan Lain</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">No</th>'+
+                              '<th style="width: 55px;">Nama Potongan</th>'+
+                              '<th style="width: 55px;">Nominal</th>'+
+                              '<th style="width: 55px;">Desc</th>'+
+                              '<th style="width: 55px;">By & At</th>';
+        htmlPotonganLain += '</tr>' ;  
+        htmlPotonganLain += '</thead>' ; 
+        htmlPotonganLain += '<tbody>' ;
+        for (var index = 0; index < dataPotonganLain.length; index++) {
+          var No = parseInt(index) + 1;
+          htmlPotonganLain += '<tr>'+
+                '<td>'+ (index+1) + '</td>'+
+                '<td>'+ dataPotonganLain[index]['DiscountName'] + '</td>'+
+                '<td>'+ '<span style = "color:blue">'+formatRupiah(dataPotonganLain[index]['DiscountValue'])+'</span>' + '</td>'+
+                '<td>'+ dataPotonganLain[index]['Description'] + '</td>'+
+                '<td>'+ '<span style = "color:green">'+dataPotonganLain[index]['Name']+ '<br/>' + dataPotonganLain[index]['UpdateAt']+'</span>' + '</td>'+
+              '<tr>'; 
+        }
+
+        htmlPotonganLain += '</tbody>' ; 
+        htmlPotonganLain += '</table></div></div>' ;
+        if (dataPotonganLain.length > 0) {
+          html += htmlPotonganLain;
+        }
+
+        // for Verify Bukti Bayar
+            var htmlPaymentProof = '<div class = "row" style = "margin-top : 10px">'+
+                                      '<div class = "col-md-12">'+
+                                          '<h5>List Proof of Payment</h5>'+
+                                            '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                                              '<thead>'+
+                                                '<tr>'+
+                                                   '<th style="width: 5px;">No</th>'+
+                                                   '<th style="width: 55px;">File</th>'+
+                                                   '<th style="width: 55px;">Money Paid</th>'+
+                                                   '<th style="width: 55px;">Account Name</th>'+
+                                                   '<th style="width: 55px;">Account Owner</th>'+
+                                                   '<th style="width: 55px;">Transaction Date</th>'+
+                                                   '<th style="width: 55px;">Upload Date</th>'+
+                                                   '<th style="width: 55px;">Bank</th>'+
+                                                   '<th style="width: 55px;">Status</th>'+
+                                                   '<th style="width: 55px;">Action</th>'+
+                                                '</tr>'+
+                                              '</thead>'+
+                                            '<tbody>';
+          var payment_proof = data_payment[i]['payment_proof'];
+          if (payment_proof.length > 0) {
+            for (var i = 0; i < payment_proof.length; i++) {
+              var FileUpload = jQuery.parseJSON(payment_proof[i]['FileUpload']);
+              var FileAhref = '';
+
+              switch(payment_proof[i].VerifyFinance) {
+                case '1':
+                  var VerifyFinance = '<span style="color: green;"><i class="fa fa-check-circle margin-right"></i> Verify</span>';
+                  break;
+                case '2':
+                  var VerifyFinance  = '<span style="color: red;"><i class="fa fa-remove margin-right"></i>Reject</span>';
+                  break;
+                default:
+                  var VerifyFinance  = '<span style="color: green;"><i class="fa fa-info-circle margin-right"></i>Not Yet Verify</span>';
+              }
+
+              for (var j = 0; j < FileUpload.length; j++) {
+                FileAhref = '<a href ="'+base_url_js+'fileGetAny/document-'+NPM+'-'+FileUpload[j].Filename+'" target="_blank">File '+ ((i+1)+j)+'</a>';
+              }
+
+              // var btnVerify = (payment_proof[i]['VerifyFinance'] == 1)? '' : '<button class = "verify" idtable = "'+payment_proof[i]['ID']+'">Verify</button><div style = "margin-top : 10px"><button class = "rejectverify" idtable = "'+payment_proof[i]['ID']+'">Reject</button></div>';
+              
+              var btnVerify = '';
+
+              htmlPaymentProof += '<tr>'+
+                                      '<td>'+(i+1)+'</td>'+
+                                      '<td>'+FileAhref+'</td>'+
+                                      '<td>'+formatRupiah(payment_proof[i]['Money'])+'</td>'+
+                                      '<td>'+payment_proof[i]['NoRek']+'</td>'+
+                                      '<td>'+payment_proof[i]['AccountOwner']+'</td>'+
+                                      '<td>'+payment_proof[i]['Date_transaction']+'</td>'+
+                                      '<td>'+payment_proof[i]['Date_upload']+'</td>'+
+                                      '<td>'+payment_proof[i]['NmBank']+'</td>'+
+                                      '<td>'+VerifyFinance+'</td>'+
+                                      '<td>'+btnVerify+'</td>'+
+                                  '</tr>';
+            }
+
+            htmlPaymentProof += '</tbody></table></div></div>';
+            html += htmlPaymentProof;
+          }
+
+        // end Verify Bukti Bayar
+
+        // for reason cancel payment
+        var htmlReason = '<div class = "row"><div class= col-md-12><h5>List Cancel Payment</h5><table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">No</th>'+
+                              '<th style="width: 55px;">Reason</th>'+
+                              '<th style="width: 55px;">CancelAt</th>'+
+                              '<th style="width: 55px;">CancelBy</th>';
+        htmlReason += '</tr>' ;
+        htmlReason += '</thead>' ;
+        htmlReason += '<tbody>' ;
+        for (var i = 0; i < CancelPayment.length; i++) {
+          var No = parseInt(i) + 1;
+          htmlReason += '<tr>'+
+                '<td>'+ (i+1) + '</td>'+
+                '<td>'+ CancelPayment[i]['Reason'] + '</td>'+
+                '<td>'+ CancelPayment[i]['CancelAt'] + '</td>'+
+                '<td>'+ CancelPayment[i]['Name'] + '</td>'+
+              '<tr>';
+        }
+
+        htmlReason += '</tbody>' ;
+        htmlReason += '</table></div></div>' ;
+        if (CancelPayment.length > 0) {
+          html += htmlReason;
+        }
+        // end reason cancel payment
+
+        return html;
+    }
+
+</script>
 
 
