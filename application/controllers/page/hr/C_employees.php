@@ -888,6 +888,7 @@ class C_employees extends HR_Controler {
                             $filenameSignature = $data_arr['NIP'].'.png';
                             file_put_contents('./uploads/signature/'.$filenameSignature, $data);
                             $Logs->Signature= $filenameSignature;
+                            $Logs->Signatures= $filenameSignature;
                         }
 
                         // for certificate
