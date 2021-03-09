@@ -1905,9 +1905,19 @@ class M_finance extends CI_Model {
             }
 
       // Detail Payment & cek cancel
-         $DetailPayment = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']);
+         $DetailPayment = $this->detail_payment_std($query[$i]['ID']);
          $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
          $potonganLain = $this->getPotonganLain($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
+
+      // cek Payment Proof
+              $payment_proof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$query[$i]['ID']);
+              for ($z=0; $z < count($payment_proof); $z++) {
+                  // get nama bank
+                  $G_bank = $this->m_master->caribasedprimary('db_finance.bank','ID',$payment_proof[$z]['ID_bank']);
+                  $payment_proof[$z]['NmBank'] = $G_bank[0]['Name'];
+              }
+
+
 
       if($prodi == '' || $prodi == Null){
         $ProdiEng = $this->m_master->caribasedprimary('db_academic.program_study','ID',$dt[0]['ProdiID']);
@@ -1934,6 +1944,7 @@ class M_finance extends CI_Model {
             'Credit' => $Credit,
             'Pay_Cond' => $query[$i]['Pay_Cond'],
             'cancelPay' => $cancelPay,
+            'payment_proof' => $payment_proof,
             'potonganLain' => $potonganLain,
         );
       }
@@ -1965,6 +1976,7 @@ class M_finance extends CI_Model {
               'Credit' => $Credit,
               'Pay_Cond' => $query[$i]['Pay_Cond'],
               'cancelPay' => $cancelPay,
+              'payment_proof' => $payment_proof,
               'potonganLain' => $potonganLain,
           );
         }
@@ -2011,6 +2023,9 @@ class M_finance extends CI_Model {
         break;
       case '0':
         $AddWhereStatusPayment = ' and a.Invoice >= (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 0)';
+        break;
+      case '-1':
+        $AddWhereStatusPayment = ' and a.ID not in (select z.ID_payment from db_finance.payment_students as z join db_finance.payment_student_details as x on z.ID = x.ID_payment_students )';
         break;
       default:
         $AddWhereStatusPayment = '';
@@ -2115,6 +2130,9 @@ class M_finance extends CI_Model {
         break;
       case '0':
         $AddWhereStatusPayment = ' and a.Invoice >= (select sum(Invoice) from db_finance.payment_students where ID_payment = a.ID and Status = 0)';
+        break;
+      case '-1':
+        $AddWhereStatusPayment = ' and a.ID not in (select z.ID_payment from db_finance.payment_students as z join db_finance.payment_student_details as x on z.ID = x.ID_payment_students )';
         break;
       default:
         $AddWhereStatusPayment = '';
@@ -2244,7 +2262,7 @@ class M_finance extends CI_Model {
             'Year' => $Year,
             'IPS' => $IPS,
             'IPK' => $IPK,
-            'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+            'DetailPayment' => $this->detail_payment_std($query[$i]['ID']),
             'VA' => $VA,
             'Credit' => $Credit,
             'Pay_Cond' => $query[$i]['Pay_Cond'],
@@ -2276,7 +2294,7 @@ class M_finance extends CI_Model {
               'Year' => $Year,
               'IPS' => $IPS,
               'IPK' => $IPK,
-              'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']),
+              'DetailPayment' => $this->detail_payment_std($query[$i]['ID']),
               'VA' => $VA,
               'Credit' => $Credit,
               'Pay_Cond' => $query[$i]['Pay_Cond'],
@@ -2607,7 +2625,7 @@ class M_finance extends CI_Model {
                 {
                   $bstatus = 'and b.Status  = 0';
                 }
-                $sql = 'select * from db_finance.payment as a join db_finance.payment_students as b
+                $sql = 'select a.*,b.ID as ID_payment_students,b.BilingID,b.ID_payment from db_finance.payment as a join db_finance.payment_students as b
                         on a.ID = b.ID_payment where a.NPM = ? and a.SemesterID = ? and a.PTID = ? '.$bstatus.' order by b.ID asc limit 1';
                 $query=$this->db->query($sql, array($NPM,$SemesterID,$PTID))->result_array();
                 // save reason
@@ -2624,12 +2642,12 @@ class M_finance extends CI_Model {
                 );
                 $this->db->insert('db_finance.payment_s_cancel',$dataSave);
 
+                $ID_payment_s_cancel = $this->db->insert_id();
+
                 if (count($query) > 0 ) {
                   $BilingID = $query[0]['BilingID'];
                   if ($BilingID != 0) {
                     $checkVa = $this->checkBiling($BilingID);
-                    // print_r($checkVa);
-                    // die();
                     // va status  = 1 => active
                     // va status = 2 => Inactive
                     if ($checkVa['msg']['va_status'] != 2) {
@@ -2670,6 +2688,23 @@ class M_finance extends CI_Model {
                     $sqlDelete = "delete from db_finance.payment_students where ID_payment = ".$query[0]['ID_payment'];
                     $queryDelete=$this->db->query($sqlDelete, array());
                     $this->delete_id_table($query[0]['ID_payment'],'payment');
+                  }
+
+                  for ($z=0; $z < count($query); $z++) { 
+                    $ID_payment_students = $query[$z]['ID_payment_students'];
+                    $dx = $this->m_master->caribasedprimary('db_finance.payment_student_details','ID_payment_students',$ID_payment_students);
+                    for ($v=0; $v < count($dx); $v++) { 
+                        $dataSaveRecycle = [
+                            'ID_payment_s_cancel' =>   $ID_payment_s_cancel,
+                            'UniqueGroupBy' =>  $dx[$v]['UniqueGroupBy']  ,
+                            'Pay' =>  $dx[$v]['Pay'] ,
+                            'Pay_Date' => $dx[$v]['Pay_Date']  ,
+                            'P_Created_By' => $dx[$v]['Created_By']  ,
+                            'P_Created_At' => $dx[$v]['Created_At']  ,
+                        ];
+
+                        $this->db->insert('db_finance.payment_student_details_cancel',$dataSaveRecycle);
+                    }
                   }
 
                 }
@@ -2772,12 +2807,48 @@ class M_finance extends CI_Model {
         $ID = $Input[$i]->ID;
         $trx_amount = $Input[$i]->Invoice;
         $datetime_expired = $Input[$i]->Deadline;
-        $this->m_finance->UpdateCicilanbyID($ID,$BilingID,$trx_amount,$datetime_expired);
+
+        // check data pembayaran
+        $count_pembayaran = $this->db->where('ID_payment_students',$ID)->count_all_results('db_finance.payment_student_details');
+
+        $number_cicilan = $this->edit_cicilan_tagihan_mhs_submit_get_number_cicilan($ID);
+
+        if ($count_pembayaran == 0) {
+           $this->m_finance->UpdateCicilanbyID($ID,$BilingID,$trx_amount,$datetime_expired);
+        }
+        else
+        {
+          $arr['msg'] .= 'Cicilan ke  : '.$number_cicilan.' telah dilakukan pembayaran <br>';
+        }
       }
     }
 
     return $arr;
 
+   }
+
+   private function edit_cicilan_tagihan_mhs_submit_get_number_cicilan($ID_payment_students){
+    $x = -1;
+    $dt = $this->m_master->caribasedprimary('db_finance.payment_students','ID',$ID_payment_students);
+
+    $ID_payment =  $dt[0]['ID_payment'];
+
+    $get =  $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+
+    for ($i=0; $i < count($get); $i++) { 
+      if ($get[$i]['ID'] == $ID_payment_students) {
+        $x = $i+1;  
+        break;
+      }
+    }
+
+    if ($x == -1) {
+      return false;
+    }
+    else
+    {
+      return $x;
+    }
    }
 
    public function UpdateCicilanbyID($ID,$BilingID,$trx_amount,$datetime_expired)
@@ -4096,6 +4167,7 @@ class M_finance extends CI_Model {
     // error_reporting(0);
     $arr = array();
     $this->load->model('master/m_master');
+    $this->load->model('statistik/m_statistik');
     // print_r($start.' - '.$limit);die();
 
     $arrDB = array();
@@ -4198,15 +4270,21 @@ class M_finance extends CI_Model {
                 $SisaBPP = 0;
                 $last = count($Q_invStudent) - 1;
                 $DueDateBPP = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
-                for ($r=0; $r < count($Q_invStudent); $r++) {
-                  if ($Q_invStudent[$r]['Status'] == 1) { // lunas
-                    $PayBPP = $PayBPP + $Q_invStudent[$r]['Invoice'];
-                  }
-                  else
-                  {
-                    $SisaBPP = $SisaBPP + $Q_invStudent[$r]['Invoice'];
-                  }
-                }
+                //for ($r=0; $r < count($Q_invStudent); $r++) {
+                  // if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                  //   $PayBPP = $PayBPP + $Q_invStudent[$r]['Invoice'];
+                  // }
+                  // else
+                  // {
+                  //   $SisaBPP = $SisaBPP + $Q_invStudent[$r]['Invoice'];
+                  // }
+                //}
+
+                $Invoice = $queryBPP[$t]['Invoice'];
+                $get_pay = $this->m_statistik->get_pay_arrDataPS($Q_invStudent,$Invoice);
+
+                $PayBPP = $get_pay['Pay'];
+                $SisaBPP = $get_pay['Sisa'];
 
                 $Aging = 'BPP : 0';
                 if ($DueDateBPP != '' && $SisaBPP > 0) {
@@ -4244,15 +4322,21 @@ class M_finance extends CI_Model {
                 $SisaCr = 0;
                 $last = count($Q_invStudent) - 1;
                 $DueDateCR = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
-                for ($r=0; $r < count($Q_invStudent); $r++) {
-                  if ($Q_invStudent[$r]['Status'] == 1) { // lunas
-                    $PayCr = $PayCr + $Q_invStudent[$r]['Invoice'];
-                  }
-                  else
-                  {
-                    $SisaCr = $SisaCr + $Q_invStudent[$r]['Invoice'];
-                  }
-                }
+                // for ($r=0; $r < count($Q_invStudent); $r++) {
+                //   if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                //     $PayCr = $PayCr + $Q_invStudent[$r]['Invoice'];
+                //   }
+                //   else
+                //   {
+                //     $SisaCr = $SisaCr + $Q_invStudent[$r]['Invoice'];
+                //   }
+                // }
+
+                $Invoice = $queryCr[$t]['Invoice'];
+                $get_pay = $this->m_statistik->get_pay_arrDataPS($Q_invStudent,$Invoice);
+
+                $PayCr = $get_pay['Pay'];
+                $SisaCr = $get_pay['Sisa'];
 
                 $Aging = 'Credit : 0';
                 if ($DueDateCR != '' && $SisaCr > 0) {
@@ -4290,15 +4374,21 @@ class M_finance extends CI_Model {
                   $SisaAn = 0;
                   $last = count($Q_invStudent) - 1;
                   $DueDateAn = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
-                  for ($r=0; $r < count($Q_invStudent); $r++) {
-                    if ($Q_invStudent[$r]['Status'] == 1) { // lunas
-                      $PayAn = $PayAn + $Q_invStudent[$r]['Invoice'];
-                    }
-                    else
-                    {
-                      $SisaAn = $SisaAn + $Q_invStudent[$r]['Invoice'];
-                    }
-                  }
+                  // for ($r=0; $r < count($Q_invStudent); $r++) {
+                  //   if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                  //     $PayAn = $PayAn + $Q_invStudent[$r]['Invoice'];
+                  //   }
+                  //   else
+                  //   {
+                  //     $SisaAn = $SisaAn + $Q_invStudent[$r]['Invoice'];
+                  //   }
+                  // }
+
+                  $Invoice = $queryAn[$t]['Invoice'];
+                  $get_pay = $this->m_statistik->get_pay_arrDataPS($Q_invStudent,$Invoice);
+
+                  $PayAn = $get_pay['Pay'];
+                  $SisaAn = $get_pay['Sisa'];
 
                   $Aging = 'lain-lain : 0';
                   if ($DueDateAn != '' && $SisaAn > 0) {
@@ -4336,15 +4426,21 @@ class M_finance extends CI_Model {
                     $SisaSPP = 0;
                     $last = count($Q_invStudent) - 1;
                     $DueDateSPP = ($Q_invStudent[$last]['Deadline'] != '' && $Q_invStudent[$last]['Deadline'] != null && strpos($Q_invStudent[$last]['Deadline'],'0000-00-00') === false) ? date('d M Y H:i:s', strtotime($Q_invStudent[$last]['Deadline'])) : '';
-                    for ($r=0; $r < count($Q_invStudent); $r++) {
-                      if ($Q_invStudent[$r]['Status'] == 1) { // lunas
-                        $PaySPP = $PaySPP + $Q_invStudent[$r]['Invoice'];
-                      }
-                      else
-                      {
-                        $SisaSPP = $SisaSPP + $Q_invStudent[$r]['Invoice'];
-                      }
-                    }
+                    // for ($r=0; $r < count($Q_invStudent); $r++) {
+                    //   if ($Q_invStudent[$r]['Status'] == 1) { // lunas
+                    //     $PaySPP = $PaySPP + $Q_invStudent[$r]['Invoice'];
+                    //   }
+                    //   else
+                    //   {
+                    //     $SisaSPP = $SisaSPP + $Q_invStudent[$r]['Invoice'];
+                    //   }
+                    // }
+
+                    $Invoice = $querySPP[$t]['Invoice'];
+                    $get_pay = $this->m_statistik->get_pay_arrDataPS($Q_invStudent,$Invoice);
+
+                    $PaySPP = $get_pay['Pay'];
+                    $SisaSPP = $get_pay['Sisa'];
 
                     $Aging = 'SPP : 0';
                     if ($DueDateSPP != '' && $SisaAn > 0) {
@@ -4852,24 +4948,26 @@ class M_finance extends CI_Model {
       $SemesterID = $SemesterID[0];
       $this->load->model('master/m_master');
       $sql = 'select * from (
-                  select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description ,e.DatePayment,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students
-              ,e.Invoice as PaymentMhs
+                  select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description ,e.DatePayment as DatePayment_STD,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students
+              ,e.Invoice as PaymentMhs_STD,psd.Pay as PaymentMhs,psd.Pay_Date as DatePayment
                     from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM
                     join db_academic.semester as c on a.SemesterID = c.ID
                     join db_finance.payment_type as d on a.PTID = d.ID
                     join db_finance.payment_students as e on a.ID = e.ID_payment
                     join db_academic.program_study as f on b.ProdiID = f.ID
-                    where e.`Status` = 1  and a.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
+                    join db_finance.payment_student_details as psd on psd.ID_payment_students = e.`ID`
+                    where a.SemesterID = ? and psd.Pay_Date like "'.$DailyTgl.'%"
                     UNION
-                    select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,sa.Name as NameSemester, d.Description ,e.DatePayment,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students
-                            ,e.Invoice as PaymentMhs
+                    select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,sa.Name as NameSemester, d.Description ,e.DatePayment as DatePayment_STD,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students
+                            ,e.Invoice as PaymentMhs_STD,psd.Pay as PaymentMhs,psd.Pay_Date as DatePayment
                                   from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM
                                   join db_academic.sa_academic_years as c on a.SemesterID = c.SASemesterID
                                   join db_academic.semester_antara as sa on sa.ID = c.SASemesterID
                                   join db_finance.payment_type as d on a.PTID = d.ID
                                   join db_finance.payment_students as e on a.ID = e.ID_payment
                                   join db_academic.program_study as f on b.ProdiID = f.ID
-                                  where e.`Status` = 1  and sa.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
+                                  join db_finance.payment_student_details as psd on psd.ID_payment_students = e.`ID`
+                                  where sa.SemesterID = ? and psd.Pay_Date like "'.$DailyTgl.'%"
               ) aa
               order by ProdiID asc,NPM asc,ID_payment asc,ID_payment_students asc';
       // print_r($sql);die();
@@ -4936,6 +5034,7 @@ class M_finance extends CI_Model {
         }
 
         $data[] = $query[$i] + array('Pembayaranke' => $Pembayaranke,'semesterCount' => $semesterCount);
+        // $subtotal = $subtotal + $query[$i]['PaymentMhs'];
         $subtotal = $subtotal + $query[$i]['PaymentMhs'];
         $NPM1 = $query[$i]['NPM'];
 
@@ -5083,6 +5182,279 @@ class M_finance extends CI_Model {
     $query=$this->db->query($sql, array($PTID,$SemesterID,$NPM))->result_array();
     return $query;
    }
+
+   public function deposit_saldo_uang_tititpan_mhs($NPM){
+    $this->load->model('m_master');
+    $get = $this->db->query(
+            '
+              select ( sum(Credit) - sum(Debit) ) as left_saldo, sum(Credit) as CreditTotal,sum(Debit) as DebitTotal
+              from db_finance.trans_deposit 
+              where NPM = "'.$NPM.'"
+            '
+          )->row()->left_saldo;
+
+    return (!empty($get) && $get > 0) ? $get : 0; 
+   }
+
+   public function get_deposit_saldo_uang_tititpan($TA){
+      $rs = [];
+      $listMHSDeposit = $this->db->select('b.NPM,b.Name,c.Code as CodeProdi')
+                                 ->join('db_academic.auth_students  b','a.NPM = b.NPM','join')
+                                 ->join('db_academic.program_study c','b.ProdiID = c.ID','join')
+                                 ->where('b.Year',$TA)
+                                 ->group_by('a.NPM')
+                                 ->get('db_finance.trans_deposit a')->result_array();
+
+      for ($i=0; $i < count($listMHSDeposit); $i++) { 
+        $NPM = $listMHSDeposit[$i]['NPM'];
+        $left_saldo = $this->deposit_saldo_uang_tititpan_mhs($NPM);
+
+        if ( (!empty($left_saldo)) && $left_saldo > 0  ) {
+          $listMHSDeposit[$i]['Saldo'] = $left_saldo;
+          $rs[] = $listMHSDeposit[$i];
+        }
+      }
+
+      return $rs;
+      
+   }
+
+   public function rekap_std_by_status($StatusStudentID){
+      $rs = [];
+      $this->load->model('m_master');
+      // distinct month
+      $dataMonthly = $this->db->select('YEAR(EffectiveDateStatus) as Yearly, MONTH(EffectiveDateStatus) as Monthly')
+                                 ->where('StatusStudentID',$StatusStudentID)
+                                 ->group_by('YEAR(EffectiveDateStatus), MONTH(EffectiveDateStatus)')
+                                 ->order_by('EffectiveDateStatus','desc')
+                                 ->get('db_academic.auth_students a')->result_array();
+      
+      // add NULL EffectiveDateStatus
+      $dataMonthly2 = $this->db->select(' EffectiveDateStatus as Yearly, EffectiveDateStatus as Monthly')
+                                 ->where('StatusStudentID',$StatusStudentID)
+                                 ->where('EffectiveDateStatus is NULL')
+                                 ->group_by('YEAR(EffectiveDateStatus), MONTH(EffectiveDateStatus)')
+                                 ->get('db_academic.auth_students a')->result_array();
+
+      $dataMonthly = $this->m_master->TwoArraysObjectJoin($dataMonthly,$dataMonthly2); // join
+
+      $rs = [
+          'StatusStudentID' => $StatusStudentID,
+          'StatusStudentName' => $this->db->select('Description')
+                                     ->where('ID',$StatusStudentID)
+                                     ->get('db_academic.status_student')->row()->Description,
+          'dataPerMonth' => [],
+
+      ];
+
+      for ($i=0; $i < count($dataMonthly); $i++) { 
+        $Yearly = $dataMonthly[$i]['Yearly'];
+        $Monthly = $dataMonthly[$i]['Monthly'];
+
+        if ($Yearly != NULL && !empty($Yearly)) {
+          $NameSemester = $Yearly.'/'.($Yearly+1);
+          // get semester name by year
+          $dataMHS =  $this->db->select('a.NPM,a.Name,c.Name as ProdiName,a.Year,a.EffectiveDateStatus')
+                                     ->join('db_academic.program_study c','a.ProdiID = c.ID','join')
+                                     ->where('a.StatusStudentID',$StatusStudentID)
+                                     ->where('YEAR(EffectiveDateStatus) = '.$Yearly)
+                                     ->where('MONTH(EffectiveDateStatus) = '.$Monthly)
+                                     ->get('db_academic.auth_students a')->result_array();
+        }
+        else
+        {
+          // $NameSemester = 'EffectiveDateStatus belum diisi';
+          $NameSemester = '-';
+          // get semester name by year
+          $dataMHS =  $this->db->select('a.NPM,a.Name,c.Name as ProdiName,a.Year,a.EffectiveDateStatus')
+                                     ->join('db_academic.program_study c','a.ProdiID = c.ID','join')
+                                     ->where('a.StatusStudentID',$StatusStudentID)
+                                     ->where('a.EffectiveDateStatus is NULL')
+                                     ->get('db_academic.auth_students a')->result_array();
+
+        }
+
+         $arr = [
+            'endNameSemester' => $NameSemester,
+            'data' => []
+          ];
+
+        // get All payment dari semester 1
+        for ($j=0; $j < count($dataMHS); $j++) { 
+          $getTA = $dataMHS[$j]['Year'];
+          $dataMHS[$j]['ALLPayment'] = $this->Payment_SemesterStart_to_End($dataMHS[$j]['NPM'],$getTA);
+        }
+
+        $arr['data'] = $dataMHS;
+        $rs['dataPerMonth'][] = $arr;
+      }
+
+      return $rs;
+
+   }
+
+   public function Payment_SemesterStart_to_End($NPM,$TA=''){
+      $rs = [];
+      if ($TA == '') {
+        $TA =  $this->db->select('Year')
+                       ->where('NPM',$NPM)
+                       ->get('db_academic.auth_students')->row()->Year;
+      }
+
+
+      $YearSemesterEnd = $this->db->select('EffectiveDateStatus')
+                                  ->where('NPM',$NPM)
+                                  ->get('db_academic.auth_students')->row()->EffectiveDateStatus;
+
+      $t = (!empty($YearSemesterEnd) && $YearSemesterEnd != NULL) ? true : false;
+      $YearSemesterEnd = (!empty($YearSemesterEnd) && $YearSemesterEnd != NULL) ? date('Y', strtotime($YearSemesterEnd)) : 14;
+     
+
+      $Semester = 1;
+      $get_Semester =  $this->db->select('*')
+                                   ->where('Year >= '.$TA)
+                                   ->order_by('Year','asc')
+                                   ->order_by('Code','asc')
+                                   ->get('db_academic.semester')->result_array();
+      // TITIPAN
+      $TITIPAN = $this->deposit_saldo_uang_tititpan_mhs($NPM);
+      $temp = [
+        'NPM' => $NPM,
+        'TITIPAN' => $TITIPAN,
+        'Payment' => []
+      ];
+
+      for ($i=0; $i < count($get_Semester); $i++) { 
+        $SemesterID = $get_Semester[$i]['ID'];
+         $JUMLAH_TAGIHAN = 0;
+         $JUMLAH_PENERIMAAN = 0;
+
+         $data_Payment =  $this->db->select('*')
+                                   ->where('SemesterID',$SemesterID)
+                                   ->where('NPM',$NPM)
+                                   ->get('db_finance.payment')->result_array();
+
+          for ($j=0; $j < count($data_Payment); $j++) { 
+            $JUMLAH_TAGIHAN = $JUMLAH_TAGIHAN + $data_Payment[$j]['Invoice'];
+            $ID_payment = $data_Payment[$j]['ID'];
+            //$get_payment_student = $this->findDatapayment_studentsBaseID_payment($ID_payment,1);
+            $get_payment_student = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+
+            for ($k=0; $k < count($get_payment_student); $k++) { 
+              // $JUMLAH_PENERIMAAN = $JUMLAH_PENERIMAAN + $get_payment_student[$k]['Invoice'];
+              $ID_payment_students = $get_payment_student[$k]['ID'];
+
+              $SumTotal =  $this->db->query(
+                '
+                  select sum(Pay) as SumTotal from db_finance.payment_student_details
+                  where ID_payment_students = '.$ID_payment_students.'                
+                '
+              )->row()->SumTotal;
+
+              $SumTotal = (empty($SumTotal)) ? 0 : $SumTotal;
+
+              $JUMLAH_PENERIMAAN = $JUMLAH_PENERIMAAN + $SumTotal;
+
+            }
+          }
+
+          $temp['Payment'][] = [
+              'SemesterID' => $SemesterID,
+              'Semester' => $Semester,
+              'JUMLAH_TAGIHAN' => $JUMLAH_TAGIHAN,
+              'JUMLAH_PENERIMAAN' => $JUMLAH_PENERIMAAN,
+          ];
+
+          if ($t) {
+             // get last semester
+             $LastSemester = $this->db->select('*')
+                                    ->where('Year',$YearSemesterEnd)
+                                    ->where('Code',2)
+                                    ->get('db_academic.semester')->result_array();
+
+             if (count($LastSemester) == 0) {
+                break;
+              }
+              else{
+                $LastSemester = $LastSemester[0]['ID'];
+                if ($SemesterID >= $LastSemester) {
+                  break;
+                }
+              }                       
+             
+          }
+          else
+          {
+            if ($Semester >= $YearSemesterEnd) {
+              break;
+            }
+          }
+          $Semester++;                         
+      }
+     
+      $rs = $temp;
+      return $rs;
+
+   }
+
+   public function report_rekap_std($StatusStudentArr){
+      $rs = [];
+
+      for ($i=0; $i < count($StatusStudentArr); $i++) { 
+        $data = $this->rekap_std_by_status($StatusStudentArr[$i]);
+        $rs[] = $data;
+      }
+
+      return $rs;
+   }
+
+   public function detail_payment_std($ID_payment) {
+    $DetailPayment = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+    for ($i=0; $i < count($DetailPayment); $i++) { 
+      $payment_student_details = $this->m_master->caribasedprimary('db_finance.payment_student_details','ID_payment_students',$DetailPayment[$i]['ID']);
+      $DetailPayment[$i]['payment_student_details'] = $payment_student_details;
+    }
+
+    return $DetailPayment;
+
+   }
+
+   public function _count_left_paymet($ID_payment){
+      $left_payment = 0;
+      $total_invoice = 0;
+      $have_pay = 0;
+      $payment = $this->m_master->caribasedprimary('db_finance.payment','ID',$ID_payment);
+      if (count($payment) > 0) {
+        $Invoice = $payment[0]['Invoice'];
+
+        $payment_students = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$ID_payment);
+        for ($i=0; $i < count($payment_students) ; $i++) { 
+          if ($payment_students[$i]['Status'] == 1 || $payment_students[$i]['Status'] == '1') {
+            $have_pay += $payment_students[$i]['Invoice'];
+          }
+          else{
+            $payment_student_details = $this->m_master->caribasedprimary('db_finance.payment_student_details','ID_payment_students',$payment_students[$i]['ID']);
+
+            if (count($payment_student_details) > 0) {
+              for ($j=0; $j < count($payment_student_details); $j++) { 
+                $have_pay += $payment_student_details[$j]['Pay'];
+              }
+            }
+          }
+        }
+
+        $total_invoice = $Invoice;
+
+        $left_payment = abs($total_invoice - $have_pay);
+
+        return ['left_payment' => $left_payment,'total_invoice' => $total_invoice, 'have_pay' => $have_pay];
+      }
+
+      return false;
+      
+   }
+
+
 
 
 }

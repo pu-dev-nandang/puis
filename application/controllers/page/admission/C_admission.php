@@ -1658,6 +1658,9 @@ class C_admission extends Admission_Controler {
                    }
 
                  }
+
+                 //$key_lastCount = $x - 1;
+
                  for ($z=0; $z < count($getPaymentAdmisi); $z++) {
                      $Invoice = $getPaymentAdmisi[$z]['Pay_tuition_fee'];
 
@@ -1686,6 +1689,20 @@ class C_admission extends Admission_Controler {
                        );
                        $this->db->insert('db_finance.payment_students', $dataSave);
 
+                       // insert to payment_student_details
+                         $ID_payment_students = $this->db->insert_id();
+                         $UniqueGroupBy = $this->m_master->generate_random_letters(6).'-'.date('YmdHis');
+                         $dataSave_student_details = [
+                             'ID_payment_students' => $ID_payment_students,
+                             'UniqueGroupBy' => $UniqueGroupBy,
+                             'Pay' => $Invoice,
+                             //'Pay_Date' =>  $PayFee[$key_lastCount]['DatePayment'],
+                             //'Created_By' => $this->session->userdata('NIP'),
+                             'Created_At' => date('Y-m-d H:i:s'),
+                         ];
+                         $this->db->insert('db_finance.payment_student_details',$dataSave_student_details);
+
+
                        $hitung = $hitung - $Invoice;
                      }
                      else
@@ -1698,6 +1715,18 @@ class C_admission extends Admission_Controler {
                            'Status' => 1,
                          );
                          $this->db->insert('db_finance.payment_students', $dataSave);
+                         // insert to payment_student_details
+                           $ID_payment_students = $this->db->insert_id();
+                           $UniqueGroupBy = $this->m_master->generate_random_letters(6).'-'.date('YmdHis');
+                           $dataSave_student_details = [
+                               'ID_payment_students' => $ID_payment_students,
+                               'UniqueGroupBy' => $UniqueGroupBy,
+                               'Pay' => $Invoice,
+                               //'Pay_Date' =>  $PayFee[$key_lastCount]['DatePayment'],
+                               //'Created_By' => $this->session->userdata('NIP'),
+                               'Created_At' => date('Y-m-d H:i:s'),
+                           ];
+                           $this->db->insert('db_finance.payment_student_details',$dataSave_student_details);
 
                          $Sisa =  $Invoice - $hitung;
                          $dataSave = array(

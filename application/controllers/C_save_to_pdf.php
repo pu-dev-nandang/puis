@@ -3617,7 +3617,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $yA = $pdf->GetY();
 
-        $pdf->Cell($w_R_label,$h,'Judul Skripsi / Tugas Akhir',0,0,'L');
+        $pdf->Cell($w_R_label,$h,'Judul Skripsi / ',0,0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
         $pdf->MultiCell($w_R_fill+$w_Div-2,$h,$SkripsiInd,0);
 
@@ -3691,7 +3691,8 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_Div+$min,$h,'NIP : '.$Rektorat['NIP'],$borderttd,0,'L');
             $pdf->Cell($w_Div-$min,$h,'NIP : '.$Student['NIP'],$borderttd,1,'L');
 
-            $pdf->Rect(85, $y+5, 40, 58);
+            // $pdf->Rect(85, $y+5, 40, 58);
+            $pdf->Rect(85, $y+16, 40, 48);
 
         } else {
 
@@ -3742,7 +3743,8 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
             $pdf->Cell($w_Div-$min,$h,'NIP : '.$Rektorat['NIP'],$borderttd,1,'L');
 
-            $pdf->Rect(61, $y+5, 40, 58);
+            // $pdf->Rect(61, $y+5, 40, 58);
+            $pdf->Rect(61, $y+16, 40, 48);
 
         }
 
@@ -4084,7 +4086,7 @@ class C_save_to_pdf extends CI_Controller {
 
 
             //foto
-            $pdf->Rect($x+45, $y, 40, 58);
+            $pdf->Rect($x+47, $y, 38, 55); //Update Irfan
 
         }
 
@@ -6269,14 +6271,14 @@ Phone: (021) 29200456';
             $thn = ($dateGen!='') ? explode('-',$dateGen)[0] : '';
 
             // Get Mata kuliah
-            $dataMK = $this->db->query('SELECT mk.NameEng, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule s
+            $dataMK = $this->db->query('SELECT mk.Name, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule s
                                                   LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                   LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                   LEFT JOIN db_academic.schedule_share_credit ssc ON (ssc.ScheduleID = s.ID AND ssc.NIP = s.Coordinator)
                                                   WHERE s.SemesterID = "'.$SemesterID.'" AND s.Coordinator = "'.$NIP.'" GROUP BY s.ID
                                                   UNION ALL
-                                                  SELECT mk2.NameEng, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule_details_course sdc2
+                                                  SELECT mk2.Name, cd.TotalSKS AS Credit, ssc.Credit AS CreditResult FROM db_academic.schedule_details_course sdc2
                                                   LEFT JOIN db_academic.schedule s2 ON (s2.ID = sdc2.ScheduleID)
                                                   LEFT JOIN db_academic.mata_kuliah mk2 ON (mk2.ID = sdc2.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc2.CDID)
@@ -6286,13 +6288,15 @@ Phone: (021) 29200456';
 
 
             // Get PHR -> 2.2
-            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees em',
+            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind, Signature')->get_where('db_employees.employees em',
         "(em.PositionMain = '2.2' OR em.PositionOther1 = '2.2' OR em.PositionOther2 = '2.2' OR em.PositionOther3 = '2.2') AND  em.StatusEmployeeID = '1'")->result_array();
+
 
             $NamePHR_a = (count($dataPHR)>0) ? trim($dataPHR[0]['TitleAhead']).' ' : '';
             $NamePHR_b = (count($dataPHR)>0) ? ' '.trim($dataPHR[0]['TitleBehind']) : '';
             $NamePHR = (count($dataPHR)>0) ? $NamePHR_a.''.trim($dataPHR[0]['Name']).''.$NamePHR_b : '';
             $NIPPHR = (count($dataPHR)>0) ? $dataPHR[0]['NIP'] : '';
+            $Signature = (count($dataPHR)>0) ? $dataPHR[0]['Signature'] : '';
 
 
 
@@ -6370,7 +6374,7 @@ Phone: (021) 29200456';
                 $y = $pdf->GetY();
 
                 $pdf->Cell(10,$h,$no,1,0,'C');
-                $pdf->Cell(125,$h,$item['NameEng'],1,0,'L');
+                $pdf->Cell(125,$h,$item['Name'],1,0,'L');
                 $pdf->Cell(20,$h,$item['Credit'],1,0,'C');
                 $pdf->Cell(20,$h,$Credit,1,0,'C');
                 $pdf->Cell(15,$h,'14',1,1,'C');
@@ -6399,8 +6403,12 @@ Phone: (021) 29200456';
             $pdf->SetFont('Arial','',11);
             $y = $pdf->GetY()+20;
 
+
             $pdf->Image(base_url('images/cap.png'),130,$y+6,40);
-            $pdf->Image('./uploads/signature/2617100.png',130,$y+6,40);
+            if($Signature!=''){
+              $pdf->Image('./uploads/signature/'.$Signature,130,$y+6,40);
+            }
+
 
             $pdf->SetXY(130,$y);
             $pdf->Cell(60,5,'Jakarta, '.$this->getDateIndonesian($dateGen),0,1,'L');
@@ -6630,8 +6638,22 @@ Phone: (021) 29200456';
         $pdf->SetFont('Arial','',11);
         $y = $pdf->GetY()+20;
 
+        // Get PHR -> 2.2
+        // $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind, Signature')->get_where('db_employees.employees em',
+        //                   "(em.PositionMain = '2.2' OR em.PositionOther1 = '2.2' OR em.PositionOther2 = '2.2' OR em.PositionOther3 = '2.2') AND  em.StatusEmployeeID = '1'")->result_array();
+
+        $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind, Signature')->get_where('db_employees.employees em',array('NIP' => $dataRequest[0]['UserConfirm']))->result_array();
+
+        $NamePHR_a = (count($dataPHR)>0) ? trim($dataPHR[0]['TitleAhead']).' ' : '';
+        $NamePHR_b = (count($dataPHR)>0) ? ' '.trim($dataPHR[0]['TitleBehind']) : '';
+        $NamePHR = (count($dataPHR)>0) ? $NamePHR_a.''.trim($dataPHR[0]['Name']).''.$NamePHR_b : '';
+        $NIPPHR = (count($dataPHR)>0) ? $dataPHR[0]['NIP'] : '';
+        $Signature = (count($dataPHR)>0 && $dataPHR[0]['Signature']!='') ? $dataPHR[0]['Signature'] : '';
+
         $pdf->Image('./images/cap.png',130,$y+1,40);
-        $pdf->Image('./uploads/signature/2617100.png',130,$y+4,40);
+        if($Signature!=''){
+            $pdf->Image('./uploads/signature/'.$Signature,130,$y+4,40);    
+        }
 
 
         $pdf->Ln(11);
@@ -6649,10 +6671,10 @@ Phone: (021) 29200456';
         $pdf->Ln(17);
 
         $pdf->Cell($w,$h,'',0,0,'L');
-        $pdf->Cell($w2,$h,'Dr. rer. nat. Maria Prihandrijanti, S.T ',0,1,'L');
+        $pdf->Cell($w2,$h,$NamePHR,0,1,'L');
 
         $pdf->Cell($w,$h,'',0,0,'L');
-        $pdf->Cell($w2,$h,'NIP : 2617100 ',0,1,'L');
+        $pdf->Cell($w2,$h,'NIP : '.$NIPPHR,0,1,'L');
 
         $pdf->SetFont('Arial','',10);
         $pdf->SetXY(10,$y+45);
@@ -7531,8 +7553,12 @@ Phone: (021) 29200456';
                 $ttd_name = $t_a.$t_name.$t_b;
 
 
-                $pdf->Image('./images/cap.png',$spasiTdd+20,$pdf->GetY()-2,40);
-                $pdf->Image('./uploads/signature/'.$ttd_Signatures,$spasiTdd + 10,$pdf->GetY(),40);
+                $pathSignature = './uploads/signature/'.$ttd_Signatures;
+                if(file_exists($pathSignature)){
+                    $pdf->Image('./images/cap.png',$spasiTdd+20,$pdf->GetY()-2,40);
+                    $pdf->Image($pathSignature,$spasiTdd + 10,$pdf->GetY(),40);
+                }
+
 
                 $pdf->SetFont('dinpromedium','',$fontBody);
                 $pdf->Cell($spasiTdd,$h_1,'',$border,0,'L');

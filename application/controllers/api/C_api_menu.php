@@ -514,7 +514,27 @@ class C_api_menu extends CI_Controller {
                 $Range = date('d M Y',strtotime($row['StartDate'])).' - '.
                     date('d M Y',strtotime($row['EndDate']));
 
+                $dateNow = date("Y-m-d");
+                $dateExpired = $row['EndDate'];
 
+                if ($dateNow>=$dateExpired) {
+                    $updates = array(
+                        'isPublicSurvey' => '0',
+        
+                    );
+                   
+                        $this->db->where('ID', $row['ID']);
+                        $this->db->update('db_it.surv_survey', $updates);
+
+                                      $updates = array(
+                                'SharePublicStat' => '0'
+                            );
+    
+                            $this->db->where('SurveyID', $row['ID']);
+                            $this->db->update('db_it.surv_survey_detail', $updates);   
+
+
+                }
                 $Status = '<span class="label label-warning">Unpublish</span>';
                 $btnClose = 'hide';
                 $btnPublish = '';
@@ -572,6 +592,7 @@ class C_api_menu extends CI_Controller {
                 $TotalYgUdahIsiSurvey = $this->db->query('SELECT COUNT(*) AS Total FROM db_it.surv_answer 
                                                                     WHERE SurveyID= "'.$row['ID'].'" AND 
                                                                       FormType = "internal" '.$whereAnswerSurvey)->result_array()[0]['Total'];
+                
 //                $TotalYgUdahIsiSurvey = $this->db->from('db_it.surv_answer')
 //                    ->where(array('SurveyID' => $row['ID'],
 //                        'FormType' => 'internal',
@@ -627,6 +648,7 @@ class C_api_menu extends CI_Controller {
                 $no++;
 
             }
+
 
             $json_data = array(
                 "draw"            => intval( $requestData['draw'] ),
@@ -773,7 +795,7 @@ class C_api_menu extends CI_Controller {
 
 
             // Cek apakah sudah mempunyai key atau blm
-            $dataCk = $this->db->select('Key')->get_where('db_it.surv_survey',array(
+            $dataCk = $this->db->select('Key,isPublicSurvey,Status')->get_where('db_it.surv_survey',array(
                 'ID' => $ID
             ))->result_array();
 
@@ -799,7 +821,10 @@ class C_api_menu extends CI_Controller {
                 'Status' => 1,
                 'Key' => $KeyPublic,
                 'Encode' => $t,
-                'QRCode' => $pic);
+                'QRCode' => $pic,
+                'isPublicSurvey' => $dataCk[0]['isPublicSurvey'],
+                'Sts'=> $dataCk[0]['Status']
+            );
 
 
             return print_r(json_encode($result));

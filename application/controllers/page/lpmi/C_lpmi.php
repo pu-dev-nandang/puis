@@ -254,8 +254,9 @@ class C_lpmi extends Lpmi_Controler {
     public function getSubCat(){
 
         $getidcat =  $this->input->post('idcat');
-        // print_r($getidlang);
-        $q = $this->m_lpmi->getSubCategory($getidcat);        
+        $getidsubcat =  $this->input->post('idsubcat');
+        // print_r($getidcat);
+        $q = $this->m_lpmi->getSubCategory($getidcat,$getidsubcat);        
         echo json_encode($q);  
     }
 

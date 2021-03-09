@@ -512,6 +512,14 @@
             '</div>');
     }
 
+    function loading_page2(selector) {
+        selector.html('<div class="row">' +
+            '<div class="col-md-12" style="text-align: center;">' +
+            '<h3 class="animated flipInX"><i class="fa fa-circle-o-notch fa-spin fa-fw"></i> <span>Loading page . . .</span></h3>' +
+            '</div>' +
+            '</div>');
+    }
+
     function loading_anytext(element,text) {
         $(element).html('<div class="row">' +
             '<div class="col-md-12" style="text-align: center;">' +
@@ -1053,6 +1061,40 @@
 
             }
         });
+
+    }
+
+    const checkboxListStatuStudent = async (selector) => {
+        var url = base_url_js+'api/__crudStatusStudents';
+        var data = {
+            action : 'read'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        loading_page2(selector);
+        try{
+            const fetch = await AjaxSubmitFormPromises(url,token);
+            let html  = '<div class = "row">';
+
+                for (var i = 0; i < fetch.length; i++) {
+                    html += '<div class = "col-sm-6">'+
+                                '<div class="checkbox">'+
+                                    '<label>'+
+                                        '<input type="checkbox" class="checkboxStatus"  value="'+fetch[i].ID+'">'+fetch[i].Description+
+                                    '</label>'+
+                                '</div>'+
+                            '</div>';
+                }
+
+                html+= '</div>';
+
+            selector.html(html);   
+
+        }
+        catch(err){
+            toastr.info('something wrong, please contact IT');
+        }
+        
 
     }
 
@@ -2394,6 +2436,18 @@
         });
     }
 
+    // change curiculem to TA
+    function loadSelectOptionCurriculum3(element,selected) {
+        var url = base_url_js+"api/__getKurikulumSelectOption";
+        $.get(url,function (data_json) {
+            // console.log(data_json);
+            for(var i=0;i<data_json.length;i++){
+                var selected = (data_json[i].ID==selected) ? 'selected' : '';
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>'+(data_json[i].NameEng).replace('Curriculum','TA')+'</option>');
+            }
+        });
+    }
+
     function loadSelectOptionLembaga(element,selected) {
 
         var url = base_url_js+'api3/__crudLembagaSurview';
@@ -2997,9 +3051,78 @@
               return false;
             }
             return true;
-        }
+        },
+
+        file_validation : (ev,TheName='',max_upload_per_file = 4,allow_extension = ['pdf,jpeg,jpg,png'],max_size = 5000000) => {
+            var files = ev[0].files;
+            var error = '';
+            var msgStr = '';
+            if (files.length > 0) {
+              if (files.length > max_upload_per_file) {
+                msgStr += 'Upload File '+TheName + ' 1 Document should not be more than '+max_upload_per_file+' Files<br>';
+
+              }
+              else
+              {
+                for(var count = 0; count<files.length; count++)
+                {
+                 var no = parseInt(count) + 1;
+                 var name = files[count].name;
+                 var extension = name.split('.').pop().toLowerCase();
+                 if(jQuery.inArray(extension, ['pdf']) == -1)
+                 {
+                  msgStr += 'Upload File '+TheName + ' Invalid Type File<br>';
+                 }
+
+                 var oFReader = new FileReader();
+                 oFReader.readAsDataURL(files[count]);
+                 var f = files[count];
+                 var fsize = f.size||f.fileSize;
+
+                 if(fsize > max_size) 
+                 {
+                  msgStr += 'Upload File '+TheName +  ' Image File Size is very big<br>';
+                 }
+                 
+                }
+              }
+            }
+            else
+            {
+              msgStr += 'Upload File '+TheName + ' Required';
+            }
+            return msgStr;
+        },
     }
     /*END ADDED BY Adhi @ Sep 2020*/
+
+    function loadSelectOptionEmployees_kelompok_profesi(selector,selected = ''){
+        var url = base_url_js+'api/__getemployees_kelompok_profesi';
+        $.getJSON(url,function (jsonResult) {
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected==v.ID_kelompok_profesi) ? 'selected' : '';
+                selector.append('<option value="'+v.ID_kelompok_profesi+'" '+sc+'>'+v.Name+'</option>');
+
+            })
+        });
+    }
+
+    function loadSelectOptionStatus_NITK(selector,selected = ''){
+        loadSelectOptionEmployees_kelompok_profesi(selector,selected)
+    }
+
+
+    // Sample query like in es6
+    // const arrayOfObject = [{ name: 'Paul', country: 'Canada', }, { name: 'Lea', country: 'Italy', }, { name: 'John', country: 'Italy' }];
+
+    // console.log(filterLikeByValue(arrayOfObject, 'lea')); // [{name: 'Lea', country: 'Italy'}]
+    // console.log(filterLikeByValue(arrayOfObject, 'ita')); // [{name: 'Lea', country: 'Italy'}, {name: 'John', country: 'Italy'}]
+    function filterLikeByValue(array, string) {
+        return array.filter(o =>
+            Object.keys(o).some(k => o[k].toLowerCase().includes(string.toLowerCase())));
+    }
+
 
 </script>
 
@@ -3074,3 +3197,40 @@ https://firebase.google.com/docs/web/setup#available-libraries -->
 
 </script>
 
+
+<!--Added by Adhi 2020-12-08 -->
+<script>
+
+const success_message_response = (message) => {
+    toastr.success(message);
+}
+const error_message_response = (message) => {
+    toastr.info(message);
+}
+
+$(document).ready(function(e){
+    <?php
+    if ($this->session->flashdata('form_response_status')) {
+        echo $this->session->flashdata('form_response_status') . '_message_response("' . $this->session->flashdata('form_response_message') . '");';
+    }
+    ?>
+})
+
+const response_form = (response) => {
+    // response = JSON.parse(response);
+    if (response.redirect) {
+        window.location = response.redirect;
+    } else {
+        if (response.message) {
+            if (response.status == 'success') {
+                success_message_response(response.message);
+            } else if (response.status == 'error') {
+                error_message_response(response.message);
+            }
+        }
+    }
+
+}
+
+</script>
+<!--Added by Adhi 2020-12-08 -->

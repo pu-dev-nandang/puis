@@ -1786,7 +1786,23 @@ class C_rest extends CI_Controller {
 
                     if(count($dataSmt)>0){
                         $data[$i]['Semester'] = count($dataSmt);
-                        $datapay = $this->db->query('SELECT Invoice, Status,Deadline,DatePayment FROM db_finance.payment_students WHERE ID_payment = "'.$data[$i]['ID'].'" ')->result_array();
+                        $datapay = $this->db->query('SELECT ID, Invoice, Status,Deadline,DatePayment FROM db_finance.payment_students WHERE ID_payment = "'.$data[$i]['ID'].'" ')->result_array();
+
+                        if (count($datapay) > 0) {
+                            for ($k=0; $k < count($datapay); $k++) { 
+                                $ID_payment_students = $datapay[$k]['ID'];
+
+                                // subcicilan
+                                $dataPembayaran = $this->m_master->caribasedprimary('db_finance.payment_student_details','ID_payment_students',$ID_payment_students);
+                                $datapay[$k]['dataPembayaran'] = $dataPembayaran;
+                            }
+                        }
+                        else
+                        {
+                            $datapay[$k]['dataPembayaran'] = [];
+                        }
+                        
+
                         $data[$i]['DetailPay'] = $datapay;
                         array_push($result,$data[$i]);
                     }

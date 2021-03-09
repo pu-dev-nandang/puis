@@ -2409,6 +2409,48 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $minFix;
     }
 
+    public function __dateDifference($date1, $date2)
+    {
+        $date1=strtotime($date1);
+        $date2=strtotime($date2);
+        $diff = abs($date1 - $date2);
+
+        $day = $diff/(60*60*24); // in day
+        $dayFix = floor($day);
+        $dayPen = $day - $dayFix;
+        $secFix = 0;
+        $minFix = 0;
+        $hourFix = 0;
+        if($dayPen > 0)
+        {
+            $hour = $dayPen*(24); // in hour (1 day = 24 hour)
+            $hourFix = floor($hour);
+            $hourPen = $hour - $hourFix;
+            if($hourPen > 0)
+            {
+                $min = $hourPen*(60); // in hour (1 hour = 60 min)
+                $minFix = floor($min);
+                $minPen = $min - $minFix;
+                if($minPen > 0)
+                {
+                    $sec = $minPen*(60); // in sec (1 min = 60 sec)
+                    $secFix = floor($sec);
+                }
+            }
+        }
+        $str = "";
+        if($dayFix > 0)
+            $str.= $dayFix." day;";
+        if($hourFix > 0)
+            $str.= $hourFix." hour;";
+        if($minFix > 0)
+            $str.= $minFix." min";
+        // if($secFix > 0)
+        //     $str.= $secFix." sec ";
+
+        return $str;
+    }
+
     public function countTimeQuery($Start, $End)
     {
         $sql = 'select TIMEDIFF("'.$Start.'","'.$End.'") as time';
@@ -3307,9 +3349,19 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     }
 
     public function SearchEmployeesByNIP($NIP){
-        $sql = 'select emp.*,divi.ID as DivisionID,divi.Division as DivisionName,divi.Description as DivisionNameDesc,divi.Abbreviation as DivAbbr,pos.Position as PositionName,pos.Description as PositionDescription,pos.ID as PositionID from db_employees.employees as emp
-            join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
-            join db_employees.position as pos on SPLIT_STR(emp.PositionMain, ".", 2) = pos.ID
+        $sql = 'select emp.*,divi.ID as DivisionID,divi.Division as DivisionName,divi.Description as DivisionNameDesc,divi.Abbreviation as DivAbbr,pos.Position as PositionName,pos.Description as PositionDescription,pos.ID as PositionID,
+            divi_other1.ID as DivisionID_other1,divi_other1.Division as DivisionName_other1,divi_other1.Description as DivisionNameDesc_other1,divi_other1.Abbreviation as DivAbbr_other1,pos_other1.Position as PositionName_other1,pos_other1.Description as PositionDescription_other1,pos_other1.ID as PositionID_other1,
+            divi_other2.ID as DivisionID_other2,divi_other2.Division as DivisionName_other2,divi_other2.Description as DivisionNameDesc_other2,divi_other2.Abbreviation as DivAbbr_other2,pos_other2.Position as PositionName_other2,pos_other2.Description as PositionDescription_other2,pos_other2.ID as PositionID_other2,
+            divi_other3.ID as DivisionID_other3,divi_other3.Division as DivisionName_other3,divi_other3.Description as DivisionNameDesc_other3,divi_other3.Abbreviation as DivAbbr_other3,pos_other3.Position as PositionName_other3,pos_other3.Description as PositionDescription_other3,pos_other3.ID as PositionID_other3
+            from db_employees.employees as emp
+            left join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
+            left join db_employees.position as pos on SPLIT_STR(emp.PositionMain, ".", 2) = pos.ID
+            left join db_employees.division as divi_other1 on SPLIT_STR(emp.PositionOther1, ".", 1) = divi_other1.ID
+            left join db_employees.position as pos_other1 on SPLIT_STR(emp.PositionOther1, ".", 2) = pos_other1.ID
+            left join db_employees.division as divi_other2 on SPLIT_STR(emp.PositionOther1, ".", 1) = divi_other2.ID
+            left join db_employees.position as pos_other2 on SPLIT_STR(emp.PositionOther1, ".", 2) = pos_other2.ID
+            left join db_employees.division as divi_other3 on SPLIT_STR(emp.PositionOther1, ".", 1) = divi_other3.ID
+            left join db_employees.position as pos_other3 on SPLIT_STR(emp.PositionOther1, ".", 2) = pos_other3.ID
             where emp.NIP = "'.$NIP.'"
                 ';
         $query=$this->db->query($sql, array())->result_array();
@@ -4278,6 +4330,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 
                 $output[] = $filenameNew;
               }
+              else
+              {
+                $error = array('error' => $this->upload->display_errors());
+                return print_r(json_encode($error));
+              }
             }
         }
 
@@ -4420,7 +4477,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     }
 
-       public function UpdatePwdAD($data_arr)
+    public function UpdatePwdAD($data_arr)
     {
         $TypeUser = $data_arr['User'];
         switch ($TypeUser) {
@@ -4459,7 +4516,148 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             default:
                 # code...
                 break;
-        }}
+        }
+    }
+
+    public function date_range_get_list($startDate,$endDate){
+        $rs = ['status' => true,'data' => [] ];
+        $query = $this->db->query(
+            '
+                select * from 
+                (select adddate("1970-01-01",t4.i*10000 + t3.i*1000 + t2.i*100 + t1.i*10 + t0.i) selected_date from
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t0,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t1,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,
+                 (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v
+                where selected_date between "'.$startDate.'" and "'.$endDate.'"
+            '
+        )->result_array();
+
+        if (count($query) > 0) {
+            for ($i=0; $i < count($query); $i++) { 
+                $rs['data'][] = $query[$i]['selected_date'];
+            }
+           
+        }
+        else
+        {
+            $rs['status'] = false;
+        }
+
+        return $rs;
+    }
+
+    public function TwoArraysObjectJoin($arr1,$arr2){
+        $rs = [];
+        for ($i=0; $i < count($arr2); $i++) { 
+            $arr1[] = $arr2[$i];
+        }
+
+        for ($i=0; $i < count($arr1); $i++) { 
+           $c = json_encode($arr1[$i]);
+           $bool = true;
+           for ($j=$i+1; $j < count($arr1); $j++) { 
+               $d = json_encode($arr1[$j]);
+               if($c===$d){
+                 $bool = false;
+                 break;
+               }     
+           }
+
+            if ($bool) {
+                $rs[] = $arr1[$i];
+            }
+
+        }
+
+        return $rs;
+    }
+
+    public function getAllDepartementPU()
+    {
+        $arr_result = array();
+        $NA = $this->caribasedprimary('db_employees.division','StatusDiv',1);
+        if (isset($_POST)) {
+            if (array_key_exists('Show', $_POST)) {
+                if ($_POST['Show'] == 'all') {
+                    $NA = $this->showData_array('db_employees.division');
+                }
+            }
+
+        }
+        $AC = $this->caribasedprimary('db_academic.program_study','Status',1);
+        $FT = $this->caribasedprimary('db_academic.faculty','StBudgeting',1);
+        for ($i=0; $i < count($NA); $i++) {
+            $arr_result[] = array(
+                'Code'  => 'NA.'.$NA[$i]['ID'],
+                'Name1' => $NA[$i]['Description'],
+                'Name2' => $NA[$i]['Division'],
+                'Abbr' => $NA[$i]['Abbreviation'],
+            );
+        }
+
+        for ($i=0; $i < count($AC); $i++) {
+            $arr_result[] = array(
+                'Code'  => 'AC.'.$AC[$i]['ID'],
+                'Name1' => 'Prodi '.$AC[$i]['Name'],
+                'Name2' => 'Study '.$AC[$i]['NameEng'],
+                'Abbr' => $AC[$i]['Code'],
+            );
+        }
+
+        for ($i=0; $i < count($FT); $i++) {
+            $arr_result[] = array(
+                'Code'  => 'FT.'.$FT[$i]['ID'],
+                'Name1' => 'Facultas '.$FT[$i]['Name'],
+                'Name2' => 'Faculty '.$FT[$i]['NameEng'],
+                'Abbr' => $FT[$i]['Abbr'],
+            );
+        }
+
+        return $arr_result;
+    }
+
+    public function dropdownEMP($condition = array()){
+        $options = ['%' => 'All Employee'];
+        $data = $this->db->get('db_employees.employees')->result();
+        foreach ($data as $key ) {
+            $options[$key->NIP] = $key->Name;
+        }
+        return $options;
+    }
+
+    public function dropdownDiv($condition = array()){
+        $options = ['%' => 'All Division'];
+        $data = $this->getAllDepartementPU();
+        for ($i=0; $i < count($data); $i++) { 
+            $options[$data[$i]['Code']] = $data[$i]['Abbr'];
+        }
+        return $options;
+    }
+
+    public function re_format_POST_serializeArray_to_Validation_CI($data){
+        $rs = [];
+        for ($i=0; $i < count($data); $i++) { 
+            if (!array_key_exists('name', $data[$i])) {
+                die('Format not match, ex : Array ( [0] => Array ( [name] => ID_kelompok_profesi [value] => ) [1] => Array ( [name] => Name [value] => fgdgfdg ) )');
+            }
+            else
+            {
+                $rs[$data[$i]['name']] = $data[$i]['value'];
+            }
+        }
+
+        return $rs;
+    }
+
+    public function generate_random_letters($length) {
+        $random = '';
+        for ($i = 0; $i < $length; $i++) {
+            $random .= chr(rand(ord('a'), ord('z')));
+        }
+        return $random;
+    }
 
 
 }

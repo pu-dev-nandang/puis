@@ -193,9 +193,24 @@
 
 <script>
   //change password portal
-   $(document).on('keypress','#modal_changepass #inputpasswordold',function () {
-        $('#modal_changepass #inputpassword').prop('disabled',false);
+   $(document).on('keyup','#modal_changepass #inputpasswordold',function () {
+        countCharCurr();
     });
+
+    $(document).on('blur','#modal_changepass #inputpasswordold',function () {
+        countCharCurr();
+    });
+
+
+  function countCharCurr() {
+        var c = $('#modal_changepass #inputpasswordold').val();
+        var d = true;
+        if(c.length>=0){
+            d = false;
+        }
+        $('#modal_changepass #inputpassword').prop('disabled',false);
+
+    }
 
  $(document).on('keyup','#modal_changepass #inputpassword',function () {
         countChar();

@@ -143,6 +143,8 @@
                     selector.append(htmlBody);
                 }
             });
+
+            newDescritionInput.getDescription(FilterTahun);
         }
     }
 
@@ -307,4 +309,10 @@
             });
         }
     }) 
+
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        var FilterTahun = $('#FilterTahun').val();
+        newDescritionInput.saveDescription(itsme,FilterTahun);
+    })
 </script>

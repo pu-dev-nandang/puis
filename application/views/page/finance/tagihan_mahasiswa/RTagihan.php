@@ -38,7 +38,7 @@
        <div class="col-md-3">
            <div class="thumbnail" style="min-height: 30px;padding: 10px;">
                 <select class="form-control filter-db-std" id="filterStatus">
-                    <option value="">-- All Status Mahasiswa--</option>
+                    <option value="">-- Aktif,cuti dan cuti akademik--</option>
                     <option disabled>------------------------</option>
                 </select>
            </div>
@@ -53,10 +53,8 @@
         <div class="col-md-12">
           <div class="DTTT btn-group">
             <button type="button" class="btn btn-convert" id="export_excel"><i class="fa fa-download" aria-hidden="true"></i> Excel</button>
-            <!--<a class="btn DTTT_button_pdf" id="ToolTables_DataTables_Table_0_1">
-              <span><i class="fa fa-download" aria-hidden="true"></i> PDF
-              </span>
-            </a>-->
+            <button type="button" class="btn DTTT_button_pdf"  id="export_pdf"><span><i class="fa fa-download" aria-hidden="true"></i> PDF
+              </span></button>
           </div>
           <div id="DataTables_Table_0_filter" class="dataTables_filter">
             <label>
@@ -80,15 +78,14 @@
     window.dataa = '';
     window.summary = '';
     window.PostPassing = '';
+    window.AllData = [];
     $(document).ready(function () {
-        loadSelectOptionCurriculum2('#selectCurriculum','');
+        loadSelectOptionCurriculum3('#selectCurriculum','');
         loadSelectOptionBaseProdi('#selectProdi','');
         loadSelectOptionPaymentTypeAll('#selectPTID','');
         loadSelectOptionSemesterByload('#selectSemester',1);
-        getReloadTableSocket();
+        //getReloadTableSocket();
     });
-
-
 
     $('#selectCurriculum').change(function () {
         loadData(1);
@@ -145,6 +142,38 @@
         summary : summary,
         PostPassing : PostPassing,
       }
+      var token = jwt_encode(data,"UAP)(*");
+      submit(url, 'POST', [
+          { name: 'token', value: token },
+      ]);
+    });
+
+    $(document).on("click", "#export_pdf", function(event){
+      var url = base_url_js+'C_save_to_pdf3/finance_report_pdf';
+      var ta = $('#selectCurriculum').val();
+      ta = ta.split('.');
+      ta = ta[1];
+
+      var Semester = $('#selectSemester').find('option:selected').text();
+     
+      var prodi = $('#selectProdi').find('option:selected').text();
+
+      var StatusMHS = $("#filterStatus").find('option:selected').text();
+
+      var Statuspay = $('#selectStatus').find('option:selected').text();
+
+      var NIM = $('#NIM').val().trim();
+
+      var data = {
+        data : AllData,
+        ta :ta,
+        Semester : Semester,
+        NPM : NIM,
+        StatusMHS : StatusMHS,
+        Statuspay : Statuspay,
+        prodi :prodi,
+      };
+      
       var token = jwt_encode(data,"UAP)(*");
       submit(url, 'POST', [
           { name: 'token', value: token },
@@ -266,6 +295,7 @@
             // console.log(resultJson);
             var Data_mhs = resultJson.loadtable;
             var taShow = ta;
+            AllData = resultJson.loadtable;
             // dataa = Data_mhs;
             setTimeout(function () {
                 $("#conTainJS").html(htmlDy);
@@ -304,7 +334,20 @@
                                 keteranganBPPEX = "BPP\n";
                                 for (var l = 0; l < DetailPaymentBPP.length; l++) {
                                   var lno = parseInt(l) + 1;
-                                  var StatusPay = (DetailPaymentBPP[l]['Status'] == 1)? 'Sudah Bayar' : 'Belum Bayar';
+                                  //var StatusPay = (DetailPaymentBPP[l]['Status'] == 1)? 'Sudah Bayar' : 'Belum Bayar';
+                                  if (DetailPaymentBPP[l]['Status'] == 1) {
+                                    var StatusPay = 'Lunas' 
+                                  }
+                                  else
+                                  {
+                                    if (parseInt(Data_mhs[i]['PayBPP']) > 0) {
+                                      var StatusPay = 'Belum Lunas'; 
+                                    }
+                                    else
+                                    {
+                                      var StatusPay = 'Belum Bayar'; 
+                                    }
+                                  }
                                   if (DetailPaymentBPP[l]['Status'] == 0) {
                                     keteranganBPP += '<li>Pembayaran : '+lno+'</li>';
                                     keteranganBPPEX += "Pembayaran : "+lno+" \n";
@@ -330,7 +373,21 @@
                                 keteranganCrEX = "Credit\n";
                                 for (var l = 0; l < DetailPaymentCr.length; l++) {
                                   var lno = parseInt(l) + 1;
-                                  var StatusPay = (DetailPaymentCr[l]['Status'] == 1)? 'Sudah Bayar' : 'Belum Bayar';
+                                  //var StatusPay = (DetailPaymentCr[l]['Status'] == 1)? 'Sudah Bayar' : 'Belum Bayar';
+                                  if (DetailPaymentCr[l]['Status'] == 1) {
+                                    var StatusPay = 'Lunas' 
+                                  }
+                                  else
+                                  {
+                                    if (parseInt(Data_mhs[i]['PayCr']) > 0) {
+                                      var StatusPay = 'Belum Lunas'; 
+                                    }
+                                    else
+                                    {
+                                      var StatusPay = 'Belum Bayar'; 
+                                    }
+                                  }
+
                                   if(DetailPaymentCr[l]['Status'] == 0)
                                   {
                                     keteranganCr += '<li>Pembayaran : '+lno+'</li>';

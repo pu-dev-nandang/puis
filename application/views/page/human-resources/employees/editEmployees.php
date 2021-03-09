@@ -269,6 +269,23 @@
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label>NITK</label>
+                                            <input type="text" class="form-control" id="formNITK" value="<?= $arrEmp['NITK']; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label>Status of NITK</label>
+                                            <select class="form-control" id="formStatus_NITK">
+                                                <option value="">Choose one</option>
+                                            </select>
+                                            <small class="text-danger text-message"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>Email Other</label>
@@ -722,8 +739,12 @@
         loadSelectOptionBaseProdi('#formProgrammeStudy', ProdiID);
         FuncEvform_MainDivision();
 
-        loadSelectOptionLevelEducation('#formLevelEducationID', <?= $arrEmp['LevelEducationID']; ?>);
-        loadSelectOptionLecturerAcademicPosition('#formLecturerAcademicPositionID', <?= $arrEmp['LecturerAcademicPositionID']; ?>);
+        loadSelectOptionLevelEducation('#formLevelEducationID',<?= $arrEmp['LevelEducationID']; ?>);
+
+        loadSelectOptionStatus_NITK($('#formStatus_NITK'),<?= $arrEmp['Status_NITK']; ?>);
+
+        loadSelectOptionLecturerAcademicPosition('#formLecturerAcademicPositionID',<?= $arrEmp['LecturerAcademicPositionID']; ?>);
+
 
         <?php if ($arrEmp['StatusForlap'] != '' && $arrEmp['StatusForlap'] != null) { ?>
             $('#formStatusForlap').val(<?= $arrEmp['StatusForlap']; ?>);
@@ -1414,6 +1435,9 @@
             var formStatusLecturer = $('#formStatusLecturer').val();
             var formProfession = $('#formProfession').val();
 
+            var formNITK = $('#formNITK').val();
+            var formStatus_NITK = $('#formStatus_NITK').val();
+
             var data = {
                 arr_Prodi: arr_Prodi,
                 action: 'UpdateEmployees',
@@ -1459,16 +1483,20 @@
                     StatusEmployeeID: formStatusEmployee,
                     StatusLecturerID: formStatusLecturer,
                     Profession: formProfession,
-                    StatusForlap: formStatusForlap,
-                    Access_Card_Number: Access_Card_Number,
-                    Serdos: formSerdos,
-                    SerdosNumber: formSerdosNumber,
-                    CountryID: CountryID,
-                    ProvinceID: ProvinceID,
-                    RegionID: RegionID,
-                    DistrictID: DistrictID,
-                    Extension: formExtension,
-                    PassTelp: formPassTelp
+                    StatusForlap : formStatusForlap,
+                    Access_Card_Number : Access_Card_Number,
+                    Serdos : formSerdos,
+                    SerdosNumber : formSerdosNumber,
+                    CountryID   : CountryID,
+                    ProvinceID  : ProvinceID,
+                    RegionID    : RegionID,
+                    DistrictID  : DistrictID,
+                    Extension   : formExtension,
+                    PassTelp    : formPassTelp,
+                    NITK : formNITK,
+                    Status_NITK : formStatus_NITK,
+
+
                 }
             };
 

@@ -877,9 +877,12 @@ class C_employees extends HR_Controler
                             list($type, $data) = explode(';', $data);
                             list(, $data)      = explode(',', $data);
                             $data = base64_decode($data);
-                            $filenameSignature = $data_arr['NIP'] . '.png';
-                            file_put_contents('./uploads/signature/' . $filenameSignature, $data);
-                            $Logs->Signature = $filenameSignature;
+                          
+                            $filenameSignature = $data_arr['NIP'].'.png';
+                            file_put_contents('./uploads/signature/'.$filenameSignature, $data);
+                            $Logs->Signature= $filenameSignature;
+                            $Logs->Signatures= $filenameSignature;
+
                         }
 
                         // for certificate

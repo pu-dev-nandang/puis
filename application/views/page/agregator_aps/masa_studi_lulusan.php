@@ -27,7 +27,8 @@ var AppJQ = {
                     var url = base_url_js+'rest3/__get_APS_CrudAgregatorTB7';
 
                     $.post(url,{token:token},function (jsonResult) {
-                        AppJQ.MakeTable(jsonResult);                           
+                        AppJQ.MakeTable(jsonResult); 
+                        newDescritionInput.getDescription();                          
                     });
                 },
     MakeTable : function(jsonResult){
@@ -168,5 +169,10 @@ $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
             'backdrop' : 'static'
         });
     }
+})
+
+$(document).on('click','.btnSaveDescription',function(e){
+    const itsme =  $(this);
+    newDescritionInput.saveDescription(itsme);
 }) 
 </script>

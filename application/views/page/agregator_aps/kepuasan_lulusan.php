@@ -109,6 +109,8 @@
 
             });
 
+            newDescritionInput.getDescription(Year);
+
         }
 
 
@@ -162,4 +164,11 @@
         });
     });
 
+    
+    $(document).on('click','.btnSaveDescription',function(e){
+        const itsme =  $(this);
+        var filterYear = $('#filterYear').val();
+        var Year = filterYear.split('.')[1];
+        newDescritionInput.saveDescription(itsme,Year);
+    })
 </script>

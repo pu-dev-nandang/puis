@@ -649,10 +649,19 @@
             '<select class="form-control" id="formChangeStatus"></select>' +
             '</div>' +
             '<div class="form-group" style="text-align: left;">' +
+            '<label>Effective Date</label>' +
+                '<div id="effectiveDate" class="input-group input-append date datetimepicker">'+
+                    '<input data-format="yyyy-MM-dd" class="form-control" id="effectiveDateTxt" type=" text" readonly="" value="<?php echo date('Y-m-d') ?>">'+
+                    '<span class="input-group-addon add-on">'+
+                       ' <i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i>'+
+                    '</span>'+
+                '</div>' +
+            '</div>' +
+            '<div class="form-group" style="text-align: left;">' +
             '<label>Email PU</label>' +
             // '<input class="form-control" id="formEmailPU" value="'+EmailPU+'" />' +
             '<div class="input-group">' +
-            '  <input type="text" class="form-control" placeholder="Username" id="formEmailPU" value="'+usermail+'">' +
+            '  <input type="text" class="form-control" placeholder="Username" id="formEmailPU" value="'+usermail+'" readonly>' +
             '  <span class="input-group-addon" id="basic-addon2">@podomorouniversity.ac.id</span>' +
             '</div>' +
             '</div>' +
@@ -672,6 +681,10 @@
             'show' : true,
             'backdrop' : 'static'
         });
+
+        $('#effectiveDate').datetimepicker({
+          format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+        });
     });
     $(document).on('click','#btnSaveChangeStatus',function () {
 
@@ -688,7 +701,8 @@
                 StatusID : formChangeStatus,
                 NPM : $(this).attr('data-npm'),
                 EmailPU : formEmailPU+'@podomorouniversity.ac.id',
-                dataYear : $(this).attr('data-year')
+                dataYear : $(this).attr('data-year'),
+                EffectiveDateStatus : $('#effectiveDateTxt').val()
             };
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudStatusStudents';
@@ -709,7 +723,6 @@
             },2000);
 
         }
-
 
     });
     
