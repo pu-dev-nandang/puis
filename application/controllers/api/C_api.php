@@ -6585,13 +6585,12 @@ class C_api extends CI_Controller
                 }
 
 
+                $this->db->reset_query();
+                $this->db->where('NIP', $data_arr['NIP']);
+                $this->db->delete('db_employees.employees_sub_prodi');
+                $this->db->reset_query();
                 // Update sub prodi
                 if (count($data_arr['listCheckedSubProdi']) > 0) {
-                    $this->db->reset_query();
-                    $this->db->where('NIP', $data_arr['NIP']);
-                    $this->db->delete('db_employees.employees_sub_prodi');
-                    $this->db->reset_query();
-
                     for ($i = 0; $i < count($data_arr['listCheckedSubProdi']); $i++) {
                         $arrIns = array(
                             'NIP' => $data_arr['NIP'],
