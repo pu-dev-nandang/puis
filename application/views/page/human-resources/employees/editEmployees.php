@@ -1,14 +1,36 @@
 <script type="text/javascript">
-    $(document).ready(function(){
+    $(document).ready(function() {
         $("#form-employee .tabulasi-emp > ul > li").removeClass("active");
         $("#form-employee .tabulasi-emp > ul > li.nv-personal").addClass("active");
     });
 </script>
 <style type="text/css">
-    .bg-required{color: red;font-weight: bold;}
+    .bg-required {
+        color: red;
+        font-weight: bold;
+    }
+
     #AppendProdi {
         margin: auto;
         width: 100%;
+    }
+
+    .panel-heading {
+        position: relative !important;
+    }
+
+    .panel-number {
+        position: absolute;
+        top: -9px;
+        left: -5px;
+        width: 20px;
+        height: 20px;
+        background: #e64a19;
+        color: #fff;
+        text-align: center;
+        font-weight: bold;
+        padding-top: 2px;
+        border-radius: 15px;
     }
 </style>
 
@@ -22,28 +44,30 @@
             <div class="col-md-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
+                        <div class="panel-number">1</div>
                         <h4 class="panel-title"><i class="fa fa-id-card"></i> Fill out this field based on Identity Card (KTP)
-                        <span class="bg-required pull-right">required</span></h4>
+                            <span class="bg-required pull-right">required</span>
+                        </h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-xs-5">
                                 <div class="form-group">
                                     <label>Full Name </label>
-                                    <input class="form-control required" id="formName" autocomplete="off"  value="<?php echo $arrEmp['Name']; ?>" />
+                                    <input class="form-control required" id="formName" autocomplete="off" value="<?php echo $arrEmp['Name']; ?>" />
                                     <small class="text-danger text-message"></small>
                                 </div>
                             </div>
                             <div class="col-xs-2">
                                 <div class="form-group">
                                     <label>Title Ahead</label>
-                                    <input class="form-control" id="formTitleAhead" autocomplete="off"  value="<?php echo $arrEmp['TitleAhead']; ?>" />
+                                    <input class="form-control" id="formTitleAhead" autocomplete="off" value="<?php echo $arrEmp['TitleAhead']; ?>" />
                                 </div>
                             </div>
                             <div class="col-xs-2">
                                 <div class="form-group">
                                     <label>Title Behind</label>
-                                    <input class="form-control" id="formTitleBehind" autocomplete="off"  value="<?php echo $arrEmp['TitleBehind']; ?>" />
+                                    <input class="form-control" id="formTitleBehind" autocomplete="off" value="<?php echo $arrEmp['TitleBehind']; ?>" />
                                 </div>
                             </div>
                             <div class="col-xs-3">
@@ -57,13 +81,13 @@
                                     <small class="text-danger text-message"></small>
                                 </div>
                             </div>
-                            
+
                         </div>
                         <div class="row">
                             <div class="col-xs-4">
                                 <div class="form-group">
                                     <label>Number of ID Card </label>
-                                    <input class="form-control number required" id="formKTP" autocomplete="off"  value="<?php echo $arrEmp['KTP']; ?>" />
+                                    <input class="form-control number required" id="formKTP" autocomplete="off" value="<?php echo $arrEmp['KTP']; ?>" />
                                     <small class="text-danger text-message"></small>
                                 </div>
                             </div>
@@ -146,7 +170,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row" id="PlaceIDCard">
                             <div class="col-xs-3">
                                 <div class="form-group">
@@ -181,7 +205,7 @@
                                     </select>
                                     <small class="text-danger text-message"></small>
                                 </div>
-                            </div>                            
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-xs-2">
@@ -198,6 +222,7 @@
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
+                        <div class="panel-number">2</div>
                         <h4 class="panel-title">
                             <i class="fa fa-id-card"></i> Fill out this field based on Employee Data
                             <span class="bg-required pull-right">required</span>
@@ -267,7 +292,7 @@
                                             <input class="form-control required" id="formEmail" autocomplete="off" value="<?php echo $arrEmp['Email']; ?>" />
                                             <small class="text-danger text-message"></small>
                                         </div>
-                                    </div>  
+                                    </div>
 
                                     <div class="col-sm-4">
                                         <div class="form-group">
@@ -281,7 +306,7 @@
                                             <input class="form-control number required" id="formMobile" autocomplete="off" value="<?php echo $arrEmp['HP']; ?>" />
                                             <small class="text-danger text-message"></small>
                                         </div>
-                                    </div>                                
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
@@ -291,13 +316,13 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label>Extension</label>                                            
+                                            <label>Extension</label>
                                             <input class="form-control number" id="formExtension" autocomplete="off" maxlength="5" value="<?php echo $arrEmp['Extension']; ?>" />
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label>Password Telp</label>                                            
+                                            <label>Password Telp</label>
                                             <input class="form-control" id="formPassTelp" autocomplete="off" value="<?php echo $arrEmp['PassTelp']; ?>" />
                                         </div>
                                     </div>
@@ -308,34 +333,34 @@
                                             <label>Email PU</label>
                                             <div class="form-group">
                                                 <div class="input-group">
-                                                    <?php $EmailPU = ($arrEmp['EmailPU']!='') ? explode('@',$arrEmp['EmailPU'])[0] : ''; ?>
+                                                    <?php $EmailPU = ($arrEmp['EmailPU'] != '') ? explode('@', $arrEmp['EmailPU'])[0] : ''; ?>
                                                     <input type="text" class="form-control" id="formEmailPU" disabled value="<?php echo $EmailPU; ?>">
                                                     <span class="input-group-addon">@podomorouniversity.ac.id</span>
                                                 </div>
                                                 <label> *Email PU Auto Generete by system</label>
                                             </div>
                                         </div>
-                                    </div> 
+                                    </div>
                                 </div>
-                                
+
                             </div>
-                            
+
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>Photo</label>
                                 </div>
                                 <div class="form-group">
                                     <center>
-                                    <?php $imgPr = ($arrEmp['Photo']!='' && $arrEmp['Photo']!=null &&
-                                    file_exists('./uploads/employees/'.$arrEmp['Photo']))
-                                    ? base_url('uploads/employees/'.$arrEmp['Photo'])
-                                    : base_url('images/icon/userfalse.png'); ?>
-                                    <img id="imgThumbnail" src="<?= $imgPr ?>" style="max-width: 100px;width: 100%;">
+                                        <?php $imgPr = ($arrEmp['Photo'] != '' && $arrEmp['Photo'] != null &&
+                                            file_exists('./uploads/employees/' . $arrEmp['Photo']))
+                                            ? base_url('uploads/employees/' . $arrEmp['Photo'])
+                                            : base_url('images/icon/userfalse.png'); ?>
+                                        <img id="imgThumbnail" src="<?= $imgPr ?>" style="max-width: 100px;width: 100%;">
                                     </center>
                                     <form id="fmPhoto" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
                                         <input id="formPhoto" class="hide" value="" hidden />
                                         <div class="form-group">
-                                                <label class="btn btn-sm btn-default btn-default-warning btn-upload" style="width:100%">
+                                            <label class="btn btn-sm btn-default btn-default-warning btn-upload" style="width:100%">
                                                 <i class="fa fa-upload margin-right"></i> Upload Photo
                                                 <input type="file" id="filePhoto" name="userfile" class="uploadPhotoEmp" style="display: none;" accept="image/*">
                                             </label>
@@ -343,7 +368,7 @@
                                         </div>
                                     </form>
                                     <div style="text-align: left;padding-top: 10px;border-top: 1px solid #ccc;margin-top: 0px;">
-                                        Size : <span id="imgSize">0</span> Kb <br/>
+                                        Size : <span id="imgSize">0</span> Kb <br />
                                         Type : <span id="imgType">-</span>
                                         <input id="formImgType" class="hide" hidden readonly />
                                     </div>
@@ -356,12 +381,11 @@
                                         <div class="form-group">
                                             <label class="btn btn-sm btn-default btn-default-primary btn-upload" style="width:100%">
                                                 <i class="fa fa-upload margin-right"></i> Upload Ijazah (.pdf)
-                                                <input type="file" id="fileIjazah" name="userfile" class="uploadIjazah"
-                                                       style="display: none;" accept="application/pdf">
+                                                <input type="file" id="fileIjazah" name="userfile" class="uploadIjazah" style="display: none;" accept="application/pdf">
                                             </label>
                                         </div>
                                     </form>
-                                </div>  
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -371,110 +395,127 @@
             <div class="col-md-6">
 
                 <div class="row">
-                    <div class="col-xs-12">
-                        <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
-                            <h4>Position Main</h4>
+                    <div class="col-sm-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="panel-number">3</div>
+                                <h4 class="panel-title">
+                                    <i class="fa fa-id-card"></i> Posision
+                                </h4>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
+                                            <h4>Position Main</h4>
 
-                            <div class="row">
-                                <div class="col-xs-6">
-                                    <div class="form-group">
-                                        <label>Division</label>
-                                        <select class="form-control required selectDiv" id="form_MainDivision"></select>
-                                        <small class="text-danger text-message"></small>
+                                            <div class="row">
+                                                <div class="col-xs-6">
+                                                    <div class="form-group">
+                                                        <label>Division</label>
+                                                        <select class="form-control required selectDiv" id="form_MainDivision"></select>
+                                                        <small class="text-danger text-message"></small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <div class="form-group">
+                                                        <label>Position</label>
+                                                        <select class="form-control required selectPost" id="form_MainPosition"></select>
+                                                        <small class="text-danger text-message"></small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="AddingProdi__"></div>
+
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-xs-6">
-                                    <div class="form-group">
-                                        <label>Position</label>
-                                        <select class="form-control required selectPost" id="form_MainPosition"></select>
-                                        <small class="text-danger text-message"></small>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
+                                            <h4>Position Other 1</h4>
+
+                                            <div class="row">
+                                                <div class="col-xs-6">
+                                                    <div class="form-group">
+                                                        <label>Division</label>
+                                                        <select class="form-control selectDiv" id="form_Other1Division"></select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <div class="form-group">
+                                                        <label>Position</label>
+                                                        <select class="form-control selectPost" id="form_Other1Position"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
+                                            <h4>Position Other 2</h4>
+                                            <div class="row">
+                                                <div class="col-xs-6">
+                                                    <div class="form-group">
+                                                        <label>Division</label>
+                                                        <select class="form-control selectDiv" id="form_Other2Division"></select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <div class="form-group">
+                                                        <label>Position</label>
+                                                        <select class="form-control selectPost" id="form_Other2Position"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
+                                            <h4>Position Other 3</h4>
+                                            <div class="row">
+                                                <div class="col-xs-6">
+                                                    <div class="form-group">
+                                                        <label>Division</label>
+                                                        <select class="form-control selectDiv" id="form_Other3Division"></select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <div class="form-group">
+                                                        <label>Position</label>
+                                                        <select class="form-control selectPost" id="form_Other3Position"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div id="AddingProdi__"></div>
-
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
-                            <h4>Position Other 1</h4>
 
-                            <div class="row">
-                                <div class="col-xs-6">
-                                    <div class="form-group">
-                                        <label>Division</label>
-                                        <select class="form-control selectDiv" id="form_Other1Division"></select>
-                                    </div>
-                                </div>
-                                <div class="col-xs-6">
-                                    <div class="form-group">
-                                        <label>Position</label>
-                                        <select class="form-control selectPost" id="form_Other1Position"></select>
-                                    </div>
-                                </div>
-                            </div>
-
-
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
-                            <h4>Position Other 2</h4>
-                            <div class="row">
-                                <div class="col-xs-6">
-                                    <div class="form-group">
-                                        <label>Division</label>
-                                        <select class="form-control selectDiv" id="form_Other2Division"></select>
-                                    </div>
-                                </div>
-                                <div class="col-xs-6">
-                                    <div class="form-group">
-                                        <label>Position</label>
-                                        <select class="form-control selectPost" id="form_Other2Position"></select>
-                                    </div>
-                                </div>
-                            </div>
-
-
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="well" style="padding: 10px;text-align: center;margin-bottom: 15px;">
-                            <h4>Position Other 3</h4>
-                            <div class="row">
-                                <div class="col-xs-6">
-                                    <div class="form-group">
-                                        <label>Division</label>
-                                        <select class="form-control selectDiv" id="form_Other3Division"></select>
-                                    </div>
-                                </div>
-                                <div class="col-xs-6">
-                                    <div class="form-group">
-                                        <label>Position</label>
-                                        <select class="form-control selectPost" id="form_Other3Position"></select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
+                                <div class="panel-number">4</div>
                                 <h4 class="panel-title">
                                     <i class="fa fa-id-card"></i> Fill out this field based on Lecturer Data
                                 </h4>
@@ -539,35 +580,53 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-xs-3">                        
+                                    <div class="col-xs-3">
                                         <div class="form-group">
                                             <label>Profession</label>
                                             <input class="form-control" id="formProfession" value="<?= $arrEmp['Profession']; ?>">
                                         </div>
                                     </div>
-                                    <div class="col-xs-4">                        
+                                    <div class="col-xs-4">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" id="formSerdos" <?= ($arrEmp['Serdos']=='1') ? 'checked' : ''; ?> value="1">
+                                                <input type="checkbox" id="formSerdos" <?= ($arrEmp['Serdos'] == '1') ? 'checked' : ''; ?> value="1">
                                                 Certified Dosen (Serdos)
                                             </label>
                                         </div>
-                                        <input type="text" id="formSerdosNumber" class="form-control" <?= ($arrEmp['Serdos']=='1') ? '' : 'disabled'; ?> value="<?= $arrEmp['SerdosNumber']; ?>" placeholder="Serdos Number">
+                                        <input type="text" id="formSerdosNumber" class="form-control" <?= ($arrEmp['Serdos'] == '1') ? '' : 'disabled'; ?> value="<?= $arrEmp['SerdosNumber']; ?>" placeholder="Serdos Number">
                                     </div>
                                     <div class="col-xs-4">
                                         <div class="form-group">
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" id="formCertified" <?= ($arrEmp['Certified']=='1') ? 'checked' : ''; ?> value="1">
+                                                    <input type="checkbox" id="formCertified" <?= ($arrEmp['Certified'] == '1') ? 'checked' : ''; ?> value="1">
                                                     Certified
                                                 </label>
                                             </div>
                                             <button class="btn btn-sm btn-default" id="btnCertificate"><i class="fa fa-folder margin-right"></i> Certificate</button>
                                         </div>
-                                    </div>  
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="panel-number">5</div>
+                                <h4 class="panel-title">
+                                    <i class="fa fa-id-card"></i> Sub Prodi
+                                </h4>
+                            </div>
+                            <textarea class="hide" id="listViewSubProdi"><?= json_encode($dataSubProdi['listSubProdi']) ?></textarea>
+                            <textarea class="hide" id="listCheckedSubProdi"><?= json_encode($dataSubProdi['selectedSubProdi']) ?></textarea>
+                            <div class="panel-body" id="panelViewSubProdi"></div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -589,35 +648,40 @@
     var split = parseInt(Prodi.length / splitBagi);
     var sisa = Prodi.length % splitBagi;
     if (sisa > 0) {
-          split++;
+        split++;
     }
-    $(document).ready(function () {
-        loadSelectOptionMaritalStatus('#formMaritalStatus',<?= $arrEmp['MaritalStatus']; ?>);
+    $(document).ready(function() {
 
-        loadSelectOptionReligi('#formReligion',<?= $arrEmp['ReligionID']; ?>);
+
+
+        loadSelectOptionMaritalStatus('#formMaritalStatus', <?= $arrEmp['MaritalStatus']; ?>);
+
+        loadSelectOptionReligi('#formReligion', <?= $arrEmp['ReligionID']; ?>);
         $('#formGender').val("<?= $arrEmp['Gender']; ?>");
 
         // Load Year
         var DateOfBirth = "<?= $arrEmp['DateOfBirth']; ?>";
         var exDOB = DateOfBirth.split('-');
-        loadYearOfBirth('#formYearBirth',exDOB[0].trim());
-        loadMonthBirth('#formMontBirth',exDOB[1].trim());
-        $("#formYearBirth").select2({width:'100%'});
+        loadYearOfBirth('#formYearBirth', exDOB[0].trim());
+        loadMonthBirth('#formMontBirth', exDOB[1].trim());
+        $("#formYearBirth").select2({
+            width: '100%'
+        });
 
-        loadCountDays(exDOB[0],exDOB[1],'#formDateBirth',exDOB[2]);
+        loadCountDays(exDOB[0], exDOB[1], '#formDateBirth', exDOB[2]);
 
         // Division Main
         var MainPosition = "<?= $arrEmp['PositionMain']; ?>";
         var MainDivision_ID = '';
         var MainPosition_ID = '';
-        if(MainPosition!='' && MainPosition!=null){
+        if (MainPosition != '' && MainPosition != null) {
             var expMain = MainPosition.split('.');
             MainDivision_ID = expMain[0];
             MainPosition_ID = expMain[1];
         }
-        loadSelectOptionDivision('#form_MainDivision',MainDivision_ID);
-        loadSelectOptionPosition('#form_MainPosition',MainPosition_ID);
-        
+        loadSelectOptionDivision('#form_MainDivision', MainDivision_ID);
+        loadSelectOptionPosition('#form_MainPosition', MainPosition_ID);
+
         $('#form_Other1Division,#form_Other1Position,' +
             '#form_Other2Division,#form_Other2Position,' +
             '#form_Other3Division,#form_Other3Position').append('<option>-- Empty --</option>');
@@ -629,49 +693,50 @@
         var Other1Position = "<?php echo $arrEmp['PositionOther1']; ?>";
         var Other1Division_ID = '';
         var Other1Position_ID = '';
-        if(Other1Position!='' && Other1Position!=null){
+        if (Other1Position != '' && Other1Position != null) {
             var expOther1 = Other1Position.split('.');
             Other1Division_ID = expOther1[0];
             Other1Position_ID = expOther1[1];
         }
 
-        loadSelectOptionDivision('#form_Other1Division',Other1Division_ID);
-        loadSelectOptionPosition('#form_Other1Position',Other1Position_ID);
+        loadSelectOptionDivision('#form_Other1Division', Other1Division_ID);
+        loadSelectOptionPosition('#form_Other1Position', Other1Position_ID);
 
         // Other 2
         var Other2Position = "<?php echo $arrEmp['PositionOther2']; ?>";
         var Other2Division_ID = '';
         var Other2Position_ID = '';
-        if(Other2Position!='' && Other2Position!=null){
+        if (Other2Position != '' && Other2Position != null) {
             var expOther2 = Other2Position.split('.');
             Other2Division_ID = expOther2[0];
             Other2Position_ID = expOther2[1];
         }
 
-        loadSelectOptionDivision('#form_Other2Division',Other2Division_ID);
-        loadSelectOptionPosition('#form_Other2Position',Other2Position_ID);
+        loadSelectOptionDivision('#form_Other2Division', Other2Division_ID);
+        loadSelectOptionPosition('#form_Other2Position', Other2Position_ID);
 
         // Other 3
         var Other3Position = "<?php echo $arrEmp['PositionOther3']; ?>";
         var Other3Division_ID = '';
         var Other3Position_ID = '';
-        if(Other3Position!='' && Other3Position!=null){
+        if (Other3Position != '' && Other3Position != null) {
             var expOther3 = Other3Position.split('.');
             Other3Division_ID = expOther3[0];
             Other3Position_ID = expOther3[1];
         }
 
-        loadSelectOptionDivision('#form_Other3Division',Other3Division_ID);
-        loadSelectOptionPosition('#form_Other3Position',Other3Position_ID);
+        loadSelectOptionDivision('#form_Other3Division', Other3Division_ID);
+        loadSelectOptionPosition('#form_Other3Position', Other3Position_ID);
 
-        loadSelectOptionEmployeesStatus2('#formStatusEmployee',"<?php echo $arrEmp['StatusEmployeeID']; ?>");
-        loadSelectOptionLecturerStatus2('#formStatusLecturer',"<?php echo $arrEmp['StatusLecturerID']; ?>");
+        loadSelectOptionEmployeesStatus2('#formStatusEmployee', "<?php echo $arrEmp['StatusEmployeeID']; ?>");
+        loadSelectOptionLecturerStatus2('#formStatusLecturer', "<?php echo $arrEmp['StatusLecturerID']; ?>");
 
         var ProdiID = "<?php echo $arrEmp['ProdiID']; ?>";
+        loadSubProdi(ProdiID);
         // if(ProdiID=='' )
         $('#formProgrammeStudy').append('<option selected>* Not set</option>');
         $('#formProgrammeStudy').append('<option disabled>-------------------</option>');
-        loadSelectOptionBaseProdi('#formProgrammeStudy',ProdiID);
+        loadSelectOptionBaseProdi('#formProgrammeStudy', ProdiID);
         FuncEvform_MainDivision();
 
         loadSelectOptionLevelEducation('#formLevelEducationID',<?= $arrEmp['LevelEducationID']; ?>);
@@ -680,144 +745,195 @@
 
         loadSelectOptionLecturerAcademicPosition('#formLecturerAcademicPositionID',<?= $arrEmp['LecturerAcademicPositionID']; ?>);
 
-        <?php if($arrEmp['StatusForlap']!='' && $arrEmp['StatusForlap']!=null){ ?>
+
+        <?php if ($arrEmp['StatusForlap'] != '' && $arrEmp['StatusForlap'] != null) { ?>
             $('#formStatusForlap').val(<?= $arrEmp['StatusForlap']; ?>);
         <?php } ?>
 
 
-        loadSelectOptionCountry("#CountryID","<?= (!empty($arrEmp['CountryID']) ? $arrEmp['CountryID'] : '001'); ?>");
-        loadSelectOptionLoc_Province('#ProvinceID',"<?=$arrEmp['ProvinceID'] ?>");
-        loadSelectOptionLoc_Regions("<?=$arrEmp['ProvinceID'] ?>",'#RegionID',"<?=$arrEmp['RegionID'] ?>");
-        loadSelectOptionLoc_District("<?=$arrEmp['RegionID'] ?>",'#DistrictID',"<?=$arrEmp['DistrictID'] ?>");
+        loadSelectOptionCountry("#CountryID", "<?= (!empty($arrEmp['CountryID']) ? $arrEmp['CountryID'] : '001'); ?>");
+        loadSelectOptionLoc_Province('#ProvinceID', "<?= $arrEmp['ProvinceID'] ?>");
+        loadSelectOptionLoc_Regions("<?= $arrEmp['ProvinceID'] ?>", '#RegionID', "<?= $arrEmp['RegionID'] ?>");
+        loadSelectOptionLoc_District("<?= $arrEmp['RegionID'] ?>", '#DistrictID', "<?= $arrEmp['DistrictID'] ?>");
 
-        $('#CountryID').change(function () {
+        $('#CountryID').change(function() {
             var value = $(this).val();
-            if($.isNumeric(value)){
-                if(value == '001'){
-                    $("#form-employee .isrequire").addClass("required").prop("disabled",false);;
-                    loadSelectOptionLoc_Province('#ProvinceID','');
-                }else{
-                    $("#form-employee .isrequire").val("").removeClass("required").prop("disabled",true);
+            if ($.isNumeric(value)) {
+                if (value == '001') {
+                    $("#form-employee .isrequire").addClass("required").prop("disabled", false);;
+                    loadSelectOptionLoc_Province('#ProvinceID', '');
+                } else {
+                    $("#form-employee .isrequire").val("").removeClass("required").prop("disabled", true);
                 }
             }
             var ProvinceID = $('#ProvinceID').val();
             $('#RegionID').html('<option value="">Choose one</option>');
             $('#DistrictID').html('<option value="">Choose one</option>');
-            if(ProvinceID!='' && ProvinceID!=null){
-                loadSelectOptionLoc_Regions(ProvinceID,'#RegionID','');
+            if (ProvinceID != '' && ProvinceID != null) {
+                loadSelectOptionLoc_Regions(ProvinceID, '#RegionID', '');
             }
         });
 
-        
-        $('#ProvinceID').change(function () {
+
+        $('#ProvinceID').change(function() {
             var ProvinceID = $('#ProvinceID').val();
             $('#RegionID').html('<option value="">Choose one</option>');
             $('#DistrictID').html('<option value="">Choose one</option>');
-            if(ProvinceID!='' && ProvinceID!=null){
-                loadSelectOptionLoc_Regions(ProvinceID,'#RegionID','');
+            if (ProvinceID != '' && ProvinceID != null) {
+                loadSelectOptionLoc_Regions(ProvinceID, '#RegionID', '');
             }
         });
 
 
-        $('#RegionID').change(function () {
+        $('#RegionID').change(function() {
             var RegionID = $('#RegionID').val();
             $('#DistrictID').html('<option value="" disabled selected>-- Select District --</option>');
-            if(RegionID!='' && RegionID!=null){
-                loadSelectOptionLoc_District(RegionID,'#DistrictID','');
+            if (RegionID != '' && RegionID != null) {
+                loadSelectOptionLoc_District(RegionID, '#DistrictID', '');
             }
         });
 
 
     });
-    
-    // SerDOS
-    $('#formSerdos').change(function () {
-        if($('#formSerdos').is(':checked')){
-            $('#formSerdosNumber').prop('disabled',false);
+
+    $(document).on('change', '#formProgrammeStudy', function() {
+        var formProgrammeStudy = $('#formProgrammeStudy').val();
+        var ProdiID = (formProgrammeStudy != '') ? formProgrammeStudy.split('.')[0] : '';
+        loadSubProdi(ProdiID);
+    });
+
+    $(document).on('change', '.actSubProdi', function() {
+        var subProdiID = $(this).val();
+        var newVal = [];
+        var listCheckedSubProdi = $('#listCheckedSubProdi').val();
+        var dataSubProdiCkd = (listCheckedSubProdi != '') ? JSON.parse(listCheckedSubProdi) : [];
+        if ($(this).is(':checked')) {
+            dataSubProdiCkd.push(subProdiID);
+            newVal = dataSubProdiCkd;
         } else {
-            $('#formSerdosNumber').prop('disabled',true);
+            if (dataSubProdiCkd.length > 0) {
+                for (let i = 0; i < dataSubProdiCkd.length; i++) {
+                    if (parseInt(dataSubProdiCkd[i]) != parseInt(subProdiID)) {
+                        console.log(dataSubProdiCkd[i]);
+                        newVal.push(dataSubProdiCkd[i]);
+                    }
+                }
+            }
+        }
+
+        $('#listCheckedSubProdi').val(JSON.stringify(newVal));
+    });
+
+
+    function loadSubProdi(ProdiID) {
+        var listProdi = JSON.parse($('#listViewSubProdi').val());
+        console.log(listProdi);
+        var viewPanel = '';
+        $('#panelViewSubProdi').empty();
+        $.each(listProdi, function(i, v) {
+            var NIP = $("#formNIP").val();
+            var ckd = (v.NIP == NIP) ? 'checked' : ''
+            var col3 = (ProdiID != v.ID) ? /*html*/ `<div class="col-md-3">
+                <div class="checkbox">
+                    <label>
+                    <input type="checkbox" class="actSubProdi" ${ckd} value="${v.ID}" > ${v.NameEng}
+                    </label>
+                </div>
+            </div>` : '';
+
+            viewPanel = viewPanel + col3;
+
+        });
+
+        $('#panelViewSubProdi').append(`<div class="row">${viewPanel}</div>`);
+    }
+
+    // SerDOS
+    $('#formSerdos').change(function() {
+        if ($('#formSerdos').is(':checked')) {
+            $('#formSerdosNumber').prop('disabled', false);
+        } else {
+            $('#formSerdosNumber').prop('disabled', true);
             $('#formSerdosNumber').val('');
         }
     });
 
-    function FuncEvform_MainDivision()
-    {
+    function FuncEvform_MainDivision() {
         // chk NIP is exist in ProgramStudy
-            var Find = false;
-            var NIP = $("#formNIP").val();
-            var ProdiGet = '';
-            for (var i = 0; i < Prodi.length; i++) {
-                var AdminID = Prodi[i].AdminID;
-                if (AdminID == NIP) {
-                    ProdiGet = Prodi[i].ID; 
-                    Find = true;
-                }
+        var Find = false;
+        var NIP = $("#formNIP").val();
+        var ProdiGet = '';
+        for (var i = 0; i < Prodi.length; i++) {
+            var AdminID = Prodi[i].AdminID;
+            if (AdminID == NIP) {
+                ProdiGet = Prodi[i].ID;
+                Find = true;
             }
+        }
 
-            var Opform_MainDivision = function(NIP,Type = 'AdminID'){
-                var getRow = 0;
-                $("#AddingProdi").empty();
-                var InputHtml = '<div class = "row">'+
-                                    '<div class = "col-xs-12">'+
-                                        '<table class="table" id ="tablechkAddingProdi">'
-                                        ;
-                $("#AddingProdi").append(InputHtml);                
-                for (var i = 0; i < split; i++) {
-                    if ((sisa > 0) && ((i+1) == split) ) {
-                                        splitBagi = sisa;
-                    }
-                    $('#tablechkAddingProdi').append('<tr id = "Prodi'+i+'">');
-                    for (var k = 0; k < splitBagi; k++) {
-                        var selected = (NIP == Prodi[getRow][Type]) ? 'checked' : '';
-                        $('#Prodi'+i).append('<td>'+
-                                            '<input type="checkbox" class = "chkProdi" name="chkProdi" value = "'+Prodi[getRow].ID+'" '+selected+'>&nbsp'+ Prodi[getRow].NameEng+
-                                         '</td>'
-                                        );
-                        getRow++;
-                    }
-                    $('#Prodi'+i).append('</tr>');
+        var Opform_MainDivision = function(NIP, Type = 'AdminID') {
+            var getRow = 0;
+            $("#AddingProdi").empty();
+            var InputHtml = '<div class = "row">' +
+                '<div class = "col-xs-12">' +
+                '<table class="table" id ="tablechkAddingProdi">';
+            $("#AddingProdi").append(InputHtml);
+            for (var i = 0; i < split; i++) {
+                if ((sisa > 0) && ((i + 1) == split)) {
+                    splitBagi = sisa;
                 }
-                $('#AddingProdi').append('</table></div></div>');   
+                $('#tablechkAddingProdi').append('<tr id = "Prodi' + i + '">');
+                for (var k = 0; k < splitBagi; k++) {
+                    var selected = (NIP == Prodi[getRow][Type]) ? 'checked' : '';
+                    $('#Prodi' + i).append('<td>' +
+                        '<input type="checkbox" class = "chkProdi" name="chkProdi" value = "' + Prodi[getRow].ID + '" ' + selected + '>&nbsp' + Prodi[getRow].NameEng +
+                        '</td>'
+                    );
+                    getRow++;
+                }
+                $('#Prodi' + i).append('</tr>');
             }
+            $('#AddingProdi').append('</table></div></div>');
+        }
 
-            var waitForEl = function(selector, callback) {
-              if (jQuery(selector).length) {
+        var waitForEl = function(selector, callback) {
+            if (jQuery(selector).length) {
                 callback();
-              } else {
+            } else {
                 setTimeout(function() {
-                  waitForEl(selector, callback);
+                    waitForEl(selector, callback);
                 }, 100);
-              }
-            };
+            }
+        };
 
-            //OLD SCRIPT NANDANG
-                /*$("#form_MainDivision").change(function(){
-                    var getValue = $(this).val();
-                    var form_MainPosition = $("#form_MainPosition").val();
-                    if (getValue == 15 || form_MainPosition == 6) { // if selected Admin Prodi
-                         Opform_MainDivision('');
-                    }
-                    else
-                    {
-                        $("#AddingProdi").empty();
-                    }
-                })
+        //OLD SCRIPT NANDANG
+        /*$("#form_MainDivision").change(function(){
+            var getValue = $(this).val();
+            var form_MainPosition = $("#form_MainPosition").val();
+            if (getValue == 15 || form_MainPosition == 6) { // if selected Admin Prodi
+                 Opform_MainDivision('');
+            }
+            else
+            {
+                $("#AddingProdi").empty();
+            }
+        })
 
-                $("#form_MainPosition").change(function(){
-                    var getValue = $(this).val();
-                    var form_MainDivision = $("#form_MainDivision").val();
-                    if (getValue == 6 || form_MainDivision == 15) { // if selected Admin Prodi
-                         Opform_MainDivision('');
-                    }
-                    else
-                    {
-                        $("#AddingProdi").empty();
-                    }
-                })*/
-            //END OF OLD SCRIPT NANDANG
+        $("#form_MainPosition").change(function(){
+            var getValue = $(this).val();
+            var form_MainDivision = $("#form_MainDivision").val();
+            if (getValue == 6 || form_MainDivision == 15) { // if selected Admin Prodi
+                 Opform_MainDivision('');
+            }
+            else
+            {
+                $("#AddingProdi").empty();
+            }
+        })*/
+        //END OF OLD SCRIPT NANDANG
 
-            waitForEl("#form_MainPosition option[value='1']", function() {
-              waitForEl("#form_MainDivision option[value='1']", function() {
+        waitForEl("#form_MainPosition option[value='1']", function() {
+            waitForEl("#form_MainDivision option[value='1']", function() {
                 var form_MainPosition = $("#form_MainPosition").val();
                 var form_MainDivision = $("#form_MainDivision").val();
                 //OLD SCRIPT NANDANG
@@ -832,164 +948,174 @@
                 }*/
                 //END SCRIPT NANDANG
 
-                if((form_MainDivision == 14 || form_MainDivision == 15) && form_MainPosition == 6){
+                if ((form_MainDivision == 14 || form_MainDivision == 15) && form_MainPosition == 6) {
                     var parentAppd = $("body #form_MainDivision").parent().parent().parent();
-                    checkBoxProdi(parentAppd,NIP,'KaprodiID');
+                    checkBoxProdi(parentAppd, NIP, 'KaprodiID');
                 }
-              });  
             });
-            
+        });
+
         //UPDATED BY FEBRI JULY 2020
         //UPDATED KAPRODI CHEKBOX
 
-            waitForEl("#form_Other1Position option[value='1']", function() {
-                waitForEl("#form_Other1Division option[value='1']", function() {
-                    var form_OTH1Division = $("#form_Other1Division").val();
-                    var form_OTH1Position = $("#form_Other1Position").val();
-                    if((form_OTH1Division == 14 || form_OTH1Division == 15) && form_OTH1Position == 6){
-                        var parentAppd = $("body #form_Other1Division").parent().parent().parent();
-                        checkBoxProdi(parentAppd,NIP,'KaprodiID');
-                    }
-                });  
-            });                
-                
-            waitForEl("#form_Other2Position option[value='1']", function() {
-                waitForEl("#form_Other2Division option[value='1']", function() {
-                    var form_OTH2Division = $("#form_Other2Division").val();
-                    var form_OTH2Position = $("#form_Other2Position").val();
-                    if((form_OTH2Division == 14 || form_OTH2Division == 15) && form_OTH2Position == 6){
-                        var parentAppd = $("body #form_Other1Division").parent().parent().parent();
-                        checkBoxProdi(parentAppd,NIP,'KaprodiID');
-                    }
-                });  
-            }); 
-            
-            waitForEl("#form_Other3Position option[value='1']", function() {
-                waitForEl("#form_Other3Division option[value='1']", function() {
-                    var form_OTH3Division = $("#form_Other3Division").val();
-                    var form_OTH3Position = $("#form_Other3Position").val();
-                    if((form_OTH3Division == 14 || form_OTH3Division == 15) && form_OTH3Position == 6){
-                        var parentAppd = $("body #form_Other3Division").parent().parent().parent();
-                        checkBoxProdi(parentAppd,NIP,'KaprodiID');
-                    }
-                });  
-            }); 
-        
-        
-            $("#form-employee").on("change",".selectPost",function(){
-                var itsme = $(this);
-                var value = itsme.val();
-                var parent = itsme.parent().parent().parent();
-                var divValue = parent.find("select.selectDiv").val();
-                if(divValue !== "" && value !== ""){
-                    if((divValue == 14 || divValue == 15) && value == 6){
-                        checkBoxProdi(parent,value);                    
-                    }else{
-                        $("body #AppendProdi").remove();
-                    }
+        waitForEl("#form_Other1Position option[value='1']", function() {
+            waitForEl("#form_Other1Division option[value='1']", function() {
+                var form_OTH1Division = $("#form_Other1Division").val();
+                var form_OTH1Position = $("#form_Other1Position").val();
+                if ((form_OTH1Division == 14 || form_OTH1Division == 15) && form_OTH1Position == 6) {
+                    var parentAppd = $("body #form_Other1Division").parent().parent().parent();
+                    checkBoxProdi(parentAppd, NIP, 'KaprodiID');
                 }
             });
+        });
+
+        waitForEl("#form_Other2Position option[value='1']", function() {
+            waitForEl("#form_Other2Division option[value='1']", function() {
+                var form_OTH2Division = $("#form_Other2Division").val();
+                var form_OTH2Position = $("#form_Other2Position").val();
+                if ((form_OTH2Division == 14 || form_OTH2Division == 15) && form_OTH2Position == 6) {
+                    var parentAppd = $("body #form_Other1Division").parent().parent().parent();
+                    checkBoxProdi(parentAppd, NIP, 'KaprodiID');
+                }
+            });
+        });
+
+        waitForEl("#form_Other3Position option[value='1']", function() {
+            waitForEl("#form_Other3Division option[value='1']", function() {
+                var form_OTH3Division = $("#form_Other3Division").val();
+                var form_OTH3Position = $("#form_Other3Position").val();
+                if ((form_OTH3Division == 14 || form_OTH3Division == 15) && form_OTH3Position == 6) {
+                    var parentAppd = $("body #form_Other3Division").parent().parent().parent();
+                    checkBoxProdi(parentAppd, NIP, 'KaprodiID');
+                }
+            });
+        });
 
 
-            var checkBoxProdi = function($appLocation,NIP,Type = 'AdminID'){
-                $("body #AppendProdi").remove();
-                var dom_div = '<div class="col-xs-11" id = "AppendProdi">'+
-                              '<table class="table" id ="tablechkAddingProdi">';
-                var getRow = 0;
-                for (var i = 0; i < split; i++) {
-                    if ((sisa > 0) && ((i+1) == split) ) {
-                        splitBagi = sisa;
-                    }
-                    dom_div += '<tr id = "Prodi'+i+'">';
-                    for (var k = 0; k < splitBagi; k++) {
-                        var selected = (NIP == Prodi[getRow][Type]) ? 'checked' : '';
-                        dom_div += '<td><input type="checkbox" class = "chkProdi" name="chkProdi" value = "'+Prodi[getRow].ID+'" '+selected+'>&nbsp'+ Prodi[getRow].NameEng+'</td>';
-                        getRow++;
-                    }
-                    dom_div += '<tr>';
-                }            
-                dom_div += '</table></div>';
-                $appLocation.append(dom_div);
-            };
+        $("#form-employee").on("change", ".selectPost", function() {
+            var itsme = $(this);
+            var value = itsme.val();
+            var parent = itsme.parent().parent().parent();
+            var divValue = parent.find("select.selectDiv").val();
+            if (divValue !== "" && value !== "") {
+                if ((divValue == 14 || divValue == 15) && value == 6) {
+                    checkBoxProdi(parent, value);
+                } else {
+                    $("body #AppendProdi").remove();
+                }
+            }
+        });
 
-    //END UPDATED BY FEBRI JULY 2020
+
+        var checkBoxProdi = function($appLocation, NIP, Type = 'AdminID') {
+            $("body #AppendProdi").remove();
+            var dom_div = '<div class="col-xs-11" id = "AppendProdi">' +
+                '<table class="table" id ="tablechkAddingProdi">';
+            var getRow = 0;
+            for (var i = 0; i < split; i++) {
+                if ((sisa > 0) && ((i + 1) == split)) {
+                    splitBagi = sisa;
+                }
+                dom_div += '<tr id = "Prodi' + i + '">';
+                for (var k = 0; k < splitBagi; k++) {
+                    var selected = (NIP == Prodi[getRow][Type]) ? 'checked' : '';
+                    dom_div += '<td><input type="checkbox" class = "chkProdi" name="chkProdi" value = "' + Prodi[getRow].ID + '" ' + selected + '>&nbsp' + Prodi[getRow].NameEng + '</td>';
+                    getRow++;
+                }
+                dom_div += '<tr>';
+            }
+            dom_div += '</table></div>';
+            $appLocation.append(dom_div);
+        };
+
+        //END UPDATED BY FEBRI JULY 2020
 
     }
 
 
     // Aksi Delete =====================
-    $('#btnDelete').click(function () {
+    $('#btnDelete').click(function() {
         var formNIP = $('#formNIP').val();
         $('#NotificationModal .modal-body').html('<div style="text-align: center;">' +
-            'NIK / NIP : <b>'+formNIP+'</b>, Do you want to <b style="color:red;">delete</b>?' +
+            'NIK / NIP : <b>' + formNIP + '</b>, Do you want to <b style="color:red;">delete</b>?' +
             '<hr/>' +
             '<button type="button" class="btn btn-default" id="btnDelNo" data-dismiss="modal">No</button> | ' +
             '<button type="button" class="btn btn-danger" id="btnDelYes">Yes</button>' +
             '</div> ');
 
         $('#NotificationModal').modal({
-            'backdrop' : 'static',
-            'show' : true
+            'backdrop': 'static',
+            'show': true
         });
 
     });
 
-    $(document).on('click','#btnDelYes',function () {
+    $(document).on('click', '#btnDelYes', function() {
         loading_buttonSm('#btnDelYes');
-        $('#btnDelNo').prop('disabled',true);
+        $('#btnDelNo').prop('disabled', true);
         var formNIP = $('#formNIP').val();
-        var token = jwt_encode({action:'deleteEmployees',NIP:formNIP}, 'UAP)(*');
+        var token = jwt_encode({
+            action: 'deleteEmployees',
+            NIP: formNIP
+        }, 'UAP)(*');
         var url = base_url_js + 'api/__crudEmployees';
-        $.post(url,{token:token},function (result) {
-            setTimeout(function () {
+        $.post(url, {
+            token: token
+        }, function(result) {
+            setTimeout(function() {
                 $('#NotificationModal').modal('hide');
-                window.location.href= base_url_js+'human-resources/employees';
-            },500);
+                window.location.href = base_url_js + 'human-resources/employees';
+            }, 500);
         });
     });
     // ============================
 
     // Aksi Delete Permanen =========
-    $('#btnDelPeranentCuy').click(function () {
+    $('#btnDelPeranentCuy').click(function() {
         var formNIP = $('#formNIP').val();
         $('#NotificationModal .modal-body').html('<div style="text-align: center;">' +
-            'NIK / NIP : <b>'+formNIP+'</b>, Do you want to <b style="color:red;">Permanent delete</b>?' +
+            'NIK / NIP : <b>' + formNIP + '</b>, Do you want to <b style="color:red;">Permanent delete</b>?' +
             '<hr/>' +
             '<button type="button" class="btn btn-default" id="btnPDelNo" data-dismiss="modal">No</button> | ' +
             '<button type="button" class="btn btn-danger" id="btnPDelYes">Yes</button>' +
             '</div> ');
 
         $('#NotificationModal').modal({
-            'backdrop' : 'static',
-            'show' : true
+            'backdrop': 'static',
+            'show': true
         });
 
     });
 
-    $(document).on('click','#btnPDelYes',function () {
+    $(document).on('click', '#btnPDelYes', function() {
         loading_buttonSm('#btnPDelYes');
-        $('#btnPDelNo').prop('disabled',true);
+        $('#btnPDelNo').prop('disabled', true);
         var formNIP = $('#formNIP').val();
-        var token = jwt_encode({action:'deletePermanantEmployees',NIP:formNIP}, 'UAP)(*');
+        var token = jwt_encode({
+            action: 'deletePermanantEmployees',
+            NIP: formNIP
+        }, 'UAP)(*');
         var url = base_url_js + 'api/__crudEmployees';
-        $.post(url,{token:token},function (result) {
-            setTimeout(function () {
+        $.post(url, {
+            token: token
+        }, function(result) {
+            setTimeout(function() {
                 $('#NotificationModal').modal('hide');
-                window.location.href= base_url_js+'human-resources/employees';
-            },500);
+                window.location.href = base_url_js + 'human-resources/employees';
+            }, 500);
         });
     });
 
     // =====================================
 
     // Aksi Update Employee ==============
-    $(document).on('change','.uploadPhotoEmp',function () {
+    $(document).on('change', '.uploadPhotoEmp', function() {
         // uploadPhoto();
-        viewImageBeforeUpload(this,'#imgThumbnail','#imgSize','#imgType','','#formImgType');
+        viewImageBeforeUpload(this, '#imgThumbnail', '#imgSize', '#imgType', '', '#formImgType');
     });
 
     // Aksi View before upload ijazah
-    $(document).on('change','.uploadIjazah',function () {
+    $(document).on('change', '.uploadIjazah', function() {
 
         var input = this;
 
@@ -998,18 +1124,18 @@
             var ext = input.files[0].type.split('/')[1];
 
             var ds = true;
-            if(Math.floor(sz)<=8){
+            if (Math.floor(sz) <= 8) {
                 ds = false;
                 $('#formIjazahExt').val(ext);
             } else {
                 alert('Maksimum size 8 Mb');
             }
 
-            $('#btnUpdate').prop('disabled',ds);
+            $('#btnUpdate').prop('disabled', ds);
         }
     });
 
-    $('#btnSave').click(function () {
+    $('#btnSave').click(function() {
         /*var NIP = $('#formNIP').val();
         $('#NotificationModal .modal-body').html('<div style="text-align: center;">' +
             'Pastikan NIK / NIP yang dimasukan tidak salah. <br/>' +
@@ -1026,33 +1152,33 @@
 
         var itsme = $(this);
         var itsform = itsme.parent().parent();
-        var error=false;
-        
-        itsform.find(".select2-req").each(function(){
+        var error = false;
+
+        itsform.find(".select2-req").each(function() {
             var value = $(this).val();
-            if($.isNumeric(value)){
-                if($.trim(value) == ''){
+            if ($.isNumeric(value)) {
+                if ($.trim(value) == '') {
                     $(this).addClass("error");
                     $(this).parent().find(".text-message").text("Please fill this field");
                     error = false;
-                }else{
+                } else {
                     error = true;
                     $(this).removeClass("error");
                     $(this).parent().find(".text-message").text("");
                 }
-            }else{
-                error = false;  
+            } else {
+                error = false;
                 $(this).addClass("error");
                 $(this).parent().find(".text-message").text("Please fill this field");
             }
         });
-        itsform.find(".required").each(function(){
+        itsform.find(".required").each(function() {
             var value = $(this).val();
-            if($.trim(value) == ''){
+            if ($.trim(value) == '') {
                 $(this).addClass("error");
                 $(this).parent().find(".text-message").text("Please fill this field");
                 error = false;
-            }else{
+            } else {
                 error = true;
                 $(this).removeClass("error");
                 $(this).parent().find(".text-message").text("");
@@ -1066,11 +1192,11 @@
         var PositionPM = $("body #form_MainPosition > option:selected");
         var attr2 = PositionPM.attr("value");
 
-        if ((typeof attr !== typeof undefined && attr !== false) && (typeof attr2 !== typeof undefined && attr2 !== false) ) {
+        if ((typeof attr !== typeof undefined && attr !== false) && (typeof attr2 !== typeof undefined && attr2 !== false)) {
             var value = PositionDM.val();
             var value2 = PositionPM.val();
-            if(($.trim(value).length > 0) && ($.trim(value2).length > 0) ){
-                if(value == '14' && value2 == '7'){
+            if (($.trim(value).length > 0) && ($.trim(value2).length > 0)) {
+                if (value == '14' && value2 == '7') {
                     isLecturer = true;
                 }
             }
@@ -1082,11 +1208,11 @@
         var PositionOTH1PM = $("body #form_Other1Position > option:selected");
         var attrOTH12 = PositionOTH1PM.attr("value");
 
-        if ((typeof attrOTH1 !== typeof undefined && attrOTH1 !== false) && (typeof attrOTH12 !== typeof undefined && attrOTH12 !== false) ) {
+        if ((typeof attrOTH1 !== typeof undefined && attrOTH1 !== false) && (typeof attrOTH12 !== typeof undefined && attrOTH12 !== false)) {
             var valueOTH1 = PositionOTH1DM.val();
             var valueOTH12 = PositionOTH1PM.val();
-            if(($.trim(valueOTH1).length > 0) && ($.trim(valueOTH12).length > 0) ){
-                if(valueOTH1 == '14' && valueOTH12 == '7'){
+            if (($.trim(valueOTH1).length > 0) && ($.trim(valueOTH12).length > 0)) {
+                if (valueOTH1 == '14' && valueOTH12 == '7') {
                     isLecturer = true;
                 }
             }
@@ -1098,11 +1224,11 @@
         var PositionOTH2PM = $("body #form_Other2Position > option:selected");
         var attrOTH22 = PositionOTH2PM.attr("value");
 
-        if ((typeof attrOTH2 !== typeof undefined && attrOTH2 !== false) && (typeof attrOTH22 !== typeof undefined && attrOTH22 !== false) ) {
+        if ((typeof attrOTH2 !== typeof undefined && attrOTH2 !== false) && (typeof attrOTH22 !== typeof undefined && attrOTH22 !== false)) {
             var valueOTH2 = PositionOTH2DM.val();
             var valueOTH22 = PositionOTH2PM.val();
-            if(($.trim(valueOTH2).length > 0) && ($.trim(valueOTH22).length > 0) ){
-                if(valueOTH2 == '14' && valueOTH22 == '7'){
+            if (($.trim(valueOTH2).length > 0) && ($.trim(valueOTH22).length > 0)) {
+                if (valueOTH2 == '14' && valueOTH22 == '7') {
                     isLecturer = true;
                 }
             }
@@ -1115,59 +1241,59 @@
         var PositionOTH3PM = $("body #form_Other3Position > option:selected");
         var attrOTH32 = PositionOTH3PM.attr("value");
 
-        if ((typeof attrOTH3 !== typeof undefined && attrOTH3 !== false) && (typeof attrOTH32 !== typeof undefined && attrOTH32 !== false) ) {
+        if ((typeof attrOTH3 !== typeof undefined && attrOTH3 !== false) && (typeof attrOTH32 !== typeof undefined && attrOTH32 !== false)) {
             var valueOTH3 = PositionOTH3DM.val();
             var valueOTH32 = PositionOTH3PM.val();
-            if(($.trim(valueOTH3).length > 0) && ($.trim(valueOTH32).length > 0) ){
-                if(valueOTH3 == '14' && valueOTH32 == '7'){
+            if (($.trim(valueOTH3).length > 0) && ($.trim(valueOTH32).length > 0)) {
+                if (valueOTH3 == '14' && valueOTH32 == '7') {
                     isLecturer = true;
                 }
             }
         }
-        
-        
-        
-        if(isLecturer){
+
+
+
+        if (isLecturer) {
             var statusLecturerVA = itsform.find("#formStatusLecturer > option:selected").attr("value");
             var statusLecturer = itsform.find("#formStatusLecturer > option:selected").val();
 
             var prodyStatusVA = itsform.find("#formProgrammeStudy > option:selected").attr("value");
             var prodyStatus = itsform.find("#formProgrammeStudy > option:selected").val();
-            
-            if(typeof statusLecturerVA !== typeof undefined && statusLecturerVA !== false){
-                error=true;
-            }else{
-                if($.trim(statusLecturer).length > 0){
+
+            if (typeof statusLecturerVA !== typeof undefined && statusLecturerVA !== false) {
+                error = true;
+            } else {
+                if ($.trim(statusLecturer).length > 0) {
                     itsform.find("#formStatusLecturer").addClass("required");
                     itsform.find("#formStatusLecturer").parent().find(".text-message").text("Please fill this field");
-                    error=false;
+                    error = false;
                 }
             }
 
-            if(prodyStatusVA.length > 0){
-                error=true;
-            }else{
+            if (prodyStatusVA.length > 0) {
+                error = true;
+            } else {
                 itsform.find("#formProgrammeStudy").addClass("required error");
                 itsform.find("#formProgrammeStudy").parent().find(".text-message").text("Please fill this field");
-                error=false;
+                error = false;
             }
-            
+
         }
-        
-        
-        
+
+
+
         var totalError = itsform.find(".error").length;
-        if(error && totalError == 0 ){
-            itsme.prop("disabled",true).text("Loading..");
+        if (error && totalError == 0) {
+            itsme.prop("disabled", true).text("Loading..");
             updateEmployees();
-        }else{
+        } else {
             alert("Please fill out the field.");
-        } 
-        
-        
+        }
+
+
     });
 
-    $('#btnUpdate').click(function () {
+    $('#btnUpdate').click(function() {
         updateEmployees();
     });
 
@@ -1231,19 +1357,21 @@
         var formSerdos = ($('#formSerdos').is(":checked")) ? '1' : '0';
         var formSerdosNumber = $('#formSerdosNumber').val();
         var SerdosForm = true;
-        if(formSerdos=='1' && formSerdosNumber==''){
+        if (formSerdos == '1' && formSerdosNumber == '') {
             SerdosForm = false
         }
 
-        if(formNIP!=null && formNIP!=''
-            && formName!='' && formName!=null
-            && formYearBirth!='' && formYearBirth!=null
-            && formMontBirth!='' && formMontBirth!=null
-            && formDateBirth!='' && formDateBirth!=null
-            && form_MainDivision!='' && form_MainDivision!=null
-            && form_MainPosition!='' && form_MainPosition!=null
-            && SerdosForm==true
-            && formMaritalStatus !='' && formPostcode !='' && formAddress !='' && formReligion !='' && formGender !=''
+        var listCheckedSubProdi = $('#listCheckedSubProdi').val();
+
+        if (formNIP != null && formNIP != '' &&
+            formName != '' && formName != null &&
+            formYearBirth != '' && formYearBirth != null &&
+            formMontBirth != '' && formMontBirth != null &&
+            formDateBirth != '' && formDateBirth != null &&
+            form_MainDivision != '' && form_MainDivision != null &&
+            form_MainPosition != '' && form_MainPosition != null &&
+            SerdosForm == true &&
+            formMaritalStatus != '' && formPostcode != '' && formAddress != '' && formReligion != '' && formGender != ''
         ) {
 
             loading_button('#btnUpdate');
@@ -1252,49 +1380,49 @@
             var PositionMain = form_MainDivision + '.' + form_MainPosition;
 
             // check validation Admin Prodi
-                var arr_Prodi = [];
-                //if (form_MainDivision == 15 || form_MainPosition == 6) {
-                if($("body #AppendProdi").length ){
-                    $(".chkProdi:checked").each(function(){
-                        valuee = this.value;
-                        arr_Prodi.push(valuee);
-                    })
+            var arr_Prodi = [];
+            //if (form_MainDivision == 15 || form_MainPosition == 6) {
+            if ($("body #AppendProdi").length) {
+                $(".chkProdi:checked").each(function() {
+                    valuee = this.value;
+                    arr_Prodi.push(valuee);
+                })
 
-                    // if (arr_Prodi.length == 0) {
-                    //     toastr.error('Please fill Type Admin Prodi','Error');
-                    //     return;
-                    // }
-                }
-                
+                // if (arr_Prodi.length == 0) {
+                //     toastr.error('Please fill Type Admin Prodi','Error');
+                //     return;
+                // }
+            }
+
             var DateOfBirht = formYearBirth + '-' + formMontBirth + '-' + formDateBirth;
             var Password_Old = formDateBirth + '' + formMontBirth + '' + formYearBirth.substr(2, 2);
 
             var PositionOther1 = (form_Other1Division != '' && form_Other1Position != '' &&
-                form_Other1Division != null && form_Other1Position != null)
-                ? form_Other1Division + '.' + form_Other1Position : '';
+                    form_Other1Division != null && form_Other1Position != null) ?
+                form_Other1Division + '.' + form_Other1Position : '';
 
             var PositionOther2 = (form_Other2Division != '' && form_Other2Position != '' &&
-                form_Other2Division != null && form_Other2Position != null)
-                ? form_Other2Division + '.' + form_Other2Position : '';
+                    form_Other2Division != null && form_Other2Position != null) ?
+                form_Other2Division + '.' + form_Other2Position : '';
 
             var PositionOther3 = (form_Other3Division != '' && form_Other3Position != '' &&
-                form_Other3Division != null && form_Other3Position != null)
-                ? form_Other3Division + '.' + form_Other3Position : '';
+                    form_Other3Division != null && form_Other3Position != null) ?
+                form_Other3Division + '.' + form_Other3Position : '';
 
             var fileType = $('#formImgType').val();
 
 
-            var emailPU = (formEmailPU != '')
-                ? formEmailPU + '@podomorouniversity.ac.id'
-                : '';
+            var emailPU = (formEmailPU != '') ?
+                formEmailPU + '@podomorouniversity.ac.id' :
+                '';
 
-            var DeletePhoto = (fileType!='') ? 1 : 0;
-            var LastPhoto = "<?php echo $arrEmp['Photo'];?>";
+            var DeletePhoto = (fileType != '') ? 1 : 0;
+            var LastPhoto = "<?php echo $arrEmp['Photo']; ?>";
 
-            var fileName = (fileType!='') ? formNIP + '.' + fileType : LastPhoto ;
+            var fileName = (fileType != '') ? formNIP + '.' + fileType : LastPhoto;
 
             var formIjazahExt = $('#formIjazahExt').val();
-            var fileNameIjazah = (formIjazahExt!='') ? 'IJAZAH_'+formNIP+'.'+formIjazahExt : '';
+            var fileNameIjazah = (formIjazahExt != '') ? 'IJAZAH_' + formNIP + '.' + formIjazahExt : '';
 
 
             var formLevelEducationID = $('#formLevelEducationID').val();
@@ -1311,11 +1439,12 @@
             var formStatus_NITK = $('#formStatus_NITK').val();
 
             var data = {
-                arr_Prodi : arr_Prodi,
-                action : 'UpdateEmployees',
-                NIP : formNIP,
-                DeletePhoto : DeletePhoto,
-                LastPhoto : LastPhoto,
+                arr_Prodi: arr_Prodi,
+                action: 'UpdateEmployees',
+                NIP: formNIP,
+                DeletePhoto: DeletePhoto,
+                LastPhoto: LastPhoto,
+                listCheckedSubProdi: (listCheckedSubProdi != '') ? JSON.parse(listCheckedSubProdi) : [],
                 formUpdate: {
                     ReligionID: formReligion,
                     PositionMain: PositionMain,
@@ -1367,102 +1496,108 @@
                     NITK : formNITK,
                     Status_NITK : formStatus_NITK,
 
+
                 }
             };
 
             var token = jwt_encode(data, 'UAP)(*');
             var url = base_url_js + 'api/__crudEmployees';
-            $.post(url,{token:token},function (result) {
+            $.post(url, {
+                token: token
+            }, function(result) {
                 console.log(result);
-                if(result.status==0 || result.status=='0'){
+                if (result.status == 0 || result.status == '0') {
                     // toastr.error('NIK / NIP is exist','Error');
-                    toastr.error(result.msg,'Error');
+                    toastr.error(result.msg, 'Error');
                     // $('#NotificationModal').modal('hide');
                 } else {
-                    if(fileType!=''){
+                    if (fileType != '') {
                         uploadPhoto(fileName);
                     }
 
                     // Upload Ijazah
-                    if(fileNameIjazah!='' && formIjazahExt!=''){
+                    if (fileNameIjazah != '' && formIjazahExt != '') {
                         uploadIjazah(fileNameIjazah);
                     }
-                    toastr.success('Employees Saved','Success');
+                    toastr.success('Employees Saved', 'Success');
 
                 }
 
-                setTimeout(function () {
+                setTimeout(function() {
                     // $('#NotificationModal').modal('hide');
                     window.location.href = '';
-                },2000);
+                }, 2000);
 
 
             });
 
-        }
-        else {
+        } else {
             var msg = '<ol>';
-            if(formName==''){
+            if (formName == '') {
                 msg += '<li>Name is required</li>';
-            } if (formYearBirth=='' || formMontBirth=='' || formDateBirth==''){
+            }
+            if (formYearBirth == '' || formMontBirth == '' || formDateBirth == '') {
                 msg += '<li>Birthday is required</li>';
-            } if(form_MainDivision==''){
+            }
+            if (form_MainDivision == '') {
                 msg += '<li>Main Division is required</li>';
-            } if (form_MainPosition==''){
+            }
+            if (form_MainPosition == '') {
                 msg += '<li>Main Position is required</li>';
-            } if(SerdosForm==false){
+            }
+            if (SerdosForm == false) {
                 msg += '<li>Serdos Number are required</li>';
             }
             /*ADDED BY FEBRI @ FEB 2020*/
-            if(formNIP == ''){
+            if (formNIP == '') {
                 msg += '<li>NIP is required</li>';
             }
-            if(formKTP == ''){
+            if (formKTP == '') {
                 msg += '<li>No KTP is required</li>';
             }
-            if(formReligion == ''){
+            if (formReligion == '') {
                 msg += '<li>Religion is required</li>';
             }
-            if(formGender == ''){
+            if (formGender == '') {
                 msg += '<li>Gender is required</li>';
             }
-            if(formPlaceOfBirht == ''){
+            if (formPlaceOfBirht == '') {
                 msg += '<li>Place of birth is required</li>';
             }
-            if(formAddress == ''){
+            if (formAddress == '') {
                 msg += '<li>Address is required</li>';
             }
-            if(formMaritalStatus == ''){
+            if (formMaritalStatus == '') {
                 msg += '<li>Marital Status is required</li>';
-            }            
-            if(formPostcode == ''){
+            }
+            if (formPostcode == '') {
                 msg += '<li>Postal code is required</li>';
             }
             msg += "</ol>";
             /*END ADDED BY FEBRI @ FEB 2020*/
-            toastr.error(msg,'Error');
+            toastr.error(msg, 'Error');
         }
 
     }
 
     function uploadPhoto(fileName) {
 
-        if(fileName!='' && fileName!=null){
+        if (fileName != '' && fileName != null) {
 
-            var formData = new FormData( $("#fmPhoto")[0]);
-            var url = base_url_js+'human-resources/upload_photo?fileName='+fileName;
+            var formData = new FormData($("#fmPhoto")[0]);
+            var url = base_url_js + 'human-resources/upload_photo?fileName=' + fileName;
 
             $.ajax({
-                url : url,  // Controller URL
-                type : 'POST',
-                data : formData,
-                async : false,
-                cache : false,
-                contentType : false,
-                processData : false,
-                success : function(data) {
+                url: url, // Controller URL
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
                     console.log(data);
-                    
+
                     //var jsonData = JSON.parse(data);
 
                     // if(typeof jsonData.success=='undefined'){
@@ -1477,27 +1612,27 @@
             });
 
         } else {
-            toastr.error('NIK / NIK is empty','Error');
+            toastr.error('NIK / NIK is empty', 'Error');
         }
 
     }
 
     function uploadIjazah(fileName) {
 
-        if(fileName!='' && fileName!=null){
+        if (fileName != '' && fileName != null) {
 
-            var formData = new FormData( $("#fmIjazah")[0]);
-            var url = base_url_js+'human-resources/upload_ijazah?fileName='+fileName;
+            var formData = new FormData($("#fmIjazah")[0]);
+            var url = base_url_js + 'human-resources/upload_ijazah?fileName=' + fileName;
 
             $.ajax({
-                url : url,  // Controller URL
-                type : 'POST',
-                data : formData,
-                async : false,
-                cache : false,
-                contentType : false,
-                processData : false,
-                success : function(data) {
+                url: url, // Controller URL
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
 
                     var jsonData = JSON.parse(data);
 
@@ -1513,20 +1648,20 @@
             });
 
         } else {
-            toastr.error('NIP / NIP is empty','Error');
+            toastr.error('NIP / NIP is empty', 'Error');
         }
 
     }
     // ===================================
 
 
-    $(document).on('click','#btnCertificate',function () {
+    $(document).on('click', '#btnCertificate', function() {
 
         var formNIP = $('#formNIP').val();
         var formName = $('#formName').val();
 
         $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">'+formNIP+' - '+formName+'</h4>');
+            '<h4 class="modal-title">' + formNIP + ' - ' + formName + '</h4>');
 
         window.bodyModal = '<div class="row">' +
             '' +
@@ -1594,17 +1729,17 @@
             '' +
             '</div>';
 
-        $('#GlobalModalLarge .modal-body').html('<div id="loadUlang">'+bodyModal+'</div>');
+        $('#GlobalModalLarge .modal-body').html('<div id="loadUlang">' + bodyModal + '</div>');
 
         loadCertificate();
 
-        $( "#formPublicationYear,#formDueDate" )
+        $("#formPublicationYear,#formDueDate")
             .datepicker({
-                showOtherMonths:true,
+                showOtherMonths: true,
                 autoSize: true,
                 dateFormat: 'dd MM yy',
                 // minDate: new Date(moment().year(),moment().month(),moment().date()),
-                onSelect : function () {
+                onSelect: function() {
                     // var data_date = $(this).val().split(' ');
                     // var nextelement = $(this).attr('nextelement');
                     // nextDatePick(data_date,nextelement);
@@ -1613,8 +1748,8 @@
 
         $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
         $('#GlobalModalLarge').modal({
-            'show' : true,
-            'backdrop' : 'static'
+            'show': true,
+            'backdrop': 'static'
         });
 
 
@@ -1622,7 +1757,7 @@
 
     });
 
-    $(document).on('click','#btnSaveCerti',function () {
+    $(document).on('click', '#btnSaveCerti', function() {
 
         var formID = $('#formID').val();
         var formNIP = $('#formNIP').val();
@@ -1632,49 +1767,51 @@
         var formLifetime = ($('#formLifetime').is(':checked')) ? '1' : '0';
         var formScale = $('#formScale').val();
 
-        if(formPublicationYear!=null && formPublicationYear!=''){
+        if (formPublicationYear != null && formPublicationYear != '') {
 
             loading_buttonSm('#btnSaveCerti');
 
             var data = {
-                action : 'UpdateCertificateLec',
-                ID : (formID!='' && formID!=null) ? formID : '',
-                dataForm : {
-                    NIP : formNIP,
-                    Certificate : formCertificate,
-                    PublicationYear : (formPublicationYear!=null) ? moment(formPublicationYear).format('YYYY-MM-DD') : '',
-                    DueDate : (formDueDate!=null) ? moment(formDueDate).format('YYYY-MM-DD') : '',
-                    Lifetime : formLifetime,
-                    Scale : formScale
+                action: 'UpdateCertificateLec',
+                ID: (formID != '' && formID != null) ? formID : '',
+                dataForm: {
+                    NIP: formNIP,
+                    Certificate: formCertificate,
+                    PublicationYear: (formPublicationYear != null) ? moment(formPublicationYear).format('YYYY-MM-DD') : '',
+                    DueDate: (formDueDate != null) ? moment(formDueDate).format('YYYY-MM-DD') : '',
+                    Lifetime: formLifetime,
+                    Scale: formScale
                 }
             };
 
             var file = $('#upload_files').val();
 
-            var token = jwt_encode(data,'UAP)(*');
+            var token = jwt_encode(data, 'UAP)(*');
             var url = base_url_js + 'api/__crudEmployees';
-            $.post(url,{token:token},function (jsonResult) {
+            $.post(url, {
+                token: token
+            }, function(jsonResult) {
 
                 var ID = jsonResult.ID;
                 var FileName = jsonResult.FileName;
 
-                if(file!='' && file!=null){
-                    uploadCertificate(ID,FileName);
+                if (file != '' && file != null) {
+                    uploadCertificate(ID, FileName);
                 } else {
-                    toastr.success('Data Saved','Success');
+                    toastr.success('Data Saved', 'Success');
                 }
 
-                setTimeout(function () {
+                setTimeout(function() {
 
                     $('#loadUlang').html(bodyModal);
 
-                    $( "#formPublicationYear,#formDueDate" )
+                    $("#formPublicationYear,#formDueDate")
                         .datepicker({
-                            showOtherMonths:true,
+                            showOtherMonths: true,
                             autoSize: true,
                             dateFormat: 'dd MM yy',
                             // minDate: new Date(moment().year(),moment().month(),moment().date()),
-                            onSelect : function () {
+                            onSelect: function() {
                                 // var data_date = $(this).val().split(' ');
                                 // var nextelement = $(this).attr('nextelement');
                                 // nextDatePick(data_date,nextelement);
@@ -1682,7 +1819,7 @@
                         });
 
                     loadCertificate();
-                },500);
+                }, 500);
 
             });
 
@@ -1694,54 +1831,54 @@
 
         var formNIP = $('#formNIP').val();
         var data = {
-            action : 'readCertificateLec',
-            NIP : formNIP
+            action: 'readCertificateLec',
+            NIP: formNIP
         };
 
-        var token = jwt_encode(data,'UAP)(*');
+        var token = jwt_encode(data, 'UAP)(*');
         var url = base_url_js + 'api/__crudEmployees';
 
-        $.post(url,{token:token},function (jsonResult) {
+        $.post(url, {
+            token: token
+        }, function(jsonResult) {
 
             $('#dataList').empty();
-            if(jsonResult.length>0){
-                $.each(jsonResult,function (i,v) {
+            if (jsonResult.length > 0) {
+                $.each(jsonResult, function(i, v) {
 
                     var btnAct = '';
-                    if (v["StatusEdit"] !== undefined && v["StatusEdit"] == 0 ) {
-                       btnAct = '<span style = "color:blue;">Awaiting Edit Process</span>';
-                    }
-                    else
-                    {
-                       btnAct = '<div class="btn-group">' +
-                           '  <button type="button" class="btn btn-default dropdown-toggle btnAct" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                           '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
-                           '  </button>' +
-                           '  <ul class="dropdown-menu">' +
-                           '    <li><a href="javascript:void(0);" class="btnEditCerti" data-id="'+v.ID+'" data-token="'+jwt_encode(v,'UAP)(*')+'">Edit</a></li>' +
-                           '    <li role="separator" class="divider"></li>' +
-                           '    <li><a href="javascript:void(0);" class="btnDelCerti" data-id="'+v.ID+'">Remove</a></li>' +
-                           '  </ul>' +
-                           '</div>' +
-                           '<textarea class="hide" id="dataEditCerti_'+v.ID+'">'+JSON.stringify(v)+'</textarea>';
+                    if (v["StatusEdit"] !== undefined && v["StatusEdit"] == 0) {
+                        btnAct = '<span style = "color:blue;">Awaiting Edit Process</span>';
+                    } else {
+                        btnAct = '<div class="btn-group">' +
+                            '  <button type="button" class="btn btn-default dropdown-toggle btnAct" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                            '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
+                            '  </button>' +
+                            '  <ul class="dropdown-menu">' +
+                            '    <li><a href="javascript:void(0);" class="btnEditCerti" data-id="' + v.ID + '" data-token="' + jwt_encode(v, 'UAP)(*') + '">Edit</a></li>' +
+                            '    <li role="separator" class="divider"></li>' +
+                            '    <li><a href="javascript:void(0);" class="btnDelCerti" data-id="' + v.ID + '">Remove</a></li>' +
+                            '  </ul>' +
+                            '</div>' +
+                            '<textarea class="hide" id="dataEditCerti_' + v.ID + '">' + JSON.stringify(v) + '</textarea>';
                     }
 
-                    var p = (v.PublicationYear!='' && v.PublicationYear!=null)
-                        ? moment(v.PublicationYear).format('DD MMM YYYY') : '';
+                    var p = (v.PublicationYear != '' && v.PublicationYear != null) ?
+                        moment(v.PublicationYear).format('DD MMM YYYY') : '';
 
-                    var d = (v.Duedate!='' && v.Duedate!=null)
-                        ? moment(v.Duedate).format('DD MMM YYYY') : '';
+                    var d = (v.Duedate != '' && v.Duedate != null) ?
+                        moment(v.Duedate).format('DD MMM YYYY') : '';
 
-                    d = (v.Lifetime!='1') ? d : 'Lifetime';
+                    d = (v.Lifetime != '1') ? d : 'Lifetime';
 
-                    var file = (v.File!='' && v.File!=null) ? '<a class="btn btn-sm btn-default" target="_blank" href="'+base_url_js+'uploads/certificate/'+v.File+'">Download</a>' : '';
+                    var file = (v.File != '' && v.File != null) ? '<a class="btn btn-sm btn-default" target="_blank" href="' + base_url_js + 'uploads/certificate/' + v.File + '">Download</a>' : '';
 
                     $('#dataList').append('<tr>' +
-                        '<td>'+(i+1)+'</td>' +
-                        '<td style="text-align: left;"><b>'+v.Certificate+'</b><br/> '+p+' - '+d+'</td>' +
-                        '<td>'+v.Scale+'</td>' +
-                        '<td>'+file+'</td>' +
-                        '<td>'+btnAct+'</td>' +
+                        '<td>' + (i + 1) + '</td>' +
+                        '<td style="text-align: left;"><b>' + v.Certificate + '</b><br/> ' + p + ' - ' + d + '</td>' +
+                        '<td>' + v.Scale + '</td>' +
+                        '<td>' + file + '</td>' +
+                        '<td>' + btnAct + '</td>' +
                         '</tr>');
                 });
             } else {
@@ -1752,10 +1889,10 @@
 
     }
 
-    $(document).on('click','.btnEditCerti',function () {
+    $(document).on('click', '.btnEditCerti', function() {
 
         var ID = $(this).attr('data-id');
-        var dataEditCerti = $('#dataEditCerti_'+ID).val();
+        var dataEditCerti = $('#dataEditCerti_' + ID).val();
         var d = JSON.parse(dataEditCerti);
 
         $('#formID').val(d.ID);
@@ -1763,19 +1900,17 @@
         $('#formScale').val(d.Scale);
 
 
-        (d.DueDate!=='0000-00-00' && d.DueDate!==null)
-            ? $('#formDueDate').datepicker('setDate',new Date(d.DueDate))
-            : '';
-        (d.PublicationYear!=='0000-00-00' && d.PublicationYear!==null)
-            ? $('#formPublicationYear').datepicker('setDate',new Date(d.PublicationYear))
-            : '';
+        (d.DueDate !== '0000-00-00' && d.DueDate !== null) ?
+        $('#formDueDate').datepicker('setDate', new Date(d.DueDate)): '';
+        (d.PublicationYear !== '0000-00-00' && d.PublicationYear !== null) ?
+        $('#formPublicationYear').datepicker('setDate', new Date(d.PublicationYear)): '';
 
-        var lf = (d.Lifetime=='1') ? true : false ;
-        $('#formLifetime').prop('checked',lf);
+        var lf = (d.Lifetime == '1') ? true : false;
+        $('#formLifetime').prop('checked', lf);
 
     });
 
-    function uploadCertificate(ID,FileNameOld) {
+    function uploadCertificate(ID, FileNameOld) {
 
         var input = $('#upload_files');
         var files = input[0].files[0];
@@ -1783,26 +1918,26 @@
         var sz = parseFloat(files.size) / 1000000; // ukuran MB
         var ext = files.type.split('/')[1];
 
-        if(Math.floor(sz)<=8){
+        if (Math.floor(sz) <= 8) {
 
-            var fileName = moment().unix()+'_'+sessionNIP+'.'+ext;
-            var formData = new FormData( $("#formupload_files")[0]);
+            var fileName = moment().unix() + '_' + sessionNIP + '.' + ext;
+            var formData = new FormData($("#formupload_files")[0]);
 
-            var url = base_url_js+'human-resources/upload_certificate?fileName='+fileName+'&old='+FileNameOld+'&&id='+ID;
+            var url = base_url_js + 'human-resources/upload_certificate?fileName=' + fileName + '&old=' + FileNameOld + '&&id=' + ID;
 
             $.ajax({
-                url : url,  // Controller URL
-                type : 'POST',
-                data : formData,
-                async : false,
-                cache : false,
-                contentType : false,
-                processData : false,
-                success : function(data) {
-                    toastr.success('Upload Success','Saved');
-                    setTimeout(function () {
+                url: url, // Controller URL
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    toastr.success('Upload Success', 'Saved');
+                    setTimeout(function() {
                         // window.location.href = '';
-                    },500);
+                    }, 500);
                     // loadDataEmployees();
 
                 }
@@ -1814,34 +1949,35 @@
 
     }
 
-    $(document).on('click','.btnDelCerti',function () {
+    $(document).on('click', '.btnDelCerti', function() {
 
-        if(confirm('Are you sure to permanent remove?')){
+        if (confirm('Are you sure to permanent remove?')) {
 
-            $('.btnAct').prop('disabled',true);
+            $('.btnAct').prop('disabled', true);
 
             var ID = $(this).attr('data-id');
-            var dataEditCerti = $('#dataEditCerti_'+ID).val();
+            var dataEditCerti = $('#dataEditCerti_' + ID).val();
             var d = JSON.parse(dataEditCerti);
 
             var data = {
-                action : 'removeCertificateLec',
-                ID : ID,
-                File : (d.File!='' && d.File!=null) ? d.File : ''
+                action: 'removeCertificateLec',
+                ID: ID,
+                File: (d.File != '' && d.File != null) ? d.File : ''
             };
 
-            var token = jwt_encode(data,'UAP)(*');
+            var token = jwt_encode(data, 'UAP)(*');
             var url = base_url_js + 'api/__crudEmployees';
 
-            $.post(url,{token:token},function (result) {
+            $.post(url, {
+                token: token
+            }, function(result) {
 
-                toastr.success('Date removed','Success');
-                setTimeout(function () {
+                toastr.success('Date removed', 'Success');
+                setTimeout(function() {
                     loadCertificate();
-                },500);
+                }, 500);
             });
         }
 
     })
-
 </script>
