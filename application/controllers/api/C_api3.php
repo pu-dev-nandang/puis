@@ -3311,35 +3311,60 @@ class C_api3 extends CI_Controller {
     public function getKecukupanDosen(){
 
         // Get Program Studi
-        $data = $this->db->select('ID,Code,Name')->get_where('db_academic.program_study',array('Status' => 1))->result_array();
+        // Get Program Studi
+        $data = $this->db->select('ID,Code,Name')->get_where('db_academic.program_study', array('Status' => 1))->result_array();
 
-        if(count($data)>0){
-            $dataLAP = $this->db->order_by('ID','DESC')->get_where('db_employees.level_education',array(
+        if (count($data) > 0) {
+            
+            $dataLAP = $this->db->order_by('ID', 'DESC')->get_where('db_employees.level_education', array(
                 'ID >' => 8
             ))->result_array();
-            for($i=0;$i<count($data);$i++){
+            for ($i = 0; $i < count($data); $i++) {
 
-                for($j=0;$j<count($dataLAP);$j++){
+                for ($j = 0; $j < count($dataLAP); $j++) {
 
                     $dataDetails = $this->db->query('SELECT em.NIP,  em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em
-                                                                            WHERE em.ProdiID = "'.$data[$i]['ID'].'"
-                                                                            AND em.LevelEducationID = "'.$dataLAP[$j]['ID'].'"
+                                                                            WHERE em.ProdiID = "' . $data[$i]['ID'] . '"
+                                                                            AND em.LevelEducationID = "' . $dataLAP[$j]['ID'] . '"
                                                                             AND ( em.StatusForlap = "1" OR em.StatusForlap = "2" ) ')->result_array();
 
                     $r = array('Level' => $dataLAP[$j]['Description'], 'Details' => $dataDetails);
                     $data[$i]['dataLecturers'][$j] = $r;
+
+                    // dengan sub prodi
+                    $dataSubs = $this->db->query('SELECT em.NIP,  em.NUP, em.NIDN, em.NIDK, em.Name FROM 
+                    db_employees.employees_sub_prodi esp
+                    LEFT JOIN db_employees.employees em ON (em.NIP = esp.NIP)
+                    WHERE esp.ProdiID = "' . $data[$i]['ID'] . '" 
+                    AND em.LevelEducationID = "' . $dataLAP[$j]['ID'] . '"
+                    AND ( em.StatusForlap = "1" OR em.StatusForlap = "2" ) ')->result_array();
+
+                    $r_sub = array('Level' => $dataLAP[$j]['Description'], 'Details' => array_merge($dataDetails, $dataSubs));
+                    $data[$i]['dataLecturersSub'][$j] = $r_sub;
                 }
 
 
                 $dataL = $this->db->query('SELECT em.NIP,  em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em
-                                                                    WHERE em.ProdiID = "'.$data[$i]['ID'].'"
-                                                                    AND em.Profession <> ""
-                                                                    AND ( em.StatusForlap = "1" OR em.StatusForlap = "2" ) ')->result_array();
+                WHERE em.ProdiID = "' . $data[$i]['ID'] . '"
+                AND em.Profession <> ""
+                AND ( em.StatusForlap = "1" OR em.StatusForlap = "2" ) ')->result_array();
                 $r = array('Level' => 'Profesi', 'Details' => $dataL);
                 $data[$i]['dataLecturers'][2] = $r;
 
-            }
+                // dengan sub prodi
+                $dataSubs2 = $this->db->query('SELECT em.NIP,  em.NUP, em.NIDN, em.NIDK, em.Name FROM 
+                db_employees.employees_sub_prodi esp
+                LEFT JOIN db_employees.employees em ON (em.NIP = esp.NIP)
+                WHERE esp.ProdiID = "' . $data[$i]['ID'] . '" 
+                AND em.Profession <> ""
+                AND ( em.StatusForlap = "1" OR em.StatusForlap = "2" )')->result_array();
 
+                $r_sub = array('Level' => 'Profesi', 'Details' => array_merge($dataL, $dataSubs2));
+                $data[$i]['dataLecturersSub'][2] = $r_sub;
+
+
+                // get dengan sub prodi
+            }
         }
 
         return print_r(json_encode($data));
