@@ -274,12 +274,6 @@
                 </a>
             </li>
 
-            <li class="<?php if($this->uri->segment(2)=='version'){echo"current";}?>">
-                <a href="<?php echo base_url('survey/list-survey');?>">
-                    <i class="fa fa-tasks"></i>
-                    Survey
-                </a>
-            </li>
         </ul>
 
         <div class="sidebar-widget align-center">
